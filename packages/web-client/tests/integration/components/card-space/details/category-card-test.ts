@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, render } from '@ember/test-helpers';
+import { click, fillIn, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { OPTIONS } from '@cardstack/web-client/components/card-space/edit-details/category';
@@ -20,6 +20,8 @@ module(
         />
       `);
 
+      assert.dom('radio-option__input--checked').doesNotExist();
+
       OPTIONS.forEach(function (buttonText, index) {
         assert
           .dom(`[data-test-category-option]:nth-child(${index + 1})`)
@@ -30,6 +32,39 @@ module(
 
       assert.equal(workflowSession.getValue<string>('category'), OPTIONS[1]);
       assert.dom('[data-test-category-option]:nth-child(2) input').isChecked();
+    });
+
+    test('it allows a custom category to be entered', async function (assert) {
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      assert
+        .dom(`[data-test-category-option]:nth-child(${OPTIONS.length + 1})`)
+        .containsText('Other');
+
+      assert
+        .dom(
+          `[data-test-category-option]:nth-child(${
+            OPTIONS.length + 1
+          }) [data-test-category-option-other]`
+        )
+        .exists();
+
+      await fillIn('[data-test-category-option-other]', 'Something');
+
+      assert
+        .dom(
+          `[data-test-category-option]:nth-child(${OPTIONS.length + 1}) input`
+        )
+        .hasClass('radio-option__input--checked');
+
+      assert.equal(workflowSession.getValue<string>('category'), 'Something');
     });
 
     test('it restores input from session', async function (assert) {
@@ -46,6 +81,26 @@ module(
       assert
         .dom('[data-test-category-option]:nth-child(2) input')
         .hasClass('radio-option__input--checked');
+    });
+
+    test('it restores custom input from session', async function (assert) {
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+      workflowSession.setValue('category', 'Hello');
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      assert
+        .dom(
+          `[data-test-category-option]:nth-child(${OPTIONS.length + 1}) input`
+        )
+        .hasClass('radio-option__input--checked');
+
+      assert.dom('[data-test-category-option-other]').hasValue('Hello');
     });
   }
 );

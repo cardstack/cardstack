@@ -18,6 +18,22 @@
           </Common::RadioOption>
         {{/let}}
       {{/each}}
+      <Common::RadioOption
+        @name='category'
+        @checked={{this.otherIsChecked}}
+        @onInput={{fn this.setCategoryValue 'jortle'}}
+        class='card-space-category-field__option'
+        data-test-category-option
+      >
+        Other:
+        {{!-- RadioOption contains a label --}}
+        {{!-- template-lint-disable require-input-label --}}
+        <Input
+          @value={{readonly this.categoryValue}}
+          {{on 'input' this.setOtherValue}}
+          data-test-category-option-other
+        />
+      </Common::RadioOption>
     </div>
   </CardPay::LabeledValue>
 </div>

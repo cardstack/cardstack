@@ -21,6 +21,14 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   @action setCategoryValue(val: string) {
     this.args.workflowSession.setValue('category', val);
   }
+
+  get otherIsChecked() {
+    return this.categoryValue && !OPTIONS.includes(this.categoryValue);
+  }
+
+  @action setOtherValue(event: InputEvent) {
+    this.setCategoryValue((event.target! as HTMLInputElement).value);
+  }
 }
 
 export default CardSpaceEditDetailsCategoryComponent;
