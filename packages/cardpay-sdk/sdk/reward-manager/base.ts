@@ -385,7 +385,7 @@ export default class RewardManager {
 
   async removeRewardProgram(txnHash: string): Promise<TransactionReceipt>;
   async removeRewardProgram(
-    safeAddressIdOrTxnHash: string,
+    safeAddress: string,
     rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
