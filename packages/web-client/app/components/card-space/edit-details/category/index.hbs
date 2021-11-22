@@ -1,0 +1,23 @@
+<div class="card-space-url-form">
+  <CardPay::LabeledValue
+    @fieldMode="edit"
+    @label="Category"
+    data-test-card-space-category-field
+  >
+    <div data-test-category-options>
+      {{#each this.options as |option|}}
+        {{#let (eq this.categoryValue option) as |checked|}}
+          <Common::RadioOption
+            @name='category'
+            @checked={{checked}}
+            @onInput={{fn this.setCategoryValue option}}
+            class='card-space-category-field__option'
+            data-test-category-option
+          >
+            {{option}}
+          </Common::RadioOption>
+        {{/let}}
+      {{/each}}
+    </div>
+  </CardPay::LabeledValue>
+</div>
