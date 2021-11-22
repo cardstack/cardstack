@@ -14,7 +14,7 @@ const prependSelector = postcss.plugin(
     return function (css) {
       css.walkRules(function (rule) {
         rule.selectors = rule.selectors.map(function (selector) {
-          if (/\b(body|html|:root|\.ember-application)\b/.test(selector)) {
+          if (/(^|\b)(html|:root)\b/.test(selector)) {
             return selector;
           }
           // eslint-disable-next-line no-useless-escape
@@ -67,7 +67,7 @@ module.exports = function (defaults) {
 
   const { Webpack } = require('@embroider/webpack');
 
-  // prepend .ember-application to all styles of web client's components
+  // prepend html to all styles of web client's components
   // so that it has a bit more specificity and will take priority over Boxel's CSS
   // since Boxel's CSS is appearing after the DApp's in production
   let appComponentsStylesTree = new compileCSS(
@@ -79,7 +79,7 @@ module.exports = function (defaults) {
     {
       plugins: [
         prependSelector({
-          selector: '.ember-application ',
+          selector: 'html ',
         }),
       ],
     }
@@ -118,7 +118,7 @@ module.exports = function (defaults) {
                     postcssOptions: {
                       plugins: [
                         prependSelector({
-                          selector: '.ember-application ',
+                          selector: 'html ',
                         }),
                       ],
                     },
