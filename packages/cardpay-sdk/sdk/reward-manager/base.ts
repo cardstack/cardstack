@@ -21,7 +21,7 @@ import {
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
-import { signRewardSafe, fullSignatureTxAsBytes, createEIP1271VerifyingData } from '../utils/signing-utils';
+import { signRewardSafe, signEIP1271SafeTxAsBytes, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
@@ -581,7 +581,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       tokenAddress
     );
 
-    let fullSignatureInnerExec = await fullSignatureTxAsBytes(
+    let fullSignatureInnerExec = await signEIP1271SafeTxAsBytes(
       this.layer2Web3,
       tokenAddress,
       0,
@@ -599,7 +599,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     // for nested gnosis executions, gasEstimate() call will fail if we sign for incremented nonce within the inner gnosis execution
     // therefore, we intentionally sign for a NON-incremented  nonce so the relayer can return a gas estimate
 
-    let fullSignatureInnerExecNonIncrementingNonce = await fullSignatureTxAsBytes(
+    let fullSignatureInnerExecNonIncrementingNonce = await signEIP1271SafeTxAsBytes(
       this.layer2Web3,
       tokenAddress,
       0,

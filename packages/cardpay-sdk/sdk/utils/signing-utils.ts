@@ -135,7 +135,7 @@ export async function signSafeTxAsBytes(
   return [await signTypedData(web3, owner, typedData)];
 }
 
-export async function fullSignatureTxAsBytes(
+export async function signEIP1271SafeTxAsBytes(
   web3: Web3,
   to: string,
   value: number,
