@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+/* eslint-disable node/shebang */
+
+// we use this because corde tries to use esm to run this command and that has problems
+// with optional chaining: https://github.com/standard-things/esm/issues/866
+// running this assumes that we are in a node environment >= 14
+require('corde/lib/src/cli/cli');
