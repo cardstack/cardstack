@@ -67,7 +67,7 @@ module.exports = function (defaults) {
 
   const { Webpack } = require('@embroider/webpack');
 
-  // prepend html to all styles of web client's components
+  // prepend #web-client-root to all styles of web client's components
   // so that it has a bit more specificity and will take priority over Boxel's CSS
   // since Boxel's CSS is appearing after the DApp's in production
   let appComponentsStylesTree = new compileCSS(
@@ -79,7 +79,7 @@ module.exports = function (defaults) {
     {
       plugins: [
         prependSelector({
-          selector: 'html ',
+          selector: '#web-client-root ',
         }),
       ],
     }
@@ -118,7 +118,7 @@ module.exports = function (defaults) {
                     postcssOptions: {
                       plugins: [
                         prependSelector({
-                          selector: 'html ',
+                          selector: '#web-client-root ',
                         }),
                       ],
                     },
