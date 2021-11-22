@@ -134,7 +134,7 @@ export default class WorkflowPersistence extends Service {
     let route, flow;
 
     if (workflowName === 'PREPAID_CARD_ISSUANCE') {
-      route = 'balances';
+      route = 'wallet';
       flow = 'issue-prepaid-card';
     } else if (workflowName === 'MERCHANT_CREATION') {
       route = 'payments';
