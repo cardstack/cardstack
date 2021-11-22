@@ -3,13 +3,16 @@ import string from 'https://cardstack.com/base/string';
 
 export default class Profile {
   @contains(string)
-  username;
+  profilePicture;
+
+  @contains(string)
+  name;
 
   @contains(string)
   url;
 
   @contains(string)
-  tag;
+  category;
 
   @contains(string)
   description;

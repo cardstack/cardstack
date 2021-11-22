@@ -1,1 +1,31 @@
-{"adoptsFrom":"../card-space-layout","data":{"profile":{"username":"Emily"}}}
+{
+  "adoptsFrom": "../card-space-layout",
+  "data": {
+    "background": {
+      "coverPhoto": "[COVER PHOTO]"
+    },
+    "profile": {
+      "name": "Amazing Emily",
+      "url": "card.space/emily",
+      "category": "health",
+      "description": "Welcome to a healthy & happy life!",
+      "profilePicture": "[PHOTO]"
+    },
+    "bio": {
+      "name": "Emily Clarke",
+      "description": "I’m all about living a healthy life – a healthy & happy life! Because you can be both. Being healthy doesn’t mean you have to torture yourself with crazy exercise or diets. Trust me, I’m doing it every day. :)"
+    },
+    "links": {
+      "links": [
+        { "linkTitle": "Emily's Twitter", "url": "http://twitter.com/amazing-emily" },
+        { "linkTitle": "Emily’s Facebook", "url": "http://facebook.com/amazingemily" },
+        { "linkTitle": "Emily’s Instagram", "url": "http://instagram.com/amazingemily" },
+        { "linkTitle": "Emily’s YouTube", "url": "http://youtube.com/amazingemily" }
+      ]
+    },
+    "donations": {
+      "title": "Donate to Amazing Emily",
+      "description": "I would love your financial support, so I can spend more and more time creating content for you guys!"
+    }
+  }
+}

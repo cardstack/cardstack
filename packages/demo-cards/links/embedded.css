@@ -1,0 +1,18 @@
+.links {
+  padding: var(--boxel-sp-lg);
+}
+
+.links__header {
+  margin-bottom: var(--boxel-sp-lg);
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.links__list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.links__list > li + li {
+  margin-top: var(--boxel-sp-sm);
+}
