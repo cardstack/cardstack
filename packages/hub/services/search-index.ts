@@ -1,5 +1,6 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { NotFound } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import { expressionToSql, param, upsert } from '../utils/expressions';
@@ -24,6 +25,9 @@ export class SearchIndex {
       let {
         rows: [result],
       } = await db.query('SELECT data from cards where url = $1', [cardURL]);
+      if (!result) {
+        throw new NotFound(`Card ${cardURL} was not found`);
+      }
       return deserializer.deserialize(result.data.data, result.data);
     } finally {
       db.release();

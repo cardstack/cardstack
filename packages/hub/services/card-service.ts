@@ -10,12 +10,12 @@ import {
   every,
   param,
   CardExpression,
-  PgPrimitive,
   isField,
   resolveNestedPath,
   expressionToSql,
   Expression,
 } from '../utils/expressions';
+import { BadRequest } from '@cardstack/core/src/utils/errors';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -118,10 +118,22 @@ export class CardService {
         let segments = element.path.split('.');
         let { expression: inner, leaf } = resolveNestedPath(element.parentExpression, [element.on, ...segments]);
 
-        let card = (await this.load(element.on)).compiled;
+        let card: CompiledCard;
+        try {
+          card = (await this.load(element.on)).compiled;
+        } catch (err) {
+          if (err.status !== 404) {
+            throw err;
+          }
+          throw new BadRequest(`Your filter refers to nonexistent card ${element.on}`);
+        }
         while (segments.length) {
           let first = segments.shift()!;
-          card = card.fields[first].card;
+          let field = card.fields[first];
+          if (!field) {
+            throw new BadRequest(`Your filter refers to nonexistent field "${first}" in card ${card.url}`);
+          }
+          card = field.card;
         }
         if (cardHasType(card, 'https://cardstack.com/base/integer')) {
           expression.push('cast(', ...inner, '->>', param(leaf), 'as bigint)');

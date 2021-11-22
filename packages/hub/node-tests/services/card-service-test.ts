@@ -3,7 +3,7 @@ import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
-  describe.only('CardService', function () {
+  describe('CardService', function () {
     this.afterEach(async function () {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
@@ -142,6 +142,16 @@ if (process.env.COMPILER) {
         expect(card.compiled!.url).to.eq(`${realm}post1`);
         expect(card.compiled!.adoptsFrom!.url).to.eq(`${realm}post`);
       });
+
+      it('handles missing card', async function () {
+        try {
+          await cards.load(`${realm}nonexistent`);
+          throw new Error('should have thrown exception');
+        } catch (err) {
+          expect(err.message).to.eq('Card https://cardstack.local/nonexistent was not found');
+          expect(err.status).to.eq(404);
+        }
+      });
     });
 
     describe('.query()', function () {
@@ -157,6 +167,32 @@ if (process.env.COMPILER) {
           filter: { on: `${realm}post`, range: { views: { gt: 7 } } },
         });
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+      });
+
+      it(`gives a good error when query refers to missing card`, async function () {
+        try {
+          await cards.query({
+            filter: { on: `${realm}nonexistent`, eq: { nonExistentField: 'hello' } },
+          });
+          throw new Error('failed to throw expected exception');
+        } catch (err: any) {
+          expect(err.message).to.eq(`Your filter refers to nonexistent card ${realm}nonexistent`);
+          expect(err.status).to.eq(400);
+        }
+      });
+
+      it(`gives a good error when query refers to missing field`, async function () {
+        try {
+          await cards.query({
+            filter: { on: `${realm}post`, eq: { 'author.nonExistentField': 'hello' } },
+          });
+          throw new Error('failed to throw expected exception');
+        } catch (err: any) {
+          expect(err.message).to.eq(
+            `Your filter refers to nonexistent field "nonExistentField" in card ${realm}person`
+          );
+          expect(err.status).to.eq(400);
+        }
       });
 
       it(`can filter on a nested field using eq`, async function () {
