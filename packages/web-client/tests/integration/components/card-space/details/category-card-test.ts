@@ -34,6 +34,10 @@ module(
 
       assert.dom('radio-option__input--checked').doesNotExist();
 
+      if (window.location.toString().includes('devmode')) {
+        await this.pauseTest();
+      }
+
       OPTIONS.forEach(function (buttonText, index) {
         assert
           .dom(`[data-test-category-option]:nth-child(${index + 1})`)
@@ -42,7 +46,10 @@ module(
 
       await click(`[data-test-category-option]:nth-child(2)`);
 
-      assert.equal(workflowSession.getValue<string>('category'), OPTIONS[1]);
+      assert.equal(
+        workflowSession.getValue<string>('profileCategory'),
+        OPTIONS[1]
+      );
       assert.dom('[data-test-category-option]:nth-child(2) input').isChecked();
     });
 
@@ -82,7 +89,10 @@ module(
         )
         .hasClass('radio-option__input--checked');
 
-      assert.equal(workflowSession.getValue<string>('category'), 'Something');
+      assert.equal(
+        workflowSession.getValue<string>('profileCategory'),
+        'Something'
+      );
 
       await click('[data-test-category-option]:nth-child(2)');
       assert
@@ -92,7 +102,10 @@ module(
       await click(
         `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
       );
-      assert.equal(workflowSession.getValue<string>('category'), 'Something');
+      assert.equal(
+        workflowSession.getValue<string>('profileCategory'),
+        'Something'
+      );
     });
 
     test('it shows the error when custom category validation fails', async function (this: Context, assert) {
@@ -131,7 +144,7 @@ module(
     test('it restores input from session', async function (assert) {
       let workflowSession = new WorkflowSession();
       this.set('workflowSession', workflowSession);
-      workflowSession.setValue('category', OPTIONS[1]);
+      workflowSession.setValue('profileCategory', OPTIONS[1]);
 
       await render(hbs`
         <CardSpace::EditDetails::Category
@@ -147,7 +160,7 @@ module(
     test('it restores custom input from session', async function (assert) {
       let workflowSession = new WorkflowSession();
       this.set('workflowSession', workflowSession);
-      workflowSession.setValue('category', 'Hello');
+      workflowSession.setValue('profileCategory', 'Hello');
 
       await render(hbs`
         <CardSpace::EditDetails::Category

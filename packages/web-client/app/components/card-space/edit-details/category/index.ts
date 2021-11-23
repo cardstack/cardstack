@@ -37,11 +37,11 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   }
 
   get categoryValue() {
-    return this.args.workflowSession.getValue<string>('category');
+    return this.args.workflowSession.getValue<string>('profileCategory');
   }
 
   @action setCategoryValue(val: string) {
-    this.args.workflowSession.setValue('category', val);
+    this.args.workflowSession.setValue('profileCategory', val);
   }
 
   get otherIsChecked() {
@@ -92,12 +92,12 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
       } else {
         this.categoryValidationState = 'invalid';
         this.categoryValidationMessage = errors[0].detail;
-        this.args.workflowSession.delete('category');
+        this.args.workflowSession.delete('profileCategory');
       }
     } catch (e) {
       console.error('Error validating card space url', e);
       Sentry.captureException(e);
-      this.args.workflowSession.delete('category');
+      this.args.workflowSession.delete('profileCategory');
       this.categoryValidationState = 'invalid';
       this.categoryValidationMessage =
         'There was an error validating your card space url. Please try again or contact support';
