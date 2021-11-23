@@ -650,7 +650,6 @@ export default class PrepaidCard {
       this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature])
     );
   }
-
   private async executePayMerchant(
     prepaidCardAddress: string,
     merchantSafe: string,

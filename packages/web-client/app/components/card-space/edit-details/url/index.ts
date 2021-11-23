@@ -51,7 +51,7 @@ class CreateSpaceWorkflowEditDetailsUrlComponent extends Component<WorkflowCardC
         {
           method: 'POST',
           headers: {
-            Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+            Authorization: 'Bearer ' + this.hubAuthentication.authToken,
             Accept: 'application/vnd.api+json',
             'Content-Type': 'application/vnd.api+json',
           },

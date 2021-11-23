@@ -1,16 +1,19 @@
-<Boxel::CardContainer @displayBoundaries={{true}} style="margin:1vw 2vw;overflow:hidden;">
+<Boxel::CardContainer class="card-container" @displayBoundaries={{true}} ...attributes>
   <Boxel::Header @header="Layout">
-    {{#if @editable}}
-      <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
-      <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
-      <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
-    {{/if}}
-    {{yield to="header"}}
+    <:default>
+      {{yield to="header"}}
+    </:default>
+    <:actions>
+      {{#if @editable}}
+        <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
+        <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
+        <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
+      {{/if}}
+      {{yield to="actions"}}
+    </:actions>
   </Boxel::Header>
 
-  <section class="card-container__content">
-    {{yield}}
-  </section>
+  {{yield}}
 
   <footer class="card-container__action-chin">
     {{yield to="action-chin"}}

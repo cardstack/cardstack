@@ -96,9 +96,13 @@
           Waiting for you to confirm on your Card Wallet mobile app...
         </div>
       </i.ActionStatusArea>
-      <i.InfoArea>
-        Only visible to you
-      </i.InfoArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea>

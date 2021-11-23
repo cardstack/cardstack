@@ -1,0 +1,14 @@
+.background-edit {
+  padding: var(--boxel-sp-lg);
+}
+
+.background-edit__header {
+  margin-bottom: var(--boxel-sp-lg);
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.background-edit__field {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}

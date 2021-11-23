@@ -28,6 +28,9 @@ import {
   isRewardProgramLocked,
   updateRewardProgramAdmin,
   rewardProgramAdmin,
+  addRewardRule,
+  rewardRule,
+  withdraw,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -105,7 +108,10 @@ type Commands =
   | 'lockRewardProgram'
   | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
-  | 'rewardProgramAdmin';
+  | 'rewardProgramAdmin'
+  | 'addRewardRule'
+  | 'rewardRule'
+  | 'withdrawRewardSafe';
 
 let command: Commands | undefined;
 interface Options {
@@ -147,6 +153,7 @@ interface Options {
   rewardSafe?: string;
   newAdmin?: string;
   force?: string;
+  blob?: string;
   safeType?: Exclude<Safe['type'], 'external'>;
 }
 let {
@@ -188,6 +195,7 @@ let {
   rewardSafe,
   newAdmin,
   force,
+  blob,
   safeType,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -896,6 +904,51 @@ let {
     });
     command = 'rewardProgramAdmin';
   })
+  .command('add-reward-rule <prepaidCard> <rewardProgramId> <blob>', 'Add/Update reward rule', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    yargs.positional('blob', {
+      type: 'string',
+      description: 'Hex encoding of rule blob',
+    });
+    command = 'addRewardRule';
+  })
+  .command('reward-rule <rewardProgramId>', 'Get reward rule', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'rewardRule';
+  })
+  .command(
+    'withdraw-reward-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
+    'Withdraw from reward safe',
+    (yargs) => {
+      yargs.positional('rewardSafe', {
+        type: 'string',
+        description: 'The address of the rewardSafe that already contains rewards',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: "The token recipient's address",
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being transferred from reward safe',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
+      });
+      command = 'withdrawRewardSafe';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1314,6 +1367,47 @@ if (!command) {
         return;
       }
       await rewardProgramAdmin(network, rewardProgramId, mnemonic);
+      break;
+    case 'addRewardRule':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (blob == null) {
+        showHelpAndExit('blob is a required value');
+        return;
+      }
+      await addRewardRule(network, prepaidCard, rewardProgramId, blob, mnemonic);
+      break;
+    case 'rewardRule':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await rewardRule(network, rewardProgramId, mnemonic);
+      break;
+    case 'withdrawRewardSafe':
+      if (recipient == null) {
+        showHelpAndExit('recipient is a required value');
+        return;
+      }
+      if (rewardSafe == null) {
+        showHelpAndExit('rewardSafe is a required value');
+        return;
+      }
+      if (tokenAddress == null) {
+        showHelpAndExit('tokenAddress is a required value');
+        return;
+      }
+      if (amount == null) {
+        showHelpAndExit('amount is a required value');
+        return;
+      }
+      await withdraw(network, rewardSafe, recipient, tokenAddress, amount, mnemonic);
       break;
     default:
       assertNever(command);

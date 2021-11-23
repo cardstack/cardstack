@@ -1,4 +1,4 @@
-<Boxel::Modal @isOpen={{this.modal.isShowing}} @onClose={{this.close}} data-test-modal>
+<Boxel::Modal @size="large" @isOpen={{this.modal.isShowing}} @onClose={{this.close}} data-test-modal>
   {{#if this.modal.isLoading}}
     <CardContainer>
       <h1>Loading...</h1>
@@ -35,9 +35,9 @@
         @card={{this.modal.card}}
         @editable={{true}}
       >
-        <:header>
+        <:actions>
           <button data-test-modal-close {{on "click" this.close}}>Close</button>
-        </:header>
+        </:actions>
 
         <:default>
           <this.modal.cardComponent />

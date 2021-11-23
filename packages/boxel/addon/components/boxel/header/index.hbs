@@ -12,7 +12,11 @@
     </span>
   {{/if}}
 
-  <div class="boxel-header__content" data-test-boxel-header-content>
-    {{yield}}
-  </div>
+  {{yield}}
+
+  {{#if (has-block "actions")}}
+    <div class="boxel-header__content" data-test-boxel-header-content>
+      {{yield to="actions"}}
+    </div>
+  {{/if}}
 </header>

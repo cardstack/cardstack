@@ -93,7 +93,7 @@ export default class HubAuth implements IHubAuth {
       'Content-Type': 'application/vnd.api+json',
     } as Record<string, string>;
     if (authToken) {
-      headers['Authorization'] = `Bearer: ${authToken}`;
+      headers['Authorization'] = `Bearer ${authToken}`;
     }
     return global.fetch(url, { headers });
   }
