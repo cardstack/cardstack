@@ -4,7 +4,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 
 if (process.env.COMPILER) {
   describe.skip('CardService', function () {
-    let { cards, realm } = setupHub(this);
+    let { cards, realm, getContainer } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({
@@ -86,6 +86,25 @@ if (process.env.COMPILER) {
         filter: { type: `${realm}post`, eq: { 'author.name': 'Sue' } },
       });
       expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+    });
+
+    describe('update()', function () {
+      it.only('can update a card that is only data correctly', async function () {
+        // Intentionally not including the adopts from because cardhost cardService
+        // doesn't include it
+        await cards.update({
+          url: `${realm}post1`,
+          data: {
+            title: 'Hello to you',
+            body: 'second post.',
+            createdAt: new Date(2020, 0, 1),
+          },
+        });
+        let realmManager = await getContainer().lookup('realm-manager');
+        let rawCard = await realmManager.read(`${realm}post1`);
+        expect(rawCard.adoptsFrom).to.equal('../post');
+        expect(rawCard.data!.title).to.equal('Hello to you');
+      });
     });
   });
 }
