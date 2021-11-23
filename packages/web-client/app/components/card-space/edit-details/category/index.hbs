@@ -21,23 +21,20 @@
       @name='category'
       @checked={{this.otherIsChecked}}
       @onInput={{fn this.setCategoryValue this.otherValue}}
-      class='card-space-category-field__option'
+      class='card-space-category-field__option card-space-category-field__other-container'
       data-test-category-option
     >
-      <span class='card-space-category-field__other-container'>
-        <span class='card-space-category-field__other-label'>Other:</span>
-
-        <Common::ValidationStateInput
-          class='card-space-category-field__other'
-          @state={{this.categoryValidationState}}
-          @value={{readonly this.otherValue}}
-          @onInput={{this.onOtherValueInput}}
-          @errorMessage={{this.categoryValidationMessage}}
-          {{!-- FIXME length? --}}
-          {{on 'blur' this.validateCategory}}
-          data-test-category-option-other
-        />
-      </span>
+      <span class='card-space-category-field__other-label'>Other:</span>
+      <Common::ValidationStateInput
+        class='card-space-category-field__other'
+        @state={{this.categoryValidationState}}
+        @value={{readonly this.otherValue}}
+        @onInput={{this.onOtherValueInput}}
+        @errorMessage={{this.categoryValidationMessage}}
+        {{!-- FIXME length? --}}
+        {{on 'blur' this.validateCategory}}
+        data-test-category-option-other
+      />
     </Common::RadioOption>
   </div>
 </CardPay::LabeledValue>

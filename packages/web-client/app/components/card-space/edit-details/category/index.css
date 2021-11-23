@@ -6,13 +6,14 @@
   margin-top: var(--boxel-sp);
 }
 
-.card-space-category-field__other-container {
+.radio-option.card-space-category-field__other-container {
   display: grid;
   grid-template-areas:
-    'label input'
-    '. validation';
-  grid-template-columns: auto 1fr;
+    'radio label input'
+    '.     .     validation';
+  grid-template-columns: auto auto 1fr;
   position: relative;
+  gap: 0 var(--boxel-sp);
 }
 
 .card-space-category-field__other {
@@ -22,10 +23,13 @@
 .card-space-category-field__other-label {
   grid-area: label;
   align-self: center;
-  margin-right: var(--boxel-sp);
 }
 
 .card-space-category-field__option .boxel-input {
+  grid-area: input;
+}
+
+.card-space-category-field__option .validation-state-input-group__icon {
   grid-area: input;
 }
 
