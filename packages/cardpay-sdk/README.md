@@ -730,7 +730,7 @@ let balanceForAllTokens = await rewardPool.rewardTokenBalances(address, rewardPr
 
 ## `RewardPool.addRewardTokens`
 
-The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, we are using single-owner safe like depot safe or merchant safe to send funds, but, in the future we will use prepaid cards to pay. If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this api not only the rewardProgramAdmin.
+The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, the sdk supports using single-owner safe like depot safe or merchant safe to send funds (the protocol supports prepaid card payments too). If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this function not only the rewardProgramAdmin.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
@@ -743,11 +743,9 @@ The `Claim` API is used by the rewardee to claim rewards for a reward program id
 
 Pre-requisite for this action:
 - reward program has to be registered
-- rewardee has to register and create safe for that particular reward program
-- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs`
+- rewardee has to register and create safe for that particular reward program. The funds will be claimed into this safe -- reward safe
+- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs` or `rewardPool.getProofsWithBalance`
 - reward pool has to be filled with reward token for that reward program
-
-This claim action is similar to `RevenuePool.claim` in that a pre-flight check is used to check that the rewards claimed will be able to cover that gas for the transaction.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
@@ -760,20 +758,48 @@ The `RewardManager` API is used to interact to manage reward program. Those inte
 
 ## `RewardManager.registerRewardProgram`
 
-The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, etc. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF").
+The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, `updateRewardProgramAdmin`. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF").
 
 ```js
-let prepaidCardAPI = await getSDK('PrepaidCard', web3);
-await prepaidCardAPI.registerRewardProgram(prepaidCard, admin)
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.registerRewardProgram(prepaidCard, admin)
 ```
 
 ## `RewardManager.registerRewardee`
 
-The `RegistereRewardee` API is used to register a rewardee for a reward program using a prepaid card. The purpose of registering is not to "be considered to receive rewards" rather to "be able to claim rewards that have been given". By registering, the owner of the prepaid card is given ownership of a reward safe that will be used to retrieve rewards from the reward pool. A rewardee/eoa is eligible to only have one reward safe for each reward program; any attempts to re-register will result in a revert error. A fee of 500 spend is charged when registering a rewardee.
+The `RegisterRewardee` API is used to register a rewardee for a reward program using a prepaid card. The purpose of registering is not to "be considered to receive rewards" rather to "be able to claim rewards that have been given". By registering, the owner of the prepaid card is given ownership of a reward safe that will be used to retrieve rewards from the reward pool. A rewardee/eoa is eligible to only have one reward safe for each reward program; any attempts to re-register will result in a revert error. There is no fee in registering a reward safe, the prepaid card will pay the gas fees to execute the transaction. 
 
 ```js
-let prepaidCardAPI = await getSDK('PrepaidCard', web3);
-await prepaidCardAPI.registerRewardee(prepaidCard , rewardProgramId)
+let rewardManagerAPI = await getSDK(RewardManager, web3);
+await rewardManagerAPI.registerRewardee(prepaidCard , rewardProgramId)
+```
+
+## `RewardManager.lockRewardProgram`
+
+The `LockRewardProgram` API is used to to lock a reward program using a prepaid card. When a reward program is locked, tally will choose to stop calculating rewards for reward reward program from that point forward. This doesn't stop the unclaimed rewards from being claimed, i.e. unused proofs. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function. Executing this function again will unlock the reward program, which will allow tally to restart calculating rewards. 
+
+
+```js
+let rewardManagerAPI = await getSDK(RewardManager, web3);
+await rewardManagerAPI.lockRewardProgram(prepaidCard , rewardProgramId)
+```
+
+## `RewardManager.updateRewardProgramAdmin`
+
+The `UpdateRewardProgramAdmin` API is used to update the reward program admin of a reward program using a prepaid card. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+
+```js
+let rewardManagerAPI = await getSDK(RewardManager, web3);
+await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard , rewardProgramId, newAdmin)
+```
+
+## `RewardManager.withdraw`
+
+The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The funds in the withdrawal will pay for the gas fees to execute the transaction. 
+
+```js
+let rewardManagerAPI = await getSDK(RewardManager, web3);
+await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
 ```
 
 ## `RewardManager.addRewardRule`

@@ -3,7 +3,7 @@ import string from 'https://cardstack.com/base/string';
 
 export default class Link {
   @contains(string)
-  name;
+  linkTitle;
 
   @contains(string)
   url;

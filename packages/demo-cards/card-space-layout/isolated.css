@@ -1,22 +1,32 @@
 .card-space-layout {
-  max-width: 60rem;
-  margin: 0 auto;
-  padding: var(--boxel-sp);
+  position: relative;
+  padding: var(--boxel-sp-xxl) var(--boxel-sp);
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--boxel-sp);
 }
 
-.card-space-layout__module {
-  flex: 1;
-  min-width: 20rem;
+.card-space-layout__cover-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-.card-space-layout__optional-modules {
-  flex: 2;
+.card-space-layout__modules {
+  width: 100%;
 }
 
-.card-space-layout__optional-modules > * + * {
+.card-space-layout__modules--xs {
+  max-width: var(--boxel-xs-container);
+}
+
+.card-space-layout__modules--md {
+  max-width: var(--boxel-md-container);
+}
+
+.card-space-layout__modules > * + * {
   margin-top: var(--boxel-sp);
 }
 

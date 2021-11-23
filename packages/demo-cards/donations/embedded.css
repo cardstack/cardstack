@@ -1,0 +1,8 @@
+.donations {
+  padding: var(--boxel-sp-lg);
+}
+
+.donations__header {
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}

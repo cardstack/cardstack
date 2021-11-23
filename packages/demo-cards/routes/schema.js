@@ -9,7 +9,7 @@ export default class Routes {
     }
 
     if (path === 'card-space') {
-      return 'https://demo.com/card-space-emily';
+      return 'https://demo.com/card-space-layout';
     }
   }
 }
