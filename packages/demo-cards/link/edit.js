@@ -6,14 +6,13 @@ import './edit.css';
 
 export default setComponentTemplate(
   precompileTemplate(
-    `<section class="links-edit">
-      <header class="links-edit__header">Links</header>
-      <ul class="links-edit__list">
-        {{#each @fields.links as |Field|}}
-          <li><Field /></li>
-        {{/each}}
-      </ul>
-    </section>`,
+    `<div class="link-edit">
+      {{#each-in @fields as |name Field|}}
+        <BoxelField @label={{name}} @fieldMode="edit" class="link-edit__field">
+          <Field />
+        </BoxelField>
+      {{/each-in}}
+    </div>`,
     {
       strictMode: true,
       scope: () => ({ BoxelField }),

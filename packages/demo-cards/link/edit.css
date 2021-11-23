@@ -1,0 +1,8 @@
+.link-edit > * + * {
+  margin-top: var(--boxel-sp-sm);
+}
+
+.link-edit__field {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}

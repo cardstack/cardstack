@@ -7,3 +7,12 @@
   font: 700 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
 }
+
+.links-edit__list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.links-edit__list > li + li {
+  margin-top: var(--boxel-sp-xxl);
+}
