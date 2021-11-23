@@ -1,3 +1,17 @@
+.radio-option.card-space-category-field__option {
+  grid-template-columns: auto 1fr;
+}
+
 .card-space-category-field__option + .card-space-category-field__option {
   margin-top: var(--boxel-sp);
+}
+
+.card-space-category-field__other-container {
+  display: flex;
+  align-items: center;
+}
+
+.card-space-category-field__other {
+  margin-left: var(--boxel-sp);
+  flex-grow: 1;
 }

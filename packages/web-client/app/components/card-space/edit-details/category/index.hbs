@@ -24,10 +24,11 @@
       class='card-space-category-field__option'
       data-test-category-option
     >
-      <span>
+      <span class='card-space-category-field__other-container'>
         Other:
 
         <Common::ValidationStateInput
+          class='card-space-category-field__other'
           @state={{this.categoryValidationState}}
           @value={{readonly this.otherValue}}
           @onInput={{this.onOtherValueInput}}
