@@ -141,6 +141,42 @@ module(
         .containsText('Is bad');
     });
 
+    test('it shows an error when custom category validation errors', async function (this: Context, assert) {
+      this.server.post('/card-spaces/validate-profile-category', function () {
+        return new MirageResponse(500, {}, {});
+      });
+
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      await fillIn('[data-test-category-option-other] input', 'Something');
+
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput !== 'initial'
+      );
+
+      assert
+        .dom('[data-test-validation-state-input]')
+        .hasAttribute('data-test-validation-state-input', 'invalid');
+
+      assert
+        .dom(
+          `[data-test-card-space-category-field] [data-test-boxel-input-error-message]`
+        )
+        .containsText(
+          'There was an error validating your Card Space profile category.'
+        );
+      assert.notOk(workflowSession.getValue<string>('profileCategory'));
+    });
+
     test('it restores input from session', async function (assert) {
       let workflowSession = new WorkflowSession();
       this.set('workflowSession', workflowSession);

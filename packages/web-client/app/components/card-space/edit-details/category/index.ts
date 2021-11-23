@@ -100,7 +100,7 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
       this.args.workflowSession.delete('profileCategory');
       this.categoryValidationState = 'invalid';
       this.categoryValidationMessage =
-        'There was an error validating your card space url. Please try again or contact support';
+        'There was an error validating your Card Space profile category. Please try again or contact support';
     }
   }
 }
