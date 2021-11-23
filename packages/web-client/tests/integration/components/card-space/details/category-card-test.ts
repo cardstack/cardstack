@@ -104,6 +104,20 @@ module(
       );
     });
 
+    test('it focuses the other field when the option is clicked', async function (assert) {
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      await click('[data-test-category-option-other]');
+      assert.dom('[data-test-category-option-other] input').isFocused();
+    });
+
     test('it shows the error when custom category validation fails', async function (this: Context, assert) {
       this.server.post('/card-spaces/validate-profile-category', function () {
         return new MirageResponse(200, {}, { errors: [{ detail: 'Is bad' }] });

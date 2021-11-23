@@ -21,6 +21,7 @@
       @name='category'
       @checked={{this.otherIsChecked}}
       @onInput={{fn this.setCategoryValue this.otherValue}}
+      {{on 'click' this.focusOtherValueInput}}
       class='card-space-category-field__option card-space-category-field__other-container'
       data-test-category-option
     >
@@ -32,6 +33,7 @@
         @onInput={{this.onOtherValueInput}}
         @errorMessage={{this.categoryValidationMessage}}
         {{on 'blur' this.validateCategory}}
+        {{did-insert this.storeOtherValueInput}}
         data-test-category-option-other
       />
     </Common::RadioOption>

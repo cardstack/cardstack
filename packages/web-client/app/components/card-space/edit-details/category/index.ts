@@ -26,6 +26,8 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   @tracked categoryValidationState: InputValidationState = 'initial';
   @tracked categoryValidationMessage: string = '';
 
+  @tracked otherValueInput: HTMLElement | null = null;
+
   options = OPTIONS;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
@@ -46,6 +48,14 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
 
   get otherIsChecked() {
     return this.categoryValue && !OPTIONS.includes(this.categoryValue);
+  }
+
+  @action storeOtherValueInput(container: HTMLElement) {
+    this.otherValueInput = container.querySelector('input');
+  }
+
+  @action focusOtherValueInput() {
+    this.otherValueInput?.focus();
   }
 
   @action onOtherValueInput(value: string) {
