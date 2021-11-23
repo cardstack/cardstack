@@ -802,6 +802,15 @@ let rewardManagerAPI = await getSDK(RewardManager, web3);
 await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
 ```
 
+## `RewardManager.addRewardRule`
+
+The `AddRewardRule` API is used to add a reward rule for a reward program using a prepaid card. The reward rule is specified as a blob of bytes which tally will parse to understand how to compute rewards for the reward program. Each reward program will only ever have a single reward rule -- a single blob. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+```
+
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
 ```js

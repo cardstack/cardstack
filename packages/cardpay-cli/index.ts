@@ -28,6 +28,8 @@ import {
   isRewardProgramLocked,
   updateRewardProgramAdmin,
   rewardProgramAdmin,
+  addRewardRule,
+  rewardRule,
   withdraw,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
@@ -107,6 +109,8 @@ type Commands =
   | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
   | 'rewardProgramAdmin'
+  | 'addRewardRule'
+  | 'rewardRule'
   | 'withdrawRewardSafe';
 
 let command: Commands | undefined;
@@ -149,6 +153,7 @@ interface Options {
   rewardSafe?: string;
   newAdmin?: string;
   force?: string;
+  blob?: string;
   safeType?: Exclude<Safe['type'], 'external'>;
 }
 let {
@@ -190,6 +195,7 @@ let {
   rewardSafe,
   newAdmin,
   force,
+  blob,
   safeType,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -898,6 +904,28 @@ let {
     });
     command = 'rewardProgramAdmin';
   })
+  .command('add-reward-rule <prepaidCard> <rewardProgramId> <blob>', 'Add/Update reward rule', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    yargs.positional('blob', {
+      type: 'string',
+      description: 'Hex encoding of rule blob',
+    });
+    command = 'addRewardRule';
+  })
+  .command('reward-rule <rewardProgramId>', 'Get reward rule', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'rewardRule';
+  })
   .command(
     'withdraw-reward-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
     'Withdraw from reward safe',
@@ -1339,6 +1367,28 @@ if (!command) {
         return;
       }
       await rewardProgramAdmin(network, rewardProgramId, mnemonic);
+      break;
+    case 'addRewardRule':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (blob == null) {
+        showHelpAndExit('blob is a required value');
+        return;
+      }
+      await addRewardRule(network, prepaidCard, rewardProgramId, blob, mnemonic);
+      break;
+    case 'rewardRule':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await rewardRule(network, rewardProgramId, mnemonic);
       break;
     case 'withdrawRewardSafe':
       if (recipient == null) {
