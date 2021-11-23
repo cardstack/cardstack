@@ -81,7 +81,8 @@ export class CardService {
   }
 
   async update(raw: RawCard): Promise<Card> {
-    await this.realmManager.update(Object.assign({}, raw, raw));
+    let originalRaw = await this.realmManager.read(raw.url);
+    await this.realmManager.update(Object.assign({}, originalRaw, raw));
     let compiled = await this.builder.getCompiledCard(raw.url);
 
     // TODO:

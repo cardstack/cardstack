@@ -147,7 +147,7 @@ if (process.env.COMPILER) {
         try {
           await cards.load(`${realm}nonexistent`);
           throw new Error('should have thrown exception');
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.eq('Card https://cardstack.local/nonexistent was not found');
           expect(err.status).to.eq(404);
         }
@@ -240,6 +240,25 @@ if (process.env.COMPILER) {
           },
         });
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`, `${realm}book0`]);
+      });
+    });
+
+    describe('update()', function () {
+      it('can update a card that is only data correctly', async function () {
+        // Intentionally not including the adopts from because cardhost cardService
+        // doesn't include it
+        await cards.update({
+          url: `${realm}post1`,
+          data: {
+            title: 'Hello to you',
+            body: 'second post.',
+            createdAt: new Date(2020, 0, 1),
+          },
+        });
+        let realmManager = await getContainer().lookup('realm-manager');
+        let rawCard = await realmManager.read(`${realm}post1`);
+        expect(rawCard.adoptsFrom).to.equal('../post');
+        expect(rawCard.data!.title).to.equal('Hello to you');
       });
     });
   });
