@@ -7,11 +7,28 @@
 }
 
 .card-space-category-field__other-container {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-areas:
+    'label input'
+    '. validation';
+  grid-template-columns: auto 1fr;
+  position: relative;
 }
 
 .card-space-category-field__other {
-  margin-left: var(--boxel-sp);
-  flex-grow: 1;
+  display: contents;
+}
+
+.card-space-category-field__other-label {
+  grid-area: label;
+  align-self: center;
+  margin-right: var(--boxel-sp);
+}
+
+.card-space-category-field__option .boxel-input {
+  grid-area: input;
+}
+
+.card-space-category-field__option .boxel-input__error-message {
+  grid-area: validation;
 }
