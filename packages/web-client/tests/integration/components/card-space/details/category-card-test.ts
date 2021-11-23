@@ -34,10 +34,6 @@ module(
 
       assert.dom('radio-option__input--checked').doesNotExist();
 
-      if (window.location.toString().includes('devmode')) {
-        await this.pauseTest();
-      }
-
       OPTIONS.forEach(function (buttonText, index) {
         assert
           .dom(`[data-test-category-option]:nth-child(${index + 1})`)
