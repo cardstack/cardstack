@@ -1,4 +1,3 @@
-const defer = require('config/defer').deferConfig;
 const { join } = require('path');
 
 module.exports = {
@@ -68,19 +67,17 @@ module.exports = {
     clientName: 'Cardstack',
   },
   compiler: {
-    realmsConfig: defer(function () {
-      return [
-        {
-          url: 'https://cardstack.com/base/',
-          directory: join(__dirname, '..', '..', 'base-cards'),
-          watch: true,
-        },
-        {
-          url: 'https://demo.com/',
-          directory: join(__dirname, '..', '..', 'demo-cards'),
-          watch: true,
-        },
-      ];
-    }),
+    realmsConfig: [
+      {
+        url: 'https://cardstack.com/base/',
+        directory: join(__dirname, '..', '..', 'base-cards'),
+        watch: true,
+      },
+      {
+        url: 'https://demo.com/',
+        directory: join(__dirname, '..', '..', 'demo-cards'),
+        watch: true,
+      },
+    ],
   },
 };
