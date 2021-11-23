@@ -64,7 +64,11 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
-    apiSubrouter.post('/card-spaces/validate-profile-category', parseBody, cardSpacesRoute.postProfileCategoryValidation);
+    apiSubrouter.post(
+      '/card-spaces/validate-profile-category',
+      parseBody,
+      cardSpacesRoute.postProfileCategoryValidation
+    );
     apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
