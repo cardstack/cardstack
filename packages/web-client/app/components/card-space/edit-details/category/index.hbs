@@ -31,7 +31,6 @@
         @value={{readonly this.otherValue}}
         @onInput={{this.onOtherValueInput}}
         @errorMessage={{this.categoryValidationMessage}}
-        {{!-- FIXME length? --}}
         {{on 'blur' this.validateCategory}}
         data-test-category-option-other
       />
