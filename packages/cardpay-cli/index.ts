@@ -30,7 +30,6 @@ import {
   rewardProgramAdmin,
   addRewardRule,
   rewardRule,
-  removeRewardProgram,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -110,8 +109,7 @@ type Commands =
   | 'updateRewardProgramAdmin'
   | 'rewardProgramAdmin'
   | 'addRewardRule'
-  | 'rewardRule'
-  | 'removeRewardProgram';
+  | 'rewardRule';
 
 let command: Commands | undefined;
 interface Options {
@@ -154,7 +152,6 @@ interface Options {
   newAdmin?: string;
   force?: string;
   blob?: string;
-  governanceAdmin?: string;
   safeType?: Exclude<Safe['type'], 'external'>;
 }
 let {
@@ -197,7 +194,6 @@ let {
   newAdmin,
   force,
   blob,
-  governanceAdmin,
   safeType,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -928,17 +924,6 @@ let {
     });
     command = 'rewardRule';
   })
-  .command('remove-reward-program <governanceAdmin> <rewardProgramId>', 'Remove reward program', (yargs) => {
-    yargs.positional('governanceAdmin', {
-      type: 'string',
-      description: 'The governance admin safe -- represents dao',
-    });
-    yargs.positional('rewardProgramId', {
-      type: 'string',
-      description: 'The reward program id.',
-    });
-    command = 'removeRewardProgram';
-  })
   .options({
     network: {
       alias: 'n',
@@ -1379,17 +1364,6 @@ if (!command) {
         return;
       }
       await rewardRule(network, rewardProgramId, mnemonic);
-      break;
-    case 'removeRewardProgram':
-      if (governanceAdmin == null) {
-        showHelpAndExit('governanceAdmin is a required value');
-        return;
-      }
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      await removeRewardProgram(network, governanceAdmin, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

@@ -7,7 +7,7 @@ import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnRecei
 import { getSDK } from '../version-resolver';
 import { ContractOptions } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3-core';
-const { fromWei, toBN } = Web3.utils;
+const { fromWei } = Web3.utils;
 import {
   EventABI,
   getParamsFromEvent,
@@ -17,12 +17,9 @@ import {
   executeSendWithRateLock,
   GnosisExecTx,
   executeSend,
-  gasEstimate,
-  executeTransaction,
 } from '../utils/safe-utils';
-import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
+import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
-import ERC677ABI from '../../contracts/abi/erc-677';
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -383,75 +380,6 @@ export default class RewardManager {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async removeRewardProgram(txnHash: string): Promise<TransactionReceipt>;
-  async removeRewardProgram(
-    safeAddress: string,
-    rewardProgramId: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
-  async removeRewardProgram(
-    safeAddressIdOrTxnHash: string,
-    rewardProgramId?: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
-    if (isTransactionHash(safeAddressIdOrTxnHash)) {
-      let txnHash = safeAddressIdOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
-    }
-    if (!safeAddressIdOrTxnHash) {
-      throw new Error('safeAddress is required');
-    }
-    if (!rewardProgramId) {
-      throw new Error('rewardProgramId is required');
-    }
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    let safeAddress = safeAddressIdOrTxnHash;
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardManagerAddress = await getAddress('rewardManager', this.layer2Web3);
-    let rewardManager = await this.getRewardManager();
-
-    let payload = rewardManager.methods.removeRewardProgram(rewardProgramId).encodeABI();
-    let gasTokenAddress = await this.defaultGasToken();
-    let estimate = await gasEstimate(
-      this.layer2Web3,
-      safeAddress,
-      rewardManagerAddress,
-      '0',
-      payload,
-      0,
-      gasTokenAddress
-    );
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], gasTokenAddress);
-    let balance = toBN(await token.methods.balanceOf(safeAddress).call());
-    if (balance.lt(gasCost)) {
-      throw new Error(`Governance admin safe does not have enoutgh to pay for gas when removing reward program`);
-    }
-    if (nonce == null) {
-      nonce = getNextNonceFromEstimate(estimate);
-      if (typeof onNonce === 'function') {
-        onNonce(nonce);
-      }
-    }
-    let gnosisResult = await executeTransaction(
-      this.layer2Web3,
-      safeAddress,
-      rewardManagerAddress,
-      payload,
-      estimate,
-      nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, rewardManagerAddress, payload, estimate, nonce, from)
-    );
-
-    let txnHash = gnosisResult.ethereumTx.txHash;
-    if (typeof onTxnHash === 'function') {
-      await onTxnHash(txnHash);
-    }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
-  }
-
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
     admin: string,
@@ -723,9 +651,5 @@ export default class RewardManager {
         },
       ],
     };
-  }
-
-  private async defaultGasToken(): Promise<string> {
-    return await getAddress('cardCpxd', this.layer2Web3);
   }
 }
