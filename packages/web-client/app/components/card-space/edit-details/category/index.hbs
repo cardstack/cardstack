@@ -33,10 +33,6 @@
           @value={{readonly this.otherValue}}
           @onInput={{this.onOtherValueInput}}
           @errorMessage={{this.categoryValidationMessage}}
-          autocomplete='off'
-          autocorrect='off'
-          autocapitalize='off'
-          spellcheck='false'
           {{!-- FIXME length? --}}
           {{on 'blur' this.validateCategory}}
           data-test-category-option-other
