@@ -4,14 +4,12 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const path = require('path');
 const concat = require('broccoli-concat');
 const compileCSS = require('broccoli-postcss');
-const postcss = require('postcss');
 const webpack = require('webpack');
 
-const prependSelector = postcss.plugin(
-  'postcss-prepend-selector',
-  function (opts) {
-    opts = opts || {};
-    return function (css) {
+const prependSelector = (opts = {}) => {
+  return {
+    postcssPlugin: 'postcss-prepend-selector',
+    Once(css) {
       css.walkRules(function (rule) {
         rule.selectors = rule.selectors.map(function (selector) {
           if (/(^|\b)(html|:root)\b/.test(selector)) {
@@ -30,9 +28,9 @@ const prependSelector = postcss.plugin(
           return opts.selector + selector;
         });
       });
-    };
-  }
-);
+    },
+  };
+};
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
