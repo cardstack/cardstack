@@ -3,6 +3,8 @@ import Koa from 'koa';
 import KoaBody from 'koa-body';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
+import { unlink } from 'fs';
+import * as Sentry from '@sentry/node';
 import { ensureLoggedIn } from './utils/auth';
 
 export interface Upload {
@@ -59,32 +61,41 @@ export default class UploadRouter {
       let file = contextFiles[filename];
       let { size, type } = file;
 
-      let validationError = this.validate(size, type);
+      try {
+        let validationError = this.validate(size, type);
 
-      if (validationError) {
-        ctx.body = validationError;
+        if (validationError) {
+          ctx.body = validationError;
+          ctx.status = 422;
+          return;
+        }
+
+        let cid = await this.web3Storage.upload(file.path, filename);
+
+        // Use CloudFlare's IPFS CDN: https://developers.cloudflare.com/distributed-web/ipfs-gateway
+        let url = `https://cloudflare-ipfs.com/ipfs/${cid}/${filename}`;
+
+        await this.uploadQueries.insert({
+          id: shortUuid.uuid(),
+          cid,
+          service: 'web3.storage',
+          url,
+          filename,
+          size,
+          type,
+          ownerAddress: '0x0',
+        });
+
+        ctx.body = url;
+        ctx.status = 200;
+      } catch (error) {
+        Sentry.captureException(error);
+        ctx.body = `Unexpected error while uploading`;
         ctx.status = 422;
-        return;
+      } finally {
+        console.log(file.path);
+        unlink(file.path, () => {});
       }
-
-      let cid = await this.web3Storage.upload(file.path, filename);
-
-      // Use CloudFlare's IPFS CDN: https://developers.cloudflare.com/distributed-web/ipfs-gateway
-      let url = `https://cloudflare-ipfs.com/ipfs/${cid}/${filename}`;
-
-      await this.uploadQueries.insert({
-        id: shortUuid.uuid(),
-        cid,
-        service: 'web3.storage',
-        url,
-        filename,
-        size,
-        type,
-        ownerAddress: ctx.state.userAddress,
-      });
-
-      ctx.body = url;
-      ctx.status = 200;
     });
 
     return uploadRouter.routes();
