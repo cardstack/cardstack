@@ -1389,7 +1389,7 @@ if (!command) {
         return;
       }
       await rewardRule(network, rewardProgramId, mnemonic);
-      break
+      break;
     case 'withdrawRewardSafe':
       if (recipient == null) {
         showHelpAndExit('recipient is a required value');
