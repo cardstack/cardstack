@@ -87,7 +87,7 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
 
       if (errors.length === 0) {
         this.categoryValidationState = 'valid';
-        this.categoryValidationMessage = 'URL available';
+        this.categoryValidationMessage = '';
         this.setCategoryValue(profileCategory!);
       } else {
         this.categoryValidationState = 'invalid';
