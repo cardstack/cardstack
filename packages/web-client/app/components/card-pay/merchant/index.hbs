@@ -11,7 +11,7 @@
     @logoTextColor={{@logoTextColor}}
   />
   <div>
-    <div class={{cn "merchant__name" merchant__name--lg=(eq @size "large")}}>
+    <div class={{cn "merchant__name" merchant__name--lg=(eq @size "large")}} title={{@name}}>
       {{@name}}
     </div>
     {{#if @address}}
