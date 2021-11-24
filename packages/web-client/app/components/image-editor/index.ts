@@ -1,9 +1,9 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import * as Sentry from '@sentry/browser';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-
 interface ImageEditorComponentArguments {
   width: number;
   height: number;
@@ -17,31 +17,40 @@ interface ImageEditorComponentArguments {
 export default class ImageEditorComponent extends Component<ImageEditorComponentArguments> {
   cropper: Cropper | undefined;
   canvas: HTMLCanvasElement | undefined;
+  @tracked errored = false;
   @tracked loading = true;
   @tracked preview: string | undefined;
 
   @action initializeCropper(image: HTMLImageElement) {
-    let component = this;
-    this.cropper = new Cropper(image, {
-      autoCrop: true,
-      aspectRatio: this.args.width / this.args.height,
-      autoCropArea: 0.9,
-      viewMode: 1,
-      cropBoxMovable: false,
-      cropBoxResizable: false,
-      dragMode: 'move',
-      toggleDragModeOnDblclick: false,
-      ready: async function (this: HTMLImageElement & { cropper: Cropper }) {
-        component.updatePreview();
-        component.loading = false;
-      },
-      cropend: async function (this: HTMLImageElement & { cropper: Cropper }) {
-        component.updatePreview();
-      },
-      zoom: async function (this: HTMLImageElement & { cropper: Cropper }) {
-        component.updatePreview();
-      },
-    });
+    try {
+      this.errored = false;
+      let component = this;
+      this.cropper = new Cropper(image, {
+        autoCrop: true,
+        aspectRatio: this.args.width / this.args.height,
+        autoCropArea: 0.9,
+        viewMode: 1,
+        cropBoxMovable: false,
+        cropBoxResizable: false,
+        toggleDragModeOnDblclick: false,
+        dragMode: 'move',
+        ready: async function (this: HTMLImageElement & { cropper: Cropper }) {
+          component.updatePreview();
+          component.loading = false;
+        },
+        cropend: async function (
+          this: HTMLImageElement & { cropper: Cropper }
+        ) {
+          component.updatePreview();
+        },
+        zoom: async function (this: HTMLImageElement & { cropper: Cropper }) {
+          component.updatePreview();
+        },
+      });
+    } catch (e) {
+      console.error('failed to initialize image cropper', e);
+      this.onError(e);
+    }
   }
 
   @action async rotate(amountInDegrees: number) {
@@ -51,25 +60,39 @@ export default class ImageEditorComponent extends Component<ImageEditorComponent
   }
 
   updatePreview() {
-    this.canvas = this.getCroppedCanvas();
-    this.preview = this.getCroppedPreviewImage();
+    try {
+      this.canvas = this.getCroppedCanvas();
+      this.preview = this.getCroppedPreviewImage();
+    } catch (e) {
+      console.error('failed to update preview while editing image', e);
+      this.onError(e);
+    }
   }
 
   @action close() {
     this.args.onClose();
     this.loading = true;
+    this.errored = false;
   }
 
   @action async save() {
     if (this.loading || !this.preview || !this.canvas) return;
 
+    let file: Blob;
+    try {
+      file = await this.getCroppedImageFile();
+    } catch (e) {
+      console.error('failed to save image as file while editing image', e);
+      this.onError(e);
+      return;
+    }
+
     this.args.saveImageEditData({
-      file: await this.getCroppedImageFile(),
+      file,
       preview: this.preview,
     });
 
-    this.args.onClose();
-    this.loading = true;
+    this.close();
   }
 
   async getCroppedImageFile(): Promise<Blob> {
@@ -82,7 +105,7 @@ export default class ImageEditorComponent extends Component<ImageEditorComponent
               : reject(
                   new Error('Failed to construct blob from cropped image')
                 ),
-          this.args.fileType ?? 'png',
+          this.args.fileType ?? 'image/jpeg',
           1
         );
       } catch (e) {
@@ -112,5 +135,12 @@ export default class ImageEditorComponent extends Component<ImageEditorComponent
     });
 
     return canvas;
+  }
+
+  onError(e: Error) {
+    Sentry.captureException(e);
+    this.errored = true;
+    this.loading = false;
+    this.cropper?.disable();
   }
 }
