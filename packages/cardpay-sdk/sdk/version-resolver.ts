@@ -4,7 +4,7 @@ import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
 import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
-import { Safes, safesMeta } from './safes';
+import Safes from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
 import Assets from './assets';
@@ -110,7 +110,7 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       apiClass = await resolveApiVersion(rewardManagerMeta, web3);
       break;
     case 'Safes':
-      apiClass = await resolveApiVersion(safesMeta, web3);
+      apiClass = Safes;
       break;
     case 'TokenBridgeForeignSide':
       apiClass = TokenBridgeForeignSide;
