@@ -6,7 +6,10 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   Safe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+  TransactionOptions,
+  ViewSafesResult,
+  BridgeValidationResult,
+} from '@cardstack/cardpay-sdk';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -14,11 +17,8 @@ import {
   BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
-import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 import { TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { TransactionOptions } from '@cardstack/cardpay-sdk';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 export type Layer1ChainEvent =
   | 'disconnect'

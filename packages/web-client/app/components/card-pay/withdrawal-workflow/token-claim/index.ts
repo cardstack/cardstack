@@ -11,7 +11,7 @@ import {
   TokenDisplayInfo,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
-import { BridgeValidationResult } from '../../../../../../cardpay-sdk/sdk/token-bridge-home-side';
+import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import walletProviders, {
   WalletProvider,

@@ -6,7 +6,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import BN from 'bn.js';
 
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
   createDepotSafe,

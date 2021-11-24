@@ -2,7 +2,7 @@ import {
   getFilenameFromDid,
   defaultCreatedPrepaidCardDID,
 } from '@cardstack/web-client/utils/test-factories';
-import { nativeCurrencies } from '@cardstack/cardpay-sdk/sdk/currencies';
+import { nativeCurrencies } from '@cardstack/cardpay-sdk';
 
 export default function () {
   this.namespace = 'api';

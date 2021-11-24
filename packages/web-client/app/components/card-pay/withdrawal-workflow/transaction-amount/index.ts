@@ -19,7 +19,7 @@ import {
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
