@@ -60,15 +60,7 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
 
   @action onOtherValueInput(value: string) {
     this.otherValue = value;
-    this.validateCategory();
-  }
-
-  @action async validateCategory() {
-    try {
-      await taskFor(this.validateCategoryTask).perform();
-    } catch (e) {
-      console.error(e);
-    }
+    taskFor(this.validateCategoryTask).perform();
   }
 
   @restartableTask *validateCategoryTask(): any {

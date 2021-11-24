@@ -32,7 +32,7 @@
         @value={{readonly this.otherValue}}
         @onInput={{this.onOtherValueInput}}
         @errorMessage={{this.categoryValidationMessage}}
-        {{on 'blur' this.validateCategory}}
+        {{on 'blur' (perform this.validateCategoryTask)}}
         {{did-insert this.storeOtherValueInput}}
         data-test-category-option-other
       />
