@@ -63,6 +63,10 @@
 
 .merchant-card__value {
   font: 700 var(--boxel-font-sm);
+  max-width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .merchant-card__manager-icon {
