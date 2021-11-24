@@ -10,7 +10,7 @@ import {
   getWithdrawalLimits,
 } from './bridge.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokensGasEstimate } from './safe.js';
+import { viewSafes, transferTokens, viewSafe, transferTokensGasEstimate } from './safe.js';
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
@@ -83,7 +83,6 @@ type Commands =
   | 'priceForFaceValue'
   | 'paymentLimits'
   | 'payMerchant'
-  | 'setSupplierInfoDID'
   | 'setPrepaidCardAsk'
   | 'skuInfo'
   | 'prepaidCardInventory'
@@ -361,27 +360,6 @@ let {
         description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
       });
       command = 'safeTransferTokens';
-    }
-  )
-  .command(
-    'set-supplier-info-did [safeAddress] [infoDID] [token]',
-    'Allows a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.',
-    (yargs) => {
-      yargs.positional('safeAddress', {
-        type: 'string',
-        description:
-          "The supplier's depot safe address (the safe that was assigned to the supplier when they bridged tokens into L2)",
-      });
-      yargs.positional('infoDID', {
-        type: 'string',
-        description: "The DID string that can be resolved to a DID document representing the supplier's information",
-      });
-      yargs.positional('token', {
-        type: 'string',
-        description:
-          'The token address that you want to use to pay for gas for this transaction. This should be an address of a token in the depot safe.',
-      });
-      command = 'setSupplierInfoDID';
     }
   )
   .command(
@@ -1053,13 +1031,6 @@ if (!command) {
         return;
       }
       await transferTokensGasEstimate(network, safeAddress, token, recipient, amount, mnemonic);
-      break;
-    case 'setSupplierInfoDID':
-      if (safeAddress == null || token == null || infoDID == null) {
-        showHelpAndExit('safeAddress, token, and infoDID are required values');
-        return;
-      }
-      await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
       if (

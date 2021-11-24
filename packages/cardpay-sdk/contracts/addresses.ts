@@ -14,6 +14,7 @@ import MerchantManagerABI from './abi/v0.8.5/merchant-manager';
 import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.5/deprecated-merchant-manager-0_6_7';
 import RegisterRewardProgramHandlerABI from './abi/v0.8.5/register-reward-program-handler';
 import RegisterRewardeeHandlerABI from './abi/v0.8.5/register-rewardee-handler';
+import SupplierManagerABI from './abi/v0.8.5/supplier-manager';
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
@@ -26,6 +27,7 @@ consumeModule(MerchantManagerABI);
 consumeModule(DeprecatedMerchantManagerABI_0_6_7);
 consumeModule(RegisterRewardProgramHandlerABI);
 consumeModule(RegisterRewardeeHandlerABI);
+consumeModule(SupplierManagerABI);
 
 const KOVAN = {
   cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',

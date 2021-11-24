@@ -1,16 +1,31 @@
 import Web3 from 'web3';
-import SupplierManagerABI from '../../contracts/abi/v0.8.5/supplier-manager';
-import ERC20ABI from '../../contracts/abi/erc-20';
+import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
-import { getAddress } from '../../contracts/addresses';
 import { ContractOptions } from 'web3-eth-contract';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
-import { signSafeTx } from '../utils/signing-utils';
+import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from './utils/safe-utils';
+import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
-import { query } from '../utils/graphql';
+import { query } from './utils/graphql';
 import { TransactionReceipt } from 'web3-core';
-import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
+import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from './utils/general-utils';
 const { fromWei } = Web3.utils;
+
+export interface ISafes {
+  viewSafe(safeAddress: string): Promise<ViewSafeResult>;
+  view(options?: Partial<Options>): Promise<ViewSafesResult>;
+  view(owner?: string): Promise<ViewSafesResult>;
+  view(owner?: string, options?: Partial<Options>): Promise<ViewSafesResult>;
+  sendTokensGasEstimate(safeAddress: string, tokenAddress: string, recipient: string, amount: string): Promise<string>;
+  sendTokens(txnHash: string): Promise<TransactionReceipt>;
+  sendTokens(
+    safeAddress: string,
+    tokenAddress: string,
+    recipient: string,
+    amount: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+}
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
@@ -188,7 +203,7 @@ export async function viewSafe(network: 'xdai' | 'sokol', safeAddress: string): 
   };
 }
 
-export default class Safes {
+export default class Safes implements ISafes {
   constructor(private layer2Web3: Web3) {}
 
   async viewSafe(safeAddress: string): Promise<ViewSafeResult> {
@@ -358,72 +373,9 @@ export default class Safes {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async setSupplierInfoDID(txnHash: string): Promise<TransactionReceipt>;
-  async setSupplierInfoDID(
-    safeAddress: string,
-    infoDID: string,
-    gasToken: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
-  async setSupplierInfoDID(
-    safeAddressOrTxnHash: string,
-    infoDID?: string,
-    gasToken?: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
-    if (isTransactionHash(safeAddressOrTxnHash)) {
-      let txnHash = safeAddressOrTxnHash;
-      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
-    }
-    let safeAddress = safeAddressOrTxnHash;
-    if (infoDID == null) {
-      throw new Error('infoDID is required');
-    }
-    if (gasToken == null) {
-      throw new Error('gasToken is required');
-    }
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let supplierManager = await getAddress('supplierManager', this.layer2Web3);
-    let payload = await this.setSupplierInfoDIDPayload(infoDID);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
-    if (nonce == null) {
-      nonce = getNextNonceFromEstimate(estimate);
-      if (typeof onNonce === 'function') {
-        onNonce(nonce);
-      }
-    }
-    let result = await executeTransaction(
-      this.layer2Web3,
-      safeAddress,
-      supplierManager,
-      payload,
-      estimate,
-      nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, estimate.gasToken, payload, estimate, nonce, from)
-    );
-
-    let txnHash = result.ethereumTx.txHash;
-
-    if (typeof onTxnHash === 'function') {
-      await onTxnHash(txnHash);
-    }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
-  }
-
   private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     return token.methods.transfer(recipient, amount).encodeABI();
-  }
-
-  private async setSupplierInfoDIDPayload(infoDID: string): Promise<string> {
-    let supplierManager = new this.layer2Web3.eth.Contract(
-      SupplierManagerABI as AbiItem[],
-      await getAddress('supplierManager', this.layer2Web3)
-    );
-    return supplierManager.methods.setSupplierInfoDID(infoDID).encodeABI();
   }
 }
 

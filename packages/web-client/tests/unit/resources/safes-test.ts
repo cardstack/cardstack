@@ -7,7 +7,7 @@ import {
   TrackedMerchantSafe,
 } from '@cardstack/web-client/resources/safes';
 import { task, TaskGenerator } from 'ember-concurrency';
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
+import { DepotSafe, Safe, ViewSafesResult } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
   createMerchantSafe,
@@ -18,7 +18,6 @@ import {
 import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 import { toWei } from 'web3-utils';
 import { BridgedTokenSymbol } from '../../../app/utils/token';
 

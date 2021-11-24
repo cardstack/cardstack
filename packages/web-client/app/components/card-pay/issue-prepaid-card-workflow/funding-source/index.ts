@@ -5,7 +5,7 @@ import { inject as service } from '@ember/service';
 import BN from 'bn.js';
 import { fromWei } from 'web3-utils';
 
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
