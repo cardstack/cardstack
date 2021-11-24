@@ -18,13 +18,13 @@ export interface ImageValidationResult {
 }
 
 const defaultImageRequirements: Required<ImageRequirements> = {
-  minWidth: 50,
+  minWidth: 0,
   maxWidth: Infinity,
-  minHeight: 50,
+  minHeight: 0,
   maxHeight: Infinity,
   minFileSize: 0,
   maxFileSize: 2 * 1024 * 1024, // 2MB
-  fileType: ['image/png', 'image/jpeg'],
+  fileType: ['image/png', 'image/jpeg', 'image/svg+xml'],
 };
 
 export class ImageValidation {
