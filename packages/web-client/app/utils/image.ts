@@ -1,4 +1,5 @@
 import { tracked } from '@glimmer/tracking';
+import fileSize from 'filesize';
 
 export interface ImageRequirements {
   minWidth: number;
@@ -15,6 +16,7 @@ export interface ImageValidationResult {
   fileSize: boolean;
   fileType: boolean;
   imageSize: boolean;
+  message: string;
 }
 
 const defaultImageRequirements: Required<ImageRequirements> = {
@@ -89,11 +91,59 @@ export class ImageValidation {
       imageSizeValid = await this.imageSizeWithinBounds(file);
     }
 
+    let message = '';
+
+    if (!fileTypeValid) {
+      const { fileType } = this;
+      const subtypeOnly = fileType.map((v) => v.replace(/^image\//, ''));
+      if (subtypeOnly.length === 1) {
+        message = `Please upload an image with a file type of ${subtypeOnly[0]}`;
+      } else {
+        const lastItem = subtypeOnly.pop();
+        message = `Please upload an image with a file type of ${subtypeOnly.join(
+          ', '
+        )} or ${lastItem}`;
+      }
+    } else if (!fileSizeValid) {
+      const { minFileSize, maxFileSize } = this;
+      if (maxFileSize === Infinity) {
+        message = `Please upload a file with size greater than ${fileSize(
+          minFileSize
+        )}`;
+      } else if (minFileSize <= 0) {
+        message = `Please upload a file with size less than ${fileSize(
+          maxFileSize
+        )}`;
+      } else {
+        message = `Please upload a file between ${fileSize(
+          minFileSize
+        )} and ${fileSize(maxFileSize)}.`;
+      }
+    } else if (!imageSizeValid) {
+      const { minWidth, maxWidth, minHeight, maxHeight } = this;
+      // ignoring the case where we want to restrict width but not height
+      if (
+        maxWidth !== Infinity &&
+        maxHeight !== Infinity &&
+        minWidth > 0 &&
+        minHeight > 0
+      ) {
+        message = `Please upload an image larger than ${minWidth}x${minHeight}, and smaller than ${maxWidth}x${maxHeight}`;
+      } else if (minWidth > 0 && minHeight > 0) {
+        message = `Please upload an image larger than ${minWidth}x${minHeight}`;
+      } else if (maxWidth !== Infinity && maxHeight !== Infinity) {
+        message = `Please upload an image smaller than ${maxWidth}x${maxHeight}`;
+      } else {
+        message = `Please upload an image larger than ${minWidth}x${minHeight}`;
+      }
+    }
+
     return {
       valid: fileTypeValid && fileSizeValid && imageSizeValid,
       fileType: fileTypeValid,
       fileSize: fileSizeValid,
       imageSize: imageSizeValid,
+      message,
     };
   }
 
