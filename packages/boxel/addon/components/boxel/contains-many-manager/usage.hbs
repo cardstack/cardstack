@@ -1,0 +1,48 @@
+<Freestyle::Usage @name="ContainsManyManager">
+  <:description>
+    Edit container for managing items in a `containsMany` array
+  </:description>
+  <:example>
+    <Boxel::ContainsManyManager
+
+    >
+
+    </Boxel::ContainsManyManager>
+  </:example>
+  <:api as |Args|>
+    {{!-- <Args.String
+      @name="state"
+      @description="Whether the action is at at rest, in progress, or memorialized."
+      @options={{array "default" "in-progress" "memorialized"}}
+      @defaultValue="default"
+      @value={{this.state}}
+      @onInput={{fn (mut this.state)}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @description="Whether the action chin is disabled. If state is default, will show the disabled named block if available."
+      @defaultValue={{false}}
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
+    />
+    <Args.Number
+      @name="stepNumber"
+      @description="If passed, will add the step number to the left of the block. Having a step number affects the styling of the chin."
+      @optional={{true}}
+      @value={{this.stepNumber}}
+      @onInput={{fn (mut this.stepNumber)}}
+    />
+    <Args.Yield
+      @name="in-progress"
+      @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelButton, ActionStatusArea, InfoArea }"
+    />
+    <Args.Yield
+      @name="memorialized"
+      @description="The block shown when @state is 'memorialized'. Yields { ActionButton, ActionStatusArea, InfoArea }"
+    />
+    <Args.Yield
+      @name="default"
+      @description="The default block shown when @state is none of the states above. Yields { ActionButton, ActionStatusArea, InfoArea }"
+    /> --}}
+  </:api>
+</Freestyle::Usage>

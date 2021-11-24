@@ -1,0 +1,22 @@
+<div class="boxel-contains-many-manager" {{did-insert this.copyItems}} data-test-boxel-contains-many-manager>
+  {{#each this.items as |item i|}}
+    <div class="boxel-contains-many-manager__item" data-test-boxel-contains-many-manager-item>
+      {{yield (hash item=item onUpdate=(fn this.setItem i))}}
+      <Boxel::Button
+        {{on "click" (fn this.removeItem i)}}
+        @kind="secondary"
+        data-test-boxel-contains-many-manager-remove-button={{i}}
+      >
+        Remove
+      </Boxel::Button>
+    </div>
+  {{/each}}
+
+  <Boxel::Button
+    {{on "click" this.addItem}}
+    @kind="secondary"
+    data-test-boxel-contains-many-manager-add-button
+  >
+    Add new
+  </Boxel::Button>
+</div>
