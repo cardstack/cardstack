@@ -53,20 +53,6 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
   });
 }
 
-async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
-  rewardPool: any,
-  arrWithTokenAddress: T[]
-): Promise<WithSymbol<T>[]> {
-  const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
-  const tokenMapping = await rewardPool.tokenSymbolMapping(tokenAddresses);
-  return arrWithTokenAddress.map((o) => {
-    return {
-      ...o,
-      tokenSymbol: tokenMapping[o.tokenAddress],
-    };
-  });
-}
-
 export async function rewardTokensAvailable(network: string, address: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
@@ -121,15 +107,6 @@ export async function getClaimableRewardProofs(
   displayProofs(enhancedProofs);
 }
 
-const fromProofArray = (arr: string[]): string => {
-  return (
-    '0x' +
-    arr.reduce((proof, s) => {
-      return proof.concat(s.replace('0x', ''));
-    }, '')
-  );
-};
-
 export async function claimRewards(
   network: string,
   rewardSafeAddress: string,
@@ -150,3 +127,28 @@ export async function claimRewards(
   );
   console.log('done');
 }
+
+async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
+  rewardPool: any,
+  arrWithTokenAddress: T[]
+): Promise<WithSymbol<T>[]> {
+  const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
+  const tokenMapping = await rewardPool.tokenSymbolMapping(tokenAddresses);
+  return arrWithTokenAddress.map((o) => {
+    return {
+      ...o,
+      tokenSymbol: tokenMapping[o.tokenAddress],
+    };
+  });
+}
+
+
+const fromProofArray = (arr: string[]): string => {
+  return (
+    '0x' +
+    arr.reduce((proof, s) => {
+      return proof.concat(s.replace('0x', ''));
+    }, '')
+  );
+};
+
