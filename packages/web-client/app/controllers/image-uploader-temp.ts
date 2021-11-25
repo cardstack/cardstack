@@ -2,10 +2,7 @@ import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-import {
-  ImageValidation,
-  ImageValidationResult,
-} from '@cardstack/web-client/utils/image';
+import { ImageValidation } from '@cardstack/web-client/utils/image';
 import { ImageUploadSuccessResult } from '../components/image-uploader';
 
 class ImageUploaderController extends Controller {
@@ -28,21 +25,7 @@ class ImageUploaderController extends Controller {
       this.showEditor = true;
       this.errorMessage = '';
     } else {
-      const m: Record<Exclude<keyof ImageValidationResult, 'valid'>, string> = {
-        fileSize: 'file size',
-        fileType: 'file type',
-        imageSize: 'image size',
-      };
-      const reasons = Object.entries(m)
-        .map(
-          ([k, v]: [Exclude<keyof ImageValidationResult, 'valid'>, string]) => {
-            return !result[k] ? v : '';
-          }
-        )
-        .filter((v) => v)
-        .join(' and ');
-
-      this.errorMessage = `Your upload is not valid because of ${reasons}`;
+      this.errorMessage = result.message;
     }
   }
 
