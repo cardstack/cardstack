@@ -4,6 +4,9 @@ import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const IMAGE_EDITOR_ROOT = '[data-test-image-editor]';
+const IMAGE_EDITOR_ERROR_OVERLAY = '[data-test-image-editor-error-overlay]';
+const IMAGE_EDITOR_ERRORED_EXIT_BUTTON =
+  '[data-test-image-editor-errored-exit-button]';
 const ROTATE_CCW_BUTTON = '[data-test-image-editor-rotate-ccw-button]';
 const PREVIEW = '[data-test-image-editor-preview]';
 const SAVE_BUTTON = '[data-test-image-editor-save-button]';
@@ -84,5 +87,31 @@ module('Integration | Component | image-editor', function (hooks) {
 
     assert.equal(result!.preview, rotatedAndCroppedImageDataUri);
     assert.equal(result!.file.type, 'image/png');
+  });
+
+  test('it throws an error when width and height are not provided', async function (assert) {
+    await render(hbs`
+      <ImageEditor
+        @isOpen={{this.isOpen}}
+        @onClose={{this.onClose}}
+        @image={{this.image}}
+        @fileType={{this.fileType}}
+        @saveImageEditData={{this.saveImageEditData}}
+        as |preview|
+      >
+        {{!-- template-lint-disable no-inline-styles --}}
+        <img data-test-image-editor-preview style="width:30px;height:30px;" src={{preview}} alt="" role="presentation"/>
+      </ImageEditor>
+    `);
+
+    assert
+      .dom(IMAGE_EDITOR_ERROR_OVERLAY)
+      .containsText('Sorry, an unexpected error occurred.');
+
+    assert.dom(IMAGE_EDITOR_ERRORED_EXIT_BUTTON).containsText('Exit');
+
+    await click(IMAGE_EDITOR_ERRORED_EXIT_BUTTON);
+
+    assert.dom(IMAGE_EDITOR_ROOT).doesNotExist();
   });
 });
