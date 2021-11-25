@@ -25,6 +25,7 @@ export interface Proof {
   blockNumber: number;
   rewardProgramId: string;
   amount: BN;
+  leaf: string;
 }
 
 const DEFAULT_PAGE_SIZE = 1000000;
@@ -72,8 +73,6 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
-  // Utility function
-  // - it is important to use this if there are many reward tokens
   async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url =

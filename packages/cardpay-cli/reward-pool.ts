@@ -46,7 +46,8 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
       console.log(`
       paymentCycle: ${o.paymentCycle}
       proof: ${fromProofArray(o.proofArray)}
-      balance: ${o.amount}
+      leaf: ${o.leaf}
+      balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
         `);
     });
@@ -142,7 +143,6 @@ async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
   });
 }
 
-
 const fromProofArray = (arr: string[]): string => {
   return (
     '0x' +
@@ -151,4 +151,3 @@ const fromProofArray = (arr: string[]): string => {
     }, '')
   );
 };
-
