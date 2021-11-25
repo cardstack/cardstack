@@ -23,6 +23,11 @@ export default class ImageEditorComponent extends Component<ImageEditorComponent
 
   @action initializeCropper(image: HTMLImageElement) {
     try {
+      if (!this.args.width || !this.args.height) {
+        throw new Error(
+          'Both width and height are required to initialize cropper'
+        );
+      }
       this.errored = false;
       let component = this;
       this.cropper = new Cropper(image, {
