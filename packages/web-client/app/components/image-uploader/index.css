@@ -44,6 +44,7 @@
 
 .image-uploader__preview--rounded {
   border-radius: 9999px;
+  overflow: hidden;
 }
 
 .image-uploader__preview--placeholder {
