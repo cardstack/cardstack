@@ -67,6 +67,9 @@ module.exports = {
     clientURL: 'https://app.cardstack.com',
     clientName: 'Cardstack',
   },
+  web3storage: {
+    token: null,
+  },
   compiler: {
     realmsConfig: defer(function () {
       return [
