@@ -3,19 +3,13 @@ import forbiddenIds from '../assets/forbidden-ids.json';
 
 export default class ReservedWords {
   lowerCaseAlphaNumericTransform = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  reservedWords = Object.entries(forbiddenIds)
+    .filter(([k]) => k !== 'profanity')
+    .flatMap(([_k, v]) => v);
+  profanity = forbiddenIds.profanity.map((k) => k.toLowerCase());
 
   constructor() {
     autoBind(this);
-  }
-
-  get reservedWords() {
-    return Object.entries(forbiddenIds)
-      .filter(([k]) => k !== 'profanity')
-      .flatMap(([_k, v]) => v);
-  }
-
-  get profanity() {
-    return forbiddenIds.profanity.map((k) => k.toLowerCase());
   }
 
   isProfane(word: string, transform?: (reservedWord: string) => string) {
