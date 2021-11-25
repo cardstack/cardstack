@@ -117,7 +117,7 @@ export class ImageValidation {
       } else {
         message = `Please upload a file between ${fileSize(
           minFileSize
-        )} and ${fileSize(maxFileSize)}.`;
+        )} and ${fileSize(maxFileSize)}`;
       }
     } else if (!imageSizeValid) {
       const { minWidth, maxWidth, minHeight, maxHeight } = this;
