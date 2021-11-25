@@ -1,11 +1,7 @@
 .image-uploader__container {
-  --horizontal-gap: var(--boxel-sp-lg);
-  --image-size: 5.625rem;
-
   display: grid;
-  gap: 0 var(--horizontal-gap);
   width: max-content;
-  grid-template-columns: var(--image-size) auto;
+  grid-template-columns: auto auto;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'preview controls'
@@ -14,45 +10,7 @@
 
 .image-uploader__preview {
   grid-area: preview;
-  position: relative;
-  width: var(--image-size);
-  height: var(--image-size);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-uploader__preview-image {
-  object-fit: contain;
-  flex-grow: 0;
-}
-
-.image-uploader__loading-indicator-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--image-size);
-  height: var(--image-size);
-  background-color: rgba(100, 100, 100, 0.5);
-}
-
-.image-uploader__loading-indicator {
-  width: 100%;
-  height: 100%;
-  padding: var(--boxel-sp-lg);
-}
-
-.image-uploader__preview--rounded {
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.image-uploader__preview--placeholder {
-  --icon-color: var(--boxel-purple-200);
-
-  overflow: visible;
-  padding: var(--boxel-sp);
-  background-color: var(--boxel-light-400);
+  margin-right: var(--boxel-sp-lg);
 }
 
 .image-uploader__controls {

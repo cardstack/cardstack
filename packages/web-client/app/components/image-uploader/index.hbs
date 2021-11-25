@@ -1,20 +1,8 @@
 <div class="image-uploader__container">
-  {{#if @image}}
-    <div class={{cn "image-uploader__preview" image-uploader__preview--rounded=@rounded}}>
-      <img class="image-uploader__preview-image" src={{@image}} alt={{@imageDescription}} data-test-image-uploader-image/>
-      {{#if (eq @state "loading")}}
-      <div class="image-uploader__loading-indicator-container">
-        <Boxel::LoadingIndicator
-          class="image-uploader__loading-indicator"
-          @color="var(--boxel-light)"
-        />
-      </div>
-      {{/if}}
+  {{#if (has-block)}}
+    <div class="image-uploader__preview">
+      {{yield}}
     </div>
-  {{else}}
-    {{#let (or @placeholderIcon "user") as |icon|}}
-      {{svg-jar icon class=(cn "image-uploader__preview" "image-uploader__preview--placeholder" image-uploader__preview--rounded=@rounded) role="presentation" data-test-image-uploader-placeholder=icon}}
-    {{/let}}
   {{/if}}
   <input {{did-insert this.setUploader}} type="file" accept={{or @acceptedFileTypes "image/jpeg, image/png"}} id={{concat "hidden-file-input-" (unique-id)}} hidden {{on "change" this.onFileChanged}} data-test-image-uploader-file-input>
   <div class="image-uploader__controls">
@@ -23,7 +11,7 @@
       <Boxel::Button @kind="secondary-light" @size="small" class="image-uploader__button image-uploader__button--icon" aria-label="Remove current image" {{on "click" @onRemoveImage}} data-test-image-uploader-delete-button>{{svg-jar "trash" width=18 height=18}}</Boxel::Button>
     {{/if}}
   </div>
-  {{#if (eq @state "error")}}
+  {{#if @errored}}
     <div class="image-uploader__error-message" data-test-image-uploader-error>
       {{@errorMessage}}
     </div>
