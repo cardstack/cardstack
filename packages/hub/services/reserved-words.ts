@@ -19,8 +19,10 @@ export default class ReservedWords {
   }
 
   isProfane(word: string, transform?: (reservedWord: string) => string) {
-    if (transform) return this.profanity.some((reservedWord) => word.includes(transform(reservedWord)));
-    else return this.profanity.some((reservedWord) => word.includes(reservedWord));
+    // assumes that profanity by default is lowercased, which it is at the moment.
+    let lowercased = word.toLowerCase();
+    if (transform) return this.profanity.some((reservedWord) => lowercased.includes(transform(reservedWord)));
+    else return this.profanity.some((reservedWord) => lowercased.includes(reservedWord));
   }
 
   isReserved(word: string, transform?: (reservedWord: string) => string) {

@@ -20,6 +20,10 @@ describe('ReservedWordsService', function () {
     expect(reservedWordsService.isProfane('fuck')).equal(true);
   });
 
+  it('can detect a profane word with mixed case', async function () {
+    expect(reservedWordsService.isProfane('fuCk')).equal(true);
+  });
+
   it('can detect a profane word with transforms', async function () {
     expect(
       reservedWordsService.isProfane('leatherrestraint', reservedWordsService.lowerCaseAlphaNumericTransform)
