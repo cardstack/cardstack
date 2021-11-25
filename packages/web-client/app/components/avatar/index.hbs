@@ -1,0 +1,21 @@
+<div class={{cn "avatar" avatar--rounded=@rounded}} ...attributes>
+{{#if @src}}
+  <img
+    class="avatar"
+    src={{@src}}
+    alt={{@alt}}
+  />
+  {{#if @loading}}
+    <div class="avatar__loading-indicator-container">
+      <Boxel::LoadingIndicator
+        class="avatar__loading-indicator"
+        @color="var(--boxel-light)"
+      />
+    </div>
+  {{/if}}
+{{else}}
+  {{#let (or @placeholderIcon "user") as |icon|}}
+    {{svg-jar icon class=(cn "avatar__preview" "avatar__preview-placeholder") role="presentation" data-test-avatar-placeholder=icon}}
+  {{/let}}
+{{/if}}
+</div>
