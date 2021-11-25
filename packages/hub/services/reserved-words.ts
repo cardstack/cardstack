@@ -19,8 +19,8 @@ export default class ReservedWords {
   }
 
   isProfane(word: string, transform?: (reservedWord: string) => string) {
-    if (transform) return this.profanity.some((reservedWord) => word.includes(transform(reservedWord)));
-    else return this.profanity.some((reservedWord) => word.includes(reservedWord));
+    if (transform) return this.profanity.some((reservedWord) => word.toLowerCase().includes(transform(reservedWord)));
+    else return this.profanity.some((reservedWord) => word.toLowerCase().includes(reservedWord));
   }
 
   isReserved(word: string, transform?: (reservedWord: string) => string) {
