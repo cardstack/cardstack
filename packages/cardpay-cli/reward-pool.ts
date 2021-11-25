@@ -1,8 +1,12 @@
 import { getWeb3 } from './utils';
-import { RewardTokenBalance, ProofWithBalance, getSDK, getConstant } from '@cardstack/cardpay-sdk';
+import { Proof, RewardTokenBalance, getSDK, getConstant } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
 import groupBy from 'lodash/groupBy';
+
+type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
+  tokenSymbol: string;
+};
 
 export async function rewardTokenBalances(
   network: string,
@@ -13,11 +17,12 @@ export async function rewardTokenBalances(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
+  const enhancedTokenBalances = await addTokenSymbol(rewardPool, tokenBalances);
   console.log(`Reward balances for ${address}`);
-  displayRewardTokenBalance(tokenBalances);
+  displayRewardTokenBalance(enhancedTokenBalances);
 }
 
-function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
+function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>[]): void {
   const groupedByRewardProgram = groupBy(tokenBalances, (a) => a.rewardProgramId);
   Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
     console.log(`---------------------------------------------------------------------
@@ -30,7 +35,7 @@ function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
   });
 }
 
-function displayProofs(proofs: ProofWithBalance[]): void {
+function displayProofs(proofs: WithSymbol<Proof>[]): void {
   const groupedByRewardProgram = groupBy(proofs, (a) => a.rewardProgramId);
   Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
     console.log(`---------------------------------------------------------------------
@@ -39,12 +44,26 @@ function displayProofs(proofs: ProofWithBalance[]): void {
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
       console.log(`
-    paymentCycle: ${o.paymentCycle}
-    token: ${o.tokenAddress} (${o.tokenSymbol})
-    proof: ${o.proof}
-    balance: ${fromWei(o.balance)}
-      `);
+      paymentCycle: ${o.paymentCycle}
+      proof: ${fromProofArray(o.proofArray)}
+      balance: ${o.amount}
+      token: ${o.tokenAddress} (${o.tokenSymbol})
+        `);
     });
+  });
+}
+
+async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
+  rewardPool: any,
+  arrWithTokenAddress: T[]
+): Promise<WithSymbol<T>[]> {
+  const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
+  const tokenMapping = await rewardPool.tokenSymbolMapping(tokenAddresses);
+  return arrWithTokenAddress.map((o) => {
+    return {
+      ...o,
+      tokenSymbol: tokenMapping[o.tokenAddress],
+    };
   });
 }
 
@@ -82,7 +101,8 @@ export async function rewardPoolBalance(
   let rewardPool = await getSDK('RewardPool', web3);
   let balance = await rewardPool.balance(rewardProgramId, tokenAddress);
   console.log(`Balance of reward pool`);
-  displayRewardTokenBalance([balance]);
+  const enhancedBalance = await addTokenSymbol(rewardPool, [balance]);
+  displayRewardTokenBalance(enhancedBalance);
 }
 
 export async function getClaimableRewardProofs(
@@ -94,10 +114,21 @@ export async function getClaimableRewardProofs(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  const claimableRewardProofs = await rewardPool.getProofsWithNonZeroBalance(address, rewardProgramId, tokenAddress);
+  const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
+  const enhancedProofs = await addTokenSymbol(rewardPool, proofs);
+
   console.log(`Reward Proofs for ${address}`);
-  displayProofs(claimableRewardProofs);
+  displayProofs(enhancedProofs);
 }
+
+const fromProofArray = (arr: string[]): string => {
+  return (
+    '0x' +
+    arr.reduce((proof, s) => {
+      return proof.concat(s.replace('0x', ''));
+    }, '')
+  );
+};
 
 export async function claimRewards(
   network: string,
