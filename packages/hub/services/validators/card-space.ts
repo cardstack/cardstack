@@ -94,6 +94,8 @@ export default class CardSpaceValidator {
 
     if (cardSpace.profileName && cardSpace.profileName.length > MAX_SHORT_FIELD_LENGTH) {
       errors.profileName.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    } else if (cardSpace.profileName && this.reservedWords.isProfane(cardSpace.profileName)) {
+      errors.profileName.push(`Username is not allowed`);
     }
 
     if (cardSpace.profileCategory && cardSpace.profileCategory.length > MAX_SHORT_FIELD_LENGTH) {
