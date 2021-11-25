@@ -134,40 +134,11 @@ export default class RewardPool {
     });
   }
 
-  // async getProofsWithBalance(
-  //   address: string,
-  //   rewardProgramId?: string,
-  //   tokenAddress?: string
-  // ): Promise<EnhancedProof[]> {
-  //   let rewardPool = await this.getRewardPool();
-  //   let proofs = await this.getProofs(address, rewardProgramId, tokenAddress);
-  //   const tokenAddresses = [...new Set(proofs.map((item) => item.tokenAddress))];
-  //   let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
-  //   return await Promise.all(
-  //     proofs.map(async (o: Proof) => {
-  //       const balance = await rewardPool.methods
-  //         .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
-  //         .call();
-  //       return {
-  //         ...o,
-  //         balance: new BN(balance),
-  //         tokenSymbol: tokenMapping[o.tokenAddress],
-  //       };
-  //     })
-  //   );
-  // }
-
-  // Puts balance into an object shape
   async rewardTokenBalance(
     address: string,
     tokenAddress: string,
     rewardProgramId?: string
   ): Promise<RewardTokenBalance> {
-    // dependent on tally change
-    // let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
-    // if (!rewardTokensAvailable.includes(tokenAddress)) {
-    //   throw new Error(`Payee does not have any reward token ${tokenAddress}`);
-    // }
     let balance = await this.getBalance(address, rewardProgramId, tokenAddress);
     return {
       rewardProgramId,
