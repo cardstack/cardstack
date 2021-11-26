@@ -3,7 +3,7 @@
   --option-input-border-color: var(--boxel-dark);
 
   display: grid;
-  grid-template-columns: auto 1fr 1fr;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: var(--boxel-sp);
   padding: var(--boxel-sp-lg) var(--boxel-sp);
