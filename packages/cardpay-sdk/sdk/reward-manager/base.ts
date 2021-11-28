@@ -787,6 +787,10 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return (await this.getRewardManager()).methods.isRewardProgram(rewardProgramId).call();
   }
 
+  async isValidRewardSafe(rewardSafe: string,rewardProgramId: string): Promise<boolean> {
+    return (await this.getRewardManager()).methods.isValidRewardSafe(rewardSafe,rewardProgramId).call();
+  }
+
   async isLocked(rewardProgramId: string): Promise<boolean> {
     return (await this.getRewardManager()).methods.rewardProgramLocked(rewardProgramId).call();
   }
