@@ -28,6 +28,23 @@ export interface Proof {
   leaf: string;
 }
 
+export interface Leaf {
+  rewardProgramId: string;
+  paymentCycleNumber: number;
+  startBlock: number;
+  endBlock: number;
+  tokenType: number;
+  payee: string;
+  transferData: string;
+}
+
+export interface TokenTransferDetail {
+  token: string;
+  amount: BN;
+}
+
+export interface FullLeaf extends Partial<TokenTransferDetail>, Leaf {}
+
 const DEFAULT_PAGE_SIZE = 1000000;
 
 export interface RewardTokenBalance {
@@ -44,17 +61,6 @@ export default class RewardPool {
     return await (await this.getRewardPool()).methods.numPaymentCycles().call();
   }
 
-  async getBalanceForProofOld(
-    rewardProgramId: string,
-    tokenAddress: string,
-    address: string,
-    proof: string
-  ): Promise<string> {
-    return (await this.getRewardPool()).methods
-      .balanceForProofWithAddress(rewardProgramId, tokenAddress, address, proof)
-      .call();
-  }
-
   async getBalance(address: string, rewardProgramId?: string, tokenAddress?: string): Promise<BN> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
     return unclaimedProofs.reduce((total, { amount }) => {
@@ -62,10 +68,13 @@ export default class RewardPool {
     }, new BN('0'));
   }
 
-  async isClaimed(leaf: string): Promise<boolean> {
-    return (await this.getRewardPool()).methods.claimed(leaf).call();
+  async isClaimed(leaf: string, proofArray: string[]): Promise<boolean> {
+    return (await this.getRewardPool()).methods.valid(leaf, proofArray).call();
   }
 
+  async isValid(leaf: string, proofArray: string[]): Promise<boolean> {
+    return (await this.getRewardPool()).methods.valid(leaf, proofArray).call();
+  }
   // TOTAL balance of reward pool -- cumulative across reward program
   async getBalanceForPool(tokenAddress: string): Promise<string> {
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
@@ -237,19 +246,17 @@ export default class RewardPool {
   async claim(txnHash: string): Promise<TransactionReceipt>;
   async claim(
     safeAddress: string,
-    rewardProgramId: string,
-    tokenAddress: string,
-    proof: string,
-    amount?: string,
+    leaf: string,
+    proofArray: string[],
+    acceptPartialClaim?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
   async claim(
     safeAddressOrTxnHash: string,
-    rewardProgramId?: string,
-    tokenAddress?: string,
-    proof?: string,
-    amount?: string,
+    leaf?: string,
+    proofArray?: string[],
+    acceptPartialClaim?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
@@ -258,14 +265,26 @@ export default class RewardPool {
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
+    if (proofArray && proofArray.length > 0) {
+      throw new Error('proof must be provided');
+    }
+    if (!leaf) {
+      throw new Error('leaf must be provided');
+    }
+
+    let { rewardProgramId, payee, token }: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
+
     if (!rewardProgramId) {
       throw new Error('rewardProgramId must be provided');
     }
-    if (!tokenAddress) {
-      throw new Error('tokenAddress must be provided');
+    if (!leaf) {
+      throw new Error('leaf must be provided');
     }
-    if (!proof) {
-      throw new Error('proof must be provided');
+    if (!proofArray) {
+      throw new Error('proofArray must be provided');
+    }
+    if (!token) {
+      throw new Error('token must be provided');
     }
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
@@ -273,51 +292,32 @@ export default class RewardPool {
     if (!(await rewardManager.isRewardProgram(rewardProgramId))) {
       throw new Error('reward program does not exist');
     }
-
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    if (!(await rewardManager.isValidRewardSafe(safeAddress, rewardProgramId))) {
+      throw new Error('reward safe is not valid');
+    }
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
-    let unclaimedRewards = new BN(
-      await this.getBalanceForProofOld(rewardProgramId, tokenAddress, rewardSafeOwner, proof)
-    );
-    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, tokenAddress)).balance;
+
+    if (rewardSafeOwner != payee) {
+      throw new Error('payee is not owner of the reward safe');
+    }
+
+    if (!(await this.isValid(leaf, proofArray))) {
+      throw new Error('proof is not valid');
+    }
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
-The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
-      );
-    }
-    let weiAmount = amount ? new BN(toWei(amount)) : unclaimedRewards;
-    if (weiAmount.gt(unclaimedRewards)) {
-      throw new Error(
-        `Insufficient rewards for rewardSafeOwner.
-For the proof, the reward safe owner can only redeem ${unclaimedRewards} but user is asking for ${amount}`
-      );
-    }
-
-    if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
-      throw new Error(
-        `Insufficient funds inside reward pool for reward program.
-The reward program ${rewardProgramId} has balance equals ${fromWei(
-          rewardPoolBalanceForRewardProgram.toString()
-        )} but user is asking for ${amount}`
+    The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
-    let payload = (await this.getRewardPool()).methods
-      .claim(rewardProgramId, tokenAddress, weiAmount, proof)
-      .encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
+    let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, token);
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (weiAmount.lt(gasCost)) {
-      throw new Error(
-        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
-          unclaimedRewards
-        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
-      );
-    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     if (nonce == null) {
@@ -333,7 +333,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       payload,
       0,
       estimate,
-      tokenAddress,
+      token,
       ZERO_ADDRESS,
       nonce,
       rewardSafeOwner,
@@ -350,7 +350,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       estimate.safeTxGas,
       estimate.baseGas,
       estimate.gasPrice,
-      tokenAddress,
+      token,
       ZERO_ADDRESS,
       nonce.toString()
     );
@@ -398,6 +398,53 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       })
     );
     return o;
+  }
+
+  private decodeLeaf(leaf: string): FullLeaf {
+    let outerObj = this.layer2Web3.eth.abi.decodeParameters(
+      [
+        { type: 'address', name: 'rewardProgramId' },
+        { type: 'uint256', name: 'paymentCycleNumber' },
+        { type: 'uint256', name: 'startBlock' },
+        { type: 'uint256', name: 'endBlock' },
+        { type: 'uint256', name: 'tokenType' },
+        { type: 'uint256', name: 'payee' },
+        { type: 'bytes', name: 'transferData' },
+      ],
+      leaf
+    ) as Leaf;
+    let transferDataObj = this.decodeTransferData(outerObj.tokenType, outerObj.transferData);
+    if (this.hasTokenTransferDetail(transferDataObj)) {
+      return { ...outerObj, ...transferDataObj };
+    } else {
+      return outerObj;
+    }
+  }
+
+  private hasTokenTransferDetail(o: any): o is TokenTransferDetail {
+    return 'token' in o && 'amount' in o;
+  }
+
+  private decodeTransferData(tokenType: number, transferData: string): TokenTransferDetail | string {
+    if (tokenType == 0) {
+      // Default data
+      return transferData;
+    } else if (
+      // ERC677 / ERC20
+      tokenType == 1 ||
+      // ERC721 (NFT)
+      tokenType == 2
+    ) {
+      return this.layer2Web3.eth.abi.decodeParameters(
+        [
+          { type: 'address', name: 'token' },
+          { type: 'uint256', name: 'amount' },
+        ],
+        transferData
+      ) as TokenTransferDetail;
+    } else {
+      throw new Error('Unknown tokenType');
+    }
   }
 
   private async getAddRewardTokensPayload(rewardProgramId: string, tokenAddress: string, amount: BN): Promise<string> {

@@ -111,21 +111,19 @@ export async function getClaimableRewardProofs(
 export async function claimRewards(
   network: string,
   rewardSafeAddress: string,
-  rewardProgramId: string,
-  tokenAddress: string,
+  leaf: string,
   proof: string,
-  amount?: string,
+  acceptPartialClaim?: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await rewardPool.claim(rewardSafeAddress, rewardProgramId, tokenAddress, proof, amount, {
+  let proofArray = fromProof(proof);
+  await rewardPool.claim(rewardSafeAddress, leaf, proofArray, acceptPartialClaim, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  console.log(
-    `Claimed token ${tokenAddress} to reward safe ${rewardSafeAddress} for reward program ${rewardProgramId}`
-  );
+  console.log(`Claimed reward to reward safe ${rewardSafeAddress}`);
   console.log('done');
 }
 
@@ -151,3 +149,22 @@ const fromProofArray = (arr: string[]): string => {
     }, '')
   );
 };
+
+const fromProof = (proof: string): any => {
+  let bytesSize = 32;
+  let hexChunkSize = bytesSize * 2;
+  let hexStr = proof.replace('0x', '');
+  if (hexStr.length % hexChunkSize != 0) {
+    throw new Error('proof array is wrong size');
+  }
+  return chunkString(hexStr, hexChunkSize).map((s) => '0x' + s);
+};
+
+function chunkString(str: string, chunkSize: number) {
+  let arr = str.match(new RegExp('.{1,' + chunkSize + '}', 'g'));
+  if (arr) {
+    return arr;
+  } else {
+    throw new Error('proof cannot be converted to proof array  split properly');
+  }
+}
