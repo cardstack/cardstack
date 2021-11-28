@@ -272,7 +272,7 @@ export default class RewardPool {
       throw new Error('leaf must be provided');
     }
 
-    let { rewardProgramId, payee, token }: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
+    let { rewardProgramId, payee, token, amount }: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
 
     if (!rewardProgramId) {
       throw new Error('rewardProgramId must be provided');
@@ -285,6 +285,9 @@ export default class RewardPool {
     }
     if (!token) {
       throw new Error('token must be provided');
+    }
+    if (!amount) {
+      throw new Error('amount must be provided');
     }
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
@@ -305,6 +308,16 @@ export default class RewardPool {
       throw new Error('proof is not valid');
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let weiAmount = new BN(toWei(amount));
+    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
+    if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
+      throw new Error(
+        `Insufficient funds inside reward pool for reward program.
+The reward program ${rewardProgramId} has balance equals ${fromWei(
+          rewardPoolBalanceForRewardProgram.toString()
+        )} but user is asking for ${amount}`
+      );
+    }
 
     if (!(rewardSafeOwner == from)) {
       throw new Error(
@@ -318,6 +331,13 @@ export default class RewardPool {
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, token);
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (weiAmount.lt(gasCost)) {
+      throw new Error(
+        `Rewards claimed does not have enough to cover the gas cost. The amount to be claimed is ${amount}, the gas cost is ${fromWei(
+          gasCost
+        )}`
+      );
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     if (nonce == null) {
