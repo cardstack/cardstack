@@ -1,6 +1,6 @@
 {
   "name": "discord-bot",
-  "version": "0.27.32",
+  "version": "0.27.33",
   "description": "",
   "main": "index.js",
   "private": true,
