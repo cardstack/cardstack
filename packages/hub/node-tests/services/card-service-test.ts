@@ -69,7 +69,7 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             import integer from "https://cardstack.com/base/integer";
-            import person from "./person";
+            import person from "../person";
             export default class Post {
               @contains(string) title;
               @contains(string) body;
