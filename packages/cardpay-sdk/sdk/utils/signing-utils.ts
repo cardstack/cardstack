@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { Estimate, SendPayload } from './safe-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.5/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.6/prepaid-card-manager';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
