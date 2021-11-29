@@ -1,50 +1,23 @@
 import { ComponentInfo, RawCard, CompiledCard, Field } from '@cardstack/core/src/interfaces';
 import type { CardJSONResponse } from '@cardstack/core/src/interfaces';
-import { Serializer, SerializerOptions } from 'jsonapi-serializer';
+import { findIncluded } from '@cardstack/core/src/jsonapi';
+import { PgPrimitive } from './expressions';
+
 import _mapKeys from 'lodash/mapKeys';
 import _camelCase from 'lodash/camelCase';
-import mergeWith from 'lodash/mergeWith';
-import uniq from 'lodash/uniq';
-import { findIncluded } from '@cardstack/core/src/jsonapi';
+import merge from 'lodash/merge';
+import set from 'lodash/set';
+import get from 'lodash/get';
 
-export async function serializeCard(
-  url: string,
-  data: RawCard['data'],
-  component: ComponentInfo
-): Promise<CardJSONResponse> {
-  let cardSerializer = new Serializer('card', {
-    ...convertUsedFields(component.usedFields),
-    keyForAttribute: 'camelCase',
-    dataMeta: {
+export function serializeCard(url: string, data: RawCard['data'], component: ComponentInfo): CardJSONResponse {
+  let resource = serializeResource('card', url, component.usedFields, data);
+  resource.meta = merge(
+    {
       componentModule: component.moduleName,
     },
-  });
-  return cardSerializer.serialize(Object.assign({ id: url }, data));
-}
-
-function mergeWithUniq(dest: Record<string, unknown>, ...srcs: Record<string, unknown>[]) {
-  return mergeWith(dest, ...srcs, appendArraysUniq);
-}
-
-function appendArraysUniq(objValue: any, srcValue: any) {
-  if (Array.isArray(objValue)) {
-    return uniq(objValue.concat(srcValue));
-  }
-  return undefined;
-}
-
-function convertUsedFields(usedFields: string[]): SerializerOptions {
-  let result: SerializerOptions = {
-    attributes: [],
-  };
-  for (let fieldName of usedFields) {
-    let [first, ...rest] = fieldName.split('.');
-    result.attributes!.push(first);
-    if (rest.length > 0) {
-      result[first] = mergeWithUniq({}, result[first], convertUsedFields([rest.join('.')]));
-    }
-  }
-  return result;
+    resource.meta
+  );
+  return resource;
 }
 
 export function deserialize(payload: any): any {
@@ -76,15 +49,15 @@ function serializeResource(
   for (const attr of attributes) {
     if (typeof attr === 'object') {
       let [aliasName, name] = Object.entries(attr)[0];
-      resource.attributes[aliasName] = payload[name] ?? null;
+      set(resource.attributes, aliasName, get(payload, name) ?? null);
     } else {
-      resource.attributes[attr] = payload[attr] ?? null;
+      set(resource.attributes, attr, get(payload, attr) ?? null);
     }
   }
   return resource;
 }
 
-export function serializeRawCard(card: RawCard, compiled?: CompiledCard): Promise<Record<string, unknown>> {
+export function serializeRawCard(card: RawCard, compiled?: CompiledCard): PgPrimitive {
   let resource = serializeResource(
     'raw-cards',
     card.url,

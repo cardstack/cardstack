@@ -1,0 +1,5 @@
+{
+  "schema": "schema.js",
+  "embedded": "embedded.js",
+  "edit": "edit.js"
+}

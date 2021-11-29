@@ -100,9 +100,23 @@ if (process.env.COMPILER) {
       expect(response.status).to.equal(409);
     });
 
-    it('404s when you try to post a card that adopts from a non-existent card', async function () {
-      // assert.expect(0);
-      await postCard('https://not-created.com/post', PAYLOAD).expect(404);
+    it('gives good error when you try to post a card that adopts from a non-existent card', async function () {
+      await postCard('https://not-created.com/post', PAYLOAD)
+        .expect(422)
+        .expect({
+          errors: [
+            {
+              code: 422,
+              detail: 'tried to adopt from card https://not-created.com/post but it failed to load',
+              title: 'Unprocessable Entity',
+            },
+            {
+              code: 404,
+              detail: 'https://not-created.com/post/ is not a realm we know about',
+              title: 'Not Found',
+            },
+          ],
+        });
     });
 
     it('Errors when you try to include other fields', async function () {
