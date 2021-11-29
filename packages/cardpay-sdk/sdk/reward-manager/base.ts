@@ -18,6 +18,7 @@ import {
   executeSend,
   gasEstimate,
   executeTransaction,
+  Operation,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -454,10 +455,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       rewardSafeDelegateAddress,
       '0',
       withdrawPayload,
-      1,
+      Operation.DELEGATECALL,
       tokenAddress
     );
-    console.log(estimate);
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
@@ -480,7 +480,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       rewardSafeDelegateAddress,
       0,
       withdrawPayload,
-      1,
+      Operation.DELEGATECALL,
       estimate,
       tokenAddress,
       ZERO_ADDRESS,
@@ -495,7 +495,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       rewardSafeDelegateAddress,
       '0',
       withdrawPayload,
-      '1',
+      Operation.DELEGATECALL.toString(),
       estimate.safeTxGas,
       estimate.baseGas,
       estimate.gasPrice,
@@ -508,7 +508,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       safeAddress,
       rewardSafeDelegateAddress,
       withdrawPayload,
-      1,
+      Operation.DELEGATECALL,
       estimate,
       nonce,
       fullSignature,
