@@ -308,12 +308,18 @@ export default class RewardPool {
     let weiAmount = new BN(amount);
     let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
     if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
-      throw new Error(
-        `Insufficient funds inside reward pool for reward program.
+      if (acceptPartialClaim) {
+        // acceptPartialClaim means: if reward pool balance is less than amount,
+        // rewardee is willing sacrifice full reward and accept the entire reward pool balance
+        weiAmount = rewardPoolBalanceForRewardProgram;
+      } else {
+        throw new Error(
+          `Insufficient funds inside reward pool for reward program.
 The reward program ${rewardProgramId} has balance equals ${fromWei(
-          rewardPoolBalanceForRewardProgram.toString()
-        )} but user is asking for ${amount}`
-      );
+            rewardPoolBalanceForRewardProgram.toString()
+          )} but user is asking for ${amount}`
+        );
+      }
     }
 
     if (!(rewardSafeOwner == from)) {
