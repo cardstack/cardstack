@@ -61,6 +61,7 @@ import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3Service from './services/web3';
+import Web3SocketService from './services/web3-socket';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
@@ -139,6 +140,7 @@ export function createRegistry(): Registry {
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
   registry.register('web3', Web3Service);
+  registry.register('web3-socket', Web3SocketService);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
