@@ -1,11 +1,7 @@
 .image-uploader__container {
-  --horizontal-gap: var(--boxel-sp-lg);
-  --image-size: 5.625rem;
-
   display: grid;
-  gap: 0 var(--horizontal-gap);
   width: max-content;
-  grid-template-columns: var(--image-size) auto;
+  grid-template-columns: auto auto;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'preview controls'
@@ -14,21 +10,7 @@
 
 .image-uploader__preview {
   grid-area: preview;
-  width: var(--image-size);
-  height: var(--image-size);
-  object-fit: contain;
-}
-
-.image-uploader__preview--rounded {
-  border-radius: 9999px;
-}
-
-.image-uploader__preview--placeholder {
-  --icon-color: var(--boxel-purple-200);
-
-  overflow: visible;
-  padding: var(--boxel-sp);
-  background-color: var(--boxel-light-400);
+  margin-right: var(--boxel-sp-lg);
 }
 
 .image-uploader__controls {
@@ -45,8 +27,19 @@
   margin: var(--boxel-sp-xs) 0;
 }
 
+/* TODO: replace this with a boxel button size variant in a future PR */
 .image-uploader__button--icon {
+  --icon-color: currentColor;
+
   padding: var(--boxel-sp-xxxs);
+}
+
+.image-uploader__error-message {
+  grid-area: requirements;
+  font: var(--boxel-font-xs);
+  max-width: 14rem;
+  color: var(--boxel-error-100);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .image-uploader__requirements {
