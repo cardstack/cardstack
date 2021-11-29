@@ -117,9 +117,8 @@ export default class RewardPool {
     if (tokenAddress) {
       url.searchParams.append('token_address', tokenAddress);
     }
-    if (knownClaimed) {
-      url.searchParams.append('known_claimed', knownClaimed.toString());
-    }
+    let knownClaimedStr = knownClaimed ? knownClaimed.toString() : 'false';
+    url.searchParams.append('known_claimed', knownClaimedStr);
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
