@@ -395,7 +395,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt>;
   async withdraw(
     safeAddressOrTxnHash: string,
-    to?: string, // TODO: use this when https://github.com/cardstack/card-pay-protocol/pull/141 is deployed
+    to?: string,
     tokenAddress?: string,
     amount?: string,
     txnOptions?: TransactionOptions,
@@ -429,7 +429,10 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
-    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(RewardSafeDelegateABI as AbiItem[], rewardSafeDelegateAddress);
+    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -438,12 +441,23 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
     let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
     if (weiAmount.gt(safeBalance)) {
-      throw new Error(`Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`);
+      throw new Error(
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+      );
     }
 
     let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
     let withdrawPayload = withdraw.encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardSafeDelegateAddress, '0', withdrawPayload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardSafeDelegateAddress,
+      '0',
+      withdrawPayload,
+      1,
+      tokenAddress
+    );
+    console.log(estimate);
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
@@ -478,7 +492,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let eip1271Data = createEIP1271VerifyingData(
       this.layer2Web3,
-      rewardManagerAddress,
+      rewardSafeDelegateAddress,
       '0',
       withdrawPayload,
       '1',
@@ -494,6 +508,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       safeAddress,
       rewardSafeDelegateAddress,
       withdrawPayload,
+      1,
       estimate,
       nonce,
       fullSignature,
