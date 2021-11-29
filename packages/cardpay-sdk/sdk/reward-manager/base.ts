@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import RewardManagerABI from '../../contracts/abi/v0.8.6/reward-manager';
+import RewardSafeDelegateABI from '../../contracts/abi/v0.8.6/reward-safe-delegate-implementation';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
@@ -23,7 +24,6 @@ import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
-import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -429,7 +429,7 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
-    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], rewardSafeDelegateAddress);
+    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(RewardSafeDelegateABI as AbiItem[], rewardSafeDelegateAddress);
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -438,11 +438,12 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
     let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
     if (weiAmount.gt(safeBalance)) {
-      throw new Error(`Insufficient funds for inside reward safe`);
+      throw new Error(`Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`);
     }
 
     let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
     let withdrawPayload = withdraw.encodeABI();
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardSafeDelegateAddress, '0', withdrawPayload, 0, tokenAddress);
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
@@ -451,8 +452,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         onNonce(nonce);
       }
     }
-
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardSafeDelegateAddress, '0', withdrawPayload, 0, tokenAddress);
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
