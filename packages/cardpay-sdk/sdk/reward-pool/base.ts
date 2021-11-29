@@ -265,7 +265,7 @@ export default class RewardPool {
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
-    if (proofArray && proofArray.length > 0) {
+    if (!(proofArray && proofArray.length > 0)) {
       throw new Error('proof must be provided');
     }
     if (!leaf) {
@@ -308,7 +308,7 @@ export default class RewardPool {
       throw new Error('proof is not valid');
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let weiAmount = new BN(toWei(amount));
+    let weiAmount = new BN(amount);
     let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
     if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
       throw new Error(
@@ -428,7 +428,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         { type: 'uint256', name: 'startBlock' },
         { type: 'uint256', name: 'endBlock' },
         { type: 'uint256', name: 'tokenType' },
-        { type: 'uint256', name: 'payee' },
+        { type: 'address', name: 'payee' },
         { type: 'bytes', name: 'transferData' },
       ],
       leaf
