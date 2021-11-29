@@ -2,10 +2,10 @@
   "compilerOptions": {
     "declaration": true,
     "esModuleInterop": true,
-    "module": "es6",
+    "module": "es2020",
     "moduleResolution": "Node",
     "pretty": true,
-    "target": "ES6",
+    "target": "es2020",
     "strict": true,
     "sourceMap": true,
     "experimentalDecorators": true,
