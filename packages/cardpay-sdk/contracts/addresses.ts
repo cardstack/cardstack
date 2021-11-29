@@ -16,6 +16,8 @@ import RegisterRewardProgramHandlerABI from './abi/v0.8.6/register-reward-progra
 import RegisterRewardeeHandlerABI from './abi/v0.8.6/register-rewardee-handler';
 import SupplierManagerABI from './abi/v0.8.6/supplier-manager';
 
+export const protocolVersions = ['v0.8.6', 'v0.8.5'];
+
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -64,6 +66,7 @@ const SOKOL = {
   rewardManager: '0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
   registerRewardeeHandler: '0xD46f5eE431eAA309ABeC7a3561E06586450171b0',
+  versionManager: '0xBbF3aad37298C997a485E270bD465ec3e6aCD2a7',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
   oracles: {
     'DAI.CPXD': '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
@@ -108,6 +111,7 @@ const XDAI = {
   rewardManager: '0x3B6bedcA6EC78fCd33aFeB385B192056de639403',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
+  versionManager: '0xd900133f96F85939335ADb9786ea9f2e07Bdf8c0',
   deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
   oracles: {
     'DAI.CPXD': '0x36698BF676c40be119b0Fe4f964f4527943258F2',

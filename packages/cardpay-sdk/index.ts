@@ -42,7 +42,7 @@ export * from './sdk/currency-utils';
 export * from './sdk/currencies';
 export { query as gqlQuery } from './sdk/utils/graphql';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
-export { getSDK } from './sdk/version-resolver';
+export { getSDK, getABI } from './sdk/version-resolver';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';
 export { default as ERC677ABI } from './contracts/abi/erc-677';
