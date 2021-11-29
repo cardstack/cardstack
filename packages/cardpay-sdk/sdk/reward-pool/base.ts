@@ -11,7 +11,7 @@ import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
+import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { TransactionReceipt } from 'web3-core';
 interface Proof {
@@ -279,7 +279,15 @@ export default class RewardPool {
       );
     }
     let payload = await this.getAddRewardTokensPayload(rewardProgramId, tokenAddress, weiAmount);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     if (nonce == null) {
@@ -293,7 +301,7 @@ export default class RewardPool {
       safeAddress,
       tokenAddress,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
@@ -376,7 +384,15 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let payload = (await this.getRewardPool()).methods
       .claim(rewardProgramId, tokenAddress, weiAmount, proof)
       .encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardPoolAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
@@ -399,7 +415,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       rewardPoolAddress,
       0,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       tokenAddress,
       ZERO_ADDRESS,
@@ -414,7 +430,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       rewardPoolAddress,
       '0',
       payload,
-      '0',
+      Operation.CALL.toString(),
       estimate.safeTxGas,
       estimate.baseGas,
       estimate.gasPrice,
@@ -427,7 +443,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       safeAddress,
       rewardPoolAddress,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       nonce,
       fullSignature,
