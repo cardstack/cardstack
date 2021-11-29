@@ -31,8 +31,8 @@ export interface Proof {
 export interface Leaf {
   rewardProgramId: string;
   paymentCycleNumber: number;
-  startBlock: number;
-  endBlock: number;
+  validFrom: number;
+  validTo: number;
   tokenType: number;
   payee: string;
   transferData: string;
@@ -277,12 +277,6 @@ export default class RewardPool {
     if (!rewardProgramId) {
       throw new Error('rewardProgramId must be provided');
     }
-    if (!leaf) {
-      throw new Error('leaf must be provided');
-    }
-    if (!proofArray) {
-      throw new Error('proofArray must be provided');
-    }
     if (!token) {
       throw new Error('token must be provided');
     }
@@ -307,7 +301,7 @@ export default class RewardPool {
     if (!(await this.isValid(leaf, proofArray))) {
       throw new Error('proof is not valid');
     }
-    if (!(await this.isClaimed(leaf))) {
+    if (await this.isClaimed(leaf)) {
       throw new Error('reward has been claimed');
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -428,8 +422,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       [
         { type: 'address', name: 'rewardProgramId' },
         { type: 'uint256', name: 'paymentCycleNumber' },
-        { type: 'uint256', name: 'startBlock' },
-        { type: 'uint256', name: 'endBlock' },
+        { type: 'uint256', name: 'validFrom' },
+        { type: 'uint256', name: 'validTo' },
         { type: 'uint256', name: 'tokenType' },
         { type: 'address', name: 'payee' },
         { type: 'bytes', name: 'transferData' },
