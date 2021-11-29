@@ -33,7 +33,11 @@ export function registry(context: object): Registry {
 }
 
 export function setupHub(mochaContext: Mocha.Suite) {
-  let container: Container, server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
+  let container: Container;
+  let server: HubServer;
+  let cardCache: CardCache;
+  let cardCacheConfig: TestCardCacheConfig;
+  let fsRealmDir: string;
 
   let currentCardService: CardServiceFactory | undefined;
   let cardServiceProxy = new Proxy(
@@ -57,9 +61,12 @@ export function setupHub(mochaContext: Mocha.Suite) {
     if (process.env.COMPILER) {
       cardCache = await container.lookup('card-cache');
       cardCacheConfig = (await container.lookup('card-cache-config')) as TestCardCacheConfig;
-      (await container.lookup('realm-manager')).createRealm({
+      fsRealmDir = tmp.dirSync().name;
+      await (
+        await container.lookup('realm-manager')
+      ).createRealm({
         url: TEST_REALM,
-        directory: tmp.dirSync().name,
+        directory: fsRealmDir,
       });
       currentCardService = await container.lookup('card-service');
     }
@@ -87,6 +94,9 @@ export function setupHub(mochaContext: Mocha.Suite) {
     },
     get realm() {
       return TEST_REALM;
+    },
+    getRealmDir(): string {
+      return fsRealmDir;
     },
   };
 }
