@@ -173,7 +173,6 @@ export async function executeTransaction(
   signatures: any,
   eip1271Data?: string
 ): Promise<GnosisExecTx> {
-  console.log('this is called');
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
   const options = {
