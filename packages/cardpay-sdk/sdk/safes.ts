@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { ContractOptions } from 'web3-eth-contract';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from './utils/safe-utils';
+import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
@@ -287,7 +287,15 @@ export default class Safes implements ISafes {
       );
     }
     let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
     let gasInToken = new BN(String(estimate.baseGas))
       .add(new BN(String(estimate.safeTxGas)))
       .mul(new BN(String(estimate.gasPrice)))
@@ -339,7 +347,15 @@ export default class Safes implements ISafes {
       );
     }
     let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (safeBalance.lt(new BN(amount).add(gasCost))) {
       throw new Error(
@@ -360,7 +376,7 @@ export default class Safes implements ISafes {
       safeAddress,
       tokenAddress,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
