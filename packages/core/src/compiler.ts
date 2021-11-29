@@ -132,13 +132,16 @@ export class Compiler {
 
   private async getParentCard(cardSource: RawCard, meta: PluginMeta): Promise<CompiledCard> {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
-
-    if (parentCardPath) {
-      let url = new URL(parentCardPath, cardSource.url).href;
+    let url = parentCardPath ? new URL(parentCardPath, cardSource.url).href : baseCardURL;
+    try {
       return await this.builder.getCompiledCard(url);
-    } else {
-      // the base card from which all other cards derive
-      return await this.builder.getCompiledCard(baseCardURL);
+    } catch (err: any) {
+      if (!err.isCardstackError || err.status !== 404) {
+        throw err;
+      }
+      let newErr = new CardstackError(`tried to adopt from card ${url} but it failed to load`, { status: 422 });
+      newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
+      throw newErr;
     }
   }
 
