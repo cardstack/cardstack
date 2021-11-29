@@ -1,8 +1,7 @@
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
+import { RewardTokenBalance, ProofWithBalance, getSDK, getConstant } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
-import { RewardTokenBalance, ProofWithBalance } from '@cardstack/cardpay-sdk/sdk/reward-pool';
 import groupBy from 'lodash/groupBy';
 
 export async function rewardTokenBalances(

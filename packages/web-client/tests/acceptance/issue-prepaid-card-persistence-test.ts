@@ -6,7 +6,6 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
 import {
@@ -30,6 +29,7 @@ import {
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
+  DepotSafe,
   convertAmountToNativeDisplay,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
@@ -133,7 +133,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -201,7 +201,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -260,7 +260,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -326,7 +326,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
       window.TEST__AUTH_TOKEN = undefined;
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Customize layout
@@ -400,7 +400,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
       assert.dom('[data-test-milestone="2"]').exists(); // Choose face value
@@ -410,7 +410,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
       await click('[data-test-milestone="1"] [data-test-boxel-button]');
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -457,7 +457,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Customize layout
@@ -490,7 +490,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert
         .dom('[data-test-cancelation][data-test-postable="0"]')
@@ -533,7 +533,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -597,7 +597,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ]);
       await layer2Service.safes.fetch();
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert
         .dom(cancelationPostableSel(0))
@@ -653,7 +653,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      await visit('/card-pay/wallet?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Customize layout

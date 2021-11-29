@@ -498,6 +498,9 @@ dataSources:
         - TokenHistory
         - Transaction
         - EOATransaction
+        - MerchantDeposit
+        - MerchantWithdraw
+        - MerchantRevenueEvent
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -507,6 +510,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -531,6 +536,9 @@ dataSources:
         - TokenHistory
         - Transaction
         - EOATransaction
+        - MerchantDeposit
+        - MerchantWithdraw
+        - MerchantRevenueEvent
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -540,6 +548,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -551,7 +561,7 @@ dataSources:
     source:
       address: "{REWARD_MANAGER_ADDRESS}"
       abi: RewardManager
-      startBlock: {v0_8_5_START_BLOCK}
+      startBlock: {v0_8_6_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -613,7 +623,7 @@ dataSources:
     source:
       address: "{REWARD_POOL_ADDRESS}"
       abi: RewardPool
-      startBlock: {v0_8_3_START_BLOCK}
+      startBlock: {v0_8_6_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -28,7 +28,7 @@ export default class MerchantInfoService extends Service {
     let response = yield fetch(`${config.hubURL}/api/merchant-infos`, {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+        Authorization: 'Bearer ' + this.hubAuthentication.authToken,
         Accept: 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
@@ -83,7 +83,7 @@ export default class MerchantInfoService extends Service {
       {
         method: 'GET',
         headers: {
-          Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+          Authorization: 'Bearer ' + this.hubAuthentication.authToken,
           Accept: 'application/vnd.api+json',
           'Content-Type': 'application/vnd.api+json',
         },

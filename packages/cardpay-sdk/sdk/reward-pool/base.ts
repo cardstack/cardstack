@@ -1,7 +1,7 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import RewardPoolABI from '../../contracts/abi/v0.8.5/reward-pool';
+import RewardPoolABI from '../../contracts/abi/v0.8.6/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
@@ -12,7 +12,7 @@ import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
-import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { TransactionReceipt } from 'web3-core';
 interface Proof {
   rootHash: string;
@@ -87,8 +87,8 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
-    tokenAddress?: string,
     rewardProgramId?: string,
+    tokenAddress?: string,
     offset?: number,
     limit?: number
   ): Promise<Proof[]> {
@@ -124,7 +124,7 @@ export default class RewardPool {
     tokenAddress?: string
   ): Promise<ProofWithBalance[]> {
     let rewardPool = await this.getRewardPool();
-    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    let proofs = await this.getProofs(address, rewardProgramId, tokenAddress);
     const tokenAddresses = [...new Set(proofs.map((item) => item.tokenAddress))];
     let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
     return await Promise.all(
@@ -165,7 +165,7 @@ export default class RewardPool {
     }
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
-    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    let proofs = await this.getProofs(address, rewardProgramId, tokenAddress);
 
     let rewardPool = await this.getRewardPool();
     let ungroupedTokenBalance = await Promise.all(
@@ -247,7 +247,7 @@ export default class RewardPool {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!rewardProgramId) {
@@ -300,7 +300,7 @@ export default class RewardPool {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
   async claim(txnHash: string): Promise<TransactionReceipt>;
@@ -324,7 +324,7 @@ export default class RewardPool {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!rewardProgramId) {
@@ -377,7 +377,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
@@ -434,7 +434,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {

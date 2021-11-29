@@ -84,3 +84,12 @@ button.workflow-tracker__toggle {
   padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
   text-align: center;
 }
+
+.abandon-workflow-confirmation {
+  padding: var(--boxel-sp-lg);
+}
+
+.abandon-workflow-confirmation p {
+  margin-top: var(--boxel-sp-sm);
+  margin-bottom: var(--boxel-sp-sm);
+}

@@ -72,7 +72,7 @@ describe('POST /api/card-spaces', function () {
     await request()
       .post('/api/card-spaces')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
@@ -134,7 +134,7 @@ describe('POST /api/card-spaces', function () {
     await request()
       .post('/api/card-spaces')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -173,7 +173,7 @@ describe('POST /api/card-spaces', function () {
     await request()
       .post('/api/card-spaces')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -212,7 +212,7 @@ describe('POST /api/card-spaces', function () {
     await request()
       .post('/api/card-spaces')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -261,7 +261,7 @@ describe('POST /api/card-spaces/validate-url', async function () {
     await request()
       .post(`/api/card-spaces/validate-url`)
       .send({ data: { attributes: { url: 'satoshi.card.space' } } })
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -281,7 +281,7 @@ describe('POST /api/card-spaces/validate-url', async function () {
     await request()
       .post(`/api/card-spaces/validate-url`)
       .send({ data: { attributes: { url: 'satoshi.card.space' } } })
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -291,6 +291,91 @@ describe('POST /api/card-spaces/validate-url', async function () {
             title: 'Invalid attribute',
             source: { pointer: `/data/attributes/url` },
             detail: 'Already exists',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/card-spaces')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
+
+describe('POST /api/card-spaces/validate-profile-name', async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+  let { request } = setupHub(this);
+
+  it('returns no url errors when profile name is available', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({ data: { attributes: { 'profile-name': 'Valid Profile Name' } } })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns an error when profile name is profane', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({ data: { attributes: { 'profile-name': "fuck this isn't valid" } } })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: {
+              pointer: `/data/attributes/profile-name`,
+            },
+            detail: 'Username is not allowed',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns an error when profile name is too long', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({
+        data: { attributes: { 'profile-name': 'morethanfiftymorethanfiftymorethanfiftymorethanfiftymorethanfifty' } },
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: {
+              pointer: `/data/attributes/profile-name`,
+            },
+            detail: 'Max length is 50',
           },
         ],
       })
@@ -333,7 +418,7 @@ describe('PUT /api/card-spaces', function () {
     await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(404);
@@ -350,7 +435,7 @@ describe('PUT /api/card-spaces', function () {
     await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(403);
@@ -415,7 +500,7 @@ describe('PUT /api/card-spaces', function () {
     await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -493,7 +578,7 @@ describe('PUT /api/card-spaces', function () {
     await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)

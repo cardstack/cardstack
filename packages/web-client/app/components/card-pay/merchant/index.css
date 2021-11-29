@@ -17,6 +17,10 @@
 .merchant__name {
   font: 700 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
+  max-width: 20rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .merchant__name--lg {

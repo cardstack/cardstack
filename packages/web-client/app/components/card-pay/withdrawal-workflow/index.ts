@@ -51,7 +51,7 @@ export const MILESTONE_TITLES = [
   `Claim tokens on ${c.layer1.conversationalName}`,
 ];
 
-export const WORKFLOW_VERSION = 4;
+export const WORKFLOW_VERSION = 5;
 
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable

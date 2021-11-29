@@ -23,7 +23,7 @@
         {{progressStep.title}}
       </span>
 
-      <span class="transaction-status__step-status">
+      <span class="transaction-status__step-status" data-test-token-bridge-step-status={{progressStep.index}} data-test-withdrawal-bridging-block-count={{this.blockCount}}>
         {{#if (eq progressStep.index 0)}}
           <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" rel="noopener" data-test-blockscout-button>
             View on Blockscout
@@ -32,6 +32,8 @@
         {{#if (eq progressStep.index 1)}}
           {{#if this.error}}
             <span data-test-withdrawal-bridging-failed>Failed</span>
+          {{else if this.showBridgingSubstate}}
+            {{this.bridgingSubstate}} <Boxel::LoadingIndicator class="transaction-status__spinner" />
           {{else}}
             <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
               View in Bridge Explorer

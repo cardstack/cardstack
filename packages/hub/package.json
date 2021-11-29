@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.27.25",
+  "version": "0.27.34",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -18,19 +18,19 @@
     "test": "npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
     "test:remove-ts-artifacts-for-corde": "find ./bot-tests \\( -name \"*.d.ts\" -or -name \"*.js\" -or -name \"*.js.map\" \\) -exec rm -f {} \\;",
-    "test:bot": "yarn test:remove-ts-artifacts-for-corde && corde",
+    "test:bot": "yarn test:remove-ts-artifacts-for-corde && bin/corde",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
     "@babel/core": "^7.12.13",
-    "@cardstack/cardpay-sdk": "0.27.25",
-    "@cardstack/core": "0.27.25",
-    "@cardstack/db": "0.27.25",
-    "@cardstack/di": "0.27.25",
-    "@cardstack/did-resolver": "0.27.25",
-    "@cardstack/discord-bot": "0.27.25",
+    "@cardstack/cardpay-sdk": "0.27.34",
+    "@cardstack/core": "0.27.34",
+    "@cardstack/db": "0.27.34",
+    "@cardstack/di": "0.27.34",
+    "@cardstack/did-resolver": "0.27.34",
+    "@cardstack/discord-bot": "0.27.34",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
@@ -85,11 +85,12 @@
     "walk-sync": "^2.2.0",
     "web3": "1.5.2",
     "web3-core": "1.5.2",
+    "web3.storage": "^3.3.4",
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.27.25",
-    "@cardstack/test-support": "0.27.25",
+    "@cardstack/eslint-config": "0.27.34",
+    "@cardstack/test-support": "0.27.34",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",

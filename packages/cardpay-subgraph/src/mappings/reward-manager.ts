@@ -1,6 +1,6 @@
 import { RewardeeRegistered } from '../../generated/RewardManager/RewardManager';
 import { RewardSafe, RewardProgram } from '../../generated/schema';
-import { toChecksumAddress, makeEOATransaction, makeAccount } from '../utils';
+import { toChecksumAddress, makeEOATransaction, makeAccount, setSafeType } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 // To track creation of reward safe
@@ -27,4 +27,6 @@ export function handleRewardeeRegistration(event: RewardeeRegistered): void {
   entity.rewardee = rewardee;
   entity.safe = rewardSafe;
   entity.save();
+
+  setSafeType(rewardSafe, 'reward');
 }

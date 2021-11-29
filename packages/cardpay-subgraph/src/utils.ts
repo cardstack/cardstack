@@ -16,6 +16,7 @@ import {
   Token,
   Account,
   MerchantSafe,
+  SafeOwner,
 } from '../generated/schema';
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 import { StaticToken } from './static-tokens';
@@ -61,6 +62,25 @@ export function makeEOATransactionForSafe(event: ethereum.Event, safe: string): 
   let owners = safeContract.getOwners();
   for (let i = 0; i < owners.length; i++) {
     makeEOATransaction(event, toChecksumAddress(owners[i]), safe);
+  }
+}
+
+export function setSafeType(safe: string, type: string): void {
+  let safeContract = GnosisSafe.bind(Address.fromString(safe));
+  let owners = safeContract.getOwners();
+  for (let i = 0; i < owners.length; i++) {
+    let ownerAddress = toChecksumAddress(owners[i]);
+    let safeOwnerEntityId = safe + '-' + ownerAddress;
+    let safeOwnerEntity = SafeOwner.load(safeOwnerEntityId);
+    if (safeOwnerEntity == null) {
+      log.warning(
+        'Cannot set safe type {} for safe {} with owner {}: SafeOwner entity does not exist for id {}. This is likely due to the subgraph having a startBlock that is higher than the block the SafeOwner was created in.',
+        [type, safe, ownerAddress, safeOwnerEntityId]
+      );
+      return;
+    }
+    safeOwnerEntity.type = type;
+    safeOwnerEntity.save();
   }
 }
 

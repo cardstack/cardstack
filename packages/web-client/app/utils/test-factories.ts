@@ -2,7 +2,7 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   DepotSafe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+} from '@cardstack/cardpay-sdk';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 import { Resolver } from 'did-resolver';
 import { encodeDID, getResolver } from '@cardstack/did-resolver';

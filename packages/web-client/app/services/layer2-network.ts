@@ -7,19 +7,17 @@ import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
   WithdrawalLimits,
 } from '../utils/web3-strategies/types';
-import {
-  MerchantSafe,
-  PrepaidCardSafe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -36,6 +34,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import { Safes } from '../resources/safes';
+import { TransactionReceipt } from 'web3-core';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
@@ -238,6 +237,10 @@ export default class Layer2Network
     return this.simpleEmitter.on(event, cb);
   }
 
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    return this.strategy.getBlockConfirmation(blockNumber);
+  }
+
   getBlockHeight() {
     return this.strategy.getBlockHeight();
   }
@@ -266,14 +269,20 @@ export default class Layer2Network
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amount: string
-  ): Promise<TransactionHash> {
+    amount: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     return this.strategy.bridgeToLayer1(
       safeAddress,
       receiverAddress,
       tokenSymbol,
-      amount
+      amount,
+      options
     );
+  }
+
+  async resumeBridgeToLayer1(txnHash: string) {
+    return this.strategy.resumeBridgeToLayer1(txnHash);
   }
 
   async awaitBridgedToLayer1(fromBlock: BN, transactionHash: TransactionHash) {

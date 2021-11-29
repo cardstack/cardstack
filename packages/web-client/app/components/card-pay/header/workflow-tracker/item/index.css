@@ -3,19 +3,13 @@
   --workflow-tracker-item-milestone-color: var(--boxel-highlight);
   --workflow-tracker-item-disabled-color: var(--boxel-purple-200);
 
-  display: grid;
-  grid-template-columns: 1fr var(--boxel-sp-xxl);
-  grid-template-rows: 1fr 1fr;
-  grid-template-areas:
-    "heading icon"
-    "milestone icon";
-  background: transparent;
   width: 100%;
-  color: var(--workflow-tracker-item-color);
+  border: 0;
   border-radius: var(--boxel-border-radius-sm);
   text-align: left;
   padding: var(--boxel-sp-sm);
-  border: 0;
+  display: flex;
+  align-items: center;
 }
 
 .workflow-tracker-item--completed,
@@ -53,9 +47,43 @@
   white-space: nowrap;
 }
 
+.workflow-tracker-item__description {
+  width: calc(100% - 25px);
+}
+
+.workflow-tracker-item__description > button {
+  background: transparent;
+  color: var(--workflow-tracker-item-color);
+  border-radius: var(--boxel-border-radius-sm);
+  text-align: left;
+  border: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.workflow-tracker-item__actions {
+  width: 25px;
+}
+
 .workflow-tracker-item__icon {
   grid-area: icon;
   justify-self: flex-end;
   align-self: center;
   margin-right: 0;
+}
+
+.workflow-tracker-item__delete-icon {
+  background: var(--boxel-danger);
+  border: none;
+  border-radius: 50px;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.workflow-tracker-item__delete-icon:hover {
+  opacity: 1;
 }

@@ -1,0 +1,18 @@
+.profile-edit {
+  padding: var(--boxel-sp-lg);
+}
+
+.profile-edit__header {
+  margin-bottom: var(--boxel-sp-lg);
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.profile-edit__field {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.profile-edit__field + .profile-edit__field {
+  margin-top: var(--boxel-sp-lg);
+}

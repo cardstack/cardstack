@@ -92,13 +92,17 @@
           class="withdrawal-transaction-amount__loading-indicator"
           @color="var(--boxel-light)"
         />
-        <div class="withdrawal-transaction-amount__loading-message">
+        <div data-test-withdrawal-transaction-amount-in-progress class="withdrawal-transaction-amount__loading-message">
           Waiting for you to confirm on your Card Wallet mobile app...
         </div>
       </i.ActionStatusArea>
-      <i.InfoArea>
-        Only visible to you
-      </i.InfoArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea>

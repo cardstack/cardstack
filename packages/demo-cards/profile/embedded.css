@@ -1,0 +1,29 @@
+.profile {
+  padding: var(--boxel-sp-lg);
+}
+
+.profile__header {
+  margin-bottom: var(--boxel-sp);
+}
+
+.profile__title {
+  margin-bottom: 0;
+  font: 700 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.profile__url {
+  color: var(--boxel-purple-500);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.profile__label {
+  display: inline-block;
+  padding: 2px var(--boxel-sp-xxs);
+  border-radius: var(--boxel-border-radius-sm);
+  background-color: var(--boxel-light-300);
+  color: var(--boxel-purple-400);
+  font: 600 var(--boxel-font-xs);
+  text-transform: uppercase;
+}

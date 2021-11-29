@@ -114,13 +114,13 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
     name: 'Card',
     symbol: 'CARD.CPXD',
     description: '',
-    icon: 'card-token',
+    icon: 'card-cpxd-token',
   },
   'DAI.CPXD': {
     name: 'Dai',
     symbol: 'DAI.CPXD',
     description: '',
-    icon: 'dai-token',
+    icon: 'dai-cpxd-token',
   },
 };
 
@@ -143,12 +143,14 @@ export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
       case 'ETH':
         return _tokenDisplayInfoMap['ETH'].icon;
       case 'DAI':
-      case 'DAI.CPXD':
       case 'XDAI':
         return _tokenDisplayInfoMap['DAI'].icon;
+      case 'DAI.CPXD':
+        return _tokenDisplayInfoMap['DAI.CPXD'].icon;
       case 'CARD':
-      case 'CARD.CPXD':
         return _tokenDisplayInfoMap['CARD'].icon;
+      case 'CARD.CPXD':
+        return _tokenDisplayInfoMap['CARD.CPXD'].icon;
       default:
         return undefined;
     }

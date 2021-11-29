@@ -6,7 +6,10 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   Safe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+  TransactionOptions,
+  ViewSafesResult,
+  BridgeValidationResult,
+} from '@cardstack/cardpay-sdk';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -14,11 +17,8 @@ import {
   BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
-import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 import { TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { TransactionOptions } from '@cardstack/cardpay-sdk';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -115,6 +115,7 @@ export interface Layer2Web3Strategy
     symbolsToUpdate: UsdConvertibleSymbol[]
   ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
+  getBlockConfirmation(blockNumber: number): Promise<void>;
   getBlockHeight(): Promise<BN>;
   awaitBridgedToLayer2(
     fromBlock: BN,
@@ -127,8 +128,10 @@ export interface Layer2Web3Strategy
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amountInWei: string
-  ): Promise<TransactionHash>;
+    amountInWei: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt>;
+  resumeBridgeToLayer1(txnHash: string): Promise<TransactionReceipt>;
   awaitBridgedToLayer1(
     fromBlock: BN,
     txnHash: TransactionHash

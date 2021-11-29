@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.8.5/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.8.6/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -16,7 +16,7 @@ import {
   getNextNonceFromEstimate,
   executeSendWithRateLock,
 } from '../utils/safe-utils';
-import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
+import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
@@ -114,7 +114,7 @@ export default class RevenuePool {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(merchantSafeAddressOrTxnHash)) {
       let txnHash = merchantSafeAddressOrTxnHash;
-      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let merchantSafeAddress = merchantSafeAddressOrTxnHash;
     if (!tokenAddress) {
@@ -173,7 +173,7 @@ export default class RevenuePool {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async registerMerchant(txnHash: string): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
@@ -194,7 +194,7 @@ export default class RevenuePool {
       let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
       return {
         merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
       };
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
@@ -249,7 +249,7 @@ export default class RevenuePool {
     let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
     return {
       merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
     };
   }
 
@@ -266,7 +266,7 @@ export default class RevenuePool {
 
   private async getMerchantSafeFromTxn(txnHash: string): Promise<string> {
     let merchantManager = await getAddress('merchantManager', this.layer2Web3);
-    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createMerchantEventABI(), merchantManager)[0]
       ?.merchantSafe;
   }

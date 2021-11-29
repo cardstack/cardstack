@@ -4,8 +4,8 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.5/prepaid-card-manager';
-import DAIOracleABI from '../../contracts/abi//v0.8.5/chainlink-feed-adapter';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.6/prepaid-card-manager';
+import DAIOracleABI from '../../contracts/abi/v0.8.6/chainlink-feed-adapter';
 import { getAddress, getOracle } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -23,7 +23,7 @@ import {
   getNextNonceFromEstimate,
   executeSendWithRateLock,
 } from '../utils/safe-utils';
-import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
@@ -104,7 +104,7 @@ export default class PrepaidCard {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(merchantSafeOrTxnHash)) {
       let txnHash = merchantSafeOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddress) {
       throw new Error('prepaidCardAddress is required');
@@ -161,7 +161,7 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async transfer(txnHash: string): Promise<TransactionReceipt>;
@@ -179,7 +179,7 @@ export default class PrepaidCard {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     if (!newOwner) {
@@ -253,7 +253,7 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async split(
@@ -277,7 +277,7 @@ export default class PrepaidCard {
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      let txReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      let txReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
       return {
         txReceipt,
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
@@ -368,7 +368,7 @@ export default class PrepaidCard {
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
-    let txReceipt = await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    let txReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisResult.ethereumTx.txHash);
 
     return {
       txReceipt,
@@ -402,7 +402,7 @@ export default class PrepaidCard {
       let txnHash = safeAddressOrTxnHash;
       return {
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
-        txnReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+        txnReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
       };
     }
     let safeAddress = safeAddressOrTxnHash;
@@ -496,7 +496,7 @@ export default class PrepaidCard {
 
     return {
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-      txnReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash),
+      txnReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash),
     };
   }
 
@@ -583,7 +583,7 @@ export default class PrepaidCard {
 
   private async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
-    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
       (createCardLog) => createCardLog.card
     );
@@ -650,7 +650,6 @@ export default class PrepaidCard {
       this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature])
     );
   }
-
   private async executePayMerchant(
     prepaidCardAddress: string,
     merchantSafe: string,

@@ -2,6 +2,7 @@ import {
   ImageRequirements,
   ImageValidation,
 } from '@cardstack/web-client/utils/image';
+import fileSize from 'filesize';
 import { module, test } from 'qunit';
 
 const minFileSizeInKb = 4;
@@ -109,6 +110,10 @@ module('Unit | image-validation', function (hooks) {
       'Validation should not succeed for invalid file type'
     );
     assert.notOk(result.fileType, 'Invalid file type is detected');
+    assert.equal(
+      result.message,
+      'Please upload an image with a file type of gif'
+    );
     assert.notOk(
       result.fileSize,
       'File size is not validated if file type is not valid'
@@ -153,6 +158,10 @@ module('Unit | image-validation', function (hooks) {
         validationResult.imageSize,
         `Image size should not be valid, tested condition: ${condition}`
       );
+      assert.equal(
+        validationResult.message,
+        `Please upload an image larger than ${validator.minWidth}x${validator.minHeight}, and smaller than ${validator.maxWidth}x${validator.maxHeight}`
+      );
       assert.ok(validationResult.fileSize, 'File size should be valid');
       assert.ok(validationResult.fileType, 'File type should be valid');
     }
@@ -170,6 +179,20 @@ module('Unit | image-validation', function (hooks) {
       },
     };
 
+    let failingMessages: Record<
+      keyof typeof failingConfigs,
+      (validator: ImageValidation) => string
+    > = {
+      minFileSizeFails: (validator: ImageValidation) =>
+        `Please upload a file between ${fileSize(
+          validator.minFileSize
+        )} and ${fileSize(validator.maxFileSize)}`,
+      maxFileSizeFails: (validator: ImageValidation) =>
+        `Please upload a file with size less than ${fileSize(
+          validator.maxFileSize
+        )}`,
+    };
+
     for (let condition in failingConfigs) {
       let validator = new ImageValidation({
         ...config,
@@ -183,6 +206,10 @@ module('Unit | image-validation', function (hooks) {
       assert.notOk(
         validationResult.fileSize,
         `File size should not be valid, tested condition: ${condition}`
+      );
+      assert.equal(
+        validationResult.message,
+        failingMessages[condition](validator)
       );
       assert.ok(validationResult.imageSize, 'Image size should be valid');
       assert.ok(validationResult.fileType, 'File type should be valid');

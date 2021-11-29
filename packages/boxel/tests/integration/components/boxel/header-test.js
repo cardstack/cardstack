@@ -14,9 +14,9 @@ module('Integration | Component | Header', function (hooks) {
 
   test('it renders', async function (assert) {
     await render(hbs`<Boxel::Header>Header</Boxel::Header>`);
-    assert.dom('[data-test-boxel-header]').exists();
+    assert.dom('[data-test-boxel-header]').hasText('Header');
     assert.dom('[data-test-boxel-header-label]').doesNotExist();
-    assert.dom('[data-test-boxel-header-content]').hasText('Header');
+    assert.dom('[data-test-boxel-header-content]').doesNotExist();
   });
 
   test('it can render with header arg', async function (assert) {

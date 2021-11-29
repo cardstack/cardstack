@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';

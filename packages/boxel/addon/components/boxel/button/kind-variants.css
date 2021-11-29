@@ -48,3 +48,15 @@
 .boxel-button--kind-secondary-light:not(:disabled):active {
   --boxel-button-border: 1px solid var(--boxel-dark);
 }
+
+.boxel-button--kind-danger:not(:disabled) {
+  --boxel-button-color: var(--boxel-danger);
+  --boxel-button-border: 1px solid var(--boxel-danger);
+  --boxel-button-text-color: var(--boxel-light-100);
+}
+
+.boxel-button--kind-danger:not(:disabled):hover,
+.boxel-button--kind-danger:not(:disabled):active {
+  --boxel-button-border: 1px solid var(--boxel-danger-hover);
+  --boxel-button-color: var(--boxel-danger-hover);
+}

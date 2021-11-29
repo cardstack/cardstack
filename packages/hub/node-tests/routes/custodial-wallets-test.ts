@@ -100,7 +100,7 @@ describe('GET /api/custodial-wallet', function () {
   it('gets a the custodial wallet for an EOA that is not yet assigned a custodial wallet', async function () {
     await request()
       .get(`/api/custodial-wallet`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -123,7 +123,7 @@ describe('GET /api/custodial-wallet', function () {
   it('gets the custodial wallet for an EOA that has already been assigned a custodial wallet', async function () {
     await request()
       .get(`/api/custodial-wallet`)
-      .set('Authorization', 'Bearer: mno123--pqr456--stu789')
+      .set('Authorization', 'Bearer mno123--pqr456--stu789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)

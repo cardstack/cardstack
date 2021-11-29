@@ -97,7 +97,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
   test('Initiating workflow without wallet connections', async function (this: Context, assert) {
     await visit('/card-pay');
-    assert.equal(currentURL(), '/card-pay/balances');
+    assert.equal(currentURL(), '/card-pay/wallet');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
     let post = postableSel(0, 0);
@@ -487,7 +487,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.equal(
       customizationStorageRequest.requestHeaders['authorization'],
-      'Bearer: abc123--def456--ghi789'
+      'Bearer abc123--def456--ghi789'
     );
 
     let customizationRequestJson = JSON.parse(
@@ -657,7 +657,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/balances');
+      assert.equal(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -700,7 +700,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/balances');
+      assert.equal(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -744,7 +744,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Workflow is canceled after showing wallet connection card if balances insufficient to create prepaid card', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/balances');
+      assert.equal(currentURL(), '/card-pay/wallet');
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
@@ -796,7 +796,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       let secondLayer2AccountAddress =
         '0x5416C61193C3393B46C2774ac4717C252031c0bE';
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/balances');
+      assert.equal(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert

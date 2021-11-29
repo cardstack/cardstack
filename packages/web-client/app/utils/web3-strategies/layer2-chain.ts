@@ -25,6 +25,7 @@ import {
   Layer2NetworkSymbol,
   Layer2ChainEvent,
   WithdrawalLimits,
+  TxnBlockNumber,
 } from './types';
 import {
   networkIds,
@@ -39,6 +40,7 @@ import {
   PrepaidCardSafe,
   Safe,
   TransactionOptions,
+  waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -48,10 +50,11 @@ import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
-import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
-import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { IAssets } from '@cardstack/cardpay-sdk';
+import { PrepaidCard } from '@cardstack/cardpay-sdk';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
+import { getLayer2RpcWssNodeUrl } from '../features';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -153,6 +156,8 @@ export default abstract class Layer2ChainWeb3Strategy
       };
     }
     this.web3 = new Web3();
+
+    let rpcWss = getLayer2RpcWssNodeUrl(this.networkSymbol);
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
@@ -162,10 +167,7 @@ export default abstract class Layer2ChainWeb3Strategy
         ),
       },
       rpcWss: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcWssNode',
-          this.networkSymbol
-        ),
+        [networkIds[this.networkSymbol]]: rpcWss,
       },
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });
@@ -460,6 +462,12 @@ export default abstract class Layer2ChainWeb3Strategy
     )}/tx/${txnHash}`;
   }
 
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    if (!this.web3)
+      throw new Error('Cannot get block confirmations without web3');
+    return await waitUntilBlock(this.web3, blockNumber);
+  }
+
   async getBlockHeight(): Promise<BN> {
     const result = await this.web3.eth.getBlockNumber();
     return new BN(result.toString());
@@ -503,26 +511,26 @@ export default abstract class Layer2ChainWeb3Strategy
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amountInWei: string
-  ): Promise<TransactionHash> {
+    amountInWei: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
 
-    // in this case we don't want to wait for mining to complete. there is a
-    // purpose built await in the SDK for the bridge validators that is
-    // performed after this action--we can just rely on that for the timing
+    return await tokenBridge.relayTokens(
+      safeAddress,
+      tokenAddress,
+      receiverAddress,
+      amountInWei,
+      options
+    );
+  }
 
-    let transactionHash = await new Promise<TransactionHash>((res, reject) => {
-      tokenBridge
-        .relayTokens(safeAddress, tokenAddress, receiverAddress, amountInWei, {
-          onTxnHash: (txnHash) => res(txnHash),
-        })
-        .catch((e) => {
-          reject(e);
-        });
-    });
-    return transactionHash;
+  async resumeBridgeToLayer1(txnHash: string) {
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+
+    return await tokenBridge.relayTokens(txnHash);
   }
 
   async awaitBridgedToLayer1(
