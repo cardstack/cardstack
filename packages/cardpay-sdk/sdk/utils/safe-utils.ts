@@ -29,6 +29,11 @@ export interface SendPayload extends Estimate {
   data: any;
 }
 
+export enum Operation {
+  CALL = 0,
+  DELEGATECALL = 1,
+}
+
 export interface RelayTransaction {
   to: string;
   ethereumTx: {
