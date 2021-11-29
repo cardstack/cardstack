@@ -122,6 +122,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       safeAddress,
       tokenAddress,
       payload,
+      0,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)

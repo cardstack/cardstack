@@ -293,6 +293,7 @@ export default class RewardPool {
       safeAddress,
       tokenAddress,
       payload,
+      0,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
@@ -426,6 +427,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       safeAddress,
       rewardPoolAddress,
       payload,
+      0,
       estimate,
       nonce,
       fullSignature,

@@ -167,11 +167,13 @@ export async function executeTransaction(
   from: string,
   to: string,
   data: any,
+  operation: number,
   estimate: Estimate,
   nonce: BN,
   signatures: any,
   eip1271Data?: string
 ): Promise<GnosisExecTx> {
+  console.log('this is called');
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
   const options = {
@@ -184,7 +186,7 @@ export async function executeTransaction(
       to,
       value: 0, // we don't have any safe tx with a value
       data,
-      operation: 0, // all our safe txs are CALL operations
+      operation: operation,
       safeTxGas: estimate.safeTxGas,
       baseGas: estimate.baseGas,
       dataGas: estimate.dataGas,

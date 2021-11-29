@@ -360,6 +360,7 @@ export default class Safes implements ISafes {
       safeAddress,
       tokenAddress,
       payload,
+      0,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
