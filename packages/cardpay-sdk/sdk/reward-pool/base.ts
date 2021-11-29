@@ -265,7 +265,8 @@ export default class RewardPool {
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
-    if (!(proofArray && proofArray.length > 0)) {
+    if (!proofArray) {
+      //proofArray can be empty e.g reward only for single rewardee
       throw new Error('proof must be provided');
     }
     if (!leaf) {
