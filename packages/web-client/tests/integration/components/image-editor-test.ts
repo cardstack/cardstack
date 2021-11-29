@@ -66,14 +66,8 @@ module('Integration | Component | image-editor', function (hooks) {
       file: Blob;
     };
 
-    let save: Function;
-    let saved = new Promise((resolve) => {
-      save = resolve;
-    });
-
     this.set('saveImageEditData', (data: { preview: string; file: Blob }) => {
       result = data;
-      save();
     });
 
     await click(ROTATE_CCW_BUTTON);
@@ -81,9 +75,6 @@ module('Integration | Component | image-editor', function (hooks) {
     assert.dom(PREVIEW).hasAttribute('src', rotatedAndCroppedImageDataUri);
 
     await click(SAVE_BUTTON);
-
-    // not sure why settled isn't picking up the async calls?
-    await saved;
 
     assert.equal(result!.preview, rotatedAndCroppedImageDataUri);
     assert.equal(result!.file.type, 'image/png');

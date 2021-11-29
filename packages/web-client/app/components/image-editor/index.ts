@@ -1,6 +1,7 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { waitForPromise } from '@ember/test-waiters';
 import * as Sentry from '@sentry/browser';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
@@ -101,22 +102,24 @@ export default class ImageEditorComponent extends Component<ImageEditorComponent
   }
 
   async getCroppedImageFile(): Promise<Blob> {
-    return await new Promise((resolve, reject) => {
-      try {
-        this.canvas?.toBlob(
-          (blob) =>
-            blob
-              ? resolve(blob)
-              : reject(
-                  new Error('Failed to construct blob from cropped image')
-                ),
-          this.args.fileType ?? 'image/jpeg',
-          1
-        );
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return await waitForPromise<Blob, Promise<Blob>>(
+      new Promise((resolve, reject) => {
+        try {
+          this.canvas?.toBlob(
+            (blob) =>
+              blob
+                ? resolve(blob)
+                : reject(
+                    new Error('Failed to construct blob from cropped image')
+                  ),
+            this.args.fileType ?? 'image/jpeg',
+            1
+          );
+        } catch (e) {
+          reject(e);
+        }
+      })
+    );
   }
 
   getCroppedPreviewImage() {
