@@ -271,20 +271,28 @@ function assertRangeFilter(filter: any, pointer: string[]): asserts filter is Ra
       status: 400,
     });
   }
-  Object.entries(filter.range).every(([key, value]) => {
-    switch (key) {
-      case 'gt':
-      case 'gte':
-      case 'lt':
-      case 'lte':
-        assertJSONPrimitive(value, pointer.concat(key));
-        return;
-
-      default:
-        throw new CardstackError('range item must be gt, gte, lt, or lte', {
-          source: { pointer: pointer.join('/') },
-          status: 400,
-        });
+  Object.entries(filter.range).every(([fieldPath, constraints]) => {
+    let innerPointer = [...pointer, fieldPath];
+    if (typeof constraints !== 'object' || constraints == null) {
+      throw new CardstackError('range constraint must be an object', {
+        source: { pointer: innerPointer.join('/') || '/' },
+        status: 400,
+      });
     }
+    Object.entries(constraints).every(([key, value]) => {
+      switch (key) {
+        case 'gt':
+        case 'gte':
+        case 'lt':
+        case 'lte':
+          assertJSONPrimitive(value, innerPointer.concat(key));
+          return;
+        default:
+          throw new CardstackError('range item must be gt, gte, lt, or lte', {
+            source: { pointer: innerPointer.join('/') },
+            status: 400,
+          });
+      }
+    });
   });
 }

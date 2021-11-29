@@ -51,7 +51,7 @@ if (process.env.COMPILER) {
       await deleteCard(`${realm}car0`).expect(404);
     });
 
-    it('can delete an existing card that has no children', async function () {
+    it.skip('can delete an existing card that has no children', async function () {
       await getCard(`${realm}post0`).expect(200);
 
       await deleteCard(`${realm}post0`).expect(204);

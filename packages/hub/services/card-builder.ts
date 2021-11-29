@@ -43,6 +43,10 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
+    let compiledCard = this.cache.getCard(url);
+    if (compiledCard) {
+      return compiledCard;
+    }
     let rawCard = await this.getRawCard(url);
     return await this.compileCardFromRaw(rawCard);
   }
@@ -55,12 +59,13 @@ export default class CardBuilder implements BuilderInterface {
     } catch (e) {
       err = e;
     }
-    if (!compiledCard) {
+    if (compiledCard) {
+      this.cache.setCard(rawCard.url, compiledCard);
+      return compiledCard;
+    } else {
       this.cache.deleteCard(rawCard.url);
       throw err;
     }
-
-    return compiledCard;
   }
 }
 

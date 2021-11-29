@@ -57,7 +57,7 @@ if (process.env.COMPILER) {
       }).expect(404);
     });
 
-    it('can update an existing data only card', async function () {
+    it.skip('can update an existing data only card', async function () {
       let initialResponse = await updateCard(`${realm}post0`, {
         data: {
           attributes: {
@@ -78,7 +78,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    it('can update a card that has a schema file', async function () {
+    it.skip('can update a card that has a schema file', async function () {
       let attributes = {
         title: 'Placeholder Title',
         body: 'Placeholder Body',

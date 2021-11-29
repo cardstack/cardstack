@@ -1,5 +1,5 @@
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, ENVIRONMENTS } from '../interfaces';
+import { Environment, ENVIRONMENTS, NODE } from '../interfaces';
 import {
   writeFileSync,
   readFileSync,
@@ -10,12 +10,14 @@ import {
   pathExistsSync,
   ensureDirSync,
   outputJSONSync,
+  readJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { serverLog } from '../utils/logger';
 import { Client } from 'pg';
+import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
@@ -114,6 +116,10 @@ export default class CardCache {
     return this.readFile(this.getFileLocation('assets', cardURL, filename));
   }
 
+  setCard(cardURL: string, source: CompiledCard) {
+    this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
+  }
+
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));
   }
@@ -132,6 +138,16 @@ export default class CardCache {
 
   getModule(moduleURL: string, env: Environment = 'node'): string | undefined {
     return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
+  }
+
+  getCard(cardURL: string, env: Environment = NODE): CompiledCard | undefined {
+    let loc = this.getFileLocation(env, encodeCardURL(cardURL), 'compiled.json');
+
+    if (existsSync(loc)) {
+      return readJSONSync(loc);
+    }
+
+    return;
   }
 
   deleteCard(cardURL: string): void {
