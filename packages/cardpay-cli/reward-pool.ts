@@ -151,6 +151,9 @@ const fromProofArray = (arr: string[]): string => {
 };
 
 const fromProof = (proof: string): any => {
+  if (proof == '0x') {
+    return [];
+  }
   let bytesSize = 32;
   let hexChunkSize = bytesSize * 2;
   let hexStr = proof.replace('0x', '');
