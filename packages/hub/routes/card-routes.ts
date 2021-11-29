@@ -39,15 +39,16 @@ export default class CardRoutes {
 
     let format = getCardFormatFromRequest(ctx.query.format);
     let { data, compiled } = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = await serializeCard(url, data, compiled[format]);
+    ctx.body = { data: serializeCard(url, data, compiled[format]) };
     ctx.status = 200;
   }
 
   private async queryCards(ctx: RouterContext) {
     let query = qs.parse(ctx.querystring);
     assertQuery(query);
-    await this.cards.as(INSECURE_CONTEXT).query(query);
-    ctx.body = { nope: 'no' };
+    let cards = await this.cards.as(INSECURE_CONTEXT).query(query);
+    let collection = cards.map((card) => serializeCard(card.compiled.url, card.data, card.compiled['embedded']));
+    ctx.body = { data: collection };
     ctx.status = 200;
   }
 
@@ -79,7 +80,7 @@ export default class CardRoutes {
 
     let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card, { realmURL });
 
-    ctx.body = await serializeCard(compiled.url, outputData, compiled[format]);
+    ctx.body = { data: serializeCard(compiled.url, outputData, compiled[format]) };
     ctx.status = 201;
   }
 
@@ -93,7 +94,7 @@ export default class CardRoutes {
     let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ url, data });
 
     // Question: Is it safe to assume the response should be isolated?
-    ctx.body = await serializeCard(url, outputData, compiled['isolated']);
+    ctx.body = { data: serializeCard(url, outputData, compiled['isolated']) };
     ctx.status = 200;
   }
 
@@ -124,7 +125,7 @@ export default class CardRoutes {
 
     let rawCard = await this.realmManager.read(url);
     let card = await this.builder.getCompiledCard(url);
-    ctx.body = await serializeCard(url, rawCard.data, card['isolated']);
+    ctx.body = { data: serializeCard(url, rawCard.data, card['isolated']) };
     ctx.status = 200;
   }
 

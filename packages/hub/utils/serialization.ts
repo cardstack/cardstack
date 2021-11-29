@@ -9,11 +9,7 @@ import merge from 'lodash/merge';
 import set from 'lodash/set';
 import get from 'lodash/get';
 
-export async function serializeCard(
-  url: string,
-  data: RawCard['data'],
-  component: ComponentInfo
-): Promise<CardJSONResponse> {
+export function serializeCard(url: string, data: RawCard['data'], component: ComponentInfo): CardJSONResponse {
   let resource = serializeResource('card', url, component.usedFields, data);
   resource.meta = merge(
     {
@@ -21,7 +17,7 @@ export async function serializeCard(
     },
     resource.meta
   );
-  return { data: resource };
+  return resource;
 }
 
 export function deserialize(payload: any): any {

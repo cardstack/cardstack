@@ -21,6 +21,7 @@ if (process.env.COMPILER) {
         url: `${realm}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
+        embedded: 'embedded.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
@@ -35,8 +36,9 @@ if (process.env.COMPILER) {
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><h2><@fields.createdAt/> <@field.author.name /> </h2><article><@fields.body/></article>'
+            '<h1><@fields.title/></h1><h2><@fields.createdAt/> </h2><article><@fields.body/></article>'
           ),
+          'embedded.js': templateOnlyComponentTemplate('<@fields.title/>'),
         },
       });
 
@@ -66,12 +68,15 @@ if (process.env.COMPILER) {
       await searchIndex.indexAllRealms();
     });
 
-    it.only(`can filter on a card's own fields`, async function () {
+    it(`can filter on a card's own fields`, async function () {
       let response = await get(`/cards/?filter[on]=${realm}post&filter[range][views][gt]=7`).expect(200);
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.be.an('array').and.have.lengthOf(1);
       expect(map(response.body.data, 'id')).to.deep.equal([`${realm}post0`]);
+      expect(response.body.data[0].attributes).to.deep.equal({
+        title: 'Hello World',
+      });
     });
   });
 }
