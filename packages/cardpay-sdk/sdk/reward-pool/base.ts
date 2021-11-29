@@ -68,8 +68,8 @@ export default class RewardPool {
     }, new BN('0'));
   }
 
-  async isClaimed(leaf: string, proofArray: string[]): Promise<boolean> {
-    return (await this.getRewardPool()).methods.valid(leaf, proofArray).call();
+  async isClaimed(leaf: string): Promise<boolean> {
+    return (await this.getRewardPool()).methods.claimed(leaf).call();
   }
 
   async isValid(leaf: string, proofArray: string[]): Promise<boolean> {
@@ -306,6 +306,9 @@ export default class RewardPool {
 
     if (!(await this.isValid(leaf, proofArray))) {
       throw new Error('proof is not valid');
+    }
+    if (!(await this.isClaimed(leaf))) {
+      throw new Error('reward has been claimed');
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let weiAmount = new BN(amount);
