@@ -312,9 +312,9 @@ export async function bootWorker() {
         let task = await container.instantiate(NotifyMerchantClaimTask);
         return task.perform(payload);
       },
-      'notify-customer-payment': async (payload: any, helpers: Helpers) => {
+      'notify-customer-payment': async (payload: any) => {
         let task = await container.instantiate(NotifyCustomerPaymentTask);
-        return task.perform(payload, helpers);
+        return task.perform(payload);
       },
       'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
