@@ -1,14 +1,33 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { SourceMapDevToolPlugin } = require('webpack');
+
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  devtool: false,
+  plugins: [
+    new SourceMapDevToolPlugin({
+      filename: '[name].js.map',
+      noSources: true,
+      moduleFilenameTemplate: '[absolute-resource-path]',
+    }),
+  ],
   entry: {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
   },
   output: {},
   target: 'node14',
-  node: {
-    __dirname: false,
+
+  // this is somewhat confusingly named, but it means: "don't polyfill
+  // Node-specific APIs". We don't need to polyfill them because we're running
+  // in Node itself.
+  node: false,
+  optimization: {
+    // leave process.env.NODE_ENV alone, so that it gets the proper behavior at
+    // runtime
+    nodeEnv: false,
   },
+
   resolve: {
     alias: {
       'web-streams-polyfill': 'web-streams-polyfill/dist/polyfill.js',
