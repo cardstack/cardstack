@@ -80,6 +80,9 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import { SafeEvents } from './services/safe-events';
+import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
+import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
@@ -115,6 +118,9 @@ export function createRegistry(): Registry {
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
+  registry.register('send-notifications', SendNotificationsTask);
+  registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
+  registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
@@ -298,6 +304,18 @@ export async function bootWorker() {
     connectionString: dbConfig.url,
     taskList: {
       boom: boom,
+      'send-notifications': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(SendNotificationsTask);
+        return task.perform(payload, helpers);
+      },
+      'notify-merchant-claim': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(NotifyMerchantClaimTask);
+        return task.perform(payload, helpers);
+      },
+      'notify-customer-payment': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(NotifyCustomerPaymentTask);
+        return task.perform(payload, helpers);
+      },
       'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
         return task.perform(payload, helpers);
