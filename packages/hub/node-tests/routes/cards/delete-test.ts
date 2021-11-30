@@ -4,6 +4,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
 import { setupHub } from '../../helpers/server';
+import { cardHelpers, configureCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('DELETE /cards/<card-id>', function () {
@@ -15,11 +16,13 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getContainer, cards, getCardCache, request, realm } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { request, getContainer } = setupHub(this);
+    let { cards, getCardCache } = cardHelpers(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -38,7 +41,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -48,20 +51,22 @@ if (process.env.COMPILER) {
     });
 
     it('returns a 404 when trying to delete from a card that doesnt exist', async function () {
-      await deleteCard(`${realm}car0`).expect(404);
+      await deleteCard(`${realmURL}car0`).expect(404);
     });
 
     it.skip('can delete an existing card that has no children', async function () {
-      await getCard(`${realm}post0`).expect(200);
+      await getCard(`${realmURL}post0`).expect(200);
 
-      await deleteCard(`${realm}post0`).expect(204);
-      await getCard(`${realm}post0`).expect(404);
+      await deleteCard(`${realmURL}post0`).expect(204);
+      await getCard(`${realmURL}post0`).expect(404);
 
-      expect(existsSync(join(getCardCache().dir, 'node', encodeCardURL(`${realm}post0`))), 'Cache for card is deleted')
-        .to.be.false;
+      expect(
+        existsSync(join(getCardCache().dir, 'node', encodeCardURL(`${realmURL}post0`))),
+        'Cache for card is deleted'
+      ).to.be.false;
 
       // TODO: Can we make getRealm return the corrent realm type?
-      let fsrealm = (await getContainer().lookup('realm-manager')).getRealmForCard(realm) as any;
+      let fsrealm = (await getContainer().lookup('realm-manager')).getRealmForCard(realmURL) as any;
       expect(existsSync(join(fsrealm.directory, 'post0')), 'card is deleted from realm').to.be.false;
     });
   });

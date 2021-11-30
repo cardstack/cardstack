@@ -3,6 +3,7 @@ import { baseCardURL } from '@cardstack/core/src/compiler';
 import CardBuilder from '../../services/card-builder';
 import { setupHub } from '../helpers/server';
 import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
+import { cardHelpers, configureCompiler } from '../helpers/cards';
 
 const PERSON_CARD = {
   url: `${TEST_REALM}person`,
@@ -30,7 +31,10 @@ const PERSON_CARD = {
 if (process.env.COMPILER) {
   describe('Compiler', function () {
     let builder: CardBuilder;
-    let { cards, getContainer } = setupHub(this);
+
+    configureCompiler(this);
+    let { getContainer } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');

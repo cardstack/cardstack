@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { cardHelpers, configureCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('CardService', function () {
@@ -8,7 +9,9 @@ if (process.env.COMPILER) {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
     });
-    let { getContainer, cards, realm } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { getContainer } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');
@@ -18,7 +21,7 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}person`,
+        url: `${realmURL}person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -32,13 +35,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}sue`,
+        url: `${realmURL}sue`,
         adoptsFrom: '../person',
         data: { name: 'Sue' },
       });
 
       await cards.create({
-        url: `${realm}dated`,
+        url: `${realmURL}dated`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -52,7 +55,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}something-else-dated`,
+        url: `${realmURL}something-else-dated`,
         adoptsFrom: '../dated',
         data: {
           createdAt: new Date(2018, 0, 1),
@@ -60,7 +63,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         adoptsFrom: '../dated',
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -84,7 +87,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -98,7 +101,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post1`,
+        url: `${realmURL}post1`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello again',
@@ -109,7 +112,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}book`,
+        url: `${realmURL}book`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -125,7 +128,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}book0`,
+        url: `${realmURL}book0`,
         adoptsFrom: '../book',
         data: {
           author: {
@@ -137,15 +140,15 @@ if (process.env.COMPILER) {
 
     describe('.load()', function () {
       it('returns a card thats been indexed', async function () {
-        let card = await cards.load(`${realm}post1`);
+        let card = await cards.load(`${realmURL}post1`);
         expect(card.data!.title).to.eq('Hello again');
-        expect(card.compiled!.url).to.eq(`${realm}post1`);
-        expect(card.compiled!.adoptsFrom!.url).to.eq(`${realm}post`);
+        expect(card.compiled!.url).to.eq(`${realmURL}post1`);
+        expect(card.compiled!.adoptsFrom!.url).to.eq(`${realmURL}post`);
       });
 
       it('handles missing card', async function () {
         try {
-          await cards.load(`${realm}nonexistent`);
+          await cards.load(`${realmURL}nonexistent`);
           throw new Error('should have thrown exception');
         } catch (err: any) {
           expect(err.message).to.eq('Card https://cardstack.local/nonexistent was not found');
@@ -157,26 +160,26 @@ if (process.env.COMPILER) {
     describe('.query()', function () {
       it(`can filter by card type`, async function () {
         let matching = await cards.query({
-          filter: { type: `${realm}post` },
+          filter: { type: `${realmURL}post` },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post1`, `${realmURL}post0`]);
       });
 
       it(`can filter on a card's own fields using gt`, async function () {
         let matching = await cards.query({
-          filter: { on: `${realm}post`, range: { views: { gt: 7 } } },
+          filter: { on: `${realmURL}post`, range: { views: { gt: 7 } } },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`]);
       });
 
       it(`gives a good error when query refers to missing card`, async function () {
         try {
           await cards.query({
-            filter: { on: `${realm}nonexistent`, eq: { nonExistentField: 'hello' } },
+            filter: { on: `${realmURL}nonexistent`, eq: { nonExistentField: 'hello' } },
           });
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
-          expect(err.message).to.eq(`Your filter refers to nonexistent card ${realm}nonexistent`);
+          expect(err.message).to.eq(`Your filter refers to nonexistent card ${realmURL}nonexistent`);
           expect(err.status).to.eq(400);
         }
       });
@@ -184,12 +187,12 @@ if (process.env.COMPILER) {
       it(`gives a good error when query refers to missing field`, async function () {
         try {
           await cards.query({
-            filter: { on: `${realm}post`, eq: { 'author.nonExistentField': 'hello' } },
+            filter: { on: `${realmURL}post`, eq: { 'author.nonExistentField': 'hello' } },
           });
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
           expect(err.message).to.eq(
-            `Your filter refers to nonexistent field "nonExistentField" in card ${realm}person`
+            `Your filter refers to nonexistent field "nonExistentField" in card ${realmURL}person`
           );
           expect(err.status).to.eq(400);
         }
@@ -198,11 +201,11 @@ if (process.env.COMPILER) {
       it(`can filter on a nested field using eq`, async function () {
         let matching = await cards.query({
           filter: {
-            on: `${realm}post`,
+            on: `${realmURL}post`,
             eq: { 'author.name': 'Sue' },
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`]);
       });
 
       it(`can negate a filter`, async function () {
@@ -210,10 +213,10 @@ if (process.env.COMPILER) {
           filter: {
             every: [
               {
-                type: `${realm}post`,
+                type: `${realmURL}post`,
               },
               {
-                on: `${realm}post`,
+                on: `${realmURL}post`,
                 not: {
                   eq: { 'author.name': 'Sue' },
                 },
@@ -221,7 +224,7 @@ if (process.env.COMPILER) {
             ],
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post1`]);
       });
 
       it(`can combine multiple types`, async function () {
@@ -229,17 +232,17 @@ if (process.env.COMPILER) {
           filter: {
             any: [
               {
-                on: `${realm}post`,
+                on: `${realmURL}post`,
                 eq: { 'author.name': 'Sue' },
               },
               {
-                on: `${realm}book`,
+                on: `${realmURL}book`,
                 eq: { 'author.name': 'Sue' },
               },
             ],
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`, `${realm}book0`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`, `${realmURL}book0`]);
       });
     });
 
@@ -248,7 +251,7 @@ if (process.env.COMPILER) {
         // Intentionally not including the adopts from because cardhost cardService
         // doesn't include it
         await cards.update({
-          url: `${realm}post1`,
+          url: `${realmURL}post1`,
           data: {
             title: 'Hello to you',
             body: 'second post.',
@@ -256,7 +259,7 @@ if (process.env.COMPILER) {
           },
         });
         let realmManager = await getContainer().lookup('realm-manager');
-        let rawCard = await realmManager.read(`${realm}post1`);
+        let rawCard = await realmManager.read(`${realmURL}post1`);
         expect(rawCard.adoptsFrom).to.equal('../post');
         expect(rawCard.data!.title).to.equal('Hello to you');
       });

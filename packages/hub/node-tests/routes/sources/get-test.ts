@@ -1,5 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
+import { cardHelpers, configureCompiler } from '../../helpers/cards';
 import { setupHub } from '../../helpers/server';
 
 let postFiles = Object.freeze({
@@ -27,18 +28,20 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { cards, request, realm } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { request } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: postFiles,
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -52,11 +55,11 @@ if (process.env.COMPILER) {
     });
 
     it('404s when you try to load missing from known realm', async function () {
-      await getSource(`${realm}thing`).expect(404);
+      await getSource(`${realmURL}thing`).expect(404);
     });
 
     it('can get source for a card with code & schema', async function () {
-      let response = await getSource(`${realm}post`).expect(200);
+      let response = await getSource(`${realmURL}post`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
       expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
@@ -73,7 +76,7 @@ if (process.env.COMPILER) {
     });
 
     it('can get source for a card with only data', async function () {
-      let response = await getSource(`${realm}post0`).expect(200);
+      let response = await getSource(`${realmURL}post0`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
       expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
@@ -90,19 +93,19 @@ if (process.env.COMPILER) {
     });
 
     it('can include compiled meta', async function () {
-      let response = await getSource(`${realm}post0`, {
+      let response = await getSource(`${realmURL}post0`, {
         include: 'compiledMeta',
       }).expect(200);
 
       expect(response.body.data.relationships?.compiledMeta).to.deep.equal({
         data: {
           type: 'compiled-metas',
-          id: `${realm}post0`,
+          id: `${realmURL}post0`,
         },
       });
 
       let compiledMeta = response.body.included?.find(
-        (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realm}post0`
+        (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realmURL}post0`
       );
 
       expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializer', 'isolated', 'embedded', 'edit']);
@@ -111,36 +114,40 @@ if (process.env.COMPILER) {
         adoptsFrom: {
           data: {
             type: 'compiled-metas',
-            id: `${realm}post`,
+            id: `${realmURL}post`,
           },
         },
         fields: {
           data: [
             {
               type: 'fields',
-              id: `${realm}post0/title`,
+              id: `${realmURL}post0/title`,
             },
             {
               type: 'fields',
-              id: `${realm}post0/body`,
+              id: `${realmURL}post0/body`,
             },
             {
               type: 'fields',
-              id: `${realm}post0/createdAt`,
+              id: `${realmURL}post0/createdAt`,
             },
             {
               type: 'fields',
-              id: `${realm}post0/extra`,
+              id: `${realmURL}post0/extra`,
             },
           ],
         },
       });
 
-      let post = response.body.included?.find((ref: any) => ref.type === 'compiled-metas' && ref.id === `${realm}post`);
+      let post = response.body.included?.find(
+        (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realmURL}post`
+      );
 
       expect(post, 'found rawCard.compiledMeta.adoptsFrom').to.be.ok;
 
-      let title = response.body.included?.find((ref: any) => ref.type === 'fields' && ref.id === `${realm}post0/title`);
+      let title = response.body.included?.find(
+        (ref: any) => ref.type === 'fields' && ref.id === `${realmURL}post0/title`
+      );
 
       expect(title, 'found title field').to.be.ok;
     });

@@ -6,6 +6,7 @@ import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import type CardBuilder from '../../services/card-builder';
 import { setupHub } from '../helpers/server';
+import { cardHelpers, configureCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('Babel CardTemplatePlugin', function () {
@@ -14,7 +15,9 @@ if (process.env.COMPILER) {
     let personCard: CompiledCard;
     let code: string;
 
-    let { cards, getContainer } = setupHub(this);
+    configureCompiler(this);
+    let { getContainer } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');

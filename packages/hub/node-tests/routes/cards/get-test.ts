@@ -1,4 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { cardHelpers, configureCompiler } from '../../helpers/cards';
 import { setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
@@ -7,11 +8,13 @@ if (process.env.COMPILER) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { cards, resolveCard, request, realm } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { request } = setupHub(this);
+    let { cards, resolveCard } = cardHelpers(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}pet`,
+        url: `${realmURL}pet`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -25,13 +28,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}person`,
+        url: `${realmURL}person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import pet from "${realm}pet";
+            import pet from "${realmURL}pet";
             export default class Person {
               @contains(string) name;
               @contains(pet) bestFriend;
@@ -41,7 +44,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -49,7 +52,7 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             import datetime from "https://cardstack.com/base/datetime";
-            import person from '${realm}person';
+            import person from '${realmURL}person';
             export default class Post {
               @contains(string) title;
               @contains(string) body;
@@ -65,7 +68,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -86,7 +89,7 @@ if (process.env.COMPILER) {
     });
 
     it("can load a simple isolated card's data", async function () {
-      let response = await getCard(`${realm}post0`); // .expect(200);
+      let response = await getCard(`${realmURL}post0`); // .expect(200);
       // console.log(JSON.stringify(response.body, null, 2));
 
       expect(response.body).to.have.all.keys('data');

@@ -3,6 +3,7 @@ import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-temp
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import CardBuilder from '../../services/card-builder';
 import { setupHub } from '../helpers/server';
+import { cardHelpers, configureCompiler } from '../helpers/cards';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -16,12 +17,14 @@ if (process.env.COMPILER) {
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-    let { cards, realm, getContainer } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { getContainer } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
       await cards.create({
-        url: `${realm}list`,
+        url: `${realmURL}list`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -40,7 +43,7 @@ if (process.env.COMPILER) {
           }`,
         },
       });
-      compiledListCard = await builder.getCompiledCard(`${realm}list`);
+      compiledListCard = await builder.getCompiledCard(`${realmURL}list`);
       compiledStringCard = await builder.getCompiledCard('https://cardstack.com/base/string');
       compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
     });
@@ -296,7 +299,7 @@ if (process.env.COMPILER) {
 
     it('Tracking deeply nested field usage', async function () {
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -319,7 +322,7 @@ if (process.env.COMPILER) {
       });
       let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
       await cards.create({
-        url: `${realm}post-list`,
+        url: `${realmURL}post-list`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
@@ -344,7 +347,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let card = await builder.getCompiledCard(`${realm}post-list`);
+      let card = await builder.getCompiledCard(`${realmURL}post-list`);
       transform(template, {
         fields: card.fields,
         usageMeta,

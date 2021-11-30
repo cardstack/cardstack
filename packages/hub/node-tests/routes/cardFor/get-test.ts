@@ -1,5 +1,6 @@
 import { TEST_REALM, templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
+import { cardHelpers, configureCompiler } from '../../helpers/cards';
 import { registry, setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
@@ -17,11 +18,13 @@ if (process.env.COMPILER) {
       );
     });
 
-    let { cards, resolveCard, request, realm } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { request } = setupHub(this);
+    let { cards, resolveCard } = cardHelpers(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}routes`,
+        url: `${realmURL}routes`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -40,14 +43,14 @@ if (process.env.COMPILER) {
         },
       });
       await cards.create({
-        url: `${realm}homepage`,
+        url: `${realmURL}homepage`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
         },
       });
       await cards.create({
-        url: `${realm}about`,
+        url: `${realmURL}about`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),

@@ -2,6 +2,7 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupHub } from '../../helpers/server';
 import { map } from 'lodash';
+import { cardHelpers, configureCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<QUERY>', function () {
@@ -14,11 +15,13 @@ if (process.env.COMPILER) {
       await si.reset();
     });
 
-    let { cards, request, realm, getContainer } = setupHub(this);
+    let { realmURL } = configureCompiler(this);
+    let { request, getContainer } = setupHub(this);
+    let { cards } = cardHelpers(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'embedded.js',
@@ -43,7 +46,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -54,7 +57,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post1`,
+        url: `${realmURL}post1`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello again',
@@ -69,11 +72,11 @@ if (process.env.COMPILER) {
     });
 
     it(`can filter on a card's own fields`, async function () {
-      let response = await get(`/cards/?filter[on]=${realm}post&filter[range][views][gt]=7`).expect(200);
+      let response = await get(`/cards/?filter[on]=${realmURL}post&filter[range][views][gt]=7`).expect(200);
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.be.an('array').and.have.lengthOf(1);
-      expect(map(response.body.data, 'id')).to.deep.equal([`${realm}post0`]);
+      expect(map(response.body.data, 'id')).to.deep.equal([`${realmURL}post0`]);
       expect(response.body.data[0].attributes).to.deep.equal({
         title: 'Hello World',
       });
