@@ -78,6 +78,7 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
+import RealmsConfig from './services/realms-config';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -140,6 +141,7 @@ export function createRegistry(): Registry {
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
+    registry.register('realmsConfig', RealmsConfig);
     registry.register('realm-manager', RealmManager);
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
