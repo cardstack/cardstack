@@ -1,6 +1,6 @@
 import { inject } from '@cardstack/di';
 import CardpaySDKService from '../services/cardpay-sdk';
-import Web3Service from '../services/web3';
+import Web3HttpService from '../services/web3-http';
 import WorkerClient from '../services/worker-client';
 
 interface CustomerPaymentSubscriptionEvent {
@@ -12,7 +12,7 @@ interface CustomerPaymentSubscriptionEvent {
 
 export default class NotifyCustomerPayment {
   cardpay: CardpaySDKService = inject('cardpay');
-  web3: Web3Service = inject('web3');
+  web3: Web3HttpService = inject('web3-http', { as: 'web3' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   async perform(payload: CustomerPaymentSubscriptionEvent) {
