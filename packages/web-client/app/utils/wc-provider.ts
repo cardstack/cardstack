@@ -37,8 +37,6 @@ export interface ICardstackWalletConnectProviderOptions
   rpcWss: IRPCMap;
 }
 
-const MIN_RECONNECTION_INTERVAL = 5000;
-
 class WalletConnectProvider extends ExtendedProviderEngine {
   public bridge = 'https://bridge.walletconnect.org';
   public qrcode = true;
@@ -57,7 +55,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   public websocketProvider!: TypedWebsocketProviderWithConstructor;
   public networkId!: number;
   public infuraId?: string;
-  private lastReconnection = -Infinity;
 
   constructor(opts: ICardstackWalletConnectProviderOptions) {
     super({
@@ -529,28 +526,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     this.websocketProvider.on('connect', this.onWebsocketConnect.bind(this));
   }
 
-  async maybeReconnect() {
-    // setTimeout is needed to delay execution of this code until the
-    // websocket provider has finished the callback for its close event,
-    // because part of that callback includes clearing all event listeners attached to it.
-    // We need to reattach the event listeners after that completes.
-    setTimeout(() => {
-      try {
-        console.log('attempting websocket reconnection');
-        if (Date.now() - this.lastReconnection < MIN_RECONNECTION_INTERVAL) {
-          this.emit('websocket-disconnected');
-          return;
-        }
-        this.lastReconnection = Date.now();
-        this.websocketProvider.reset();
-        this.bindSocketListeners();
-        this.websocketProvider.connect();
-      } catch (e) {
-        this.emit('websocket-disconnected');
-      }
-    }, 0);
-  }
-
   async onWebsocketConnect() {
     console.log('websocket connected', this.websocketProvider.connection.url);
     Sentry.addBreadcrumb({
@@ -582,7 +557,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
         ? Sentry.Severity.Info
         : Sentry.Severity.Error,
     });
-    this.maybeReconnect();
+    this.emit('websocket-disconnected');
   }
 }
 
