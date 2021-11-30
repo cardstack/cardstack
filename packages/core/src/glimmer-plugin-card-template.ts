@@ -10,8 +10,9 @@ import type {
 import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { cloneDeep } from 'lodash';
-import { classify, getFieldForPath } from './utils';
+import { classify } from './utils';
 import { augmentBadRequest } from './utils/errors';
+import { getFieldForPath } from './utils/fields';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
