@@ -1,14 +1,16 @@
 // fromWei is in both
-import { getAddressByNetwork, getABI, viewSafe, fromWei } from '@cardstack/cardpay-sdk';
+import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import config from 'config';
+import WorkerClient from './worker-client';
 
 // TODO: figure out better way to type this + other config.get stuff?
 const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
 export class SafeEvents {
   private web3 = inject('web3-socket', { as: 'web3' });
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -30,38 +32,21 @@ export class SafeEvents {
       getAddressByNetwork('payMerchantHandler', network)
     );
 
-    payMerchantContract.events.CustomerPayment({}, async function (error: Error, event: any) {
+    payMerchantContract.events.CustomerPayment({}, async (error: Error, event: any) => {
       if (error) {
         // TODO: log to sentry
         console.error('error in subscription', error);
       } else {
-        let { safe } = await viewSafe(network, event.returnValues.merchantSafe);
-        if (!safe) {
-          // TODO: log to sentry;
-          return;
-        }
-        console.log('event and relevant safe', event, safe.owners[0]);
-        console.log(safe.owners[0], `Your business received a payment of ${event.returnValues.spendAmount} SPEND`);
+        this.workerClient.addJob('notify-customer-payment', event);
       }
     });
 
-    revenuePoolContract.events.MerchantClaim({}, async function (error: Error, event: any) {
+    revenuePoolContract.events.MerchantClaim({}, async (error: Error, event: any) => {
       if (error) {
         // TODO: log to sentry
         console.error('error in subscription', error);
       } else {
-        // let tokenAddress = event.returnValues.payableToken;
-        let merchantSafeAddress = event.returnValues.merchantSafe;
-        let amountInWei = event.returnValues.amount;
-
-        let { safe } = await viewSafe(network, merchantSafeAddress);
-        if (!safe) {
-          // TODO: log to sentry;
-          return;
-        }
-
-        console.log('event and EOA', event, safe.owners[0]);
-        console.log(`Your just claimed ${fromWei(amountInWei)} DAI.CPXD from your business account`);
+        this.workerClient.addJob('notify-merchant-claim', event);
       }
     });
 
