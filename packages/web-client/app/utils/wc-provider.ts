@@ -62,9 +62,14 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   constructor(opts: ICardstackWalletConnectProviderOptions) {
     super({
       blockTracker: new BlockTracker({
-        provider: new WebsocketProvider(
-          opts.rpcWss[opts.chainId!]
-        ) as unknown as Provider,
+        provider: new WebsocketProvider(opts.rpcWss[opts.chainId!], {
+          reconnect: {
+            auto: true,
+            delay: 1000,
+            onTimeout: true,
+            maxAttempts: 10,
+          },
+        }) as unknown as Provider,
       }),
     });
     let rpcWss: IRPCMap = opts.rpcWss || null;
