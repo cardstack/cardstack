@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -699,7 +699,9 @@ ALTER TABLE public.card_spaces OWNER TO postgres;
 
 CREATE TABLE public.cards (
     url text NOT NULL,
-    data jsonb
+    data jsonb,
+    ancestors text[],
+    "searchData" jsonb
 );
 
 
@@ -1252,8 +1254,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1271,14 +1273,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-10-25 14:13:27.499839-04
-2	2021-10-25 14:13:27.499839-04
-3	2021-10-25 14:13:27.499839-04
-4	2021-10-25 14:13:27.499839-04
-5	2021-10-25 14:13:27.499839-04
-6	2021-10-25 14:13:27.499839-04
-7	2021-10-25 14:13:27.499839-04
-8	2021-10-25 14:13:27.499839-04
+1	2021-11-29 17:02:42.091944-05
+2	2021-11-29 17:02:42.091944-05
+3	2021-11-29 17:02:42.091944-05
+4	2021-11-29 17:02:42.091944-05
+5	2021-11-29 17:02:42.091944-05
+6	2021-11-29 17:02:42.091944-05
+7	2021-11-29 17:02:42.091944-05
+8	2021-11-29 17:02:42.091944-05
 \.
 
 
@@ -1287,20 +1289,21 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-08-02 16:26:07.752752
-2	20210614080132698_create-prepaid-card-customizations-table	2021-08-02 16:26:07.752752
-3	20210623052200757_create-graphile-worker-schema	2021-08-02 16:26:07.752752
-5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
-6	20210817184105100_wallet-orders	2021-08-25 08:15:41.07505
-7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
-8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
-13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
-14	20211014131843187_add-fields-to-card-spaces	2021-10-18 09:59:34.440379
-19	20211013155536724_card-index	2021-11-18 11:18:35.492811
-20	20211013173917696_beta-testers	2021-11-18 11:18:35.492811
-21	20211020231214235_discord-bots	2021-11-18 11:18:35.492811
-22	20211105180905492_wyre-price-service	2021-11-18 11:18:35.492811
-25	20211118084217151_create-uploads	2021-11-19 10:12:01.421516
+1	20210527151505645_create-prepaid-card-tables	2021-11-29 17:02:42.091944
+2	20210614080132698_create-prepaid-card-customizations-table	2021-11-29 17:02:42.091944
+3	20210623052200757_create-graphile-worker-schema	2021-11-29 17:02:42.091944
+4	20210809113449561_merchant-infos	2021-11-29 17:02:42.091944
+5	20210817184105100_wallet-orders	2021-11-29 17:02:42.091944
+6	20210920142313915_prepaid-card-reservations	2021-11-29 17:02:42.091944
+7	20210924200122612_order-indicies	2021-11-29 17:02:42.091944
+8	20211006090701108_create-card-spaces	2021-11-29 17:02:42.091944
+9	20211013155536724_card-index	2021-11-29 17:02:42.091944
+10	20211013173917696_beta-testers	2021-11-29 17:02:42.091944
+11	20211014131843187_add-fields-to-card-spaces	2021-11-29 17:02:42.091944
+12	20211020231214235_discord-bots	2021-11-29 17:02:42.091944
+13	20211105180905492_wyre-price-service	2021-11-29 17:02:42.091944
+14	20211110210324178_card-index-part-duex	2021-11-29 17:02:42.091944
+15	20211118084217151_create-uploads	2021-11-29 17:02:42.091944
 \.
 
 
@@ -1308,7 +1311,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 25, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 15, true);
 
 
 --

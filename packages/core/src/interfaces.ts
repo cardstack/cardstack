@@ -117,7 +117,6 @@ export interface CompiledCard {
   };
   schemaModule: string;
   serializer?: SerializerName;
-
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;
@@ -143,7 +142,8 @@ export interface Builder {
 
 export interface RealmConfig {
   url: string;
-  directory?: string;
+  directory: string;
+  watch?: boolean;
 }
 
 export interface CardJSONResponse {

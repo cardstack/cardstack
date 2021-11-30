@@ -1,22 +1,69 @@
-import { assertValidRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync } from 'fs-extra';
-import { join } from 'path';
+import { sep, join } from 'path';
+import sane from 'sane';
 import walkSync from 'walk-sync';
+
+import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
+
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
+import { serverLog as logger } from '../utils/logger';
+
+import { IndexerHandle } from '../services/search-index';
 import RealmManager from '../services/realm-manager';
-import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 
 export default class FSRealm implements RealmInterface {
   url: string;
-  directory: string;
-  manager: RealmManager;
+  private directory: string;
+  private logger = logger;
+  private watcher?: sane.Watcher;
 
-  constructor(config: RealmConfig, manager: RealmManager) {
-    this.url = config.url;
-    this.directory = ensureTrailingSlash(config.directory!);
-    this.manager = manager;
+  constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
+    this.url = url;
+    this.directory = ensureTrailingSlash(directory);
+  }
+
+  async ready() {
+    if (this.notify) {
+      let watcher = sane(this.directory);
+      await new Promise<void>((resolve) => watcher.once('ready', resolve));
+      watcher.on('add', this.onFileChanged.bind(this, 'save'));
+      watcher.on('change', this.onFileChanged.bind(this, 'save'));
+      watcher.on('delete', this.onFileChanged.bind(this, 'delete'));
+      this.watcher = watcher;
+    }
+  }
+
+  async teardown() {
+    this.watcher?.close();
+  }
+
+  // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
+  async reindex(ops: IndexerHandle): Promise<void> {
+    this.logger.info(`Indexing realm: ${this.url}`);
+
+    await ops.beginReplaceAll();
+    let cards = walkSync(this.directory, { globs: ['**/card.json'] });
+    for (let cardPath of cards) {
+      let fullCardUrl = new URL(cardPath.replace('/card.json', ''), this.url).href;
+      this.logger.info(`--> ${fullCardUrl}`);
+      let rawCard = await this.read(fullCardUrl);
+      await ops.save(rawCard);
+    }
+    await ops.finishReplaceAll();
+  }
+
+  private onFileChanged(action: 'save' | 'delete', filepath: string) {
+    let segments = filepath.split(sep);
+    if (!this.notify || shouldIgnoreChange(segments)) {
+      // top-level files in the realm are not cards, we're assuming all
+      // cards are directories under the realm.
+      return;
+    }
+    let url = new URL(segments[0] + '/', this.url).href;
+    this.notify(url, action);
   }
 
   private buildCardPath(cardURL: string, ...paths: string[]): string {
@@ -128,4 +175,10 @@ export default class FSRealm implements RealmInterface {
     }
     removeSync(cardDir);
   }
+}
+
+function shouldIgnoreChange(segments: string[]): boolean {
+  // top-level files in the realm are not cards, we're assuming all
+  // cards are directories under the realm.
+  return segments.length < 2;
 }

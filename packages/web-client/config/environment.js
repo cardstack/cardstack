@@ -77,7 +77,7 @@ module.exports = function (environment) {
     urls: {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
-      testFlightLink: 'https://cardstack.com/cardpay',
+      testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
       discordSupportChannelUrl:
         'https://discord.com/channels/584043165066199050/899645340746141806',
     },
