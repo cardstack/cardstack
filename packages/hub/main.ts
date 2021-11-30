@@ -79,6 +79,7 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
+import { SafeEvents } from './services/safe-events';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
@@ -135,6 +136,7 @@ export function createRegistry(): Registry {
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
+  registry.register('safe-events', SafeEvents);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
