@@ -8,6 +8,8 @@ import { default as CardServiceFactory, CardService, INSECURE_CONTEXT } from '..
 
 import tmp from 'tmp';
 import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
+import { BASE_REALM_CONFIG, DEMO_REALM_CONFIG } from '../../services/realms-config';
+import { RealmConfig } from '@cardstack/core/src/interfaces';
 tmp.setGracefulCleanup();
 
 interface InternalContext {
@@ -27,7 +29,10 @@ export function registry(context: object): Registry {
   let internal = contextFor(context);
   if (!internal.registry) {
     internal.registry = createRegistry();
-    internal.registry.register('card-cache-config', TestCardCacheConfig);
+
+    if (process.env.COMPILER) {
+      internal.registry.register('card-cache-config', TestCardCacheConfig);
+    }
   }
   return internal.registry;
 }
@@ -37,7 +42,7 @@ export function setupHub(mochaContext: Mocha.Suite) {
   let server: HubServer;
   let cardCache: CardCache;
   let cardCacheConfig: TestCardCacheConfig;
-  let fsRealmDir: string;
+  let testRealmDir: string;
 
   let currentCardService: CardServiceFactory | undefined;
   let cardServiceProxy = new Proxy(
@@ -56,20 +61,26 @@ export function setupHub(mochaContext: Mocha.Suite) {
   );
 
   mochaContext.beforeEach(async function () {
-    container = new Container(registry(this));
+    let reg = registry(this);
+
+    if (process.env.COMPILER) {
+      testRealmDir = tmp.dirSync().name;
+      reg.register(
+        'realmsConfig',
+        class TestRealmsConfig {
+          realms: RealmConfig[] = [BASE_REALM_CONFIG, DEMO_REALM_CONFIG, { url: TEST_REALM, directory: testRealmDir }];
+        }
+      );
+    }
+
+    container = new Container(reg);
 
     if (process.env.COMPILER) {
       cardCache = await container.lookup('card-cache');
       cardCacheConfig = (await container.lookup('card-cache-config')) as TestCardCacheConfig;
-      fsRealmDir = tmp.dirSync().name;
-      await (
-        await container.lookup('realm-manager')
-      ).createRealm({
-        url: TEST_REALM,
-        directory: fsRealmDir,
-      });
       currentCardService = await container.lookup('card-service');
     }
+
     server = await container.lookup('hubServer');
   });
 
@@ -96,7 +107,7 @@ export function setupHub(mochaContext: Mocha.Suite) {
       return TEST_REALM;
     },
     getRealmDir(): string {
-      return fsRealmDir;
+      return testRealmDir;
     },
   };
 }
