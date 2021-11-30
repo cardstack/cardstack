@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { AddressKeys, getAddress } from '../contracts/addresses';
+import { AddressKeys, getAddress, protocolVersions } from '../contracts/addresses';
 import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
@@ -77,6 +77,34 @@ const cardPayVersionABI: AbiItem[] = [
     type: 'function',
   },
 ];
+const VersionManagerABI: AbiItem[] = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'version',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+];
+
+export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[]> {
+  let versionManager = new web3.eth.Contract(VersionManagerABI, await getAddress('versionManager', web3));
+  let protocolVersion = await versionManager.methods.version().call();
+  let versionMap: { [version: string]: AbiItem[] } = {};
+  for (let version of protocolVersions) {
+    versionMap[version.replace('v', '')] = (await import(`../contracts/abi/${version}/${contractName}.js`)).default;
+  }
+  let abi = getAPIVersion(versionMap, protocolVersion);
+  return abi;
+}
 
 export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
   let [web3] = args;

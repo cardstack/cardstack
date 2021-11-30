@@ -84,9 +84,12 @@ const XDAI = {
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'xDai Chain',
-  rpcNode: 'https://rpc.xdaichain.com',
-  rpcArchiveNode: 'https://xdai-archive.blockscout.com', // warning this is an OpenEthereum node which has issues with modern web3 providers
+  rpcNode: 'https://apis.ankr.com/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
+  rpcArchiveNode:
+    'https://apis.ankr.com/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
+  rpcWssNodeNext:
+    'wss://apis.ankr.com/wss/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,

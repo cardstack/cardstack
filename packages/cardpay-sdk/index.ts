@@ -4,7 +4,7 @@ export { PrepaidCard } from './sdk/prepaid-card';
 export { PrepaidCardMarket } from './sdk/prepaid-card-market';
 export { RevenuePool } from './sdk/revenue-pool';
 export { RewardManager } from './sdk/reward-manager';
-export { RewardPool, RewardTokenBalance, ProofWithBalance } from './sdk/reward-pool';
+export { RewardPool, Proof, RewardTokenBalance } from './sdk/reward-pool';
 export {
   ISafes,
   Safe,
@@ -42,7 +42,7 @@ export * from './sdk/currency-utils';
 export * from './sdk/currencies';
 export { query as gqlQuery } from './sdk/utils/graphql';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
-export { getSDK } from './sdk/version-resolver';
+export { getSDK, getABI } from './sdk/version-resolver';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';
 export { default as ERC677ABI } from './contracts/abi/erc-677';

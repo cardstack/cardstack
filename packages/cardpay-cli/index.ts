@@ -154,6 +154,8 @@ interface Options {
   force?: string;
   blob?: string;
   safeType?: Exclude<Safe['type'], 'external'>;
+  leaf?: string;
+  acceptPartialClaim?: string;
 }
 let {
   network,
@@ -196,6 +198,8 @@ let {
   force,
   blob,
   safeType,
+  leaf,
+  acceptPartialClaim,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -792,33 +796,25 @@ let {
     });
     command = 'rewardPoolBalance';
   })
-  .command(
-    'claim-rewards <rewardSafe> <rewardProgramId> <tokenAddress> <proof> [amount]',
-    'Claim rewards using proof',
-    (yargs) => {
-      yargs.positional('rewardSafe', {
-        type: 'string',
-        description: 'The address of the rewardSafe that  which will receive the rewards',
-      });
-      yargs.positional('rewardProgramId', {
-        type: 'string',
-        description: 'Reward program id',
-      });
-      yargs.positional('tokenAddress', {
-        type: 'string',
-        description: 'The address of the tokens that are being filled in the reward pool',
-      });
-      yargs.positional('proof', {
-        type: 'string',
-        description: 'The proof used to claim reward',
-      });
-      yargs.positional('amount', {
-        type: 'string',
-        description: 'The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)',
-      });
-      command = 'claimRewards';
-    }
-  )
+  .command('claim-rewards <rewardSafe> <leaf> <proof> [acceptPartialClaim]', 'Claim rewards using proof', (yargs) => {
+    yargs.positional('rewardSafe', {
+      type: 'string',
+      description: 'The address of the rewardSafe that  which will receive the rewards',
+    });
+    yargs.positional('leaf', {
+      type: 'string',
+      description: 'The encoded the encoded bytes of merkle tree',
+    });
+    yargs.positional('proof', {
+      type: 'string',
+      description: 'The proof used to claim reward',
+    });
+    yargs.positional('acceptPartialClaim', {
+      type: 'string',
+      description: 'Boolean if user is fine to accept partial claim of reward',
+    });
+    command = 'claimRewards';
+  })
   .command(
     'claimable-reward-proofs <address> [rewardProgramId] [tokenAddress]',
     'View proofs that are claimable.',
@@ -1278,19 +1274,15 @@ if (!command) {
         showHelpAndExit('rewardSafe is a required value');
         return;
       }
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      if (tokenAddress == null) {
-        showHelpAndExit('tokenAddress is a required value');
+      if (leaf == null) {
+        showHelpAndExit('leaf is a required value');
         return;
       }
       if (proof == null) {
         showHelpAndExit('proof is a required value');
         return;
       }
-      await claimRewards(network, rewardSafe, rewardProgramId, tokenAddress, proof, amount, mnemonic);
+      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim, mnemonic);
       break;
     case 'claimableRewardProofs':
       if (address == null) {

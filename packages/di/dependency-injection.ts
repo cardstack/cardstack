@@ -50,6 +50,9 @@ export class Container implements ContainerInterface {
   // of using instantiate() to create an indexer for each realm. The desired
   // behavior is that there is a separate indexer instance for each realm--not
   // that they are all using the same indexer instance.
+  //
+  // When you use instantiate, you are responsible for calling teardown on the
+  // returned object.
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
     let { instance, promise } = this.provideInjections(() => {
       if (isFactoryByCreateMethod(factory)) {

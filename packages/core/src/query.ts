@@ -12,10 +12,9 @@ export interface Query {
 
 export type CardURL = string;
 export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter | CardTypeFilter;
-export type InteriorFilter = Exclude<Filter, CardTypeFilter>;
 
 export interface TypedFilter {
-  type?: CardURL;
+  on?: CardURL;
 }
 
 // The CardTypeFilter is used when you solely want to filter for all cards that
@@ -26,15 +25,15 @@ export interface CardTypeFilter {
 }
 
 export interface AnyFilter extends TypedFilter {
-  any: InteriorFilter[];
+  any: Filter[];
 }
 
 export interface EveryFilter extends TypedFilter {
-  every: InteriorFilter[];
+  every: Filter[];
 }
 
 export interface NotFilter extends TypedFilter {
-  not: InteriorFilter;
+  not: Filter;
 }
 
 export interface EqFilter extends TypedFilter {
@@ -50,10 +49,6 @@ export interface RangeFilter extends TypedFilter {
       lte?: JSON.Primitive;
     };
   };
-}
-
-export function baseType(filter: Filter | undefined): CardURL {
-  return filter?.type || 'https://cardstack.com/base/base';
 }
 
 export function assertQuery(query: any, pointer: string[] = ['']): asserts query is Query {
@@ -132,6 +127,10 @@ function assertFilter(filter: any, pointer: string[]): asserts filter is Filter 
     if (isEqual(Object.keys(filter), ['type'])) {
       return; // This is a pure card type filter
     }
+  }
+
+  if ('on' in filter) {
+    assertCardId(filter.on, pointer.concat('on'));
   }
 
   if ('any' in filter) {
@@ -272,20 +271,28 @@ function assertRangeFilter(filter: any, pointer: string[]): asserts filter is Ra
       status: 400,
     });
   }
-  Object.entries(filter.range).every(([key, value]) => {
-    switch (key) {
-      case 'gt':
-      case 'gte':
-      case 'lt':
-      case 'lte':
-        assertJSONPrimitive(value, pointer.concat(key));
-        return;
-
-      default:
-        throw new CardstackError('range item must be gt, gte, lt, or lte', {
-          source: { pointer: pointer.join('/') },
-          status: 400,
-        });
+  Object.entries(filter.range).every(([fieldPath, constraints]) => {
+    let innerPointer = [...pointer, fieldPath];
+    if (typeof constraints !== 'object' || constraints == null) {
+      throw new CardstackError('range constraint must be an object', {
+        source: { pointer: innerPointer.join('/') || '/' },
+        status: 400,
+      });
     }
+    Object.entries(constraints).every(([key, value]) => {
+      switch (key) {
+        case 'gt':
+        case 'gte':
+        case 'lt':
+        case 'lte':
+          assertJSONPrimitive(value, innerPointer.concat(key));
+          return;
+        default:
+          throw new CardstackError('range item must be gt, gte, lt, or lte', {
+            source: { pointer: innerPointer.join('/') },
+            status: 400,
+          });
+      }
+    });
   });
 }
