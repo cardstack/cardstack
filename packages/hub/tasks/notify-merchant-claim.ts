@@ -1,6 +1,8 @@
-import { fromWei, viewSafe } from '@cardstack/cardpay-sdk';
-import { Helpers } from 'graphile-worker';
-import config from 'config';
+import { fromWei } from '@cardstack/cardpay-sdk';
+import { inject } from '@cardstack/di';
+import CardpaySDKService from '../services/cardpay-sdk';
+import Web3Service from '../services/web3';
+import WorkerClient from '../services/worker-client';
 
 interface MerchantClaimSubscriptionEvent {
   returnValues: {
@@ -9,17 +11,21 @@ interface MerchantClaimSubscriptionEvent {
   };
 }
 
-const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
-
 export default class NotifyMerchantClaim {
-  async perform(payload: MerchantClaimSubscriptionEvent, helpers: Helpers) {
+  cardpay: CardpaySDKService = inject('cardpay');
+  web3: Web3Service = inject('web3');
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+
+  async perform(payload: MerchantClaimSubscriptionEvent) {
     let merchantSafeAddress = payload.returnValues.merchantSafe;
     let amountInWei = payload.returnValues.amount;
 
-    let { safe } = await viewSafe(network, merchantSafeAddress);
+    let Safes = await this.cardpay.getSDK('Safes', this.web3.getInstance());
+    let { safe } = await Safes.viewSafe(merchantSafeAddress);
+
     if (!safe) {
-      // TODO: log to sentry
-      return;
+      // Sufficient to log to Sentry because of on('job:error')…?
+      throw new Error('Safe not found');
     }
 
     // TODO: how should we resolve the token symbol from an address?
@@ -28,7 +34,7 @@ export default class NotifyMerchantClaim {
     let notifiedAddress = safe.owners[0];
     let message = `You just claimed ${fromWei(amountInWei)} ${token} from your business account`;
 
-    helpers.addJob('send-notifications', {
+    await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
       message,
     });

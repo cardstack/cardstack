@@ -308,9 +308,9 @@ export async function bootWorker() {
         let task = await container.instantiate(SendNotificationsTask);
         return task.perform(payload, helpers);
       },
-      'notify-merchant-claim': async (payload: any, helpers: Helpers) => {
+      'notify-merchant-claim': async (payload: any) => {
         let task = await container.instantiate(NotifyMerchantClaimTask);
-        return task.perform(payload, helpers);
+        return task.perform(payload);
       },
       'notify-customer-payment': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(NotifyCustomerPaymentTask);
