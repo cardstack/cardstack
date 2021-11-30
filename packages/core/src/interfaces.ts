@@ -180,7 +180,7 @@ export type CardOperation =
       };
     };
 
-// this is the set of enviroment-specific capabilities a CardModel gets access
+// this is the set of environment-specific capabilities a CardModel gets access
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
