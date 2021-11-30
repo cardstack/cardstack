@@ -6,7 +6,6 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
 import {
@@ -30,6 +29,7 @@ import {
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
+  DepotSafe,
   convertAmountToNativeDisplay,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';

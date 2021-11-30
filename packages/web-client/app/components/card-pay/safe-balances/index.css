@@ -67,11 +67,17 @@
   align-items: center;
 }
 
+.card-pay-safe-balances__title-and-link {
+  min-width: 0; /* Allow text-overflow to work */
+}
+
 .card-pay-safe-balances__title {
   font-size: 1.625rem;
   font-weight: 600;
   letter-spacing: 0;
-  line-height: var(--boxel-font-size-lg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card-pay-safe-balances__logo {

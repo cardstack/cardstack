@@ -4,20 +4,46 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import config from 'config';
+import { getOwner } from '@cardstack/di';
+import { inject } from '@cardstack/di';
 
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
-export default class RealmManager implements Omit<RealmInterface, 'create'> {
-  realms: FSRealm[] = realmsConfig.map((realm) => new FSRealm(realm, this));
+export default class RealmManager {
+  realms: RealmInterface[] = [];
 
-  createRealm(config: RealmConfig, klass?: any) {
-    config.url = ensureTrailingSlash(config.url);
-    let realm = klass ? new klass(config, this) : new FSRealm(config, this);
+  private searchIndex = inject('searchIndex');
+
+  async ready() {
+    await Promise.all(
+      realmsConfig.map((config) => {
+        return this.createRealm(config);
+      })
+    );
+  }
+
+  async teardown() {
+    for (let realm of this.realms) {
+      await realm.teardown();
+    }
+  }
+
+  async createRealm(config: RealmConfig) {
+    let realm = await getOwner(this).instantiate(
+      FSRealm,
+      ensureTrailingSlash(config.url),
+      config.directory,
+      config.watch ? this.notify.bind(this) : undefined
+    );
     this.realms.push(realm);
     return realm;
   }
 
-  getRealm(url: string): FSRealm {
+  private notify(cardURL: string, action: 'save' | 'delete'): void {
+    this.searchIndex.notify(cardURL, action);
+  }
+
+  getRealmForCard(url: string): RealmInterface {
     url = ensureTrailingSlash(url);
 
     for (let realm of this.realms) {
@@ -32,15 +58,15 @@ export default class RealmManager implements Omit<RealmInterface, 'create'> {
   }
 
   async read(url: string): Promise<RawCard> {
-    return this.getRealm(url).read(url);
+    return this.getRealmForCard(url).read(url);
   }
 
   async update(raw: RawCard): Promise<RawCard> {
-    return this.getRealm(raw.url).update(raw);
+    return this.getRealmForCard(raw.url).update(raw);
   }
 
   async delete(cardURL: string) {
-    return this.getRealm(cardURL).delete(cardURL);
+    return this.getRealmForCard(cardURL).delete(cardURL);
   }
 }
 

@@ -30,8 +30,8 @@
           @logoTextColor={{this.data.info.textColor}}
         />
       {{/if}}
-      <div>
-        <h3 class='card-pay-safe-balances__title'>
+      <div class='card-pay-safe-balances__title-and-link'>
+        <h3 class='card-pay-safe-balances__title' title={{this.data.info.name}}>
           {{this.data.info.name}}
         </h3>
         {{#if this.data.info.id}}

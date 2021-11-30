@@ -5,12 +5,12 @@ import {
   PrepaidCardSafe,
   MerchantSafe,
   DepotSafe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+} from '@cardstack/cardpay-sdk';
 import { taskFor, TaskFunction } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 
 export interface SafesResourceStrategy {

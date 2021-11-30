@@ -2,13 +2,12 @@ import CardModel from '@cardstack/core/src/card-model';
 import type {
   CardJSONResponse,
   CompiledCard,
-  Field,
   Format,
   RawCard,
   Builder,
   CardOperation,
 } from '@cardstack/core/src/interfaces';
-import { findIncluded } from '@cardstack/core/src/jsonapi';
+import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import { Compiler } from '@cardstack/core/src/compiler';
@@ -57,8 +56,8 @@ export default class LocalRealm implements Builder {
 
   private compiledCardCache = new Map<string, CompiledCard>();
   private compiler: Compiler;
-
   private localModules = new Map<string, LocalModule>();
+  private deserializer = new RawCardDeserializer();
 
   constructor(private ownRealmURL: string, private cards: Cards) {
     this.compiler = new Compiler({
@@ -67,8 +66,8 @@ export default class LocalRealm implements Builder {
   }
 
   async load(url: string, format: Format): Promise<CardJSONResponse> {
-    let raw = await this.getRawCard(url);
     let compiled = await this.getCompiledCard(url);
+    let raw = await this.getRawCard(url);
 
     // TODO: reduce data shape for the given format like we do on the server
     return {
@@ -121,7 +120,10 @@ export default class LocalRealm implements Builder {
         let response = await fetchJSON<any>(
           [cardServer, 'sources/', encodeURIComponent(url)].join('')
         );
-        return this.deserializeRawCard(response.data, response).raw;
+
+        let raw = this.deserializer.deserialize(response.data, response).raw;
+        this.remoteRawCards.set(raw.url, raw);
+        return raw;
       }
     }
   }
@@ -147,10 +149,14 @@ export default class LocalRealm implements Builder {
         ].join('')
       );
 
-      let { compiled } = this.deserializeRawCard(response.data, response);
+      let { compiled, raw } = this.deserializer.deserialize(
+        response.data,
+        response
+      );
       if (!compiled) {
         throw new Error(`expected to find compiled meta alongside raw card`);
       }
+      this.remoteRawCards.set(raw.url, raw);
       return compiled;
     }
   }
@@ -198,116 +204,6 @@ export default class LocalRealm implements Builder {
 
   private inOwnRealm(cardURL: string): boolean {
     return cardURL.startsWith(this.ownRealmURL);
-  }
-
-  private deserializeRawCard(
-    resource: any,
-    doc: any
-  ): {
-    raw: RawCard;
-    compiled: CompiledCard | undefined;
-  } {
-    if (resource.type !== 'raw-cards') {
-      throw new Error(`expected type raw-cards, got ${resource.type}`);
-    }
-    let { attributes: attrs } = resource;
-    let raw: RawCard = {
-      url: resource.id,
-      schema: attrs?.schema,
-      isolated: attrs?.isolated,
-      embedded: attrs?.embedded,
-      edit: attrs?.edit,
-      deserializer: attrs?.deserializer,
-      adoptsFrom: attrs?.adoptsFrom,
-      files: attrs?.files,
-      data: attrs?.data,
-    };
-    this.remoteRawCards.set(raw.url, raw);
-    let metaRef = resource.relationships?.compiledMeta?.data;
-    let compiled: CompiledCard | undefined;
-    if (metaRef) {
-      compiled = this.compiledCardCache.get(metaRef.id);
-      if (!compiled) {
-        let metaResource = findIncluded(doc, metaRef);
-        if (metaRef) {
-          compiled = this.deserializeCompiledMeta(metaResource, doc);
-        }
-      }
-    }
-    return { raw, compiled };
-  }
-
-  private deserializeCompiledMeta(resource: any, doc: any): CompiledCard {
-    if (resource.type !== 'compiled-metas') {
-      throw new Error(`expected type compiled-metas, got ${resource.type}`);
-    }
-    let { attributes: attrs } = resource;
-    let compiled: CompiledCard = {
-      url: resource.id,
-      schemaModule: attrs?.schemaModule,
-      serializer: attrs?.serializer,
-      isolated: attrs?.isolated,
-      embedded: attrs?.embedded,
-      edit: attrs?.edit,
-      fields: {},
-    };
-    this.compiledCardCache.set(compiled.url, compiled);
-
-    let parentRef = resource.relationships?.adoptsFrom?.data;
-    if (parentRef) {
-      let cached = this.compiledCardCache.get(parentRef.id);
-      if (cached) {
-        compiled.adoptsFrom = cached;
-      } else {
-        let parentResource = findIncluded(doc, parentRef);
-        if (parentResource) {
-          compiled.adoptsFrom = this.deserializeCompiledMeta(
-            parentResource,
-            doc
-          );
-        }
-      }
-    }
-
-    let fieldRefs = resource.relationships?.fields?.data;
-    if (fieldRefs) {
-      for (let fieldRef of fieldRefs) {
-        let fieldResource = findIncluded(doc, fieldRef);
-        if (fieldResource) {
-          let field = this.deserializeField(fieldRef, doc);
-          compiled.fields[field.name] = field;
-        }
-      }
-    }
-
-    return compiled;
-  }
-
-  private deserializeField(resource: any, doc: any): Field {
-    if (resource.type !== 'fields') {
-      throw new Error(`expected type fields, got ${resource.type}`);
-    }
-    let card = undefined;
-    let cardRef = resource.relationships?.card.data;
-    if (cardRef) {
-      card = this.compiledCardCache.get(cardRef.id);
-      if (!card) {
-        let cardResource = findIncluded(doc, cardRef);
-        if (cardResource) {
-          card = this.deserializeCompiledMeta(cardResource, doc);
-        }
-      }
-    }
-    if (!card) {
-      throw new Error(`bug: field ${resource.id} is missing card relationship`);
-    }
-    let { attributes: attrs } = resource;
-    let field: Field = {
-      name: attrs?.name,
-      type: attrs?.fieldType,
-      card,
-    };
-    return field;
   }
 
   private async evaluateModule<T extends object>(

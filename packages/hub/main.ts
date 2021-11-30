@@ -53,6 +53,8 @@ import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
 import HealthCheck from './services/health-check';
+import Upload from './routes/upload';
+import UploadQueries from './services/queries/upload';
 import NonceTracker from './services/nonce-tracker';
 import ReservedWords from './services/reserved-words';
 import CardpaySDKService from './services/cardpay-sdk';
@@ -68,12 +70,14 @@ import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
-import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
+import { SearchIndex } from './services/search-index';
+import Web3Storage from './services/web3-storage';
+import UploadRouter from './routes/upload';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -94,6 +98,9 @@ export function createRegistry(): Registry {
   registry.register('exchange-rates', ExchangeRatesService);
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('health-check', HealthCheck);
+  registry.register('upload-router', UploadRouter);
+  registry.register('upload', Upload);
+  registry.register('upload-queries', UploadQueries);
   registry.register('hubServer', HubServer);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
@@ -129,6 +136,7 @@ export function createRegistry(): Registry {
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
+  registry.register('web3-storage', Web3Storage);
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
@@ -143,7 +151,7 @@ export function createRegistry(): Registry {
       }
     );
     registry.register('card-builder', CardBuilder);
-    registry.register('card-watcher', CardWatcher);
+    registry.register('searchIndex', SearchIndex);
   }
 
   return registry;
@@ -164,6 +172,7 @@ export class HubServer {
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
   private cardRoutes: KnownServices['card-routes'] | undefined;
   private healthCheck = inject('health-check', { as: 'healthCheck' });
+  private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
 
   constructor() {
     initSentry();
@@ -187,6 +196,7 @@ export class HubServer {
     app.use(this.devProxy.middleware());
     app.use(this.apiRouter.routes());
     app.use(this.callbacksRouter.routes());
+    app.use(this.uploadRouter.routes());
 
     if (this.cardRoutes) {
       app.use(this.cardRoutes.routes());
@@ -229,17 +239,8 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-    let builder = await getOwner(this).lookup('card-builder');
-    await builder.primeCache();
-  }
-
-  async watchCards() {
-    if (!process.env.COMPILER) {
-      throw new Error('COMPILER feature flag is not present');
-    }
-
-    let watcher = await getOwner(this).lookup('card-watcher');
-    watcher.watch();
+    let searchIndex = await getOwner(this).lookup('searchIndex');
+    await searchIndex.indexAllRealms();
   }
 }
 

@@ -1,9 +1,7 @@
-import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, NODE, ENVIRONMENTS } from '../interfaces';
+import { Environment, ENVIRONMENTS, NODE } from '../interfaces';
 import {
   writeFileSync,
-  readJSONSync,
   readFileSync,
   existsSync,
   mkdirpSync,
@@ -12,12 +10,14 @@ import {
   pathExistsSync,
   ensureDirSync,
   outputJSONSync,
+  readJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { serverLog } from '../utils/logger';
 import { Client } from 'pg';
+import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',

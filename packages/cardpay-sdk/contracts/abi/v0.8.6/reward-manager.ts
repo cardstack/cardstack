@@ -93,31 +93,12 @@ export default [
       },
       {
         indexed: false,
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
+        internalType: 'bytes',
+        name: 'blob',
+        type: 'bytes',
       },
     ],
     name: 'RewardRuleAdded',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-    ],
-    name: 'RewardRuleRemoved',
     type: 'event',
   },
   {
@@ -200,19 +181,9 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'tallyRuleDID',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'benefitDID',
-        type: 'string',
+        internalType: 'bytes',
+        name: 'blob',
+        type: 'bytes',
       },
     ],
     name: 'addRewardRule',
@@ -251,6 +222,16 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+      {
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
+      },
+      {
+        internalType: 'enum Enum.Operation',
+        name: '',
+        type: 'uint8',
       },
       {
         internalType: 'bytes',
@@ -300,32 +281,6 @@ export default [
   },
   {
     constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'rewardSafe',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'getTransferRewardSafeData',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: '',
-        type: 'bytes',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [],
     name: 'gnosisProxyFactory',
     outputs: [
@@ -356,24 +311,13 @@ export default [
   },
   {
     constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-    ],
-    name: 'hasRule',
+    inputs: [],
+    name: 'governanceAdmin',
     outputs: [
       {
-        internalType: 'bool',
+        internalType: 'address',
         name: '',
-        type: 'bool',
+        type: 'address',
       },
     ],
     payable: false,
@@ -484,6 +428,27 @@ export default [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+    ],
+    name: 'isValidToken',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -496,6 +461,32 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'ownedRewardSafes',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -569,26 +560,6 @@ export default [
       },
     ],
     name: 'removeRewardProgram',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-    ],
-    name: 'removeRewardRule',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -684,32 +655,12 @@ export default [
         type: 'address',
       },
     ],
-    name: 'rewardPrograms',
+    name: 'rewardProgramsForRewardSafes',
     outputs: [
       {
         internalType: 'address',
-        name: 'admin',
-        type: 'address',
-      },
-      {
-        internalType: 'bool',
-        name: 'locked',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'rewardeeRegistrationFeeInSPEND',
-    outputs: [
-      {
-        internalType: 'uint256',
         name: '',
-        type: 'uint256',
+        type: 'address',
       },
     ],
     payable: false,
@@ -724,23 +675,28 @@ export default [
         name: '',
         type: 'address',
       },
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
     ],
     name: 'rule',
     outputs: [
       {
-        internalType: 'string',
-        name: 'tallyRuleDID',
-        type: 'string',
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
       },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'safeDelegateImplementation',
+    outputs: [
       {
-        internalType: 'string',
-        name: 'benefitDID',
-        type: 'string',
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
     payable: false,
@@ -772,11 +728,6 @@ export default [
       },
       {
         internalType: 'uint256',
-        name: '_rewardeeRegistrationFeeInSPEND',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
         name: '_rewardProgramRegistrationFeeInSPEND',
         type: 'uint256',
       },
@@ -784,6 +735,16 @@ export default [
         internalType: 'address[]',
         name: '_eip1271Contracts',
         type: 'address[]',
+      },
+      {
+        internalType: 'address',
+        name: '_governanceAdmin',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_safeDelegateImplementation',
+        type: 'address',
       },
       {
         internalType: 'address',
@@ -807,46 +768,6 @@ export default [
       },
     ],
     name: 'transferOwnership',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'safeTxGas',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'baseGas',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'gasPrice',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'gasToken',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'signature',
-        type: 'bytes',
-      },
-    ],
-    name: 'transferRewardSafe',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -885,6 +806,21 @@ export default [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'willTransferRewardSafe',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];

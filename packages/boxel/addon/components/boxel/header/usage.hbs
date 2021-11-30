@@ -8,18 +8,20 @@
       @noBackground={{this.noBackground}}
       @isHighlighted={{this.isHighlighted}}
     >
-      <button>Edit</button>
-      {{!-- Usage with Boxel::IconButton component --}}
-      <Boxel::IconButton
-        @icon="more-actions"
-        @height="30px"
-        aria-label="More Actions"
-      />
-      <Boxel::IconButton
-        @icon="expand"
-        @height="30px"
-        aria-label="Isolate"
-      />
+      <:actions>
+        <button>Edit</button>
+        {{!-- Usage with Boxel::IconButton component --}}
+        <Boxel::IconButton
+          @icon="more-actions"
+          @height="30px"
+          aria-label="More Actions"
+        />
+        <Boxel::IconButton
+          @icon="expand"
+          @height="30px"
+          aria-label="Isolate"
+        />
+      </:actions>
     </Boxel::Header>
   </:example>
   <:api as |Args|>

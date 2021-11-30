@@ -17,7 +17,7 @@
   background: url('/images/backgrounds/bridge-background.svg');
 }
 
-/* many selectors for specificity, excluding disabled/href-less link so that it's clear when the link fails to load */
-a.card-pay-bridge__button.boxel-button[href] {
+/* excluding disabled/href-less link so that it's clear when the link fails to load */
+.card-pay-bridge__button[href] {
   --boxel-button-color: var(--boxel-light-300);
 }

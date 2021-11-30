@@ -10,17 +10,14 @@ import {
   TxnBlockNumber,
   WithdrawalLimits,
 } from '../utils/web3-strategies/types';
-import {
-  MerchantSafe,
-  PrepaidCardSafe,
-} from '@cardstack/cardpay-sdk/sdk/safes';
+import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   ConvertibleSymbol,
   ConversionFunction,

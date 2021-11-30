@@ -3,6 +3,31 @@ export default [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'address',
+        name: 'tokenUsdFeed',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'ethUsdFeed',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'daiUsdFeed',
+        type: 'address',
+      },
+    ],
+    name: 'ChainlinkFeedSetup',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -19,57 +44,14 @@ export default [
     type: 'event',
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'issuingTokenAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'RewardeeRegistrationFee',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [],
-    name: 'Setup',
-    type: 'event',
-  },
-  {
     constant: true,
     inputs: [],
-    name: 'actionDispatcher',
+    name: 'canSnapToUSD',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'bool',
         name: '',
-        type: 'address',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -94,7 +76,92 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'exchangeAddress',
+    name: 'daiPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'daiUsdFeed',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [
+      {
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'description',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'ethPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'ethUsdFeed',
     outputs: [
       {
         internalType: 'address',
@@ -137,45 +204,14 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'onTokenTransfer',
+    constant: true,
+    inputs: [],
+    name: 'isSnappedToUSD',
     outputs: [
       {
         internalType: 'bool',
         name: '',
         type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'owner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
       },
     ],
     payable: false,
@@ -185,7 +221,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'prepaidCardManager',
+    name: 'owner',
     outputs: [
       {
         internalType: 'address',
@@ -207,47 +243,32 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'rewardManagerAddress',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     constant: false,
     inputs: [
       {
         internalType: 'address',
-        name: '_actionDispatcher',
+        name: '_tokenUsdFeed',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_prepaidCardManager',
+        name: '_ethUsdFeed',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_exchangeAddress',
+        name: '_daiUsdFeed',
         type: 'address',
       },
       {
-        internalType: 'address',
-        name: '_tokenManagerAddress',
-        type: 'address',
+        internalType: 'bool',
+        name: '_canSnapToUSD',
+        type: 'bool',
       },
       {
-        internalType: 'address',
-        name: '_rewardManagerAddress',
-        type: 'address',
+        internalType: 'uint256',
+        name: '_snapThreshold',
+        type: 'uint256',
       },
       {
         internalType: 'address',
@@ -256,13 +277,7 @@ export default [
       },
     ],
     name: 'setup',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
+    outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
@@ -270,7 +285,22 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'tokenManagerAddress',
+    name: 'snapThreshold',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'tokenUsdFeed',
     outputs: [
       {
         internalType: 'address',
@@ -295,6 +325,41 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'usdDelta',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'usdPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
