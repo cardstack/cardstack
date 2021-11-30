@@ -17,6 +17,7 @@
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
+    "test:node-webpack": "NODE_ENV=test mocha dist/tests.js --timeout 60000",
     "test:remove-ts-artifacts-for-corde": "find ./bot-tests \\( -name \"*.d.ts\" -or -name \"*.js\" -or -name \"*.js.map\" \\) -exec rm -f {} \\;",
     "test:bot": "yarn test:remove-ts-artifacts-for-corde && bin/corde",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
@@ -89,6 +90,9 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-proposal-decorators": "^7.16.4",
+    "@babel/plugin-transform-typescript": "^7.16.1",
     "@cardstack/eslint-config": "0.27.35",
     "@cardstack/test-support": "0.27.35",
     "@types/chai": "^4.2.15",
@@ -103,14 +107,18 @@
     "@types/sane": "^2.0.1",
     "@types/supertest": "^2.0.11",
     "@types/yargs": "^17.0.2",
+    "babel-loader": "^8.2.3",
     "chai": "^4.3.4",
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
+    "node-loader": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "supertest": "^6.1.3",
+    "ts-loader": "^9.2.6",
     "ts-node": "^10.3.0",
-    "tslog": "^3.2.2"
+    "tslog": "^3.2.2",
+    "webpack": "^5.64.4"
   },
   "engines": {
     "node": "^14.0",
