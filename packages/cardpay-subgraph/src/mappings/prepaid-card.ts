@@ -10,6 +10,8 @@ import {
   PrepaidCardCreation,
   PrepaidCardTransfer,
   PrepaidCardSendAction,
+  MerchantSafe,
+  MerchantPrepaidCardIssuance,
 } from '../../generated/schema';
 import {
   makeToken,
@@ -20,6 +22,7 @@ import {
   makeEOATransactionForSafe,
   makeAccount,
   setSafeType,
+  makeMerchantRevenueEvent,
 } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -36,6 +39,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   }
   makeAccount(issuer);
 
+  let txnHash = event.transaction.hash.toHex();
   let prepaidCardMgr = PrepaidCardManager.bind(event.address);
   let cardInfo = prepaidCardMgr.cardDetails(event.params.card);
   let reloadable = cardInfo.value4;
@@ -53,7 +57,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.save();
 
   let creationEntity = new PrepaidCardCreation(prepaidCard);
-  creationEntity.transaction = event.transaction.hash.toHex();
+  creationEntity.transaction = txnHash;
   creationEntity.createdAt = event.block.timestamp;
   creationEntity.prepaidCard = prepaidCard;
   creationEntity.issuer = issuer;
@@ -66,6 +70,21 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;
   creationEntity.save();
+
+  if (MerchantSafe.load(maybeDepot) != null) {
+    let merchantPrepaidCardIssuanceEntity = new MerchantPrepaidCardIssuance(txnHash);
+    merchantPrepaidCardIssuanceEntity.timestamp = event.block.timestamp;
+    merchantPrepaidCardIssuanceEntity.transaction = txnHash;
+    merchantPrepaidCardIssuanceEntity.merchantSafe = maybeDepot;
+    merchantPrepaidCardIssuanceEntity.token = issuingToken;
+    merchantPrepaidCardIssuanceEntity.amount = event.params.issuingTokenAmount;
+    merchantPrepaidCardIssuanceEntity.prepaidCard = prepaidCard;
+    merchantPrepaidCardIssuanceEntity.save();
+
+    let revenueEventEntity = makeMerchantRevenueEvent(event, maybeDepot, issuingToken);
+    revenueEventEntity.prepaidCardIssuance = txnHash;
+    revenueEventEntity.save();
+  }
 
   setSafeType(prepaidCard, 'prepaid-card');
 }
