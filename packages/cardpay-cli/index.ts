@@ -10,7 +10,7 @@ import {
   getWithdrawalLimits,
 } from './bridge.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokensGasEstimate } from './safe.js';
+import { viewSafes, transferTokens, viewSafe, transferTokensGasEstimate } from './safe.js';
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
@@ -83,7 +83,6 @@ type Commands =
   | 'priceForFaceValue'
   | 'paymentLimits'
   | 'payMerchant'
-  | 'setSupplierInfoDID'
   | 'setPrepaidCardAsk'
   | 'skuInfo'
   | 'prepaidCardInventory'
@@ -155,6 +154,8 @@ interface Options {
   force?: string;
   blob?: string;
   safeType?: Exclude<Safe['type'], 'external'>;
+  leaf?: string;
+  acceptPartialClaim?: string;
 }
 let {
   network,
@@ -197,6 +198,8 @@ let {
   force,
   blob,
   safeType,
+  leaf,
+  acceptPartialClaim,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -361,27 +364,6 @@ let {
         description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
       });
       command = 'safeTransferTokens';
-    }
-  )
-  .command(
-    'set-supplier-info-did [safeAddress] [infoDID] [token]',
-    'Allows a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.',
-    (yargs) => {
-      yargs.positional('safeAddress', {
-        type: 'string',
-        description:
-          "The supplier's depot safe address (the safe that was assigned to the supplier when they bridged tokens into L2)",
-      });
-      yargs.positional('infoDID', {
-        type: 'string',
-        description: "The DID string that can be resolved to a DID document representing the supplier's information",
-      });
-      yargs.positional('token', {
-        type: 'string',
-        description:
-          'The token address that you want to use to pay for gas for this transaction. This should be an address of a token in the depot safe.',
-      });
-      command = 'setSupplierInfoDID';
     }
   )
   .command(
@@ -814,33 +796,25 @@ let {
     });
     command = 'rewardPoolBalance';
   })
-  .command(
-    'claim-rewards <rewardSafe> <rewardProgramId> <tokenAddress> <proof> [amount]',
-    'Claim rewards using proof',
-    (yargs) => {
-      yargs.positional('rewardSafe', {
-        type: 'string',
-        description: 'The address of the rewardSafe that  which will receive the rewards',
-      });
-      yargs.positional('rewardProgramId', {
-        type: 'string',
-        description: 'Reward program id',
-      });
-      yargs.positional('tokenAddress', {
-        type: 'string',
-        description: 'The address of the tokens that are being filled in the reward pool',
-      });
-      yargs.positional('proof', {
-        type: 'string',
-        description: 'The proof used to claim reward',
-      });
-      yargs.positional('amount', {
-        type: 'string',
-        description: 'The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)',
-      });
-      command = 'claimRewards';
-    }
-  )
+  .command('claim-rewards <rewardSafe> <leaf> <proof> [acceptPartialClaim]', 'Claim rewards using proof', (yargs) => {
+    yargs.positional('rewardSafe', {
+      type: 'string',
+      description: 'The address of the rewardSafe that  which will receive the rewards',
+    });
+    yargs.positional('leaf', {
+      type: 'string',
+      description: 'The encoded the encoded bytes of merkle tree',
+    });
+    yargs.positional('proof', {
+      type: 'string',
+      description: 'The proof used to claim reward',
+    });
+    yargs.positional('acceptPartialClaim', {
+      type: 'string',
+      description: 'Boolean if user is fine to accept partial claim of reward',
+    });
+    command = 'claimRewards';
+  })
   .command(
     'claimable-reward-proofs <address> [rewardProgramId] [tokenAddress]',
     'View proofs that are claimable.',
@@ -1053,13 +1027,6 @@ if (!command) {
         return;
       }
       await transferTokensGasEstimate(network, safeAddress, token, recipient, amount, mnemonic);
-      break;
-    case 'setSupplierInfoDID':
-      if (safeAddress == null || token == null || infoDID == null) {
-        showHelpAndExit('safeAddress, token, and infoDID are required values');
-        return;
-      }
-      await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
       if (
@@ -1307,19 +1274,15 @@ if (!command) {
         showHelpAndExit('rewardSafe is a required value');
         return;
       }
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      if (tokenAddress == null) {
-        showHelpAndExit('tokenAddress is a required value');
+      if (leaf == null) {
+        showHelpAndExit('leaf is a required value');
         return;
       }
       if (proof == null) {
         showHelpAndExit('proof is a required value');
         return;
       }
-      await claimRewards(network, rewardSafe, rewardProgramId, tokenAddress, proof, amount, mnemonic);
+      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim, mnemonic);
       break;
     case 'claimableRewardProofs':
       if (address == null) {

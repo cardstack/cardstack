@@ -6,7 +6,7 @@
   ...attributes
 >
   <ActionCardContainer @header="Edit image" class="image-editor__card">
-    <div class="image-editor__layout">
+    <div class={{cn "image-editor__layout" image-editor__layout--errored=this.errored}}>
       <div class="image-editor__editing-section">
         <div class="image-editor__cropper-container">
           <img class="image-editor__cropper-target" src={{@image}} alt="" role="presentation" {{did-insert this.initializeCropper}}>
@@ -38,11 +38,21 @@
         </div>
       </div>
       <div class="image-editor__preview-section">
-        {{yield this.output}}
+        {{yield this.preview}}
       </div>
+      {{#if this.errored}}
+        <div class="image-editor__error-overlay" data-test-image-editor-error-overlay>
+          Sorry, an unexpected error occurred.
+        </div>
+      {{/if}}
     </div>
     <Boxel::ActionChin @disabled={{this.loading}}>
       <:default as |d|>
+      {{#if this.errored}}
+        <d.ActionButton {{on "click" this.close}} data-test-image-editor-errored-exit-button>
+          Exit
+        </d.ActionButton>
+      {{else}}
         <d.ActionButton {{on "click" this.save}} data-test-image-editor-save-button>
           Save
         </d.ActionButton>
@@ -50,6 +60,7 @@
         <Boxel::Button data-test-image-editor-cancel-button @size="base" @kind="secondary-dark" class="image-editor__cancel-button" {{on "click" this.close}}>
           Cancel
         </Boxel::Button>
+      {{/if}}
       </:default>
     </Boxel::ActionChin>
   </ActionCardContainer>

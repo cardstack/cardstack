@@ -9,7 +9,7 @@ import {
   BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 import { reads } from 'macro-decorators';
 

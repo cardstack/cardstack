@@ -92,8 +92,14 @@ export default class CardSpaceValidator {
       errors.profileDescription.push(`Max length is ${MAX_LONG_FIELD_LENGTH}`);
     }
 
-    if (cardSpace.profileName && cardSpace.profileName.length > MAX_SHORT_FIELD_LENGTH) {
-      errors.profileName.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    if (cardSpace.profileName) {
+      if (cardSpace.profileName.length > MAX_SHORT_FIELD_LENGTH) {
+        errors.profileName.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+      }
+
+      if (this.reservedWords.isProfane(cardSpace.profileName)) {
+        errors.profileName.push(`Username is not allowed`);
+      }
     }
 
     if (cardSpace.profileCategory && cardSpace.profileCategory.length > MAX_SHORT_FIELD_LENGTH) {

@@ -19,11 +19,12 @@
 .layer-two-connect-card__testflight-link {
   --icon-color: currentColor;
 
-  display: flex;
-  align-items: center;
-  gap: var(--boxel-sp-xs);
   font: 600 var(--boxel-font);
   padding: var(--boxel-sp-sm);
+}
+
+.layer-two-connect-card__testflight-link > svg {
+  margin-bottom: var(--boxel-sp-sm);
 }
 
 .layer-two-connect-card__testflight-link-icon {

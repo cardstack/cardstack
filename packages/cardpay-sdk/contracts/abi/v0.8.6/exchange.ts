@@ -46,6 +46,21 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'cardTokenSymbol',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'cardpayVersion',
     outputs: [
       {
@@ -418,6 +433,11 @@ export default [
         internalType: 'address',
         name: '_versionManager',
         type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: '_cardTokenSymbol',
+        type: 'string',
       },
     ],
     name: 'setup',

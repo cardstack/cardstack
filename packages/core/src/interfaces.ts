@@ -117,7 +117,6 @@ export interface CompiledCard {
   };
   schemaModule: string;
   serializer?: SerializerName;
-
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;
@@ -143,7 +142,8 @@ export interface Builder {
 
 export interface RealmConfig {
   url: string;
-  directory?: string;
+  directory: string;
+  watch?: boolean;
 }
 
 export interface CardJSONResponse {
@@ -180,7 +180,7 @@ export type CardOperation =
       };
     };
 
-// this is the set of enviroment-specific capabilities a CardModel gets access
+// this is the set of environment-specific capabilities a CardModel gets access
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;

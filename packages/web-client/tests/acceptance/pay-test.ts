@@ -13,6 +13,7 @@ import {
   roundAmountToNativeCurrencyDecimals,
   spendToUsd,
   usdToSpend,
+  ViewSafeResult,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
@@ -21,7 +22,6 @@ import {
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import { Response as MirageResponse } from 'ember-cli-mirage';
-import { ViewSafeResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';

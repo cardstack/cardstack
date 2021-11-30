@@ -137,7 +137,7 @@ After you have completed running your new DB migration script create a pg_dump o
 
 To test, debug and call isolated parts of the application within its context.
 
-`bin/hub console` starts the application console.
+`yarn console` starts the application console.
 
 Examples:
 

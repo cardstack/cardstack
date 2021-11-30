@@ -37,7 +37,7 @@ import {
   createPrepaidCardSafe,
   createMerchantSafe,
 } from '@cardstack/web-client/utils/test-factories';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 
 interface BridgeToLayer1Request {
   safeAddress: string;
