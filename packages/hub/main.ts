@@ -79,7 +79,7 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
-import { SafeEvents } from './services/safe-events';
+import { ContractSubscriptionEventHandler } from './contract-subsciption-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -99,6 +99,7 @@ export function createRegistry(): Registry {
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
+  registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -142,7 +143,6 @@ export function createRegistry(): Registry {
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
-  registry.register('safe-events', SafeEvents);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
@@ -266,7 +266,7 @@ declare module '@cardstack/di' {
   }
 }
 
-function initSentry() {
+export async function initSentry() {
   if (config.get('sentry.enabled')) {
     Sentry.init({
       dsn: config.get('sentry.dsn'),

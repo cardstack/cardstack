@@ -1,17 +1,17 @@
-// fromWei is in both
 import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import config from 'config';
-import WorkerClient from './worker-client';
+import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
+import { contractSubscriptionEventHandlerLog } from './utils/logger';
 
-// TODO: figure out better way to type this + other config.get stuff?
 const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
-export class SafeEvents {
+export class ContractSubscriptionEventHandler {
   private web3 = inject('web3-socket', { as: 'web3' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  logger = contractSubscriptionEventHandlerLog;
 
   constructor() {
     autoBind(this);
@@ -39,8 +39,9 @@ export class SafeEvents {
             action: 'safe-event-subscription-handler',
           },
         });
-        console.error('error in subscription', error);
+        this.logger.error('Error in CustomerPayment subscription', error);
       } else {
+        this.logger.info('Received CustomerPayment event', event);
         this.workerClient.addJob('notify-customer-payment', event);
       }
     });
@@ -52,16 +53,13 @@ export class SafeEvents {
             action: 'safe-event-subscription-handler',
           },
         });
-        console.error('error in subscription', error);
+        this.logger.error('Error in MerchantClaim subscription', error);
       } else {
+        this.logger.info('Received MerchantClaim event', event);
         this.workerClient.addJob('notify-merchant-claim', event);
       }
     });
-  }
-}
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'safe-events': SafeEvents;
+    this.logger.info('Subscribed to events');
   }
 }

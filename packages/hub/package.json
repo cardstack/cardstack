@@ -11,6 +11,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
     "start": "run-p -c start:*",
+    "start:contract-subscription-event-handler": "bin/hub contract-subscription-event-handler",
     "start:server": "bin/hub server",
     "start:worker": "bin/hub worker",
     "console": "node --experimental-repl-await ./bin/hub console",
