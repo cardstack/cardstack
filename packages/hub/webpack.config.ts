@@ -1,17 +1,34 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
 const { SourceMapDevToolPlugin } = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
-  // customize the sourcemap configuration so that sourcemaps point back to the
-  // original sources.
+  // disabling the default sourcemap plugin in favor of customizing our own
+  // below
   devtool: false,
+
   plugins: [
+    // customize the sourcemap configuration so that sourcemaps point back to the
+    // original sources.
     new SourceMapDevToolPlugin({
       filename: '[name].js.map',
       noSources: true,
       moduleFilenameTemplate: '[absolute-resource-path]',
+    }),
+
+    // graphile-worker contains standalone sql files that it expects to be able
+    // to read at runtime. We copy them into our dist so that they're easier to
+    // get into our Docker image.
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.dirname(require.resolve('graphile-worker/sql/000001.sql')),
+          to: 'sql',
+        },
+      ],
     }),
   ],
 
