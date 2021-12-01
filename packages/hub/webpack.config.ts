@@ -71,6 +71,8 @@ module.exports = {
     'pg-native': 'commonjs pg-native',
     'ffmpeg-static': 'commonjs ffmpeg-static',
     electron: 'commonjs electron',
+    'zlib-sync': 'commonjs zlib-sync',
+    erlpack: 'commonjs erlpack',
   },
 
   module: {
@@ -91,4 +93,19 @@ module.exports = {
       },
     ],
   },
+  ignoreWarnings: [
+    {
+      // yargs and yargs-parser can dynamically load your command files, but we
+      // don't use that feature
+      module: /node_modules\/yargs(-parser)?\/build\/index.cjs$/,
+      message:
+        /(require function is used in a way in which dependencies cannot be statically extracted)|(the request of a dependency is an expression)/,
+    },
+    {
+      // sane can load a dynamically provided custom Watcher class but we don't
+      // use that feature
+      module: /node_modules\/sane\/index.js$/,
+      message: /the request of a dependency is an expression/,
+    },
+  ],
 };
