@@ -21,7 +21,11 @@ module.exports = {
   // this is somewhat confusingly named, but it means: "don't polyfill
   // Node-specific APIs". We don't need to polyfill them because we're running
   // in Node itself.
-  node: false,
+  node: {
+    global: false,
+    __dirname: true,
+    __filename: true,
+  },
   optimization: {
     // leave process.env.NODE_ENV alone, so that it gets the proper behavior at
     // runtime
