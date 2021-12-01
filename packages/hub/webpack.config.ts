@@ -35,6 +35,7 @@ module.exports = {
   entry: {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
+    'bot-tests': './bot-tests/entrypoint.ts',
   },
 
   target: 'node14',
@@ -57,6 +58,10 @@ module.exports = {
       // by default, but the package that consumes this package expects to get
       // the CJS implementation.
       'web-streams-polyfill': 'web-streams-polyfill/dist/polyfill.js',
+
+      // corde needs this to run bot-tests successfully, though we do not fully
+      // understand why.
+      'node-fetch': 'node-fetch/lib/index',
     },
 
     // the only thing we added here beyond the defaults is typescript. It needs
@@ -73,6 +78,10 @@ module.exports = {
     electron: 'commonjs electron',
     'zlib-sync': 'commonjs zlib-sync',
     erlpack: 'commonjs erlpack',
+
+    // corde wants to insert itself at runtime, as it drives the bot tests. We
+    // don't want to compile it in.
+    corde: 'commonjs corde',
   },
 
   module: {
@@ -105,6 +114,26 @@ module.exports = {
       // sane can load a dynamically provided custom Watcher class but we don't
       // use that feature
       module: /node_modules\/sane\/index.js$/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      // for voice support that we don't use
+      module: /node_modules\/prism-media\/src\/util\/loader\.js$/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      // we statically register tasks with the worker
+      module: /node_modules\/graphile-worker\/dist\/(module|getTasks)\.js$/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      // for graphile-worker's dynamic tasks
+      module: /node_modules\/import-fresh\/index\.js$/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      //
+      module: /node_modules\/import-fresh\/index\.js$/,
       message: /the request of a dependency is an expression/,
     },
   ],

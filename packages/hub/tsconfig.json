@@ -15,7 +15,7 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
   },
   "exclude": ["../*/dist", "../*/tmp", "../*/node_modules", "node_modules", "tmp"]
 }

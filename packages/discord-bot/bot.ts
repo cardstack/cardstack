@@ -1,5 +1,4 @@
 import { Client, MessageEmbed } from 'discord.js';
-import glob from 'glob-promise';
 import {
   DiscordBotsDbGateway,
   DiscordBotConfig,
@@ -18,7 +17,6 @@ const log = logger('bot:main');
 export interface CommandCallback {
   (client: Bot, message: Message, args?: string[]): Promise<void>;
 }
-import { CommandDiscovery } from './command-discovery';
 import shortUuid, { SUUID } from 'short-uuid';
 import InMemoryMessageVerificationScheduler from './in-memory-message-verification-scheduler';
 
@@ -42,14 +40,9 @@ export interface Command {
   description: string;
 }
 
-export interface CommandDiscoverer {
-  discover(commandsDir: string): Promise<{ dmCommands: Map<string, Command>; guildCommands: Map<string, Command> }>;
-}
-
 export class Bot extends Client {
   config!: DiscordBotConfig;
   type = 'generic'; // override this in your bot subclass
-  commandDiscovery: CommandDiscoverer = new CommandDiscovery();
   discordBotsDbGateway!: DiscordBotsDbGateway;
   dmChannelsDbGateway!: DmChannelsDbGateway;
   guildCommands = new Map<string, Command>();
@@ -66,11 +59,8 @@ export class Bot extends Client {
       throw new Error('discordBotsDbGateway property must be set before starting the bot');
     }
     this.messageProcessingVerifier = new InMemoryMessageVerificationScheduler(this);
-    let discoveredCommands = await this.commandDiscovery.discover(this.config.commandsDir);
-    this.guildCommands = discoveredCommands.guildCommands;
-    this.dmCommands = discoveredCommands.dmCommands;
     if (this.guildCommands.size === 0 && this.dmCommands.size === 0) {
-      throw new Error('No bot commands found. Check your configuration.');
+      throw new Error('No bot commands found. Your subclass should provide some.');
     }
     await this.updateStatus('connecting');
 
@@ -125,13 +115,15 @@ export class Bot extends Client {
   }
 
   private async wireDiscordEventHandling() {
-    const eventModules: string[] = await glob(`${__dirname}/events/**/*.js`);
-    await Promise.all(
-      eventModules.map(async (module) => {
-        const { name, run } = (await import(module)) as Event;
-        this.on(name, run.bind(undefined, this));
-      })
-    );
+    let handlers = await Promise.all([
+      import('./events/direct-message'),
+      import('./events/guild-message'),
+      import('./events/ready'),
+    ]);
+    for (let handler of handlers) {
+      const { name, run } = handler as Event;
+      this.on(name, run.bind(undefined, this));
+    }
   }
   /* This method is called after a delay to verify that a message has processed by the listening bot.
    * If it has, all is well. If it hasn't, this instance will try to assume listening status and

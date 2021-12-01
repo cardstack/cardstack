@@ -13,7 +13,6 @@ export interface DiscordBotConfig {
   cordeBotId: string;
   cordeBotToken: string;
   commandPrefix: string;
-  commandsDir: string;
   allowedGuilds: string;
   allowedChannels: string;
   messageVerificationDelayMs: number;

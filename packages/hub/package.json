@@ -16,10 +16,8 @@
     "console": "node --experimental-repl-await ./bin/hub console",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "npm-run-all test:*",
-    "test:node": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
-    "test:node-webpack": "NODE_ENV=test mocha dist/tests.js --timeout 60000",
-    "test:remove-ts-artifacts-for-corde": "find ./bot-tests \\( -name \"*.d.ts\" -or -name \"*.js\" -or -name \"*.js.map\" \\) -exec rm -f {} \\;",
-    "test:bot": "yarn test:remove-ts-artifacts-for-corde && bin/corde",
+    "test:node": "NODE_ENV=test mocha dist/tests.js --timeout 60000",
+    "test:bot": "bin/corde",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
   "dependencies": {

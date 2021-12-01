@@ -141,3 +141,5 @@ async function checkInventory(message: Message, bot: Bot): Promise<boolean> {
   }
   return true;
 }
+
+export const aliases = [];
