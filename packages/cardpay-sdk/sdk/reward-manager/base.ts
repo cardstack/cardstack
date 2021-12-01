@@ -468,7 +468,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (weiAmount.lt(gasCost)) {
+    if (safeBalance.lt(gasCost.add(weiAmount))) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
