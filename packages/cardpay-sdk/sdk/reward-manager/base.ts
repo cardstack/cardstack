@@ -520,6 +520,136 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
+  async transfer(txnHash: string): Promise<TransactionReceipt>;
+  async transfer(
+    safeAddress: string,
+    newOwner: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async transfer(
+    safeAddressOrTxnHash: string,
+    newOwner?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    }
+    if (!safeAddressOrTxnHash) {
+      throw new Error('safeAddress is required');
+    }
+    if (!newOwner) {
+      throw new Error('newOwner must be provided');
+    }
+    let safeAddress = safeAddressOrTxnHash;
+
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardManagerAddress = await this.address();
+
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
+
+    // Temporarily, transfer function will use card as a the default gas token
+    // This means that the safe has to have card tokens within it before it can transfer
+    // This will change after we finalise the gas policy
+    let gasTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
+    let gasToken = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
+
+    let safeBalance = new BN(await gasToken.methods.balanceOf(safeAddress).call());
+
+    let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
+    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
+    if (!(rewardSafeOwner == from)) {
+      throw new Error(
+        `Reward safe owner is NOT the signer of transaction.
+The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
+      );
+    }
+    let payload = await rewardSafeDelegate.methods.swapOwner(
+      rewardManagerAddress,
+      rewardManagerAddress,
+      rewardSafeOwner,
+      newOwner
+    ).encodeABI();
+    console.log(payload);
+
+    console.log('here');
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardSafeDelegateAddress,
+      '0',
+      payload,
+      Operation.DELEGATECALL,
+      gasTokenAddress
+    );
+    console.log('here');
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (safeBalance.lt(gasCost)) {
+      throw new Error(
+        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${gasTokenAddress} is ${fromWei(
+          safeBalance
+        )}, the gas cost is ${fromWei(gasCost)}`
+      );
+    }
+    let fullSignature = await signRewardSafe(
+      this.layer2Web3,
+      rewardSafeDelegateAddress,
+      0,
+      payload,
+      Operation.DELEGATECALL,
+      estimate,
+      gasTokenAddress,
+      ZERO_ADDRESS,
+      nonce,
+      rewardSafeOwner,
+      safeAddress,
+      rewardManagerAddress
+    );
+
+    let eip1271Data = createEIP1271VerifyingData(
+      this.layer2Web3,
+      rewardSafeDelegateAddress,
+      '0',
+      payload,
+      Operation.DELEGATECALL.toString(),
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      gasTokenAddress,
+      ZERO_ADDRESS,
+      nonce.toString()
+    );
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      rewardSafeDelegateAddress,
+      payload,
+      Operation.DELEGATECALL,
+      estimate,
+      nonce,
+      fullSignature,
+      eip1271Data
+    );
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
+    }
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
     admin: string,

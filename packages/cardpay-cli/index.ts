@@ -31,6 +31,7 @@ import {
   addRewardRule,
   rewardRule,
   withdraw,
+  transferRewardSafe,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -110,7 +111,8 @@ type Commands =
   | 'rewardProgramAdmin'
   | 'addRewardRule'
   | 'rewardRule'
-  | 'withdrawRewardSafe';
+  | 'withdrawRewardSafe'
+  | 'transferRewardSafe';
 
 let command: Commands | undefined;
 interface Options {
@@ -923,6 +925,17 @@ let {
       command = 'withdrawRewardSafe';
     }
   )
+  .command('transfer-reward-safe <rewardSafe> <newOwner>', 'Transfer reward safe', (yargs) => {
+    yargs.positional('rewardSafe', {
+      type: 'string',
+      description: 'The address of the rewardSafe that already contains rewards',
+    });
+    yargs.positional('newOwner', {
+      type: 'string',
+      description: 'The address of the new owner',
+    });
+    command = 'transferRewardSafe';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1371,6 +1384,17 @@ if (!command) {
         return;
       }
       await withdraw(network, rewardSafe, recipient, tokenAddress, amount, mnemonic);
+      break;
+    case 'transferRewardSafe':
+      if (rewardSafe == null) {
+        showHelpAndExit('rewardSafe is a required value');
+        return;
+      }
+      if (newOwner == null) {
+        showHelpAndExit('newOwner is a required value');
+        return;
+      }
+      await transferRewardSafe(network, rewardSafe, newOwner, mnemonic);
       break;
     default:
       assertNever(command);
