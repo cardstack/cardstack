@@ -36,7 +36,7 @@ export class ContractSubscriptionEventHandler {
       if (error) {
         Sentry.captureException(error, {
           tags: {
-            action: 'safe-event-subscription-handler',
+            action: 'contract-subscription-event-handler',
           },
         });
         this.logger.error('Error in CustomerPayment subscription', error);
@@ -50,7 +50,7 @@ export class ContractSubscriptionEventHandler {
       if (error) {
         Sentry.captureException(error, {
           tags: {
-            action: 'safe-event-subscription-handler',
+            action: 'contract-subscription-event-handler',
           },
         });
         this.logger.error('Error in MerchantClaim subscription', error);
