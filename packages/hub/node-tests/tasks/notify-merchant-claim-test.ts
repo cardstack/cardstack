@@ -82,7 +82,6 @@ describe('NotifyMerchantClaimTask', function () {
     )
       .to.be.rejectedWith(/Safe not found/)
       .then(() => {
-        // awk!!!
         expect(lastAddedJobIdentifier).to.be.undefined;
         expect(lastAddedJobPayload).to.be.undefined;
       });
