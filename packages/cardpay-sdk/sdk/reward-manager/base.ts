@@ -573,9 +573,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let payload = await rewardSafeDelegate.methods
       .swapOwner(rewardManagerAddress, rewardManagerAddress, rewardSafeOwner, newOwner)
       .encodeABI();
-    console.log(payload);
-
-    console.log('here');
     let estimate = await gasEstimate(
       this.layer2Web3,
       safeAddress,
@@ -585,7 +582,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       Operation.DELEGATECALL,
       gasTokenAddress
     );
-    console.log('here');
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
