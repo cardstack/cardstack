@@ -1,4 +1,3 @@
-import { fromWei } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import CardpaySDKService from '../services/cardpay-sdk';
 import Web3HttpService from '../services/web3-http';
@@ -20,7 +19,8 @@ export default class NotifyMerchantClaim {
     let merchantSafeAddress = payload.returnValues.merchantSafe;
     let amountInWei = payload.returnValues.amount;
 
-    let Safes = await this.cardpay.getSDK('Safes', this.web3.getInstance());
+    let web3Instance = this.web3.getInstance();
+    let Safes = await this.cardpay.getSDK('Safes', web3Instance);
     let { safe } = await Safes.viewSafe(merchantSafeAddress);
 
     if (!safe) {
@@ -32,7 +32,7 @@ export default class NotifyMerchantClaim {
     // let tokenAddress = event.returnValues.payableToken;
     let token = 'DAI.CPXD';
     let notifiedAddress = safe.owners[0];
-    let message = `You just claimed ${fromWei(amountInWei)} ${token} from your business account`;
+    let message = `You just claimed ${web3Instance.utils.fromWei(amountInWei)} ${token} from your business account`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
