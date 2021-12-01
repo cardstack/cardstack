@@ -4,6 +4,7 @@ import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import WorkerClient from './worker-client';
+import * as Sentry from '@sentry/node';
 
 // TODO: figure out better way to type this + other config.get stuff?
 const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
@@ -17,7 +18,6 @@ export class SafeEvents {
   }
 
   async initialize() {
-    console.log(this);
     let web3Instance = this.web3.getInstance();
 
     let RevenuePoolABI = await getABI('revenue-pool', web3Instance);
@@ -34,7 +34,11 @@ export class SafeEvents {
 
     payMerchantContract.events.CustomerPayment({}, async (error: Error, event: any) => {
       if (error) {
-        // TODO: log to sentry
+        Sentry.captureException(error, {
+          tags: {
+            action: 'safe-event-subscription-handler',
+          },
+        });
         console.error('error in subscription', error);
       } else {
         this.workerClient.addJob('notify-customer-payment', event);
@@ -43,14 +47,16 @@ export class SafeEvents {
 
     revenuePoolContract.events.MerchantClaim({}, async (error: Error, event: any) => {
       if (error) {
-        // TODO: log to sentry
+        Sentry.captureException(error, {
+          tags: {
+            action: 'safe-event-subscription-handler',
+          },
+        });
         console.error('error in subscription', error);
       } else {
         this.workerClient.addJob('notify-merchant-claim', event);
       }
     });
-
-    console.log('ready');
   }
 }
 
