@@ -5,9 +5,7 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 interface ContainsManyModel {
-  model: {
-    links: unknown[];
-  };
+  model: unknown[];
   set: (model: unknown[]) => void;
 }
 
@@ -15,7 +13,7 @@ export default class ContainsManyManager extends Component<ContainsManyModel> {
   @tracked items: unknown[] = [];
 
   @action copyItems(): void {
-    this.items = this.args.model.links ?? [];
+    this.items = this.args.model ?? [];
   }
 
   @action setItem(i: number, val: unknown): void {
@@ -24,7 +22,12 @@ export default class ContainsManyManager extends Component<ContainsManyModel> {
   }
 
   @action addItem(): void {
-    this.items = [...this.items, null];
+    if (this.items.length) {
+      let newItem = Object.assign({}, this.items[0]);
+      this.items = [...this.items, newItem];
+    } else {
+      this.items = [...this.items, null];
+    }
     this.args.set(this.items);
   }
 
