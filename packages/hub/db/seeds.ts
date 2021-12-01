@@ -5,6 +5,7 @@ export default async function seed(db: Client) {
   try {
     await loadPrepaidCardColorSchemes(db);
     await loadPrepaidCardPatterns(db);
+    await loadNotificationTypes(db);
   } catch (e) {
     console.error(e);
   }
@@ -116,4 +117,21 @@ async function loadPrepaidCardPatterns(db: Client) {
   console.log(sql);
   let result = await db.query(sql);
   console.log(`Upserted ${result.rowCount} prepaid_card_patterns rows`);
+}
+
+async function loadNotificationTypes(db: Client) {
+  let query = `INSERT INTO notification_types(
+    id, notification_type, default_status
+  )
+  VALUES %L ON CONFLICT (id) DO UPDATE SET
+    notification_type = excluded.notification_type,
+    default_status = excluded.default_status;`;
+  let rows = [
+    ['10b75b75-b855-42eb-893e-d223995b8872', 'merchant_revenue_claimed', 'enabled'],
+    ['1137c2b1-fb2e-45d2-9f62-d365b989d151', 'merchant_payment', 'enabled'],
+  ];
+  let sql = pgFormat(query, rows);
+  console.log(sql);
+  let result = await db.query(sql);
+  console.log(`Upserted ${result.rowCount} notification_types rows`);
 }
