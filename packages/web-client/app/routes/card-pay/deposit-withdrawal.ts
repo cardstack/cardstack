@@ -5,7 +5,7 @@ import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/supplier
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const SUPPLIERS_PANEL = {
-  title: 'Easy Deposit & Withdrawal',
+  title: 'Easy Deposits & Withdrawals',
   description: 'Token bridging between layer 1 and layer 2',
   heroImageUrl,
   summaryHeroImageUrl,
