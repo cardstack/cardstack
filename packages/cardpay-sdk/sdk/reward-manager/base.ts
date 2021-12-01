@@ -570,12 +570,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-    let payload = await rewardSafeDelegate.methods.swapOwner(
-      rewardManagerAddress,
-      rewardManagerAddress,
-      rewardSafeOwner,
-      newOwner
-    ).encodeABI();
+    let payload = await rewardSafeDelegate.methods
+      .swapOwner(rewardManagerAddress, rewardManagerAddress, rewardSafeOwner, newOwner)
+      .encodeABI();
     console.log(payload);
 
     console.log('here');
