@@ -2,6 +2,7 @@ import { inject } from '@cardstack/di';
 import config from 'config';
 import Web3 from 'web3';
 import CardpaySDKService from '../services/cardpay-sdk';
+import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 
 export interface MerchantClaimsQueryResult {
@@ -9,6 +10,7 @@ export interface MerchantClaimsQueryResult {
     merchantClaims: {
       merchantSafe: {
         id: string;
+        infoDid: string;
         merchant: {
           id: string;
         };
@@ -24,6 +26,7 @@ query($txn: String!) {
   merchantClaims(where: { transaction: $txn }) {
     merchantSafe {
       id
+      infoDid
       merchant {
         id
       }
@@ -38,6 +41,7 @@ const { network } = config.get('web3') as { network: 'sokol' | 'xdai' };
 
 export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');
+  merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   async perform(payload: string) {
@@ -53,10 +57,13 @@ export default class NotifyMerchantClaim {
       throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
     }
 
+    let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+
     let token = result.token.symbol;
     let notifiedAddress = result.merchantSafe.merchant.id;
     let amountInWei = result.amount;
-    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your business account`;
+
+    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your ${merchantInfo.name} business account`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,

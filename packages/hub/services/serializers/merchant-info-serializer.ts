@@ -35,6 +35,17 @@ export default class MerchantInfoSerializer {
 
     return result as JSONAPIDocument;
   }
+
+  deserialize(json: JSONAPIDocument): MerchantInfo {
+    return {
+      id: json.data.id,
+      name: json.data.attributes['name'],
+      slug: json.data.attributes['slug'],
+      color: json.data.attributes['color'],
+      textColor: json.data.attributes['text-color'],
+      ownerAddress: json.data.attributes['owner-address'],
+    };
+  }
 }
 
 declare module '@cardstack/di' {

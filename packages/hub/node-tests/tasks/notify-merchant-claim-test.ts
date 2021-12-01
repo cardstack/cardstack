@@ -39,10 +39,19 @@ class StubWorkerClient {
   }
 }
 
+class StubMerchantInfo {
+  async getMerchantInfo(_did: string) {
+    return {
+      name: 'Mandello',
+    };
+  }
+}
+
 describe('NotifyMerchantClaimTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
     registry(this).register('cardpay', StubCardPay);
+    registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
   });
   let { getContainer } = setupHub(this);
@@ -56,6 +65,7 @@ describe('NotifyMerchantClaimTask', function () {
     mockData.value = {
       merchantSafe: {
         id: 'merchant-safe-address',
+        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
         merchant: {
           id: 'eoa-address',
         },
@@ -72,7 +82,7 @@ describe('NotifyMerchantClaimTask', function () {
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
-      message: `You just claimed 1155 DAI.CPXD from your business account`,
+      message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
     });
   });
 
