@@ -7,7 +7,12 @@ app "hub" {
     path = "./packages/hub"
 
     build {
-        use "pack" {}
+         use "docker" {
+          dockerfile = "Dockerfile"
+          build_args {
+              hub_command = "serve"
+          }
+        }
 
         registry {
             use "aws-ecr" {
