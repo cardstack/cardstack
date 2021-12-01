@@ -3,6 +3,9 @@ const { SourceMapDevToolPlugin } = require('webpack');
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
+  // customize the sourcemap configuration so that sourcemaps point back to the
+  // original sources.
   devtool: false,
   plugins: [
     new SourceMapDevToolPlugin({
@@ -11,11 +14,12 @@ module.exports = {
       moduleFilenameTemplate: '[absolute-resource-path]',
     }),
   ],
+
   entry: {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
   },
-  output: {},
+
   target: 'node14',
 
   node: {
@@ -23,6 +27,7 @@ module.exports = {
     __dirname: true,
     __filename: true,
   },
+
   optimization: {
     // leave process.env.NODE_ENV alone, so that it gets the proper behavior at
     // runtime
@@ -31,19 +36,32 @@ module.exports = {
 
   resolve: {
     alias: {
+      // this library has an ES module implementation that webpack will discover
+      // by default, but the package that consumes this package expects to get
+      // the CJS implementation.
       'web-streams-polyfill': 'web-streams-polyfill/dist/polyfill.js',
     },
-    extensions: ['.mjs', '.cjs', '.js', '.ts', '.json', '.wasm'],
+
+    // the only thing we added here beyond the defaults is typescript. It needs
+    // to come after JS because some libraries publish both and we don't want to
+    // be typechecking the libraries (that rarely works).
+    extensions: ['.js', '.ts', '.json', '.wasm'],
   },
   externals: {
     // these are all optional dependencies that are supposed to be tried (and
-    // failed) at runtime.
+    // failed) at runtime. We need them here so that webpack doesn't make them
+    // build-time failures instead.
     'pg-native': 'commonjs pg-native',
     'ffmpeg-static': 'commonjs ffmpeg-static',
     electron: 'commonjs electron',
   },
+
   module: {
+    // this is the place in the "config" package that does all the dynamic
+    // loading of config files. Thankfully that's all it does (it doesn't have
+    // any dependencies) so we can just not parse it.
     noParse: /config\/parser\.js$/,
+
     rules: [
       {
         test: /\.ts$/,
