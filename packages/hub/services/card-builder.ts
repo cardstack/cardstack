@@ -8,7 +8,7 @@ import { inject } from '@cardstack/di';
 import { serverLog as logger } from '../utils/logger';
 
 // @ts-ignore
-import TransformModulesAmd from '@babel/plugin-transform-modules-amd';
+import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
@@ -38,7 +38,7 @@ export default class CardBuilder implements BuilderInterface {
       configFile: false,
       babelrc: false,
       filenameRelative: moduleURL,
-      plugins: [ClassPropertiesPlugin, TransformModulesAmd],
+      plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
     });
     return out!.code!;
   }
