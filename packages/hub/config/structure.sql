@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -53,6 +53,30 @@ CREATE TYPE public.discord_bots_status_enum AS ENUM (
 
 
 ALTER TYPE public.discord_bots_status_enum OWNER TO postgres;
+
+--
+-- Name: notification_preferences_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.notification_preferences_status_enum AS ENUM (
+    'enabled',
+    'disabled'
+);
+
+
+ALTER TYPE public.notification_preferences_status_enum OWNER TO postgres;
+
+--
+-- Name: notification_types_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.notification_types_status_enum AS ENUM (
+    'enabled',
+    'disabled'
+);
+
+
+ALTER TYPE public.notification_types_status_enum OWNER TO postgres;
 
 --
 -- Name: wallet_orders_status_enum; Type: TYPE; Schema: public; Owner: postgres
@@ -757,6 +781,34 @@ CREATE TABLE public.merchant_infos (
 ALTER TABLE public.merchant_infos OWNER TO postgres;
 
 --
+-- Name: notification_preferences; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notification_preferences (
+    owner_address text NOT NULL,
+    notification_type_id uuid NOT NULL,
+    status public.notification_preferences_status_enum DEFAULT 'enabled'::public.notification_preferences_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.notification_preferences OWNER TO postgres;
+
+--
+-- Name: notification_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notification_types (
+    id uuid NOT NULL,
+    notification_type text NOT NULL,
+    default_status public.notification_types_status_enum DEFAULT 'enabled'::public.notification_types_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.notification_types OWNER TO postgres;
+
+--
 -- Name: pgmigrations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1024,6 +1076,14 @@ ALTER TABLE ONLY public.merchant_infos
 
 
 --
+-- Name: notification_types notification_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification_types
+    ADD CONSTRAINT notification_types_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1121,6 +1181,20 @@ CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btr
 --
 
 CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos USING btree (slug);
+
+
+--
+-- Name: notification_preferences_owner_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX notification_preferences_owner_address_index ON public.notification_preferences USING btree (owner_address);
+
+
+--
+-- Name: notification_preferences_owner_address_notification_type_id_uni; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX notification_preferences_owner_address_notification_type_id_uni ON public.notification_preferences USING btree (owner_address, notification_type_id);
 
 
 --
@@ -1245,6 +1319,14 @@ ALTER TABLE ONLY public.wallet_orders
 
 
 --
+-- Name: notification_preferences notification_preferences_notification_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification_preferences
+    ADD CONSTRAINT notification_preferences_notification_type_id_fkey FOREIGN KEY (notification_type_id) REFERENCES public.notification_types(id);
+
+
+--
 -- Name: prepaid_card_customizations prepaid_card_customizations_color_scheme_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1337,7 +1419,9 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 22	20211110210324178_card-index-part-duex	2021-12-06 15:09:12.05072
 23	20211118084217151_create-uploads	2021-12-06 15:09:12.05072
 24	20211129083801382_create-push-notification-registrations	2021-12-06 15:09:12.05072
-26	20211206195559187_card-index-generations	2021-12-06 15:16:30.440737
+25  20211129123635817_create-notification-types	2021-11-30 14:56:46.211409
+26	20211129130425303_create-notification-preferences	2021-12-02 12:07:27.87946
+27	20211206195559187_card-index-generations	2021-12-06 15:16:30.440737
 \.
 
 
