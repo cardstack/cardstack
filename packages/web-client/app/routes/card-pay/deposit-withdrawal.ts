@@ -6,8 +6,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 
 const SUPPLIERS_PANEL = {
   title: 'Easy Deposit & Withdrawal',
-  description:
-    'Token bridging between layer 1 and layer 2 with protocol fees as rewards',
+  description: 'Token bridging between layer 1 and layer 2',
   heroImageUrl,
   summaryHeroImageUrl,
   sections: [
@@ -16,7 +15,7 @@ const SUPPLIERS_PANEL = {
       icon: 'deposit-route',
       buttonIcon: 'plus',
       title: 'Deposits',
-      description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your ${c.layer2.fullName} wallet.`,
+      description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your Card Wallet.`,
       bullets: [
         'Deposit funds into the CARD Protocol reserve pool and earn rewards',
         `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
@@ -28,10 +27,10 @@ const SUPPLIERS_PANEL = {
       icon: 'withdrawal-route',
       buttonIcon: 'minus',
       title: 'Withdrawals',
-      description: `Withdraw tokens from your Card Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
+      description: `Withdraw CPXD tokens from your Card Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
       bullets: [
         `Withdraw from a depot or business account in your Card Wallet`,
-        `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.conversationalName}`,
+        `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
       ],
       cta: 'Withdraw Tokens',
     },
