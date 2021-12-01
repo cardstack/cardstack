@@ -266,7 +266,7 @@ declare module '@cardstack/di' {
   }
 }
 
-export async function initSentry() {
+export function initSentry() {
   if (config.get('sentry.enabled')) {
     Sentry.init({
       dsn: config.get('sentry.dsn'),
