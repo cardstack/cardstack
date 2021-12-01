@@ -623,7 +623,7 @@ dataSources:
     source:
       address: "{REWARD_POOL_ADDRESS}"
       abi: RewardPool
-      startBlock: {v0_8_6_START_BLOCK}
+      startBlock: {v0_8_7_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -642,7 +642,7 @@ dataSources:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
-        - event: RewardeeClaim(address,address,address,address,uint256)
+        - event: RewardeeClaim(address,address,address,address,uint256,bytes)
           handler: handleRewardeeClaim
         - event: RewardTokensAdded(address,address,address,uint256)
           handler: handleRewardTokensAdded
