@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
 const { SourceMapDevToolPlugin } = require('webpack');
 
 module.exports = {
@@ -18,9 +18,6 @@ module.exports = {
   output: {},
   target: 'node14',
 
-  // this is somewhat confusingly named, but it means: "don't polyfill
-  // Node-specific APIs". We don't need to polyfill them because we're running
-  // in Node itself.
   node: {
     global: false,
     __dirname: true,
@@ -44,42 +41,15 @@ module.exports = {
     'pg-native': 'commonjs pg-native',
     'ffmpeg-static': 'commonjs ffmpeg-static',
     electron: 'commonjs electron',
-
-    // todo
-    config: 'commonjs config',
-    'graphile-worker': 'commonjs graphile-worker',
   },
   module: {
+    noParse: /config\/parser\.js$/,
     rules: [
       {
         test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      // {
-      //   test: /\.ts$/,
-      //   exclude: /node_modules/,
-      //   use: {
-      //     loader: 'babel-loader',
-      //     options: {
-      //       plugins: [
-      //         [
-      //           '@babel/plugin-transform-typescript',
-      //           {
-      //             optimizeConstEnums: true,
-      //           },
-      //         ],
-      //         [
-      //           '@babel/plugin-proposal-decorators',
-      //           {
-      //             legacy: true,
-      //           },
-      //         ],
-      //         '@babel/plugin-proposal-class-properties',
-      //       ],
-      //     },
-      //   },
-      // },
       {
         test: /\.node$/,
         loader: 'node-loader',

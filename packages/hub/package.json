@@ -90,9 +90,6 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.16.0",
-    "@babel/plugin-proposal-decorators": "^7.16.4",
-    "@babel/plugin-transform-typescript": "^7.16.1",
     "@cardstack/eslint-config": "0.27.35",
     "@cardstack/test-support": "0.27.35",
     "@types/chai": "^4.2.15",
@@ -107,7 +104,6 @@
     "@types/sane": "^2.0.1",
     "@types/supertest": "^2.0.11",
     "@types/yargs": "^17.0.2",
-    "babel-loader": "^8.2.3",
     "chai": "^4.3.4",
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",
