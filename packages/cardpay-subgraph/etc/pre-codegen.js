@@ -67,12 +67,12 @@ let v0_8_5_startBlock = {
 
 let v0_8_6_startBlock = {
   sokol: 23843871,
-  xdai: 0,
+  xdai: 19375796,
 };
 
 let v0_8_7_startBlock = {
   sokol: 23912918,
-  xdai: 0,
+  xdai: 19375796,
 };
 
 let abis = {

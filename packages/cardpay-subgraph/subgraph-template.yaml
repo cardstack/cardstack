@@ -561,7 +561,7 @@ dataSources:
     source:
       address: "{REWARD_MANAGER_ADDRESS}"
       abi: RewardManager
-      startBlock: {v0_8_6_START_BLOCK}
+      startBlock: {v0_8_7_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -590,7 +590,7 @@ dataSources:
     source:
       address: "{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}"
       abi: RegisterRewardProgramHandler
-      startBlock: {v0_8_3_START_BLOCK}
+      startBlock: {v0_8_7_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
