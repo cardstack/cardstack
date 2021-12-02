@@ -23,6 +23,7 @@ import { log } from '@graphprotocol/graph-ts';
 export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): void {
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
+  let blockNumber = event.block.number;
   let prepaidCard = toChecksumAddress(event.params.prepaidCard);
   let customer = toChecksumAddress(event.params.customer);
   let sku = event.params.sku.toHex();
@@ -43,6 +44,7 @@ export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): voi
 
   let provisionedEventEntity = new PrepaidCardProvisionedEvent(txnHash + '-' + prepaidCard);
   provisionedEventEntity.timestamp = timestamp;
+  provisionedEventEntity.blockNumber = blockNumber;
   provisionedEventEntity.txnHash = txnHash;
   provisionedEventEntity.transaction = txnHash;
   provisionedEventEntity.prepaidCard = prepaidCard;
@@ -59,6 +61,7 @@ export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): voi
 export function handleItemSet(event: ItemSet): void {
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
+  let blockNumber = event.block.number;
   let prepaidCard = toChecksumAddress(event.params.prepaidCard);
   let issuer = toChecksumAddress(event.params.issuer);
   let sku = event.params.sku.toHex();
@@ -74,6 +77,7 @@ export function handleItemSet(event: ItemSet): void {
 
   let addEventEntity = new PrepaidCardInventoryAddEvent(txnHash + '-' + prepaidCard);
   addEventEntity.timestamp = timestamp;
+  addEventEntity.blockNumber = blockNumber;
   addEventEntity.transaction = txnHash;
   addEventEntity.prepaidCard = prepaidCard;
   addEventEntity.inventory = sku;
@@ -87,6 +91,7 @@ export function handleItemSet(event: ItemSet): void {
 export function handleAskSet(event: AskSet): void {
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
+  let blockNumber = event.block.number;
   let askPrice = event.params.askPrice;
   let sku = event.params.sku.toHex();
   let issuer = toChecksumAddress(event.params.issuer);
@@ -113,6 +118,7 @@ export function handleAskSet(event: AskSet): void {
 
   let askEventEntity = new PrepaidCardAskSetEvent(txnHash);
   askEventEntity.timestamp = timestamp;
+  askEventEntity.blockNumber = blockNumber;
   askEventEntity.transaction = txnHash;
   askEventEntity.sku = sku;
   askEventEntity.issuingToken = issuingToken;
@@ -123,6 +129,7 @@ export function handleAskSet(event: AskSet): void {
 export function handleItemRemoved(event: ItemRemoved): void {
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
+  let blockNumber = event.block.number;
   let prepaidCard = toChecksumAddress(event.params.prepaidCard);
   let issuer = toChecksumAddress(event.params.issuer);
   let sku = event.params.sku.toHex();
@@ -142,6 +149,7 @@ export function handleItemRemoved(event: ItemRemoved): void {
 
   let removeEventEntity = new PrepaidCardInventoryRemoveEvent(txnHash + '-' + prepaidCard);
   removeEventEntity.timestamp = timestamp;
+  removeEventEntity.blockNumber = blockNumber;
   removeEventEntity.transaction = txnHash;
   removeEventEntity.prepaidCard = prepaidCard;
   removeEventEntity.inventory = sku;
@@ -190,9 +198,11 @@ function makeInventoryItem(sku: string, prepaidCard: string): PrepaidCardInvento
 function makeInventoryEvent(sku: string, prepaidCard: string, event: ethereum.Event): PrepaidCardInventoryEvent {
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
+  let blockNumber = event.block.number;
   let id = txnHash + '-' + prepaidCard;
   let entity = new PrepaidCardInventoryEvent(id);
   entity.timestamp = timestamp;
+  entity.blockNumber = blockNumber;
   entity.transaction = txnHash;
   entity.inventory = sku;
   entity.prepaidCard = prepaidCard;
