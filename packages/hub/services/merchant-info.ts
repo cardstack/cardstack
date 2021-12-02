@@ -5,7 +5,6 @@ import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
 export default class MerchantInfoService {
-  // @ts-ignore FIXME what is with this?!?!
   #didResolver = new Resolver(getResolver());
 
   merchantInfoSerializer = inject('merchant-info-serializer', {
