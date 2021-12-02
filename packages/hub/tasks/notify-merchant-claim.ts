@@ -70,7 +70,9 @@ export default class NotifyMerchantClaim {
     let notifiedAddress = result.merchantSafe.merchant.id;
     let amountInWei = result.amount;
 
-    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your${merchantName} business account`;
+    let message = `You just claimed ${Web3.utils.fromWei(
+      amountInWei
+    )} ${token} from your${merchantName} business account`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
