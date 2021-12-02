@@ -31,6 +31,7 @@ export function handleAddedOwner(event: AddedOwner): void {
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-add-' + owner + '-' + txnHash);
   ownerChangeEntity.transaction = txnHash;
   ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.blockNumber = event.block.number;
   ownerChangeEntity.safe = safeAddress;
   ownerChangeEntity.ownerAdded = owner;
   ownerChangeEntity.save();
@@ -46,6 +47,7 @@ export function handleRemovedOwner(event: RemovedOwner): void {
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-remove-' + owner + '-' + txnHash);
   ownerChangeEntity.transaction = txnHash;
   ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.blockNumber = event.block.number;
   ownerChangeEntity.safe = safeAddress;
   ownerChangeEntity.ownerRemoved = owner;
   ownerChangeEntity.save();
@@ -74,6 +76,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.safe = safeAddress;
     safeTxEntity.transaction = txnHash;
     safeTxEntity.timestamp = event.block.timestamp;
+    safeTxEntity.blockNumber = event.block.number;
 
     let decoded = decode(EXEC_TRANSACTION, bytes);
     safeTxEntity.to = toChecksumAddress(decoded[0].toAddress());
@@ -89,12 +92,13 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.signatures = decoded[9].toBytes();
 
     log.debug(
-      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
+      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         txnHash,
         safeTxEntity.id,
         safeTxEntity.safe,
         safeTxEntity.timestamp.toString(),
+        safeTxEntity.blockNumber.toString(),
         safeTxEntity.to,
         safeTxEntity.value.toString(),
         safeTxEntity.data.toHex(),

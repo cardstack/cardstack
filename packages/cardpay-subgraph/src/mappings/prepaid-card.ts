@@ -55,6 +55,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let creationEntity = new PrepaidCardCreation(prepaidCard);
   creationEntity.transaction = event.transaction.hash.toHex();
   creationEntity.createdAt = event.block.timestamp;
+  creationEntity.blockNumber = event.block.number;
   creationEntity.prepaidCard = prepaidCard;
   creationEntity.issuer = issuer;
   creationEntity.issuingToken = issuingToken;
@@ -94,6 +95,7 @@ export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {
 
   let transferEntity = new PrepaidCardTransfer(txnHash);
   transferEntity.timestamp = event.block.timestamp;
+  transferEntity.blockNumber = event.block.number;
   transferEntity.transaction = txnHash;
   transferEntity.prepaidCard = prepaidCard;
   transferEntity.from = from;
@@ -106,6 +108,7 @@ export function handleSendAction(event: PrepaidCardSend): void {
   let txnHash = event.transaction.hash.toHex();
   let entity = new PrepaidCardSendAction(txnHash);
   entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.transaction = txnHash;
   entity.prepaidCard = toChecksumAddress(event.params.prepaidCard);
   entity.spendAmount = event.params.spendAmount;
