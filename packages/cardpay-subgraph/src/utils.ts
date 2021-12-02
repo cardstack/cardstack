@@ -127,6 +127,7 @@ export function makePrepaidCardPayment(
   let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;
   paymentEntity.timestamp = timestamp;
+  paymentEntity.blockNumber = event.block.number;
   paymentEntity.prepaidCard = prepaidCard;
   paymentEntity.prepaidCardOwner = prepaidCardEntity.owner;
   if (merchantSafe != null) {
