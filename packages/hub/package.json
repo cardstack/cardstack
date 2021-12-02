@@ -16,7 +16,7 @@
     "start:server": "node -r source-map-support/register dist/hub.js server",
     "start:worker": "node -r source-map-support/register dist/hub.js worker",
     "console": "node --experimental-repl-await ./dist/hub.js console",
-    "db:test-init": "yarn build && NODE_ENV=test node -r source-map-support/register ./dist/hub.js db init-test",
+    "db:test-init": "yarn build && NODE_ENV=test node -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha dist/tests.js --timeout 60000",
