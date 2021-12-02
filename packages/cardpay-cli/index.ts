@@ -939,7 +939,7 @@ let {
     command = 'transferRewardSafe';
   })
   .command(
-    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>',
+    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]',
     'Recover reward tokens from reward pool',
     (yargs) => {
       yargs.positional('rewardProgramId', {
@@ -1432,10 +1432,6 @@ if (!command) {
       }
       if (tokenAddress == null) {
         showHelpAndExit('tokenAddress is a required value');
-        return;
-      }
-      if (amount == null) {
-        showHelpAndExit('amount is a required value');
         return;
       }
       await recoverRewardTokens(network, safeAddress, rewardProgramId, tokenAddress, amount, mnemonic);

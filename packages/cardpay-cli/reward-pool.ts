@@ -132,7 +132,7 @@ export async function recoverRewardTokens(
   safeAddress: string,
   rewardProgramId: string,
   tokenAddress: string,
-  amount: string,
+  amount?: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
