@@ -24,6 +24,8 @@
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
     "@babel/core": "^7.12.13",
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@cardstack/cardpay-sdk": "0.27.35",
     "@cardstack/core": "0.27.35",
     "@cardstack/db": "0.27.35",

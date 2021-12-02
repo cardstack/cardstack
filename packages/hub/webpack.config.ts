@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires */
 const { SourceMapDevToolPlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');

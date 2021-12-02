@@ -4,4 +4,7 @@ module.exports = {
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
+  globals: {
+    __non_webpack_require__: 'readable',
+  },
 };
