@@ -46,6 +46,7 @@ import {
   rewardPoolBalance,
   claimRewards,
   getClaimableRewardProofs,
+  recoverRewardTokens,
 } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 import {
@@ -112,7 +113,8 @@ type Commands =
   | 'addRewardRule'
   | 'rewardRule'
   | 'withdrawRewardSafe'
-  | 'transferRewardSafe';
+  | 'transferRewardSafe'
+  | 'recoverRewardTokens';
 
 let command: Commands | undefined;
 interface Options {
@@ -936,6 +938,29 @@ let {
     });
     command = 'transferRewardSafe';
   })
+  .command(
+    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]',
+    'Recover reward tokens from reward pool',
+    (yargs) => {
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being recovered from reward pool',
+      });
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe that is to receive the recovered tokens',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to recover into safe',
+      });
+      command = 'recoverRewardTokens';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1395,6 +1420,25 @@ if (!command) {
         return;
       }
       await transferRewardSafe(network, rewardSafe, newOwner, mnemonic);
+      break;
+    case 'recoverRewardTokens':
+      if (safeAddress == null) {
+        showHelpAndExit('safeAddress is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (tokenAddress == null) {
+        showHelpAndExit('tokenAddress is a required value');
+        return;
+      }
+      if (amount == null) {
+        showHelpAndExit('amount is a required value');
+        return;
+      }
+      await recoverRewardTokens(network, safeAddress, rewardProgramId, tokenAddress, amount, mnemonic);
       break;
     default:
       assertNever(command);

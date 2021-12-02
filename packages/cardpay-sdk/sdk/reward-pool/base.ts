@@ -14,6 +14,7 @@ import ERC677ABI from '../../contracts/abi/erc-677';
 import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { TransactionReceipt } from 'web3-core';
+import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
 export interface Proof {
   rootHash: string;
@@ -401,6 +402,101 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
+
+  async recoverTokens(txnHash: string): Promise<TransactionReceipt>;
+  async recoverTokens(
+    safeAddress: string,
+    rewardProgramId: string,
+    tokenAddress: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async recoverTokens(
+    safeAddressOrTxnHash: string,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+
+    if (!rewardProgramId) {
+      throw new Error('rewardProgramId is required');
+    }
+    if (!tokenAddress) {
+      throw new Error('tokenAddress is required');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+
+    let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
+    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, tokenAddress)).balance;
+
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+
+    if (!(await rewardManager.isRewardProgram(rewardProgramId))) {
+      throw new Error('reward program does not exist');
+    }
+
+    if (!((await rewardManager.getRewardProgramAdmin(rewardProgramId)) == from)) {
+      throw new Error('signer is not signer of reward program admin');
+    }
+
+    let safe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+    const safeOwner = (await safe.methods.getOwners().call())[0];
+
+    if (!(safeOwner == from)) {
+      throw new Error('signer is not safe owner');
+    }
+    let weiAmount = amount ? new BN(toWei(amount)) : rewardPoolBalanceForRewardProgram;
+
+    if (rewardPoolBalanceForRewardProgram.lt(weiAmount)) {
+      throw new Error(
+        `Insufficient funds inside reward pool for reward program. The amount to be claimed is ${amount},
+but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgram).toString()}`
+      );
+    }
+    let payload = (await this.getRewardPool()).methods
+      .recoverTokens(rewardProgramId, tokenAddress, weiAmount)
+      .encodeABI();
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (weiAmount.add(gasCost).gt(rewardPoolBalanceForRewardProgram)) {
+      throw new Error(
+        `Insufficient funds inside reward pool for reward program to cover gas cost. Funds claimed does not have enough to cover the gas cost. The amount to be claimed is ${amount}, the gas cost is ${fromWei(
+          gasCost
+        )} but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgram).toString()}`
+      );
+    }
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+    let gnosisResult = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      rewardPoolAddress,
+      payload,
+      0,
+      estimate,
+      nonce,
+      await signSafeTx(this.layer2Web3, safeAddress, rewardPoolAddress, payload, estimate, nonce, from)
+    );
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
