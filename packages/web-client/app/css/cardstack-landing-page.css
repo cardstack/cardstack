@@ -4,15 +4,18 @@
   --horizontal-card-gap: var(--boxel-sp-lg);
 
   width: 100%;
-  max-width:
-    calc(
-      var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2
-    );
+  max-width: 100vw;
+  min-height: 100vh;
   margin: auto;
   padding: var(--boxel-sp);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cardstack-landing-page-org-grid {
+  width: 100%;
+  max-width: calc(var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2);
   list-style-type: none;
   padding: 0;
   display: grid;
