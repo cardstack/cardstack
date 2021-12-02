@@ -446,7 +446,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     }
 
     if (!((await rewardManager.getRewardProgramAdmin(rewardProgramId)) == from)) {
-      throw new Error('signer is not signer of reward program admin');
+      throw new Error('signer is not reward program admin');
     }
 
     let safe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
