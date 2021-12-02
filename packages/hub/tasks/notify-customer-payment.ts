@@ -1,6 +1,7 @@
 import { inject } from '@cardstack/di';
 import config from 'config';
 import CardpaySDKService from '../services/cardpay-sdk';
+import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 
 export interface PrepaidCardPaymentsQueryResult {
@@ -11,6 +12,7 @@ export interface PrepaidCardPaymentsQueryResult {
       };
       merchantSafe: {
         id: string;
+        infoDid: string;
       };
       merchant: {
         id: string;
@@ -33,6 +35,7 @@ query($txn: String!) {
     }
     merchantSafe {
       id
+      infoDid
     }
     merchant {
       id
@@ -48,6 +51,7 @@ query($txn: String!) {
 
 export default class NotifyCustomerPayment {
   cardpay: CardpaySDKService = inject('cardpay');
+  merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   async perform(payload: string) {
@@ -65,9 +69,11 @@ export default class NotifyCustomerPayment {
       );
     }
 
+    let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+
     let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
-    let message = `Your business received a payment of §${spendAmount}`;
+    let message = `Your business ${merchantInfo.name} received a payment of §${spendAmount}`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,

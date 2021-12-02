@@ -40,10 +40,19 @@ class StubWorkerClient {
   }
 }
 
+class StubMerchantInfo {
+  async getMerchantInfo(_did: string) {
+    return {
+      name: 'Mandello',
+    };
+  }
+}
+
 describe('NotifyCustomerPaymentTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
     registry(this).register('cardpay', StubCardPay);
+    registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
   });
   let { getContainer } = setupHub(this);
@@ -63,6 +72,7 @@ describe('NotifyCustomerPaymentTask', function () {
       },
       merchantSafe: {
         id: 'merchant-safe-address',
+        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
       },
       issuingToken: {
         symbol: 'DAI.CPXD',
@@ -78,7 +88,7 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
-      message: `Your business received a payment of §2324`,
+      message: `Your business Mandello received a payment of §2324`,
     });
   });
 
