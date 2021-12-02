@@ -130,7 +130,7 @@ export default class RevenuePool {
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
     if (unclaimedBalance.lt(new BN(amount))) {
       throw new Error(
-        `Merchant safe does not have enough enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
+        `Merchant safe does not have enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedBalance
         )}, amount being claimed is ${fromWei(amount)}`
       );
@@ -145,12 +145,12 @@ export default class RevenuePool {
       0,
       tokenAddress
     );
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (unclaimedBalance.lt(new BN(amount).add(gasCost))) {
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (new BN(amount).lt(gasCost)) {
       throw new Error(
-        `Merchant safe does not have enough enough to pay for gas when claiming revenue. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
-          unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
+        `Revenue claim is not enough to cover the gas cost. The revenue amount to be claimed is ${fromWei(
+          amount
+        )}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     if (nonce == null) {
