@@ -75,6 +75,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   if (MerchantSafe.load(maybeDepot) != null) {
     let merchantPrepaidCardIssuanceEntity = new MerchantPrepaidCardIssuance(txnHash);
     merchantPrepaidCardIssuanceEntity.timestamp = event.block.timestamp;
+    merchantPrepaidCardIssuanceEntity.blockNumber = event.block.number;
     merchantPrepaidCardIssuanceEntity.transaction = txnHash;
     merchantPrepaidCardIssuanceEntity.merchantSafe = maybeDepot;
     merchantPrepaidCardIssuanceEntity.token = issuingToken;
