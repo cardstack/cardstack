@@ -1,11 +1,10 @@
-import { getSDK } from '@cardstack/cardpay-sdk';
-import { MapReturnType, SDK } from '@cardstack/cardpay-sdk/sdk/version-resolver';
+import { getSDK, waitForSubgraphIndex, gqlQuery } from '@cardstack/cardpay-sdk';
 
 // This service makes it easier to mock the SDK in our tests
 export default class CardpaySDKService {
-  getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
-    return getSDK(sdk, ...args);
-  }
+  getSDK = getSDK;
+  waitForSubgraphIndex = waitForSubgraphIndex;
+  gqlQuery = gqlQuery;
 }
 
 declare module '@cardstack/di' {

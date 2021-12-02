@@ -29,6 +29,7 @@ export function handlePrepaidCardSplit(event: SplitPrepaidCardEvent): void {
 
   let splitEntity = new PrepaidCardSplit(txnHash);
   splitEntity.timestamp = event.block.timestamp;
+  splitEntity.blockNumber = event.block.number;
   splitEntity.transaction = txnHash;
   splitEntity.prepaidCard = prepaidCard;
   splitEntity.issuer = issuer;

@@ -115,7 +115,7 @@ if (process.env.COMPILER) {
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
-            import person from "./person";
+            import person from "../person";
             export default class Post {
               @contains(person) author;
             }

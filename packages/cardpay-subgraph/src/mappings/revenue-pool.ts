@@ -26,6 +26,7 @@ export function handleMerchantClaim(event: MerchantClaimEvent): void {
   let claimEntity = new MerchantClaim(txnHash);
   claimEntity.transaction = txnHash;
   claimEntity.timestamp = event.block.timestamp;
+  claimEntity.blockNumber = event.block.number;
   claimEntity.merchantSafe = merchantSafe;
   claimEntity.token = token;
   claimEntity.amount = event.params.amount;
@@ -34,6 +35,7 @@ export function handleMerchantClaim(event: MerchantClaimEvent): void {
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
   revenueEventEntity.transaction = txnHash;
   revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.blockNumber = event.block.number;
   revenueEventEntity.merchantRevenue = revenueEntity.id;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;

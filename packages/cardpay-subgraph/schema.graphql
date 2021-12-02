@@ -63,6 +63,7 @@ type BridgeToLayer1Event @entity {
   transaction: Transaction!
   safe: Safe
   timestamp: BigInt!
+  blockNumber: BigInt!
   account: Account!
   token: Token!
   amount: BigInt!
@@ -84,16 +85,18 @@ type SupplierInfoDIDUpdate @entity {
   transaction: Transaction!
   infoDID: String!
   timestamp: BigInt!
+  blockNumber: BigInt!
   supplier: Account!
 }
 
 type PrepaidCardPayment @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   prepaidCardOwner: Account!
-  merchantSafe: MerchantSafe   # for merchant registration this will not be set
+  merchantSafe: MerchantSafe # for merchant registration this will not be set
   merchant: Account
   issuingToken: Token!
   issuingTokenAmount: BigInt!
@@ -109,6 +112,7 @@ type PrepaidCardPayment @entity {
 type PrepaidCardSplit @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   issuer: Account!
@@ -136,6 +140,7 @@ type PrepaidCardAsk @entity {
 type PrepaidCardAskSetEvent @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   sku: SKU!
   issuingToken: Token!
@@ -161,6 +166,7 @@ type SKUInventory @entity {
 type PrepaidCardInventoryEvent @entity {
   id: ID!                   # id is 'txHash-prepaidCard'
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   inventory: SKUInventory!
   prepaidCard: PrepaidCard!
@@ -172,6 +178,7 @@ type PrepaidCardInventoryEvent @entity {
 type PrepaidCardInventoryAddEvent @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   inventory: SKUInventory!
@@ -180,6 +187,7 @@ type PrepaidCardInventoryAddEvent @entity {
 type PrepaidCardInventoryRemoveEvent @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   inventory: SKUInventory!
@@ -188,6 +196,7 @@ type PrepaidCardInventoryRemoveEvent @entity {
 type PrepaidCardProvisionedEvent @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   txnHash: String!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
@@ -199,6 +208,7 @@ type PrepaidCardProvisionedEvent @entity {
 type PrepaidCardTransfer @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   from: Account!
@@ -226,6 +236,7 @@ type RevenueEarningsByDay @entity {
 type MerchantClaim @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
   token: Token!
@@ -235,6 +246,7 @@ type MerchantClaim @entity {
 type MerchantWithdraw @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
   token: Token!
@@ -245,6 +257,7 @@ type MerchantWithdraw @entity {
 type MerchantDeposit @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
   token: Token!
@@ -266,6 +279,7 @@ type MerchantRevenueEvent @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
   historicLifetimeAccumulation: BigInt!
   historicUnclaimedBalance: BigInt!
   merchantRevenue: MerchantRevenue!
@@ -279,6 +293,7 @@ type MerchantRevenueEvent @entity {
 type SpendAccumulation @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
   amount: BigInt!
@@ -288,6 +303,7 @@ type SpendAccumulation @entity {
 type MerchantFeePayment @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   merchantSafe: MerchantSafe!
@@ -299,6 +315,7 @@ type PrepaidCardCreation @entity {
   id: ID!
   transaction: Transaction!
   createdAt: BigInt!
+  blockNumber: BigInt!
   prepaidCard: PrepaidCard!
   depot: Depot # prepaid card may not heave been created from depot.
   createdFromAddress: String!
@@ -313,6 +330,7 @@ type MerchantCreation @entity {
   id: ID!
   transaction: Transaction!
   createdAt: BigInt!
+  blockNumber: BigInt!
   merchantSafe: MerchantSafe!
   merchant: Account!
 }
@@ -321,6 +339,7 @@ type MerchantRegistrationPayment @entity {
   id: ID!
   transaction: Transaction!
   createdAt: BigInt!
+  blockNumber: BigInt!
   paidWith: PrepaidCard!
   prepaidCardPayment: PrepaidCardPayment!
   issuingToken: Token!
@@ -332,6 +351,7 @@ type TokenSwap @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
   tokenPair: TokenPair!
   to: Account!
   token0AmountIn: BigInt!
@@ -358,6 +378,7 @@ type SafeTransaction @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
   safe: Safe!
   to: String!
   value: BigInt!
@@ -375,6 +396,7 @@ type SafeTransaction @entity {
 type SafeOwnerChange @entity {
   id: ID!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   safe: Safe!
    # these are not Account types because the owner may be a contract address
@@ -386,6 +408,7 @@ type PrepaidCardSendAction @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
   prepaidCard: PrepaidCard!
   spendAmount: BigInt!
   rateLock: BigInt!
@@ -451,6 +474,7 @@ type SafeOwner @entity {
 type TokenTransfer @entity {
   id: ID!              # Set to token address + txn-hash + log index
   timestamp: BigInt!
+  blockNumber: BigInt!
   transaction: Transaction!
   token: Token!
   amount: BigInt!
@@ -486,6 +510,7 @@ type TokenHistory @entity {
   sent: TokenTransfer
   received: TokenTransfer
   timestamp: BigInt!
+  blockNumber: BigInt!
   tokenHolder: TokenHolder!
 }
 
@@ -502,6 +527,7 @@ type RewardProgramRegistrationPayment @entity {
   admin: Account!
   transaction: Transaction!
   createdAt: BigInt!
+  blockNumber: BigInt!
   prepaidCardPayment: PrepaidCardPayment!
 }
 
@@ -511,6 +537,7 @@ type RewardeeRegistrationPayment @entity {
   rewardee: Account!
   transaction: Transaction!
   createdAt: BigInt!
+  blockNumber: BigInt!
   prepaidCardPayment: PrepaidCardPayment!
 }
 
@@ -539,6 +566,7 @@ type RewardeeClaim @entity {
   amount: BigInt!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
 }
 
 type RewardTokensAdd @entity {
@@ -549,4 +577,5 @@ type RewardTokensAdd @entity {
   amount: BigInt!
   transaction: Transaction!
   timestamp: BigInt!
+  blockNumber: BigInt!
 }

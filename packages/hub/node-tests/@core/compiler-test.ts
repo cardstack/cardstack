@@ -3,6 +3,7 @@ import { baseCardURL } from '@cardstack/core/src/compiler';
 import CardBuilder from '../../services/card-builder';
 import { setupHub } from '../helpers/server';
 import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
+import { RawCard } from '@cardstack/core/src/interfaces';
 
 const PERSON_CARD = {
   url: `${TEST_REALM}person`,
@@ -211,6 +212,42 @@ if (process.env.COMPILER) {
         builder.cache.getModule(compiled.embedded.moduleName),
         'Embedded template inlines post title'
       ).to.containsSource(`<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`);
+    });
+
+    it(`gives a good error when a card can't compile because adoptsFrom does not exist`, async function () {
+      let rawCard: RawCard = { url: `${TEST_REALM}post`, adoptsFrom: '../post' };
+      try {
+        await builder.compileCardFromRaw(rawCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`tried to adopt from card ${TEST_REALM}post but it failed to load`);
+        expect(err.status).to.eq(422);
+      }
+    });
+
+    it(`gives a good error when a card can't compile because field does not exist`, async function () {
+      let rawCard: RawCard = {
+        url: `${TEST_REALM}post`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import person from "../person";
+            export default class Post {
+              @contains(person) author;
+            }
+          `,
+          'isolated.js': templateOnlyComponentTemplate('<@field.author.name />'),
+        },
+      };
+      try {
+        await builder.compileCardFromRaw(rawCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`tried to lookup field 'author' from card ${TEST_REALM}post but it failed to load`);
+        expect(err.status).to.eq(422);
+      }
     });
 
     describe('@fields iterating', function () {
