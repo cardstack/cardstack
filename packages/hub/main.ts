@@ -99,7 +99,6 @@ export function createRegistry(): Registry {
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
-  registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -341,10 +340,12 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
+  let web3 = await container.lookup('web3-socket');
+  let workerClient = await container.lookup('worker-client');
 
   // listen for contract events
   // internally this talks to the worker client
-  await container.lookup('contract-subscription-event-handler');
+  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
 
   await runner.promise;
 }

@@ -1,29 +1,27 @@
 import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
-import { inject, injectionReady } from '@cardstack/di';
 import config from 'config';
 import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
+import Web3SocketService from './services/web3-socket';
 import { contractSubscriptionEventHandlerLog } from './utils/logger';
 
 const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
+// DO NOT USE only for use in bootWorker to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
-  private web3 = inject('web3-socket', { as: 'web3' });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
-  logger = contractSubscriptionEventHandlerLog;
+  #web3: Web3SocketService;
+  #workerClient: WorkerClient;
+  #logger = contractSubscriptionEventHandlerLog;
 
-  constructor() {
+  constructor(web3: Web3SocketService, workerClient: WorkerClient) {
     autoBind(this);
-  }
-
-  async ready() {
-    await Promise.all([injectionReady(this, 'web3-socket'), injectionReady(this, 'worker-client')]);
-    await this.setupContractEventSubscriptions();
+    this.#web3 = web3;
+    this.#workerClient = workerClient;
   }
 
   async setupContractEventSubscriptions() {
-    let web3Instance = this.web3.getInstance();
+    let web3Instance = this.#web3.getInstance();
 
     let RevenuePoolABI = await getABI('revenue-pool', web3Instance);
     let revenuePoolContract = new web3Instance.eth.Contract(
@@ -44,10 +42,10 @@ export class ContractSubscriptionEventHandler {
             action: 'contract-subscription-event-handler',
           },
         });
-        this.logger.error('Error in CustomerPayment subscription', error);
+        this.#logger.error('Error in CustomerPayment subscription', error);
       } else {
-        this.logger.info('Received CustomerPayment event', event.transactionHash);
-        this.workerClient.addJob('notify-customer-payment', event.transactionHash);
+        this.#logger.info('Received CustomerPayment event', event.transactionHash);
+        this.#workerClient.addJob('notify-customer-payment', event.transactionHash);
       }
     });
 
@@ -58,19 +56,13 @@ export class ContractSubscriptionEventHandler {
             action: 'contract-subscription-event-handler',
           },
         });
-        this.logger.error('Error in MerchantClaim subscription', error);
+        this.#logger.error('Error in MerchantClaim subscription', error);
       } else {
-        this.logger.info('Received MerchantClaim event', event.transactionHash);
-        this.workerClient.addJob('notify-merchant-claim', event.transactionHash);
+        this.#logger.info('Received MerchantClaim event', event.transactionHash);
+        this.#workerClient.addJob('notify-merchant-claim', event.transactionHash);
       }
     });
 
-    this.logger.info('Subscribed to events');
-  }
-}
-
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'contract-subscription-event-handler': ContractSubscriptionEventHandler;
+    this.#logger.info('Subscribed to events');
   }
 }
