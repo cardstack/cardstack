@@ -471,11 +471,11 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (weiAmount.add(gasCost).gt(rewardPoolBalanceForRewardProgram)) {
+    if (weiAmount.lt(gasCost)) {
       throw new Error(
-        `Insufficient funds inside reward pool for reward program to cover gas cost. Funds claimed does not have enough to cover the gas cost. The amount to be claimed is ${amount}, the gas cost is ${fromWei(
+        `Funds recovered does not have enough to cover the gas cost. The amount to be recovered is ${amount}, the gas cost is ${fromWei(
           gasCost
-        )} but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgram).toString()}`
+        )}`
       );
     }
     if (nonce == null) {
