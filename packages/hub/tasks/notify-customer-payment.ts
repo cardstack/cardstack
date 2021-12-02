@@ -69,11 +69,18 @@ export default class NotifyCustomerPayment {
       );
     }
 
-    let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+    let merchantName = '';
+
+    try {
+      let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+      merchantName = ` ${merchantInfo.name}`;
+    } catch (e) {
+      // What is to be done? Sentry? Does it matter?
+    }
 
     let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
-    let message = `Your business ${merchantInfo.name} received a payment of §${spendAmount}`;
+    let message = `Your business${merchantName} received a payment of §${spendAmount}`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,

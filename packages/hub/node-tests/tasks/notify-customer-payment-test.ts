@@ -40,17 +40,23 @@ class StubWorkerClient {
   }
 }
 
+let merchantInfoShouldError = false;
 class StubMerchantInfo {
   async getMerchantInfo(_did: string) {
-    return {
-      name: 'Mandello',
-    };
+    if (merchantInfoShouldError) {
+      throw new Error('Simulated error fetching merchant info');
+    } else {
+      return {
+        name: 'Mandello',
+      };
+    }
   }
 }
 
 describe('NotifyCustomerPaymentTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
+    merchantInfoShouldError = false;
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
@@ -89,6 +95,37 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
       message: `Your business Mandello received a payment of §2324`,
+    });
+  });
+
+  it('omits the merchant name when fetching it fails', async function () {
+    merchantInfoShouldError = true;
+    mockData.value = {
+      prepaidCardOwner: {
+        id: 'prepaid-card-eoa-address',
+      },
+      merchant: {
+        id: 'eoa-address',
+      },
+      merchantSafe: {
+        id: 'merchant-safe-address',
+        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
+      },
+      issuingToken: {
+        symbol: 'DAI.CPXD',
+      },
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+    };
+
+    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+
+    await task.perform('a');
+
+    expect(lastAddedJobIdentifier).to.equal('send-notifications');
+    expect(lastAddedJobPayload).to.deep.equal({
+      notifiedAddress: 'eoa-address',
+      message: `Your business received a payment of §2324`,
     });
   });
 

@@ -57,13 +57,20 @@ export default class NotifyMerchantClaim {
       throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
     }
 
-    let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+    let merchantName = '';
+
+    try {
+      let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+      merchantName = ` ${merchantInfo.name}`;
+    } catch (e) {
+      // What is to be done? Sentry? Does it matter?
+    }
 
     let token = result.token.symbol;
     let notifiedAddress = result.merchantSafe.merchant.id;
     let amountInWei = result.amount;
 
-    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your ${merchantInfo.name} business account`;
+    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your${merchantName} business account`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
