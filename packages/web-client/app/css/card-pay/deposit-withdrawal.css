@@ -12,6 +12,10 @@
   margin-top: var(--boxel-sp-xxl);
 }
 
+.card-pay-dashboard__deposit-withdrawal .dashboard-details .dashboard-panel-section:last-child {
+  margin-top: var(--boxel-sp-xs);
+}
+
 .card-pay-dashboard__deposit-withdrawal-header {
   display: flex;
   align-items: center;
