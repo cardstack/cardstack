@@ -43,7 +43,7 @@ Below is a list of the most common environment variables that the Hub accepts:
 - `HUB_AWS_ACCESS_KEY_ID`
 - `HUB_AWS_SECRET_ACCESS_KEY`
 - `HUB_AWS_REGION`
-- `AWS_PROFILE` - if none of the HUB_AWS_* variables are defined, no credentials or region will be passed to the aws-sdk. This will make the aws-sdk's default behavior take effect, which includes using an AWS_PROFILE env var if it is set
+- `AWS_PROFILE` - if none of the HUB*AWS*\* variables are defined, no credentials or region will be passed to the aws-sdk. This will make the aws-sdk's default behavior take effect, which includes using an AWS_PROFILE env var if it is set
 - `DATABASE_URL` - defaults in development to postgres://postgres:postgres@localhost:5432/hub_development
 - `LOG_LEVELS` - defaults to `*=info`
 
@@ -59,6 +59,7 @@ AWS_PROFILE=cardstack
 ```
 
 ## Setting up Discord
+
 Some of the packages in this mono repo support the operation of a discord bot that uses the hub's DI system. We leverage [CordeJS](https://cordejs.org/docs/cordebot/) for our unit tests. CordeJS uses a discord bot running in discord to test the bot functionality by emulating a discord user and sending commands to the bot under test. In order to run the cordejs tests, you'll need to setup a discord server and install the cordebot with full permissions as well as the cardbot into the discord server.
 
 The instructions for setting up the cordebot (and cardbot) are here: https://cordejs.org/docs/creatingdiscordbot. In these instructions you need to setup 2 bots (the instructions outline how to setup a single bot). One bot that you setup will be the cardbot, the other bot that you setup will be the cordebot (used to test the cardbot).
@@ -68,33 +69,27 @@ At the time of this writing the cardbot requires the following OAuth scopes:
 
 Once the cardbot and cordebot bots are setup, you can then configure environment variables for running the bot tests. Specifically:
 
- - `CORDE_BOT_ID`: The bot ID for the cordebot
- - `CORDE_BOT_TOKEN`: The bot token for the cordebot
- - `CARDBOT_ID`: The bot ID for the cardbot
- - `CARDBOT_TOKEN`: The bot token for the cardbot
- - `CARDBOT_ALLOWED_GUILDS`: A comma separated list of the discord server IDs that the cardbot is allowed to communicate on. This should be the server(s) that you added the cardbot to.
- - `CARDBOT_ALLOWED_CHANNELS`: A comma separated list of channel IDs the cardbot is allowed to communicate in.
+- `CORDE_BOT_ID`: The bot ID for the cordebot
+- `CORDE_BOT_TOKEN`: The bot token for the cordebot
+- `CARDBOT_ID`: The bot ID for the cardbot
+- `CARDBOT_TOKEN`: The bot token for the cardbot
+- `CARDBOT_ALLOWED_GUILDS`: A comma separated list of the discord server IDs that the cardbot is allowed to communicate on. This should be the server(s) that you added the cardbot to.
+- `CARDBOT_ALLOWED_CHANNELS`: A comma separated list of channel IDs the cardbot is allowed to communicate in.
 
- (Note: to easily obtain server and channel ID's enable  `User Settings -> Advanced -> Enable Developer Mode` in Discord. This will reveal a "Copy ID" item in the settings panel for servers and channels to retrieve these ID's.)
-
+(Note: to easily obtain server and channel ID's enable `User Settings -> Advanced -> Enable Developer Mode` in Discord. This will reveal a "Copy ID" item in the settings panel for servers and channels to retrieve these ID's.)
 
 ## Getting Started
 
 You need to build the hub via `yarn build`, or start watching for live rebuilds with `yarn rebuild`.
 
-The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data.
-```sh
-    dist/hub.js db setup
-```
+The following command will create a hub_development database on your locally running postgres server
 
-Load the database with seed data
 ```sh
+    createdb hub_development
+    yarn db:migrate up
     dist/hub.js db seed
-```
-
-To initialize your test db
-```sh
-    NODE_ENV=test dist/hub.js db init-test
+    dist/hub.js db dump
+    NODE_ENV=test dist/hub.js db init
 ```
 
 ### Running the hub
