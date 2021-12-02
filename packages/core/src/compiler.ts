@@ -14,7 +14,7 @@ import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
 import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
-import { getBasenameAndExtension } from './utils';
+import { getBasenameAndExtension, resolveCardURL } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
@@ -132,7 +132,7 @@ export class Compiler {
 
   private async getParentCard(cardSource: RawCard, meta: PluginMeta): Promise<CompiledCard> {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
-    let url = parentCardPath ? new URL(parentCardPath, cardSource.url).href : baseCardURL;
+    let url = parentCardPath ? resolveCardURL(parentCardPath, cardSource.url) : baseCardURL;
     try {
       return await this.builder.getCompiledCard(url);
     } catch (err: any) {
@@ -188,7 +188,7 @@ export class Compiler {
   private async lookupFieldsForCard(metaFields: FieldsMeta, ownURL: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
-      let fieldURL = new URL(cardURL, ownURL).href;
+      let fieldURL = resolveCardURL(cardURL, ownURL);
       try {
         fields[name] = {
           card: await this.builder.getCompiledCard(fieldURL),
