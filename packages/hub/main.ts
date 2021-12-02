@@ -79,6 +79,9 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import RealmsConfig from './services/realms-config';
+import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
+import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
+import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -126,6 +129,9 @@ export function createRegistry(): Registry {
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
+  registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
+  registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
+  registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
