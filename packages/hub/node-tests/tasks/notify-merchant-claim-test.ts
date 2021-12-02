@@ -20,7 +20,7 @@ const mockData: {
 };
 
 class StubCardPay {
-  async query(_network: string, _query: string, _variables: { txn: string }) {
+  async gqlQuery(_network: string, _query: string, _variables: { txn: string }) {
     return mockData.queryReturnValue;
   }
 

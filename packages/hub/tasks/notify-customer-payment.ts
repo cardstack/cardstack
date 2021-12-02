@@ -53,7 +53,7 @@ export default class NotifyCustomerPayment {
   async perform(payload: string) {
     await this.cardpay.waitForSubgraphIndex(payload, network);
 
-    let queryResult: PrepaidCardPaymentsQueryResult = await this.cardpay.query(network, prepaidCardPaymentsQuery, {
+    let queryResult: PrepaidCardPaymentsQueryResult = await this.cardpay.gqlQuery(network, prepaidCardPaymentsQuery, {
       txn: payload,
     });
 

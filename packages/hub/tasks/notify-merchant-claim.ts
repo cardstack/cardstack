@@ -42,7 +42,7 @@ export default class NotifyMerchantClaim {
   async perform(payload: string) {
     await this.cardpay.waitForSubgraphIndex(payload, network);
 
-    let queryResult: MerchantClaimsQueryResult = await this.cardpay.query(network, merchantClaimsQuery, {
+    let queryResult: MerchantClaimsQueryResult = await this.cardpay.gqlQuery(network, merchantClaimsQuery, {
       txn: payload,
     });
 
