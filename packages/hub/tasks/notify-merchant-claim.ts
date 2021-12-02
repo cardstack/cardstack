@@ -53,7 +53,6 @@ export default class NotifyMerchantClaim {
     }
 
     let token = result.token.symbol;
-    // let merchantSafeAddress = result.merchantSafe.id;
     let notifiedAddress = result.merchantSafe.merchant.id;
     let amountInWei = result.amount;
     let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your business account`;

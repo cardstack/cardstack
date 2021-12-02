@@ -65,7 +65,6 @@ export default class NotifyCustomerPayment {
       );
     }
 
-    // let merchantSafeAddress = result.merchantSafe.id;
     let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
     let message = `Your business received a payment of §${spendAmount}`;
