@@ -172,7 +172,7 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      await expect(bot.start()).to.be.rejectedWith('No bot commands found. Check your configuration.');
+      await expect(bot.start()).to.be.rejectedWith('No bot commands found. Your subclass should provide some.');
       expect(bot.status).to.eq('disconnected');
     });
 
