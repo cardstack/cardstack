@@ -1,6 +1,6 @@
 import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { inject, injectionReady } from '@cardstack/di';
 import config from 'config';
 import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
@@ -17,7 +17,12 @@ export class ContractSubscriptionEventHandler {
     autoBind(this);
   }
 
-  async initialize() {
+  async ready() {
+    await Promise.all([injectionReady(this, 'web3-socket'), injectionReady(this, 'worker-client')]);
+    await this.setupContractEventSubscriptions();
+  }
+
+  async setupContractEventSubscriptions() {
     let web3Instance = this.web3.getInstance();
 
     let RevenuePoolABI = await getABI('revenue-pool', web3Instance);

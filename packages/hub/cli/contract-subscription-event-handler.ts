@@ -9,9 +9,8 @@ export async function handler(/* argv: Argv */) {
   initSentry();
 
   let container = createContainer();
-  let server: ContractSubscriptionEventHandler;
   try {
-    server = (await container.lookup('contract-subscription-event-handler')) as ContractSubscriptionEventHandler;
+    (await container.lookup('contract-subscription-event-handler')) as ContractSubscriptionEventHandler;
   } catch (err: any) {
     contractSubscriptionEventHandlerLog.error(
       'Contract subscription event handler failed to start cleanly: %s',
@@ -20,6 +19,4 @@ export async function handler(/* argv: Argv */) {
     // eslint-disable-next-line no-process-exit
     process.exit(-1);
   }
-
-  await server.initialize();
 }
