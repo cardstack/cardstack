@@ -939,7 +939,7 @@ let {
     command = 'transferRewardSafe';
   })
   .command(
-    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]',
+    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>',
     'Recover reward tokens from reward pool',
     (yargs) => {
       yargs.positional('rewardProgramId', {

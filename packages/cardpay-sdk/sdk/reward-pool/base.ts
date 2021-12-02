@@ -409,7 +409,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     safeAddress: string,
     rewardProgramId: string,
     tokenAddress: string,
-    amount?: string,
+    amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
@@ -433,6 +433,9 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     if (!tokenAddress) {
       throw new Error('tokenAddress is required');
     }
+    if (!amount) {
+      throw new Error('amount is required');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
@@ -455,7 +458,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     if (!(safeOwner == from)) {
       throw new Error('signer is not safe owner');
     }
-    let weiAmount = amount ? new BN(toWei(amount)) : rewardPoolBalanceForRewardProgram;
+    let weiAmount = new BN(toWei(amount));
 
     if (rewardPoolBalanceForRewardProgram.lt(weiAmount)) {
       throw new Error(
