@@ -118,6 +118,7 @@ export function makeMerchantRevenueEvent(
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
   revenueEventEntity.transaction = txnHash;
   revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.blockNumber = event.block.number;
   revenueEventEntity.merchantRevenue = revenueEntity.id;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
