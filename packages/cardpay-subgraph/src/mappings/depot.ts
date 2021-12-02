@@ -47,6 +47,7 @@ export function handleSentBridgedTokens(event: TokensBridgingInitiated): void {
   let bridgeEventEntity = new BridgeToLayer1Event(txnHash);
   bridgeEventEntity.transaction = txnHash;
   bridgeEventEntity.timestamp = event.block.timestamp;
+  bridgeEventEntity.blockNumber = event.block.number;
   bridgeEventEntity.token = makeToken(event.params.token);
   bridgeEventEntity.amount = event.params.value;
 
@@ -78,6 +79,7 @@ export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
 
   let updateEntity = new SupplierInfoDIDUpdate(event.transaction.hash.toHex());
   updateEntity.timestamp = event.block.timestamp;
+  updateEntity.blockNumber = event.block.number;
   updateEntity.transaction = event.transaction.hash.toHex();
   updateEntity.infoDID = infoDID;
   updateEntity.supplier = supplier;
