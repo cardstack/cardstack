@@ -68,3 +68,9 @@ export class ContractSubscriptionEventHandler {
     this.logger.info('Subscribed to events');
   }
 }
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    'contract-subscription-event-handler': ContractSubscriptionEventHandler;
+  }
+}

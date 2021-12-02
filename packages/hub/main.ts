@@ -342,6 +342,10 @@ export async function bootWorker() {
     });
   });
 
+  // listen for contract events
+  // internally this talks to the worker client
+  await container.lookup('contract-subscription-event-handler');
+
   await runner.promise;
 }
 
