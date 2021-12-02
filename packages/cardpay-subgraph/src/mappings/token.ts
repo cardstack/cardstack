@@ -1,11 +1,10 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { RevenuePool } from '../../generated/RevenuePool/RevenuePool';
+import { Address, BigInt } from '@graphprotocol/graph-ts';
 import {
   makeToken,
   makeEOATransaction,
   makeEOATransactionForSafe,
   toChecksumAddress,
-  makeMerchantRevenue,
+  makeMerchantRevenueEvent,
 } from '../utils';
 import {
   Safe,
@@ -13,7 +12,6 @@ import {
   TokenTransfer,
   TokenHolder,
   TokenHistory,
-  MerchantRevenueEvent,
   MerchantDeposit,
   MerchantWithdraw,
   MerchantSafe,
@@ -153,25 +151,4 @@ function makeAccount(address: Address): string {
   let entity = new Account(account);
   entity.save();
   return account;
-}
-
-function makeMerchantRevenueEvent(event: ethereum.Event, merchantSafe: string, token: string): MerchantRevenueEvent {
-  let txnHash = event.transaction.hash.toHex();
-  let revenuePoolAddress = addresses.get('revenuePool') as string;
-  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
-  let revenuePool = RevenuePool.bind(Address.fromString(revenuePoolAddress));
-  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(
-    Address.fromString(merchantSafe),
-    Address.fromString(token)
-  );
-  revenueEntity.save();
-
-  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
-  revenueEventEntity.transaction = txnHash;
-  revenueEventEntity.timestamp = event.block.timestamp;
-  revenueEventEntity.blockNumber = event.block.number;
-  revenueEventEntity.merchantRevenue = revenueEntity.id;
-  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
-  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
-  return revenueEventEntity;
 }

@@ -20,9 +20,14 @@ dataSources:
         - Transaction
         - Account
         - EOATransaction
+        - MerchantRevenue
+        - MerchantRevenueEvent
+        - MerchantPrepaidCardIssuance
       abis:
         - name: PrepaidCardManager
           file: ./abis/generated/PrepaidCardManager.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
         - name: ERC20
