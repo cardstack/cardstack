@@ -80,32 +80,34 @@ Once the cardbot and cordebot bots are setup, you can then configure environment
 
 ## Getting Started
 
+You need to build the hub via `yarn build`, or start watching for live rebuilds with `yarn rebuild`.
+
 The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data.
 ```sh
-    bin/hub db setup
+    dist/hub.js db setup
 ```
 
 Load the database with seed data
 ```sh
-    bin/hub db seed
+    dist/hub.js db seed
 ```
 
 To initialize your test db
 ```sh
-    NODE_ENV=test bin/hub db init-test
+    NODE_ENV=test dist/hub.js db init-test
 ```
 
 ### Running the hub
 
 ```sh
 # Starts the server on port 3000
-bin/hub server
+dist/hub.js server
 
 # Starts the worker process
-bin/hub worker
+dist/hub.js worker
 
 # Starts the discord bot
-bin/hub bot
+dist/hub.js bot
 
 # If you want to run both in the same terminal you can run
 yarn start
@@ -131,7 +133,7 @@ Documentation on how to create migration scripts is available at https://salsita
 
 After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
 
-    bin/hub db dump
+    dist/hub.js db dump
 
 ## Application console
 
@@ -200,7 +202,7 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 
 The hub CLI can be invoked from within the hub package
 
-    bin/hub
+    dist/hub.js
 
 _💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)_
 
@@ -211,7 +213,7 @@ The files that support the CLI are in the `cli/` directory. You can add your own
 All compiler functionality is currently hidden behind the COMPILER feature flag. So to start the server with card compiling and related routes, use that flag.
 
 ```
-COMPILER=true bin/hub server
+COMPILER=true dist/hub.js server
 ```
 
 ## Contributing
