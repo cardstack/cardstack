@@ -6,17 +6,23 @@ interface JSONAPIDocument {
 }
 
 export default class NotificationPreferenceSerializer {
-  serialize(models: NotificationPreference[]): JSONAPIDocument {
+  serialize(model: NotificationPreference): JSONAPIDocument {
+    return {
+      data: {
+        type: 'notification-preference',
+        attributes: {
+          'owner-address': model.ownerAddress,
+          'notification-type': model.notificationType,
+          status: model.status,
+        },
+      },
+    };
+  }
+
+  serializeCollection(models: NotificationPreference[]): JSONAPIDocument {
     const result = {
       data: models.map((model) => {
-        return {
-          type: 'notification-preference',
-          attributes: {
-            'owner-address': model.ownerAddress,
-            'notification-type': model.notificationType,
-            status: model.status,
-          },
-        };
+        return this.serialize(model).data;
       }),
     };
 
