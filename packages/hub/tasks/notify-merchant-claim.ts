@@ -35,6 +35,7 @@ query($txn: String!) {
 `;
 
 const { network } = config.get('web3') as { network: 'sokol' | 'xdai' };
+
 export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
