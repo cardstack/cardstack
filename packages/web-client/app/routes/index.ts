@@ -2,7 +2,6 @@ import Route from '@ember/routing/route';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
-import CardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-white-text.svg';
 import CardSpaceLogo from '@cardstack/web-client/images/icons/card-space-logo-clear-background.svg';
 import CardPayLogo from '@cardstack/web-client/images/icons/card-pay-logo.svg';
 import CardMembershipLogo from '@cardstack/web-client/images/icons/card-membership-logo.svg';
@@ -108,7 +107,6 @@ const ORGS = [
 export default class CardstackRoute extends Route {
   async model() {
     return {
-      logo: CardstackLogo,
       orgs: ORGS,
     };
   }

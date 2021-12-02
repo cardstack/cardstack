@@ -189,11 +189,22 @@ export class Compiler {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
       let fieldURL = resolveCardURL(cardURL, ownURL);
-      fields[name] = {
-        card: await this.builder.getCompiledCard(fieldURL),
-        type,
-        name,
-      };
+      try {
+        fields[name] = {
+          card: await this.builder.getCompiledCard(fieldURL),
+          type,
+          name,
+        };
+      } catch (err: any) {
+        if (!err.isCardstackError || err.status !== 404) {
+          throw err;
+        }
+        let newErr = new CardstackError(`tried to lookup field '${name}' from card ${ownURL} but it failed to load`, {
+          status: 422,
+        });
+        newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
+        throw newErr;
+      }
     }
 
     return fields;
