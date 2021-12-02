@@ -1,25 +1,31 @@
 import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
-import { Safe } from '@cardstack/cardpay-sdk';
-import NotifyCustomerPayment from '../../tasks/notify-customer-payment';
+import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
 
-let stubbedSafes: Record<string, Safe> = {};
+type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
+
+const mockData: {
+  value: TransactionInformation | undefined;
+  queryReturnValue: PrepaidCardPaymentsQueryResult;
+} = {
+  value: undefined,
+  get queryReturnValue() {
+    return {
+      data: {
+        prepaidCardPayments: this.value ? [this.value] : [],
+      },
+    };
+  },
+};
 
 class StubCardPay {
-  getSDK(sdk: string) {
-    if (sdk === 'Safes') {
-      return {
-        async viewSafe(safeAddress: string) {
-          return {
-            safe: stubbedSafes[safeAddress],
-            blockNumber: 1,
-          };
-        },
-      };
-    } else {
-      throw new Error('Attempted to access unstubbed SDK: ' + sdk);
-    }
+  async query(_network: string, _query: string, _variables: { txn: string }) {
+    return mockData.queryReturnValue;
+  }
+
+  async waitForSubgraphIndex(_txnHash: string) {
+    return;
   }
 }
 
@@ -36,6 +42,7 @@ class StubWorkerClient {
 
 describe('NotifyCustomerPaymentTask', function () {
   this.beforeEach(function () {
+    mockData.value = undefined;
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('worker-client', StubWorkerClient);
   });
@@ -47,39 +54,39 @@ describe('NotifyCustomerPaymentTask', function () {
   });
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
-    stubbedSafes['0x1234'] = {
-      type: 'merchant',
-      owners: ['0xEOA'],
-    } as Safe;
+    mockData.value = {
+      prepaidCardOwner: {
+        id: 'prepaid-card-eoa-address',
+      },
+      merchant: {
+        id: 'eoa-address',
+      },
+      merchantSafe: {
+        id: 'merchant-safe-address',
+      },
+      issuingToken: {
+        symbol: 'DAI.CPXD',
+      },
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+    };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    await task.perform({
-      returnValues: {
-        merchantSafe: '0x1234',
-        spendAmount: '2324',
-      },
-    });
+    await task.perform('a');
 
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: '0xEOA',
+      notifiedAddress: 'eoa-address',
       message: `Your business received a payment of §2324`,
     });
   });
 
-  it('throws when the safe is not found', async function () {
+  it('throws when the transaction is not found on the subgraph', async function () {
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    return expect(
-      task.perform({
-        returnValues: {
-          merchantSafe: 'no',
-          spendAmount: '2324',
-        },
-      })
-    )
-      .to.be.rejectedWith(/Safe not found/)
+    return expect(task.perform('a'))
+      .to.be.rejectedWith(`Subgraph did not return information for prepaid card payment with transaction hash: "a"`)
       .then(() => {
         expect(lastAddedJobIdentifier).to.be.undefined;
         expect(lastAddedJobPayload).to.be.undefined;

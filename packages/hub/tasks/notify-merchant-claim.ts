@@ -1,38 +1,62 @@
 import { inject } from '@cardstack/di';
+import config from 'config';
+import Web3 from 'web3';
 import CardpaySDKService from '../services/cardpay-sdk';
-import Web3HttpService from '../services/web3-http';
 import WorkerClient from '../services/worker-client';
 
-interface MerchantClaimSubscriptionEvent {
-  returnValues: {
-    merchantSafe: string;
-    amount: string;
+export interface MerchantClaimsQueryResult {
+  data: {
+    merchantClaims: {
+      merchantSafe: {
+        id: string;
+        merchant: {
+          id: string;
+        };
+      };
+      amount: string;
+      token: { symbol: string };
+    }[];
   };
 }
 
+const merchantClaimsQuery = `
+query($txn: String!) {
+  merchantClaims(where: { transaction: $txn }) {
+    merchantSafe {
+      id
+      merchant {
+        id
+      }
+    }
+    amount
+    token { symbol }
+  }
+}
+`;
+
+const { network } = config.get('web3') as { network: 'sokol' | 'xdai' };
 export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');
-  web3: Web3HttpService = inject('web3-http', { as: 'web3' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
-  async perform(payload: MerchantClaimSubscriptionEvent) {
-    let merchantSafeAddress = payload.returnValues.merchantSafe;
-    let amountInWei = payload.returnValues.amount;
+  async perform(payload: string) {
+    await this.cardpay.waitForSubgraphIndex(payload, network);
 
-    let web3Instance = this.web3.getInstance();
-    let Safes = await this.cardpay.getSDK('Safes', web3Instance);
-    let { safe } = await Safes.viewSafe(merchantSafeAddress);
+    let queryResult: MerchantClaimsQueryResult = await this.cardpay.query(network, merchantClaimsQuery, {
+      txn: payload,
+    });
 
-    if (!safe) {
-      // Sufficient to log to Sentry because of on('job:error')…?
-      throw new Error('Safe not found');
+    let result = queryResult?.data?.merchantClaims?.[0];
+
+    if (!result) {
+      throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
     }
 
-    // TODO: how should we resolve the token symbol from an address?
-    // let tokenAddress = event.returnValues.payableToken;
-    let token = 'DAI.CPXD';
-    let notifiedAddress = safe.owners[0];
-    let message = `You just claimed ${web3Instance.utils.fromWei(amountInWei)} ${token} from your business account`;
+    let token = result.token.symbol;
+    // let merchantSafeAddress = result.merchantSafe.id;
+    let notifiedAddress = result.merchantSafe.merchant.id;
+    let amountInWei = result.amount;
+    let message = `You just claimed ${Web3.utils.fromWei(amountInWei)} ${token} from your business account`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,

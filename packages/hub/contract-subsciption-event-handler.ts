@@ -41,8 +41,8 @@ export class ContractSubscriptionEventHandler {
         });
         this.logger.error('Error in CustomerPayment subscription', error);
       } else {
-        this.logger.info('Received CustomerPayment event', event);
-        this.workerClient.addJob('notify-customer-payment', event);
+        this.logger.info('Received CustomerPayment event', event.transactionHash);
+        this.workerClient.addJob('notify-customer-payment', event.transactionHash);
       }
     });
 
@@ -55,8 +55,8 @@ export class ContractSubscriptionEventHandler {
         });
         this.logger.error('Error in MerchantClaim subscription', error);
       } else {
-        this.logger.info('Received MerchantClaim event', event);
-        this.workerClient.addJob('notify-merchant-claim', event);
+        this.logger.info('Received MerchantClaim event', event.transactionHash);
+        this.workerClient.addJob('notify-merchant-claim', event.transactionHash);
       }
     });
 
