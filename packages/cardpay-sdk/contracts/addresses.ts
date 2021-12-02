@@ -16,7 +16,7 @@ import RegisterRewardProgramHandlerABI from './abi/v0.8.7/register-reward-progra
 import RegisterRewardeeHandlerABI from './abi/v0.8.7/register-rewardee-handler';
 import SupplierManagerABI from './abi/v0.8.7/supplier-manager';
 
-export const protocolVersions = ['v0.8.7', 'v0.8.6', 'v0.8.5'];
+export const protocolVersions = ['v0.8.7'];
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
