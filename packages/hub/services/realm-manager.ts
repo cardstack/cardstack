@@ -3,7 +3,6 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
-import { ensureTrailingSlash } from '../utils/path';
 import { getOwner, inject, injectionReady } from '@cardstack/di';
 
 export default class RealmManager {
