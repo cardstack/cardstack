@@ -5,9 +5,9 @@ import walkSync from 'walk-sync';
 
 import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
+import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 
 import { RealmInterface } from '../interfaces';
-import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import { serverLog as logger } from '../utils/logger';
 

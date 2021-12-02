@@ -21,6 +21,7 @@ export function handleMerchantRegistrationFee(event: MerchantRegistrationFee): v
   let registrationFeeEntity = new MerchantRegistrationPayment(txnHash);
   registrationFeeEntity.transaction = txnHash;
   registrationFeeEntity.createdAt = event.block.timestamp;
+  registrationFeeEntity.blockNumber = event.block.number;
   registrationFeeEntity.paidWith = prepaidCard;
   registrationFeeEntity.prepaidCardPayment = txnHash;
   registrationFeeEntity.issuingToken = issuingToken;

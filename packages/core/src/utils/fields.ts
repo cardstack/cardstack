@@ -1,6 +1,18 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
-import { getFieldForPath } from '../utils';
+
+export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
+  let paths = path.split('.');
+  let [first, ...tail] = paths;
+
+  let field = fields[first];
+
+  if (paths.length > 1) {
+    return getFieldForPath(field.card.fields, tail.join('.'));
+  }
+
+  return field;
+}
 
 export function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],

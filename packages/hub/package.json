@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.27.35",
+  "version": "0.27.36",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -29,12 +29,12 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
-    "@cardstack/cardpay-sdk": "0.27.35",
-    "@cardstack/core": "0.27.35",
-    "@cardstack/db": "0.27.35",
-    "@cardstack/di": "0.27.35",
-    "@cardstack/did-resolver": "0.27.35",
-    "@cardstack/discord-bot": "0.27.35",
+    "@cardstack/cardpay-sdk": "0.27.36",
+    "@cardstack/core": "0.27.36",
+    "@cardstack/db": "0.27.36",
+    "@cardstack/di": "0.27.36",
+    "@cardstack/did-resolver": "0.27.36",
+    "@cardstack/discord-bot": "0.27.36",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
@@ -93,8 +93,8 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.27.35",
-    "@cardstack/test-support": "0.27.35",
+    "@cardstack/eslint-config": "0.27.36",
+    "@cardstack/test-support": "0.27.36",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",
@@ -114,11 +114,13 @@
     "moment-timezone": "^0.5.33",
     "node-loader": "^2.0.0",
     "npm-run-all": "^4.1.5",
+    "sentry-testkit": "^3.3.7",
     "supertest": "^6.1.3",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.3.0",
     "tslog": "^3.2.2",
     "webpack": "^5.64.4",
+    "web3-utils": "1.5.2",
     "webpack-cli": "^4.9.1"
   },
   "engines": {
