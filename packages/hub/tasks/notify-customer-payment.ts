@@ -77,7 +77,7 @@ export default class NotifyCustomerPayment {
         merchantName = ` ${merchantInfo.name}`;
       }
     } catch (e) {
-      // What is to be done? Sentry? Does it matter?
+      // Silently ignore and just show notification without merchant name
     }
 
     let notifiedAddress = result.merchant.id;
