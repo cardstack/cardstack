@@ -1,6 +1,6 @@
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
-import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
+import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 interface PrepaidCardColorScheme {
   id: string;

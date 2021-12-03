@@ -4,7 +4,7 @@ import DatabaseManager from '@cardstack/db';
 import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
 import config from 'config';
-import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
+import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 interface PrepaidCardCustomization {
   id: string;

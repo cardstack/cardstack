@@ -4,7 +4,7 @@ import { inject } from '@cardstack/di';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 import { MerchantInfo } from '../routes/merchant-infos';
-import { JSONAPIDocument } from '../utils/JSONAPIDocument';
+import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 export default class MerchantInfoService {
   #didResolver = new Resolver(getResolver());

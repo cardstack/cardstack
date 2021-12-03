@@ -3,7 +3,7 @@ import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import { CardSpace } from '../../routes/card-spaces';
 import config from 'config';
-import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
+import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 export default class CardSpaceSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });

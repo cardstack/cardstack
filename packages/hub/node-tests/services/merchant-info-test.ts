@@ -1,5 +1,5 @@
 import MerchantInfoService from '../../services/merchant-info';
-import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
+import { JSONAPIDocument } from '../../utils/jsonapi-document';
 import { registry, setupHub } from '../helpers/server';
 
 describe('MerchantInfoService', function () {
