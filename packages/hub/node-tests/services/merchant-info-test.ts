@@ -57,4 +57,22 @@ describe('MerchantInfoService', function () {
 
     expect(result).to.be.null;
   });
+
+  it('returns null when there is no DID', async function () {
+    registry(this).register('merchant-info', MerchantInfoService);
+
+    let subject = await getContainer().lookup('merchant-info');
+    let result = await subject.getMerchantInfo(undefined);
+
+    expect(result).to.be.null;
+  });
+
+  it('returns null the DID is invalid', async function () {
+    registry(this).register('merchant-info', MerchantInfoService);
+
+    let subject = await getContainer().lookup('merchant-info');
+    let result = await subject.getMerchantInfo('did:cardstack:hey');
+
+    expect(result).to.be.null;
+  });
 });

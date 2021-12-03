@@ -13,7 +13,11 @@ export default class MerchantInfoService {
     as: 'merchantInfoSerializer',
   });
 
-  async getMerchantInfo(did: string): Promise<MerchantInfo | null> {
+  async getMerchantInfo(did?: string): Promise<MerchantInfo | null> {
+    if (!did) {
+      return null;
+    }
+
     try {
       let merchantInfo = await this.fetchMerchantInfo(did);
       return this.merchantInfoSerializer.deserialize(merchantInfo);
