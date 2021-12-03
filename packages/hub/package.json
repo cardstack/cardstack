@@ -30,6 +30,7 @@
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@cardstack/cardpay-sdk": "0.27.36",
+    "@cardstack/compiled": "0.27.36",
     "@cardstack/core": "0.27.36",
     "@cardstack/db": "0.27.36",
     "@cardstack/di": "0.27.36",

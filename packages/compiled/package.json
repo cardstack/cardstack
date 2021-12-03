@@ -6,6 +6,9 @@
     "ember-addon"
   ],
   "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
     ".": {
       "browser": "./browser",
       "default": "./node"
