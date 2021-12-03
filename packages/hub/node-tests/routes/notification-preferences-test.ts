@@ -604,5 +604,47 @@ describe('POST /api/notification-preferences', async function () {
         ],
       });
   });
+
+  it('should fail when mandatory attributes are not given', async function () {
+    await request()
+      .post('/api/notification-preferences')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send({
+        data: {
+          type: 'notification-preference',
+          attributes: {},
+        },
+      })
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: 'Must be present',
+            source: {
+              pointer: '/data/attributes/status',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail: 'Must be present',
+            source: {
+              pointer: '/data/attributes/notification-type',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail: 'Must be present',
+            source: {
+              pointer: '/data/attributes/push-client-id',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
   });
 });

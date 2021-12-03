@@ -5,6 +5,7 @@ import { ensureLoggedIn } from './utils/auth';
 import NotificationTypeQueries from '../services/queries/notification-type';
 import NotificationPreferenceQueries from '../services/queries/notification-preference';
 import NotificationPreferenceSerializer from '../services/serializers/notification-preference-serializer';
+import { serializeErrors } from './utils/error';
 
 export interface NotificationType {
   id: string;
@@ -81,6 +82,20 @@ export default class NotificationPreferencesRoute {
     let status = ctx.request.body.data.attributes['status'];
     let notificationType = ctx.request.body.data.attributes['notification-type'];
     let pushClientId = ctx.request.body.data.attributes['push-client-id'];
+
+    if (!status || !notificationType || !pushClientId) {
+      let errors = {} as any;
+      if (!status) errors['status'] = ['Must be present'];
+      if (!notificationType) errors['notification-type'] = ['Must be present'];
+      if (!pushClientId) errors['push-client-id'] = ['Must be present'];
+
+      ctx.status = 422;
+      ctx.body = {
+        errors: serializeErrors(errors),
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
 
     let notificationPreference = (
       await this.notificationPreferenceQueries.query({
