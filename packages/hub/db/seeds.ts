@@ -127,8 +127,8 @@ async function loadNotificationTypes(db: Client) {
     notification_type = excluded.notification_type,
     default_status = excluded.default_status;`;
   let rows = [
-    ['10b75b75-b855-42eb-893e-d223995b8872', 'merchant_revenue_claimed', 'enabled'],
-    ['1137c2b1-fb2e-45d2-9f62-d365b989d151', 'merchant_payment', 'enabled'],
+    ['10b75b75-b855-42eb-893e-d223995b8872', 'merchant_claim', 'enabled'],
+    ['1137c2b1-fb2e-45d2-9f62-d365b989d151', 'customer_payment', 'enabled'],
   ];
   let sql = pgFormat(query, rows);
   console.log(sql);

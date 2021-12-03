@@ -36,12 +36,12 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
     let db = await dbManager.getClient();
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
-      'merchant_revenue_claimed',
+      'merchant_claim',
       'enabled',
     ]);
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '2cbe34e4-f41d-41d5-b7d2-ee875dc7c588',
-      'merchant_payment',
+      'customer_payment',
       'enabled',
     ]);
   });
@@ -79,7 +79,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'enabled',
             },
           },
@@ -88,7 +88,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'enabled',
             },
           },
@@ -103,7 +103,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
     await notificationPreferenceQueries.insert({
       ownerAddress: stubUserAddress,
       pushClientId,
-      notificationType: 'merchant_payment',
+      notificationType: 'customer_payment',
       status: 'disabled',
     });
 
@@ -121,7 +121,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'enabled',
             },
           },
@@ -130,7 +130,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'disabled',
             },
           },
@@ -149,12 +149,12 @@ describe('POST /api/notification-preferences', async function () {
     let db = await dbManager.getClient();
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
-      'merchant_revenue_claimed',
+      'merchant_claim',
       'enabled',
     ]);
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '2cbe34e4-f41d-41d5-b7d2-ee875dc7c588',
-      'merchant_payment',
+      'customer_payment',
       'enabled',
     ]);
   });
@@ -185,7 +185,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -200,7 +200,7 @@ describe('POST /api/notification-preferences', async function () {
           attributes: {
             'owner-address': stubUserAddress,
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -210,13 +210,13 @@ describe('POST /api/notification-preferences', async function () {
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
-      notificationType: 'merchant_revenue_claimed',
+      notificationType: 'merchant_claim',
     });
 
     expect(records.length).to.equal(1);
     expect(records[0].ownerAddress).to.equal(stubUserAddress);
     expect(records[0].pushClientId).to.equal('1234567');
-    expect(records[0].notificationType).to.equal('merchant_revenue_claimed');
+    expect(records[0].notificationType).to.equal('merchant_claim');
     expect(records[0].status).to.equal('disabled');
 
     await request()
@@ -233,7 +233,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'disabled',
             },
           },
@@ -242,7 +242,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'enabled',
             },
           },
@@ -255,7 +255,7 @@ describe('POST /api/notification-preferences', async function () {
     await notificationPreferenceQueries.insert({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
-      notificationType: 'merchant_payment',
+      notificationType: 'customer_payment',
       status: 'disabled',
     });
 
@@ -266,7 +266,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_payment',
+            'notification-type': 'customer_payment',
             status: 'disabled',
           },
         },
@@ -281,7 +281,7 @@ describe('POST /api/notification-preferences', async function () {
           attributes: {
             'owner-address': stubUserAddress,
             'push-client-id': '1234567',
-            'notification-type': 'merchant_payment',
+            'notification-type': 'customer_payment',
             status: 'disabled',
           },
         },
@@ -295,7 +295,7 @@ describe('POST /api/notification-preferences', async function () {
     expect(records.length).to.equal(1);
     expect(records[0].ownerAddress).to.equal(stubUserAddress);
     expect(records[0].pushClientId).to.equal('1234567');
-    expect(records[0].notificationType).to.equal('merchant_payment');
+    expect(records[0].notificationType).to.equal('customer_payment');
     expect(records[0].status).to.equal('disabled');
 
     await request()
@@ -312,7 +312,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'enabled',
             },
           },
@@ -321,7 +321,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'disabled',
             },
           },
@@ -337,7 +337,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -352,7 +352,7 @@ describe('POST /api/notification-preferences', async function () {
           attributes: {
             'owner-address': stubUserAddress,
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -366,7 +366,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -381,7 +381,7 @@ describe('POST /api/notification-preferences', async function () {
           attributes: {
             'push-client-id': '1234567',
             'owner-address': stubUserAddress,
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -401,7 +401,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'disabled',
             },
           },
@@ -410,7 +410,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'enabled',
             },
           },
@@ -429,7 +429,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -443,7 +443,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'enabled',
           },
         },
@@ -460,7 +460,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_payment',
+            'notification-type': 'customer_payment',
             status: 'disabled',
           },
         },
@@ -477,7 +477,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_payment',
+            'notification-type': 'customer_payment',
             status: 'enabled',
           },
         },
@@ -495,16 +495,16 @@ describe('POST /api/notification-preferences', async function () {
 
     expect(records.length).to.equal(2);
 
-    let revenueClaimedPreference = records.find((r) => r.notificationType === 'merchant_revenue_claimed')!;
-    let merchantPaymentPreference = records.find((r) => r.notificationType === 'merchant_payment')!;
+    let revenueClaimedPreference = records.find((r) => r.notificationType === 'merchant_claim')!;
+    let merchantPaymentPreference = records.find((r) => r.notificationType === 'customer_payment')!;
 
     expect(revenueClaimedPreference.ownerAddress).to.equal(stubUserAddress);
     expect(revenueClaimedPreference.pushClientId).to.equal('1234567');
-    expect(revenueClaimedPreference.notificationType).to.equal('merchant_revenue_claimed');
+    expect(revenueClaimedPreference.notificationType).to.equal('merchant_claim');
     expect(revenueClaimedPreference.status).to.equal('enabled');
     expect(merchantPaymentPreference.ownerAddress).to.equal(stubUserAddress);
     expect(merchantPaymentPreference.pushClientId).to.equal('1234567');
-    expect(merchantPaymentPreference.notificationType).to.equal('merchant_payment');
+    expect(merchantPaymentPreference.notificationType).to.equal('customer_payment');
     expect(merchantPaymentPreference.status).to.equal('enabled');
   });
 
@@ -519,7 +519,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '1234567',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -536,7 +536,7 @@ describe('POST /api/notification-preferences', async function () {
           type: 'notification-preference',
           attributes: {
             'push-client-id': '7654321',
-            'notification-type': 'merchant_revenue_claimed',
+            'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
@@ -558,7 +558,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'disabled',
             },
           },
@@ -567,7 +567,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '1234567',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'enabled',
             },
           },
@@ -588,7 +588,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '7654321',
-              'notification-type': 'merchant_revenue_claimed',
+              'notification-type': 'merchant_claim',
               status: 'disabled',
             },
           },
@@ -597,7 +597,7 @@ describe('POST /api/notification-preferences', async function () {
             attributes: {
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'push-client-id': '7654321',
-              'notification-type': 'merchant_payment',
+              'notification-type': 'customer_payment',
               status: 'enabled',
             },
           },
