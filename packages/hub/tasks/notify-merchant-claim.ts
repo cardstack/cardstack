@@ -65,7 +65,7 @@ export default class NotifyMerchantClaim {
         merchantName = ` ${merchantInfo.name}`;
       }
     } catch (e) {
-      // What is to be done? Sentry? Does it matter?
+      // Silently ignore and just show notification without merchant name
     }
 
     let token = result.token.symbol;
