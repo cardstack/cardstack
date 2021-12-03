@@ -88,8 +88,7 @@ const XDAI = {
   rpcArchiveNode:
     'https://apis.ankr.com/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
-  rpcWssNodeNext:
-    'wss://apis.ankr.com/wss/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
+  rpcWssNodeNext: 'wss://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
