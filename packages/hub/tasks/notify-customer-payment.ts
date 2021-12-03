@@ -12,7 +12,7 @@ export interface PrepaidCardPaymentsQueryResult {
       };
       merchantSafe: {
         id: string;
-        infoDid: string;
+        infoDid: string | undefined;
       };
       merchant: {
         id: string;
@@ -72,8 +72,10 @@ export default class NotifyCustomerPayment {
     let merchantName = '';
 
     try {
-      let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
-      merchantName = ` ${merchantInfo.name}`;
+      if (result.merchantSafe?.infoDid) {
+        let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+        merchantName = ` ${merchantInfo.name}`;
+      }
     } catch (e) {
       // What is to be done? Sentry? Does it matter?
     }

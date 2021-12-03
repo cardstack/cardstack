@@ -129,6 +129,36 @@ describe('NotifyCustomerPaymentTask', function () {
     });
   });
 
+  it('omits the merchant name when there is no DID', async function () {
+    mockData.value = {
+      prepaidCardOwner: {
+        id: 'prepaid-card-eoa-address',
+      },
+      merchant: {
+        id: 'eoa-address',
+      },
+      merchantSafe: {
+        id: 'merchant-safe-address',
+        infoDid: undefined,
+      },
+      issuingToken: {
+        symbol: 'DAI.CPXD',
+      },
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+    };
+
+    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+
+    await task.perform('a');
+
+    expect(lastAddedJobIdentifier).to.equal('send-notifications');
+    expect(lastAddedJobPayload).to.deep.equal({
+      notifiedAddress: 'eoa-address',
+      message: `Your business received a payment of §2324`,
+    });
+  });
+
   it('throws when the transaction is not found on the subgraph', async function () {
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
