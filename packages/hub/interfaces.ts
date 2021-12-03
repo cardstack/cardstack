@@ -11,7 +11,7 @@ export const ENVIRONMENTS = Object.keys(ENVIRONMENTS_OBJ) as Environment[];
 export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
 
-export interface CardStackContext {
+export interface CardstackContext {
   builder: Builder;
   cardRouter: any;
   realms: RealmManager;

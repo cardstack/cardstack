@@ -1,5 +1,6 @@
-import { CompiledCard, Field } from './interfaces';
-import { flow, upperFirst, camelCase } from 'lodash';
+import flow from 'lodash/flow';
+import upperFirst from 'lodash/upperFirst';
+import camelCase from 'lodash/camelCase';
 
 const SPECIAL_CHAR_REPLACEMENT = '-';
 
@@ -12,17 +13,12 @@ export function encodeCardURL(url: string): string {
     .replace(/([;,/?:@&=+$])/g, SPECIAL_CHAR_REPLACEMENT);
 }
 
-export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
-  let paths = path.split('.');
-  let [first, ...tail] = paths;
+export function resolveCardURL(url: string, base: string): string {
+  return new URL(url, ensureTrailingSlash(base)).href;
+}
 
-  let field = fields[first];
-
-  if (paths.length > 1) {
-    return getFieldForPath(field.card.fields, tail.join('.'));
-  }
-
-  return field;
+export function ensureTrailingSlash(p: string): string {
+  return p.replace(/\/$/, '') + '/';
 }
 
 export function getBasenameAndExtension(filename: string): {

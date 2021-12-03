@@ -14,9 +14,9 @@ const WALLET_PANEL = {
       workflow: 'issue-prepaid-card',
       icon: 'prepaid-cards',
       title: 'Issue a prepaid card',
-      description: `Use available balance in your business account or depot to issue a prepaid card.`,
+      description: `Use the available balance in your business account or depot to issue a prepaid card.`,
       bullets: [
-        'Choose your own design for your prepaid card.',
+        'Choose your own design for your prepaid card',
         `Issue your prepaid card with ${c.layer2.daiToken}`,
       ],
       cta: 'Issue Prepaid Card',

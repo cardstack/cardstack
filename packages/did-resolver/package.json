@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/did-resolver",
-  "version": "0.27.36",
+  "version": "0.27.37",
   "description": "A javascript resolver for the cardstack DID method",
   "main": "./index.js",
   "author": "Cardstack Team",
@@ -15,8 +15,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.27.36",
-    "@cardstack/test-support": "0.27.36",
+    "@cardstack/eslint-config": "0.27.37",
+    "@cardstack/test-support": "0.27.37",
     "@types/chai": "^4.2.15",
     "@types/lodash": "^4.14.169",
     "@types/mocha": "^8.2.1",
