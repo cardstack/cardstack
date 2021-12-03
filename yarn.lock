@@ -2571,12 +2571,12 @@
     semver "^7.3.5"
 
 "@embroider/addon-shim@*":
-  version "0.43.5"
-  resolved "https://registry.yarnpkg.com/@embroider/addon-shim/-/addon-shim-0.43.5.tgz#5018ced38dc84089b455ca1be7f32b82eddb88ca"
-  integrity sha512-nUcAwQX0KrxSev+EjBUlx/fvbBzWi89n4DWeEB9spVlRRDQ1WduVSao3vjxiAABWmCG4nLzNPwtDgTlwTOI62g==
+  version "0.47.2"
+  resolved "https://registry.yarnpkg.com/@embroider/addon-shim/-/addon-shim-0.47.2.tgz#a1dc77e8cf00d2c797f6551cba9a6868d8166fec"
+  integrity sha512-5M/q5CdrTyInczKlH+f54vpoMROz/DrbMTWSHHauFx5grCyLROkgY8iVcmZEF8H0h7LFO74RpB42fo2w6NcgdA==
   dependencies:
-    "@embroider/shared-internals" "^0.43.5"
-    ember-auto-import "^2.0.1"
+    "@embroider/shared-internals" "^0.47.2"
+    ember-auto-import "^2.2.0"
     semver "^7.3.5"
 
 "@embroider/babel-loader-7@0.41.0":
@@ -2980,11 +2980,12 @@
     semver "^7.3.5"
     typescript-memoize "^1.0.1"
 
-"@embroider/shared-internals@^0.43.5":
-  version "0.43.5"
-  resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-0.43.5.tgz#4269208095452c23bfa4f08554fd8f7ed7b83a83"
-  integrity sha512-vydU3kRS5hH/hWOBHiHP06427d0C5t2p+UTPtbH09+Jlyj0WvvtgUfiNltEneY6jjpLXlqOfgs4LjsRdmBFksw==
+"@embroider/shared-internals@^0.47.2":
+  version "0.47.2"
+  resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-0.47.2.tgz#24e9fa0dd9c529d5c996ee1325729ea08d1fa19f"
+  integrity sha512-SxdZYjAE0fiM5zGDz+12euWIsQZ1tsfR1k+NKmiWMyLhA5T3pNgbR2/Djvx/cVIxOtEavGGSllYbzRKBtV4xMg==
   dependencies:
+    babel-import-util "^0.2.0"
     ember-rfc176-data "^0.3.17"
     fs-extra "^9.1.0"
     lodash "^4.17.21"
@@ -8246,7 +8247,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.8.0.tgz#f0e003d9ca9e7f59c7a508945d7b2ef9a04a542f"
   integrity sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
 
-axe-core@^4.1.4:
+axe-core@4.1.4, axe-core@^4.1.4:
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.4.tgz#f19cd99a84ee32a318b9c5b5bb8ed373ad94f143"
   integrity sha512-Pdgfv6iP0gNx9ejRGa3zE7Xgkj/iclXqLfe7BnatdZz0QnLZ3jrRHUVH8wNSdN68w05Sk3ShGTb3ydktMTooig==
@@ -12639,7 +12640,7 @@ elliptic@6.5.4, elliptic@^6.0.0, elliptic@^6.4.0, elliptic@^6.5.2:
     minimalistic-assert "^1.0.1"
     minimalistic-crypto-utils "^1.0.1"
 
-ember-a11y-testing@^4.0.3:
+ember-a11y-testing@4.0.3, ember-a11y-testing@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/ember-a11y-testing/-/ember-a11y-testing-4.0.3.tgz#1f5c91266d39ea5b20614b0d294a562079887ac7"
   integrity sha512-Q7nq2crC9+bT+sZi/BORAM4FUhI080edEhnpsvB6vdkD9Ro2Rg4DksQs5Be65/DM108VNDMtbHZtrPS060Mzcw==
@@ -12784,7 +12785,7 @@ ember-auto-import@^1.11.3:
     walk-sync "^0.3.3"
     webpack "^4.43.0"
 
-ember-auto-import@^2.0.0, ember-auto-import@^2.0.1, ember-auto-import@^2.0.2:
+ember-auto-import@^2.0.0, ember-auto-import@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-2.0.2.tgz#bd25191fbce58c4c91ca1789e5514de4fc7ee9d4"
   integrity sha512-mBtHZCmFQvAnq31sM1PHvHRQWkI2p/T2VZ0Y7c+HE2BGUkY/2AW0wMhw3uhpivIr3WRbRIiYwYPVNtInNL7TwA==
@@ -12821,6 +12822,44 @@ ember-auto-import@^2.0.0, ember-auto-import@^2.0.1, ember-auto-import@^2.0.2:
     semver "^7.3.4"
     style-loader "^2.0.0"
     symlink-or-copy "^1.2.0"
+    typescript-memoize "^1.0.0-alpha.3"
+    walk-sync "^0.3.3"
+
+ember-auto-import@^2.2.0:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-2.2.4.tgz#68c08cb0b7533293024c97387fc449b00561185a"
+  integrity sha512-iXHH+bSMP/uWvJmIhjt+PZz4ymqOLccIxZUouVcUFLKA5EAWE7gamlA684m0pIbSE/V9zKpOul4OfIgKXFprBg==
+  dependencies:
+    "@babel/core" "^7.1.6"
+    "@babel/plugin-proposal-class-properties" "^7.13.0"
+    "@babel/plugin-proposal-decorators" "^7.13.5"
+    "@babel/preset-env" "^7.10.2"
+    "@babel/traverse" "^7.1.6"
+    "@embroider/shared-internals" "^0.40.0"
+    babel-loader "^8.0.6"
+    babel-plugin-ember-modules-api-polyfill "^3.5.0"
+    babel-plugin-htmlbars-inline-precompile "^5.2.1"
+    babel-plugin-syntax-dynamic-import "^6.18.0"
+    broccoli-debug "^0.6.4"
+    broccoli-funnel "^3.0.8"
+    broccoli-merge-trees "^4.2.0"
+    broccoli-plugin "^4.0.0"
+    broccoli-source "^3.0.0"
+    css-loader "^5.2.0"
+    debug "^4.3.1"
+    ember-cli-babel "^7.0.0"
+    fs-extra "^6.0.1"
+    fs-tree-diff "^2.0.0"
+    handlebars "^4.3.1"
+    js-string-escape "^1.0.1"
+    lodash "^4.17.19"
+    mkdirp "^0.5.1"
+    parse5 "^6.0.1"
+    resolve "^1.20.0"
+    resolve-package-path "^3.1.0"
+    rimraf "^2.6.2"
+    semver "^7.3.4"
+    style-loader "^2.0.0"
     typescript-memoize "^1.0.0-alpha.3"
     walk-sync "^0.3.3"
 
