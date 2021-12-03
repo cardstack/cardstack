@@ -136,5 +136,15 @@ module.exports = {
       module: /node_modules\/import-fresh\/index\.js$/,
       message: /the request of a dependency is an expression/,
     },
+    {
+      // for formidable's testing which hijacks the require function
+      module: /node_modules\/formidable\/lib\/(querystring_parser|json_parser|incoming_form|file)\.js$/,
+      message: /require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+    {
+      // for voice support that we don't use
+      module: /node_modules\/discord\.js\/src\/client\/voice\/util\/Secretbox\.js$/,
+      message: /the request of a dependency is an expression/,
+    },
   ],
 };
