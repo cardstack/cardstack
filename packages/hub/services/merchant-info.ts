@@ -3,6 +3,8 @@ import { inject } from '@cardstack/di';
 
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
+import { MerchantInfo } from '../routes/merchant-infos';
+import { JSONAPIDocument } from '../utils/JSONAPIDocument';
 
 export default class MerchantInfoService {
   #didResolver = new Resolver(getResolver());
@@ -11,12 +13,12 @@ export default class MerchantInfoService {
     as: 'merchantInfoSerializer',
   });
 
-  async getMerchantInfo(did: string): Promise<any> {
+  async getMerchantInfo(did: string): Promise<MerchantInfo> {
     let merchantInfo = await this.fetchMerchantInfo(did);
     return this.merchantInfoSerializer.deserialize(merchantInfo);
   }
 
-  async fetchMerchantInfo(did: string): Promise<any> {
+  async fetchMerchantInfo(did: string): Promise<JSONAPIDocument> {
     let didResult = await this.#didResolver.resolve(did);
     let alsoKnownAs = didResult?.didDocument?.alsoKnownAs;
 
