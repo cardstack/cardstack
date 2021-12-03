@@ -12,6 +12,7 @@ export default class NotificationPreferenceSerializer {
         type: 'notification-preference',
         attributes: {
           'owner-address': model.ownerAddress,
+          'push-client-id': model.pushClientId,
           'notification-type': model.notificationType,
           status: model.status,
         },

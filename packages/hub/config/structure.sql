@@ -787,6 +787,7 @@ ALTER TABLE public.merchant_infos OWNER TO postgres;
 CREATE TABLE public.notification_preferences (
     owner_address text NOT NULL,
     notification_type_id uuid NOT NULL,
+    push_client_id text NOT NULL,
     status public.notification_preferences_status_enum DEFAULT 'enabled'::public.notification_preferences_status_enum NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -1191,10 +1192,10 @@ CREATE INDEX notification_preferences_owner_address_index ON public.notification
 
 
 --
--- Name: notification_preferences_owner_address_notification_type_id_uni; Type: INDEX; Schema: public; Owner: postgres
+-- Name: notification_preferences_owner_address_notification_type_id_pus; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE UNIQUE INDEX notification_preferences_owner_address_notification_type_id_uni ON public.notification_preferences USING btree (owner_address, notification_type_id);
+CREATE UNIQUE INDEX notification_preferences_owner_address_notification_type_id_pus ON public.notification_preferences USING btree (owner_address, notification_type_id, push_client_id);
 
 
 --

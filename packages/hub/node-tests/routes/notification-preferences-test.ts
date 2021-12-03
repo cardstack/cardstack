@@ -26,7 +26,7 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe('GET /api/notification-preferences', async function () {
+describe('GET /api/notification-preferences/:push_client_id', async function () {
   let { request, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
@@ -48,7 +48,7 @@ describe('GET /api/notification-preferences', async function () {
 
   it('returns 401 without bearer token', async function () {
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/PUSH_CLIENT_ID')
       .send({})
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -64,9 +64,9 @@ describe('GET /api/notification-preferences', async function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('returns default preferences when none are defined for an EOA', async function () {
+  it('returns default preferences when none are defined for the EOA/device pair', async function () {
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/1234567')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -77,16 +77,18 @@ describe('GET /api/notification-preferences', async function () {
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_revenue_claimed',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
               status: 'enabled',
             },
           },
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_payment',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
               status: 'enabled',
             },
           },
@@ -94,19 +96,19 @@ describe('GET /api/notification-preferences', async function () {
       });
   });
 
-  it('returns overriden preference when EOA has a preference saved', async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    let db = await dbManager.getClient();
+  it('returns overriden preference when EOA/device pair has a preference saved', async function () {
+    let pushClientId = '1234567';
 
-    let merchantRevenueClaimedNotificationId = '73994d4b-bb3a-4d73-969f-6fa24da16fb4';
-
-    await db.query(
-      'INSERT INTO notification_preferences(owner_address, notification_type_id, status) VALUES($1, $2, $3)',
-      [stubUserAddress, merchantRevenueClaimedNotificationId, 'disabled']
-    );
+    let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
+    await notificationPreferenceQueries.insert({
+      ownerAddress: stubUserAddress,
+      pushClientId,
+      notificationType: 'merchant_payment',
+      status: 'disabled',
+    });
 
     await request()
-      .get('/api/notification-preferences')
+      .get(`/api/notification-preferences/${pushClientId}`)
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -117,17 +119,19 @@ describe('GET /api/notification-preferences', async function () {
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_revenue_claimed',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
-              status: 'disabled',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
+              status: 'enabled',
             },
           },
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_payment',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
-              status: 'enabled',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
+              status: 'disabled',
             },
           },
         ],
@@ -157,7 +161,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('returns 401 without bearer token', async function () {
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/1234567')
       .send({})
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -180,6 +184,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
@@ -193,8 +198,9 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'notification-type': 'merchant_revenue_claimed',
             'owner-address': stubUserAddress,
+            'push-client-id': '1234567',
+            'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
         },
@@ -203,16 +209,18 @@ describe('POST /api/notification-preferences', async function () {
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
+      pushClientId: '1234567',
       notificationType: 'merchant_revenue_claimed',
     });
 
     expect(records.length).to.equal(1);
     expect(records[0].ownerAddress).to.equal(stubUserAddress);
+    expect(records[0].pushClientId).to.equal('1234567');
     expect(records[0].notificationType).to.equal('merchant_revenue_claimed');
     expect(records[0].status).to.equal('disabled');
 
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/1234567')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -223,16 +231,18 @@ describe('POST /api/notification-preferences', async function () {
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_revenue_claimed',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
               status: 'disabled',
             },
           },
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_payment',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
               status: 'enabled',
             },
           },
@@ -244,6 +254,7 @@ describe('POST /api/notification-preferences', async function () {
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
     await notificationPreferenceQueries.insert({
       ownerAddress: stubUserAddress,
+      pushClientId: '1234567',
       notificationType: 'merchant_payment',
       status: 'disabled',
     });
@@ -254,6 +265,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_payment',
             status: 'disabled',
           },
@@ -267,8 +279,9 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'notification-type': 'merchant_payment',
             'owner-address': stubUserAddress,
+            'push-client-id': '1234567',
+            'notification-type': 'merchant_payment',
             status: 'disabled',
           },
         },
@@ -276,15 +289,17 @@ describe('POST /api/notification-preferences', async function () {
 
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
+      pushClientId: '1234567',
     });
 
     expect(records.length).to.equal(1);
     expect(records[0].ownerAddress).to.equal(stubUserAddress);
+    expect(records[0].pushClientId).to.equal('1234567');
     expect(records[0].notificationType).to.equal('merchant_payment');
     expect(records[0].status).to.equal('disabled');
 
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/1234567')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -295,16 +310,18 @@ describe('POST /api/notification-preferences', async function () {
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_revenue_claimed',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
               status: 'enabled',
             },
           },
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_payment',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
               status: 'disabled',
             },
           },
@@ -319,6 +336,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
@@ -332,8 +350,9 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'notification-type': 'merchant_revenue_claimed',
             'owner-address': stubUserAddress,
+            'push-client-id': '1234567',
+            'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
         },
@@ -346,6 +365,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
@@ -359,15 +379,16 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'notification-type': 'merchant_revenue_claimed',
+            'push-client-id': '1234567',
             'owner-address': stubUserAddress,
+            'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
         },
       });
 
     await request()
-      .get('/api/notification-preferences')
+      .get('/api/notification-preferences/1234567')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -378,16 +399,18 @@ describe('POST /api/notification-preferences', async function () {
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_revenue_claimed',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
               status: 'disabled',
             },
           },
           {
             type: 'notification-preference',
             attributes: {
-              'notification-type': 'merchant_payment',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
               status: 'enabled',
             },
           },
@@ -405,6 +428,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_revenue_claimed',
             status: 'disabled',
           },
@@ -418,6 +442,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_revenue_claimed',
             status: 'enabled',
           },
@@ -434,6 +459,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_payment',
             status: 'disabled',
           },
@@ -450,6 +476,7 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
+            'push-client-id': '1234567',
             'notification-type': 'merchant_payment',
             status: 'enabled',
           },
@@ -463,14 +490,119 @@ describe('POST /api/notification-preferences', async function () {
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
+      pushClientId: '1234567',
     });
 
     expect(records.length).to.equal(2);
-    expect(records[0].ownerAddress).to.equal(stubUserAddress);
-    expect(records[0].notificationType).to.equal('merchant_revenue_claimed');
-    expect(records[0].status).to.equal('enabled');
-    expect(records[1].ownerAddress).to.equal(stubUserAddress);
-    expect(records[1].notificationType).to.equal('merchant_payment');
-    expect(records[1].status).to.equal('enabled');
+
+    let revenueClaimedPreference = records.find((r) => r.notificationType === 'merchant_revenue_claimed')!;
+    let merchantPaymentPreference = records.find((r) => r.notificationType === 'merchant_payment')!;
+
+    expect(revenueClaimedPreference.ownerAddress).to.equal(stubUserAddress);
+    expect(revenueClaimedPreference.pushClientId).to.equal('1234567');
+    expect(revenueClaimedPreference.notificationType).to.equal('merchant_revenue_claimed');
+    expect(revenueClaimedPreference.status).to.equal('enabled');
+    expect(merchantPaymentPreference.ownerAddress).to.equal(stubUserAddress);
+    expect(merchantPaymentPreference.pushClientId).to.equal('1234567');
+    expect(merchantPaymentPreference.notificationType).to.equal('merchant_payment');
+    expect(merchantPaymentPreference.status).to.equal('enabled');
+  });
+
+  it('allows creating preferences for multiple devices on a single EOA', async function () {
+    await request()
+      .post('/api/notification-preferences')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send({
+        data: {
+          type: 'notification-preference',
+          attributes: {
+            'push-client-id': '1234567',
+            'notification-type': 'merchant_revenue_claimed',
+            status: 'disabled',
+          },
+        },
+      })
+      .expect(201);
+
+    await request()
+      .post('/api/notification-preferences')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send({
+        data: {
+          type: 'notification-preference',
+          attributes: {
+            'push-client-id': '7654321',
+            'notification-type': 'merchant_revenue_claimed',
+            status: 'disabled',
+          },
+        },
+      })
+      .expect(201);
+
+    // At this point, an EOA should have two sets of notification preferences, for each device
+    await request()
+      .get('/api/notification-preferences/1234567')
+      .send({})
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: [
+          {
+            type: 'notification-preference',
+            attributes: {
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_revenue_claimed',
+              status: 'disabled',
+            },
+          },
+          {
+            type: 'notification-preference',
+            attributes: {
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '1234567',
+              'notification-type': 'merchant_payment',
+              status: 'enabled',
+            },
+          },
+        ],
+      });
+
+    await request()
+      .get('/api/notification-preferences/7654321')
+      .send({})
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: [
+          {
+            type: 'notification-preference',
+            attributes: {
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '7654321',
+              'notification-type': 'merchant_revenue_claimed',
+              status: 'disabled',
+            },
+          },
+          {
+            type: 'notification-preference',
+            attributes: {
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              'push-client-id': '7654321',
+              'notification-type': 'merchant_payment',
+              status: 'enabled',
+            },
+          },
+        ],
+      });
+  });
   });
 });

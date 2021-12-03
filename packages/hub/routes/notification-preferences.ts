@@ -14,6 +14,7 @@ export interface NotificationType {
 
 export interface NotificationPreference {
   ownerAddress: string;
+  pushClientId: string;
   notificationType: string;
   status: 'enabled' | 'disabled';
 }
@@ -42,10 +43,16 @@ export default class NotificationPreferencesRoute {
     let notificationTypes = await this.notificationTypeQueries.query();
     let notificationPreferences = await this.notificationPreferenceQueries.query({
       ownerAddress: ctx.state.userAddress,
+      pushClientId: ctx.params.push_client_id,
     });
 
     let defaultPreferences = notificationTypes.map((nt) => {
-      return { status: nt.defaultStatus, notificationType: nt.notificationType, ownerAddress: ctx.state.userAddress };
+      return {
+        status: nt.defaultStatus,
+        notificationType: nt.notificationType,
+        ownerAddress: ctx.state.userAddress,
+        pushClientId: ctx.params.push_client_id,
+      };
     });
 
     let preferences: NotificationPreference[] = defaultPreferences.map((defaultPreference) => {
@@ -73,10 +80,12 @@ export default class NotificationPreferencesRoute {
 
     let status = ctx.request.body.data.attributes['status'];
     let notificationType = ctx.request.body.data.attributes['notification-type'];
+    let pushClientId = ctx.request.body.data.attributes['push-client-id'];
 
     let notificationPreference = (
       await this.notificationPreferenceQueries.query({
         ownerAddress: ctx.state.userAddress,
+        pushClientId,
         notificationType,
       })
     )[0];
@@ -84,12 +93,14 @@ export default class NotificationPreferencesRoute {
     if (notificationPreference) {
       await this.notificationPreferenceQueries.update({
         ownerAddress: ctx.state.userAddress,
+        pushClientId,
         notificationType,
         status,
       });
     } else {
       await this.notificationPreferenceQueries.insert({
         ownerAddress: ctx.state.userAddress,
+        pushClientId,
         notificationType,
         status,
       });
@@ -97,9 +108,11 @@ export default class NotificationPreferencesRoute {
 
     let serialized = this.notificationPreferenceSerializer.serialize({
       ownerAddress: ctx.state.userAddress,
+      pushClientId,
       notificationType,
       status,
     });
+
     ctx.status = 201;
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
