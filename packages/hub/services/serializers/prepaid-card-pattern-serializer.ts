@@ -1,16 +1,12 @@
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
+import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
 
 interface PrepaidCardPattern {
   id: string;
   patternUrl?: string;
   description: string;
 }
-interface JSONAPIDocument {
-  data: any;
-  included?: any[];
-}
-
 export default class PrepaidCardPatternSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 

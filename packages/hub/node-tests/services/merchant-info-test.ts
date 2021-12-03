@@ -1,10 +1,6 @@
 import MerchantInfoService from '../../services/merchant-info';
+import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
 import { registry, setupHub } from '../helpers/server';
-
-interface JSONAPIDocument {
-  data: any;
-  included?: any[];
-}
 
 describe('MerchantInfoService', function () {
   let { getContainer } = setupHub(this);

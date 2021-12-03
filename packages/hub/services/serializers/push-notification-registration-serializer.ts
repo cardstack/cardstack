@@ -1,9 +1,5 @@
 import { PushNotificationRegistration } from '../../routes/push_notification_registrations';
-
-interface JSONAPIDocument {
-  data: any;
-  included?: any[];
-}
+import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
 
 export default class PushNotificationRegistrationSerializer {
   serialize(model: PushNotificationRegistration): JSONAPIDocument {

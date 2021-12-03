@@ -3,11 +3,7 @@ import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import { MerchantInfo } from '../../routes/merchant-infos';
 import config from 'config';
-
-interface JSONAPIDocument {
-  data: any;
-  included?: any[];
-}
+import { JSONAPIDocument } from '../../utils/JSONAPIDocument';
 
 export default class MerchantInfoSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
