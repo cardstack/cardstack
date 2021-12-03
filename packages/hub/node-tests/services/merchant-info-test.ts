@@ -42,4 +42,19 @@ describe('MerchantInfoService', function () {
       ownerAddress: '0x323B2318F35c6b31113342830204335Dac715AA8',
     });
   });
+
+  it('returns null when the fetch fails', async function () {
+    class PatchedMerchantInfoService extends MerchantInfoService {
+      async fetchMerchantInfo(): Promise<JSONAPIDocument> {
+        throw new Error('Simulated merchant info fetch failure');
+      }
+    }
+
+    registry(this).register('merchant-info', PatchedMerchantInfoService);
+
+    let subject = await getContainer().lookup('merchant-info');
+    let result = await subject.getMerchantInfo('did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62');
+
+    expect(result).to.be.null;
+  });
 });

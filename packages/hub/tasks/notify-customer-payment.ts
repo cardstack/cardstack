@@ -74,7 +74,10 @@ export default class NotifyCustomerPayment {
     try {
       if (result.merchantSafe?.infoDid) {
         let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
-        merchantName = ` ${merchantInfo.name}`;
+
+        if (merchantInfo) {
+          merchantName = ` ${merchantInfo.name}`;
+        }
       }
     } catch (e) {
       // Silently ignore and just show notification without merchant name
