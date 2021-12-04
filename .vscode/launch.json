@@ -746,9 +746,8 @@
         "add-reward-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", //single owner safe
         "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
-        // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
-        "5",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        "5.5",
         "--network",
         "sokol",
         "--mnemonic",
@@ -765,8 +764,8 @@
       "args": [
         "reward-pool-balance",
         "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program id
-        // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        // "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
         "--network",
         "sokol",
         "--mnemonic",
