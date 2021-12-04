@@ -693,8 +693,8 @@
       "args": [
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
-        "--rewardProgramId",
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115",
+        // "--rewardProgramId",
+        // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         "--network",
         "sokol",
         "--mnemonic",
@@ -728,7 +728,7 @@
       "args": [
         "register-rewardee",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e",
         "--network",
         "sokol",
         "--mnemonic",
@@ -745,9 +745,9 @@
       "args": [
         "add-reward-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", //single owner safe
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
-        "5",
+        "5.5",
         "--network",
         "sokol",
         "--mnemonic",
@@ -763,8 +763,9 @@
       "env": {},
       "args": [
         "reward-pool-balance",
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program id
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program id
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        // "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
         "--network",
         "sokol",
         "--mnemonic",
@@ -780,12 +781,11 @@
       "env": {},
       "args": [
         "claim-rewards",
-        "0x7f4B3963E6B65Fb09445C0E62993d9343eb55434", //reward safe
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program id
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
-        "0x00000000000000000000000000000000000000000000000000000000000001cd0000000000000000000000000000000000000000000000000de0b6b3a7640000",
-        // "--amount",
-        // "1",
+        "0x94461BA263cbb97A25af010530f94132Ad513926", //reward safe
+        "0x00000000000000000000000065db507b9d24f12926d08c1e8bceaa0790b6277e00000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+        "0x686daa4aa9d1df6acef91e382cdf8a846f02b8e374905a0b83ac3a90f2e540fe",
+        "--acceptPartialClaim",
+        "false",
         "--network",
         "sokol",
         "--mnemonic",
@@ -803,9 +803,9 @@
         "claimable-reward-proofs",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         "--rewardProgramId",
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115",
-        // "--tokenAddress",
-        // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        "--tokenAddress",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
         "--network",
         "sokol",
         "--mnemonic",
@@ -822,7 +822,7 @@
       "args": [
         "lock-reward-program",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
         "--network",
         "sokol",
         "--mnemonic",
@@ -838,7 +838,7 @@
       "env": {},
       "args": [
         "is-reward-program-locked",
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
         "--network",
         "sokol",
         "--mnemonic",
@@ -855,7 +855,7 @@
       "args": [
         "update-reward-program-admin",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
         "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
         "--network",
         "sokol",
@@ -872,7 +872,7 @@
       "env": {},
       "args": [
         "reward-program-admin",
-        "0x2E3C67B93082CC9EA68334f1eb0259E822973115", //reward program
+        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
         "--network",
         "sokol",
         "--mnemonic",
@@ -888,8 +888,7 @@
       "env": {},
       "args": [
         "withdraw-reward-safe",
-        "0x7f4B3963E6B65Fb09445C0E62993d9343eb55434", //reward safe
-        // "0x908630DFdE60552DAF5291C7081cF2fD475CB368", //reward safe
+        "0xE276B68129a51376350855BaAEfcf756D1e5CDF7", //reward safe
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         "1", // amount (in ether units)

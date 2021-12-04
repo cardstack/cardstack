@@ -29,6 +29,11 @@ export interface SendPayload extends Estimate {
   data: any;
 }
 
+export enum Operation {
+  CALL = 0,
+  DELEGATECALL = 1,
+}
+
 export interface RelayTransaction {
   to: string;
   ethereumTx: {
@@ -167,6 +172,7 @@ export async function executeTransaction(
   from: string,
   to: string,
   data: any,
+  operation: number,
   estimate: Estimate,
   nonce: BN,
   signatures: any,
@@ -184,7 +190,7 @@ export async function executeTransaction(
       to,
       value: 0, // we don't have any safe tx with a value
       data,
-      operation: 0, // all our safe txs are CALL operations
+      operation: operation,
       safeTxGas: estimate.safeTxGas,
       baseGas: estimate.baseGas,
       dataGas: estimate.dataGas,
