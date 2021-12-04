@@ -888,8 +888,7 @@
       "env": {},
       "args": [
         "withdraw-reward-safe",
-        "0x94461BA263cbb97A25af010530f94132Ad513926", //reward safe
-        // "0x908630DFdE60552DAF5291C7081cF2fD475CB368", //reward safe
+        "0xE276B68129a51376350855BaAEfcf756D1e5CDF7", //reward safe
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         "1", // amount (in ether units)
