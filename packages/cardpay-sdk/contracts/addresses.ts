@@ -74,7 +74,6 @@ const SOKOL = {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
     CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
-  rewardSafeDelegate: '0x83D0d79aBFB18f3E50bE0f680aF88D933731E7f5',
 };
 const MAINNET = {
   cardToken: '0x954b890704693af242613edEf1B603825afcD708',
@@ -119,7 +118,6 @@ const XDAI = {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
-  rewardSafeDelegate: '',
 };
 const addresses: {
   [network: string]: {
