@@ -1,6 +1,6 @@
 import Web3 from 'web3';
-import RewardManagerABI from '../../contracts/abi/v0.8.6/reward-manager';
-import RewardSafeDelegateABI from '../../contracts/abi/v0.8.6/reward-safe-delegate-implementation';
+import RewardSafeDelegateABI from '../../contracts/abi/v0.8.7/reward-safe-delegate-implementation';
+import RewardManagerABI from '../../contracts/abi/v0.8.7/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
@@ -429,7 +429,7 @@ export default class RewardManager {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
-    let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
     let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
       RewardSafeDelegateABI as AbiItem[],
       rewardSafeDelegateAddress
@@ -888,6 +888,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   }
   async getRewardRule(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
+  }
+  async getRewardSafeDelegateAddress(): Promise<string> {
+    return await (await this.getRewardManager()).methods.safeDelegateImplementation().call();
   }
 
   async address(): Promise<string> {

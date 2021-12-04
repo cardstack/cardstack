@@ -5,18 +5,18 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.8.6/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.8.6/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.8.6/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.8.6/split-prepaid-card-handler';
-import SpendABI from './abi/v0.8.6/spend';
-import MerchantManagerABI from './abi/v0.8.6/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.6/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.6/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.6/register-rewardee-handler';
-import SupplierManagerABI from './abi/v0.8.6/supplier-manager';
+import PayMerchantHandlerABI from './abi/v0.8.7/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.8.7/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.8.7/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.8.7/split-prepaid-card-handler';
+import SpendABI from './abi/v0.8.7/spend';
+import MerchantManagerABI from './abi/v0.8.7/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.7/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.8.7/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.8.7/register-rewardee-handler';
+import SupplierManagerABI from './abi/v0.8.7/supplier-manager';
 
-export const protocolVersions = ['v0.8.6', 'v0.8.5'];
+export const protocolVersions = ['v0.8.7'];
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
@@ -62,7 +62,7 @@ const SOKOL = {
   actionDispatcher: '0xaE5AC3685630b33Ed2677438EEaAe0aD5372c795',
   uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
-  rewardPool: '0x93a2684c14CeeF20fCdE714BDF362dda6A4C9287',
+  rewardPool: '0xc9A238Ee71A65554984234DF9721dbdA873F84FA',
   rewardManager: '0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
   registerRewardeeHandler: '0xD46f5eE431eAA309ABeC7a3561E06586450171b0',
@@ -74,7 +74,6 @@ const SOKOL = {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
     CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
-  rewardSafeDelegate: '0x4F771D5d4B6DA6be9811EE199D0bb735aB5948a6',
 };
 const MAINNET = {
   cardToken: '0x954b890704693af242613edEf1B603825afcD708',
@@ -107,8 +106,8 @@ const XDAI = {
   actionDispatcher: '0x3cC7DeB8dE522E2176e8c599FaAf7503d0c78AE9',
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
-  rewardPool: '0x86648EbB0de02B9815Bfc5001cEa1Dd35a5A4552',
-  rewardManager: '0x3B6bedcA6EC78fCd33aFeB385B192056de639403',
+  rewardPool: '0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a',
+  rewardManager: '0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
   versionManager: '0xd900133f96F85939335ADb9786ea9f2e07Bdf8c0',
@@ -119,7 +118,6 @@ const XDAI = {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
-  rewardSafeDelegate: '',
 };
 const addresses: {
   [network: string]: {

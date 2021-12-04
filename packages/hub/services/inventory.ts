@@ -15,7 +15,7 @@ interface SKUReservations {
 
 export default class InventoryService {
   subgraph = inject('subgraph');
-  web3 = inject('web3');
+  web3 = inject('web3-http', { as: 'web3' });
   relay = inject('relay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 

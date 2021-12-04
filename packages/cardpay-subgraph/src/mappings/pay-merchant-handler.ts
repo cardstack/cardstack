@@ -36,6 +36,7 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
   revenueEventEntity.transaction = txnHash;
   revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.blockNumber = event.block.number;
   revenueEventEntity.merchantRevenue = revenueEntity.id;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
@@ -49,6 +50,7 @@ export function handleMerchantFee(event: MerchantFeeEvent): void {
   let entity = new MerchantFeePayment(event.transaction.hash.toHex()); // There will only ever be one merchant fee collection event per txn
   entity.transaction = event.transaction.hash.toHex();
   entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.prepaidCard = toChecksumAddress(event.params.card);
   entity.merchantSafe = toChecksumAddress(event.params.merchantSafe);
   entity.issuingToken = makeToken(event.params.issuingToken);
