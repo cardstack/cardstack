@@ -551,6 +551,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
 
+    let rewardProgramId = await this.getRewardProgram('0x853fD3376b6f0b2b839Bd841FbdC6C1f93B3BFBD');
+    if (rewardProgramId == ZERO_ADDRESS) {
+      throw new Error('reward safe does not does not have reward program');
+    }
+    if (!(await this.isValidRewardSafe(safeAddress, rewardProgramId))) {
+      throw new Error('reward safe is not valid');
+    }
     // Temporarily, transfer function will use card as a the default gas token
     // This means that the safe has to have card tokens within it before it can transfer
     // This will change after we finalise the gas policy
@@ -559,7 +566,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let safeBalance = new BN(await gasToken.methods.balanceOf(safeAddress).call());
 
-    let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
     let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
       RewardSafeDelegateABI as AbiItem[],
       rewardSafeDelegateAddress
@@ -893,6 +900,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return await (await this.getRewardManager()).methods.safeDelegateImplementation().call();
   }
 
+  async getRewardProgram(rewardSafe: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.rewardProgramsForRewardSafes(rewardSafe).call();
+  }
   async address(): Promise<string> {
     return await getAddress('rewardManager', this.layer2Web3);
   }
