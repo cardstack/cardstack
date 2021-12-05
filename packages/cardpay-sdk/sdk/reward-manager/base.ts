@@ -384,7 +384,6 @@ export default class RewardManager {
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
-
   async withdraw(txnHash: string): Promise<TransactionReceipt>;
   async withdraw(
     safeAddress: string,
