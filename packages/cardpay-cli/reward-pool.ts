@@ -113,7 +113,7 @@ export async function claimRewards(
   rewardSafeAddress: string,
   leaf: string,
   proof: string,
-  acceptPartialClaim?: string,
+  acceptPartialClaim?: boolean,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);

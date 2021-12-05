@@ -256,7 +256,7 @@ export default class RewardPool {
     safeAddress: string,
     leaf: string,
     proofArray: string[],
-    acceptPartialClaim?: string,
+    acceptPartialClaim?: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
@@ -264,7 +264,7 @@ export default class RewardPool {
     safeAddressOrTxnHash: string,
     leaf?: string,
     proofArray?: string[],
-    acceptPartialClaim?: string,
+    acceptPartialClaim?: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
@@ -345,9 +345,9 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
       throw new Error(
-        `Rewards claimed does not have enough to cover the gas cost. The amount to be claimed is ${amount}, the gas cost is ${fromWei(
-          gasCost
-        )}`
+        `Rewards claimed does not have enough to cover the gas cost. The amount to be claimed is ${fromWei(
+          weiAmount
+        )}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
