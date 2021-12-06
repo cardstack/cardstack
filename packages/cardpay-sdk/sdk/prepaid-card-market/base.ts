@@ -16,7 +16,7 @@ import {
   getSendPayload,
   GnosisExecTx,
   SendPayload,
-  Operation
+  Operation,
 } from '../utils/safe-utils';
 import { getAddress } from '../..';
 import { Signature, signPrepaidCardSendTx, signSafeTxAsBytes } from '../utils/signing-utils';
