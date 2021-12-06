@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js';
 import { isNil } from 'lodash';
 import { multiply } from './arithmetic';
 import { isZero } from './comparison';
+import { roundAmountToNativeCurrencyDecimals } from './rounding-and-approximation';
 import { BigNumberish } from './types';
 
 /**
@@ -61,7 +62,6 @@ const SPEND_TO_USD_RATE = 0.01;
  * Returns `0` if `amountInSpend` is an empty string,
  * and otherwise `undefined` if amountInSpend is not a number.
  *
- * @see {@link usdToSpend}
  */
 export const spendToUsd = (amountInSpend: number): number | undefined => {
   if ((amountInSpend as unknown) === '') {
@@ -74,20 +74,15 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
 };
 
 /**
- * Converts USD to SPEND by dividing `amountInUsd` by 0.01.
- * The amount is rounded up to the nearest integer.
- * Returns `0` if `amountInUsd` is an empty string,
- * and otherwise `undefined` if amountInUsd is not a number.
+ * Rounds a given amount up to the specified currency's decimals and then converts it to spend, rounding up to the nearest integer.
+ * Internally uses {@link roundAmountToNativeCurrencyDecimals} with rounding mode = up
  *
- * @see {@link spendToUsd}
+ * @param amount A number
+ * @param currency A Currency specified in the SDK's currency module
+ * @param usdRate Exchange rate for this currency vs usd (amount of this currency equivalent to 1 USD)
+ *
+ * @returns integer spend amount
  */
-export const usdToSpend = (amountInUsd: number): number | undefined => {
-  if ((amountInUsd as unknown) === '') {
-    return 0;
-  }
-  if (typeof (amountInUsd as unknown) !== 'number') {
-    return undefined;
-  }
-
-  return Math.ceil(amountInUsd / SPEND_TO_USD_RATE);
+export const convertToSpend = (amount: number, currency: string, usdRate: number) => {
+  return Math.ceil(Number(roundAmountToNativeCurrencyDecimals(amount, currency)) / usdRate / SPEND_TO_USD_RATE);
 };
