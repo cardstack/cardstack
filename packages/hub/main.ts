@@ -10,8 +10,10 @@ import { Memoize } from 'typescript-memoize';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import packageJson from './package.json';
 import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
+
+import initSentry from './initializers/sentry';
+import initFirebase from './initializers/firebase';
 
 import DatabaseManager from '@cardstack/db';
 import WalletConnectService from './services/discord-bots/hub-bot/services/wallet-connect';
@@ -88,6 +90,7 @@ import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
+import FirebasePushNotifications from './services/push-notifications/firebase';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -142,6 +145,7 @@ export function createRegistry(): Registry {
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
+  registry.register('firebase-push-notifications', FirebasePushNotifications);
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
@@ -194,7 +198,7 @@ export class HubServer {
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
 
   constructor() {
-    initSentry();
+    runInitializers();
   }
 
   async ready() {
@@ -269,19 +273,13 @@ declare module '@cardstack/di' {
   }
 }
 
-export function initSentry() {
-  if (config.get('sentry.enabled')) {
-    Sentry.init({
-      dsn: config.get('sentry.dsn'),
-      enabled: config.get('sentry.enabled'),
-      environment: config.get('sentry.environment'),
-      release: 'hub@' + packageJson.version,
-    });
-  }
+export function runInitializers() {
+  initSentry();
+  initFirebase();
 }
 
 export async function bootWorker() {
-  initSentry();
+  runInitializers();
 
   let workerLogFactory: LogFunctionFactory = (scope: any) => {
     return (level: LogLevel, message: any, meta?: LogMeta) => {
@@ -360,7 +358,7 @@ export class HubBotController {
 
   static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
     this.logger.info(`booting pid:${process.pid}`);
-    initSentry();
+    runInitializers();
 
     let registry = createRegistry();
     if (serverConfig?.registryCallback) {
