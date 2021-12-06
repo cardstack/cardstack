@@ -99,7 +99,7 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
-      message: `Your business Mandello received a payment of §2324`,
+      message: `Mandello received a payment of §2324`,
     });
   });
 
@@ -137,7 +137,7 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
-      message: `Your business received a payment of §2324`,
+      message: `You received a payment of §2324`,
     });
 
     await waitFor(() => testkit.reports().length > 0);
@@ -173,7 +173,7 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobIdentifier).to.equal('send-notifications');
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
-      message: `Your business received a payment of §2324`,
+      message: `You received a payment of §2324`,
     });
   });
 

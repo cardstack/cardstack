@@ -70,14 +70,14 @@ export default class NotifyCustomerPayment {
       );
     }
 
-    let merchantName = '';
+    let merchantName = 'You';
 
     try {
       if (result.merchantSafe?.infoDid) {
         let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
 
         if (merchantInfo?.name) {
-          merchantName = ` ${merchantInfo.name}`;
+          merchantName = merchantInfo.name;
         }
       }
     } catch (e) {
@@ -90,7 +90,7 @@ export default class NotifyCustomerPayment {
 
     let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
-    let message = `Your business${merchantName} received a payment of §${spendAmount}`;
+    let message = `${merchantName} received a payment of §${spendAmount}`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
