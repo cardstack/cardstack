@@ -194,9 +194,17 @@ export class HubServer {
   }
 
   async ready() {
+    const container = getOwner(this);
+
     if (process.env.COMPILER) {
-      this.cardRoutes = await getOwner(this).lookup('card-routes');
+      this.cardRoutes = await container.lookup('card-routes');
     }
+
+    let web3 = await container.lookup('web3-socket');
+    let workerClient = await container.lookup('worker-client');
+
+    // listen for contract events and add tasks to the worker client
+    await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
   }
 
   @Memoize()
@@ -340,12 +348,6 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
-  let web3 = await container.lookup('web3-socket');
-  let workerClient = await container.lookup('worker-client');
-
-  // listen for contract events
-  // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
 
   await runner.promise;
 }

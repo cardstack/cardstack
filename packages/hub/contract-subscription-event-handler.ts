@@ -8,7 +8,7 @@ import { contractSubscriptionEventHandlerLog } from './utils/logger';
 
 const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
-// DO NOT USE only for use in bootWorker to prevent duplicate notifications
+// DO NOT USE only for use in HubServer's ready hook to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
   #web3: Web3SocketService;
   #workerClient: WorkerClient;
