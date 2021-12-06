@@ -76,7 +76,7 @@ export async function gasEstimate(
   to: string,
   value: string,
   data: string,
-  operation: number,
+  operation: Operation,
   gasToken: string
 ): Promise<Estimate> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
@@ -172,7 +172,7 @@ export async function executeTransaction(
   from: string,
   to: string,
   data: any,
-  operation: number,
+  operation: Operation,
   estimate: Estimate,
   nonce: BN,
   signatures: any,
