@@ -70,6 +70,12 @@ export default function () {
     return customization;
   });
 
+  this.post('/card-spaces/validate-profile-name', function () {
+    return {
+      errors: [],
+    };
+  });
+
   this.get(
     'https://storage.cardstack.com/prepaid-card-customization/:idWithExtension',
     function (schema, { params: { idWithExtension } }) {
@@ -98,6 +104,7 @@ export default function () {
 
   this.passthrough((request) => {
     return (
+      !request.url.startsWith('/upload') &&
       !request.url.includes('/api/') &&
       !request.url.includes('storage.cardstack.com')
     );
