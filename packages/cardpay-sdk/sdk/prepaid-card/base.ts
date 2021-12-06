@@ -4,8 +4,8 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.6/prepaid-card-manager';
-import DAIOracleABI from '../../contracts/abi/v0.8.6/chainlink-feed-adapter';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
+import DAIOracleABI from '../../contracts/abi/v0.8.7/chainlink-feed-adapter';
 import { getAddress, getOracle } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -22,6 +22,7 @@ import {
   executeSend,
   getNextNonceFromEstimate,
   executeSendWithRateLock,
+  Operation,
 } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
@@ -213,7 +214,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       0,
       transferData,
-      0,
+      Operation.CALL,
       '0',
       '0',
       '0',
@@ -457,8 +458,16 @@ export default class PrepaidCard {
       customizationDID,
       marketAddress
     );
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
 
     if (balance.lt(totalWeiAmount.add(gasCost))) {
       throw new Error(
@@ -483,6 +492,7 @@ export default class PrepaidCard {
       safeAddress,
       tokenAddress,
       payload,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)

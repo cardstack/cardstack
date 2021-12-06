@@ -10,9 +10,9 @@ interface Web3Config {
 }
 
 const { network } = config.get('web3') as Web3Config;
-let log = Logger('service:web3');
+let log = Logger('service:web3-http');
 
-export default class Web3Service {
+export default class Web3HttpService {
   private web3: Web3 | undefined;
 
   getInstance() {
@@ -40,6 +40,6 @@ export default class Web3Service {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    web3: Web3Service;
+    'web3-http': Web3HttpService;
   }
 }

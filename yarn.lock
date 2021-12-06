@@ -25494,6 +25494,14 @@ send@0.17.1:
     range-parser "~1.2.1"
     statuses "~1.5.0"
 
+sentry-testkit@^3.3.7:
+  version "3.3.7"
+  resolved "https://registry.yarnpkg.com/sentry-testkit/-/sentry-testkit-3.3.7.tgz#e76dd896944dce30df2d2eea81f048da91b14d3b"
+  integrity sha512-ZKDQS/IPAK7NwDOuT6gDMdextoMyCeOFIO1kBcdfqemQov5UXZkn92ylLs/MFEf47v+M6vbwgGCsepb2jUf0YQ==
+  dependencies:
+    body-parser "^1.19.0"
+    express "^4.17.1"
+
 serialize-javascript@5.0.1, serialize-javascript@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-5.0.1.tgz#7886ec848049a462467a97d3d918ebb2aaf934f4"

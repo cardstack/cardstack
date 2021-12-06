@@ -31,6 +31,7 @@ import {
   addRewardRule,
   rewardRule,
   withdraw,
+  transferRewardSafe,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -45,6 +46,7 @@ import {
   rewardPoolBalance,
   claimRewards,
   getClaimableRewardProofs,
+  recoverRewardTokens,
 } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 import {
@@ -110,7 +112,9 @@ type Commands =
   | 'rewardProgramAdmin'
   | 'addRewardRule'
   | 'rewardRule'
-  | 'withdrawRewardSafe';
+  | 'withdrawRewardSafe'
+  | 'transferRewardSafe'
+  | 'recoverRewardTokens';
 
 let command: Commands | undefined;
 interface Options {
@@ -923,6 +927,40 @@ let {
       command = 'withdrawRewardSafe';
     }
   )
+  .command('transfer-reward-safe <rewardSafe> <newOwner>', 'Transfer reward safe', (yargs) => {
+    yargs.positional('rewardSafe', {
+      type: 'string',
+      description: 'The address of the rewardSafe that already contains rewards',
+    });
+    yargs.positional('newOwner', {
+      type: 'string',
+      description: 'The address of the new owner',
+    });
+    command = 'transferRewardSafe';
+  })
+  .command(
+    'recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]',
+    'Recover reward tokens from reward pool',
+    (yargs) => {
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being recovered from reward pool',
+      });
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe that is to receive the recovered tokens',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to recover into safe',
+      });
+      command = 'recoverRewardTokens';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1282,7 +1320,7 @@ if (!command) {
         showHelpAndExit('proof is a required value');
         return;
       }
-      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim, mnemonic);
+      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim == 'true', mnemonic);
       break;
     case 'claimableRewardProofs':
       if (address == null) {
@@ -1371,6 +1409,32 @@ if (!command) {
         return;
       }
       await withdraw(network, rewardSafe, recipient, tokenAddress, amount, mnemonic);
+      break;
+    case 'transferRewardSafe':
+      if (rewardSafe == null) {
+        showHelpAndExit('rewardSafe is a required value');
+        return;
+      }
+      if (newOwner == null) {
+        showHelpAndExit('newOwner is a required value');
+        return;
+      }
+      await transferRewardSafe(network, rewardSafe, newOwner, mnemonic);
+      break;
+    case 'recoverRewardTokens':
+      if (safeAddress == null) {
+        showHelpAndExit('safeAddress is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (tokenAddress == null) {
+        showHelpAndExit('tokenAddress is a required value');
+        return;
+      }
+      await recoverRewardTokens(network, safeAddress, rewardProgramId, tokenAddress, amount, mnemonic);
       break;
     default:
       assertNever(command);

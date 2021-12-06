@@ -14,7 +14,7 @@ let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
   authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  web3 = inject('web3');
+  web3 = inject('web3-http', { as: 'web3' });
   relay = inject('relay');
   inventory = inject('inventory');
   databaseManager = inject('database-manager', { as: 'databaseManager' });

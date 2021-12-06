@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { Estimate, SendPayload } from './safe-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.6/prepaid-card-manager';
+import { Estimate, SendPayload, Operation } from './safe-utils';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
@@ -30,7 +30,7 @@ export async function signPrepaidCardSendTx(
     issuingToken,
     0,
     payload.data,
-    0,
+    Operation.CALL,
     payload.safeTxGas,
     payload.dataGas,
     payload.gasPrice,
@@ -56,7 +56,7 @@ export async function signSafeTx(
     to,
     0,
     data,
-    0,
+    Operation.CALL,
     estimate.safeTxGas,
     estimate.dataGas,
     estimate.gasPrice,
@@ -74,7 +74,7 @@ export async function signSafeTxAsRSV(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -109,7 +109,7 @@ export async function signSafeTxAsBytes(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -140,7 +140,7 @@ export async function signSafeTxWithEIP1271AsBytes(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   estimate: Estimate,
   refundReceiver: string,
   nonce: any,
@@ -188,7 +188,7 @@ function safeTransactionTypedData(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -279,7 +279,7 @@ export async function signRewardSafe(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   estimate: Estimate,
   txGasToken: string,
   refundReceiver: string,

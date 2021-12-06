@@ -2,7 +2,16 @@ import { Address, store } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess, AddedOwner, RemovedOwner } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { Safe, SafeOwner, SafeTransaction, SafeOwnerChange } from '../../generated/schema';
+import {
+  Safe,
+  SafeOwner,
+  SafeTransaction,
+  SafeOwnerChange,
+  PrepaidCard,
+  MerchantSafe,
+  Depot,
+  RewardSafe,
+} from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
@@ -26,11 +35,21 @@ export function handleAddedOwner(event: AddedOwner): void {
   safeOwnerEntity.owner = owner;
   safeOwnerEntity.createdAt = safe.createdAt;
   safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
+  if (PrepaidCard.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'prepaid-card';
+  } else if (MerchantSafe.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'merchant';
+  } else if (Depot.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'depot';
+  } else if (RewardSafe.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'reward';
+  }
   safeOwnerEntity.save();
 
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-add-' + owner + '-' + txnHash);
   ownerChangeEntity.transaction = txnHash;
   ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.blockNumber = event.block.number;
   ownerChangeEntity.safe = safeAddress;
   ownerChangeEntity.ownerAdded = owner;
   ownerChangeEntity.save();
@@ -46,6 +65,7 @@ export function handleRemovedOwner(event: RemovedOwner): void {
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-remove-' + owner + '-' + txnHash);
   ownerChangeEntity.transaction = txnHash;
   ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.blockNumber = event.block.number;
   ownerChangeEntity.safe = safeAddress;
   ownerChangeEntity.ownerRemoved = owner;
   ownerChangeEntity.save();
@@ -74,6 +94,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.safe = safeAddress;
     safeTxEntity.transaction = txnHash;
     safeTxEntity.timestamp = event.block.timestamp;
+    safeTxEntity.blockNumber = event.block.number;
 
     let decoded = decode(EXEC_TRANSACTION, bytes);
     safeTxEntity.to = toChecksumAddress(decoded[0].toAddress());
@@ -89,12 +110,13 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.signatures = decoded[9].toBytes();
 
     log.debug(
-      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
+      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         txnHash,
         safeTxEntity.id,
         safeTxEntity.safe,
         safeTxEntity.timestamp.toString(),
+        safeTxEntity.blockNumber.toString(),
         safeTxEntity.to,
         safeTxEntity.value.toString(),
         safeTxEntity.data.toHex(),
