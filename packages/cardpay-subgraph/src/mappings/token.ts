@@ -1,11 +1,10 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { RevenuePool } from '../../generated/RevenuePool/RevenuePool';
+import { Address, BigInt } from '@graphprotocol/graph-ts';
 import {
   makeToken,
   makeEOATransaction,
   makeEOATransactionForSafe,
   toChecksumAddress,
-  makeMerchantRevenue,
+  makeMerchantRevenueEvent,
 } from '../utils';
 import {
   Safe,
@@ -13,7 +12,6 @@ import {
   TokenTransfer,
   TokenHolder,
   TokenHistory,
-  MerchantRevenueEvent,
   MerchantDeposit,
   MerchantWithdraw,
   MerchantSafe,
@@ -43,6 +41,7 @@ export function handleTransfer(event: TransferEvent): void {
       if (MerchantSafe.load(to) != null && from != revenuePoolAddress) {
         let merchantDepositEntity = new MerchantDeposit(txnHash);
         merchantDepositEntity.timestamp = event.block.timestamp;
+        merchantDepositEntity.blockNumber = event.block.number;
         merchantDepositEntity.transaction = txnHash;
         merchantDepositEntity.merchantSafe = to;
         merchantDepositEntity.token = tokenAddress;
@@ -68,6 +67,7 @@ export function handleTransfer(event: TransferEvent): void {
       if (MerchantSafe.load(from) != null && to != relayFunder) {
         let merchantWithdrawEntity = new MerchantWithdraw(txnHash);
         merchantWithdrawEntity.timestamp = event.block.timestamp;
+        merchantWithdrawEntity.blockNumber = event.block.number;
         merchantWithdrawEntity.transaction = txnHash;
         merchantWithdrawEntity.merchantSafe = from;
         merchantWithdrawEntity.token = tokenAddress;
@@ -87,6 +87,7 @@ export function handleTransfer(event: TransferEvent): void {
   let transferEntity = new TokenTransfer(tokenAddress + '-' + txnHash + '-' + event.transactionLogIndex.toString());
   transferEntity.transaction = txnHash;
   transferEntity.timestamp = event.block.timestamp;
+  transferEntity.blockNumber = event.block.number;
   transferEntity.token = tokenAddress;
   transferEntity.amount = event.params.value;
   transferEntity.from = from != ZERO_ADDRESS ? from : null;
@@ -100,6 +101,7 @@ export function handleTransfer(event: TransferEvent): void {
     let historyEntity = new TokenHistory(transferEntity.id + '-' + sender.id);
     historyEntity.transaction = txnHash;
     historyEntity.timestamp = event.block.timestamp;
+    historyEntity.blockNumber = event.block.number;
     historyEntity.sent = transferEntity.id;
     historyEntity.tokenHolder = sender.id;
     historyEntity.save();
@@ -109,6 +111,7 @@ export function handleTransfer(event: TransferEvent): void {
     let historyEntity = new TokenHistory(transferEntity.id + '-' + receiver.id);
     historyEntity.transaction = txnHash;
     historyEntity.timestamp = event.block.timestamp;
+    historyEntity.blockNumber = event.block.number;
     historyEntity.received = transferEntity.id;
     historyEntity.tokenHolder = receiver.id;
     historyEntity.save();
@@ -148,24 +151,4 @@ function makeAccount(address: Address): string {
   let entity = new Account(account);
   entity.save();
   return account;
-}
-
-function makeMerchantRevenueEvent(event: ethereum.Event, merchantSafe: string, token: string): MerchantRevenueEvent {
-  let txnHash = event.transaction.hash.toHex();
-  let revenuePoolAddress = addresses.get('revenuePool') as string;
-  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
-  let revenuePool = RevenuePool.bind(Address.fromString(revenuePoolAddress));
-  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(
-    Address.fromString(merchantSafe),
-    Address.fromString(token)
-  );
-  revenueEntity.save();
-
-  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
-  revenueEventEntity.transaction = txnHash;
-  revenueEventEntity.timestamp = event.block.timestamp;
-  revenueEventEntity.merchantRevenue = revenueEntity.id;
-  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
-  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
-  return revenueEventEntity;
 }

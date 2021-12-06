@@ -39,6 +39,7 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   entity.rewardSafe = rewardSafe;
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.save();
 }
 
@@ -66,5 +67,6 @@ export function handleRewardTokensAdded(event: RewardTokensAdded): void {
   entity.amount = amount;
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.save();
 }

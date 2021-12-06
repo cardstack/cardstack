@@ -107,7 +107,7 @@ describe('/api/reservations', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('subgraph', StubSubgraph);
     registry(this).register('relay', StubRelay);
-    registry(this).register('web3', StubWeb3);
+    registry(this).register('web3-http', StubWeb3);
   });
 
   let { getContainer, request } = setupHub(this);

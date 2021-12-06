@@ -22,6 +22,7 @@ export function handleMerchantCreation(event: MerchantCreationEvent): void {
   let creationEntity = new MerchantCreation(merchantSafe);
   creationEntity.transaction = event.transaction.hash.toHex();
   creationEntity.createdAt = event.block.timestamp;
+  creationEntity.blockNumber = event.block.number;
   creationEntity.merchantSafe = merchantSafe;
   creationEntity.merchant = merchant;
   creationEntity.save();

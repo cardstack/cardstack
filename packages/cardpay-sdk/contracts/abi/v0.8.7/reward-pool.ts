@@ -10,8 +10,14 @@ export default [
       },
       {
         indexed: false,
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        indexed: false,
         internalType: 'uint256',
-        name: 'numPaymentCycles',
+        name: 'paymentCycle',
         type: 'uint256',
       },
     ],
@@ -35,31 +41,6 @@ export default [
       },
     ],
     name: 'OwnershipTransferred',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'paymentCycle',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'startBlock',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'endBlock',
-        type: 'uint256',
-      },
-    ],
-    name: 'PaymentCycleEnded',
     type: 'event',
   },
   {
@@ -105,6 +86,37 @@ export default [
       {
         indexed: false,
         internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'rewardProgramAdmin',
+        type: 'address',
+      },
+    ],
+    name: 'RewardTokensRecovered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
         name: 'rewardee',
         type: 'address',
       },
@@ -125,6 +137,12 @@ export default [
         internalType: 'uint256',
         name: 'amount',
         type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'leaf',
+        type: 'bytes',
       },
     ],
     name: 'RewardeeClaim',
@@ -157,73 +175,6 @@ export default [
   },
   {
     constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'payableToken',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'proof',
-        type: 'bytes',
-      },
-    ],
-    name: 'balanceForProof',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'payableToken',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_address',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'proof',
-        type: 'bytes',
-      },
-    ],
-    name: 'balanceForProofWithAddress',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [],
     name: 'cardpayVersion',
     outputs: [
@@ -241,24 +192,19 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'payableToken',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
         internalType: 'bytes',
-        name: 'proof',
+        name: 'leaf',
         type: 'bytes',
+      },
+      {
+        internalType: 'bytes32[]',
+        name: 'proof',
+        type: 'bytes32[]',
+      },
+      {
+        internalType: 'bool',
+        name: 'acceptPartialClaim',
+        type: 'bool',
       },
     ],
     name: 'claim',
@@ -277,47 +223,17 @@ export default [
     constant: true,
     inputs: [
       {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
+        internalType: 'bytes',
+        name: 'leaf',
+        type: 'bytes',
       },
     ],
-    name: 'claims',
+    name: 'claimed',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'bool',
         name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'currentPaymentCycleStartBlock',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -348,21 +264,6 @@ export default [
         internalType: 'bool',
         name: '',
         type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'numPaymentCycles',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
       },
     ],
     payable: false,
@@ -413,6 +314,63 @@ export default [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'payeeRoots',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'recoverTokens',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -499,6 +457,16 @@ export default [
     constant: false,
     inputs: [
       {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'paymentCycle',
+        type: 'uint256',
+      },
+      {
         internalType: 'bytes32',
         name: 'payeeRoot',
         type: 'bytes32',
@@ -559,6 +527,32 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: 'leaf',
+        type: 'bytes',
+      },
+      {
+        internalType: 'bytes32[]',
+        name: 'proof',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'valid',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {

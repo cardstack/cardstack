@@ -16,6 +16,7 @@ export function handleSwap(event: SwapEvent): void {
   let swapEntity = new TokenSwap(txnHash);
   swapEntity.transaction = txnHash;
   swapEntity.timestamp = event.block.timestamp;
+  swapEntity.blockNumber = event.block.number;
   swapEntity.tokenPair = pair;
   swapEntity.to = to;
   swapEntity.token0AmountIn = event.params.amount0In;

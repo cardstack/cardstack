@@ -1,6 +1,6 @@
 import Web3 from 'web3';
-import RewardManagerABI from '../../contracts/abi/v0.8.6/reward-manager';
-import RewardSafeDelegateABI from '../../contracts/abi/v0.8.6/reward-safe-delegate-implementation';
+import RewardSafeDelegateABI from '../../contracts/abi/v0.8.7/reward-safe-delegate-implementation';
+import RewardManagerABI from '../../contracts/abi/v0.8.7/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
@@ -384,7 +384,6 @@ export default class RewardManager {
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
-
   async withdraw(txnHash: string): Promise<TransactionReceipt>;
   async withdraw(
     safeAddress: string,
@@ -429,7 +428,7 @@ export default class RewardManager {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
-    let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
     let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
       RewardSafeDelegateABI as AbiItem[],
       rewardSafeDelegateAddress
@@ -551,6 +550,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
 
+    let rewardProgramId = await this.getRewardProgram('0x853fD3376b6f0b2b839Bd841FbdC6C1f93B3BFBD');
+    if (rewardProgramId == ZERO_ADDRESS) {
+      throw new Error('reward safe does not does not have reward program');
+    }
+    if (!(await this.isValidRewardSafe(safeAddress, rewardProgramId))) {
+      throw new Error('reward safe is not valid');
+    }
     // Temporarily, transfer function will use card as a the default gas token
     // This means that the safe has to have card tokens within it before it can transfer
     // This will change after we finalise the gas policy
@@ -559,7 +565,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let safeBalance = new BN(await gasToken.methods.balanceOf(safeAddress).call());
 
-    let rewardSafeDelegateAddress = await getAddress('rewardSafeDelegate', this.layer2Web3);
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
     let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
       RewardSafeDelegateABI as AbiItem[],
       rewardSafeDelegateAddress
@@ -889,7 +895,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   async getRewardRule(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
   }
+  async getRewardSafeDelegateAddress(): Promise<string> {
+    return await (await this.getRewardManager()).methods.safeDelegateImplementation().call();
+  }
 
+  async getRewardProgram(rewardSafe: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.rewardProgramsForRewardSafes(rewardSafe).call();
+  }
   async address(): Promise<string> {
     return await getAddress('rewardManager', this.layer2Web3);
   }

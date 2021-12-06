@@ -1320,7 +1320,7 @@ if (!command) {
         showHelpAndExit('proof is a required value');
         return;
       }
-      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim, mnemonic);
+      await claimRewards(network, rewardSafe, leaf, proof, acceptPartialClaim == 'true', mnemonic);
       break;
     case 'claimableRewardProofs':
       if (address == null) {

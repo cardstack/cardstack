@@ -1,4 +1,5 @@
 import { crypto, Address, ByteArray, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts';
+import { RevenuePool } from '../generated/RevenuePool/RevenuePool';
 import { log } from '@graphprotocol/graph-ts';
 import { ERC20 } from './erc-20/ERC20';
 import { ERC20SymbolBytes } from './erc-20/ERC20SymbolBytes';
@@ -16,6 +17,7 @@ import {
   Token,
   Account,
   MerchantSafe,
+  MerchantRevenueEvent,
   SafeOwner,
 } from '../generated/schema';
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
@@ -98,6 +100,31 @@ export function makeMerchantRevenue(merchantSafe: string, token: string): Mercha
   return entity as MerchantRevenue;
 }
 
+export function makeMerchantRevenueEvent(
+  event: ethereum.Event,
+  merchantSafe: string,
+  token: string
+): MerchantRevenueEvent {
+  let txnHash = event.transaction.hash.toHex();
+  let revenuePoolAddress = addresses.get('revenuePool') as string;
+  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
+  let revenuePool = RevenuePool.bind(Address.fromString(revenuePoolAddress));
+  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(
+    Address.fromString(merchantSafe),
+    Address.fromString(token)
+  );
+  revenueEntity.save();
+
+  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
+  revenueEventEntity.transaction = txnHash;
+  revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.blockNumber = event.block.number;
+  revenueEventEntity.merchantRevenue = revenueEntity.id;
+  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
+  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
+  return revenueEventEntity;
+}
+
 export function makePrepaidCardPayment(
   event: ethereum.Event,
   prepaidCard: string,
@@ -127,6 +154,7 @@ export function makePrepaidCardPayment(
   let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;
   paymentEntity.timestamp = timestamp;
+  paymentEntity.blockNumber = event.block.number;
   paymentEntity.prepaidCard = prepaidCard;
   paymentEntity.prepaidCardOwner = prepaidCardEntity.owner;
   if (merchantSafe != null) {
