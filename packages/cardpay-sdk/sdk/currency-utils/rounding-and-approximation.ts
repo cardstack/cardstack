@@ -80,7 +80,7 @@ export const addBuffer = (numberOne: BigNumberish, buffer: BigNumberish = '1.2')
   new BigNumber(numberOne).times(buffer).toFixed(0);
 
 /**
- * Rounds `value` down to the number of decimals specified by the native currency (see `currencies.ts`)
+ * Rounds `value` to the number of decimals specified by the native currency (see `currencies.ts`)
  */
 export const roundAmountToNativeCurrencyDecimals = (
   value: BigNumberish,
