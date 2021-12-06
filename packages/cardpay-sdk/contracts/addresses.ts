@@ -16,7 +16,7 @@ import RegisterRewardProgramHandlerABI from './abi/v0.8.7/register-reward-progra
 import RegisterRewardeeHandlerABI from './abi/v0.8.7/register-rewardee-handler';
 import SupplierManagerABI from './abi/v0.8.7/supplier-manager';
 
-export const protocolVersions = ['v0.8.7', 'v0.8.6', 'v0.8.5'];
+export const protocolVersions = ['v0.8.7'];
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
@@ -74,7 +74,6 @@ const SOKOL = {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
     CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
-  rewardSafeDelegate: '0x83D0d79aBFB18f3E50bE0f680aF88D933731E7f5',
 };
 const MAINNET = {
   cardToken: '0x954b890704693af242613edEf1B603825afcD708',
@@ -107,8 +106,8 @@ const XDAI = {
   actionDispatcher: '0x3cC7DeB8dE522E2176e8c599FaAf7503d0c78AE9',
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
-  rewardPool: '0x86648EbB0de02B9815Bfc5001cEa1Dd35a5A4552',
-  rewardManager: '0x3B6bedcA6EC78fCd33aFeB385B192056de639403',
+  rewardPool: '0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a',
+  rewardManager: '0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
   versionManager: '0xd900133f96F85939335ADb9786ea9f2e07Bdf8c0',
@@ -119,7 +118,6 @@ const XDAI = {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
-  rewardSafeDelegate: '',
 };
 const addresses: {
   [network: string]: {

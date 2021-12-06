@@ -1,4 +1,4 @@
-The CardStack team and community are committed to everyone having a safe and inclusive experience.
+The Cardstack team and community are committed to everyone having a safe and inclusive experience.
 
 We follow the Ember Community Guidelines:
 

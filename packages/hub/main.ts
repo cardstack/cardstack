@@ -60,7 +60,8 @@ import ReservedWords from './services/reserved-words';
 import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
-import Web3Service from './services/web3';
+import Web3HttpService from './services/web3-http';
+import Web3SocketService from './services/web3-socket';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
@@ -79,6 +80,10 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import RealmsConfig from './services/realms-config';
+import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
+import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
+import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
@@ -114,6 +119,9 @@ export function createRegistry(): Registry {
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
+  registry.register('send-notifications', SendNotificationsTask);
+  registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
+  registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
@@ -139,7 +147,8 @@ export function createRegistry(): Registry {
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
-  registry.register('web3', Web3Service);
+  registry.register('web3-http', Web3HttpService);
+  registry.register('web3-socket', Web3SocketService);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
@@ -258,7 +267,7 @@ declare module '@cardstack/di' {
   }
 }
 
-function initSentry() {
+export function initSentry() {
   if (config.get('sentry.enabled')) {
     Sentry.init({
       dsn: config.get('sentry.dsn'),
@@ -296,6 +305,18 @@ export async function bootWorker() {
     connectionString: dbConfig.url,
     taskList: {
       boom: boom,
+      'send-notifications': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(SendNotificationsTask);
+        return task.perform(payload, helpers);
+      },
+      'notify-merchant-claim': async (payload: any) => {
+        let task = await container.instantiate(NotifyMerchantClaimTask);
+        return task.perform(payload);
+      },
+      'notify-customer-payment': async (payload: any) => {
+        let task = await container.instantiate(NotifyCustomerPaymentTask);
+        return task.perform(payload);
+      },
       'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
         return task.perform(payload, helpers);
@@ -321,6 +342,12 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
+  let web3 = await container.lookup('web3-socket');
+  let workerClient = await container.lookup('worker-client');
+
+  // listen for contract events
+  // internally this talks to the worker client
+  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
 
   await runner.promise;
 }

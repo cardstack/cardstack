@@ -2,7 +2,16 @@ import { Address, store } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess, AddedOwner, RemovedOwner } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { Safe, SafeOwner, SafeTransaction, SafeOwnerChange } from '../../generated/schema';
+import {
+  Safe,
+  SafeOwner,
+  SafeTransaction,
+  SafeOwnerChange,
+  PrepaidCard,
+  MerchantSafe,
+  Depot,
+  RewardSafe,
+} from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
@@ -26,6 +35,15 @@ export function handleAddedOwner(event: AddedOwner): void {
   safeOwnerEntity.owner = owner;
   safeOwnerEntity.createdAt = safe.createdAt;
   safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
+  if (PrepaidCard.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'prepaid-card';
+  } else if (MerchantSafe.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'merchant';
+  } else if (Depot.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'depot';
+  } else if (RewardSafe.load(safeAddress) != null) {
+    safeOwnerEntity.type = 'reward';
+  }
   safeOwnerEntity.save();
 
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-add-' + owner + '-' + txnHash);
