@@ -502,7 +502,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       safeAddress,
       rewardPoolAddress,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, rewardPoolAddress, payload, estimate, nonce, from)

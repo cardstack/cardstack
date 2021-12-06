@@ -165,7 +165,7 @@ export default class RevenuePool {
       merchantSafeAddress,
       revenuePoolAddress,
       payload,
-      0,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, merchantSafeAddress, revenuePoolAddress, payload, estimate, nonce, from)
