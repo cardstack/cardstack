@@ -15,7 +15,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run server",
-      "program": "${workspaceRoot}/packages/hub/bin/hub",
+      "program": "${workspaceRoot}/packages/hub/dist/hub.js",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "args": ["serve"]
@@ -43,7 +43,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run cardpay bot",
-      "program": "${workspaceRoot}/packages/hub/bin/hub",
+      "program": "${workspaceRoot}/packages/hub/dist/hub.js",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "args": ["bot"]

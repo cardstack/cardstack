@@ -11,12 +11,15 @@ import { difference } from 'lodash';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
 
+declare global {
+  const __non_webpack_require__: any;
+}
+
 const requireCard = function (path: string, root: string): any {
-  const module = require.resolve(path, {
+  const module = __non_webpack_require__.resolve(path, {
     paths: [root],
   });
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require(module);
+  return __non_webpack_require__(module);
 };
 
 export default class CardRoutes {

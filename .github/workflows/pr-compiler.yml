@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - uses: actions/checkout@v2
       - run: yarn install
-      - run: NODE_ENV=test bin/hub db init-test
+      - run: yarn db:test-init
         working-directory: packages/hub
       - name: Start the card server
         run: NODE_ENV=test COMPILER=true yarn start &

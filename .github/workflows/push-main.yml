@@ -62,7 +62,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: NODE_ENV=test bin/hub db init-test
+      - run: yarn db:test-init
         working-directory: packages/hub
       - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
 

@@ -22,6 +22,11 @@ runs:
     - run: yarn --prefer-offline
       shell: bash
 
+    - name: Webpack build
+      run: yarn build
+      shell: bash
+      working-directory: packages/hub
+
     - name: Deploy server
       run: waypoint up --app=hub -plain
       shell: bash

@@ -28,7 +28,7 @@ export class TestCardCacheConfig extends CardCacheConfig {
 }
 
 export function resolveCard(root: string, modulePath: string): string {
-  return require.resolve(modulePath, { paths: [root] });
+  return __non_webpack_require__.resolve(modulePath, { paths: [root] });
 }
 
 export function configureHubWithCompiler(mochaContext: Mocha.Suite) {

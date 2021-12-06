@@ -10,7 +10,6 @@ import {
   Snowflake,
   SUUID,
 } from '../types';
-import { CommandDiscoverer } from '../bot';
 import sinon, { SinonStub } from 'sinon';
 import { makeTestMessage, makeTestChannel, makeTestGuild, MockChannel } from '../utils/mocks';
 
@@ -137,14 +136,8 @@ describe('DiscordBot', function () {
     description = 'foo bar';
   }
 
-  class FakeCommandDiscovery implements CommandDiscoverer {
-    discover(_commandsDir: string): Promise<{ dmCommands: Map<string, Command>; guildCommands: Map<string, Command> }> {
-      return Promise.resolve({
-        dmCommands: new Map<string, Command>([['!foo', new BarCommand()]]),
-        guildCommands: new Map<string, Command>([['!ping', new PingCommand()]]),
-      });
-    }
-  }
+  const dmCommands = new Map<string, Command>([['!foo', new BarCommand()]]);
+  const guildCommands = new Map<string, Command>([['!ping', new PingCommand()]]);
 
   let discordBotsDbGateway: FakeDiscordBotsDbGateway;
   let dmChannelsDbGateway: FakeDmChannelsDbGateway;
@@ -179,12 +172,7 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = {
-        discover(_commandsDir) {
-          return Promise.resolve({ guildCommands: new Map<string, Command>(), dmCommands: new Map<string, Command>() });
-        },
-      };
-      await expect(bot.start()).to.be.rejectedWith('No bot commands found. Check your configuration.');
+      await expect(bot.start()).to.be.rejectedWith('No bot commands found. Your subclass should provide some.');
       expect(bot.status).to.eq('disconnected');
     });
 
@@ -196,14 +184,14 @@ describe('DiscordBot', function () {
         cordeBotId: '',
         cordeBotToken: '',
         commandPrefix: '',
-        commandsDir: '',
         allowedChannels: '',
         allowedGuilds: '',
         messageVerificationDelayMs: 25,
       };
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       expect(loginStub.callCount).to.equal(0);
@@ -215,7 +203,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       expect(loginStub.callCount).to.equal(1);
@@ -227,7 +216,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       let loginDeferred = defer();
       loginStub.returns(loginDeferred.promise);
@@ -247,7 +237,8 @@ describe('DiscordBot', function () {
       discordBotsDbGateway.onBecomeListener = () => {
         return deferred.promise as Promise<boolean>;
       };
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       bot.start();
       await new Promise((resolve) => setTimeout(resolve, 25));
@@ -261,7 +252,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       expect(Array.from(discordBotsDbGateway.listeningChannels.keys())).to.deep.equal([
@@ -276,7 +268,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       expect(Array.from(discordBotsDbGateway.listeningChannels.keys())).to.deep.equal([
@@ -296,7 +289,8 @@ describe('DiscordBot', function () {
       discordBotsDbGateway.onBecomeListener = () => {
         return deferred.promise as Promise<boolean>;
       };
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       bot.start();
       await new Promise((resolve) => setTimeout(resolve, 25));
@@ -317,7 +311,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       user = {
         id: 'userId',
@@ -399,7 +394,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
 
       loginStub = sinon.stub(bot, 'login');
       user = {
@@ -561,7 +557,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       await bot.destroy();
@@ -575,7 +572,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       await bot.destroy();
@@ -588,7 +586,8 @@ describe('DiscordBot', function () {
       bot.config = basicConfig;
       bot.discordBotsDbGateway = discordBotsDbGateway;
       bot.dmChannelsDbGateway = dmChannelsDbGateway;
-      bot.commandDiscovery = new FakeCommandDiscovery();
+      bot.dmCommands = dmCommands;
+      bot.guildCommands = guildCommands;
       loginStub = sinon.stub(bot, 'login');
       await bot.start();
       await bot.messageProcessingVerifier.scheduleVerification(

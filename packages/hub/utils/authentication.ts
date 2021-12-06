@@ -4,12 +4,19 @@ import { Clock } from '../services/clock';
 import queryString from 'query-string';
 import config from 'config';
 
-const SECRET = config.get('serverSecret') as string;
+function secret(): string {
+  let s = config.get('serverSecret');
+  if (!s || typeof s !== 'string') {
+    throw new Error('Missing ENV var SERVER_secret()');
+  }
+  return s;
+}
+
 const encryptionAlgorithm = 'aes-256-gcm';
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
 
 function encrypt(plaintext: string): string {
-  const key = Buffer.from(SECRET, 'base64');
+  const key = Buffer.from(secret(), 'base64');
   const iv = randomBytes(16);
   const cipher = createCipheriv(encryptionAlgorithm, key, iv);
   const encrypted = [
@@ -26,15 +33,11 @@ function encrypt(plaintext: string): string {
 function decrypt(cipherText: string) {
   const [ivString, encryptedString, authTagString] = cipherText.split('--');
   const iv = Buffer.from(ivString, 'hex');
-  const key = Buffer.from(SECRET, 'base64');
+  const key = Buffer.from(secret(), 'base64');
   const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
   decipher.setAuthTag(Buffer.from(authTagString, 'hex'));
   let decrypted = decipher.update(encryptedString, 'hex', 'utf8') + decipher.final('utf8');
   return decrypted;
-}
-
-if (!SECRET) {
-  throw new Error('Missing ENV var SERVER_SECRET');
 }
 
 export class AuthenticationUtils {
@@ -42,8 +45,8 @@ export class AuthenticationUtils {
 
   generateNonce(): string {
     let timestampInNanoseconds = this.clock.hrNow().toString();
-    let hmac = createHmac('sha256', SECRET);
-    let nonceSignature = hmac.update(`${timestampInNanoseconds}:${SECRET}`).digest('hex');
+    let hmac = createHmac('sha256', secret());
+    let nonceSignature = hmac.update(`${timestampInNanoseconds}:${secret()}`).digest('hex');
     let nonce = `${Buffer.from(timestampInNanoseconds).toString('base64')}:${nonceSignature}`;
     return nonce;
   }
@@ -51,8 +54,8 @@ export class AuthenticationUtils {
   extractVerifiedTimestamp(nonce: string): bigint {
     let [base64Timestamp, signature] = nonce.split(':');
     let timestamp = Buffer.from(base64Timestamp, 'base64').toString('ascii');
-    let hmac = createHmac('sha256', SECRET);
-    let expectedNonceSignature = hmac.update(`${timestamp}:${SECRET}`).digest('hex');
+    let hmac = createHmac('sha256', secret());
+    let expectedNonceSignature = hmac.update(`${timestamp}:${secret()}`).digest('hex');
     if (expectedNonceSignature === signature) {
       return BigInt(timestamp);
     } else {

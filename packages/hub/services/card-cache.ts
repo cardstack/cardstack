@@ -22,6 +22,9 @@ import { CompiledCard } from '@cardstack/core/src/interfaces';
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
   exports: {
+    './package.json': {
+      default: './package.json',
+    },
     '.': {
       browser: './browser',
       default: './node',
@@ -49,8 +52,7 @@ function setupCacheDir(cardCacheDir: string): void {
 
   let pkg;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    pkg = require(`${cardCacheDir}/package.json`);
+    pkg = __non_webpack_require__(`${cardCacheDir}/package.json`);
   } catch (error) {
     createMinimalPackageJSON(cardCacheDir);
     pkg = MINIMAL_PACKAGE;

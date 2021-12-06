@@ -80,3 +80,5 @@ If you are viewing this message on the same device that you downloaded your Card
 Type "ok" if you are ready to continue.`
   );
 };
+
+export const aliases = [];

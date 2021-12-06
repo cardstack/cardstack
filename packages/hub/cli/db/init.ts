@@ -4,8 +4,8 @@ const exec = util.promisify(childProcess.exec);
 import config from 'config';
 import { Argv } from 'yargs';
 
-export let command = 'init-test';
-export let describe = 'Create the test database using the ENVs config';
+export let command = 'init';
+export let describe = 'Create the database using the ENVs config';
 export let builder = {};
 
 export async function handler(_argv: Argv) {

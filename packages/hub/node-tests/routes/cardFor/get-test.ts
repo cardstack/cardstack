@@ -57,7 +57,6 @@ if (process.env.COMPILER) {
     });
 
     it('404s when you try to load a path that the router doesnt have', async function () {
-      // assert.expect(0);
       await getCardForPath('thing').expect(404);
     });
 

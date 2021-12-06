@@ -6,3 +6,5 @@ export const description: Command['description'] = 'Ping command';
 export const run: Command['run'] = async (_client: Client, message: Message) => {
   message.channel.send('pong');
 };
+
+export const aliases = [];
