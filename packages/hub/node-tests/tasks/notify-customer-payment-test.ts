@@ -2,6 +2,11 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
+import sentryTestkit from 'sentry-testkit';
+import * as Sentry from '@sentry/node';
+import waitFor from '../utils/wait-for';
+
+const { testkit, sentryTransport } = sentryTestkit();
 
 type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
 
@@ -98,7 +103,14 @@ describe('NotifyCustomerPaymentTask', function () {
     });
   });
 
-  it('omits the merchant name when fetching it fails', async function () {
+  it('omits the merchant name and logs an error when fetching it fails', async function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
     merchantInfoShouldError = true;
     mockData.value = {
       prepaidCardOwner: {
@@ -126,6 +138,12 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(lastAddedJobPayload).to.deep.equal({
       notifiedAddress: 'eoa-address',
       message: `Your business received a payment of §2324`,
+    });
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'notify-customer-payment',
     });
   });
 

@@ -3,6 +3,7 @@ import config from 'config';
 import CardpaySDKService from '../services/cardpay-sdk';
 import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
+import * as Sentry from '@sentry/node';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -80,7 +81,11 @@ export default class NotifyCustomerPayment {
         }
       }
     } catch (e) {
-      // Silently ignore and just show notification without merchant name
+      Sentry.captureException(e, {
+        tags: {
+          action: 'notify-customer-payment',
+        },
+      });
     }
 
     let notifiedAddress = result.merchant.id;

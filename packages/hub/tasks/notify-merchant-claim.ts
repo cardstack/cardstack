@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import CardpaySDKService from '../services/cardpay-sdk';
 import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
+import * as Sentry from '@sentry/node';
 
 export interface MerchantClaimsQueryResult {
   data: {
@@ -68,7 +69,11 @@ export default class NotifyMerchantClaim {
         }
       }
     } catch (e) {
-      // Silently ignore and just show notification without merchant name
+      Sentry.captureException(e, {
+        tags: {
+          action: 'notify-merchant-claim',
+        },
+      });
     }
 
     let token = result.token.symbol;
