@@ -1,0 +1,3 @@
+web: node ./hub server
+worker: node ./hub worker
+bot: node ./hub bot

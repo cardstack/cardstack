@@ -10,7 +10,7 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && cp ./Procfile ./dist",
     "rebuild": "webpack --watch",
     "start": "run-p -c start:*",
     "start:server": "node -r source-map-support/register dist/hub.js server",

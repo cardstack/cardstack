@@ -4,7 +4,7 @@ project = "cardstack"
 # labels = { "foo" = "bar" }
 
 app "hub" {
-    path = "./packages/hub"
+    path = "./packages/hub/dist"
 
     build {
          use "docker" {
@@ -49,7 +49,7 @@ app "hub" {
 }
 
 app "hub-worker" {
-    path = "./packages/hub"
+    path = "./packages/hub/dist"
 
     build {
         use "pack" {
@@ -84,7 +84,7 @@ app "hub-worker" {
 }
 
 app "hub-bot" {
-    path = "./packages/hub"
+    path = "./packages/hub/dist"
 
     build {
         use "pack" {

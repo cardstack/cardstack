@@ -23,7 +23,7 @@ runs:
       shell: bash
 
     - name: Webpack build
-      run: yarn webpack
+      run: yarn build
       shell: bash
       working-directory: packages/hub
 
