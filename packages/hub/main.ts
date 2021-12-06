@@ -79,7 +79,6 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
-import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -340,12 +339,6 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
-  let web3 = await container.lookup('web3-socket');
-  let workerClient = await container.lookup('worker-client');
-
-  // listen for contract events
-  // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
 
   await runner.promise;
 }

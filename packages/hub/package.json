@@ -13,6 +13,7 @@
     "start": "run-p -c start:*",
     "start:server": "bin/hub server",
     "start:worker": "bin/hub worker",
+    "start:contract-subscription-event-handler": "bin/hub contract-subscription-event-handler",
     "console": "node --experimental-repl-await ./bin/hub console",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "npm-run-all test:*",
