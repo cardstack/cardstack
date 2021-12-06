@@ -45,6 +45,7 @@ import WyreCallbackRoute from './routes/wyre-callback';
 import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
+import MerchantInfoService from './services/merchant-info';
 import MerchantInfoQueries from './services/queries/merchant-info';
 import CardSpaceQueries from './services/queries/card-space';
 import CardSpaceSerializer from './services/serializers/card-space-serializer';
@@ -79,6 +80,7 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
+import RealmsConfig from './services/realms-config';
 import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
@@ -116,6 +118,7 @@ export function createRegistry(): Registry {
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
+  registry.register('merchant-info', MerchantInfoService);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('send-notifications', SendNotificationsTask);
@@ -155,6 +158,7 @@ export function createRegistry(): Registry {
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
+    registry.register('realmsConfig', RealmsConfig);
     registry.register('realm-manager', RealmManager);
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);

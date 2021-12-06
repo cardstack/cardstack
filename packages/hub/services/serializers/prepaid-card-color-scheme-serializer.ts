@@ -1,5 +1,6 @@
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
+import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 interface PrepaidCardColorScheme {
   id: string;
@@ -7,10 +8,6 @@ interface PrepaidCardColorScheme {
   patternColor: string;
   textColor: string;
   description: string;
-}
-interface JSONAPIDocument {
-  data: any;
-  included?: any[];
 }
 
 export default class PrepaidCardColorSchemeSerializer {

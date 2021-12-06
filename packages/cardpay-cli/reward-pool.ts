@@ -113,7 +113,7 @@ export async function claimRewards(
   rewardSafeAddress: string,
   leaf: string,
   proof: string,
-  acceptPartialClaim?: string,
+  acceptPartialClaim?: boolean,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -124,6 +124,26 @@ export async function claimRewards(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Claimed reward to reward safe ${rewardSafeAddress}`);
+  console.log('done');
+}
+
+export async function recoverRewardTokens(
+  network: string,
+  safeAddress: string,
+  rewardProgramId: string,
+  tokenAddress: string,
+  amount?: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardPool.recoverTokens(safeAddress, rewardProgramId, tokenAddress, amount, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(
+    `Recover ${amount} of ${tokenAddress} token for reward program id ${rewardProgramId} to safe ${safeAddress}`
+  );
   console.log('done');
 }
 

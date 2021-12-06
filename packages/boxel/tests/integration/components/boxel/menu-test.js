@@ -50,7 +50,7 @@ module('Integration | Component | Menu', function (hooks) {
   test('It can render dividers', async function (assert) {
     await render(hbs`
       <Boxel::Menu
-        @closeMenu={{noop}}
+        @closeMenu={{(noop)}}
         @items={{array
           (menu-item 'Top' (noop))
           (menu-item '---')
@@ -64,7 +64,7 @@ module('Integration | Component | Menu', function (hooks) {
   test('It can render variants with appropriate classes', async function (assert) {
     await render(hbs`
       <Boxel::Menu
-        @closeMenu={{noop}}
+        @closeMenu={{(noop)}}
         @items={{array
           (menu-item 'Dangerous' (noop) dangerous=true)
           (menu-item 'Icon' (noop) icon='gear')

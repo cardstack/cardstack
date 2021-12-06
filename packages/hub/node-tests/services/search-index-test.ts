@@ -1,15 +1,16 @@
 import { expect } from 'chai';
-import { setupHub } from '../helpers/server';
 import { outputJSONSync } from 'fs-extra';
 import { join } from 'path';
+import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe.skip('SearchIndex', function () {
+    let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
+
     this.afterEach(async function () {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
     });
-    let { getContainer, cards, realm, getRealmDir } = setupHub(this);
 
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');
@@ -22,10 +23,10 @@ if (process.env.COMPILER) {
       let si = await getContainer().lookup('searchIndex');
       await si.indexAllRealms();
       try {
-        await cards.load(`${realm}example`);
+        await cards.load(`${realmURL}example`);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
-        expect(err.message).to.eq(`Error: tried to adopt from card ${realm}post but it failed to load`);
+        expect(err.message).to.eq(`Error: tried to adopt from card ${realmURL}post but it failed to load`);
         expect(err.status).to.eq(422);
       }
     });

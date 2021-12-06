@@ -119,3 +119,19 @@ export async function withdraw(
   console.log(`Withdraw ${amount} of ${tokenAddress} out of ${rewardSafe} to ${to}`);
   console.log('done');
 }
+
+export async function transferRewardSafe(
+  network: string,
+  rewardSafe: string,
+  newOwner: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardManagerAPI.transfer(rewardSafe, newOwner, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(`Transfer reward safe ${rewardSafe} ownership to ${newOwner}`);
+  console.log('done');
+}

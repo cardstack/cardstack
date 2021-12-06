@@ -2,6 +2,11 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import NotifyMerchantClaim, { MerchantClaimsQueryResult } from '../../tasks/notify-merchant-claim';
 import { expect } from 'chai';
+import sentryTestkit from 'sentry-testkit';
+import * as Sentry from '@sentry/node';
+import waitFor from '../utils/wait-for';
+
+const { testkit, sentryTransport } = sentryTestkit();
 
 type TransactionInformation = MerchantClaimsQueryResult['data']['merchantClaims'][number];
 
@@ -39,10 +44,26 @@ class StubWorkerClient {
   }
 }
 
+let merchantInfoShouldError = false;
+
+class StubMerchantInfo {
+  async getMerchantInfo(_did: string) {
+    if (merchantInfoShouldError) {
+      throw new Error('Simulated error fetching merchant info');
+    } else {
+      return {
+        name: 'Mandello',
+      };
+    }
+  }
+}
+
 describe('NotifyMerchantClaimTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
+    merchantInfoShouldError = false;
     registry(this).register('cardpay', StubCardPay);
+    registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
   });
   let { getContainer } = setupHub(this);
@@ -56,6 +77,7 @@ describe('NotifyMerchantClaimTask', function () {
     mockData.value = {
       merchantSafe: {
         id: 'merchant-safe-address',
+        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
         merchant: {
           id: 'eoa-address',
         },
@@ -65,6 +87,72 @@ describe('NotifyMerchantClaimTask', function () {
         symbol: 'DAI.CPXD',
       },
     };
+    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+
+    await task.perform('a');
+
+    expect(lastAddedJobIdentifier).to.equal('send-notifications');
+    expect(lastAddedJobPayload).to.deep.equal({
+      notifiedAddress: 'eoa-address',
+      message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
+    });
+  });
+
+  it('omits the merchant name and logs an error when fetching it fails', async function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
+    merchantInfoShouldError = true;
+    mockData.value = {
+      merchantSafe: {
+        id: 'merchant-safe-address',
+        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
+        merchant: {
+          id: 'eoa-address',
+        },
+      },
+      amount: '1155000000000000000000',
+      token: {
+        symbol: 'DAI.CPXD',
+      },
+    };
+
+    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+
+    await task.perform('a');
+
+    expect(lastAddedJobIdentifier).to.equal('send-notifications');
+    expect(lastAddedJobPayload).to.deep.equal({
+      notifiedAddress: 'eoa-address',
+      message: `You just claimed 1155 DAI.CPXD from your business account`,
+    });
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'notify-merchant-claim',
+    });
+  });
+
+  it('omits the merchant name when there is no DID', async function () {
+    mockData.value = {
+      merchantSafe: {
+        id: 'merchant-safe-address',
+        infoDid: undefined,
+        merchant: {
+          id: 'eoa-address',
+        },
+      },
+      amount: '1155000000000000000000',
+      token: {
+        symbol: 'DAI.CPXD',
+      },
+    };
+
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
     await task.perform('a');

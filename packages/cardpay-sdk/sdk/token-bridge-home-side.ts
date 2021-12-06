@@ -6,7 +6,7 @@ import HomeAMBABI from '../contracts/abi/home-amb';
 import HomeBridgeMediatorABI from '../contracts/abi/home-bridge-mediator';
 import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
-import { executeTransaction, gasEstimate, getNextNonceFromEstimate } from './utils/safe-utils';
+import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTx } from './utils/signing-utils';
 import { query } from './utils/graphql';
@@ -102,8 +102,16 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     }
 
     let payload = token.methods.transferAndCall(homeBridgeAddress, amount, recipientAddress).encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
-    let gasCost = toBN(estimate.dataGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
+    let gasCost = toBN(estimate.safeTxGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
     if (safeBalance.lt(toBN(amount).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when relaying tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
@@ -122,6 +130,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       safeAddress,
       tokenAddress,
       payload,
+      Operation.CALL,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)

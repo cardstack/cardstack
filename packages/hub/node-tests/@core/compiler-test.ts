@@ -1,8 +1,8 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 import CardBuilder from '../../services/card-builder';
-import { setupHub } from '../helpers/server';
 import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
+import { configureHubWithCompiler } from '../helpers/cards';
 import { RawCard } from '@cardstack/core/src/interfaces';
 
 const PERSON_CARD = {
@@ -31,7 +31,8 @@ const PERSON_CARD = {
 if (process.env.COMPILER) {
   describe('Compiler', function () {
     let builder: CardBuilder;
-    let { cards, getContainer } = setupHub(this);
+
+    let { getContainer, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
