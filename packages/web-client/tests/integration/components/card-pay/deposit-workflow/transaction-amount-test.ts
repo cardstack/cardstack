@@ -63,7 +63,7 @@ module(
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
         @onComplete={{this.onComplete}}
-        @onIncomplete={{noop}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -118,8 +118,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -156,8 +156,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -178,8 +178,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -201,8 +201,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -232,8 +232,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 
@@ -287,8 +287,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{(noop)}}
+        @onIncomplete={{(noop)}}
       />
     `);
 

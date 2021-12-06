@@ -68,8 +68,8 @@ module(
         await render(hbs`
           <CardPay::WithdrawalWorkflow::TransactionAmount
             @workflowSession={{this.session}}
-            @onComplete={{noop}}
-            @onIncomplete={{noop}}
+            @onComplete={{(noop)}}
+            @onIncomplete={{(noop)}}
           />
         `);
       };
