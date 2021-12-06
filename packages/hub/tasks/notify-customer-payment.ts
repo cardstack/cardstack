@@ -1,7 +1,9 @@
 import { inject } from '@cardstack/di';
 import config from 'config';
 import CardpaySDKService from '../services/cardpay-sdk';
+import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
+import * as Sentry from '@sentry/node';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -11,6 +13,7 @@ export interface PrepaidCardPaymentsQueryResult {
       };
       merchantSafe: {
         id: string;
+        infoDid: string | undefined;
       };
       merchant: {
         id: string;
@@ -33,6 +36,7 @@ query($txn: String!) {
     }
     merchantSafe {
       id
+      infoDid
     }
     merchant {
       id
@@ -48,6 +52,7 @@ query($txn: String!) {
 
 export default class NotifyCustomerPayment {
   cardpay: CardpaySDKService = inject('cardpay');
+  merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   async perform(payload: string) {
@@ -65,9 +70,27 @@ export default class NotifyCustomerPayment {
       );
     }
 
+    let merchantName = 'You';
+
+    try {
+      if (result.merchantSafe?.infoDid) {
+        let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
+
+        if (merchantInfo?.name) {
+          merchantName = merchantInfo.name;
+        }
+      }
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'notify-customer-payment',
+        },
+      });
+    }
+
     let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
-    let message = `Your business received a payment of §${spendAmount}`;
+    let message = `${merchantName} received a payment of §${spendAmount}`;
 
     await this.workerClient.addJob('send-notifications', {
       notifiedAddress,
