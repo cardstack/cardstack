@@ -1,11 +1,10 @@
-import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import FSRealm from '../realms/fs-realm';
 import { NotFound } from '@cardstack/core/src/utils/errors';
+import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
+import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
-import { ensureTrailingSlash } from '../utils/path';
 import config from 'config';
-import { getOwner } from '@cardstack/di';
-import { inject } from '@cardstack/di';
+import { getOwner, inject } from '@cardstack/di';
 
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 

@@ -4,8 +4,8 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.6/prepaid-card-manager';
-import DAIOracleABI from '../../contracts/abi/v0.8.6/chainlink-feed-adapter';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
+import DAIOracleABI from '../../contracts/abi/v0.8.7/chainlink-feed-adapter';
 import { getAddress, getOracle } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -483,6 +483,7 @@ export default class PrepaidCard {
       safeAddress,
       tokenAddress,
       payload,
+      0,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)

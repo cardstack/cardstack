@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.8.6/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.8.7/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -164,6 +164,7 @@ export default class RevenuePool {
       merchantSafeAddress,
       revenuePoolAddress,
       payload,
+      0,
       estimate,
       nonce,
       await signSafeTx(this.layer2Web3, merchantSafeAddress, revenuePoolAddress, payload, estimate, nonce, from)

@@ -1,5 +1,6 @@
 import Web3 from 'web3';
-import RewardManagerABI from '../../contracts/abi/v0.8.6/reward-manager';
+import RewardSafeDelegateABI from '../../contracts/abi/v0.8.7/reward-safe-delegate-implementation';
+import RewardManagerABI from '../../contracts/abi/v0.8.7/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
@@ -17,13 +18,13 @@ import {
   executeSend,
   gasEstimate,
   executeTransaction,
+  Operation,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
-import { signRewardSafe, signSafeTxWithEIP1271AsBytes, createEIP1271VerifyingData } from '../utils/signing-utils';
+import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
-import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -383,7 +384,6 @@ export default class RewardManager {
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
-
   async withdraw(txnHash: string): Promise<TransactionReceipt>;
   async withdraw(
     safeAddress: string,
@@ -395,7 +395,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt>;
   async withdraw(
     safeAddressOrTxnHash: string,
-    to?: string, // TODO: use this when https://github.com/cardstack/card-pay-protocol/pull/141 is deployed
+    to?: string,
     tokenAddress?: string,
     amount?: string,
     txnOptions?: TransactionOptions,
@@ -428,6 +428,11 @@ export default class RewardManager {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -436,105 +441,33 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
     let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
     if (weiAmount.gt(safeBalance)) {
-      throw new Error(`Insufficient funds for inside reward safe`);
+      throw new Error(
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+      );
     }
 
-    let transfer = await token.methods.transfer(rewardSafeOwner, weiAmount);
-    let transferPayload = transfer.encodeABI();
-
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    let transferNonce: BN;
-    if (nonce != null) {
-      transferNonce = nonce.add(new BN(1));
-    } else {
-      let rewardSafe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
-      nonce = new BN(await rewardSafe.methods.nonce().call());
-      if (typeof onNonce === 'function') {
-        onNonce(nonce);
-      }
-      transferNonce = nonce.add(new BN('1'));
-    }
-
-    let innerEstimate = await gasEstimate(
-      this.layer2Web3,
-      safeAddress,
-      tokenAddress,
-      '0',
-      transferPayload,
-      0,
-      tokenAddress
-    );
-
-    let fullSignatureInnerExec = await signSafeTxWithEIP1271AsBytes(
-      this.layer2Web3,
-      tokenAddress,
-      0,
-      transferPayload,
-      0,
-      innerEstimate,
-      safeAddress,
-      transferNonce,
-      rewardSafeOwner,
-      safeAddress,
-      rewardManagerAddress
-    );
-
-    //=============================================================================================================================================
-    // for nested gnosis executions, gasEstimate() call will fail if we sign for incremented nonce within the inner gnosis execution
-    // therefore, we intentionally sign for a NON-incremented  nonce so the relayer can return a gas estimate
-
-    let fullSignatureInnerExecNonIncrementingNonce = await signSafeTxWithEIP1271AsBytes(
-      this.layer2Web3,
-      tokenAddress,
-      0,
-      transferPayload,
-      0,
-      innerEstimate,
-      safeAddress,
-      nonce,
-      rewardSafeOwner,
-      safeAddress,
-      rewardManagerAddress
-    );
-
-    let payloadNonIncrementingNonce = (await this.getRewardManager()).methods
-      .withdrawFromRewardSafe(
-        tokenAddress,
-        weiAmount,
-        innerEstimate.safeTxGas,
-        innerEstimate.baseGas,
-        innerEstimate.gasPrice,
-        innerEstimate.gasToken,
-        fullSignatureInnerExecNonIncrementingNonce
-      )
-      .encodeABI();
-
+    let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+    let withdrawPayload = withdraw.encodeABI();
     let estimate = await gasEstimate(
       this.layer2Web3,
       safeAddress,
-      rewardManagerAddress,
+      rewardSafeDelegateAddress,
       '0',
-      payloadNonIncrementingNonce,
-      0,
+      withdrawPayload,
+      Operation.DELEGATECALL,
       tokenAddress
     );
 
-    //=============================================================================================================================================
-
-    let payload = (await this.getRewardManager()).methods
-      .withdrawFromRewardSafe(
-        tokenAddress,
-        weiAmount,
-        innerEstimate.safeTxGas,
-        innerEstimate.baseGas,
-        innerEstimate.gasPrice,
-        innerEstimate.gasToken,
-        fullSignatureInnerExec
-      )
-      .encodeABI();
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (weiAmount.lt(gasCost)) {
+    if (safeBalance.lt(gasCost.add(weiAmount))) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
@@ -543,10 +476,10 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
-      rewardManagerAddress,
+      rewardSafeDelegateAddress,
       0,
-      payload,
-      0,
+      withdrawPayload,
+      Operation.DELEGATECALL,
       estimate,
       tokenAddress,
       ZERO_ADDRESS,
@@ -558,10 +491,10 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let eip1271Data = createEIP1271VerifyingData(
       this.layer2Web3,
-      rewardManagerAddress,
+      rewardSafeDelegateAddress,
       '0',
-      payload,
-      '0',
+      withdrawPayload,
+      Operation.DELEGATECALL.toString(),
       estimate.safeTxGas,
       estimate.baseGas,
       estimate.gasPrice,
@@ -572,8 +505,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
-      rewardManagerAddress,
-      payload,
+      rewardSafeDelegateAddress,
+      withdrawPayload,
+      Operation.DELEGATECALL,
       estimate,
       nonce,
       fullSignature,
@@ -585,6 +519,136 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
+  async transfer(txnHash: string): Promise<TransactionReceipt>;
+  async transfer(
+    safeAddress: string,
+    newOwner: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async transfer(
+    safeAddressOrTxnHash: string,
+    newOwner?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    }
+    if (!safeAddressOrTxnHash) {
+      throw new Error('safeAddress is required');
+    }
+    if (!newOwner) {
+      throw new Error('newOwner must be provided');
+    }
+    let safeAddress = safeAddressOrTxnHash;
+
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardManagerAddress = await this.address();
+
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
+
+    let rewardProgramId = await this.getRewardProgram('0x853fD3376b6f0b2b839Bd841FbdC6C1f93B3BFBD');
+    if (rewardProgramId == ZERO_ADDRESS) {
+      throw new Error('reward safe does not does not have reward program');
+    }
+    if (!(await this.isValidRewardSafe(safeAddress, rewardProgramId))) {
+      throw new Error('reward safe is not valid');
+    }
+    // Temporarily, transfer function will use card as a the default gas token
+    // This means that the safe has to have card tokens within it before it can transfer
+    // This will change after we finalise the gas policy
+    let gasTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
+    let gasToken = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
+
+    let safeBalance = new BN(await gasToken.methods.balanceOf(safeAddress).call());
+
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
+    if (!(rewardSafeOwner == from)) {
+      throw new Error(
+        `Reward safe owner is NOT the signer of transaction.
+The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
+      );
+    }
+    let payload = await rewardSafeDelegate.methods
+      .swapOwner(rewardManagerAddress, rewardManagerAddress, rewardSafeOwner, newOwner)
+      .encodeABI();
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardSafeDelegateAddress,
+      '0',
+      payload,
+      Operation.DELEGATECALL,
+      gasTokenAddress
+    );
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (safeBalance.lt(gasCost)) {
+      throw new Error(
+        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${gasTokenAddress} is ${fromWei(
+          safeBalance
+        )}, the gas cost is ${fromWei(gasCost)}`
+      );
+    }
+    let fullSignature = await signRewardSafe(
+      this.layer2Web3,
+      rewardSafeDelegateAddress,
+      0,
+      payload,
+      Operation.DELEGATECALL,
+      estimate,
+      gasTokenAddress,
+      ZERO_ADDRESS,
+      nonce,
+      rewardSafeOwner,
+      safeAddress,
+      rewardManagerAddress
+    );
+
+    let eip1271Data = createEIP1271VerifyingData(
+      this.layer2Web3,
+      rewardSafeDelegateAddress,
+      '0',
+      payload,
+      Operation.DELEGATECALL.toString(),
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      gasTokenAddress,
+      ZERO_ADDRESS,
+      nonce.toString()
+    );
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      rewardSafeDelegateAddress,
+      payload,
+      Operation.DELEGATECALL,
+      estimate,
+      nonce,
+      fullSignature,
+      eip1271Data
+    );
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
+    }
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
     admin: string,
@@ -831,7 +895,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   async getRewardRule(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
   }
+  async getRewardSafeDelegateAddress(): Promise<string> {
+    return await (await this.getRewardManager()).methods.safeDelegateImplementation().call();
+  }
 
+  async getRewardProgram(rewardSafe: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.rewardProgramsForRewardSafes(rewardSafe).call();
+  }
   async address(): Promise<string> {
     return await getAddress('rewardManager', this.layer2Web3);
   }

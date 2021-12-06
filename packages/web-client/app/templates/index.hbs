@@ -4,33 +4,6 @@
 >
   <:body>
   <div class="cardstack-landing-page-container">
-    {{!-- <header class="cardstack-landing-page-section-header"> --}}
-    <h1 class="cardstack-landing-page-section-header__title" data-test-cardstack-dashboard-header>
-      Cardstack
-    </h1>
-    {{!-- {{#unless this.layer2Network.isConnected}}
-      <Boxel::Button
-        @kind="secondary-dark"
-        @size="tall"
-        {{on "click" (fn this.connectToWallet)}}
-        data-test-cardstack-login-button
-      >
-        Connect Account
-      </Boxel::Button>
-    {{/unless}} --}}
-    {{!-- </header> --}}
-    <div class="cardstack-landing-page-hero">
-      <div class="cardstack-landing-page-hero__content-container">
-        <img src={{@model.logo}} alt="" role="presentation" class="cardstack-landing-page-hero__logo">
-        <p class="cardstack-landing-page-hero__description">The world’s first cooperative SaaS platform.</p>
-        <p class="cardstack-landing-page-hero__description">Own the platform. Choose the tools. Work your way.</p>
-        <a href="https://cardstack.com/" class="cardstack-landing-page-hero__cta">
-          Learn more {{svg-jar "caret-right" class="cardstack-landing-page-hero__cta-icon"}}
-        </a>
-      </div>
-    </div>
-
-    <h2 class="cardstack-landing-page-section-header__title">Launch a Product</h2>
     <ul class="cardstack-landing-page-org-grid">
       {{#each @model.orgs as |org|}}
       <li>
