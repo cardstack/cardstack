@@ -1,6 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { cardHelpers, configureCompiler } from '../../helpers/cards';
-import { setupHub } from '../../helpers/server';
+import { configureHubWithCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<card-id>', function () {
@@ -8,9 +7,7 @@ if (process.env.COMPILER) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { realmURL } = configureCompiler(this);
-    let { request } = setupHub(this);
-    let { cards, resolveCard } = cardHelpers(this);
+    let { realmURL, request, cards, resolveCard } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({

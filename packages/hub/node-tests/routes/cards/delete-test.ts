@@ -3,8 +3,7 @@ import { encodeCardURL } from '@cardstack/core/src/utils';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
-import { setupHub } from '../../helpers/server';
-import { cardHelpers, configureCompiler } from '../../helpers/cards';
+import { configureHubWithCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('DELETE /cards/<card-id>', function () {
@@ -16,9 +15,7 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { realmURL } = configureCompiler(this);
-    let { request, getContainer } = setupHub(this);
-    let { cards, getCardCache } = cardHelpers(this);
+    let { getContainer, realmURL, getCardCache, request, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({

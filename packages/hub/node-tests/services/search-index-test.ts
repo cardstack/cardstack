@@ -1,18 +1,16 @@
 import { expect } from 'chai';
-import { setupHub } from '../helpers/server';
 import { outputJSONSync } from 'fs-extra';
 import { join } from 'path';
-import { cardHelpers, configureCompiler } from '../helpers/cards';
+import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe.skip('SearchIndex', function () {
+    let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
+
     this.afterEach(async function () {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
     });
-    let { realmURL, getRealmDir } = configureCompiler(this);
-    let { getContainer } = setupHub(this);
-    let { cards } = cardHelpers(this);
 
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');

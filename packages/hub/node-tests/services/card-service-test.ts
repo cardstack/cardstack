@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { cardHelpers, configureCompiler } from '../helpers/cards';
+import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('CardService', function () {
@@ -9,9 +8,7 @@ if (process.env.COMPILER) {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
     });
-    let { realmURL } = configureCompiler(this);
-    let { getContainer } = setupHub(this);
-    let { cards } = cardHelpers(this);
+    let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');

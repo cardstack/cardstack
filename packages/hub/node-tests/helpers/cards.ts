@@ -2,7 +2,7 @@ import Mocha from 'mocha';
 import tmp from 'tmp';
 import { join } from 'path';
 import { CardCacheConfig } from '../../services/card-cache-config';
-import { contextFor, registry } from './server';
+import { contextFor, registry, setupHub } from './server';
 import CardServiceFactory, { CardService, INSECURE_CONTEXT } from '../../services/card-service';
 import CardCache from '../../services/card-cache';
 import { TEST_REALM } from '@cardstack/core/tests/helpers';
@@ -30,6 +30,22 @@ export class TestCardCacheConfig extends CardCacheConfig {
 export function resolveCard(root: string, modulePath: string): string {
   return require.resolve(modulePath, { paths: [root] });
 }
+
+export function configureHubWithCompiler(mochaContext: Mocha.Suite) {
+  let { realmURL, getRealmDir } = configureCompiler(mochaContext);
+  let { request, getContainer } = setupHub(mochaContext);
+  let { cards, resolveCard, getCardCache } = cardHelpers(mochaContext);
+  return {
+    realmURL,
+    getRealmDir,
+    request,
+    getContainer,
+    cards,
+    resolveCard,
+    getCardCache,
+  };
+}
+
 /**
  *  Override default config objects on the container. Must be run before container is setup.
  */

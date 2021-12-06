@@ -2,8 +2,7 @@ import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-template';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import CardBuilder from '../../services/card-builder';
-import { setupHub } from '../helpers/server';
-import { cardHelpers, configureCompiler } from '../helpers/cards';
+import { configureHubWithCompiler } from '../helpers/cards';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -17,9 +16,7 @@ if (process.env.COMPILER) {
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-    let { realmURL } = configureCompiler(this);
-    let { getContainer } = setupHub(this);
-    let { cards } = cardHelpers(this);
+    let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');

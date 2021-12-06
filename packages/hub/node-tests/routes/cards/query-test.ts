@@ -1,8 +1,7 @@
 /* eslint-disable mocha/no-exclusive-tests */
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupHub } from '../../helpers/server';
 import { map } from 'lodash';
-import { cardHelpers, configureCompiler } from '../../helpers/cards';
+import { configureHubWithCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<QUERY>', function () {
@@ -15,9 +14,7 @@ if (process.env.COMPILER) {
       await si.reset();
     });
 
-    let { realmURL } = configureCompiler(this);
-    let { request, getContainer } = setupHub(this);
-    let { cards } = cardHelpers(this);
+    let { getContainer, realmURL, request, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({

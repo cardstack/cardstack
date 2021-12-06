@@ -1,7 +1,7 @@
 import { TEST_REALM, templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
-import { cardHelpers, configureCompiler } from '../../helpers/cards';
-import { registry, setupHub } from '../../helpers/server';
+import { configureHubWithCompiler } from '../../helpers/cards';
+import { registry } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
@@ -18,9 +18,7 @@ if (process.env.COMPILER) {
       );
     });
 
-    let { realmURL } = configureCompiler(this);
-    let { request } = setupHub(this);
-    let { cards, resolveCard } = cardHelpers(this);
+    let { realmURL, request, cards, resolveCard } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({

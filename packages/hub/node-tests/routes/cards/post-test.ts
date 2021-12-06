@@ -1,14 +1,11 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { cardHelpers, configureCompiler } from '../../helpers/cards';
-import { setupHub } from '../../helpers/server';
+import { configureHubWithCompiler } from '../../helpers/cards';
 
 let e = encodeURIComponent;
 if (process.env.COMPILER) {
   describe('POST /cards/<card-id>', function () {
-    let { realmURL } = configureCompiler(this);
-    let { request } = setupHub(this);
-    let { cards, resolveCard } = cardHelpers(this);
+    let { realmURL, request, cards, resolveCard } = configureHubWithCompiler(this);
 
     function getCard(cardURL: string) {
       return request().get(`/cards/${e(cardURL)}`);
