@@ -8,11 +8,11 @@ import sinon from 'sinon';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
+  convertToSpend,
   formatCurrencyAmount,
   generateMerchantPaymentUrl,
   roundAmountToNativeCurrencyDecimals,
   spendToUsd,
-  usdToSpend,
   ViewSafeResult,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
@@ -294,7 +294,10 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(SECONDARY_AMOUNT)
       .containsText(
-        `§${formatCurrencyAmount(usdToSpend(roundedJpyAmountInUsd)!, 0)}`
+        `§${formatCurrencyAmount(
+          convertToSpend(roundedJpyAmountInUsd, 'USD', 1)!,
+          0
+        )}`
       );
 
     let expectedUrl = generateMerchantPaymentUrl({
@@ -311,8 +314,10 @@ module('Acceptance | pay', function (hooks) {
   test('it rounds amount up to min spend amount if currency is non-USD and non-SPEND', async function (assert) {
     const minJpyAmount = minUsdAmount * mirageConversionRate;
     const jpyAmount = minJpyAmount - 0.1;
-    const convertedMinSpendAmount = usdToSpend(
-      minJpyAmount / mirageConversionRate
+    const convertedMinSpendAmount = convertToSpend(
+      minJpyAmount,
+      'JPY',
+      mirageConversionRate
     );
 
     await visit(
