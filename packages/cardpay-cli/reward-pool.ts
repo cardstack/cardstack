@@ -127,6 +127,26 @@ export async function claimRewards(
   console.log('done');
 }
 
+export async function recoverRewardTokens(
+  network: string,
+  safeAddress: string,
+  rewardProgramId: string,
+  tokenAddress: string,
+  amount?: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardPool.recoverTokens(safeAddress, rewardProgramId, tokenAddress, amount, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(
+    `Recover ${amount} of ${tokenAddress} token for reward program id ${rewardProgramId} to safe ${safeAddress}`
+  );
+  console.log('done');
+}
+
 async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
   rewardPool: any,
   arrWithTokenAddress: T[]
