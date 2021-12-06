@@ -214,7 +214,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       0,
       transferData,
-      0,
+      Operation.CALL,
       '0',
       '0',
       '0',
