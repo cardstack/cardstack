@@ -16,6 +16,7 @@ import {
   getSendPayload,
   GnosisExecTx,
   SendPayload,
+  Operation,
 } from '../utils/safe-utils';
 import { getAddress } from '../..';
 import { Signature, signPrepaidCardSendTx, signSafeTxAsBytes } from '../utils/signing-utils';
@@ -116,7 +117,7 @@ export default class PrepaidCardMarket {
       prepaidCardToAdd,
       0,
       transferData,
-      0,
+      Operation.CALL,
       '0',
       '0',
       '0',
