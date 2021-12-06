@@ -4,13 +4,13 @@ project = "cardstack"
 # labels = { "foo" = "bar" }
 
 app "hub" {
-    path = "./packages/hub/dist"
+    path = "./packages/hub"
 
     build {
-         use "docker" {
+        use "docker" {
           dockerfile = "Dockerfile"
-          build_args {
-              hub_command = "serve"
+          build_args = {
+              hub_command = "server"
           }
         }
 
@@ -49,11 +49,14 @@ app "hub" {
 }
 
 app "hub-worker" {
-    path = "./packages/hub/dist"
+    path = "./packages/hub"
 
     build {
-        use "pack" {
-            process_type = "worker"
+        use "docker" {
+          dockerfile = "Dockerfile"
+          build_args = {
+              hub_command = "worker"
+          }
         }
 
         registry {
@@ -84,11 +87,14 @@ app "hub-worker" {
 }
 
 app "hub-bot" {
-    path = "./packages/hub/dist"
+    path = "./packages/hub"
 
     build {
-        use "pack" {
-            process_type = "bot"
+        use "docker" {
+          dockerfile = "Dockerfile"
+          build_args = {
+              hub_command = "bot"
+          }
         }
 
         registry {
