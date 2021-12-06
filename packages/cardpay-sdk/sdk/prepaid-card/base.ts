@@ -458,7 +458,7 @@ export default class PrepaidCard {
       marketAddress
     );
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
 
     if (balance.lt(totalWeiAmount.add(gasCost))) {
       throw new Error(

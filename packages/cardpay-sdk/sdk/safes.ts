@@ -356,7 +356,7 @@ export default class Safes implements ISafes {
       Operation.CALL,
       tokenAddress
     );
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (safeBalance.lt(new BN(amount).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
