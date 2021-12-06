@@ -111,7 +111,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       Operation.CALL,
       tokenAddress
     );
-    let gasCost = toBN(estimate.dataGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
+    let gasCost = toBN(estimate.safeTxGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
     if (safeBalance.lt(toBN(amount).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when relaying tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
