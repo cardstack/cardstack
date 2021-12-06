@@ -15,6 +15,7 @@ import {
   executeTransaction,
   getNextNonceFromEstimate,
   executeSendWithRateLock,
+  Operation,
 } from '../utils/safe-utils';
 import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
@@ -87,7 +88,7 @@ export default class RevenuePool {
       revenuePoolAddress,
       '0',
       payload,
-      0,
+      Operation.CALL,
       tokenAddress
     );
     let gasInToken = new BN(String(estimate.baseGas))
@@ -142,7 +143,7 @@ export default class RevenuePool {
       revenuePoolAddress,
       '0',
       payload,
-      0,
+      Operation.CALL,
       tokenAddress
     );
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));

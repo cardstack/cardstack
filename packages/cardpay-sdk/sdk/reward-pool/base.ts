@@ -341,7 +341,15 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
     let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, token);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardPoolAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      token
+    );
 
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
@@ -466,7 +474,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     let payload = (await this.getRewardPool()).methods
       .recoverTokens(rewardProgramId, tokenAddress, weiAmount)
       .encodeABI();
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardPoolAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
       throw new Error(
