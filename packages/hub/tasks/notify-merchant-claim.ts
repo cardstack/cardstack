@@ -64,7 +64,7 @@ export default class NotifyMerchantClaim {
       if (result.merchantSafe.infoDid) {
         let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
 
-        if (merchantInfo) {
+        if (merchantInfo?.name) {
           merchantName = ` ${merchantInfo.name}`;
         }
       }
