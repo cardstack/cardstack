@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupHub } from '../../helpers/server';
+import { configureHubWithCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('PATCH /cards/<card-id>', function () {
@@ -16,11 +16,11 @@ if (process.env.COMPILER) {
         .expect('Content-Type', /json/);
     }
 
-    let { cards, request, realm } = setupHub(this);
+    let { realmURL, request, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}post`,
+        url: `${realmURL}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -39,7 +39,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}post0`,
+        url: `${realmURL}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -50,7 +50,7 @@ if (process.env.COMPILER) {
 
     it('returns a 404 when trying to update from a card that doesnt exist', async function () {
       // assert.expect(0);
-      await updateCard(`${realm}car0`, {
+      await updateCard(`${realmURL}car0`, {
         data: {
           vin: '123',
         },
@@ -58,7 +58,7 @@ if (process.env.COMPILER) {
     });
 
     it.skip('can update an existing data only card', async function () {
-      let initialResponse = await updateCard(`${realm}post0`, {
+      let initialResponse = await updateCard(`${realmURL}post0`, {
         data: {
           attributes: {
             title: 'Goodbye World!',
@@ -71,7 +71,7 @@ if (process.env.COMPILER) {
         body: 'First post',
       });
 
-      let response = await getCard(`${realm}post0`).expect(200);
+      let response = await getCard(`${realmURL}post0`).expect(200);
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Goodbye World!',
         body: 'First post',
@@ -83,14 +83,14 @@ if (process.env.COMPILER) {
         title: 'Placeholder Title',
         body: 'Placeholder Body',
       };
-      let initialResponse = await updateCard(`${realm}post`, {
+      let initialResponse = await updateCard(`${realmURL}post`, {
         data: {
           attributes,
         },
       }).expect(200);
       expect(initialResponse.body.data.attributes).to.deep.equal(attributes);
 
-      let response = await getCard(`${realm}post`).expect(200);
+      let response = await getCard(`${realmURL}post`).expect(200);
       expect(response.body.data?.attributes).to.deep.equal(attributes);
     });
   });

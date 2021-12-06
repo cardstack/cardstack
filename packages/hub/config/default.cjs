@@ -1,5 +1,3 @@
-const { join } = require('path');
-
 module.exports = {
   hubEnvironment: 'development',
   aws: {
@@ -68,19 +66,5 @@ module.exports = {
   },
   web3storage: {
     token: null,
-  },
-  compiler: {
-    realmsConfig: [
-      {
-        url: 'https://cardstack.com/base/',
-        directory: join(__dirname, '..', '..', 'base-cards'),
-        watch: true,
-      },
-      {
-        url: 'https://demo.com/',
-        directory: join(__dirname, '..', '..', 'demo-cards'),
-        watch: true,
-      },
-    ],
   },
 };

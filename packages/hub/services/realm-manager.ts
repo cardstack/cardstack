@@ -3,19 +3,18 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
-import config from 'config';
-import { getOwner, inject } from '@cardstack/di';
-
-const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
+import { getOwner, inject, injectionReady } from '@cardstack/di';
 
 export default class RealmManager {
   realms: RealmInterface[] = [];
 
+  private realmsConfig = inject('realmsConfig');
   private searchIndex = inject('searchIndex');
 
   async ready() {
+    await injectionReady(this, 'realmsConfig');
     await Promise.all(
-      realmsConfig.map((config) => {
+      this.realmsConfig.realms.map((config) => {
         return this.createRealm(config);
       })
     );
