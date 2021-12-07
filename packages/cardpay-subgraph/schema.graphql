@@ -568,6 +568,7 @@ type RewardeeClaim @entity {
   transaction: Transaction!
   timestamp: BigInt!
   blockNumber: BigInt!
+  leaf: Bytes!
 }
 
 type RewardTokensAdd @entity {

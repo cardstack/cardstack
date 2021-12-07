@@ -10,6 +10,7 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   let rewardSafe = toChecksumAddress(event.params.rewardSafe);
   let token = makeToken(event.params.token);
   let amount = event.params.amount;
+  let leaf = event.params.leaf;
 
   let rewardProgramEntity = RewardProgram.load(rewardProgramID);
   if (rewardProgramEntity == null) {
@@ -40,6 +41,7 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
   entity.blockNumber = event.block.number;
+  entity.leaf = leaf;
   entity.save();
 }
 
