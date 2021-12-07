@@ -108,8 +108,8 @@ export interface Field {
   name: string;
 }
 
-export interface CompiledCard {
-  url: string;
+export interface NewCompiledCard {
+  realm: string;
   adoptsFrom?: CompiledCard;
   fields: {
     [key: string]: Field;
@@ -120,29 +120,30 @@ export interface CompiledCard {
   embedded: ComponentInfo;
   edit: ComponentInfo;
 
-  modules: {
-    localModule: string;
-    type: string;
-    source: string;
-  }[];
+  modules: Record<
+    string, // local module path
+    {
+      type: string;
+      source: string;
+    }
+  >;
+}
+
+export interface CompiledCard extends NewCompiledCard {
+  url: string;
 }
 
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  inlineHBS?: string;
-  sourceCardURL: string;
+  inlineHBS?: boolean;
+  source: RawCard;
 }
 
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-
-  // returns the module identifier that can be used to get this module back.
-  // It's exactly meaning depends on the environment. In node it's a path you
-  // can actually `require`.
-  define: (cardURL: string, localModule: string, type: string, source: string) => Promise<string>;
 }
 
 export interface RealmConfig {

@@ -20,6 +20,7 @@ import {
   FEATURE_NAMES,
   Format,
   FORMATS,
+  NewCompiledCard,
   NewRawCard,
   RawCard,
 } from './interfaces';
@@ -29,7 +30,7 @@ import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
-function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
+function getNonAssetFilePaths(sourceCard: NewRawCard): (string | undefined)[] {
   let paths: string[] = [];
   for (const feature of FEATURE_NAMES) {
     paths.push(sourceCard[feature]);
@@ -45,25 +46,28 @@ export class Compiler {
     this.builder = params.builder;
   }
 
-  async compile(cardSource: NewRawCard | RawCard): Promise<CompiledCard> {
+  async compile(cardSource: NewRawCard): Promise<NewCompiledCard>;
+  async compile(cardSource: RawCard): Promise<CompiledCard>;
+  async compile(cardSource: NewRawCard | RawCard): Promise<NewCompiledCard | CompiledCard> {
     let options = {};
-    let schemaModule = await this.prepareSchema(cardSource, options);
+    let modules: CompiledCard['modules'] = {};
+    let schemaModule = await this.prepareSchema(cardSource, options, modules);
     let meta = getMeta(options);
 
-    let fields = await this.lookupFieldsForCard(meta.fields, cardSource.url);
+    let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
 
-    this.defineAssets(cardSource);
+    this.defineAssets(cardSource, modules);
 
     let parentCard;
     let serializer = cardSource.deserializer;
 
-    if (isBaseCard(cardSource.url)) {
+    if (isBaseCard(cardSource)) {
       schemaModule = 'todo';
     } else {
       parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
-        throw new CardstackError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
+        throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
       }
 
       if (!schemaModule) {
@@ -75,7 +79,7 @@ export class Compiler {
       if (parentCard.serializer) {
         if (serializer && parentCard.serializer !== serializer) {
           throw new CardstackError(
-            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${cardSource.url}:${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
+            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
         serializer = parentCard.serializer;
@@ -87,51 +91,56 @@ export class Compiler {
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
       if (unexpectedFields.length) {
-        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on card "${cardSource.url}"`);
+        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on this card`);
       }
     }
 
     return {
-      url: cardSource.url,
+      realm: cardSource.realm,
+      url: cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined,
       serializer,
       schemaModule,
       fields,
       adoptsFrom: parentCard,
       ...components,
+      modules,
     };
   }
 
-  private defineAssets(sourceCard: RawCard) {
+  private defineAssets(sourceCard: NewRawCard | RawCard, modules: CompiledCard['modules']) {
     if (!sourceCard.files) {
       return;
     }
 
     let assetPaths = difference(Object.keys(sourceCard.files), getNonAssetFilePaths(sourceCard));
 
-    for (const p of assetPaths) {
-      if (!p) {
+    for (const localModule of assetPaths) {
+      if (!localModule) {
         continue;
       }
 
-      let src = this.getFile(sourceCard, p);
-      this.builder.define(sourceCard.url, p, getFileType(p), src);
+      let source = this.getFile(sourceCard, localModule);
+      modules[localModule] = {
+        type: getFileType(localModule),
+        source,
+      };
     }
   }
 
-  private getCardParentPath(cardSource: RawCard, meta: PluginMeta): string | undefined {
+  private getCardParentPath(cardSource: NewRawCard, meta: PluginMeta): string | undefined {
     let parentPath;
-    let { url, adoptsFrom } = cardSource;
+    let { adoptsFrom, realm, id } = cardSource;
 
     if (adoptsFrom) {
-      if (adoptsFrom === url) {
-        throw new Error(`BUG: ${url} provides itself as its parent. That should not happen.`);
+      if (id != null && `${realm}${id}` === adoptsFrom) {
+        throw new Error(`BUG: ${realm}${id} provides itself as its parent. That should not happen.`);
       }
       parentPath = cardSource.adoptsFrom;
     }
 
     if (meta.parent && meta.parent.cardURL) {
       if (parentPath && parentPath !== meta.parent.cardURL) {
-        throw new Error(`${url} provides conflicting parent URLs in card.json and schema.js`);
+        throw new Error(`card provides conflicting parent URLs in card.json and schema.js`);
       }
       parentPath = meta.parent.cardURL;
     }
@@ -139,7 +148,7 @@ export class Compiler {
     return parentPath;
   }
 
-  private async getParentCard(cardSource: RawCard, meta: PluginMeta): Promise<CompiledCard> {
+  private async getParentCard(cardSource: NewRawCard, meta: PluginMeta): Promise<CompiledCard> {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
     let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
     try {
@@ -154,7 +163,7 @@ export class Compiler {
     }
   }
 
-  private getFile(cardSource: RawCard, path: string): string {
+  private getFile(cardSource: NewRawCard, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
       throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`);
@@ -165,13 +174,15 @@ export class Compiler {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private async prepareSchema(cardSource: NewRawCard, options: any): Promise<string | undefined> {
+  private async prepareSchema(
+    cardSource: NewRawCard,
+    options: any,
+    modules: CompiledCard['modules']
+  ): Promise<string | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
-        console.warn(
-          `You did not specify what is your schema file, but a schema.js file exists. Using schema.js. url = ${cardSource.url}`
-        );
+        console.warn(`You did not specify what is your schema file, but a schema.js file exists. Using schema.js.`);
       }
 
       return undefined;
@@ -190,14 +201,17 @@ export class Compiler {
       throw augmentBadRequest(error);
     }
 
-    let code = out!.code!;
-    return await this.builder.define(cardSource.url, schemaLocalFilePath, JS_TYPE, code);
+    modules[schemaLocalFilePath] = {
+      type: JS_TYPE,
+      source: out!.code!,
+    };
+    return schemaLocalFilePath;
   }
 
-  private async lookupFieldsForCard(metaFields: FieldsMeta, ownURL: string): Promise<CompiledCard['fields']> {
+  private async lookupFieldsForCard(metaFields: FieldsMeta, realm: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
-      let fieldURL = resolveCardURL(cardURL, ownURL);
+      let fieldURL = resolveCard(cardURL, realm);
       try {
         fields[name] = {
           card: await this.builder.getCompiledCard(fieldURL),
@@ -208,7 +222,7 @@ export class Compiler {
         if (!err.isCardstackError || err.status !== 404) {
           throw err;
         }
-        let newErr = new CardstackError(`tried to lookup field '${name}' from card ${ownURL} but it failed to load`, {
+        let newErr = new CardstackError(`tried to lookup field '${name}' but it failed to load`, {
           status: 422,
         });
         newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
@@ -232,7 +246,7 @@ export class Compiler {
   }
 
   private async prepareComponents(
-    cardSource: RawCard,
+    cardSource: NewRawCard,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined
   ) {
@@ -244,19 +258,18 @@ export class Compiler {
   }
 
   private async prepareComponent(
-    cardSource: RawCard,
+    cardSource: NewRawCard,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
-    which: Format
+    which: Format,
+    modules: CompiledCard['modules']
   ): Promise<ComponentInfo> {
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
       // we don't have an implementation of our own
       if (!parentCard) {
-        throw new CardstackError(
-          `${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`
-        );
+        throw new CardstackError(`card doesn't have a ${which} component OR a parent card. This is not right.`);
       }
 
       if (cardSource.schema) {
@@ -269,7 +282,15 @@ export class Compiler {
           );
         }
         let src = this.getFile(originalRawCard, srcLocalPath);
-        return await this.compileComponent(src, fields, originalRawCard.url, srcLocalPath, which);
+        return await this.compileComponent(
+          src,
+          fields,
+          originalRawCard.realm,
+          originalRawCard.id,
+          srcLocalPath,
+          which,
+          modules
+        );
       } else {
         // directly reuse existing parent component because we didn't extend
         // anything
@@ -278,19 +299,20 @@ export class Compiler {
     }
 
     let src = this.getFile(cardSource, localFilePath);
-    return await this.compileComponent(src, fields, cardSource.url, localFilePath, which);
+    return await this.compileComponent(src, fields, cardSource.realm, cardSource.id, localFilePath, which, modules);
   }
 
   private async compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
-    cardURL: string,
+    realm: string,
+    id: string | undefined,
     localFile: string,
-    format: Format
+    format: Format,
+    modules: CompiledCard['modules']
   ): Promise<ComponentInfo> {
     let options: CardComponentPluginOptions = {
-      cardURL,
-      componentFile: localFile,
+      debugPath: `${realm}${id ?? 'NEW_CARD'}/${localFile}`,
       fields,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
@@ -299,13 +321,15 @@ export class Compiler {
 
     let code: string;
     code = transformCardComponent(templateSource, options);
-    let moduleName = await this.builder.define(cardURL, hashFilenameFromFields(localFile, fields), JS_TYPE, code);
-
+    let moduleName = hashFilenameFromFields(localFile, fields);
+    modules[moduleName] = {
+      type: JS_TYPE,
+      source: code,
+    };
     let componentInfo: ComponentInfo = {
       moduleName,
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
-      sourceCardURL: cardURL,
     };
 
     return componentInfo;
@@ -326,8 +350,8 @@ function hashFilenameFromFields(localFile: string, fields: CompiledCard['fields'
   return `${basename}-${hash}${extension}`;
 }
 
-function isBaseCard(url: string): boolean {
-  return url === baseCardURL;
+function isBaseCard(cardSource: NewRawCard): boolean {
+  return cardSource.id === 'base' && cardSource.realm === 'https://cardstack.com/base/';
 }
 
 // we expect this to expand when we add edit format

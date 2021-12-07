@@ -49,7 +49,7 @@ export class CardService {
   async load(url: string): Promise<Card> {
     let { raw, compiled } = await this.searchIndex.getCard(url);
     if (!compiled) {
-      throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+      throw new Error(`bug: database entry for ${url} is missing the compiled card`);
     }
     return { data: raw.data, compiled };
   }

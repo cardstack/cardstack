@@ -23,7 +23,7 @@ export default class CardBuilder implements BuilderInterface {
     builder: this,
   });
 
-  async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
+  private async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
     switch (type) {
       case JS_TYPE:
         this.cache.setModule(BROWSER, cardURL, localPath, source);

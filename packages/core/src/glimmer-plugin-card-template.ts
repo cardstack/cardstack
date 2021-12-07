@@ -33,7 +33,7 @@ export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
-  moduleName?: string;
+  debugPath: string;
   importAndChooseName: ImportAndChooseName;
 }
 

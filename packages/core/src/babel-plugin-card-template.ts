@@ -16,8 +16,7 @@ import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 export interface CardComponentPluginOptions {
-  cardURL: string;
-  componentFile?: string;
+  debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
   // these are for gathering output
@@ -41,7 +40,7 @@ export default function (templateSource: string, options: CardComponentPluginOpt
       plugins: [[babelPluginCardTemplate, options], classPropertiesPlugin],
       // HACK: The / resets the relative path setup, removing the cwd of the hub.
       // This allows the error module to look a lot more like the card URL.
-      filename: `/${options.cardURL}/${options.componentFile}`,
+      filename: '/' + options.debugPath.replace(/^\//, ''),
     });
     return out!.code!;
   } catch (e: any) {
@@ -231,7 +230,7 @@ function transformTemplate(
     fields: opts.fields,
     usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
-    moduleName: `${opts.cardURL}/${opts.componentFile}`,
+    debugPath: opts.debugPath,
     importAndChooseName,
   });
 
