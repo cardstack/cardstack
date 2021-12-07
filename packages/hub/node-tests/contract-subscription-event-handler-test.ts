@@ -58,6 +58,8 @@ let workerClient: StubWorkerClient;
 
 describe('ContractSubscriptionEventHandler', function () {
   this.beforeEach(async function () {
+    testkit.reset();
+
     contracts = new StubContracts();
     workerClient = new StubWorkerClient();
 
@@ -84,13 +86,16 @@ describe('ContractSubscriptionEventHandler', function () {
       transport: sentryTransport,
     });
 
-    contracts.handlers.CustomerPayment(new Error('Mock CustomerPayment error'));
+    let error = new Error('Mock CustomerPayment error');
+    contracts.handlers.CustomerPayment(error);
 
     await waitFor(() => testkit.reports().length > 0);
 
     expect(testkit.reports()[0].tags).to.deep.equal({
       action: 'contract-subscription-event-handler',
     });
+
+    expect(testkit.reports()[0].error?.message).to.equal(error.message);
   });
 
   it('handles a MerchantClaim event', async function () {
@@ -107,12 +112,15 @@ describe('ContractSubscriptionEventHandler', function () {
       transport: sentryTransport,
     });
 
-    contracts.handlers.MerchantClaim(new Error('Mock MerchantClaim error'));
+    let error = new Error('Mock MerchantClaim error');
+    contracts.handlers.MerchantClaim(error);
 
     await waitFor(() => testkit.reports().length > 0);
 
     expect(testkit.reports()[0].tags).to.deep.equal({
       action: 'contract-subscription-event-handler',
     });
+
+    expect(testkit.reports()[0].error?.message).to.equal(error.message);
   });
 });
