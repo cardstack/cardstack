@@ -138,6 +138,8 @@ export interface ComponentInfo {
   usedFields: string[]; // ["title", "author.firstName"]
 
   inlineHBS?: boolean;
+
+  // TODO: not sure about this yet
   source: RawCard;
 }
 
