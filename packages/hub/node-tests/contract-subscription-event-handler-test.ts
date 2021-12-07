@@ -71,8 +71,6 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('handles a CustomerPayment event', async function () {
-    expect(1).to.equal(1);
-
     contracts.handlers.CustomerPayment(null, { transactionHash: '0x123' });
 
     expect(workerClient.jobs).to.deep.equal([['notify-merchant-claim', '0x123']]);
