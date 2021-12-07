@@ -40,19 +40,14 @@ export type CardData = Record<string, any>;
 
 export type Setter = (value: any) => void;
 
-/* Card type IDEAS
-  primitive:
-    Where card is a value, has validation and/or a serialize. IE: Date, string
-    Has a @value attribute
-  composite:
-    Where card is combining multifle cards, ie: A blog post
-    Has a @model attribute
-  data:
-    A card that likely adopts from a composite card, but only provides new data for it
-*/
+export interface CardId {
+  realm: string;
+  id: string;
+}
 
-export interface RawCard {
-  url: string;
+export interface NewRawCard {
+  realm: string;
+  id?: string;
 
   // Feature Files. Value is path inside the files list
   schema?: string;
@@ -70,6 +65,10 @@ export interface RawCard {
 
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;
+}
+
+export interface RawCard extends NewRawCard {
+  id: string;
 }
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -120,6 +119,12 @@ export interface CompiledCard {
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;
+
+  modules: {
+    localModule: string;
+    type: string;
+    source: string;
+  }[];
 }
 
 export interface ComponentInfo {

@@ -66,16 +66,22 @@ if (process.env.COMPILER) {
           },
         },
       }).expect(200);
-      expect(initialResponse.body.data.attributes).to.deep.equal({
-        title: 'Goodbye World!',
-        body: 'First post',
-      });
+      expect(initialResponse.body.data.attributes).to.deep.equal(
+        {
+          title: 'Goodbye World!',
+          body: 'First post',
+        },
+        'PATCH Response'
+      );
 
       let response = await getCard(`${realmURL}post0`).expect(200);
-      expect(response.body.data?.attributes).to.deep.equal({
-        title: 'Goodbye World!',
-        body: 'First post',
-      });
+      expect(response.body.data?.attributes).to.deep.equal(
+        {
+          title: 'Goodbye World!',
+          body: 'First post',
+        },
+        'Followup Request'
+      );
     });
 
     it.skip('can update a card that has a schema file', async function () {
@@ -88,10 +94,10 @@ if (process.env.COMPILER) {
           attributes,
         },
       }).expect(200);
-      expect(initialResponse.body.data.attributes).to.deep.equal(attributes);
+      expect(initialResponse.body.data.attributes).to.deep.equal(attributes, 'PATCH response');
 
       let response = await getCard(`${realmURL}post`).expect(200);
-      expect(response.body.data?.attributes).to.deep.equal(attributes);
+      expect(response.body.data?.attributes).to.deep.equal(attributes, 'Followup Request');
     });
   });
 }

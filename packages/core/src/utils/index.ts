@@ -13,10 +13,6 @@ export function encodeCardURL(url: string): string {
     .replace(/([;,/?:@&=+$])/g, SPECIAL_CHAR_REPLACEMENT);
 }
 
-export function resolveCardURL(url: string, base: string): string {
-  return new URL(url, ensureTrailingSlash(base)).href;
-}
-
 export function ensureTrailingSlash(p: string): string {
   return p.replace(/\/$/, '') + '/';
 }

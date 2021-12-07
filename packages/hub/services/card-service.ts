@@ -1,4 +1,4 @@
-import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -54,29 +54,9 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
-  async create(raw: RawCard): Promise<Card>;
-  async create(raw: RawCard | Omit<RawCard, 'url'>, params: { realmURL: string }): Promise<Card>;
-  async create(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
-    let realmURL: string;
-    if (params) {
-      if ('url' in raw && !raw.url.startsWith(params.realmURL)) {
-        throw new Error(`realm mismatch. You tried to create card ${raw.url} in realm ${params.realmURL}`);
-      }
-      realmURL = params.realmURL;
-    } else {
-      if (!('url' in raw)) {
-        throw new Error(`you must either choose the card's URL or choose which realmURL it will go into`);
-      }
-      let realm = this.realmManager.realms.find((r) => raw.url.startsWith(r.url));
-      if (!realm) {
-        throw new Error(`tried to create card ${raw.url} but we don't have a realm configured that matches that URL`);
-      }
-      realmURL = realm.url;
-    }
-
-    let rawCard = await this.realmManager.getRealmForCard(realmURL).create(raw);
+  async create(raw: NewRawCard): Promise<Card> {
+    let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard);
-
     return { data: rawCard.data, compiled };
   }
 

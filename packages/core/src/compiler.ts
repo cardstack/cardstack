@@ -13,8 +13,17 @@ import cardSchemaPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugi
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
-import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
-import { getBasenameAndExtension, resolveCardURL } from './utils';
+import {
+  Builder,
+  CompiledCard,
+  ComponentInfo,
+  FEATURE_NAMES,
+  Format,
+  FORMATS,
+  NewRawCard,
+  RawCard,
+} from './interfaces';
+import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
@@ -36,7 +45,7 @@ export class Compiler {
     this.builder = params.builder;
   }
 
-  async compile(cardSource: RawCard): Promise<CompiledCard> {
+  async compile(cardSource: NewRawCard | RawCard): Promise<CompiledCard> {
     let options = {};
     let schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
@@ -132,7 +141,7 @@ export class Compiler {
 
   private async getParentCard(cardSource: RawCard, meta: PluginMeta): Promise<CompiledCard> {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
-    let url = parentCardPath ? resolveCardURL(parentCardPath, cardSource.url) : baseCardURL;
+    let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
     try {
       return await this.builder.getCompiledCard(url);
     } catch (err: any) {
@@ -148,7 +157,7 @@ export class Compiler {
   private getFile(cardSource: RawCard, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new CardstackError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
+      throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`);
     }
     return fileSrc;
   }
@@ -156,7 +165,7 @@ export class Compiler {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private async prepareSchema(cardSource: RawCard, options: any): Promise<string | undefined> {
+  private async prepareSchema(cardSource: NewRawCard, options: any): Promise<string | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -330,4 +339,13 @@ function defaultFieldFormat(format: Format): Format {
     case 'edit':
       return 'edit';
   }
+}
+
+export function resolveCard(url: string, realm: string): string {
+  let base = ensureTrailingSlash(realm) + 'PLACEHOLDER/';
+  let resolved = new URL(url, base).href;
+  if (resolved.startsWith(base)) {
+    throw new CardstackError(`${url} resolves to a local file within a card, but it should resolve to a whole card`);
+  }
+  return resolved;
 }
