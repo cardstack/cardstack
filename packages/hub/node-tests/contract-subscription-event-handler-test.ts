@@ -27,7 +27,7 @@ class StubContracts {
     return {
       events: {
         MerchantClaim: (_config: any, callback: Function) => {
-          this.handlers.CustomerPayment = callback;
+          this.handlers.MerchantClaim = callback;
         },
       },
     };
@@ -73,7 +73,7 @@ describe('ContractSubscriptionEventHandler', function () {
   it('handles a CustomerPayment event', async function () {
     contracts.handlers.CustomerPayment(null, { transactionHash: '0x123' });
 
-    expect(workerClient.jobs).to.deep.equal([['notify-merchant-claim', '0x123']]);
+    expect(workerClient.jobs).to.deep.equal([['notify-customer-payment', '0x123']]);
   });
 
   it('logs an error when receiving a CustomerPayment error', async function () {
@@ -85,6 +85,29 @@ describe('ContractSubscriptionEventHandler', function () {
     });
 
     contracts.handlers.CustomerPayment(new Error('Mock CustomerPayment error'));
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'contract-subscription-event-handler',
+    });
+  });
+
+  it('handles a MerchantClaim event', async function () {
+    contracts.handlers.MerchantClaim(null, { transactionHash: '0x123' });
+
+    expect(workerClient.jobs).to.deep.equal([['notify-merchant-claim', '0x123']]);
+  });
+
+  it('logs an error when receiving a MerchantClaim error', async function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
+    contracts.handlers.MerchantClaim(new Error('Mock MerchantClaim error'));
 
     await waitFor(() => testkit.reports().length > 0);
 
