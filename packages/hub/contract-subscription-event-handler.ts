@@ -1,14 +1,10 @@
-// import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
-// import config from 'config';
 import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
 import Web3SocketService from './services/web3-socket';
 import { contractSubscriptionEventHandlerLog } from './utils/logger';
 import { Contracts } from './services/contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
-
-// const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
 const CONTRACT_EVENTS = [
   {
