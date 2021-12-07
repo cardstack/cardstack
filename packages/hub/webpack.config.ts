@@ -146,5 +146,37 @@ module.exports = {
       module: /node_modules\/discord\.js\/src\/client\/voice\/util\/Secretbox\.js$/,
       message: /the request of a dependency is an expression/,
     },
+    {
+      module: /node_modules\/@babel\/core\/lib\/config\/files\/(configuration|plugins)\.js/,
+      message: /require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+    {
+      module: /node_modules\/@babel\/core\/lib\/config\/files\/(import|module-types)\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/any-promise\/register\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/browserslist\/node\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/browserslist\/node\.js/,
+      message: /require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+    {
+      module: /node_modules\/config\/lib\/config\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/express\/lib\/view\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/hash-stream-validation\/index\.js/,
+      message: /Can't resolve 'fast-crc32c'/,
+    },
   ],
 };
