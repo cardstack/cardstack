@@ -23,14 +23,17 @@ class StubContracts {
           },
         },
       };
-    }
-    return {
-      events: {
-        MerchantClaim: (_config: any, callback: Function) => {
-          this.handlers.MerchantClaim = callback;
+    } else if (contractName == 'revenuePool') {
+      return {
+        events: {
+          MerchantClaim: (_config: any, callback: Function) => {
+            this.handlers.MerchantClaim = callback;
+          },
         },
-      },
-    };
+      };
+    }
+
+    return null;
   }
 }
 
