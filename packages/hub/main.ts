@@ -88,6 +88,7 @@ import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
+import { Contracts } from './services/contracts';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -101,6 +102,7 @@ export function createRegistry(): Registry {
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
+  registry.register('contracts', Contracts);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -344,12 +346,13 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
+  let contracts = await container.lookup('contracts');
   let web3 = await container.lookup('web3-socket');
   let workerClient = await container.lookup('worker-client');
 
   // listen for contract events
   // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
+  await new ContractSubscriptionEventHandler(web3, workerClient, contracts).setupContractEventSubscriptions();
 
   await runner.promise;
 }

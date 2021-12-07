@@ -1,21 +1,24 @@
-import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
+// import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
-import config from 'config';
+// import config from 'config';
 import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
 import Web3SocketService from './services/web3-socket';
 import { contractSubscriptionEventHandlerLog } from './utils/logger';
+import { Contracts } from './services/contracts';
 
-const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
+// const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
 
 // DO NOT USE only for use in bootWorker to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
+  #contracts: Contracts;
   #web3: Web3SocketService;
   #workerClient: WorkerClient;
   #logger = contractSubscriptionEventHandlerLog;
 
-  constructor(web3: Web3SocketService, workerClient: WorkerClient) {
+  constructor(web3: Web3SocketService, workerClient: WorkerClient, contracts: Contracts) {
     autoBind(this);
+    this.#contracts = contracts;
     this.#web3 = web3;
     this.#workerClient = workerClient;
   }
@@ -23,16 +26,22 @@ export class ContractSubscriptionEventHandler {
   async setupContractEventSubscriptions() {
     let web3Instance = this.#web3.getInstance();
 
-    let RevenuePoolABI = await getABI('revenue-pool', web3Instance);
-    let revenuePoolContract = new web3Instance.eth.Contract(
-      RevenuePoolABI,
-      getAddressByNetwork('revenuePool', network)
-    );
+    // let RevenuePoolABI = await getABI('revenue-pool', web3Instance);
+    // let revenuePoolContract = new web3Instance.eth.Contract(
+    //   RevenuePoolABI,
+    //   getAddressByNetwork('revenuePool', network)
+    // );
+    let revenuePoolContract = await this.#contracts.getContract(web3Instance, 'revenue-pool', 'revenuePool');
 
-    let PayMerchantHandlerABI = await getABI('pay-merchant-handler', web3Instance);
-    let payMerchantContract = new web3Instance.eth.Contract(
-      PayMerchantHandlerABI,
-      getAddressByNetwork('payMerchantHandler', network)
+    // let PayMerchantHandlerABI = await getABI('pay-merchant-handler', web3Instance);
+    // let payMerchantContract = new web3Instance.eth.Contract(
+    //   PayMerchantHandlerABI,
+    //   getAddressByNetwork('payMerchantHandler', network)
+    // );
+    let payMerchantContract = await this.#contracts.getContract(
+      web3Instance,
+      'pay-merchant-handler',
+      'payMerchantHandler'
     );
 
     payMerchantContract.events.CustomerPayment({}, async (error: Error, event: any) => {
