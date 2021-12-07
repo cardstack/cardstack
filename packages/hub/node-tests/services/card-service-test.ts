@@ -18,7 +18,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}person`,
+        realm: realmURL,
+        id: 'person',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -32,13 +33,15 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}sue`,
+        realm: realmURL,
+        id: 'sue',
         adoptsFrom: '../person',
         data: { name: 'Sue' },
       });
 
       await cards.create({
-        url: `${realmURL}dated`,
+        realm: realmURL,
+        id: 'dated',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -52,7 +55,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}something-else-dated`,
+        realm: realmURL,
+        id: 'something-else-dated',
         adoptsFrom: '../dated',
         data: {
           createdAt: new Date(2018, 0, 1),
@@ -60,7 +64,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         adoptsFrom: '../dated',
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -84,7 +89,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post0`,
+        realm: realmURL,
+        id: 'post0',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -98,7 +104,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post1`,
+        realm: realmURL,
+        id: 'post1',
         adoptsFrom: '../post',
         data: {
           title: 'Hello again',
@@ -109,7 +116,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}book`,
+        realm: realmURL,
+        id: 'book',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -125,7 +133,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}book0`,
+        realm: realmURL,
+        id: 'book0',
         adoptsFrom: '../book',
         data: {
           author: {
@@ -248,7 +257,8 @@ if (process.env.COMPILER) {
         // Intentionally not including the adopts from because cardhost cardService
         // doesn't include it
         await cards.update({
-          url: `${realmURL}post1`,
+          realm: realmURL,
+          id: 'post1',
           data: {
             title: 'Hello to you',
             body: 'second post.',

@@ -55,13 +55,15 @@ export class CardService {
   }
 
   async create(raw: NewRawCard): Promise<Card> {
+    // NEW: Compile it to make sure everything is valid
+    // `${realm}${id ?? 'NEW_CARD'}/${localFile}`
     let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard);
     return { data: rawCard.data, compiled };
   }
 
   async update(raw: RawCard): Promise<Card> {
-    let originalRaw = await this.realmManager.read(raw.url);
+    let originalRaw = await this.realmManager.read(raw);
     await this.realmManager.update(Object.assign({}, originalRaw, raw));
     let compiled = await this.builder.getCompiledCard(raw.url);
 
