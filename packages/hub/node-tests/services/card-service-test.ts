@@ -4,15 +4,10 @@ import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('CardService', function () {
-    this.afterEach(async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.reset();
-    });
     let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');
-      await si.reset();
       await si.indexAllRealms();
     });
 
