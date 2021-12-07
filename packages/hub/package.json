@@ -61,6 +61,7 @@
     "dotenv": "^10.0.0",
     "eth-sig-util": "^3.0.1",
     "fast-json-stable-stringify": "^2.1.0",
+    "firebase-admin": "^10.0.0",
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
     "graphile-worker": "^0.11.3",

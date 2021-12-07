@@ -7,14 +7,8 @@ if (process.env.COMPILER) {
   describe.skip('SearchIndex', function () {
     let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
-    this.afterEach(async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.reset();
-    });
-
     this.beforeEach(async function () {
       let si = await getContainer().lookup('searchIndex');
-      await si.reset();
       await si.indexAllRealms();
     });
 

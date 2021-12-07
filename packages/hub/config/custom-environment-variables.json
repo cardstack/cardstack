@@ -54,5 +54,11 @@
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"
   },
+  "firebase": {
+    "projectId": "FIREBASE_PROJECT_ID",
+    "clientEmail": "FIREBASE_CLIENT_EMAIL",
+    "privateKey": "FIREBASE_PRIVATE_KEY",
+    "databaseURL": "FIREBASE_DATABASE_URL"
+  },
   "serverSecret": "SERVER_SECRET"
 }

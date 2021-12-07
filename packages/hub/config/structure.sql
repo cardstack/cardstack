@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -701,7 +701,9 @@ CREATE TABLE public.cards (
     url text NOT NULL,
     data jsonb,
     ancestors text[],
-    "searchData" jsonb
+    "searchData" jsonb,
+    realm text NOT NULL,
+    generation integer
 );
 
 
@@ -1327,13 +1329,15 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
 8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
 13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
-21	20211020231214235_discord-bots	2021-11-18 11:18:35.492811
-22	20211105180905492_wyre-price-service	2021-11-18 11:18:35.492811
-33	20211118084217151_create-uploads	2021-11-29 09:21:50.978293
-14	20211013155536724_card-index	2021-10-18 09:59:34.440379
-19	20211013173917696_beta-testers	2021-11-18 11:18:35.492811
-20	20211014131843187_add-fields-to-card-spaces	2021-11-18 11:18:35.492811
-41	20211129083801382_create-push-notification-registrations	2021-11-30 11:02:14.267117
+17	20211013155536724_card-index	2021-12-06 15:09:12.05072
+18	20211013173917696_beta-testers	2021-12-06 15:09:12.05072
+19	20211014131843187_add-fields-to-card-spaces	2021-12-06 15:09:12.05072
+20	20211020231214235_discord-bots	2021-12-06 15:09:12.05072
+21	20211105180905492_wyre-price-service	2021-12-06 15:09:12.05072
+22	20211110210324178_card-index-part-duex	2021-12-06 15:09:12.05072
+23	20211118084217151_create-uploads	2021-12-06 15:09:12.05072
+24	20211129083801382_create-push-notification-registrations	2021-12-06 15:09:12.05072
+26	20211206195559187_card-index-generations	2021-12-06 15:16:30.440737
 \.
 
 
@@ -1341,7 +1345,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 15, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 26, true);
 
 
 --

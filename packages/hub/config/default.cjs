@@ -38,6 +38,12 @@ module.exports = {
     enabled: false,
     environment: null,
   },
+  firebase: {
+    projectId: null,
+    clientEmail: null,
+    privateKey: null,
+    databaseURL: null,
+  },
   wyre: {
     accountId: null,
     apiKey: null,
