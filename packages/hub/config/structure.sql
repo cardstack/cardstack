@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
+-- Dumped from database version 13.5
 -- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -764,6 +764,20 @@ CREATE TABLE public.dm_channels (
 ALTER TABLE public.dm_channels OWNER TO postgres;
 
 --
+-- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.latest_event_block (
+    id integer DEFAULT 1 NOT NULL,
+    block_number integer NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT latest_event_block_singleton CHECK ((id = 1))
+);
+
+
+ALTER TABLE public.latest_event_block OWNER TO postgres;
+
+--
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1069,6 +1083,14 @@ ALTER TABLE ONLY public.dm_channels
 
 
 --
+-- Name: latest_event_block latest_event_block_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.latest_event_block
+    ADD CONSTRAINT latest_event_block_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1369,7 +1391,7 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
+-- Dumped from database version 13.5
 -- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
@@ -1388,14 +1410,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-11-29 17:02:42.091944-05
-2	2021-11-29 17:02:42.091944-05
-3	2021-11-29 17:02:42.091944-05
-4	2021-11-29 17:02:42.091944-05
-5	2021-11-29 17:02:42.091944-05
-6	2021-11-29 17:02:42.091944-05
-7	2021-11-29 17:02:42.091944-05
-8	2021-11-29 17:02:42.091944-05
+1	2021-12-08 14:30:02.864241-06
+2	2021-12-08 14:30:02.864241-06
+3	2021-12-08 14:30:02.864241-06
+4	2021-12-08 14:30:02.864241-06
+5	2021-12-08 14:30:02.864241-06
+6	2021-12-08 14:30:02.864241-06
+7	2021-12-08 14:30:02.864241-06
+8	2021-12-08 14:30:02.864241-06
 \.
 
 
@@ -1404,25 +1426,26 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-08-02 16:26:07.752752
-2	20210614080132698_create-prepaid-card-customizations-table	2021-08-02 16:26:07.752752
-3	20210623052200757_create-graphile-worker-schema	2021-08-02 16:26:07.752752
-5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
-6	20210817184105100_wallet-orders	2021-08-25 08:15:41.07505
-7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
-8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
-13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
-21	20211020231214235_discord-bots	2021-11-18 11:18:35.492811
-14	20211013155536724_card-index	2021-10-18 09:59:34.440379
-19	20211013173917696_beta-testers	2021-11-18 11:18:35.492811
-20	20211014131843187_add-fields-to-card-spaces	2021-11-18 11:18:35.492811
-42	20211105180905492_wyre-price-service	2021-11-30 14:56:46.211409
-43	20211110210324178_card-index-part-duex	2021-11-30 14:56:46.211409
-44	20211118084217151_create-uploads	2021-11-30 14:56:46.211409
-45	20211129083801382_create-push-notification-registrations	2021-11-30 14:56:46.211409
-46	20211129123635817_create-notification-types	2021-11-30 14:56:46.211409
-51	20211129130425303_create-notification-preferences	2021-12-03 10:12:08.511999
-52	20211206195559187_card-index-generations	2021-12-08 10:33:57.847407
+1	20210527151505645_create-prepaid-card-tables	2021-12-08 14:30:02.864241
+2	20210614080132698_create-prepaid-card-customizations-table	2021-12-08 14:30:02.864241
+3	20210623052200757_create-graphile-worker-schema	2021-12-08 14:30:02.864241
+4	20210809113449561_merchant-infos	2021-12-08 14:30:02.864241
+5	20210817184105100_wallet-orders	2021-12-08 14:30:02.864241
+6	20210920142313915_prepaid-card-reservations	2021-12-08 14:30:02.864241
+7	20210924200122612_order-indicies	2021-12-08 14:30:02.864241
+8	20211006090701108_create-card-spaces	2021-12-08 14:30:02.864241
+9	20211013155536724_card-index	2021-12-08 14:30:02.864241
+10	20211013173917696_beta-testers	2021-12-08 14:30:02.864241
+11	20211014131843187_add-fields-to-card-spaces	2021-12-08 14:30:02.864241
+12	20211020231214235_discord-bots	2021-12-08 14:30:02.864241
+13	20211105180905492_wyre-price-service	2021-12-08 14:30:02.864241
+14	20211110210324178_card-index-part-duex	2021-12-08 14:30:02.864241
+15	20211118084217151_create-uploads	2021-12-08 14:30:02.864241
+16	20211129083801382_create-push-notification-registrations	2021-12-08 14:30:02.864241
+17	20211129123635817_create-notification-types	2021-12-08 14:30:02.864241
+18	20211129130425303_create-notification-preferences	2021-12-08 14:30:02.864241
+19	20211206195559187_card-index-generations	2021-12-08 14:30:02.864241
+20	20211207190527999_create-latest-event-block	2021-12-08 14:30:02.864241
 \.
 
 
@@ -1430,7 +1453,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 26, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 20, true);
 
 
 --
