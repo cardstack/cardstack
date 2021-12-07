@@ -91,7 +91,7 @@ import PushNotificationRegistrationSerializer from './services/serializers/push-
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
-import { Contracts } from './services/contracts';
+import Contracts from './services/contracts';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;

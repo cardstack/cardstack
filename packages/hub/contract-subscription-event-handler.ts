@@ -3,7 +3,7 @@ import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
 import Web3SocketService from './services/web3-socket';
 import { contractSubscriptionEventHandlerLog } from './utils/logger';
-import { Contracts } from './services/contracts';
+import Contracts from './services/contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
 
 const CONTRACT_EVENTS = [

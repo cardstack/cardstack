@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/node';
 import waitFor from './utils/wait-for';
 import Web3SocketService from '../services/web3-socket';
 import WorkerClient from '../services/worker-client';
-import { Contracts } from '../services/contracts';
+import Contracts from '../services/contracts';
 import Web3 from 'web3';
 
 const { testkit, sentryTransport } = sentryTestkit();
