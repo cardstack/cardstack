@@ -61,6 +61,13 @@ let workerClient: StubWorkerClient;
 
 describe('ContractSubscriptionEventHandler', function () {
   this.beforeEach(async function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
     testkit.reset();
 
     contracts = new StubContracts();
@@ -82,13 +89,6 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('logs an error when receiving a CustomerPayment error', async function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
     let error = new Error('Mock CustomerPayment error');
     contracts.handlers.CustomerPayment(error);
 
@@ -108,13 +108,6 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('logs an error when receiving a MerchantClaim error', async function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
     let error = new Error('Mock MerchantClaim error');
     contracts.handlers.MerchantClaim(error);
 
