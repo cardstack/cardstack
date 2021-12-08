@@ -30,6 +30,17 @@ module.exports = {
         },
       ],
     }),
+
+    // place the db migrations into the dist folder so that node-pg-migrate can
+    // find them
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(path.dirname(require.resolve('@cardstack/hub/package.json')), 'db', 'migrations', '*.js'),
+          to: 'migrations',
+        },
+      ],
+    }),
   ],
 
   entry: {
