@@ -43,7 +43,7 @@ export default class SentPushNotificationsQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT transaction_hash FROM sent_push_notifications WHERE ${conditions.where}`;
+    const query = `SELECT 1 FROM sent_push_notifications WHERE ${conditions.where} LIMIT 1`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rowCount > 0;
