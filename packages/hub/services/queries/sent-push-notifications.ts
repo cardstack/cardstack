@@ -1,31 +1,21 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { PushNotificationData, PushNotificationsIdentifiers } from '../../tasks/send-notifications';
 import { buildConditions } from '../../utils/queries';
 
 /**
- * This filter is the index of this table. All fields are necessary to identify a unique push notification for a given event
+ * All fields in this type are necessary to identify a unique push notification for a given event
  */
-interface SentPushNotificationsFilter {
-  transactionHash: string;
-  ownerAddress: string;
-  pushClientId: string;
-}
-
-export interface PushNotificationData extends SentPushNotificationsFilter {
-  notificationType: string;
-  notificationTitle?: string;
-  notificationBody: string;
-  notificationData?: {};
-}
+type SentPushNotificationsFilter = PushNotificationsIdentifiers;
 
 export default class SentPushNotificationsQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async insert(model: PushNotificationData) {
+  async insert(model: PushNotificationData & { messageId: string }) {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data) VALUES($1, $2, $3, $4, $5, $6, $7)',
+      'INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data, message_id, network) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
       [
         model.transactionHash,
         model.ownerAddress,
@@ -34,6 +24,8 @@ export default class SentPushNotificationsQueries {
         model.notificationTitle,
         model.notificationBody,
         model.notificationData,
+        model.messageId,
+        model.network,
       ]
     );
   }

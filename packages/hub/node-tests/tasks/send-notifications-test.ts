@@ -1,7 +1,6 @@
 import { Job } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
-import SendNotifications from '../../tasks/send-notifications';
-import { PushNotificationData } from '../../services/queries/sent-push-notifications';
+import SendNotifications, { PushNotificationData } from '../../tasks/send-notifications';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import { Client } from 'pg';
@@ -36,6 +35,7 @@ let helpers = makeJobHelpers({}, makeMockJob('send-notifications'), {
   },
 });
 
+const messageID = 'firebase-message-id';
 let createPushNotification: (prefix: string) => PushNotificationData = (prefix = '') => ({
   transactionHash: `${prefix}transaction-hash`,
   // keep owner-address and pushClientId the same since this is a likely occurence in prod
@@ -46,6 +46,7 @@ let createPushNotification: (prefix: string) => PushNotificationData = (prefix =
   notificationBody: `${prefix}notification-body`,
   notificationData: [],
   notificationType: `${prefix}mock`,
+  network: 'test-network',
 });
 let existingNotification = createPushNotification('existing-');
 let newlyAddedNotification = createPushNotification('newly-added-');
@@ -57,7 +58,7 @@ class StubFirebasePushNotifications {
   async send(data: any) {
     lastSentData = data;
     notificationSent = true;
-    return 'firebase-message-id';
+    return messageID;
   }
 }
 
@@ -71,7 +72,7 @@ describe('SendNotificationsTask', function () {
     db = await dbManager.getClient();
     await db.query(`DELETE FROM sent_push_notifications`);
     await db.query(
-      `INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data, message_id, network) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         existingNotification.transactionHash,
         existingNotification.ownerAddress,
@@ -80,6 +81,8 @@ describe('SendNotificationsTask', function () {
         existingNotification.notificationTitle,
         existingNotification.notificationBody,
         existingNotification.notificationData,
+        'existing-message-id',
+        existingNotification.network,
       ]
     );
     subject = (await getContainer().lookup('send-notifications')) as SendNotifications;

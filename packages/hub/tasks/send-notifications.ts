@@ -1,7 +1,23 @@
 import { inject } from '@cardstack/di';
 import { Helpers } from 'graphile-worker';
-import { PushNotificationData } from '../services/queries/sent-push-notifications';
 import * as Sentry from '@sentry/node';
+
+export interface PushNotificationData {
+  transactionHash: string;
+  ownerAddress: string;
+  pushClientId: string;
+  network: string;
+  notificationType: string;
+  notificationTitle?: string;
+  notificationBody: string;
+  notificationData?: {};
+}
+
+export interface PushNotificationsIdentifiers {
+  transactionHash: PushNotificationData['transactionHash'];
+  ownerAddress: PushNotificationData['ownerAddress'];
+  pushClientId: PushNotificationData['pushClientId'];
+}
 
 export default class SendNotificationsTask {
   sentPushNotificationsQueries = inject('sent-push-notifications-queries', { as: 'sentPushNotificationsQueries' });
@@ -21,7 +37,7 @@ export default class SendNotificationsTask {
         return;
       }
 
-      await this.firebasePushNotifications.send({
+      let messageId = await this.firebasePushNotifications.send({
         notification: {
           title: payload.notificationTitle,
           body: payload.notificationBody,
@@ -30,7 +46,7 @@ export default class SendNotificationsTask {
         token: payload.pushClientId,
       });
       helpers.logger.info(`Sent notification for ${payload.transactionHash}`);
-      await this.sentPushNotificationsQueries.insert(payload);
+      await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
     } catch (e) {
       Sentry.captureException(e, {
         tags: {

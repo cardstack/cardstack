@@ -5,7 +5,7 @@ import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
-import { PushNotificationData } from '../services/queries/sent-push-notifications';
+import { PushNotificationData } from './send-notifications';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {

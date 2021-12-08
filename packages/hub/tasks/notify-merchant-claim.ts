@@ -6,7 +6,7 @@ import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
-import { PushNotificationData } from '../services/queries/sent-push-notifications';
+import { PushNotificationData } from './send-notifications';
 
 export interface MerchantClaimsQueryResult {
   data: {
@@ -109,7 +109,5 @@ export default class NotifyMerchantClaim {
 
       await this.workerClient.addJob('send-notifications', notification);
     }
-    // TODO: find out which device-address combinations need notifying
-    // and add a job for each (CS-2726)?
   }
 }

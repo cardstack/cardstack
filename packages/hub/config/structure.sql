@@ -945,7 +945,9 @@ CREATE TABLE public.sent_push_notifications (
     notification_type text NOT NULL,
     notification_title text,
     notification_body text NOT NULL,
-    notification_data json
+    notification_data json,
+    message_id text NOT NULL,
+    network text
 );
 
 
