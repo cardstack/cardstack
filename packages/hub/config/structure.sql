@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -935,6 +935,23 @@ CREATE TABLE public.reservations (
 ALTER TABLE public.reservations OWNER TO postgres;
 
 --
+-- Name: sent_push_notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sent_push_notifications (
+    transaction_hash text NOT NULL,
+    owner_address text NOT NULL,
+    push_client_id text NOT NULL,
+    notification_type text NOT NULL,
+    notification_title text,
+    notification_body text NOT NULL,
+    notification_data json
+);
+
+
+ALTER TABLE public.sent_push_notifications OWNER TO postgres;
+
+--
 -- Name: uploads; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1253,6 +1270,13 @@ CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.re
 --
 
 CREATE INDEX reservations_user_address_index ON public.reservations USING btree (user_address);
+
+
+--
+-- Name: sent_push_notifications_transaction_hash_owner_address_push_cli; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX sent_push_notifications_transaction_hash_owner_address_push_cli ON public.sent_push_notifications USING btree (transaction_hash, owner_address, push_client_id);
 
 
 --
