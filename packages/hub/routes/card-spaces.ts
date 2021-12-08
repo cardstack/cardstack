@@ -7,8 +7,8 @@ import CardSpaceSerializer from '../services/serializers/card-space-serializer';
 import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import CardSpaceQueries from '../services/queries/card-space';
-import CardSpaceValidator, { NestedAttributeError, CardSpaceErrors } from '../services/validators/card-space';
-import kebabCase from 'lodash/kebabCase';
+import CardSpaceValidator from '../services/validators/card-space';
+import { serializeErrors } from './utils/error';
 
 export interface CardSpace {
   id: string;
@@ -30,29 +30,6 @@ export interface CardSpace {
   donationSuggestionAmount4?: number;
   ownerAddress?: string;
   merchantId?: string;
-}
-
-function serializeErrors(errors: any) {
-  return Object.keys(errors).flatMap((attribute) => {
-    let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
-    return errorsForAttribute.map((error: string | NestedAttributeError) => {
-      if (typeof error === 'string') {
-        return {
-          status: '422',
-          title: 'Invalid attribute',
-          source: { pointer: `/data/attributes/${kebabCase(attribute)}` },
-          detail: error,
-        };
-      } else {
-        return {
-          status: '422',
-          title: 'Invalid attribute',
-          source: { pointer: `/data/attributes/${kebabCase(attribute)}/${error.index}/${kebabCase(error.attribute)}` },
-          detail: error.detail,
-        };
-      }
-    });
-  });
 }
 
 export default class CardSpacesRoute {

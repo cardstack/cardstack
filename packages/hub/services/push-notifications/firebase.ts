@@ -1,19 +1,9 @@
 import admin from 'firebase-admin';
-
-interface FCMPayload {
-  message: {
-    notification: {
-      body: string;
-      title: string;
-      data: any; // TODO: Define deep link
-    };
-  };
-  token: string;
-}
+import { TokenMessage } from 'firebase-admin/lib/messaging/messaging-api';
 
 export default class FirebasePushNotifications {
-  async send(payload: FCMPayload) {
-    await admin.messaging().send(payload);
+  async send(payload: TokenMessage) {
+    return await admin.messaging().send(payload);
   }
 }
 

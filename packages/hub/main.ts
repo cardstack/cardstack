@@ -91,6 +91,11 @@ import PushNotificationRegistrationSerializer from './services/serializers/push-
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
+import Contracts from './services/contracts';
+import NotificationTypeQueries from './services/queries/notification-type';
+import NotificationPreferenceQueries from './services/queries/notification-preference';
+import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
+import NotificationPreferencesRoute from './routes/notification-preferences';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -104,6 +109,7 @@ export function createRegistry(): Registry {
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
+  registry.register('contracts', Contracts);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -146,6 +152,10 @@ export function createRegistry(): Registry {
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
+  registry.register('notification-type-queries', NotificationTypeQueries);
+  registry.register('notification-preferences-route', NotificationPreferencesRoute);
+  registry.register('notification-preference-queries', NotificationPreferenceQueries);
+  registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
@@ -342,12 +352,13 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
+  let contracts = await container.lookup('contracts');
   let web3 = await container.lookup('web3-socket');
   let workerClient = await container.lookup('worker-client');
 
   // listen for contract events
   // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
+  await new ContractSubscriptionEventHandler(web3, workerClient, contracts).setupContractEventSubscriptions();
 
   await runner.promise;
 }
