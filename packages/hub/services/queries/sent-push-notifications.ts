@@ -8,7 +8,7 @@ interface SentPushNotificationsIndex {
   pushClientId: string;
 }
 
-interface PushNotificationData extends SentPushNotificationsIndex {
+export interface PushNotificationData extends SentPushNotificationsIndex {
   notificationType: string;
   notificationTitle?: string;
   notificationBody: string;

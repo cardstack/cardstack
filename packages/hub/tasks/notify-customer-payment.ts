@@ -5,6 +5,7 @@ import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
+import { PushNotificationData } from '../services/queries/sent-push-notifications';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -74,10 +75,10 @@ export default class NotifyCustomerPayment {
       );
     }
 
-    let notifiedAddress = result.merchant.id;
+    let ownerAddress = result.merchant.id;
 
     let pushClientIdsForNotification = await this.notificationPreferenceService.getEligiblePushClientIds(
-      notifiedAddress,
+      ownerAddress,
       'customer_payment'
     );
 
@@ -104,14 +105,17 @@ export default class NotifyCustomerPayment {
     }
 
     let spendAmount = result.spendAmount;
-    let message = `${merchantName} received a payment of §${spendAmount}`;
+    let notificationBody = `${merchantName} received a payment of §${spendAmount}`;
 
     for (const pushClientId of pushClientIdsForNotification) {
-      await this.workerClient.addJob('send-notifications', {
-        notifiedAddress,
+      let notification: PushNotificationData = {
+        ownerAddress,
         pushClientId,
-        message,
-      });
+        transactionHash: payload,
+        notificationBody,
+        notificationType: 'CustomerPayment',
+      };
+      await this.workerClient.addJob('send-notifications', notification);
     }
   }
 }
