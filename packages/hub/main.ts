@@ -91,6 +91,10 @@ import PushNotificationRegistrationSerializer from './services/serializers/push-
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
+import NotificationTypeQueries from './services/queries/notification-type';
+import NotificationPreferenceQueries from './services/queries/notification-preference';
+import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
+import NotificationPreferencesRoute from './routes/notification-preferences';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -146,6 +150,10 @@ export function createRegistry(): Registry {
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
+  registry.register('notification-type-queries', NotificationTypeQueries);
+  registry.register('notification-preferences-route', NotificationPreferencesRoute);
+  registry.register('notification-preference-queries', NotificationPreferenceQueries);
+  registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);

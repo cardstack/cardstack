@@ -3,6 +3,7 @@ import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
 import isValidDomain from 'is-valid-domain';
+import { NestedAttributeError } from '../../routes/utils/error';
 
 export type CardSpaceAttribute =
   | 'url'
@@ -22,12 +23,8 @@ export type CardSpaceAttribute =
   | 'donationSuggestionAmount3'
   | 'donationSuggestionAmount4';
 
-export interface NestedAttributeError {
-  index: number;
-  attribute: string;
-  detail: string;
-}
 export type CardSpaceErrors = Record<CardSpaceAttribute, (string | NestedAttributeError)[]>;
+
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
 const ALLOWED_BUTTON_TEXTS = ['Visit this Space', 'Visit this Business', 'Visit this Creator', 'Visit this Person'];

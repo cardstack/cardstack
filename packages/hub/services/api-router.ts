@@ -29,6 +29,9 @@ export default class APIRouter {
   pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
     as: 'pushNotificationRegistrationsRoute',
   });
+  notificationPreferencesRoute = inject('notification-preferences-route', {
+    as: 'notificationPreferencesRoute',
+  });
   custodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   ordersRoute = inject('orders-route', { as: 'ordersRoute' });
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
@@ -50,6 +53,7 @@ export default class APIRouter {
       cardSpacesRoute,
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
+      notificationPreferencesRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -77,6 +81,8 @@ export default class APIRouter {
       parseBody,
       pushNotificationRegistrationsRoute.delete
     );
+    apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
+    apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
