@@ -46,8 +46,8 @@ export class Compiler {
     this.builder = params.builder;
   }
 
-  async compile(cardSource: NewRawCard): Promise<NewCompiledCard>;
   async compile(cardSource: RawCard): Promise<CompiledCard>;
+  async compile(cardSource: NewRawCard): Promise<NewCompiledCard>;
   async compile(cardSource: NewRawCard | RawCard): Promise<NewCompiledCard | CompiledCard> {
     let options = {};
     let modules: CompiledCard['modules'] = {};
@@ -86,7 +86,7 @@ export class Compiler {
       }
     }
 
-    let components = await this.prepareComponents(cardSource, fields, parentCard);
+    let components = await this.prepareComponents(cardSource, fields, parentCard, modules);
 
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
@@ -248,11 +248,12 @@ export class Compiler {
   private async prepareComponents(
     cardSource: NewRawCard,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard | undefined
+    parentCard: CompiledCard | undefined,
+    modules: CompiledCard['modules']
   ) {
     let components: Partial<Pick<CompiledCard, Format>> = {};
     for (const format of FORMATS) {
-      components[format] = await this.prepareComponent(cardSource, fields, parentCard, format);
+      components[format] = await this.prepareComponent(cardSource, fields, parentCard, format, modules);
     }
     return components as Pick<CompiledCard, Format>;
   }
@@ -272,47 +273,68 @@ export class Compiler {
         throw new CardstackError(`card doesn't have a ${which} component OR a parent card. This is not right.`);
       }
 
+      let componentInfo = parentCard[which];
+      let inheritedFrom = componentInfo.inheritedFrom ?? parentCard.url;
+      componentInfo = {
+        ...componentInfo,
+        inheritedFrom,
+      };
+
       if (cardSource.schema) {
         // recompile parent component because we extend the schema
-        let originalRawCard = await this.builder.getRawCard(parentCard[which].sourceCardURL);
+        let originalRawCard = await this.builder.getRawCard(inheritedFrom);
         let srcLocalPath = originalRawCard[which];
         if (!srcLocalPath) {
           throw new CardstackError(
-            `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
+            `bug: ${parentCard.url} says it got ${which} from ${inheritedFrom}, but that card does not have a ${which} component`
           );
         }
         let src = this.getFile(originalRawCard, srcLocalPath);
-        return await this.compileComponent(
+        let componentInfo = await this.compileComponent(
           src,
           fields,
-          originalRawCard.realm,
-          originalRawCard.id,
+          `${originalRawCard.realm}${originalRawCard.id}/${srcLocalPath}`,
           srcLocalPath,
           which,
           modules
         );
+        componentInfo.inheritedFrom = inheritedFrom;
+        return componentInfo;
       } else {
         // directly reuse existing parent component because we didn't extend
         // anything
-        return parentCard[which];
+        let componentInfo = parentCard[which];
+        if (!componentInfo.inheritedFrom) {
+          componentInfo = {
+            ...componentInfo,
+            inheritedFrom: parentCard.url,
+          };
+        }
+        return componentInfo;
       }
     }
 
     let src = this.getFile(cardSource, localFilePath);
-    return await this.compileComponent(src, fields, cardSource.realm, cardSource.id, localFilePath, which, modules);
+    return await this.compileComponent(
+      src,
+      fields,
+      `${cardSource.realm}${cardSource.id ?? 'NEW_CARD'}/${localFilePath}`,
+      localFilePath,
+      which,
+      modules
+    );
   }
 
   private async compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
-    realm: string,
-    id: string | undefined,
+    debugPath: string,
     localFile: string,
     format: Format,
     modules: CompiledCard['modules']
   ): Promise<ComponentInfo> {
     let options: CardComponentPluginOptions = {
-      debugPath: `${realm}${id ?? 'NEW_CARD'}/${localFile}`,
+      debugPath,
       fields,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),

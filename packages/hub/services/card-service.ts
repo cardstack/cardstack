@@ -16,6 +16,7 @@ import {
   Expression,
 } from '../utils/expressions';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
+import { cardURL } from '@cardstack/core/src/utils';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -65,7 +66,7 @@ export class CardService {
   async update(raw: RawCard): Promise<Card> {
     let originalRaw = await this.realmManager.read(raw);
     await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let compiled = await this.builder.getCompiledCard(raw.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(raw));
 
     // TODO:
     // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
@@ -85,7 +86,7 @@ export class CardService {
       return result.rows.map((row) => {
         let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
         if (!compiled) {
-          throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+          throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }
         return { data: raw.data, compiled };
       });

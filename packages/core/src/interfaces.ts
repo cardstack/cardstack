@@ -136,11 +136,10 @@ export interface CompiledCard extends NewCompiledCard {
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
+  inlineHBS?: string;
 
-  inlineHBS?: boolean;
-
-  // TODO: not sure about this yet
-  source: RawCard;
+  // the URL of the card that originally defined this component, if it's not ourself
+  inheritedFrom?: string;
 }
 
 export interface Builder {

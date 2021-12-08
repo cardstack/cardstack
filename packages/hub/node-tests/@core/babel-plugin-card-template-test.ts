@@ -4,28 +4,23 @@ import transformCardComponent, {
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
-import type CardBuilder from '../../services/card-builder';
 import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('Babel CardTemplatePlugin', function () {
-    let builder: CardBuilder;
     let options: CardTemplateOptions;
     let personCard: CompiledCard;
     let code: string;
 
-    let { getContainer, cards } = configureHubWithCompiler(this);
+    let { cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async () => {
-      builder = await getContainer().lookup('card-builder');
-
       await cards.create(ADDRESS_RAW_CARD);
-      await cards.create(PERSON_RAW_CARD);
-      personCard = await builder.getCompiledCard(PERSON_RAW_CARD.url);
+      personCard = (await cards.create(PERSON_RAW_CARD)).compiled;
 
       options = {
         fields: personCard.fields,
-        cardURL: personCard.url,
+        debugPath: personCard.url,
         inlineHBS: undefined,
         defaultFieldFormat: 'embedded',
         usedFields: [],

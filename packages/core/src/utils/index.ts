@@ -1,6 +1,7 @@
 import flow from 'lodash/flow';
 import upperFirst from 'lodash/upperFirst';
 import camelCase from 'lodash/camelCase';
+import { CardId } from '../interfaces';
 
 const SPECIAL_CHAR_REPLACEMENT = '-';
 
@@ -26,4 +27,8 @@ export function getBasenameAndExtension(filename: string): {
   let basename = filename.replace(extension, '');
 
   return { basename, extension };
+}
+
+export function cardURL(card: CardId): string {
+  return `${card.realm}${card.id}`;
 }

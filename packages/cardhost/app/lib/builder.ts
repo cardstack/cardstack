@@ -263,7 +263,7 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async define(
+  private async define(
     cardURL: string,
     localModule: string,
     type: string,

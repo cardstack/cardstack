@@ -33,7 +33,7 @@ export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
-  debugPath: string;
+  debugPath?: string;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -87,7 +87,7 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
           ast: [cardTransformPlugin(options)],
         },
         meta: {
-          moduleName: options.moduleName,
+          moduleName: options.debugPath,
         },
       })
     );

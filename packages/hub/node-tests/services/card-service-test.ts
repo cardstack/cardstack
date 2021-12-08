@@ -266,7 +266,7 @@ if (process.env.COMPILER) {
           },
         });
         let realmManager = await getContainer().lookup('realm-manager');
-        let rawCard = await realmManager.read(`${realmURL}post1`);
+        let rawCard = await realmManager.read({ realm: realmURL, id: 'post1' });
         expect(rawCard.adoptsFrom).to.equal('../post');
         expect(rawCard.data!.title).to.equal('Hello to you');
       });

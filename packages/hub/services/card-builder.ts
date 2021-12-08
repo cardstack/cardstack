@@ -11,6 +11,7 @@ import { serverLog as logger } from '../utils/logger';
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { cardURL } from '@cardstack/core/src/utils';
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -23,7 +24,7 @@ export default class CardBuilder implements BuilderInterface {
     builder: this,
   });
 
-  private async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
+  private define(cardURL: string, localPath: string, type: string, source: string): string {
     switch (type) {
       case JS_TYPE:
         this.cache.setModule(BROWSER, cardURL, localPath, source);
@@ -31,6 +32,29 @@ export default class CardBuilder implements BuilderInterface {
       default:
         return this.cache.writeAsset(cardURL, localPath, source);
     }
+  }
+
+  private defineModules(card: CompiledCard): CompiledCard {
+    for (let [localPath, { type, source }] of Object.entries(card.modules)) {
+      let publicRef = this.define(card.url, localPath, type, source);
+
+      if (card.schemaModule === localPath) {
+        card.schemaModule = publicRef;
+      }
+
+      if (card.isolated.moduleName === localPath) {
+        card.isolated.moduleName = publicRef;
+      }
+
+      if (card.embedded.moduleName === localPath) {
+        card.embedded.moduleName = publicRef;
+      }
+
+      if (card.edit.moduleName === localPath) {
+        card.edit.moduleName = publicRef;
+      }
+    }
+    return card;
   }
 
   private transformToCommonJS(moduleURL: string, source: string): string {
@@ -44,7 +68,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    return await this.realmManager.read(url.replace(/\/$/, ''));
+    return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -65,10 +89,13 @@ export default class CardBuilder implements BuilderInterface {
       err = e;
     }
     if (compiledCard) {
-      this.cache.setCard(rawCard.url, compiledCard);
-      return compiledCard;
+      // TODO: definedCompiledCard can be a different type than CompiledCard, by
+      // parameterizing the inter-module reference type.
+      let definedCompiledCard = this.defineModules(compiledCard);
+      this.cache.setCard(cardURL(rawCard), definedCompiledCard);
+      return definedCompiledCard;
     } else {
-      this.cache.deleteCard(rawCard.url);
+      this.cache.deleteCard(cardURL(rawCard));
       throw err;
     }
   }

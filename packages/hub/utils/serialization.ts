@@ -60,8 +60,8 @@ function serializeResource(
 export function serializeRawCard(card: RawCard, compiled?: CompiledCard): PgPrimitive {
   let resource = serializeResource(
     'raw-cards',
-    card.url,
-    ['schema', 'isolated', 'embedded', 'edit', 'deserializer', 'adoptsFrom', 'files', 'data'],
+    `${card.realm}${card.id}`,
+    ['schema', 'isolated', 'embedded', 'edit', 'deserializer', 'adoptsFrom', 'files', 'data', 'realm'],
     card
   );
   let doc: any = { data: resource };

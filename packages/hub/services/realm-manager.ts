@@ -41,6 +41,18 @@ export default class RealmManager {
     this.searchIndex.notify(cardURL, action);
   }
 
+  parseCardURL(cardURL: string): CardId {
+    for (let realm of this.realms) {
+      if (cardURL.startsWith(realm.url)) {
+        return {
+          realm: realm.url,
+          id: cardURL.slice(realm.url.length),
+        };
+      }
+    }
+    throw new Error(`card URL ${cardURL} is not in a configured realm`);
+  }
+
   private findRealm(targetRealm: string): RealmInterface {
     targetRealm = ensureTrailingSlash(targetRealm);
     for (let realm of this.realms) {
