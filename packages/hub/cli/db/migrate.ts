@@ -5,7 +5,7 @@ import config from 'dotenv';
 import { createContainer } from '../../main';
 
 export let command = 'migrate';
-export let describe = 'Perform database migrations';
+export let describe = `Perform database migrations, specify direction 'up' or 'down' and optionally --no-check-order`;
 export let builder = {};
 
 export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean }) {
