@@ -8,9 +8,10 @@ export let command = 'migrate';
 export let describe = 'Perform database migrations';
 export let builder = {};
 
-export async function handler(_argv: Argv & { _: string[] }) {
+export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean }) {
   let {
-    _: [, , direction, ...args],
+    _: [, , direction],
+    checkOrder = true,
   } = _argv;
   if (direction! !== 'up' && direction! !== 'down') {
     console.error(`Invalid migration direction: '${direction}'. Must be 'up' or 'down'`);
@@ -20,11 +21,10 @@ export async function handler(_argv: Argv & { _: string[] }) {
   let container = createContainer();
   let dbManager = await container.lookup('database-manager');
   let dbClient = await dbManager.getClient();
-  let dir = join('.', 'dist', 'migrations');
-  let checkOrder = args?.includes('--no-check-order') ? false : true;
+  let dir = join('.', 'dist', 'db', 'migrations');
 
   try {
-    let migrations = await migrate({
+    await migrate({
       direction,
       dir,
       migrationsTable: 'pgmigrations',
@@ -32,7 +32,6 @@ export async function handler(_argv: Argv & { _: string[] }) {
       dbClient,
       checkOrder,
     });
-    console.log(JSON.stringify(migrations, null, 2));
     container.teardown();
   } catch (e) {
     console.error(e);
