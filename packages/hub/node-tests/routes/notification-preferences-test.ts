@@ -100,7 +100,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
     let pushClientId = '1234567';
 
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
-    await notificationPreferenceQueries.insert({
+    await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId,
       notificationType: 'customer_payment',
@@ -252,7 +252,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('updates a preference', async function () {
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
-    await notificationPreferenceQueries.insert({
+    await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
       notificationType: 'customer_payment',

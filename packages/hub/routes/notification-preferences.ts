@@ -97,29 +97,12 @@ export default class NotificationPreferencesRoute {
       return;
     }
 
-    let notificationPreference = (
-      await this.notificationPreferenceQueries.query({
-        ownerAddress: ctx.state.userAddress,
-        pushClientId,
-        notificationType,
-      })
-    )[0];
-
-    if (notificationPreference) {
-      await this.notificationPreferenceQueries.update({
-        ownerAddress: ctx.state.userAddress,
-        pushClientId,
-        notificationType,
-        status,
-      });
-    } else {
-      await this.notificationPreferenceQueries.insert({
-        ownerAddress: ctx.state.userAddress,
-        pushClientId,
-        notificationType,
-        status,
-      });
-    }
+    await this.notificationPreferenceQueries.upsert({
+      ownerAddress: ctx.state.userAddress,
+      pushClientId,
+      notificationType,
+      status,
+    });
 
     let serialized = this.notificationPreferenceSerializer.serialize({
       ownerAddress: ctx.state.userAddress,

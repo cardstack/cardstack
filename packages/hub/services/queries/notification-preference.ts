@@ -2,6 +2,7 @@ import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { NotificationPreference } from '../../routes/notification-preferences';
 import { buildConditions } from '../../utils/queries';
+import pgFormat from 'pg-format';
 
 interface NotificationPreferenceQueriesFilter {
   ownerAddress: string;
@@ -34,27 +35,19 @@ export default class NotificationPreferenceQueries {
     });
   }
 
-  async insert(model: NotificationPreference) {
+  async upsert(model: NotificationPreference) {
     let db = await this.databaseManager.getClient();
 
-    let query = `INSERT INTO notification_preferences (owner_address, push_client_id, notification_type_id, status)
-      VALUES ($1, $2, $3, $4)`;
+    let query = `INSERT INTO notification_preferences(
+      owner_address, push_client_id, notification_type_id, status
+    )
+    VALUES (%L) ON CONFLICT (owner_address, push_client_id, notification_type_id) DO UPDATE SET
+    status = excluded.status;`;
 
     let notificationTypeId = await this.notificationTypeToId(model.notificationType);
+    let sql = pgFormat(query, [model.ownerAddress, model.pushClientId, notificationTypeId, model.status]);
 
-    await db.query(query, [model.ownerAddress, model.pushClientId, notificationTypeId, model.status]);
-  }
-
-  async update(model: NotificationPreference) {
-    let db = await this.databaseManager.getClient();
-
-    let query = `UPDATE notification_preferences
-      SET status = $1
-      WHERE owner_address = $2 AND push_client_id = $3 AND notification_type_id = $4`;
-
-    let notificationTypeId = await this.notificationTypeToId(model.notificationType);
-
-    await db.query(query, [model.status, model.ownerAddress, model.pushClientId, notificationTypeId]);
+    await db.query(sql);
   }
 
   private async notificationTypeToId(notificationType: string) {
