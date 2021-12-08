@@ -1,0 +1,29 @@
+name: beta_rewards
+subgraph: habdelra/cardpay-xdai
+tables:
+  prepaid_card_payment:
+    column_mappings:
+      block_number:
+        block_number_uint64:
+          default: 0
+          max_value: 18446744073709551615
+          type: uint64
+          validity_column: block_number_uint64_valid
+      spend_amount:
+        spend_amount_uint64:
+          default: 0
+          max_value: 18446744073709551615
+          type: uint64
+          validity_column: spend_amount_uint64_valid
+      timestamp:
+        timestamp_uint64:
+          default: 0
+          max_value: 18446744073709551615
+          type: uint64
+          validity_column: timestamp_uint64_valid
+    partition_column: block_number
+    partition_sizes:
+      - 524288
+      - 32768
+      - 1024
+version: 0.0.1
