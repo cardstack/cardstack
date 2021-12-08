@@ -36,6 +36,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
+          // we are @cardstack/hub, so there is no need to declare ourselves as a dep
+          // eslint-disable-next-line node/no-extraneous-require
           from: path.join(path.dirname(require.resolve('@cardstack/hub/package.json')), 'db', 'migrations', '*.js'),
         },
       ],

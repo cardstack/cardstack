@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+
 import { Argv } from 'yargs';
 import migrate from 'node-pg-migrate';
 import { join } from 'path';
