@@ -74,20 +74,19 @@ export default class NotificationPreferencesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
-  async post(ctx: Koa.Context) {
+  async put(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
 
+    let pushClientId = ctx.params.push_client_id;
     let status = ctx.request.body.data.attributes['status'];
     let notificationType = ctx.request.body.data.attributes['notification-type'];
-    let pushClientId = ctx.request.body.data.attributes['push-client-id'];
 
-    if (!status || !notificationType || !pushClientId) {
+    if (!status || !notificationType) {
       let errors = {} as any;
       if (!status) errors['status'] = ['Must be present'];
       if (!notificationType) errors['notification-type'] = ['Must be present'];
-      if (!pushClientId) errors['push-client-id'] = ['Must be present'];
 
       ctx.status = 422;
       ctx.body = {
@@ -111,7 +110,7 @@ export default class NotificationPreferencesRoute {
       status,
     });
 
-    ctx.status = 201;
+    ctx.status = 200;
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
   }

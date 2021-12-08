@@ -139,7 +139,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
   });
 });
 
-describe('POST /api/notification-preferences', async function () {
+describe('PUT /api/notification-preferences/:push_client_id', async function () {
   let { request, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
@@ -161,7 +161,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('returns 401 without bearer token', async function () {
     await request()
-      .get('/api/notification-preferences/1234567')
+      .put('/api/notification-preferences/1234567')
       .send({})
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -179,12 +179,11 @@ describe('POST /api/notification-preferences', async function () {
 
   it('creates a new preference', async function () {
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'merchant_claim',
             status: 'disabled',
           },
@@ -193,7 +192,7 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
+      .expect(200)
       .expect({
         data: {
           type: 'notification-preference',
@@ -260,12 +259,11 @@ describe('POST /api/notification-preferences', async function () {
     });
 
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'customer_payment',
             status: 'disabled',
           },
@@ -274,7 +272,7 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
+      .expect(200)
       .expect({
         data: {
           type: 'notification-preference',
@@ -331,7 +329,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('is idempotent when saving a new preference', async function () {
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
@@ -345,7 +343,7 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
+      .expect(200)
       .expect({
         data: {
           type: 'notification-preference',
@@ -360,7 +358,7 @@ describe('POST /api/notification-preferences', async function () {
 
     // second same request
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
@@ -374,7 +372,7 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
+      .expect(200)
       .expect({
         data: {
           type: 'notification-preference',
@@ -420,7 +418,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('does not create duplicates when toggling a couple of times', async function () {
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -428,21 +426,19 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
       })
-      .expect(201);
+      .expect(200);
 
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'merchant_claim',
             status: 'enabled',
           },
@@ -451,15 +447,14 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201);
+      .expect(200);
 
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'customer_payment',
             status: 'disabled',
           },
@@ -468,15 +463,14 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201);
+      .expect(200);
 
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .send({
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'customer_payment',
             status: 'enabled',
           },
@@ -485,7 +479,7 @@ describe('POST /api/notification-preferences', async function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(201);
+      .expect(200);
 
     let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
     let records = await notificationPreferenceQueries.query({
@@ -510,7 +504,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('allows creating preferences for multiple devices on a single EOA', async function () {
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -518,16 +512,15 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '1234567',
             'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
       })
-      .expect(201);
+      .expect(200);
 
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/7654321')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -535,13 +528,12 @@ describe('POST /api/notification-preferences', async function () {
         data: {
           type: 'notification-preference',
           attributes: {
-            'push-client-id': '7654321',
             'notification-type': 'merchant_claim',
             status: 'disabled',
           },
         },
       })
-      .expect(201);
+      .expect(200);
 
     // At this point, an EOA should have two sets of notification preferences, for each device
     await request()
@@ -607,7 +599,7 @@ describe('POST /api/notification-preferences', async function () {
 
   it('should fail when mandatory attributes are not given', async function () {
     await request()
-      .post('/api/notification-preferences')
+      .put('/api/notification-preferences/1234567')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -632,14 +624,6 @@ describe('POST /api/notification-preferences', async function () {
             detail: 'Must be present',
             source: {
               pointer: '/data/attributes/notification-type',
-            },
-            status: '422',
-            title: 'Invalid attribute',
-          },
-          {
-            detail: 'Must be present',
-            source: {
-              pointer: '/data/attributes/push-client-id',
             },
             status: '422',
             title: 'Invalid attribute',

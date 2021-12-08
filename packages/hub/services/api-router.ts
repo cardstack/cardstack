@@ -82,7 +82,7 @@ export default class APIRouter {
       pushNotificationRegistrationsRoute.delete
     );
     apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
-    apiSubrouter.post('/notification-preferences', parseBody, notificationPreferencesRoute.post);
+    apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
