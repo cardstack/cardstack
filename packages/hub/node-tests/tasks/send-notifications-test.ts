@@ -116,9 +116,10 @@ describe('SendNotificationsTask', function () {
       ownerAddress: newlyAddedNotification.ownerAddress,
     });
     const queryResult = await db.query(
-      `SELECT transaction_hash FROM sent_push_notifications WHERE ${conditions.where}`,
+      `SELECT message_id FROM sent_push_notifications WHERE ${conditions.where}`,
       conditions.values
     );
     expect(queryResult.rowCount).equal(1);
+    expect(queryResult.rows[0].message_id).equal(messageID);
   });
 });
