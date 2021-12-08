@@ -71,12 +71,12 @@ Usage:
 
 Connect to the instance where the app is deployed:
 ```sh
-waypoint exec -app=hub bash
+waypoint exec -app=hub sh
 ```
 
 Then, add node to the PATH and run the migrations:
 ```sh
 heroku@ip-10-91-1-8:/ cd /workspace
 heroku@ip-10-91-1-8:/workspace$ PATH=$PATH:/layers/heroku_nodejs-engine/nodejs/bin/;
-heroku@ip-10-91-1-8:/workspace$ npm run db:migrate up
+heroku@ip-10-91-1-8:/workspace$ node dist/hub.js db migrate up
 ```
