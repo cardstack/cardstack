@@ -2,13 +2,16 @@ import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { buildConditions } from '../../utils/queries';
 
-interface SentPushNotificationsIndex {
+/**
+ * This filter is the index of this table. All fields are necessary to identify a unique push notification for a given event
+ */
+interface SentPushNotificationsFilter {
   transactionHash: string;
   ownerAddress: string;
   pushClientId: string;
 }
 
-export interface PushNotificationData extends SentPushNotificationsIndex {
+export interface PushNotificationData extends SentPushNotificationsFilter {
   notificationType: string;
   notificationTitle?: string;
   notificationBody: string;
@@ -35,10 +38,10 @@ export default class SentPushNotificationsQueries {
     );
   }
 
-  async exists(index: SentPushNotificationsIndex): Promise<any> {
+  async exists(filter: SentPushNotificationsFilter): Promise<boolean> {
     let db = await this.databaseManager.getClient();
 
-    const conditions = buildConditions(index);
+    const conditions = buildConditions(filter);
 
     const query = `SELECT transaction_hash FROM sent_push_notifications WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
