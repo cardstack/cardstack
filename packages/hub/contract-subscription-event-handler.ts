@@ -1,21 +1,36 @@
-import { getAddressByNetwork, getABI } from '@cardstack/cardpay-sdk';
 import autoBind from 'auto-bind';
-import config from 'config';
 import WorkerClient from './services/worker-client';
 import * as Sentry from '@sentry/node';
 import Web3SocketService from './services/web3-socket';
 import { contractSubscriptionEventHandlerLog } from './utils/logger';
+import Contracts from './services/contracts';
+import { AddressKeys } from '@cardstack/cardpay-sdk';
 
-const { network } = config.get('web3') as { network: 'xdai' | 'sokol' };
+const CONTRACT_EVENTS = [
+  {
+    abiName: 'pay-merchant-handler',
+    contractName: 'payMerchantHandler' as AddressKeys,
+    eventName: 'CustomerPayment',
+    taskName: 'notify-customer-payment',
+  },
+  {
+    abiName: 'revenue-pool',
+    contractName: 'revenuePool' as AddressKeys,
+    eventName: 'MerchantClaim',
+    taskName: 'notify-merchant-claim',
+  },
+];
 
 // DO NOT USE only for use in bootWorker to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
+  #contracts: Contracts;
   #web3: Web3SocketService;
   #workerClient: WorkerClient;
   #logger = contractSubscriptionEventHandlerLog;
 
-  constructor(web3: Web3SocketService, workerClient: WorkerClient) {
+  constructor(web3: Web3SocketService, workerClient: WorkerClient, contracts: Contracts) {
     autoBind(this);
+    this.#contracts = contracts;
     this.#web3 = web3;
     this.#workerClient = workerClient;
   }
@@ -23,45 +38,23 @@ export class ContractSubscriptionEventHandler {
   async setupContractEventSubscriptions() {
     let web3Instance = this.#web3.getInstance();
 
-    let RevenuePoolABI = await getABI('revenue-pool', web3Instance);
-    let revenuePoolContract = new web3Instance.eth.Contract(
-      RevenuePoolABI,
-      getAddressByNetwork('revenuePool', network)
-    );
+    for (let contractEvent of CONTRACT_EVENTS) {
+      let contract = await this.#contracts.getContract(web3Instance, contractEvent.abiName, contractEvent.contractName);
 
-    let PayMerchantHandlerABI = await getABI('pay-merchant-handler', web3Instance);
-    let payMerchantContract = new web3Instance.eth.Contract(
-      PayMerchantHandlerABI,
-      getAddressByNetwork('payMerchantHandler', network)
-    );
-
-    payMerchantContract.events.CustomerPayment({}, async (error: Error, event: any) => {
-      if (error) {
-        Sentry.captureException(error, {
-          tags: {
-            action: 'contract-subscription-event-handler',
-          },
-        });
-        this.#logger.error('Error in CustomerPayment subscription', error);
-      } else {
-        this.#logger.info('Received CustomerPayment event', event.transactionHash);
-        this.#workerClient.addJob('notify-customer-payment', event.transactionHash);
-      }
-    });
-
-    revenuePoolContract.events.MerchantClaim({}, async (error: Error, event: any) => {
-      if (error) {
-        Sentry.captureException(error, {
-          tags: {
-            action: 'contract-subscription-event-handler',
-          },
-        });
-        this.#logger.error('Error in MerchantClaim subscription', error);
-      } else {
-        this.#logger.info('Received MerchantClaim event', event.transactionHash);
-        this.#workerClient.addJob('notify-merchant-claim', event.transactionHash);
-      }
-    });
+      contract.events[contractEvent.eventName]({}, async (error: Error, event: any) => {
+        if (error) {
+          Sentry.captureException(error, {
+            tags: {
+              action: 'contract-subscription-event-handler',
+            },
+          });
+          this.#logger.error(`Error in ${contractEvent.contractName} subscription`, error);
+        } else {
+          this.#logger.info(`Received ${contractEvent.contractName} event`, event.transactionHash);
+          this.#workerClient.addJob(contractEvent.taskName, event.transactionHash);
+        }
+      });
+    }
 
     this.#logger.info('Subscribed to events');
   }
