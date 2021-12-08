@@ -71,6 +71,7 @@ if (process.env.COMPILER) {
         deserializer: null,
         adoptsFrom: null,
         data: null,
+        realm: realmURL,
       });
     });
 
@@ -88,6 +89,7 @@ if (process.env.COMPILER) {
         deserializer: null,
         adoptsFrom: '../post',
         data: { title: 'Hello World', body: 'First post.' },
+        realm: realmURL,
       });
     });
 

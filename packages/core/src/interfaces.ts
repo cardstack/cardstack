@@ -75,8 +75,11 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
     throw new CardstackError('A raw card that is empty is not valid');
   }
-  if (typeof obj.url !== 'string') {
-    throw new CardstackError('A card requires a URL');
+  if (typeof obj.id !== 'string') {
+    throw new CardstackError('A card requires an id');
+  }
+  if (typeof obj.realm !== 'string') {
+    throw new CardstackError('A card requires a realm');
   }
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {

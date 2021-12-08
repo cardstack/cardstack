@@ -21,15 +21,24 @@ export class RawCardDeserializer {
     let raw: RawCard = {
       realm: attrs.realm,
       id: resource.id.slice(attrs.realm.length),
-      schema: attrs.schema,
-      isolated: attrs.isolated,
-      embedded: attrs.embedded,
-      edit: attrs.edit,
-      deserializer: attrs.deserializer,
-      adoptsFrom: attrs.adoptsFrom,
-      files: attrs.files,
-      data: attrs.data,
     };
+
+    let fields: (keyof RawCard)[] = [
+      'schema',
+      'isolated',
+      'embedded',
+      'edit',
+      'deserializer',
+      'adoptsFrom',
+      'files',
+      'data',
+    ];
+    for (let field of fields) {
+      if (attrs[field] != null) {
+        raw[field] = attrs[field];
+      }
+    }
+
     assertValidRawCard(raw);
     let metaRef = resource.relationships?.compiledMeta?.data;
     let compiled: CompiledCard | undefined;

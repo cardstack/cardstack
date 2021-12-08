@@ -253,7 +253,7 @@ if (process.env.COMPILER) {
         await builder.compileCardFromRaw(rawCard);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
-        expect(err.message).to.eq(`tried to lookup field 'author' from card ${realm}post but it failed to load`);
+        expect(err.message).to.eq(`tried to lookup field 'author' but it failed to load`);
         expect(err.status).to.eq(422);
       }
     });
