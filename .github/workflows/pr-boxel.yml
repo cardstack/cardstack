@@ -13,6 +13,8 @@ jobs:
   test:
     name: Build & Test
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max_old_space_size=4096"
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
@@ -32,6 +34,8 @@ jobs:
   try-scenarios:
     name: Tests - ${{ matrix.ember-try-scenario }}
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max_old_space_size=4096"
     continue-on-error: true
     needs: test
     strategy:
@@ -53,13 +57,14 @@ jobs:
       - name: Test
         env:
           EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
-          NODE_OPTIONS: "--max_old_space_size=4096"
         run: yarn test:boxel:try $EMBER_TRY_SCENARIO
         timeout-minutes: 10
 
   check-if-requires-preview:
     name: Check if a preview deploy is required
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max_old_space_size=4096"
     needs: try-scenarios
     outputs:
       boxel-files-changed: ${{ steps.boxel-files-that-changed.outputs.any_changed }}
