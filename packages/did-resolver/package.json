@@ -22,14 +22,15 @@
     "@types/mocha": "^8.2.1",
     "chai": "^4.3.4",
     "fast-check": "^1.26.0",
+    "ts-node": "^10.3.0",
     "mocha": "^8.3.2"
   },
   "engines": {
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
-    "autotest": "mocha -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.js' --timeout 60000"
+    "test": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.ts' --timeout 60000",
+    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"
