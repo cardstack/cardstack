@@ -42,6 +42,47 @@ module.exports = {
         },
       ],
     }),
+
+    // copy over pkgs necessary for node-pg-migrate to work. these will be added
+    // to the docker image's file system
+    ...[
+      'node-pg-migrate',
+      'pg',
+      'pg-connection-string',
+      'pg-format',
+      'pg-int8',
+      'pg-pool',
+      'pg-protocol',
+      'pg-types',
+      'pgpass',
+      'postgres-array',
+      'postgres-bytea',
+      'postgres-date',
+      'postgres-interval',
+      'buffer-writer',
+      'packet-reader',
+      'xtend',
+      'split2',
+      'readable-stream',
+      'inherits',
+      'string_decoder',
+      'util-deprecate',
+      'lodash',
+      'fs-extra',
+      'graceful-fs',
+      'jsonfile',
+      'universalify',
+    ].map(
+      (pkg) =>
+        new CopyPlugin({
+          patterns: [
+            {
+              from: path.dirname(require.resolve(`${pkg}/package.json`)),
+              to: pkg,
+            },
+          ],
+        })
+    ),
   ],
 
   entry: {
