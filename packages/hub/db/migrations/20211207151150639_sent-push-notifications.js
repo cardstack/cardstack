@@ -7,10 +7,10 @@ exports.up = (pgm) => {
     push_client_id: { type: 'string' },
     notification_type: { type: 'string' },
     notification_title: { type: 'string' },
-    notification_body: { type: 'string', notNull: true },
+    notification_body: { type: 'string' },
     notification_data: { type: 'json' },
     // This is firebase's id for the sent message
-    message_id: { type: 'string', notNull: true },
+    message_id: { type: 'string' },
     network: { type: 'string' },
     created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
   });
