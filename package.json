@@ -32,7 +32,7 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace",
-    "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
+    "compile": "yarn codegen:subgraph-sokol",
     "prepare": "npm run compile",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
