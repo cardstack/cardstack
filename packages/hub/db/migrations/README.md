@@ -1,1 +1,3 @@
 Migrations currently must be authored in Javascript. `node-pg-migrate` has typescript support but I was unable to get it to work with our repository.
+
+Note that any `require()` that you add to the migration scripts must also be accompanied by adding the package to the list of pkg's that node-pg-migrate needs (and the graph of the pgk's deps) in the webpack.config.ts, as well as updating the Docker file to copy the pkg into the docker container's file system's node_modules folder.

@@ -4,15 +4,13 @@ import { Argv } from 'yargs';
 import { join } from 'path';
 import config from 'dotenv';
 import { createContainer } from '../../main';
+import migrate from 'node-pg-migrate';
 
 export let command = 'migrate';
 export let describe = `Perform database migrations, specify direction 'up' or 'down' and optionally --no-check-order`;
 export let builder = {};
 
 export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean }) {
-  const migrateModule = join(process.cwd(), 'dist', 'node-pg-migrate');
-  const { default: migrate } = __non_webpack_require__(migrateModule);
-
   let {
     _: [, , direction],
     checkOrder = true,
