@@ -104,7 +104,7 @@ export default class NotifyMerchantClaim {
         pushClientId,
         transactionHash: payload,
         notificationBody,
-        notificationType: 'MerchantClaim',
+        notificationType: 'merchant_claim',
       };
 
       await this.workerClient.addJob('send-notifications', notification);

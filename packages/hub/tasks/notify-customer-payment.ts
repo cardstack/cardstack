@@ -113,7 +113,7 @@ export default class NotifyCustomerPayment {
         pushClientId,
         transactionHash: payload,
         notificationBody,
-        notificationType: 'CustomerPayment',
+        notificationType: 'customer_payment',
       };
       await this.workerClient.addJob('send-notifications', notification);
     }
