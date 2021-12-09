@@ -5,6 +5,6 @@ export function generateContractEventNotificationId(identifiers: {
   network: string;
 }) {
   return [identifiers.network, identifiers.transactionHash, identifiers.pushClientId, identifiers.ownerAddress].join(
-    '-'
+    '::'
   );
 }
