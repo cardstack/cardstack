@@ -21,7 +21,8 @@ module('Integration | card-service', function (hooks) {
 
     hooks.beforeEach(function () {
       this.builder.createRawCard({
-        url: `${LOCAL_REALM}/post`,
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'isolated.js',
@@ -46,7 +47,8 @@ module('Integration | card-service', function (hooks) {
       });
 
       this.builder.createRawCard({
-        url: cardID,
+        id: 'post-1',
+        realm: LOCAL_REALM,
         adoptsFrom: `${LOCAL_REALM}/post`,
         data: {
           title: 'A blog post title',
@@ -94,7 +96,8 @@ module('Integration | card-service', function (hooks) {
 
     test('Serialization works on nested cards', async function (assert) {
       this.builder.createRawCard({
-        url: `${LOCAL_REALM}/post-list`,
+        id: 'post-list',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {

@@ -395,3 +395,31 @@ export function resolveCard(url: string, realm: string): string {
   }
   return resolved;
 }
+
+// Takes a CompiledCard containing only local references to its modules and
+// defines those modules in the current environment and mutates the CompiledCard
+// to refer to them.
+export function defineModules(
+  card: CompiledCard,
+  define: (localPath: string, type: string, source: string) => string
+): void {
+  for (let [localPath, { type, source }] of Object.entries(card.modules)) {
+    let publicRef = define(localPath, type, source);
+
+    if (card.schemaModule === localPath) {
+      card.schemaModule = publicRef;
+    }
+
+    if (card.isolated.moduleName === localPath) {
+      card.isolated.moduleName = publicRef;
+    }
+
+    if (card.embedded.moduleName === localPath) {
+      card.embedded.moduleName = publicRef;
+    }
+
+    if (card.edit.moduleName === localPath) {
+      card.edit.moduleName = publicRef;
+    }
+  }
+}

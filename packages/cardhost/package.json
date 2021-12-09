@@ -23,6 +23,7 @@
     "lint:js": "eslint . --cache --ext .js,.ts",
     "lint:js:fix": "eslint . --fix",
     "lint:types": "tsc",
+    "lint:types:watch": "tsc --watch",
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test"

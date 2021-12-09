@@ -1,5 +1,5 @@
 import { Builder as BuilderInterface, RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
-import { Compiler } from '@cardstack/core/src/compiler';
+import { Compiler, defineModules } from '@cardstack/core/src/compiler';
 
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from '../interfaces';
@@ -34,29 +34,6 @@ export default class CardBuilder implements BuilderInterface {
     }
   }
 
-  private defineModules(card: CompiledCard): CompiledCard {
-    for (let [localPath, { type, source }] of Object.entries(card.modules)) {
-      let publicRef = this.define(card.url, localPath, type, source);
-
-      if (card.schemaModule === localPath) {
-        card.schemaModule = publicRef;
-      }
-
-      if (card.isolated.moduleName === localPath) {
-        card.isolated.moduleName = publicRef;
-      }
-
-      if (card.embedded.moduleName === localPath) {
-        card.embedded.moduleName = publicRef;
-      }
-
-      if (card.edit.moduleName === localPath) {
-        card.edit.moduleName = publicRef;
-      }
-    }
-    return card;
-  }
-
   private transformToCommonJS(moduleURL: string, source: string): string {
     let out = transformSync(source, {
       configFile: false,
@@ -89,11 +66,9 @@ export default class CardBuilder implements BuilderInterface {
       err = e;
     }
     if (compiledCard) {
-      // TODO: definedCompiledCard can be a different type than CompiledCard, by
-      // parameterizing the inter-module reference type.
-      let definedCompiledCard = this.defineModules(compiledCard);
-      this.cache.setCard(cardURL(rawCard), definedCompiledCard);
-      return definedCompiledCard;
+      defineModules(compiledCard, (local, type, src) => this.define(cardURL(rawCard), local, type, src));
+      this.cache.setCard(cardURL(rawCard), compiledCard);
+      return compiledCard;
     } else {
       this.cache.deleteCard(cardURL(rawCard));
       throw err;
