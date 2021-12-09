@@ -22,13 +22,8 @@
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",
     "./packages/discord-bot/**/*.ts",
-    "./packages/did-resolver/**/*.ts",
     "./packages/eslint-config/**/*.ts",
     "./packages/firebase-functions/**/*.ts",
-    "./packages/di/**/*.ts",
-    "./packages/db/**/*.ts",
-    "./packages/test-support/**/*.ts",
-    "./packages/core/**/*.ts",
     "**/.eslintrc.ts"
   ],
   "exclude": ["./packages/*/dist", "./packages/*/tmp", "./packages/*/node_modules", "node_modules", "tmp"]
