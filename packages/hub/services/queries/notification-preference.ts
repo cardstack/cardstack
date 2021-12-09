@@ -6,7 +6,7 @@ import pgFormat from 'pg-format';
 
 interface NotificationPreferenceQueriesFilter {
   ownerAddress: string;
-  pushClientId: string;
+  pushClientId?: string;
   notificationType?: string;
 }
 
