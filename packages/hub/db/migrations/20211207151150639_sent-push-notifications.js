@@ -11,6 +11,7 @@ exports.up = (pgm) => {
     notification_data: { type: 'json' },
     message_id: { type: 'string', notNull: true },
     network: { type: 'string' },
+    created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
   });
 
   pgm.createIndex(SENT_PUSH_NOTIFICATIONS_TABLE, ['transaction_hash', 'owner_address', 'push_client_id'], {

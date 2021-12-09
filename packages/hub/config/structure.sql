@@ -947,7 +947,8 @@ CREATE TABLE public.sent_push_notifications (
     notification_body text NOT NULL,
     notification_data json,
     message_id text NOT NULL,
-    network text
+    network text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
