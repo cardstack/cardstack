@@ -22,6 +22,7 @@
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",
     "./packages/discord-bot/**/*.ts",
+    "./packages/test-support/**/*.ts",
   ],
   "exclude": ["./packages/*/dist", "./packages/*/tmp", "./packages/*/node_modules", "node_modules", "tmp"]
 }
