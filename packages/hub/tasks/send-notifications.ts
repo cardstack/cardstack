@@ -24,17 +24,32 @@ export default class SendNotificationsTask {
 
   async perform(payload: PushNotificationData, helpers: Helpers) {
     try {
+      // we do this in a separate block because failure to read should not affect
+      // notifications being sent. the worst that can happen is 2-3 notifications,
+      // which seems preferable to a dead notifications service
       let index = {
         notificationId: payload.notificationId,
       };
-
       let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists(index);
       if (notificationHasBeenSent) {
         helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
         return;
       }
+    } catch (e) {
+      // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
+      Sentry.captureException(e, {
+        tags: {
+          action: 'send-notifications-deduplication-read',
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
+        },
+      });
+      helpers.logger.error(`failed to check if notification with id ${payload.notificationId} is sent`);
+    }
 
-      let messageId = await this.firebasePushNotifications.send({
+    let messageId: string;
+    try {
+      messageId = await this.firebasePushNotifications.send({
         notification: {
           title: payload.notificationTitle,
           body: payload.notificationBody,
@@ -43,7 +58,6 @@ export default class SendNotificationsTask {
         token: payload.pushClientId,
       });
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
-      await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
     } catch (e) {
       Sentry.captureException(e, {
         tags: {
@@ -52,6 +66,25 @@ export default class SendNotificationsTask {
           notificationType: payload.notificationType,
         },
       });
+      // this error must be rethrown to make sure this task fails and is retried
+      throw e;
+    }
+
+    try {
+      // We don't want to have this in the same try catch block because
+      // We don't want failure to write to the database to result in infinite notifications being sent
+      await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
+    } catch (e) {
+      // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
+      Sentry.captureException(e, {
+        tags: {
+          action: 'send-notifications-deduplication-write',
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
+          messageId,
+        },
+      });
+      helpers.logger.error(`failed to record that notification with id ${payload.notificationId} is sent`);
     }
   }
 }

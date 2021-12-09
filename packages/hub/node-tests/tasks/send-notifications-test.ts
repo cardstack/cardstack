@@ -4,6 +4,9 @@ import SendNotifications, { PushNotificationData } from '../../tasks/send-notifi
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import SentPushNotificationsQueries from '../../services/queries/sent-push-notifications';
+import waitFor from '../utils/wait-for';
+import * as Sentry from '@sentry/node';
+import sentryTestkit from 'sentry-testkit';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 export function makeMockJob(taskIdentifier: string): Job {
@@ -48,12 +51,19 @@ let newlyAddedNotification = createPushNotification('newly-added-');
 
 let lastSentData: any;
 let notificationSent = false;
-
 class StubFirebasePushNotifications {
   async send(data: any) {
     lastSentData = data;
     notificationSent = true;
     return messageID;
+  }
+}
+
+class ErroredFirebasePushNotifications {
+  static message = 'mock firebase push notifications error';
+
+  send() {
+    throw new Error(ErroredFirebasePushNotifications.message);
   }
 }
 
@@ -75,11 +85,11 @@ describe('SendNotificationsTask', function () {
       messageId: 'existing-message-id',
     });
 
-    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
-
     lastSentData = undefined;
     notificationSent = false;
+
+    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
   });
 
   it('will not send a notification if it already exists in the db', async function () {
@@ -105,5 +115,84 @@ describe('SendNotificationsTask', function () {
     });
 
     expect(newNotificationInDatabase).equal(true);
+  });
+});
+
+describe('SendNotificationsTask Errors', async function () {
+  let { getContainer } = setupHub(this);
+
+  const { testkit, sentryTransport } = sentryTestkit();
+  Sentry.init({
+    dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+    release: 'test',
+    tracesSampleRate: 1,
+    transport: sentryTransport,
+  });
+
+  this.beforeEach(async function () {
+    lastSentData = undefined;
+    notificationSent = false;
+    testkit.reset();
+  });
+
+  it('handles deduplication mechanism failure and sends the notification', async function () {
+    registry(this).register(
+      'sent-push-notifications-queries',
+      class ErroredSentPushNotificationsQueries {
+        async insert() {
+          throw new Error('insert fails');
+        }
+
+        async exists() {
+          throw new Error('exists fails');
+        }
+      }
+    );
+    registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
+    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    // This should not error despite db reads and writes erroring
+    await subject.perform(newlyAddedNotification, helpers);
+
+    expect(lastSentData).to.deep.equal({
+      notification: {
+        body: newlyAddedNotification.notificationBody,
+        title: newlyAddedNotification.notificationTitle,
+      },
+      data: newlyAddedNotification.notificationData,
+      token: newlyAddedNotification.pushClientId,
+    });
+    expect(notificationSent).equal(true);
+
+    await waitFor(() => testkit.reports().length == 2);
+
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'send-notifications-deduplication-read',
+      notificationId: newlyAddedNotification.notificationId,
+      notificationType: newlyAddedNotification.notificationType,
+    });
+
+    expect(testkit.reports()[1].tags).to.deep.equal({
+      action: 'send-notifications-deduplication-write',
+      notificationId: newlyAddedNotification.notificationId,
+      notificationType: newlyAddedNotification.notificationType,
+      messageId: messageID,
+    });
+  });
+
+  it('should throw if sending a notification fails, and still log to sentry', async function () {
+    registry(this).register('firebase-push-notifications', ErroredFirebasePushNotifications);
+    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+
+    await expect(subject.perform(newlyAddedNotification, helpers)).to.be.rejectedWith(
+      ErroredFirebasePushNotifications.message
+    );
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[1].tags).to.deep.equal({
+      action: 'send-notifications',
+      notificationId: newlyAddedNotification.notificationId,
+      notificationType: newlyAddedNotification.notificationType,
+    });
   });
 });
