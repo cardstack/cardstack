@@ -41,7 +41,7 @@ let createPushNotification: (prefix: string) => PushNotificationData = (prefix =
   notificationBody: `${prefix}notification-body`,
   notificationData: [],
   notificationType: `${prefix}mock`,
-  notificationToken: 'push-client-id',
+  pushClientId: 'push-client-id',
 });
 let existingNotification = createPushNotification('existing-');
 let newlyAddedNotification = createPushNotification('newly-added-');
@@ -96,7 +96,7 @@ describe('SendNotificationsTask', function () {
         title: newlyAddedNotification.notificationTitle,
       },
       data: newlyAddedNotification.notificationData,
-      token: newlyAddedNotification.notificationToken,
+      token: newlyAddedNotification.pushClientId,
     });
     expect(notificationSent).equal(true);
 

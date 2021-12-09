@@ -8,13 +8,17 @@ type SentPushNotificationsFilter = PushNotificationsIdentifiers;
 export default class SentPushNotificationsQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
+  // messageId is firebase's message id
+  // notificationId is our own identifier for the notification
+  // pushClientId identifies the device
   async insert(model: PushNotificationData & { messageId: string }) {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO sent_push_notifications (notification_id, notification_type, notification_title, notification_body, notification_data, message_id) VALUES($1, $2, $3, $4, $5, $6)',
+      'INSERT INTO sent_push_notifications (notification_id, push_client_id, notification_type, notification_title, notification_body, notification_data, message_id) VALUES($1, $2, $3, $4, $5, $6, $7)',
       [
         model.notificationId,
+        model.pushClientId,
         model.notificationType,
         model.notificationTitle,
         model.notificationBody,

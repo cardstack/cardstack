@@ -8,7 +8,7 @@ export interface PushNotificationData {
    */
   notificationId: string;
   notificationType: string;
-  notificationToken: string;
+  pushClientId: string;
   notificationTitle?: string;
   notificationBody?: string;
   notificationData?: {};
@@ -22,7 +22,7 @@ export default class SendNotificationsTask {
   sentPushNotificationsQueries = inject('sent-push-notifications-queries', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
-  async perform<T extends PushNotificationData>(payload: T, helpers: Helpers) {
+  async perform(payload: PushNotificationData, helpers: Helpers) {
     try {
       let index = {
         notificationId: payload.notificationId,
@@ -40,7 +40,7 @@ export default class SendNotificationsTask {
           body: payload.notificationBody,
         },
         data: payload.notificationData,
-        token: payload.notificationToken,
+        token: payload.pushClientId,
       });
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
       await this.sentPushNotificationsQueries.insert({ ...payload, messageId });

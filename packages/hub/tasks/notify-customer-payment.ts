@@ -116,7 +116,7 @@ export default class NotifyCustomerPayment {
           transactionHash: payload,
           pushClientId,
         }),
-        notificationToken: pushClientId,
+        pushClientId,
         notificationBody,
         notificationType: 'customer_payment',
       };

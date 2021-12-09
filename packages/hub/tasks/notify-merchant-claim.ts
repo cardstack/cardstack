@@ -107,7 +107,7 @@ export default class NotifyMerchantClaim {
           transactionHash: payload,
           pushClientId,
         }),
-        notificationToken: pushClientId,
+        pushClientId,
         notificationBody,
         notificationType: 'merchant_claim',
       };

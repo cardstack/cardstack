@@ -4,7 +4,8 @@ exports.up = (pgm) => {
   pgm.createTable(SENT_PUSH_NOTIFICATIONS_TABLE, {
     // This is our own id for the notification.
     notification_id: { type: 'string', primaryKey: true },
-    notification_type: { type: 'string', notNull: true },
+    push_client_id: { type: 'string' },
+    notification_type: { type: 'string' },
     notification_title: { type: 'string' },
     notification_body: { type: 'string', notNull: true },
     notification_data: { type: 'json' },
