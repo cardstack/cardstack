@@ -42,6 +42,18 @@ module.exports = {
         },
       ],
     }),
+
+    // we exclude node-pg-migrate from the webpack build because of the logic it
+    // uses to locate migration modules needs to use __dirname to work. So we
+    // copy over the original npm pkg to dist
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.dirname(require.resolve('node-pg-migrate')),
+          to: 'node-pg-migrate',
+        },
+      ],
+    }),
   ],
 
   entry: {

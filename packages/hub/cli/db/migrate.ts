@@ -1,14 +1,20 @@
 /* eslint-disable no-process-exit */
 
 import { Argv } from 'yargs';
-import migrate from 'node-pg-migrate';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import config from 'dotenv';
 import { createContainer } from '../../main';
 
 export let command = 'migrate';
 export let describe = `Perform database migrations, specify direction 'up' or 'down' and optionally --no-check-order`;
 export let builder = {};
+
+const migrateModule = join(
+  dirname(__non_webpack_require__.resolve('@cardstack/hub/package.json')),
+  'dist',
+  'node-pg-migrate'
+);
+const { default: migrate } = __non_webpack_require__(migrateModule);
 
 export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean }) {
   let {
