@@ -14,9 +14,13 @@ export class SearchIndex {
   private database = inject('database-manager', { as: 'database' });
 
   async indexAllRealms(): Promise<void> {
-    await this.runIndexing(async (ops) => {
-      await Promise.all(this.realmManager.realms.map((realm) => realm.reindex(ops, undefined)));
-    });
+    await Promise.all(
+      this.realmManager.realms.map((realm) => {
+        return this.runIndexing(realm.url, async (ops) => {
+          await realm.reindex(ops, undefined);
+        });
+      })
+    );
   }
 
   async getCard(cardURL: string): Promise<{ raw: RawCard; compiled: CompiledCard | undefined }> {
@@ -36,15 +40,15 @@ export class SearchIndex {
   }
 
   async indexCard(raw: RawCard): Promise<CompiledCard> {
-    return await this.runIndexing(async (ops) => {
+    return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.saveAndReturn(raw);
     });
   }
 
-  private async runIndexing<Out>(fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
+  private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
-      let run = new IndexerRun(db, this.builder);
+      let run = new IndexerRun(db, this.builder, realmURL);
       let result = await fn(run);
       await run.finalize();
       return result;
@@ -76,7 +80,9 @@ export interface IndexerHandle {
 }
 
 class IndexerRun implements IndexerHandle {
-  constructor(private db: PoolClient, private builder: CardBuilder) {}
+  private generation?: number;
+
+  constructor(private db: PoolClient, private builder: CardBuilder, private realmURL: string) {}
 
   async finalize() {}
 
@@ -88,6 +94,8 @@ class IndexerRun implements IndexerHandle {
     let compiledCard = await this.builder.compileCardFromRaw(card);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(cardURL(card)),
+      realm: param(this.realmURL),
+      generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
       data: param(serializeRawCard(card, compiledCard)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
@@ -100,9 +108,13 @@ class IndexerRun implements IndexerHandle {
     await this.db.query(`DELETE from cards where url=$1`, [cardURL]);
   }
 
-  async beginReplaceAll(): Promise<void> {}
+  async beginReplaceAll(): Promise<void> {
+    this.generation = Math.floor(Math.random() * 1000000000);
+  }
 
-  async finishReplaceAll(): Promise<void> {}
+  async finishReplaceAll(): Promise<void> {
+    await this.db.query('DELETE FROM cards where realm = $1 AND generation != $2', [this.realmURL, this.generation]);
+  }
 }
 
 function ancestorsOf(compiledCard: CompiledCard): string[] {

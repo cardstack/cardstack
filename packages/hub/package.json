@@ -10,8 +10,8 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
-    "build": "webpack",
-    "rebuild": "webpack --watch",
+    "build": "webpack --progress",
+    "rebuild": "webpack --watch --progress",
     "start": "run-p -c start:*",
     "start:server": "node -r source-map-support/register dist/hub.js server",
     "start:worker": "node -r source-map-support/register dist/hub.js worker",

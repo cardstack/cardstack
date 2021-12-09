@@ -30,6 +30,18 @@ module.exports = {
         },
       ],
     }),
+
+    // place the db migrations into the dist folder so that node-pg-migrate can
+    // find them
+    new CopyPlugin({
+      patterns: [
+        {
+          // we are @cardstack/hub, so there is no need to declare ourselves as a dep
+          // eslint-disable-next-line node/no-extraneous-require
+          from: path.join(path.dirname(require.resolve('@cardstack/hub/package.json')), 'db', 'migrations', '*.js'),
+        },
+      ],
+    }),
   ],
 
   entry: {
@@ -82,6 +94,11 @@ module.exports = {
     // corde wants to insert itself at runtime, as it drives the bot tests. We
     // don't want to compile it in.
     corde: 'commonjs corde',
+
+    // node-pg-migrate has very specific logic for how it determines the path of
+    // the migration files which rely on a relative path calculation from
+    // __dirname
+    'node-pg-migrate': 'commonjs node-pg-migrate',
   },
 
   module: {
@@ -145,6 +162,39 @@ module.exports = {
       // for voice support that we don't use
       module: /node_modules\/discord\.js\/src\/client\/voice\/util\/Secretbox\.js$/,
       message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/@babel\/core\/lib\/config\/files\/(configuration|plugins)\.js/,
+      message: /require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+    {
+      module: /node_modules\/@babel\/core\/lib\/config\/files\/(import|module-types)\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/any-promise\/register\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/browserslist\/node\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/browserslist\/node\.js/,
+      message: /require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+    {
+      module: /node_modules\/config\/lib\/config\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      module: /node_modules\/express\/lib\/view\.js/,
+      message: /the request of a dependency is an expression/,
+    },
+    {
+      // this require is wrapped in a try catch and will import a local pkg if the fast-crc32c is not available
+      module: /node_modules\/hash-stream-validation\/index\.js/,
+      message: /Can't resolve 'fast-crc32c'/,
     },
   ],
 };

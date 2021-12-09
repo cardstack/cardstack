@@ -105,7 +105,7 @@ export class CardService {
         let card: CompiledCard;
         try {
           card = (await this.load(element.on)).compiled;
-        } catch (err) {
+        } catch (err: any) {
           if (err.status !== 404) {
             throw err;
           }
