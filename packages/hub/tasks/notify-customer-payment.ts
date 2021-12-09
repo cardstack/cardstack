@@ -4,6 +4,7 @@ import CardpaySDKService from '../services/cardpay-sdk';
 import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
+import NotificationPreferenceService from '../services/push-notifications/preferences';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -54,6 +55,9 @@ export default class NotifyCustomerPayment {
   cardpay: CardpaySDKService = inject('cardpay');
   merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
+    as: 'notificationPreferenceService',
+  });
 
   async perform(payload: string) {
     await this.cardpay.waitForSubgraphIndex(payload, network);
@@ -68,6 +72,17 @@ export default class NotifyCustomerPayment {
       throw new Error(
         `Subgraph did not return information for prepaid card payment with transaction hash: "${payload}"`
       );
+    }
+
+    let notifiedAddress = result.merchant.id;
+
+    let pushClientIdsForNotification = await this.notificationPreferenceService.getEligiblePushClientIds(
+      notifiedAddress,
+      'customer_payment'
+    );
+
+    if (pushClientIdsForNotification.length === 0) {
+      return;
     }
 
     let merchantName = 'You';
@@ -88,13 +103,15 @@ export default class NotifyCustomerPayment {
       });
     }
 
-    let notifiedAddress = result.merchant.id;
     let spendAmount = result.spendAmount;
     let message = `${merchantName} received a payment of §${spendAmount}`;
 
-    await this.workerClient.addJob('send-notifications', {
-      notifiedAddress,
-      message,
-    });
+    for (const pushClientId of pushClientIdsForNotification) {
+      await this.workerClient.addJob('send-notifications', {
+        notifiedAddress,
+        pushClientId,
+        message,
+      });
+    }
   }
 }
