@@ -5,7 +5,8 @@ import { buildConditions } from '../../utils/queries';
 
 interface PushNotificationRegistrationQueriesFilter {
   ownerAddress: string;
-  pushClientId: string;
+  pushClientId?: string;
+  disabledAt?: string | null;
 }
 
 export default class PushNotificationRegistrationQueries {
