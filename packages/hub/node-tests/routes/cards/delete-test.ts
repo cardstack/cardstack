@@ -15,11 +15,12 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getContainer, realmURL, getCardCache, request, cards } = configureHubWithCompiler(this);
+    let { realmURL, getCardCache, request, cards, getRealmDir } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -38,7 +39,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post0`,
+        realm: realmURL,
+        id: 'post0',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -62,9 +64,7 @@ if (process.env.COMPILER) {
         'Cache for card is deleted'
       ).to.be.false;
 
-      // TODO: Can we make getRealm return the corrent realm type?
-      let fsrealm = (await getContainer().lookup('realm-manager')).getRealmForCard(realmURL) as any;
-      expect(existsSync(join(fsrealm.directory, 'post0')), 'card is deleted from realm').to.be.false;
+      expect(existsSync(join(getRealmDir(), 'post0')), 'card is deleted from realm').to.be.false;
     });
   });
 }

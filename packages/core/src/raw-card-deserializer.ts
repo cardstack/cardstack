@@ -1,4 +1,4 @@
-import { CompiledCard, Field, RawCard } from './interfaces';
+import { assertValidRawCard, CompiledCard, Field, RawCard } from './interfaces';
 import { findIncluded } from './jsonapi';
 
 export class RawCardDeserializer {
@@ -15,17 +15,31 @@ export class RawCardDeserializer {
       throw new Error(`expected type raw-cards, got ${resource.type}`);
     }
     let { attributes: attrs } = resource;
+    if (!attrs) {
+      throw new Error('invalid raw-card jsonapi: missing attributes');
+    }
     let raw: RawCard = {
-      url: resource.id,
-      schema: attrs?.schema,
-      isolated: attrs?.isolated,
-      embedded: attrs?.embedded,
-      edit: attrs?.edit,
-      deserializer: attrs?.deserializer,
-      adoptsFrom: attrs?.adoptsFrom,
-      files: attrs?.files,
-      data: attrs?.data,
+      realm: attrs.realm,
+      id: resource.id.slice(attrs.realm.length),
     };
+
+    let fields: (keyof RawCard)[] = [
+      'schema',
+      'isolated',
+      'embedded',
+      'edit',
+      'deserializer',
+      'adoptsFrom',
+      'files',
+      'data',
+    ];
+    for (let field of fields) {
+      if (attrs[field] != null) {
+        raw[field] = attrs[field];
+      }
+    }
+
+    assertValidRawCard(raw);
     let metaRef = resource.relationships?.compiledMeta?.data;
     let compiled: CompiledCard | undefined;
     if (metaRef) {
@@ -47,12 +61,14 @@ export class RawCardDeserializer {
     let { attributes: attrs } = resource;
     let compiled: CompiledCard = {
       url: resource.id,
+      realm: attrs?.realm,
       schemaModule: attrs?.schemaModule,
       serializer: attrs?.serializer,
       isolated: attrs?.isolated,
       embedded: attrs?.embedded,
       edit: attrs?.edit,
       fields: {},
+      modules: attrs?.modules,
     };
     this.shared.set(compiled.url, compiled);
 

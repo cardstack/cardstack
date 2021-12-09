@@ -1,5 +1,6 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { cardURL } from '@cardstack/core/src/utils';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
@@ -38,10 +39,8 @@ export class SearchIndex {
     }
   }
 
-  // TODO: The realmURL arugment is neccessary until we refactor RawCard by
-  // splitting up url into realmURL and ID
-  async indexCard(raw: RawCard, realmURL: string): Promise<CompiledCard> {
-    return await this.runIndexing(realmURL, async (ops) => {
+  async indexCard(raw: RawCard): Promise<CompiledCard> {
+    return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.saveAndReturn(raw);
     });
   }
@@ -94,7 +93,7 @@ class IndexerRun implements IndexerHandle {
   async saveAndReturn(card: RawCard): Promise<CompiledCard> {
     let compiledCard = await this.builder.compileCardFromRaw(card);
     let expression = upsert('cards', 'cards_pkey', {
-      url: param(card.url),
+      url: param(cardURL(card)),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),

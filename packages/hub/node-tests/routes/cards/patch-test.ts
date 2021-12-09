@@ -20,7 +20,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -39,7 +40,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post0`,
+        realm: realmURL,
+        id: 'post0',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -66,16 +68,22 @@ if (process.env.COMPILER) {
           },
         },
       }).expect(200);
-      expect(initialResponse.body.data.attributes).to.deep.equal({
-        title: 'Goodbye World!',
-        body: 'First post',
-      });
+      expect(initialResponse.body.data.attributes).to.deep.equal(
+        {
+          title: 'Goodbye World!',
+          body: 'First post',
+        },
+        'PATCH Response'
+      );
 
       let response = await getCard(`${realmURL}post0`).expect(200);
-      expect(response.body.data?.attributes).to.deep.equal({
-        title: 'Goodbye World!',
-        body: 'First post',
-      });
+      expect(response.body.data?.attributes).to.deep.equal(
+        {
+          title: 'Goodbye World!',
+          body: 'First post',
+        },
+        'Followup Request'
+      );
     });
 
     it.skip('can update a card that has a schema file', async function () {
@@ -88,10 +96,10 @@ if (process.env.COMPILER) {
           attributes,
         },
       }).expect(200);
-      expect(initialResponse.body.data.attributes).to.deep.equal(attributes);
+      expect(initialResponse.body.data.attributes).to.deep.equal(attributes, 'PATCH response');
 
       let response = await getCard(`${realmURL}post`).expect(200);
-      expect(response.body.data?.attributes).to.deep.equal(attributes);
+      expect(response.body.data?.attributes).to.deep.equal(attributes, 'Followup Request');
     });
   });
 }

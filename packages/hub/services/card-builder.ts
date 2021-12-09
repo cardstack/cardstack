@@ -1,5 +1,5 @@
 import { Builder as BuilderInterface, RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
-import { Compiler } from '@cardstack/core/src/compiler';
+import { Compiler, defineModules } from '@cardstack/core/src/compiler';
 
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from '../interfaces';
@@ -11,6 +11,7 @@ import { serverLog as logger } from '../utils/logger';
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { cardURL } from '@cardstack/core/src/utils';
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -23,7 +24,7 @@ export default class CardBuilder implements BuilderInterface {
     builder: this,
   });
 
-  async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
+  private define(cardURL: string, localPath: string, type: string, source: string): string {
     switch (type) {
       case JS_TYPE:
         this.cache.setModule(BROWSER, cardURL, localPath, source);
@@ -44,7 +45,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    return await this.realmManager.read(url.replace(/\/$/, ''));
+    return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -65,10 +66,11 @@ export default class CardBuilder implements BuilderInterface {
       err = e;
     }
     if (compiledCard) {
-      this.cache.setCard(rawCard.url, compiledCard);
+      defineModules(compiledCard, (local, type, src) => this.define(cardURL(rawCard), local, type, src));
+      this.cache.setCard(cardURL(rawCard), compiledCard);
       return compiledCard;
     } else {
-      this.cache.deleteCard(rawCard.url);
+      this.cache.deleteCard(cardURL(rawCard));
       throw err;
     }
   }

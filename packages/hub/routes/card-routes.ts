@@ -10,6 +10,7 @@ import { NotFound, BadRequest } from '@cardstack/core/src/utils/errors';
 import { difference } from 'lodash';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
+import { NewRawCard } from '@cardstack/core/src/interfaces';
 
 declare global {
   const __non_webpack_require__: any;
@@ -73,15 +74,16 @@ export default class CardRoutes {
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let card: any = {
+    let card: NewRawCard = {
+      realm: realmURL,
       adoptsFrom: parentCardURL,
       data: inputData.attributes,
     };
     if (inputData.id) {
-      card.url = inputData.id;
+      card.id = inputData.id.slice(realmURL.length);
     }
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card, { realmURL });
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card);
 
     ctx.body = { data: serializeCard(compiled.url, outputData, compiled[format]) };
     ctx.status = 201;
@@ -94,7 +96,8 @@ export default class CardRoutes {
     } = ctx;
 
     let data = await deserialize(body).attributes;
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ url, data });
+    let cardId = this.realmManager.parseCardURL(url);
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
 
     // Question: Is it safe to assume the response should be isolated?
     ctx.body = { data: serializeCard(url, outputData, compiled['isolated']) };
@@ -106,7 +109,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    await this.realmManager.getRealmForCard(url).delete(url);
+    await this.realmManager.delete(this.realmManager.parseCardURL(url));
     this.cache.deleteCard(url);
 
     ctx.status = 204;
@@ -126,7 +129,7 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let rawCard = await this.realmManager.read(url);
+    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
     let card = await this.builder.getCompiledCard(url);
     ctx.body = { data: serializeCard(url, rawCard.data, card['isolated']) };
     ctx.status = 200;
@@ -139,7 +142,7 @@ export default class CardRoutes {
     } = ctx;
 
     let compiledCard;
-    let rawCard = await this.realmManager.read(url);
+    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
 
     if (query.include === 'compiledMeta') {
       compiledCard = await this.builder.getCompiledCard(url);

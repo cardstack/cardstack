@@ -3,9 +3,9 @@ import { sep, join } from 'path';
 import sane from 'sane';
 import walkSync from 'walk-sync';
 
-import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { assertValidRawCard, CardId, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
-import { ensureTrailingSlash } from '@cardstack/core/src/utils';
+import { cardURL, ensureTrailingSlash } from '@cardstack/core/src/utils';
 
 import { RealmInterface } from '../interfaces';
 import { nanoid } from '../utils/ids';
@@ -47,9 +47,9 @@ export default class FSRealm implements RealmInterface {
     await ops.beginReplaceAll();
     let cards = walkSync(this.directory, { globs: ['**/card.json'] });
     for (let cardPath of cards) {
-      let fullCardUrl = new URL(cardPath.replace('/card.json', ''), this.url).href;
-      this.logger.info(`--> ${fullCardUrl}`);
-      let rawCard = await this.read(fullCardUrl);
+      let id = cardPath.replace('/card.json', '');
+      this.logger.info(`--> ${id}`);
+      let rawCard = await this.read({ id, realm: this.url });
       await ops.save(rawCard);
     }
     await ops.finishReplaceAll();
@@ -66,12 +66,15 @@ export default class FSRealm implements RealmInterface {
     this.notify(url, action);
   }
 
-  private buildCardPath(cardURL: string, ...paths: string[]): string {
-    return join(this.directory, cardURL.replace(this.url, ''), ...(paths || ''));
+  private buildCardPath(cardId: CardId, ...paths: string[]): string {
+    if (cardId.realm !== this.url) {
+      throw new Error(`realm ${this.url} does not contain card ${cardURL(cardId)}`);
+    }
+    return join(this.directory, cardId.id, ...(paths || ''));
   }
 
-  async read(cardURL: string): Promise<RawCard> {
-    let dir = this.buildCardPath(cardURL);
+  async read(cardId: CardId): Promise<RawCard> {
+    let dir = this.buildCardPath(cardId);
     let files: any = {};
 
     let entries: string[];
@@ -81,7 +84,7 @@ export default class FSRealm implements RealmInterface {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`card ${cardURL} not found`);
+      throw new NotFound(`card ${cardId.id} not found`);
     }
 
     for (let file of entries) {
@@ -91,7 +94,7 @@ export default class FSRealm implements RealmInterface {
 
     let cardJSON = files['card.json'];
     if (!cardJSON) {
-      throw new CardstackError(`${cardURL} is missing card.json`);
+      throw new CardstackError(`${cardId.id} is missing card.json`);
     }
 
     delete files['card.json'];
@@ -101,7 +104,7 @@ export default class FSRealm implements RealmInterface {
     } catch (e: any) {
       throw augmentBadRequest(e);
     }
-    Object.assign(card, { files, url: cardURL });
+    Object.assign(card, { files, id: cardId.id, realm: cardId.realm });
     assertValidRawCard(card);
 
     return card;
@@ -114,17 +117,17 @@ export default class FSRealm implements RealmInterface {
     return doc;
   }
 
-  private ensureCardURL(raw: RawCard | Omit<RawCard, 'url'>): string {
-    if ('url' in raw) {
-      return raw.url;
+  private ensureCardId(raw: NewRawCard): CardId {
+    if (raw.id) {
+      return { id: raw.id, realm: this.url };
     } else {
-      return this.url + nanoid();
+      return { id: nanoid(), realm: this.url };
     }
   }
 
-  async create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard> {
-    let url = this.ensureCardURL(raw);
-    let cardDir = this.buildCardPath(url);
+  async create(raw: NewRawCard): Promise<RawCard> {
+    let cardId = this.ensureCardId(raw);
+    let cardDir = this.buildCardPath(cardId);
 
     try {
       mkdirSync(cardDir);
@@ -132,13 +135,13 @@ export default class FSRealm implements RealmInterface {
       if (err.code !== 'EEXIST') {
         throw err;
       }
-      throw new Conflict(`card ${url} already exists`);
+      throw new Conflict(`card ${cardURL(cardId)} already exists`);
     }
     let completeRawCard: RawCard;
-    if ('url' in raw) {
-      completeRawCard = raw;
+    if ('id' in raw) {
+      completeRawCard = raw as RawCard;
     } else {
-      completeRawCard = Object.assign({}, raw, { url });
+      completeRawCard = Object.assign({}, raw, { ...cardId });
     }
 
     this.write(cardDir, completeRawCard);
@@ -146,7 +149,7 @@ export default class FSRealm implements RealmInterface {
   }
 
   async update(raw: RawCard): Promise<RawCard> {
-    let cardDir = this.buildCardPath(raw.url);
+    let cardDir = this.buildCardPath(raw);
     this.write(cardDir, raw);
     return raw;
   }
@@ -159,7 +162,7 @@ export default class FSRealm implements RealmInterface {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`tried to update card ${raw.url} but it does not exist`);
+      throw new NotFound(`tried to update card ${cardURL(raw)} but it does not exist`);
     }
     if (raw.files) {
       for (let [name, contents] of Object.entries(raw.files)) {
@@ -168,10 +171,10 @@ export default class FSRealm implements RealmInterface {
     }
   }
 
-  async delete(cardURL: string): Promise<void> {
-    let cardDir = this.buildCardPath(cardURL);
+  async delete(cardId: CardId): Promise<void> {
+    let cardDir = this.buildCardPath(cardId);
     if (!existsSync(cardDir)) {
-      throw new NotFound(`tried to delete ${cardURL} but it does not exist`);
+      throw new NotFound(`tried to delete ${cardURL(cardId)} but it does not exist`);
     }
     removeSync(cardDir);
   }

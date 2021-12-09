@@ -11,7 +11,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}pet`,
+        realm: realmURL,
+        id: 'pet',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -25,7 +26,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}person`,
+        realm: realmURL,
+        id: 'person',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -41,7 +43,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -65,7 +68,8 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realmURL}post0`,
+        realm: realmURL,
+        id: 'post0',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',

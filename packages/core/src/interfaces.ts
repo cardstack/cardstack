@@ -40,19 +40,14 @@ export type CardData = Record<string, any>;
 
 export type Setter = (value: any) => void;
 
-/* Card type IDEAS
-  primitive:
-    Where card is a value, has validation and/or a serialize. IE: Date, string
-    Has a @value attribute
-  composite:
-    Where card is combining multifle cards, ie: A blog post
-    Has a @model attribute
-  data:
-    A card that likely adopts from a composite card, but only provides new data for it
-*/
+export interface CardId {
+  realm: string;
+  id: string;
+}
 
-export interface RawCard {
-  url: string;
+export interface NewRawCard {
+  realm: string;
+  id?: string;
 
   // Feature Files. Value is path inside the files list
   schema?: string;
@@ -72,12 +67,19 @@ export interface RawCard {
   data?: Record<string, any> | undefined;
 }
 
+export interface RawCard extends NewRawCard {
+  id: string;
+}
+
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
     throw new CardstackError('A raw card that is empty is not valid');
   }
-  if (typeof obj.url !== 'string') {
-    throw new CardstackError('A card requires a URL');
+  if (typeof obj.id !== 'string') {
+    throw new CardstackError('A card requires an id');
+  }
+  if (typeof obj.realm !== 'string') {
+    throw new CardstackError('A card requires a realm');
   }
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
@@ -109,8 +111,8 @@ export interface Field {
   name: string;
 }
 
-export interface CompiledCard {
-  url: string;
+export interface NewCompiledCard {
+  realm: string;
   adoptsFrom?: CompiledCard;
   fields: {
     [key: string]: Field;
@@ -120,24 +122,32 @@ export interface CompiledCard {
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;
+
+  modules: Record<
+    string, // local module path
+    {
+      type: string;
+      source: string;
+    }
+  >;
+}
+
+export interface CompiledCard extends NewCompiledCard {
+  url: string;
 }
 
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
-
   inlineHBS?: string;
-  sourceCardURL: string;
+
+  // the URL of the card that originally defined this component, if it's not ourself
+  inheritedFrom?: string;
 }
 
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-
-  // returns the module identifier that can be used to get this module back.
-  // It's exactly meaning depends on the environment. In node it's a path you
-  // can actually `require`.
-  define: (cardURL: string, localModule: string, type: string, source: string) => Promise<string>;
 }
 
 export interface RealmConfig {

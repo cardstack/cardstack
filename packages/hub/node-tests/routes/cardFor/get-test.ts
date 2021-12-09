@@ -22,7 +22,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}routes`,
+        realm: realmURL,
+        id: 'routes',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -41,14 +42,16 @@ if (process.env.COMPILER) {
         },
       });
       await cards.create({
-        url: `${realmURL}homepage`,
+        realm: realmURL,
+        id: 'homepage',
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
         },
       });
       await cards.create({
-        url: `${realmURL}about`,
+        realm: realmURL,
+        id: 'about',
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),

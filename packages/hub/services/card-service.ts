@@ -1,4 +1,4 @@
-import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -16,6 +16,7 @@ import {
   Expression,
 } from '../utils/expressions';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
+import { cardURL } from '@cardstack/core/src/utils';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -49,41 +50,23 @@ export class CardService {
   async load(url: string): Promise<Card> {
     let { raw, compiled } = await this.searchIndex.getCard(url);
     if (!compiled) {
-      throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+      throw new Error(`bug: database entry for ${url} is missing the compiled card`);
     }
     return { data: raw.data, compiled };
   }
 
-  async create(raw: RawCard): Promise<Card>;
-  async create(raw: RawCard | Omit<RawCard, 'url'>, params: { realmURL: string }): Promise<Card>;
-  async create(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
-    let realmURL: string;
-    if (params) {
-      if ('url' in raw && !raw.url.startsWith(params.realmURL)) {
-        throw new Error(`realm mismatch. You tried to create card ${raw.url} in realm ${params.realmURL}`);
-      }
-      realmURL = params.realmURL;
-    } else {
-      if (!('url' in raw)) {
-        throw new Error(`you must either choose the card's URL or choose which realmURL it will go into`);
-      }
-      let realm = this.realmManager.realms.find((r) => raw.url.startsWith(r.url));
-      if (!realm) {
-        throw new Error(`tried to create card ${raw.url} but we don't have a realm configured that matches that URL`);
-      }
-      realmURL = realm.url;
-    }
-
-    let rawCard = await this.realmManager.getRealmForCard(realmURL).create(raw);
-    let compiled = await this.searchIndex.indexCard(rawCard, realmURL);
-
+  async create(raw: NewRawCard): Promise<Card> {
+    // NEW: Compile it to make sure everything is valid
+    // `${realm}${id ?? 'NEW_CARD'}/${localFile}`
+    let rawCard = await this.realmManager.create(raw);
+    let compiled = await this.searchIndex.indexCard(rawCard);
     return { data: rawCard.data, compiled };
   }
 
   async update(raw: RawCard): Promise<Card> {
-    let originalRaw = await this.realmManager.read(raw.url);
+    let originalRaw = await this.realmManager.read(raw);
     await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let compiled = await this.builder.getCompiledCard(raw.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(raw));
 
     // TODO:
     // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
@@ -103,7 +86,7 @@ export class CardService {
       return result.rows.map((row) => {
         let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
         if (!compiled) {
-          throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+          throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }
         return { data: raw.data, compiled };
       });
@@ -122,7 +105,7 @@ export class CardService {
         let card: CompiledCard;
         try {
           card = (await this.load(element.on)).compiled;
-        } catch (err) {
+        } catch (err: any) {
           if (err.status !== 404) {
             throw err;
           }

@@ -31,7 +31,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -86,7 +87,8 @@ if (process.env.COMPILER) {
 
     it('Errors when you provide an ID that alreay exists', async function () {
       await cards.create({
-        url: `${realmURL}post-is-the-most`,
+        realm: realmURL,
+        id: 'post-is-the-most',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -112,7 +114,7 @@ if (process.env.COMPILER) {
             },
             {
               code: 404,
-              detail: 'https://not-created.com/post/ is not a realm we know about',
+              detail: 'card URL https://not-created.com/post is not in a configured realm',
               title: 'Not Found',
             },
           ],

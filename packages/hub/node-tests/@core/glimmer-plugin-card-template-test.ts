@@ -21,7 +21,8 @@ if (process.env.COMPILER) {
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
       await cards.create({
-        url: `${realmURL}list`,
+        realm: realmURL,
+        id: 'list',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -296,7 +297,8 @@ if (process.env.COMPILER) {
 
     it('Tracking deeply nested field usage', async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -319,7 +321,8 @@ if (process.env.COMPILER) {
       });
       let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
       await cards.create({
-        url: `${realmURL}post-list`,
+        realm: realmURL,
+        id: 'post-list',
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {

@@ -11,6 +11,7 @@ import {
   ADDRESS_RAW_CARD,
   PERSON_RAW_CARD,
 } from '@cardstack/core/tests/helpers/fixtures';
+import { cardURL } from '@cardstack/core/src/utils';
 
 const PERSON = '[data-test-person]';
 const MODAL = '[data-test-modal]';
@@ -20,7 +21,7 @@ const SAVE = '[data-test-modal-save]';
 module('Acceptance | Card Editing', function (hooks) {
   setupApplicationTest(hooks);
   setupBuilder(hooks);
-  let personURL = PERSON_RAW_CARD.url;
+  let personURL = cardURL(PERSON_RAW_CARD);
 
   hooks.beforeEach(async function () {
     await this.builder.createRawCard(ADDRESS_RAW_CARD);

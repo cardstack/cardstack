@@ -1,12 +1,14 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 import CardBuilder from '../../services/card-builder';
-import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
+import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { RawCard } from '@cardstack/core/src/interfaces';
+import { cardURL } from '@cardstack/core/src/utils';
 
-const PERSON_CARD = {
-  url: `${TEST_REALM}person`,
+const PERSON_CARD: RawCard = {
+  realm,
+  id: 'person',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -53,7 +55,8 @@ if (process.env.COMPILER) {
 
     it('deserializer is inherited', async function () {
       await cards.create({
-        url: `${TEST_REALM}fancy-date`,
+        realm,
+        id: 'fancy-date',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -62,32 +65,32 @@ if (process.env.COMPILER) {
           export default @adopts(date) class FancyDate { }`,
         },
       });
-      let compiled = await builder.getCompiledCard(`${TEST_REALM}fancy-date`);
+      let compiled = await builder.getCompiledCard(`${realm}fancy-date`);
       expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
     });
 
     it('CompiledCard fields', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
+      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
     });
 
     it('CompiledCard embedded view', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
+      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
 
       expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
-      expect(builder.cache.getAsset(`${TEST_REALM}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
-        PERSON_CARD.files['embedded.css']
+      expect(builder.cache.getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
+        PERSON_CARD.files!['embedded.css']
       );
     });
 
     it('CompiledCard edit view', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
+      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
 
       expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
       expect(builder.cache.getModule(compiled.edit.moduleName), 'Edit template is rendered for text').to.containsSource(
@@ -101,7 +104,8 @@ if (process.env.COMPILER) {
     it('nested cards', async function () {
       await cards.create(PERSON_CARD);
       await cards.create({
-        url: `${TEST_REALM}post`,
+        realm,
+        id: 'post',
         schema: 'schema.js',
         embedded: 'embedded.js',
         isolated: 'isolated.js',
@@ -109,7 +113,7 @@ if (process.env.COMPILER) {
           'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import Person from "${PERSON_CARD.url}";
+          import Person from "${cardURL(PERSON_CARD)}";
           export default class Post {
             @contains(string)
             title;
@@ -124,7 +128,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard(`${TEST_REALM}post`);
+      let compiled = await builder.getCompiledCard(`${realm}post`);
       expect(compiled.fields).to.have.all.keys('title', 'author');
 
       expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
@@ -138,7 +142,8 @@ if (process.env.COMPILER) {
 
     it('deeply nested cards', async function () {
       await cards.create({
-        url: `${TEST_REALM}post`,
+        realm,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'embedded.js',
@@ -166,7 +171,8 @@ if (process.env.COMPILER) {
         },
       });
       await cards.create({
-        url: `${TEST_REALM}post-list`,
+        realm,
+        id: 'post-list',
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'embedded.js',
@@ -195,7 +201,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard(`${TEST_REALM}post-list`);
+      let compiled = await builder.getCompiledCard(`${realm}post-list`);
       expect(compiled.fields).to.have.all.keys('posts');
 
       expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
@@ -216,19 +222,20 @@ if (process.env.COMPILER) {
     });
 
     it(`gives a good error when a card can't compile because adoptsFrom does not exist`, async function () {
-      let rawCard: RawCard = { url: `${TEST_REALM}post`, adoptsFrom: '../post' };
+      let rawCard: RawCard = { realm, id: 'post', adoptsFrom: '../post' };
       try {
         await builder.compileCardFromRaw(rawCard);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
-        expect(err.message).to.eq(`tried to adopt from card ${TEST_REALM}post but it failed to load`);
+        expect(err.message).to.eq(`tried to adopt from card ${realm}post but it failed to load`);
         expect(err.status).to.eq(422);
       }
     });
 
     it(`gives a good error when a card can't compile because field does not exist`, async function () {
       let rawCard: RawCard = {
-        url: `${TEST_REALM}post`,
+        realm,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -246,14 +253,15 @@ if (process.env.COMPILER) {
         await builder.compileCardFromRaw(rawCard);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
-        expect(err.message).to.eq(`tried to lookup field 'author' from card ${TEST_REALM}post but it failed to load`);
+        expect(err.message).to.eq(`tried to lookup field 'author' but it failed to load`);
         expect(err.status).to.eq(422);
       }
     });
 
     describe('@fields iterating', function () {
-      let postCard = {
-        url: `${TEST_REALM}post`,
+      let postCard: RawCard = {
+        realm,
+        id: 'post',
         schema: 'schema.js',
         embedded: 'embedded.js',
         files: {
@@ -275,35 +283,37 @@ if (process.env.COMPILER) {
       });
 
       it('iterators of fields and inlines templates', async function () {
-        let compiled = await builder.getCompiledCard(`${TEST_REALM}post`);
+        let compiled = await builder.getCompiledCard(`${realm}post`);
         expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label></article>'
         );
       });
 
       it('recompiled parent field iterator', async function () {
-        let fancyPostCard = {
-          url: `${TEST_REALM}fancy-post`,
+        let fancyPostCard: RawCard = {
+          realm,
+          id: 'fancy-post',
           schema: 'schema.js',
           files: {
             'schema.js': `
           import { contains, adopts } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import Post from "${postCard.url}";
+          import Post from "${cardURL(postCard)}";
           export default @adopts(Post) class FancyPost {
             @contains(string)
             body;
           }`,
           },
         };
-        let timelyPostCard = {
-          url: `${TEST_REALM}timely-post`,
+        let timelyPostCard: RawCard = {
+          realm,
+          id: 'timely-post',
           schema: 'schema.js',
           files: {
             'schema.js': `
           import { contains, adopts } from "@cardstack/types";
           import date from "https://cardstack.com/base/date";
-          import Post from "${postCard.url}";
+          import Post from "${cardURL(postCard)}";
           export default @adopts(Post) class TimelyPost {
             @contains(date)
             createdAt;
@@ -314,8 +324,8 @@ if (process.env.COMPILER) {
         await cards.create(fancyPostCard);
         await cards.create(timelyPostCard);
 
-        let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
-        let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);
+        let timelyCompiled = await builder.getCompiledCard(cardURL(timelyPostCard));
+        let fancyCompiled = await builder.getCompiledCard(cardURL(fancyPostCard));
 
         expect(builder.cache.getModule(timelyCompiled.embedded.moduleName)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'

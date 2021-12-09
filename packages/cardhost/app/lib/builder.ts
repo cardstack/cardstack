@@ -6,18 +6,19 @@ import type {
   RawCard,
   Builder,
   CardOperation,
+  CardId,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
-import { Compiler } from '@cardstack/core/src/compiler';
+import { Compiler, defineModules } from '@cardstack/core/src/compiler';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
-import { encodeCardURL } from '@cardstack/core/src/utils';
+import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 
-export const LOCAL_REALM = 'https://cardstack.local';
-export const DEMO_REALM = 'https://demo.com';
+export const LOCAL_REALM = 'https://cardstack.local/';
+export const DEMO_REALM = 'https://demo.com/';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -47,7 +48,7 @@ type LocalModule =
 // "Creator" because it encompasses all API for manipulating cards at the source
 // code level, whether or not you're storing them in an in-browser local realm.
 export default class LocalRealm implements Builder {
-  // these are the canonical sources for cards stored in our local realm
+  // these are the canonical sources for cards stored in our local realm, key is card id
   private rawCards = new Map<string, RawCard>();
 
   // cache of raw cards that we loaded from the server (because we needed them
@@ -60,6 +61,9 @@ export default class LocalRealm implements Builder {
   private deserializer = new RawCardDeserializer();
 
   constructor(private ownRealmURL: string, private cards: Cards) {
+    if (!ownRealmURL.endsWith('/')) {
+      throw new Error(`realm URLs must have trailing slash`);
+    }
     this.compiler = new Compiler({
       builder: this,
     });
@@ -98,16 +102,17 @@ export default class LocalRealm implements Builder {
   }
 
   async createRawCard(rawCard: RawCard): Promise<void> {
-    if (this.inOwnRealm(rawCard.url)) {
-      this.rawCards.set(rawCard.url, rawCard);
+    if (this.inOwnRealm(rawCard)) {
+      this.rawCards.set(rawCard.id, rawCard);
     } else {
       throw new Error('unimplemented');
     }
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    if (this.inOwnRealm(url)) {
-      let card = this.rawCards.get(url);
+    let cardId = this.parseOwnRealmURL(url);
+    if (cardId) {
+      let card = this.rawCards.get(cardId.id);
       if (!card) {
         throw new Error(`${url} not found in local realm`);
       }
@@ -122,7 +127,7 @@ export default class LocalRealm implements Builder {
         );
 
         let raw = this.deserializer.deserialize(response.data, response).raw;
-        this.remoteRawCards.set(raw.url, raw);
+        this.remoteRawCards.set(url, raw);
         return raw;
       }
     }
@@ -134,9 +139,13 @@ export default class LocalRealm implements Builder {
       return cached;
     }
 
-    if (this.inOwnRealm(url)) {
+    let cardId = this.parseOwnRealmURL(url);
+    if (cardId) {
       let rawCard = await this.getRawCard(url);
       let compiledCard = await this.compiler.compile(rawCard);
+      defineModules(compiledCard, (local, type, src) =>
+        this.define(url, local, type, src)
+      );
       this.compiledCardCache.set(url, compiledCard);
       return compiledCard;
     } else {
@@ -156,42 +165,47 @@ export default class LocalRealm implements Builder {
       if (!compiled) {
         throw new Error(`expected to find compiled meta alongside raw card`);
       }
-      this.remoteRawCards.set(raw.url, raw);
+      this.remoteRawCards.set(url, raw);
       return compiled;
     }
   }
 
   generateId(): string {
-    let url;
-    while (!url) {
-      let possibleURL = this.ownRealmURL + Math.floor(Math.random() * 10000);
-      if (!this.rawCards.has(possibleURL)) {
-        url = possibleURL;
+    let id;
+    while (!id) {
+      let possibleId = String(Math.floor(Math.random() * 10000));
+      if (!this.rawCards.has(possibleId)) {
+        id = possibleId;
       }
     }
-    return url;
+    return id;
   }
 
   async send(op: CardOperation): Promise<CardJSONResponse> {
     if ('create' in op) {
       let data = op.create.payload.data.attributes;
 
-      let url = this.generateId();
+      let id = this.generateId();
 
       this.createRawCard({
-        url,
+        realm: this.ownRealmURL,
+        id,
         data,
         adoptsFrom: op.create.parentCardURL,
       });
 
-      return this.load(url, 'isolated');
+      return this.load(cardURL({ realm: this.ownRealmURL, id }), 'isolated');
     } else if ('update' in op) {
       let { cardURL: url } = op.update;
+      let cardId = this.parseOwnRealmURL(url);
+      if (!cardId) {
+        throw new Error(`${url} is not in this realm`);
+      }
       let data = op.update.payload.data.attributes;
-      let existingRawCard = this.rawCards.get(url);
+      let existingRawCard = this.rawCards.get(cardId.id);
       if (!existingRawCard) {
         throw new Error(
-          `Tried to update a local card that doesnt exist: ${url}`
+          `Tried to update a local card that doesn't exist: ${url}`
         );
       }
 
@@ -202,8 +216,18 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  private inOwnRealm(cardURL: string): boolean {
-    return cardURL.startsWith(this.ownRealmURL);
+  private inOwnRealm(card: RawCard): boolean {
+    return card.realm === this.ownRealmURL;
+  }
+
+  private parseOwnRealmURL(url: string): CardId | undefined {
+    if (url.startsWith(this.ownRealmURL)) {
+      return {
+        realm: this.ownRealmURL,
+        id: url.slice(this.ownRealmURL.length),
+      };
+    }
+    return undefined;
   }
 
   private async evaluateModule<T extends object>(
@@ -263,12 +287,12 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async define(
+  private define(
     cardURL: string,
     localModule: string,
     type: string,
     source: string
-  ): Promise<string> {
+  ): string {
     let moduleIdentifier = `@cardstack/local-realm-compiled/${encodeCardURL(
       cardURL
     )}/${localModule}`;

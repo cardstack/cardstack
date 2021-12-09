@@ -1,6 +1,6 @@
 import FSRealm from '../realms/fs-realm';
 import { NotFound } from '@cardstack/core/src/utils/errors';
-import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
+import { CardId, NewRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
 import { getOwner, inject, injectionReady } from '@cardstack/di';
@@ -26,7 +26,7 @@ export default class RealmManager {
     }
   }
 
-  async createRealm(config: RealmConfig) {
+  private async createRealm(config: RealmConfig) {
     let realm = await getOwner(this).instantiate(
       FSRealm,
       ensureTrailingSlash(config.url),
@@ -41,30 +41,42 @@ export default class RealmManager {
     this.searchIndex.notify(cardURL, action);
   }
 
-  getRealmForCard(url: string): RealmInterface {
-    url = ensureTrailingSlash(url);
-
+  parseCardURL(cardURL: string): CardId {
     for (let realm of this.realms) {
-      if (!url.startsWith(realm.url)) {
-        continue;
+      if (cardURL.startsWith(realm.url)) {
+        return {
+          realm: realm.url,
+          id: cardURL.slice(realm.url.length),
+        };
       }
-
-      return realm;
     }
-
-    throw new NotFound(`${url} is not a realm we know about`);
+    throw new NotFound(`card URL ${cardURL} is not in a configured realm`);
   }
 
-  async read(url: string): Promise<RawCard> {
-    return this.getRealmForCard(url).read(url);
+  private findRealm(targetRealm: string): RealmInterface {
+    targetRealm = ensureTrailingSlash(targetRealm);
+    for (let realm of this.realms) {
+      if (targetRealm === realm.url) {
+        return realm;
+      }
+    }
+    throw new NotFound(`${targetRealm} is not a realm we know about`);
+  }
+
+  async create(card: NewRawCard): Promise<RawCard> {
+    return this.findRealm(card.realm).create(card);
+  }
+
+  async read(cardId: CardId): Promise<RawCard> {
+    return this.findRealm(cardId.realm).read(cardId);
   }
 
   async update(raw: RawCard): Promise<RawCard> {
-    return this.getRealmForCard(raw.url).update(raw);
+    return this.findRealm(raw.realm).update(raw);
   }
 
-  async delete(cardURL: string) {
-    return this.getRealmForCard(cardURL).delete(cardURL);
+  async delete(cardId: CardId) {
+    return this.findRealm(cardId.realm).delete(cardId);
   }
 }
 
