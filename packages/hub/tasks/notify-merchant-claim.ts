@@ -112,7 +112,11 @@ export default class NotifyMerchantClaim {
         notificationType: 'merchant_claim',
       };
 
-      await this.workerClient.addJob('send-notifications', notification);
+      await this.workerClient.addJob('send-notifications', notification, {
+        jobKey: notification.notificationId,
+        jobKeyMode: 'preserve_run_at',
+        maxAttempts: 8, // 8th attempt is estimated to run at 28 mins. https://github.com/graphile/worker#exponential-backoff
+      });
     }
   }
 }
