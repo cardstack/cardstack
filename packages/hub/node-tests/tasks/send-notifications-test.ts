@@ -36,16 +36,12 @@ let helpers = makeJobHelpers({}, makeMockJob('send-notifications'), {
 
 const messageID = 'firebase-message-id';
 let createPushNotification: (prefix: string) => PushNotificationData = (prefix = '') => ({
-  transactionHash: `${prefix}transaction-hash`,
-  // keep owner-address and pushClientId the same since this is a likely occurence in prod
-  // when we send several notifications for different transactions
-  ownerAddress: `owner-address`,
-  pushClientId: `push-client-id`,
+  notificationId: `${prefix}-mock-notification-id`,
   notificationTitle: `${prefix}notification-title`,
   notificationBody: `${prefix}notification-body`,
   notificationData: [],
   notificationType: `${prefix}mock`,
-  network: 'test-network',
+  notificationToken: 'push-client-id',
 });
 let existingNotification = createPushNotification('existing-');
 let newlyAddedNotification = createPushNotification('newly-added-');
@@ -100,14 +96,12 @@ describe('SendNotificationsTask', function () {
         title: newlyAddedNotification.notificationTitle,
       },
       data: newlyAddedNotification.notificationData,
-      token: newlyAddedNotification.pushClientId,
+      token: newlyAddedNotification.notificationToken,
     });
     expect(notificationSent).equal(true);
 
     let newNotificationInDatabase = await sentPushNotificationsQueries.exists({
-      transactionHash: newlyAddedNotification.transactionHash,
-      pushClientId: newlyAddedNotification.pushClientId,
-      ownerAddress: newlyAddedNotification.ownerAddress,
+      notificationId: newlyAddedNotification.notificationId,
     });
 
     expect(newNotificationInDatabase).equal(true);

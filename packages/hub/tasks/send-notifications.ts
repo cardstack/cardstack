@@ -3,37 +3,34 @@ import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
 
 export interface PushNotificationData {
-  transactionHash: string;
-  ownerAddress: string;
-  pushClientId: string;
-  network: string;
+  /**
+   * A unique ID determined by the caller of this task, to be used for deduplication
+   */
+  notificationId: string;
   notificationType: string;
+  notificationToken: string;
   notificationTitle?: string;
-  notificationBody: string;
+  notificationBody?: string;
   notificationData?: {};
 }
 
 export interface PushNotificationsIdentifiers {
-  transactionHash: PushNotificationData['transactionHash'];
-  ownerAddress: PushNotificationData['ownerAddress'];
-  pushClientId: PushNotificationData['pushClientId'];
+  notificationId: PushNotificationData['notificationId'];
 }
 
 export default class SendNotificationsTask {
   sentPushNotificationsQueries = inject('sent-push-notifications-queries', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
-  async perform(payload: PushNotificationData, helpers: Helpers) {
+  async perform<T extends PushNotificationData>(payload: T, helpers: Helpers) {
     try {
       let index = {
-        transactionHash: payload.transactionHash,
-        pushClientId: payload.pushClientId,
-        ownerAddress: payload.ownerAddress,
+        notificationId: payload.notificationId,
       };
 
       let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists(index);
       if (notificationHasBeenSent) {
-        helpers.logger.info(`Not sending notification for ${payload.transactionHash} because it has already been sent`);
+        helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
         return;
       }
 
@@ -43,15 +40,16 @@ export default class SendNotificationsTask {
           body: payload.notificationBody,
         },
         data: payload.notificationData,
-        token: payload.pushClientId,
+        token: payload.notificationToken,
       });
-      helpers.logger.info(`Sent notification for ${payload.transactionHash}`);
+      helpers.logger.info(`Sent notification for ${payload.notificationId}`);
       await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
     } catch (e) {
       Sentry.captureException(e, {
         tags: {
           action: 'send-notifications',
-          transactionHash: payload.transactionHash,
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
         },
       });
     }

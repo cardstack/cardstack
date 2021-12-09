@@ -939,9 +939,7 @@ ALTER TABLE public.reservations OWNER TO postgres;
 --
 
 CREATE TABLE public.sent_push_notifications (
-    transaction_hash text NOT NULL,
-    owner_address text NOT NULL,
-    push_client_id text NOT NULL,
+    notification_id text NOT NULL,
     notification_type text NOT NULL,
     notification_title text,
     notification_body text NOT NULL,
@@ -1175,6 +1173,14 @@ ALTER TABLE ONLY public.reservations
 
 
 --
+-- Name: sent_push_notifications sent_push_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sent_push_notifications
+    ADD CONSTRAINT sent_push_notifications_pkey PRIMARY KEY (notification_id);
+
+
+--
 -- Name: uploads uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1273,13 +1279,6 @@ CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.re
 --
 
 CREATE INDEX reservations_user_address_index ON public.reservations USING btree (user_address);
-
-
---
--- Name: sent_push_notifications_transaction_hash_owner_address_push_cli; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX sent_push_notifications_transaction_hash_owner_address_push_cli ON public.sent_push_notifications USING btree (transaction_hash, owner_address, push_client_id);
 
 
 --

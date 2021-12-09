@@ -3,9 +3,6 @@ import { inject } from '@cardstack/di';
 import { PushNotificationData, PushNotificationsIdentifiers } from '../../tasks/send-notifications';
 import { buildConditions } from '../../utils/queries';
 
-/**
- * All fields in this type are necessary to identify a unique push notification for a given event
- */
 type SentPushNotificationsFilter = PushNotificationsIdentifiers;
 
 export default class SentPushNotificationsQueries {
@@ -15,17 +12,14 @@ export default class SentPushNotificationsQueries {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data, message_id, network) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      'INSERT INTO sent_push_notifications (notification_id, notification_type, notification_title, notification_body, notification_data, message_id) VALUES($1, $2, $3, $4, $5, $6)',
       [
-        model.transactionHash,
-        model.ownerAddress,
-        model.pushClientId,
+        model.notificationId,
         model.notificationType,
         model.notificationTitle,
         model.notificationBody,
         model.notificationData,
         model.messageId,
-        model.network,
       ]
     );
   }

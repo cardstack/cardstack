@@ -6,6 +6,7 @@ import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
 import { PushNotificationData } from './send-notifications';
+import { generateContractEventNotificationId } from '../utils/notifications';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -109,9 +110,13 @@ export default class NotifyCustomerPayment {
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
-        ownerAddress,
-        pushClientId,
-        transactionHash: payload,
+        notificationId: generateContractEventNotificationId({
+          network,
+          ownerAddress,
+          transactionHash: payload,
+          pushClientId,
+        }),
+        notificationToken: pushClientId,
         notificationBody,
         notificationType: 'customer_payment',
       };
