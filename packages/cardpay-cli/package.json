@@ -6,7 +6,7 @@
   "repository": "cardstack/cardstack",
   "scripts": {
     "build": "tsc && chmod +x ./index.js",
-    "cardpay": "node ./cardpay.js",
+    "cardpay": "ts-node ./index.ts",
     "pkg": "npm-run-all pkg:*",
     "pkg:build": "rm -rf ./dist && rm -rf ~/.cardpay-cli-dist && mkdir ~/.cardpay-cli-dist && find . -name '*.js' | cpio -pdm ~/.cardpay-cli-dist && cp ./package.json ~/.cardpay-cli-dist && cp ../../yarn.lock ~/.cardpay-cli-dist && cd ~/.cardpay-cli-dist && yarn install",
     "pkg:assemble": "mkdir -p ./dist/bin && cp -r ~/.cardpay-cli-dist/* ./dist && cp ./bin/cardpay ./dist/bin && rm -rf ~/.cardpay-cli-dist",
@@ -40,6 +40,7 @@
     "web3": "1.5.2",
     "web3-core": "1.5.2",
     "web3-utils": "1.5.2",
+    "ts-node": "^10.3.0",
     "yargs": "^16.2.0"
   },
   "config": {

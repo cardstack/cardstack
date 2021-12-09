@@ -8,9 +8,9 @@ import {
   awaitBridgedToLayer2,
   claimLayer1BridgedTokens,
   getWithdrawalLimits,
-} from './bridge.js';
+} from './bridge';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, viewSafe, transferTokensGasEstimate } from './safe.js';
+import { viewSafes, transferTokens, viewSafe, transferTokensGasEstimate } from './safe';
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
@@ -20,7 +20,7 @@ import {
   payMerchant,
   gasFee,
   getPaymentLimits,
-} from './prepaid-card.js';
+} from './prepaid-card';
 import {
   registerRewardProgram,
   registerRewardee,
@@ -39,7 +39,7 @@ import {
   ethPrice as layer2EthPrice,
   priceOracleUpdatedAt as layer2PriceOracleUpdatedAt,
 } from './layer-two-oracle';
-import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
+import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool';
 import {
   rewardTokenBalances,
   addRewardTokens,
@@ -47,7 +47,7 @@ import {
   claimRewards,
   getClaimableRewardProofs,
   recoverRewardTokens,
-} from './reward-pool.js';
+} from './reward-pool';
 import { hubAuth } from './hub-auth';
 import {
   getSKUInfo,
@@ -57,7 +57,7 @@ import {
   getInventories as prepaidCardInventories,
   removeFromInventory as removePrepaidCardInventory,
   addToInventory as addPrepaidCardInventory,
-} from './prepaid-card-market.js';
+} from './prepaid-card-market';
 import { Safe } from '@cardstack/cardpay-sdk';
 
 //@ts-ignore polyfilling fetch

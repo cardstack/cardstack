@@ -18,8 +18,6 @@
   },
   "include": [
     "./packages/cardie/**/*.ts",
-    "./packages/cardpay-cli/**/*.ts",
-    "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",
     "./packages/discord-bot/**/*.ts",
     "./packages/test-support/**/*.ts",
