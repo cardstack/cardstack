@@ -940,12 +940,12 @@ ALTER TABLE public.reservations OWNER TO postgres;
 
 CREATE TABLE public.sent_push_notifications (
     notification_id text NOT NULL,
-    notification_type text NOT NULL,
+    push_client_id text,
+    notification_type text,
     notification_title text,
-    notification_body text NOT NULL,
+    notification_body text,
     notification_data json,
-    message_id text NOT NULL,
-    network text,
+    message_id text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
