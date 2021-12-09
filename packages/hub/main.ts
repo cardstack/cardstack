@@ -92,6 +92,7 @@ import PushNotificationRegistrationQueries from './services/queries/push-notific
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
 import Contracts from './services/contracts';
+import LatestEventBlockQueries from './services/queries/latest-event-block';
 import NotificationTypeQueries from './services/queries/notification-type';
 import NotificationPreferenceQueries from './services/queries/notification-preference';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
@@ -125,6 +126,7 @@ export function createRegistry(): Registry {
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
+  registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
@@ -356,9 +358,16 @@ export async function bootWorker() {
   let web3 = await container.lookup('web3-socket');
   let workerClient = await container.lookup('worker-client');
 
+  let latestEventBlockQueries = await container.lookup('latest-event-block-queries');
+
   // listen for contract events
   // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient, contracts).setupContractEventSubscriptions();
+  await new ContractSubscriptionEventHandler(
+    web3,
+    workerClient,
+    contracts,
+    latestEventBlockQueries
+  ).setupContractEventSubscriptions();
 
   await runner.promise;
 }
