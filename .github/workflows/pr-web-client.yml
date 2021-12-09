@@ -18,7 +18,7 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max_old_space_size=8096"
+      NODE_OPTIONS: "--max-old-space-size=12096"
     steps:
       - uses: actions/checkout@v2
         with:
