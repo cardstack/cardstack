@@ -82,7 +82,7 @@ module('@core | compiler-basics', function (hooks) {
   test('Generates inlineHBS for templates without', async function (assert) {
     let card: RawCard = {
       id: 'string',
-realm: LOCAL_REALM,
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       embedded: 'embedded.js',
       files: {
@@ -104,14 +104,14 @@ realm: LOCAL_REALM,
     await this.builder.createRawCard(PERSON_RAW_CARD);
     let card: RawCard = {
       id: 'post',
-realm: LOCAL_REALM,
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
           import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
-          import person from "${LOCAL_REALM}/person";
+          import person from "${LOCAL_REALM}person";
 
           export default class Post {
             @contains(string)
@@ -136,7 +136,7 @@ realm: LOCAL_REALM,
   test('it discovers a string literal field', async function (assert) {
     let card: RawCard = {
       id: 'post',
-realm: LOCAL_REALM,
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -159,7 +159,7 @@ realm: LOCAL_REALM,
   test('it discovers a field whose import comes before the field decorator', async function (assert) {
     let card: RawCard = {
       id: 'post',
-realm: LOCAL_REALM,
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -182,7 +182,7 @@ realm: LOCAL_REALM,
   test('it discovers the field type of contains', async function (assert) {
     let card: RawCard = {
       id: 'post',
-realm: LOCAL_REALM,
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -208,7 +208,7 @@ realm: LOCAL_REALM,
     test('it accepts data and returns the values', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         data: {
           title: 'Hello World',
@@ -239,7 +239,7 @@ realm: LOCAL_REALM,
     hooks.beforeEach(async function () {
       card = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -274,7 +274,9 @@ realm: LOCAL_REALM,
     test('it inlines a compound field template', async function (assert) {
       this.builder.createRawCard(PERSON_RAW_CARD);
 
-      let compiled = await this.builder.getCompiledCard(cardURL(PERSON_RAW_CARD));
+      let compiled = await this.builder.getCompiledCard(
+        cardURL(PERSON_RAW_CARD)
+      );
 
       let code = await this.cardService.loadModule<any>(
         compiled.embedded.moduleName
@@ -288,7 +290,7 @@ realm: LOCAL_REALM,
     test('field must be called', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -314,7 +316,7 @@ realm: LOCAL_REALM,
     test('field must be a decorator', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -344,7 +346,7 @@ realm: LOCAL_REALM,
     test('field must be on a class property', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -374,7 +376,7 @@ realm: LOCAL_REALM,
     test('field must have static name', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -406,7 +408,7 @@ realm: LOCAL_REALM,
     test('field cannot be weird type', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -440,7 +442,7 @@ realm: LOCAL_REALM,
     test('field with wrong number of arguments', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -470,7 +472,7 @@ realm: LOCAL_REALM,
     test('hasMany with wrong number of arguments', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -500,7 +502,7 @@ realm: LOCAL_REALM,
     test('field with wrong argument syntax', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -530,7 +532,7 @@ realm: LOCAL_REALM,
     test('field with undefined type', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -559,7 +561,7 @@ realm: LOCAL_REALM,
     test('field with card type that was not imported', async function (assert) {
       let card: RawCard = {
         id: 'post',
-realm: LOCAL_REALM,
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `

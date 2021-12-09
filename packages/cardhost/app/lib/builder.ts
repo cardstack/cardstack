@@ -14,11 +14,11 @@ import config from 'cardhost/config/environment';
 import { Compiler, defineModules } from '@cardstack/core/src/compiler';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
-import { encodeCardURL } from '@cardstack/core/src/utils';
+import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 
-export const LOCAL_REALM = 'https://cardstack.local';
-export const DEMO_REALM = 'https://demo.com';
+export const LOCAL_REALM = 'https://cardstack.local/';
+export const DEMO_REALM = 'https://demo.com/';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -61,6 +61,9 @@ export default class LocalRealm implements Builder {
   private deserializer = new RawCardDeserializer();
 
   constructor(private ownRealmURL: string, private cards: Cards) {
+    if (!ownRealmURL.endsWith('/')) {
+      throw new Error(`realm URLs must have trailing slash`);
+    }
     this.compiler = new Compiler({
       builder: this,
     });
@@ -191,7 +194,7 @@ export default class LocalRealm implements Builder {
         adoptsFrom: op.create.parentCardURL,
       });
 
-      return this.load(id, 'isolated');
+      return this.load(cardURL({ realm: this.ownRealmURL, id }), 'isolated');
     } else if ('update' in op) {
       let { cardURL: url } = op.update;
       let cardId = this.parseOwnRealmURL(url);

@@ -38,7 +38,7 @@ module('@core | compiler-adoption', function (hooks) {
   hooks.beforeEach(async function () {
     this.builder.createRawCard(PERSON_CARD);
 
-    parentCard = await this.builder.getCompiledCard(`${LOCAL_REALM}/person`);
+    parentCard = await this.builder.getCompiledCard(`${LOCAL_REALM}person`);
   });
 
   module('fields', function (/*hooks*/) {
@@ -46,15 +46,7 @@ module('@core | compiler-adoption', function (hooks) {
       let card = {
         id: 'user',
         realm: LOCAL_REALM,
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { adopts } from "@cardstack/types";
-            import Person from "${LOCAL_REALM}/person";
-
-            export default @adopts(Person) class User {}
-          `,
-        },
+        adoptsFrom: '../person',
       };
       this.builder.createRawCard(card);
 
@@ -76,7 +68,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "${LOCAL_REALM}/person";
+          import Person from "${LOCAL_REALM}person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -104,7 +96,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "${LOCAL_REALM}/person";
+          import Person from "${LOCAL_REALM}person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -122,7 +114,7 @@ module('@core | compiler-adoption', function (hooks) {
       } catch (err) {
         assert.equal(
           err.message,
-          `Field collision on birthdate with parent card ${LOCAL_REALM}/person`
+          `Field collision on birthdate with parent card ${LOCAL_REALM}person`
         );
       }
     });
@@ -135,7 +127,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "${LOCAL_REALM}/person";
+          import Person from "${LOCAL_REALM}person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -152,7 +144,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import User from "${LOCAL_REALM}/user";
+          import User from "${LOCAL_REALM}user";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(User) class Admin {
@@ -170,7 +162,7 @@ module('@core | compiler-adoption', function (hooks) {
       } catch (err) {
         assert.equal(
           err.message,
-          `Field collision on name with parent card ${LOCAL_REALM}/user`
+          `Field collision on name with parent card ${LOCAL_REALM}user`
         );
       }
     });
@@ -185,7 +177,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "${LOCAL_REALM}/person";
+            import Person from "${LOCAL_REALM}person";
 
             export default @adopts(Person) class User {}
         `,
@@ -209,7 +201,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "${LOCAL_REALM}/person";
+          import Person from "${LOCAL_REALM}person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -225,7 +217,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import User from "${LOCAL_REALM}/user";
+            import User from "${LOCAL_REALM}user";
 
             export default @adopts(User) class Admin {}
         `,
@@ -251,7 +243,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "${LOCAL_REALM}/person";
+            import Person from "${LOCAL_REALM}person";
 
             export default class Admin {
               @adopts(Person)
@@ -281,7 +273,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "${LOCAL_REALM}/person";
+            import Person from "${LOCAL_REALM}person";
 
             export default @adopts(Person, true) class Admin {}
         `,

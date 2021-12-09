@@ -17,7 +17,7 @@ module('Integration | card-service', function (hooks) {
   });
 
   module('blog post', function (hooks) {
-    let cardID = `${LOCAL_REALM}/post-1`;
+    let cardID = `${LOCAL_REALM}post-1`;
 
     hooks.beforeEach(function () {
       this.builder.createRawCard({
@@ -49,7 +49,7 @@ module('Integration | card-service', function (hooks) {
       this.builder.createRawCard({
         id: 'post-1',
         realm: LOCAL_REALM,
-        adoptsFrom: `${LOCAL_REALM}/post`,
+        adoptsFrom: `${LOCAL_REALM}post`,
         data: {
           title: 'A blog post title',
           createdAt: '2021-03-02T19:51:32.121Z',
@@ -111,7 +111,7 @@ module('Integration | card-service', function (hooks) {
         files: {
           'schema.js': `
             import { containsMany } from "@cardstack/types";
-            import post from "${LOCAL_REALM}/post";
+            import post from "${LOCAL_REALM}post";
 
             export default class Hello {
               @containsMany(post)
@@ -124,7 +124,7 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let model = await cards.load(`${LOCAL_REALM}/post-list`, 'isolated');
+      let model = await cards.load(`${LOCAL_REALM}post-list`, 'isolated');
       this.set('component', model.component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');

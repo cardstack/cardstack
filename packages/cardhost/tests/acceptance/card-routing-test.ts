@@ -11,7 +11,7 @@ import { cardURL } from '@cardstack/core/src/utils';
 
 module('Acceptance | card routing', function (hooks) {
   let personURL = cardURL(PERSON_RAW_CARD);
-  let routeCardURL = `${LOCAL_REALM}/my-routes`;
+  let routeCardURL = `${LOCAL_REALM}my-routes`;
 
   setupApplicationTest(hooks);
   setupBuilder(hooks, { routingCard: routeCardURL });
