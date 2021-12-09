@@ -122,16 +122,14 @@ describe('SendNotificationsTask Errors', async function () {
   let { getContainer } = setupHub(this);
 
   const { testkit, sentryTransport } = sentryTestkit();
-  Sentry.init({
-    dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-    release: 'test',
-    tracesSampleRate: 1,
-    transport: sentryTransport,
-  });
 
   this.beforeEach(async function () {
-    lastSentData = undefined;
-    notificationSent = false;
+    Sentry.init({
+      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
     testkit.reset();
   });
 
@@ -148,8 +146,11 @@ describe('SendNotificationsTask Errors', async function () {
         }
       }
     );
+    lastSentData = undefined;
+    notificationSent = false;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
     let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+
     // This should not error despite db reads and writes erroring
     await subject.perform(newlyAddedNotification, helpers);
 
