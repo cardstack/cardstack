@@ -3,8 +3,7 @@ import { registry, setupHub } from '../helpers/server';
 import SendNotifications, { PushNotificationData } from '../../tasks/send-notifications';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import { Client } from 'pg';
-import { buildConditions } from '../../utils/queries';
+import SentPushNotificationsQueries from '../../services/queries/sent-push-notifications';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 export function makeMockJob(taskIdentifier: string): Job {
@@ -64,27 +63,22 @@ class StubFirebasePushNotifications {
 
 describe('SendNotificationsTask', function () {
   let subject: SendNotifications;
-  let db: Client;
+  let sentPushNotificationsQueries: SentPushNotificationsQueries;
   let { getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
     let dbManager = await getContainer().lookup('database-manager');
-    db = await dbManager.getClient();
+    let db = await dbManager.getClient();
     await db.query(`DELETE FROM sent_push_notifications`);
-    await db.query(
-      `INSERT INTO sent_push_notifications (transaction_hash, owner_address, push_client_id, notification_type, notification_title, notification_body, notification_data, message_id, network) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [
-        existingNotification.transactionHash,
-        existingNotification.ownerAddress,
-        existingNotification.pushClientId,
-        existingNotification.notificationType,
-        existingNotification.notificationTitle,
-        existingNotification.notificationBody,
-        existingNotification.notificationData,
-        'existing-message-id',
-        existingNotification.network,
-      ]
-    );
+
+    sentPushNotificationsQueries = (await getContainer().lookup(
+      'sent-push-notifications-queries'
+    )) as SentPushNotificationsQueries;
+    sentPushNotificationsQueries.insert({
+      ...existingNotification,
+      messageId: 'existing-message-id',
+    });
+
     subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
 
@@ -110,16 +104,12 @@ describe('SendNotificationsTask', function () {
     });
     expect(notificationSent).equal(true);
 
-    const conditions = buildConditions({
+    let newNotificationInDatabase = await sentPushNotificationsQueries.exists({
       transactionHash: newlyAddedNotification.transactionHash,
       pushClientId: newlyAddedNotification.pushClientId,
       ownerAddress: newlyAddedNotification.ownerAddress,
     });
-    const queryResult = await db.query(
-      `SELECT message_id FROM sent_push_notifications WHERE ${conditions.where}`,
-      conditions.values
-    );
-    expect(queryResult.rowCount).equal(1);
-    expect(queryResult.rows[0].message_id).equal(messageID);
+
+    expect(newNotificationInDatabase).equal(true);
   });
 });
