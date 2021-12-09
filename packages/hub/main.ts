@@ -30,6 +30,7 @@ import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
+import StatusRoute from './routes/status';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
@@ -173,6 +174,7 @@ export function createRegistry(): Registry {
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
+  registry.register('status-route', StatusRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
