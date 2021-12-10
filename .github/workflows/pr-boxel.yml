@@ -29,40 +29,32 @@ jobs:
       - name: Test
         run: yarn test:boxel
 
-  # This is currently encountering a V8 JavaScript heap out of memory when
-  # performing a yarn install. We encountered a similar problem with yarn add
-  # @percy/cli and solved it by switching to npm. According to
-  # https://stackoverflow.com/a/56568741 likely  there is a dependency cycle
-  # that yarn can't see through. However, npm has the ability to collapse these
-  # cycles. I don't think, though, using npm is an option here, though. So I'm
-  # disabling this test until we can figure out why these errors occur.
-
-  # try-scenarios:
-  #   name: Tests - ${{ matrix.ember-try-scenario }}
-  #   runs-on: ubuntu-latest
-  #   continue-on-error: true
-  #   needs: test
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       ember-try-scenario: [ember-release]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: volta-cli/action@v1
-  #     - name: Set up yarn cache
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: ~/.cache/yarn
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-  #     - name: Install dependencies
-  #       run: yarn --prefer-offline
-  #     - name: Test
-  #       env:
-  #         EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
-  #       run: yarn test:boxel:try $EMBER_TRY_SCENARIO
-  #       timeout-minutes: 10
+  try-scenarios:
+    name: Tests - ${{ matrix.ember-try-scenario }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: test
+    strategy:
+      fail-fast: true
+      matrix:
+        ember-try-scenario: [ember-release]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: yarn --prefer-offline
+      - name: Test
+        env:
+          EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
+        run: yarn test:boxel:try $EMBER_TRY_SCENARIO
+        timeout-minutes: 10
 
   check-if-requires-preview:
     name: Check if a preview deploy is required
