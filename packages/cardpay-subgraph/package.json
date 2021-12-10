@@ -5,7 +5,7 @@
   "scripts": {
     "codegen-sokol": "node ./etc/pre-codegen.js poa-sokol && graph codegen && node ./etc/pre-tsc-build.js",
     "codegen-xdai": "node ./etc/pre-codegen.js xdai && graph codegen && node ./etc/pre-tsc-build.js",
-    "build": "graph build",
+    "build": "yarn codegen-sokol && graph build",
     "deploy-sokol-green": "yarn deploy-thegraph-sokol && yarn deploy-cardstack-sokol-green",
     "deploy-sokol-blue": "yarn deploy-thegraph-sokol && yarn deploy-cardstack-sokol-blue",
     "deploy-thegraph-sokol": "ts-node ./lib/validate-subgraph-network.ts sokol && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ habdelra/cardpay-sokol",
