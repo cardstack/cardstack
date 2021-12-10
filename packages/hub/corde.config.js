@@ -18,7 +18,7 @@ module.exports = {
   guildId: allowedGuilds.split(',').pop(),
   testMatches: ['dist/bot-tests.js'],
   botToken,
-  timeout: 5000,
+  timeout: 9000,
   exitOnFileReadingError: true,
   extensions: ['.js'],
   modulePathIgnorePatterns: ['(?:^|/)node_modules/'],
