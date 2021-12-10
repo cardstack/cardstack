@@ -1,8 +1,10 @@
 'use strict';
-const {
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-} = require('@cardstack/cardpay-sdk/index');
+
+// Note that the SDK (which holds these constants) is a TS lib, so we can't
+// require it in this CJS file.
+const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
+const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME =
+  'wallet-staging.stack.cards';
 
 const infuraIdsByTarget = {
   staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
