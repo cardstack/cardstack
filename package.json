@@ -32,12 +32,10 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace",
-    "compile": "yarn codegen:subgraph-sokol",
-    "prepare": "npm run compile",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
-    "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "cd packages/cardhost && yarn lint",
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",
     "lint:deps": "node scripts/find-bad-deps.js",

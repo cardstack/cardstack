@@ -3,7 +3,7 @@
     "target": "es2017",
     "module": "commonjs",
     "declaration": true,
-    "typeRoots": ["../../../../node_modules/@types", "../../../types"],
+    "typeRoots": ["../../node_modules/@types", "../../types"],
     "esModuleInterop": true,
     "sourceMap": true,
     "experimentalDecorators": true,
@@ -14,9 +14,6 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "lib": ["es2017"],
+    "noImplicitReturns": true
   },
-  "compileOnSave": true,
-  "include": ["src"]
 }
