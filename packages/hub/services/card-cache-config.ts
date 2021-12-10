@@ -4,7 +4,7 @@ export class CardCacheConfig {
   packageName = '@cardstack/compiled';
 
   get root() {
-    return dirname(__non_webpack_require__.resolve('@cardstack/hub/package.json'));
+    return process.cwd();
   }
 
   get cacheDirectory() {

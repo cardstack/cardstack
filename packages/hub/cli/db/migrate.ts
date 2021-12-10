@@ -1,10 +1,10 @@
 /* eslint-disable no-process-exit */
 
 import { Argv } from 'yargs';
-import migrate from 'node-pg-migrate';
 import { join } from 'path';
 import config from 'dotenv';
 import { createContainer } from '../../main';
+import migrate from 'node-pg-migrate';
 
 export let command = 'migrate';
 export let describe = `Perform database migrations, specify direction 'up' or 'down' and optionally --no-check-order`;

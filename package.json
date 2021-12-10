@@ -78,7 +78,8 @@
   },
   "workspaces": {
     "packages": [
-      "packages/**"
+      "packages/*",
+      "packages/firebase-functions/**"
     ],
     "nohoist": [
       "**/@types/loader-utils"

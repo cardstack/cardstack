@@ -78,5 +78,17 @@ waypoint exec -app=hub sh
 Then, execute the db migrate command:
 
 ```sh
-/workspace/packages/hub # node dist/hub.js db migrate up
+node dist/hub.js db migrate up
+```
+If you receive an error like:
+```sh
+Error: Not run migration 20211013155536724_card-index is preceding already run migration 20211013173917696_beta-testers
+    at checkOrder (/workspace/node_modules/node-pg-migrate/dist/runner.js:103:19)
+    at exports.default (/workspace/node_modules/node-pg-migrate/dist/runner.js:149:13)
+    at processTicksAndRejections (internal/process/task_queues.js:95:5)
+    at async Object.handler (/workspace/packages/hub/dist/hub.js:713760:9)
+  ```
+  Then include the `--no-check-order` flag:
+  ```sh
+node dist/hub.js db migrate up --no-check-order
 ```
