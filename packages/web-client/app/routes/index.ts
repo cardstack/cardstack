@@ -11,6 +11,10 @@ import CardSpaceImage from '@cardstack/web-client/images/illustrations/card-spac
 import CardPayImage from '@cardstack/web-client/images/illustrations/card-pay-illustration.svg';
 import CardCatalogImage from '@cardstack/web-client/images/illustrations/card-catalog-illustration.svg';
 import CardMembershipImage from '@cardstack/web-client/images/illustrations/card-membership-illustration.svg';
+import CardSpaceHor from '@cardstack/web-client/images/illustrations/card-space-illustration-horizontal.svg';
+import CardPayHor from '@cardstack/web-client/images/illustrations/card-pay-illustration-horizontal.svg';
+import CardCatalogHor from '@cardstack/web-client/images/illustrations/card-catalog-illustration-horizontal.svg';
+import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-membership-illustration-horizontal.svg';
 
 import '../css/cardstack-landing-page.css';
 
@@ -19,10 +23,8 @@ const { enableCardSpace, enableCardPay } = ENV.features;
 
 const ORGS = [
   {
-    sideImage: {
-      url: CardPayImage,
-      alt: '',
-    },
+    sideImage: CardPayImage,
+    topImage: CardPayHor,
     icon: {
       url: CardPayLogo,
       alt: 'Logo for Card Pay',
@@ -43,10 +45,8 @@ const ORGS = [
     route: 'card-pay',
   },
   {
-    sideImage: {
-      url: CardSpaceImage,
-      alt: '',
-    },
+    sideImage: CardSpaceImage,
+    topImage: CardSpaceHor,
     icon: {
       url: CardSpaceLogo,
       alt: 'Logo for Card Space',
@@ -67,10 +67,8 @@ const ORGS = [
     route: enableCardSpace ? 'card-space' : 'index',
   },
   {
-    sideImage: {
-      url: CardCatalogImage,
-      alt: '',
-    },
+    sideImage: CardCatalogImage,
+    topImage: CardCatalogHor,
     icon: {
       url: CardCatalogLogo,
       alt: 'Logo for Card Catalog',
@@ -91,10 +89,8 @@ const ORGS = [
     route: 'index',
   },
   {
-    sideImage: {
-      url: CardMembershipImage,
-      alt: '',
-    },
+    sideImage: CardMembershipImage,
+    topImage: CardMembershipHor,
     icon: {
       url: CardMembershipLogo,
       alt: 'Logo for Card Membership',

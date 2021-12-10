@@ -10,6 +10,10 @@ class IndexController extends Controller {
   @action connectToWallet() {
     console.log('Connect to wallet here');
   }
+
+  get isHorizontal() {
+    return window.innerWidth < 560;
+  }
 }
 
 export default IndexController;
