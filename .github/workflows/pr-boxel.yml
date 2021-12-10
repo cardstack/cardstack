@@ -29,6 +29,7 @@ jobs:
       - name: Test
         run: yarn test:boxel
 
+  # Filed as issue CS-2779
   # This is currently encountering a V8 JavaScript heap out of memory when
   # performing a yarn install. We encountered a similar problem with yarn add
   # @percy/cli and solved it by switching to npm. According to
