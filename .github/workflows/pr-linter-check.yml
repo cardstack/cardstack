@@ -7,6 +7,8 @@ jobs:
   test:
     name: Build & Lint
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - uses: actions/checkout@v2
         with:
