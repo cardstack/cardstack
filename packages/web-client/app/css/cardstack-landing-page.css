@@ -24,3 +24,15 @@
   grid-template-rows: auto auto;
   gap: var(--boxel-sp-xl) var(--horizontal-card-gap);
 }
+
+@media screen and (max-width: 35rem) {
+  .cardstack-landing-page-org-grid {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+
+  .cardstack-landing-page-org-grid > li {
+    width: 100%;
+    max-width: 100%;
+  }
+}
