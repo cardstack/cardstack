@@ -1282,6 +1282,13 @@ CREATE INDEX reservations_user_address_index ON public.reservations USING btree 
 
 
 --
+-- Name: sent_push_notifications_created_at_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX sent_push_notifications_created_at_index ON public.sent_push_notifications USING btree (created_at);
+
+
+--
 -- Name: wallet_orders_custodial_transfer_id_status_index; Type: INDEX; Schema: public; Owner: postgres
 --
 

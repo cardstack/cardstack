@@ -13,6 +13,8 @@ exports.up = (pgm) => {
     message_id: { type: 'string' },
     created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
   });
+
+  pgm.createIndex(SENT_PUSH_NOTIFICATIONS_TABLE, 'created_at');
 };
 
 exports.down = (pgm) => {
