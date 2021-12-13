@@ -131,9 +131,7 @@ describe('SendNotificationsTask deduplication errors', async function () {
       transport: sentryTransport,
     });
     testkit.reset();
-  });
 
-  it('handles deduplication mechanism failure and sends the notification', async function () {
     registry(this).register(
       'sent-push-notifications-queries',
       class ErroredSentPushNotificationsQueries {
@@ -142,16 +140,18 @@ describe('SendNotificationsTask deduplication errors', async function () {
         }
 
         async exists() {
-          throw new Error('exists fails');
+          return false;
         }
       }
     );
     lastSentData = undefined;
     notificationSent = false;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
+  });
+
+  it('handles deduplication write failure by catching the error, and sends the notification', async function () {
     let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
 
-    // This should not error despite db reads and writes erroring
     await subject.perform(newlyAddedNotification, helpers);
 
     expect(lastSentData).to.deep.equal({
@@ -164,16 +164,10 @@ describe('SendNotificationsTask deduplication errors', async function () {
     });
     expect(notificationSent).equal(true);
 
-    await waitFor(() => testkit.reports().length == 2);
+    await waitFor(() => testkit.reports().length > 0);
 
     expect(testkit.reports()[0].tags).to.deep.equal({
-      action: 'send-notifications-deduplication-read',
-      notificationId: newlyAddedNotification.notificationId,
-      notificationType: newlyAddedNotification.notificationType,
-    });
-
-    expect(testkit.reports()[1].tags).to.deep.equal({
-      action: 'send-notifications-deduplication-write',
+      action: 'send-notifications-deduplication',
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
       messageId: messageID,

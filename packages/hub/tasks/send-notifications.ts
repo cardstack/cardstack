@@ -23,32 +23,16 @@ export default class SendNotificationsTask {
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
   async perform(payload: PushNotificationData, helpers: Helpers) {
+    let messageId: string;
     try {
-      // we do this in a separate block because failure to read should not affect
-      // notifications being sent. the worst that can happen is 2-3 notifications,
-      // which seems preferable to a dead notifications service
-      let index = {
+      let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists({
         notificationId: payload.notificationId,
-      };
-      let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists(index);
+      });
       if (notificationHasBeenSent) {
         helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
         return;
       }
-    } catch (e) {
-      // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
-      Sentry.captureException(e, {
-        tags: {
-          action: 'send-notifications-deduplication-read',
-          notificationId: payload.notificationId,
-          notificationType: payload.notificationType,
-        },
-      });
-      helpers.logger.error(`failed to check if notification with id ${payload.notificationId} is sent`);
-    }
 
-    let messageId: string;
-    try {
       messageId = await this.firebasePushNotifications.send({
         notification: {
           title: payload.notificationTitle,
@@ -78,7 +62,7 @@ export default class SendNotificationsTask {
       // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
       Sentry.captureException(e, {
         tags: {
-          action: 'send-notifications-deduplication-write',
+          action: 'send-notifications-deduplication',
           notificationId: payload.notificationId,
           notificationType: payload.notificationType,
           messageId,
