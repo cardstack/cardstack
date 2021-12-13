@@ -5,6 +5,8 @@ WORKDIR /workspace
 COPY dist packages/hub/dist
 COPY config packages/hub/config
 COPY dist/sql node_modules/graphile-worker/sql
+# This includes the discord bot image assets that are hosted by the hub
+copy dist/services package/hub/services
 
 # Replicate enough of the node_modules structure to support node-pg-migrate
 COPY dist/node-pg-migrate node_modules/node-pg-migrate
