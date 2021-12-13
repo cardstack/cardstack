@@ -106,14 +106,16 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'Mandello received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '123',
-        message: `Mandello received a payment of §2324`,
       },
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'Mandello received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '456',
-        message: `Mandello received a payment of §2324`,
       },
     ]);
   });
@@ -152,14 +154,16 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '123',
-        message: `You received a payment of §2324`,
       },
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '456',
-        message: `You received a payment of §2324`,
       },
     ]);
 
@@ -196,14 +200,16 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '123',
-        message: `You received a payment of §2324`,
       },
       {
-        notifiedAddress: 'eoa-address',
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
         pushClientId: '456',
-        message: `You received a payment of §2324`,
       },
     ]);
   });
