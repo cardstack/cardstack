@@ -118,7 +118,7 @@ describe('SendNotificationsTask', function () {
   });
 });
 
-describe('SendNotificationsTask Errors', async function () {
+describe('SendNotificationsTask deduplication errors', async function () {
   let { getContainer } = setupHub(this);
 
   const { testkit, sentryTransport } = sentryTestkit();
@@ -179,6 +179,21 @@ describe('SendNotificationsTask Errors', async function () {
       messageId: messageID,
     });
   });
+});
+
+describe('SendNotificationsTask firebase errors', function () {
+  let { getContainer } = setupHub(this);
+
+  const { testkit, sentryTransport } = sentryTestkit();
+
+  this.beforeEach(async function () {
+    Sentry.init({
+      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+  });
 
   it('should throw if sending a notification fails, and still log to sentry', async function () {
     registry(this).register('firebase-push-notifications', ErroredFirebasePushNotifications);
@@ -190,7 +205,7 @@ describe('SendNotificationsTask Errors', async function () {
 
     await waitFor(() => testkit.reports().length > 0);
 
-    expect(testkit.reports()[1].tags).to.deep.equal({
+    expect(testkit.reports()[0].tags).to.deep.equal({
       action: 'send-notifications',
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
