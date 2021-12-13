@@ -6,6 +6,8 @@ import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
+import { PushNotificationData } from './send-notifications';
+import { generateContractEventNotificationId } from '../utils/notifications';
 
 export interface MerchantClaimsQueryResult {
   data: {
@@ -62,10 +64,10 @@ export default class NotifyMerchantClaim {
       throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
     }
 
-    let notifiedAddress = result.merchantSafe.merchant.id;
+    let ownerAddress = result.merchantSafe.merchant.id;
 
     let pushClientIdsForNotification = await this.notificationPreferenceService.getEligiblePushClientIds(
-      notifiedAddress,
+      ownerAddress,
       'customer_payment'
     );
 
@@ -93,17 +95,24 @@ export default class NotifyMerchantClaim {
 
     let token = result.token.symbol;
     let amountInWei = result.amount;
-
-    let message = `You just claimed ${Web3.utils.fromWei(
+    let notificationBody = `You just claimed ${Web3.utils.fromWei(
       amountInWei
     )} ${token} from your${merchantName} business account`;
 
     for (const pushClientId of pushClientIdsForNotification) {
-      await this.workerClient.addJob('send-notifications', {
-        notifiedAddress,
+      let notification: PushNotificationData = {
+        notificationId: generateContractEventNotificationId({
+          network,
+          ownerAddress,
+          transactionHash: payload,
+          pushClientId,
+        }),
         pushClientId,
-        message,
-      });
+        notificationBody,
+        notificationType: 'merchant_claim',
+      };
+
+      await this.workerClient.addJob('send-notifications', notification);
     }
   }
 }

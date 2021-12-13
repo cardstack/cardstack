@@ -98,6 +98,7 @@ import NotificationPreferenceQueries from './services/queries/notification-prefe
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
 import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
+import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -164,6 +165,7 @@ export function createRegistry(): Registry {
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
+  registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);

@@ -101,13 +101,15 @@ describe('NotifyMerchantClaimTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your Mandello business account',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '123',
       },
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your Mandello business account',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '456',
       },
     ]);
@@ -144,13 +146,15 @@ describe('NotifyMerchantClaimTask', function () {
 
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '123',
       },
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '456',
       },
     ]);
@@ -185,13 +189,15 @@ describe('NotifyMerchantClaimTask', function () {
 
     expect(addedJobPayloads).to.deep.equal([
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '123',
       },
       {
-        notifiedAddress: 'eoa-address',
-        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'merchant_claim',
         pushClientId: '456',
       },
     ]);
