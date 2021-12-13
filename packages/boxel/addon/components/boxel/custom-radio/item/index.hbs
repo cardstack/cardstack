@@ -22,8 +22,6 @@ aria-labelledby seems friendlier to safari than the for element, but unsure abou
       boxel-custom-radio-option__input--checked=@checked
     }}
     {{on "change" (optional @onChange)}}
-    {{on "focusin" (fn (mut this.focused) true)}}
-    {{on "focusout" (fn (mut this.focused) false)}}
   />
   {{yield}}
 </label>

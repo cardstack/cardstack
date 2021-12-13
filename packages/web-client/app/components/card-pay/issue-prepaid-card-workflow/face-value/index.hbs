@@ -36,19 +36,32 @@
           />
         </CardPay::LabeledValue>
       {{else}}
-        <div class="face-value-card__options">
-          {{#each this.options as |option|}}
-            <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
-              @disabled={{option.isOptionDisabled}}
-              @checked={{eq option.spendAmount this.selectedFaceValue.spendAmount}}
-              @spendFaceValue={{option.spendAmount}}
-              @usdAmount={{spend-to-usd option.spendAmount}}
-              @approxTokenAmount={{option.approxTokenAmount}}
-              @tokenSymbol={{this.fundingTokenSymbol}}
-              @onInput={{fn this.chooseFaceValue option}}
-            />
-          {{/each}}
-        </div>
+        <Boxel::CustomRadio
+          @groupDescription="Select face value"
+          @items={{this.options}}
+          as |option|
+        >
+          <option.component
+            @name="face-value-selection"
+            @disabled={{option.data.isOptionDisabled}}
+            @checked={{eq option.data.spendAmount this.selectedFaceValue.spendAmount}}
+            @value={{option.spendAmount}}
+            @onChange={{fn this.chooseFaceValue option.data}}
+          >
+            <div class="face-value-option">
+              {{svg-jar "spend" width="20" height="20" role="presentation"}}
+              <div class="face-value-option__amount">
+                §{{format-amount option.data.spendAmount}} SPEND
+              </div>
+              <div class="face-value-option__conversion">
+                ${{spend-to-usd option.data.spendAmount}} USD
+              </div>
+              <div class="face-value-option__conversion">
+                ≈ {{option.data.approxTokenAmount}} {{this.fundingTokenSymbol}}*
+              </div>
+            </div>
+          </option.component>
+        </Boxel::CustomRadio>
       {{/if}}
     </div>
     <small class="face-value-card__footnote">

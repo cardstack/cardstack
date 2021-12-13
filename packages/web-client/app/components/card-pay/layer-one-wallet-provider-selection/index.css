@@ -1,16 +1,3 @@
-.card-pay-layer-one-wallet-provider-selection__details {
-  --min-column-width: 15rem;
-  --max-column-width: 1fr;
-  --ideal-column-width: 19.875rem;
-  --row-height: 9.375rem;
-  --gap: var(--boxel-sp-lg);
-
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--min-column-width), var(--max-column-width)));
-  gap: var(--gap);
-  justify-items: center;
-}
-
 .card-pay-layer-one-wallet-provider-selection-body {
   padding: 0 var(--horizontal-padding);
 }

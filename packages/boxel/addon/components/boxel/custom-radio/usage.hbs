@@ -7,7 +7,7 @@
         @onChange={{fn this.onChange item.data.id}}
         @hiddenInput={{this.hiddenInput}}
       >
-          {{item.data.id}}
+        {{item.data.id}}
       </item.component>
     </Boxel::CustomRadio>
   </:example>
@@ -74,13 +74,10 @@
     </Boxel::CustomRadio::Container>
   </:example>
   <:api as |Args|>
-      <Args.String
+    <Args.String
       @name="groupDescription"
       @description="Description for this group of radio buttons"
-      @optional={{true}}
     />
-    <Args.Yield
-      @description="Add radio buttons here"
-    />
+    <Args.Yield @description="Add radio buttons here" />
   </:api>
 </Freestyle::Usage>
