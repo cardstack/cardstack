@@ -23,17 +23,11 @@
 }
 
 .card-pay-layer-one-wallet-provider-selection__item {
-  height: var(--row-height);
-  width: 100%;
-  max-width: var(--ideal-column-width);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--boxel-sp-sm);
-  border-radius: var(--boxel-border-radius);
-  box-shadow: 0 0 0 1px var(--boxel-light-400);
-  transition: box-shadow var(--boxel-transition);
+  padding: var(--boxel-sp);
 }
 
 .card-pay-layer-one-wallet-provider-selection__item-image {
@@ -55,22 +49,4 @@
 
 .card-pay-layer-one-wallet-provider-selection__cta {
   width: 100%;
-}
-
-/* variants start here */
-.card-pay-layer-one-wallet-provider-selection__item:hover:not(.card-pay-layer-one-wallet-provider-selection__item--checked) {
-  box-shadow: 0 0 0 2px var(--boxel-purple-300);
-}
-
-.card-pay-layer-one-wallet-provider-selection__item--checked {
-  box-shadow: 0 0 0 2px var(--boxel-highlight);
-}
-
-.card-pay-layer-one-wallet-provider-selection__item-disabled {
-  pointer-events: none;
-}
-
-.card-pay-layer-one-wallet-provider-selection__item-disabled:not(.card-pay-layer-one-wallet-provider-selection__item--checked) {
-  opacity: 0.5;
-  box-shadow: 0 0 0 1px var(--boxel-light-400);
 }

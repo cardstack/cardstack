@@ -1,7 +1,7 @@
-<Boxel::CustomRadio 
+<Boxel::CustomRadio
   class="card-pay-layer-one-wallet-provider-selection__details"
-  @groupDescription="Select a wallet to connect to" 
-  @items={{@walletProviders}} 
+  @groupDescription="Select a wallet to connect to"
+  @items={{@walletProviders}}
   @checkedId={{@currentWalletProviderId}}
   @disabled={{@isConnecting}}
   ...attributes
@@ -14,17 +14,14 @@
     @value={{item.data.name}}
     @checked={{item.checked}}
     @onChange={{fn (optional @changeWalletProvider) item.data.id}}
-    @focusedClass="card-pay-layer-one-wallet-provider-selection__item--focused"
-    @checkedClass="card-pay-layer-one-wallet-provider-selection__item--checked"
-    class={{cn 
-      "card-pay-layer-one-wallet-provider-selection__item"
-      card-pay-layer-one-wallet-provider-selection__item-disabled=@isConnecting
-    }}
+    @disabled={{@isConnecting}}
+    @hiddenInput={{true}}
     data-test-wallet-option={{item.data.id}}
   >
-    {{!-- semantics are swallowed by label element so not using hx elements here --}}
-    <img src={{item.data.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
-    <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.data.name}}</span>
-    <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.data.description}}</span>
+    <div class="card-pay-layer-one-wallet-provider-selection__item">
+      <img src={{item.data.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
+      <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.data.name}}</span>
+      <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.data.description}}</span>
+    </div>
   </item.component>
 </Boxel::CustomRadio>
