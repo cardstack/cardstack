@@ -84,9 +84,8 @@ const XDAI = {
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'xDai Chain',
-  rpcNode: 'https://apis.ankr.com/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
-  rpcArchiveNode:
-    'https://apis.ankr.com/eaf28986bda44bfe95354b64c666a8fa/00f97db34d49dd3b0beb288e7542365d/xdai/fast/main',
+  rpcNode: 'https://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
+  rpcArchiveNode: 'https://xdai-archive.blockscout.com',
   rpcWssNode: 'wss://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
   rpcWssNodeNext: 'wss://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
   relayServiceURL: 'https://relay.cardstack.com/api',
