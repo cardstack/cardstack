@@ -1,6 +1,9 @@
 import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
-import NotifyMerchantClaim, { MerchantClaimsQueryResult } from '../../tasks/notify-merchant-claim';
+import NotifyMerchantClaim, {
+  MerchantClaimsQueryResult,
+  MERCHANT_CLAIM_EXPIRY_TIME,
+} from '../../tasks/notify-merchant-claim';
 import { expect } from 'chai';
 import sentryTestkit from 'sentry-testkit';
 import * as Sentry from '@sentry/node';
@@ -18,7 +21,7 @@ const mockData: {
   get queryReturnValue() {
     return {
       data: {
-        timestamp: '0',
+        timestamp: '0', // because timestamp is 0, the sendBy will be the expiry time
         merchantClaims: this.value ? [this.value] : [],
       },
     };
@@ -107,12 +110,14 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '123',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your Mandello business account',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '456',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
     ]);
   });
@@ -153,12 +158,14 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '123',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '456',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
     ]);
 
@@ -197,12 +204,14 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '123',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'merchant_claim',
         pushClientId: '456',
+        sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
     ]);
   });

@@ -9,6 +9,8 @@ import NotificationPreferenceService from '../services/push-notifications/prefer
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
 
+export const MERCHANT_CLAIM_EXPIRY_TIME = 30 * 60 * 1000;
+
 export interface MerchantClaimsQueryResult {
   data: {
     merchantClaims: {
@@ -103,7 +105,7 @@ export default class NotifyMerchantClaim {
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
-        sendBy: parseInt(result.timestamp) * 1000 + 30 * 60 * 1000,
+        sendBy: parseInt(result.timestamp) * 1000 + MERCHANT_CLAIM_EXPIRY_TIME,
         notificationId: generateContractEventNotificationId({
           network,
           ownerAddress,
