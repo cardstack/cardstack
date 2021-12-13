@@ -6,6 +6,7 @@ import NotificationTypeQueries from '../services/queries/notification-type';
 import NotificationPreferenceQueries from '../services/queries/notification-preference';
 import NotificationPreferenceSerializer from '../services/serializers/notification-preference-serializer';
 import { serializeErrors } from './utils/error';
+import NotificationPreferenceService from '../services/push-notifications/preferences';
 
 export interface NotificationType {
   id: string;
@@ -31,6 +32,9 @@ export default class NotificationPreferencesRoute {
   notificationPreferenceSerializer: NotificationPreferenceSerializer = inject('notification-preference-serializer', {
     as: 'notificationPreferenceSerializer',
   });
+  notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
+    as: 'notificationPreferenceService',
+  });
 
   constructor() {
     autoBind(this);
@@ -41,31 +45,10 @@ export default class NotificationPreferencesRoute {
       return;
     }
 
-    let notificationTypes = await this.notificationTypeQueries.query();
-    let notificationPreferences = await this.notificationPreferenceQueries.query({
-      ownerAddress: ctx.state.userAddress,
-      pushClientId: ctx.params.push_client_id,
-    });
-
-    let defaultPreferences = notificationTypes.map((nt) => {
-      return {
-        status: nt.defaultStatus,
-        notificationType: nt.notificationType,
-        ownerAddress: ctx.state.userAddress,
-        pushClientId: ctx.params.push_client_id,
-      };
-    });
-
-    let preferences: NotificationPreference[] = defaultPreferences.map((defaultPreference) => {
-      let preference = notificationPreferences.find(
-        (preference) => preference.notificationType === defaultPreference.notificationType
-      );
-      if (preference) {
-        return preference;
-      } else {
-        return defaultPreference;
-      }
-    });
+    let preferences = await this.notificationPreferenceService.getPreferences(
+      ctx.state.userAddress,
+      ctx.params.push_client_id
+    );
 
     let serialized = this.notificationPreferenceSerializer.serializeCollection(preferences);
 

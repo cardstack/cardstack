@@ -97,6 +97,7 @@ import NotificationTypeQueries from './services/queries/notification-type';
 import NotificationPreferenceQueries from './services/queries/notification-preference';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
 import NotificationPreferencesRoute from './routes/notification-preferences';
+import NotificationPreferenceService from './services/push-notifications/preferences';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -158,6 +159,7 @@ export function createRegistry(): Registry {
   registry.register('notification-preferences-route', NotificationPreferencesRoute);
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
+  registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('relay', RelayService);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);

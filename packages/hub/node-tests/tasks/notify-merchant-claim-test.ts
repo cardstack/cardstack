@@ -33,13 +33,13 @@ class StubCardPay {
     return;
   }
 }
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
+let addedJobIdentifiers: string[] = [];
+let addedJobPayloads: string[] = [];
 
 class StubWorkerClient {
   async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
+    addedJobIdentifiers.push(identifier);
+    addedJobPayloads.push(payload);
     return Promise.resolve({} as Job);
   }
 }
@@ -58,6 +58,12 @@ class StubMerchantInfo {
   }
 }
 
+class StubNotificationPreferenceService {
+  async getEligiblePushClientIds(_ownerAddress: string, _notificationType: string) {
+    return ['123', '456'];
+  }
+}
+
 describe('NotifyMerchantClaimTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
@@ -65,12 +71,13 @@ describe('NotifyMerchantClaimTask', function () {
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
+    registry(this).register('notification-preference-service', StubNotificationPreferenceService);
   });
   let { getContainer } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    addedJobIdentifiers = [];
+    addedJobPayloads = [];
   });
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
@@ -90,12 +97,20 @@ describe('NotifyMerchantClaimTask', function () {
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
     await task.perform('a');
-
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
-    });
+    // debugger;
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
+        pushClientId: '123',
+      },
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your Mandello business account`,
+        pushClientId: '456',
+      },
+    ]);
   });
 
   it('omits the merchant name and logs an error when fetching it fails', async function () {
@@ -125,11 +140,20 @@ describe('NotifyMerchantClaimTask', function () {
 
     await task.perform('a');
 
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `You just claimed 1155 DAI.CPXD from your business account`,
-    });
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        pushClientId: '123',
+      },
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        pushClientId: '456',
+      },
+    ]);
 
     await waitFor(() => testkit.reports().length > 0);
 
@@ -157,11 +181,20 @@ describe('NotifyMerchantClaimTask', function () {
 
     await task.perform('a');
 
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `You just claimed 1155 DAI.CPXD from your business account`,
-    });
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        pushClientId: '123',
+      },
+      {
+        notifiedAddress: 'eoa-address',
+        message: `You just claimed 1155 DAI.CPXD from your business account`,
+        pushClientId: '456',
+      },
+    ]);
   });
 
   it('throws when the transaction is not found on the subgraph', async function () {
@@ -170,8 +203,8 @@ describe('NotifyMerchantClaimTask', function () {
     return expect(task.perform('a'))
       .to.be.rejectedWith(`Subgraph did not return information for merchant claim with transaction hash: "a"`)
       .then(() => {
-        expect(lastAddedJobIdentifier).to.be.undefined;
-        expect(lastAddedJobPayload).to.be.undefined;
+        expect(addedJobIdentifiers).to.deep.equal([]);
+        expect(addedJobPayloads).to.deep.equal([]);
       });
   });
 });

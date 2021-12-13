@@ -5,6 +5,7 @@ import CardpaySDKService from '../services/cardpay-sdk';
 import MerchantInfoService from '../services/merchant-info';
 import WorkerClient from '../services/worker-client';
 import * as Sentry from '@sentry/node';
+import NotificationPreferenceService from '../services/push-notifications/preferences';
 
 export interface MerchantClaimsQueryResult {
   data: {
@@ -44,6 +45,9 @@ export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');
   merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
+    as: 'notificationPreferenceService',
+  });
 
   async perform(payload: string) {
     await this.cardpay.waitForSubgraphIndex(payload, network);
@@ -56,6 +60,17 @@ export default class NotifyMerchantClaim {
 
     if (!result) {
       throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
+    }
+
+    let notifiedAddress = result.merchantSafe.merchant.id;
+
+    let pushClientIdsForNotification = await this.notificationPreferenceService.getEligiblePushClientIds(
+      notifiedAddress,
+      'customer_payment'
+    );
+
+    if (pushClientIdsForNotification.length === 0) {
+      return;
     }
 
     let merchantName = '';
@@ -77,16 +92,18 @@ export default class NotifyMerchantClaim {
     }
 
     let token = result.token.symbol;
-    let notifiedAddress = result.merchantSafe.merchant.id;
     let amountInWei = result.amount;
 
     let message = `You just claimed ${Web3.utils.fromWei(
       amountInWei
     )} ${token} from your${merchantName} business account`;
 
-    await this.workerClient.addJob('send-notifications', {
-      notifiedAddress,
-      message,
-    });
+    for (const pushClientId of pushClientIdsForNotification) {
+      await this.workerClient.addJob('send-notifications', {
+        notifiedAddress,
+        pushClientId,
+        message,
+      });
+    }
   }
 }
