@@ -7,6 +7,7 @@ export interface PushNotificationData {
    * A unique ID determined by the caller of this task, to be used for deduplication
    */
   notificationId: string;
+  sendBy?: number;
   notificationType: string;
   pushClientId: string;
   notificationTitle?: string;
@@ -30,6 +31,23 @@ export default class SendNotificationsTask {
       });
       if (notificationHasBeenSent) {
         helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
+        return;
+      }
+
+      if (payload.sendBy && payload.sendBy < Date.now()) {
+        helpers.logger.info(
+          `Notification ${payload.notificationId} failed to send because it was too old, should send by: ${new Date(
+            payload.sendBy
+          ).toString()}`
+        );
+        Sentry.captureException(new Error('Notification is too old to send'), {
+          tags: {
+            action: 'send-notifications',
+            notificationId: payload.notificationId,
+            notificationType: payload.notificationType,
+          },
+        });
+
         return;
       }
 

@@ -9,9 +9,12 @@ import NotificationPreferenceService from '../services/push-notifications/prefer
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
 
+export const MERCHANT_CLAIM_EXPIRY_TIME = 30 * 60 * 1000;
+
 export interface MerchantClaimsQueryResult {
   data: {
     merchantClaims: {
+      timestamp: string;
       merchantSafe: {
         id: string;
         infoDid: string | undefined;
@@ -28,6 +31,7 @@ export interface MerchantClaimsQueryResult {
 const merchantClaimsQuery = `
 query($txn: String!) {
   merchantClaims(where: { transaction: $txn }) {
+    timestamp
     merchantSafe {
       id
       infoDid
@@ -101,6 +105,7 @@ export default class NotifyMerchantClaim {
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
+        sendBy: parseInt(result.timestamp) * 1000 + MERCHANT_CLAIM_EXPIRY_TIME,
         notificationId: generateContractEventNotificationId({
           network,
           ownerAddress,
@@ -112,7 +117,11 @@ export default class NotifyMerchantClaim {
         notificationType: 'merchant_claim',
       };
 
-      await this.workerClient.addJob('send-notifications', notification);
+      await this.workerClient.addJob('send-notifications', notification, {
+        jobKey: notification.notificationId,
+        jobKeyMode: 'preserve_run_at',
+        maxAttempts: 8, // 8th attempt is estimated to run at 28 mins. https://github.com/graphile/worker#exponential-backoff
+      });
     }
   }
 }
