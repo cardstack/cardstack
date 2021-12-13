@@ -8,7 +8,10 @@ jobs:
   lint:
     name: Lint All
     runs-on: ubuntu-latest
-
+    env:
+      # we are running into heap out of memory issues with the linting--so
+      # increasing the heap size to 8GB
+      NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - uses: actions/checkout@v2
         with:

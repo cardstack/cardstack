@@ -2,10 +2,10 @@
   "name": "discord-bot",
   "version": "0.27.40",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node server.ts"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "@octokit/openapi-types": "^9.4.0",
     "@octokit/rest": "^18.7.1",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "ts-node": "^10.3.0"
   }
 }

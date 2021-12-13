@@ -11,6 +11,7 @@
     "@cardstack/logger": "^0.2.1",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",
+    "@types/node": "^16.0.0",
     "@types/qrcode": "^1.4.1",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
@@ -28,6 +29,7 @@
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",
     "chai": "^4.3.4",
+    "ts-node": "^10.3.0",
     "mocha": "^8.3.2"
   },
   "publishConfig": {
@@ -38,8 +40,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
-    "autotest": "mocha -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.js' --timeout 60000"
+    "test": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.ts' --timeout 60000",
+    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000"
   },
   "engines": {
     "node": "^14.0",
