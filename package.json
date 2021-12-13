@@ -32,7 +32,6 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace",
-    "compile": "find ./packages -name node_modules -prune -o -name 'cardpay-subgraph' -prune -o -name 'tsconfig.json' -exec tsc --project {} \\;",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
@@ -41,6 +40,7 @@
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
+    "lint:typecheck": "find ./packages -name node_modules -prune -o -name 'cardpay-subgraph' -prune -o -name 'tsconfig.json' -exec tsc --project {} \\;",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
     "lint:hbs": "cd packages/web-client && ember-template-lint .",
     "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
