@@ -1,13 +1,62 @@
-/*
-  set default display to block, because we are using a label
-  that is inline by default.
-*/
-.boxel-custom-radio__label {
+.boxel-custom-radio-option {
   position: relative;
+  flex: 1;
+  display: block;
+  padding: var(--boxel-sp);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 0 0 1px var(--boxel-light-400);
+  transition: box-shadow var(--boxel-transition);
+}
+
+.boxel-custom-radio-option--grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--boxel-sp-sm);
+}
+
+.boxel-custom-radio-option:hover:not(.boxel-custom-radio-option--disabled) {
+  box-shadow: 0 0 0 1px var(--boxel-dark);
+  cursor: pointer;
+}
+
+.boxel-custom-radio-option--checked:not(.boxel-custom-radio-option--disabled),
+.boxel-custom-radio-option:focus:not(.boxel-custom-radio-option--disabled),
+.boxel-custom-radio-option:focus-within:not(.boxel-custom-radio-option--disabled) {
+  box-shadow: 0 0 0 2px var(--boxel-highlight);
+  outline: 1px solid transparent;
+}
+
+.boxel-custom-radio-option--disabled > * {
+  opacity: 0.5;
+}
+
+.boxel-custom-radio-option__input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border: 1.5px solid var(--boxel-dark);
+  border-radius: 100px;
+  background-color: transparent;
+}
+
+.boxel-custom-radio-option__input--checked {
+  background-color: var(--boxel-highlight);
+  border-width: 3px;
+}
+
+.boxel-custom-radio-option__input:disabled {
+  border-color: var(--boxel-purple-300);
+}
+
+.boxel-custom-radio-option__input:focus:not(:disabled) {
+  outline: 1px solid transparent;
 }
 
 /* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
-.boxel-custom-radio__hidden-input {
+.boxel-custom-radio-option__input--hidden {
   position: absolute;
   top: 0;
   left: 0;
@@ -17,6 +66,6 @@
 }
 
 /* default focus class - can be overwritten by providing @focusedClass */
-.boxel-custom-radio__focused-item {
+.boxel-custom-radio-option__focused-item {
   outline: 1px solid var(--boxel-outline-color);
 }

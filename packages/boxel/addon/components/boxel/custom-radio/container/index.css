@@ -1,3 +1,9 @@
+.boxel-custom-radio__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--boxel-sp);
+}
+
 /* essentially reset fieldset and hide legend from visibility */
 .boxel-custom-radio__fieldset {
   border: 0;

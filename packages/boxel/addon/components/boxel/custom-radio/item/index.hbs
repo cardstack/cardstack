@@ -4,14 +4,23 @@ that seems ok, since you probably shouldn't make a form work as document hierarc
 aria-labelledby seems friendlier to safari than the for element, but unsure about other browsers.
 --}}
 <label
-  class={{cn "boxel-custom-radio__label" (if this.focused this.focusedClass) (if @checked this.checkedClass)}}
+  class={{cn
+    "boxel-custom-radio-option"
+    boxel-custom-radio-option--grid=(not @hiddenInput)
+    boxel-custom-radio-option--disabled=@disabled
+  }}
   ...attributes
 >
   <Input
     @type="radio"
     @checked={{@checked}}
+    disabled={{@disabled}}
     name={{@name}}
-    class="boxel-custom-radio__hidden-input"
+    class={{cn
+      "boxel-custom-radio-option__input"
+      boxel-custom-radio-option__input--hidden=@hiddenInput
+      boxel-custom-radio-option__input--checked=@checked
+    }}
     {{on "change" (optional @onChange)}}
     {{on "focusin" (fn (mut this.focused) true)}}
     {{on "focusout" (fn (mut this.focused) false)}}
