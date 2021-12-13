@@ -18,6 +18,7 @@ const mockData: {
   get queryReturnValue() {
     return {
       data: {
+        timestamp: '0',
         merchantClaims: this.value ? [this.value] : [],
       },
     };
@@ -82,6 +83,7 @@ describe('NotifyMerchantClaimTask', function () {
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
     mockData.value = {
+      timestamp: '0',
       merchantSafe: {
         id: 'merchant-safe-address',
         infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
@@ -125,6 +127,7 @@ describe('NotifyMerchantClaimTask', function () {
 
     merchantInfoShouldError = true;
     mockData.value = {
+      timestamp: '0',
       merchantSafe: {
         id: 'merchant-safe-address',
         infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
@@ -168,6 +171,7 @@ describe('NotifyMerchantClaimTask', function () {
 
   it('omits the merchant name when there is no DID', async function () {
     mockData.value = {
+      timestamp: '0',
       merchantSafe: {
         id: 'merchant-safe-address',
         infoDid: undefined,

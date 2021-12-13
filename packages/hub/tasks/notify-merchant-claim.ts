@@ -12,6 +12,7 @@ import { generateContractEventNotificationId } from '../utils/notifications';
 export interface MerchantClaimsQueryResult {
   data: {
     merchantClaims: {
+      timestamp: string;
       merchantSafe: {
         id: string;
         infoDid: string | undefined;
@@ -28,6 +29,7 @@ export interface MerchantClaimsQueryResult {
 const merchantClaimsQuery = `
 query($txn: String!) {
   merchantClaims(where: { transaction: $txn }) {
+    timestamp
     merchantSafe {
       id
       infoDid
@@ -101,6 +103,7 @@ export default class NotifyMerchantClaim {
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
+        sendBy: parseInt(result.timestamp) * 1000 + 30 * 60 * 1000,
         notificationId: generateContractEventNotificationId({
           network,
           ownerAddress,

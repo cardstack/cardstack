@@ -48,6 +48,8 @@ let createPushNotification: (prefix: string) => PushNotificationData = (prefix =
 });
 let existingNotification = createPushNotification('existing-');
 let newlyAddedNotification = createPushNotification('newly-added-');
+let expiredNotification = createPushNotification('expired-');
+expiredNotification.sendBy = Date.now() - 1;
 
 let lastSentData: any;
 let notificationSent = false;
@@ -203,6 +205,44 @@ describe('SendNotificationsTask firebase errors', function () {
       action: 'send-notifications',
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
+    });
+  });
+});
+
+describe('SendNotificationsTask expired notifications', function () {
+  let { getContainer } = setupHub(this);
+  let subject: SendNotifications;
+
+  const { testkit, sentryTransport } = sentryTestkit();
+
+  this.beforeEach(async function () {
+    Sentry.init({
+      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+    testkit.reset();
+    lastSentData = undefined;
+    notificationSent = false;
+    registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
+
+    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+  });
+
+  it('should not send an expired notification', async function () {
+    await subject.perform(expiredNotification, helpers);
+
+    expect(lastSentData).to.equal(undefined);
+    expect(notificationSent).to.equal(false);
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].error?.message).to.equal('Notification is too old to send');
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'send-notifications',
+      notificationId: expiredNotification.notificationId,
+      notificationType: expiredNotification.notificationType,
     });
   });
 });
