@@ -1,6 +1,11 @@
 /* eslint-disable no-process-exit */
-
+// make sure the side-effect of `import 'load-dotenv'` happens before config is
+// imported. since imports are statically resolved, using dotenv.config() before
+// the import config, will not actually mean that dotenv.config() is called
+// before the config is imported.
+import './load-dotenv';
 import config from 'config';
+
 import Koa from 'koa';
 import { environment, httpLogging, errorMiddleware } from './middleware';
 import cors from '@koa/cors';
