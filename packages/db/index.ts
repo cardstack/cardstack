@@ -45,6 +45,7 @@ export default class DatabaseManager {
   }
 }
 
+import '@cardstack/di';
 declare module '@cardstack/di' {
   interface KnownServices {
     'database-manager': DatabaseManager;

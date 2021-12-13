@@ -1,19 +1,12 @@
 #!/bin/bash
 
-for name in `ls packages/*/tsconfig.json`; do 
-
+for name in `find packages -name node_modules -prune -o -name 'cardpay-subgraph' -prune -o -name 'tsconfig.json' -print`; do
   {
   cd `dirname $name`
-  yarn tsc --noEmit
+  yarn -s tsc --noEmit
   code=$?
-  if [ $code -eq 0 ]; 
-  then
-    echo PASS $name
-    exit $code
-  else    
-    echo FAIL $name
-    exit $code
-  fi
+  [ $code -eq 0 ] && echo PASS $name || echo FAIL $name
+  exit $code
   } &
 
 done
