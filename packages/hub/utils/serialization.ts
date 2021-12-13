@@ -13,7 +13,7 @@ export function serializeCard(url: string, data: RawCard['data'], component: Com
   let resource = serializeResource('card', url, component.usedFields, data);
   resource.meta = merge(
     {
-      componentModule: component.moduleName,
+      componentModule: component.moduleName.global,
     },
     resource.meta
   );

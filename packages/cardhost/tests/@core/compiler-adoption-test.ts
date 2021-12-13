@@ -188,7 +188,9 @@ module('@core | compiler-adoption', function (hooks) {
       let compiledCard = await this.builder.getCompiledCard(cardURL(card));
 
       assert.ok(
-        await this.cardService.loadModule(compiledCard.embedded.moduleName),
+        await this.cardService.loadModule(
+          compiledCard.embedded.moduleName.global
+        ),
         'Has a embedded component'
       );
     });
@@ -227,7 +229,9 @@ module('@core | compiler-adoption', function (hooks) {
 
       let compiledCard = await this.builder.getCompiledCard(cardURL(card));
       assert.ok(
-        await this.cardService.loadModule(compiledCard.embedded.moduleName),
+        await this.cardService.loadModule(
+          compiledCard.embedded.moduleName.global
+        ),
         'Has a embedded component'
       );
     });

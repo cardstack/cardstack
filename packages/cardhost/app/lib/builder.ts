@@ -80,7 +80,7 @@ export default class LocalRealm implements Builder {
         id: url,
         attributes: raw.data,
         meta: {
-          componentModule: compiled[format].moduleName,
+          componentModule: compiled[format].moduleName.global,
         },
       },
     };
@@ -92,7 +92,7 @@ export default class LocalRealm implements Builder {
   ): Promise<CardModel> {
     let routeCard = await this.getCompiledCard(routeCardURL);
     let routeCardClass = (
-      await this.cards.loadModule<any>(routeCard.schemaModule)
+      await this.cards.loadModule<any>(routeCard.schemaModule.global)
     ).default;
     let routableCardURL = new routeCardClass().routeTo(pathname);
     if (!routableCardURL) {
@@ -143,11 +143,11 @@ export default class LocalRealm implements Builder {
     if (cardId) {
       let rawCard = await this.getRawCard(url);
       let compiledCard = await this.compiler.compile(rawCard);
-      defineModules(compiledCard, (local, type, src) =>
+      let definedCard = defineModules(compiledCard, (local, type, src) =>
         this.define(url, local, type, src)
       );
-      this.compiledCardCache.set(url, compiledCard);
-      return compiledCard;
+      this.compiledCardCache.set(url, definedCard);
+      return definedCard;
     } else {
       let response = await fetchJSON<any>(
         [

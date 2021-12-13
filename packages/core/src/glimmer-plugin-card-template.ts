@@ -417,7 +417,7 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName, 'default');
+  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName.global, 'default');
 
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);

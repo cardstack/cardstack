@@ -1,4 +1,4 @@
-import { Builder as BuilderInterface, RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
+import { Builder as BuilderInterface, RawCard, CompiledCard, Saved, ModuleRef } from '@cardstack/core/src/interfaces';
 import { Compiler, defineModules } from '@cardstack/core/src/compiler';
 
 import { transformSync } from '@babel/core';
@@ -58,7 +58,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
-    let compiledCard: CompiledCard | undefined;
+    let compiledCard: CompiledCard<Saved, ModuleRef> | undefined;
     let err: unknown;
     try {
       compiledCard = await this.compiler.compile(rawCard);
@@ -66,9 +66,11 @@ export default class CardBuilder implements BuilderInterface {
       err = e;
     }
     if (compiledCard) {
-      defineModules(compiledCard, (local, type, src) => this.define(cardURL(rawCard), local, type, src));
-      this.cache.setCard(cardURL(rawCard), compiledCard);
-      return compiledCard;
+      let definedCard = defineModules(compiledCard, (local, type, src) =>
+        this.define(cardURL(rawCard), local, type, src)
+      );
+      this.cache.setCard(cardURL(rawCard), definedCard);
+      return definedCard;
     } else {
       this.cache.deleteCard(cardURL(rawCard));
       throw err;

@@ -111,17 +111,28 @@ export interface Field {
   name: string;
 }
 
-export interface NewCompiledCard {
+export interface LocalRef {
+  local: string;
+}
+export interface GlobalRef {
+  global: string;
+}
+export type ModuleRef = LocalRef | GlobalRef;
+export type Saved = string;
+export type Unsaved = undefined;
+
+export interface CompiledCard<Identity extends Saved | Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
+  url: Identity;
   realm: string;
-  adoptsFrom?: CompiledCard;
+  adoptsFrom?: CompiledCard<string, GlobalRef>;
   fields: {
     [key: string]: Field;
   };
-  schemaModule: string;
+  schemaModule: Ref;
   serializer?: SerializerName;
-  isolated: ComponentInfo;
-  embedded: ComponentInfo;
-  edit: ComponentInfo;
+  isolated: ComponentInfo<Ref>;
+  embedded: ComponentInfo<Ref>;
+  edit: ComponentInfo<Ref>;
 
   modules: Record<
     string, // local module path
@@ -132,12 +143,8 @@ export interface NewCompiledCard {
   >;
 }
 
-export interface CompiledCard extends NewCompiledCard {
-  url: string;
-}
-
-export interface ComponentInfo {
-  moduleName: string;
+export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
+  moduleName: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
   inlineHBS?: string;
 

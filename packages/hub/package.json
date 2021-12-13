@@ -20,7 +20,7 @@
     "db:test-init": "yarn build && NODE_ENV=test node -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "npm-run-all test:*",
-    "test:node": "NODE_ENV=test mocha dist/tests.js --timeout 60000",
+    "test:node": "NODE_ENV=test mocha -r source-map-support/register dist/tests.js --timeout 60000",
     "test:bot": "bin/corde",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'dist/*tests.js' --timeout 60000"
   },

@@ -20,9 +20,13 @@ import {
   FEATURE_NAMES,
   Format,
   FORMATS,
-  NewCompiledCard,
+  GlobalRef,
+  LocalRef,
+  ModuleRef,
   NewRawCard,
   RawCard,
+  Saved,
+  Unsaved,
 } from './interfaces';
 import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
@@ -46,12 +50,12 @@ export class Compiler {
     this.builder = params.builder;
   }
 
-  async compile(cardSource: RawCard): Promise<CompiledCard>;
-  async compile(cardSource: NewRawCard): Promise<NewCompiledCard>;
-  async compile(cardSource: NewRawCard | RawCard): Promise<NewCompiledCard | CompiledCard> {
+  async compile(cardSource: RawCard): Promise<CompiledCard<Saved, ModuleRef>>;
+  async compile(cardSource: NewRawCard): Promise<CompiledCard<Unsaved, ModuleRef>>;
+  async compile(cardSource: NewRawCard | RawCard): Promise<CompiledCard<Saved | Unsaved, ModuleRef>> {
     let options = {};
     let modules: CompiledCard['modules'] = {};
-    let schemaModule = await this.prepareSchema(cardSource, options, modules);
+    let schemaModule: ModuleRef | undefined = await this.prepareSchema(cardSource, options, modules);
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
@@ -62,7 +66,7 @@ export class Compiler {
     let serializer = cardSource.deserializer;
 
     if (isBaseCard(cardSource)) {
-      schemaModule = 'todo';
+      schemaModule = { global: 'todo' };
     } else {
       parentCard = await this.getParentCard(cardSource, meta);
 
@@ -178,7 +182,7 @@ export class Compiler {
     cardSource: NewRawCard,
     options: any,
     modules: CompiledCard['modules']
-  ): Promise<string | undefined> {
+  ): Promise<LocalRef | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -205,7 +209,7 @@ export class Compiler {
       type: JS_TYPE,
       source: out!.code!,
     };
-    return schemaLocalFilePath;
+    return { local: schemaLocalFilePath };
   }
 
   private async lookupFieldsForCard(metaFields: FieldsMeta, realm: string): Promise<CompiledCard['fields']> {
@@ -251,7 +255,7 @@ export class Compiler {
     parentCard: CompiledCard | undefined,
     modules: CompiledCard['modules']
   ) {
-    let components: Partial<Pick<CompiledCard, Format>> = {};
+    let components: Partial<Pick<CompiledCard<Unsaved, ModuleRef>, Format>> = {};
     for (const format of FORMATS) {
       components[format] = await this.prepareComponent(cardSource, fields, parentCard, format, modules);
     }
@@ -264,7 +268,7 @@ export class Compiler {
     parentCard: CompiledCard | undefined,
     which: Format,
     modules: CompiledCard['modules']
-  ): Promise<ComponentInfo> {
+  ): Promise<ComponentInfo<ModuleRef>> {
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
@@ -332,7 +336,7 @@ export class Compiler {
     localFile: string,
     format: Format,
     modules: CompiledCard['modules']
-  ): Promise<ComponentInfo> {
+  ): Promise<ComponentInfo<LocalRef>> {
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
@@ -348,8 +352,8 @@ export class Compiler {
       type: JS_TYPE,
       source: code,
     };
-    let componentInfo: ComponentInfo = {
-      moduleName,
+    let componentInfo: ComponentInfo<LocalRef> = {
+      moduleName: { local: moduleName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
     };
@@ -396,30 +400,47 @@ export function resolveCard(url: string, realm: string): string {
   return resolved;
 }
 
-// Takes a CompiledCard containing only local references to its modules and
-// defines those modules in the current environment and mutates the CompiledCard
-// to refer to them.
-export function defineModules(
-  card: CompiledCard,
+export function defineModules<Identity extends Saved | Unsaved>(
+  card: CompiledCard<Identity, ModuleRef>,
   define: (localPath: string, type: string, source: string) => string
-): void {
+): CompiledCard<Identity, GlobalRef> {
+  let localToGlobal = new Map<string, string>();
+
   for (let [localPath, { type, source }] of Object.entries(card.modules)) {
-    let publicRef = define(localPath, type, source);
-
-    if (card.schemaModule === localPath) {
-      card.schemaModule = publicRef;
-    }
-
-    if (card.isolated.moduleName === localPath) {
-      card.isolated.moduleName = publicRef;
-    }
-
-    if (card.embedded.moduleName === localPath) {
-      card.embedded.moduleName = publicRef;
-    }
-
-    if (card.edit.moduleName === localPath) {
-      card.edit.moduleName = publicRef;
-    }
+    let globalRef = define(localPath, type, source);
+    localToGlobal.set(localPath, globalRef);
   }
+
+  function ensureGlobal(ref: ModuleRef): GlobalRef {
+    if ('global' in ref) {
+      return ref;
+    }
+    let globalRef = localToGlobal.get(ref.local);
+    if (!globalRef) {
+      throw new Error(`bug: found to global ref for ${ref.local}`);
+    }
+    return { global: globalRef };
+  }
+
+  function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
+    return {
+      moduleName: ensureGlobal(info.moduleName),
+      usedFields: info.usedFields,
+      inlineHBS: info.inlineHBS,
+      inheritedFrom: info.inheritedFrom,
+    };
+  }
+
+  return {
+    url: card.url,
+    realm: card.realm,
+    adoptsFrom: card.adoptsFrom,
+    fields: card.fields,
+    schemaModule: ensureGlobal(card.schemaModule),
+    serializer: card.serializer,
+    isolated: ensureGlobalComponentInfo(card.isolated),
+    embedded: ensureGlobalComponentInfo(card.embedded),
+    edit: ensureGlobalComponentInfo(card.edit),
+    modules: card.modules,
+  };
 }
