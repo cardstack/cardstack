@@ -1,5 +1,5 @@
 import { assertValidRawCard, CompiledCard, Field, RawCard } from './interfaces';
-import { findIncluded } from './jsonapi';
+import { findIncluded } from './utils/jsonapi';
 
 export class RawCardDeserializer {
   private shared = new Map<string, CompiledCard>();

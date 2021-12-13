@@ -1,11 +1,11 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { RawCardSerializer } from '@cardstack/core/src/raw-card-serializer';
 import { cardURL } from '@cardstack/core/src/utils';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import { expressionToSql, param, upsert } from '../utils/expressions';
-import { serializeRawCard } from '../utils/serialization';
 import CardBuilder from './card-builder';
 
 export class SearchIndex {
@@ -92,12 +92,13 @@ class IndexerRun implements IndexerHandle {
 
   async saveAndReturn(card: RawCard): Promise<CompiledCard> {
     let compiledCard = await this.builder.compileCardFromRaw(card);
+    let data = new RawCardSerializer().serialize(card, compiledCard);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(cardURL(card)),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(serializeRawCard(card, compiledCard)),
+      data: param(data),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
     });
     await this.db.query(expressionToSql(expression));

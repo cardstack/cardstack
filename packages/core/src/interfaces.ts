@@ -152,6 +152,11 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   inheritedFrom?: string;
 }
 
+export interface Card {
+  data: RawCard['data'];
+  compiled: CompiledCard;
+}
+
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;

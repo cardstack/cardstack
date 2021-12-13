@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { parseISO, parse, format } from 'date-fns';
+import merge from 'lodash/merge';
+import { Card, Format, CardJSONResponse } from './interfaces';
+import { serializeResource } from './utils/jsonapi';
 
 export interface PrimitiveSerializer {
   serialize(val: any): any;
@@ -32,3 +35,16 @@ export default {
   datetime: DateTimeSerializer,
   date: DateSerializer,
 };
+
+export function serializeCardForFormat(card: Card, format: Format): CardJSONResponse {
+  // TODO: typing....
+  let componentInfo = card.compiled[format];
+  let resource = serializeResource('card', card.compiled.url, componentInfo.usedFields, card.data) as any;
+  resource.meta = merge(
+    {
+      componentModule: componentInfo.moduleName.global,
+    },
+    resource.meta
+  );
+  return { data: resource };
+}

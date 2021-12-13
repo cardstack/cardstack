@@ -1,4 +1,4 @@
-import { CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -31,11 +31,6 @@ export default class CardServiceFactory {
   as(requestContext: unknown): CardService {
     return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db);
   }
-}
-
-interface Card {
-  data: RawCard['data'];
-  compiled: CompiledCard;
 }
 
 export class CardService {
