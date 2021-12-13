@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
+import * as Sentry from '@sentry/node';
 
 const DEGRADED_THRESHOLD = 10;
 
@@ -13,12 +14,36 @@ export default class StatusRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let subgraphMeta = await this.subgraph.getMeta();
+    let subgraphBlockNumber = null;
 
-    let subgraphBlockNumber = subgraphMeta.data._meta.block.number;
-    let rpcBlockNumber = await this.web3.getInstance().eth.getBlockNumber();
+    try {
+      let subgraphMeta = await this.subgraph.getMeta();
+      subgraphBlockNumber = subgraphMeta?.data?._meta?.block?.number;
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'status-route',
+        },
+      });
+    }
 
-    let status = rpcBlockNumber - subgraphBlockNumber >= DEGRADED_THRESHOLD ? 'degraded' : 'healthy';
+    let rpcBlockNumber = null;
+
+    try {
+      rpcBlockNumber = await this.web3.getInstance().eth.getBlockNumber();
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'status-route',
+        },
+      });
+    }
+
+    let status = 'degraded';
+
+    if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
+      status = 'healthy';
+    }
 
     ctx.status = 200;
     ctx.body = {
