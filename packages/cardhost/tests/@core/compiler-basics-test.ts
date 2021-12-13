@@ -50,11 +50,11 @@ module('@core | compiler-basics', function (hooks) {
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
-      await this.cardService.loadModule(compiled.isolated.moduleName),
+      await this.cardService.loadModule(compiled.isolated.moduleName.global),
       'Isolated module exists'
     );
     assert.ok(
-      await this.cardService.loadModule(compiled.embedded.moduleName),
+      await this.cardService.loadModule(compiled.embedded.moduleName.global),
       'Embedded module exists'
     );
   });
@@ -71,7 +71,9 @@ module('@core | compiler-basics', function (hooks) {
     this.builder.createRawCard(card);
 
     let compiled = await this.builder.getCompiledCard(cardURL(card));
-    let source = await this.cardService.loadModule<any>(compiled.schemaModule);
+    let source = await this.cardService.loadModule<any>(
+      compiled.schemaModule.global
+    );
     assert.equal(
       source.default.toString(),
       'class Post {}',
@@ -266,7 +268,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('it inlines a simple field template', async function (assert) {
       assert.ok(
-        compiled.isolated.moduleName.includes(`/isolated`),
+        compiled.isolated.moduleName.global.includes(`/isolated`),
         'templateModule for "isolated" is full url'
       );
     });
@@ -279,7 +281,7 @@ module('@core | compiler-basics', function (hooks) {
       );
 
       let code = await this.cardService.loadModule<any>(
-        compiled.embedded.moduleName
+        compiled.embedded.moduleName.global
       );
 
       assert.equal(code.default.moduleName, '@glimmer/component/template-only');

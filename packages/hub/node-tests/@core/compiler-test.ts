@@ -79,7 +79,7 @@ if (process.env.COMPILER) {
       await cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
 
-      expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
+      expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
@@ -93,10 +93,16 @@ if (process.env.COMPILER) {
       let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
 
       expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
-      expect(builder.cache.getModule(compiled.edit.moduleName), 'Edit template is rendered for text').to.containsSource(
+      expect(
+        builder.cache.getModule(compiled.edit.moduleName.global),
+        'Edit template is rendered for text'
+      ).to.containsSource(
         '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
       );
-      expect(builder.cache.getModule(compiled.edit.moduleName), 'Edit template is rendered for date').to.containsSource(
+      expect(
+        builder.cache.getModule(compiled.edit.moduleName.global),
+        'Edit template is rendered for date'
+      ).to.containsSource(
         '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
       );
     });
@@ -133,7 +139,7 @@ if (process.env.COMPILER) {
 
       expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
 
-      expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
+      expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
         `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><HttpsCardstackComBaseDateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
       );
 
@@ -207,7 +213,7 @@ if (process.env.COMPILER) {
       expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
 
       expect(
-        builder.cache.getModule(compiled.isolated.moduleName),
+        builder.cache.getModule(compiled.isolated.moduleName.global),
         'Isolated template includes PostField component'
       ).to.containsSource(
         `{{#each @model.posts as |Post|}}<HttpsCardstackLocalPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`
@@ -216,7 +222,7 @@ if (process.env.COMPILER) {
       expect(compiled.embedded.usedFields).to.deep.equal(['posts.title']);
 
       expect(
-        builder.cache.getModule(compiled.embedded.moduleName),
+        builder.cache.getModule(compiled.embedded.moduleName.global),
         'Embedded template inlines post title'
       ).to.containsSource(`<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`);
     });
@@ -284,7 +290,7 @@ if (process.env.COMPILER) {
 
       it('iterators of fields and inlines templates', async function () {
         let compiled = await builder.getCompiledCard(`${realm}post`);
-        expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
+        expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label></article>'
         );
       });
@@ -327,10 +333,10 @@ if (process.env.COMPILER) {
         let timelyCompiled = await builder.getCompiledCard(cardURL(timelyPostCard));
         let fancyCompiled = await builder.getCompiledCard(cardURL(fancyPostCard));
 
-        expect(builder.cache.getModule(timelyCompiled.embedded.moduleName)).to.containsSource(
+        expect(builder.cache.getModule(timelyCompiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
         );
-        expect(builder.cache.getModule(fancyCompiled.embedded.moduleName)).to.containsSource(
+        expect(builder.cache.getModule(fancyCompiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
         );
       });

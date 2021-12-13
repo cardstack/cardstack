@@ -158,7 +158,7 @@ export default class CardRoutes {
       } else {
         let card = await this.builder.getCompiledCard(this.config.routeCard);
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const CardRouterClass = requireCard(card.schemaModule, this.cache.dir).default;
+        const CardRouterClass = requireCard(card.schemaModule.global, this.cache.dir).default;
         const cardRouterInstance = new CardRouterClass();
         assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
         this.routerInstance = cardRouterInstance;
