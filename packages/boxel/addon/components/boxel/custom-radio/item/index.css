@@ -1,11 +1,20 @@
 .boxel-custom-radio-option {
   position: relative;
-  flex: 1;
   display: block;
-  padding: var(--boxel-sp);
+  flex: var(--boxel-custom-radio-option-flex, 1);
+  padding: var(--boxel-custom-radio-option-padding, var(--boxel-sp));
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
   transition: box-shadow var(--boxel-transition);
+}
+
+.boxel-custom-radio-option--compact {
+  --boxel-custom-radio-option-flex: 0;
+  --boxel-custom-radio-option-padding: var(--boxel-sp-xxxs);
+}
+
+.boxel-custom-radio-option--hidden-border {
+  box-shadow: 0 0 0 1px transparent;
 }
 
 .boxel-custom-radio-option--grid {

@@ -17,11 +17,6 @@
   background: var(--swatch-background); /* stylelint-disable-line declaration-block-no-shorthand-property-overrides */
 }
 
-.layout-customization__swatch--squeezed {
-  width: calc(var(--swatch-width) - 3px);
-  height: calc(var(--swatch-height) - 3px);
-}
-
 .layout-customization__swatch-image {
   width: 100%;
   height: 100%;

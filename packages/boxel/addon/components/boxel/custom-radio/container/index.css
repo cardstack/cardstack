@@ -4,6 +4,13 @@
   gap: var(--boxel-sp);
 }
 
+.boxel-custom-radio__container--compact {
+  --boxel-custom-radio-option-flex: 0;
+  --boxel-custom-radio-option-padding: var(--boxel-sp-xxxs);
+
+  gap: var(--boxel-sp-xxxs);
+}
+
 /* essentially reset fieldset and hide legend from visibility */
 .boxel-custom-radio__fieldset {
   border: 0;

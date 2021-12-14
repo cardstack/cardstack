@@ -1,4 +1,4 @@
-<div class="layout-form-view__content" data-test-layout-customization-form>
+<div data-test-layout-customization-form>
   <CardPay::FieldStack>
     <CardPay::LabeledValue
       @label="Card Preview"
@@ -20,7 +20,6 @@
     <CardPay::LabeledValue
       @fieldMode="edit"
       @label="Name of Issuer *"
-      class="layout-form-view__input-field"
     >
       <Boxel::Input
         @value={{@issuerName}}
@@ -32,9 +31,7 @@
         data-test-layout-customization-name-input
       />
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue
-      @label="Background Color"
-    >
+    <CardPay::LabeledValue @label="Background Color">
       {{#if @loadingCustomizations}}
         <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
@@ -42,7 +39,7 @@
           @checkedId={{@colorScheme.id}}
           @groupDescription="Pick a background color for your card’s header"
           @items={{@colorSchemeOptions}}
-          class="layout-form-view__selection layout-form-view__selection--background"
+          @spacing="compact"
           as |colorSchemeItem|
         >
           <colorSchemeItem.component
@@ -51,15 +48,13 @@
             @value={{colorSchemeItem.data.id}}
             @checked={{colorSchemeItem.checked}}
             @onChange={{fn (optional @updateColorScheme) colorSchemeItem.data}}
-            @focusedClass="layout-form-view__selection-item--focused"
-            @checkedClass="layout-form-view__selection-item--checked"
-            class="layout-form-view__selection-item"
+            @hiddenInput={{true}}
+            @hiddenBorder={{true}}
             data-test-customization-background-selection-item={{colorSchemeItem.data.background}}
           >
             <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
               @type="background"
               @swatchBackground={{colorSchemeItem.data.background}}
-              @squeezed={{colorSchemeItem.checked}}
             />
           </colorSchemeItem.component>
         </Boxel::CustomRadio>
@@ -73,7 +68,7 @@
           @checkedId={{@pattern.id}}
           @groupDescription="Pick a theme for your card’s header"
           @items={{@patternOptions}}
-          class="layout-form-view__selection layout-form-view__selection--theme"
+          @spacing="compact"
           as |patternItem|
         >
           <patternItem.component
@@ -82,9 +77,8 @@
             @value={{patternItem.data.id}}
             @checked={{patternItem.checked}}
             @onChange={{fn (optional @updatePattern) patternItem.data}}
-            @focusedClass="layout-form-view__selection-item--focused"
-            @checkedClass="layout-form-view__selection-item--checked"
-            class="layout-form-view__selection-item"
+            @hiddenInput={{true}}
+            @hiddenBorder={{true}}
             data-test-customization-pattern-selection-item={{or patternItem.data.patternUrl "blank"}}
           >
             {{!-- rerenders appear to cause flashes if we use a background image --}}
