@@ -67,11 +67,6 @@ it(`can respond to a guild command`, async function () {
   expect('ping').toReturn('pong');
 });
 
-it(`does not respond in a non-allowed channel`, async function () {
-  await setupTest();
-  expect('ping', '898897116913623050').not.toReturn('pong');
-});
-
 it(`can start a conversation for a beta tester that has not received an airdrop`, async function () {
   await setupTest();
   expect('card-drop').toMessageContentContains(`Connect your Card Wallet app to receive your prepaid card`);
