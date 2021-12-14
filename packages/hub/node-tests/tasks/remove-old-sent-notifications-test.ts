@@ -49,7 +49,7 @@ describe('RemoveOldSentNotificationsTask', function () {
     for (let item of ['old 1', 'old 2']) {
       await db.query('INSERT INTO sent_push_notifications (notification_id, created_at) VALUES($1, $2)', [
         item,
-        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 - 100).toUTCString(),
+        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 - 100),
       ]);
     }
 
@@ -57,7 +57,7 @@ describe('RemoveOldSentNotificationsTask', function () {
     for (let item of ['recent 1', 'recent 2']) {
       await db.query('INSERT INTO sent_push_notifications (notification_id, created_at) VALUES($1, $2)', [
         item,
-        new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toUTCString(),
+        new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
       ]);
     }
 
