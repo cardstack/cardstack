@@ -214,10 +214,12 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: View Safes",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "cwd": "${workspaceRoot}/packages/cardpay-cli",
       "env": {},
       "args": [
+        "index.ts",
         "safes-view",
         "--network",
         "sokol",
