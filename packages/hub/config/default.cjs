@@ -62,7 +62,6 @@ module.exports = {
     network: 'sokol',
   },
   betaTesting: {
-    discordRole: 'Beta Tester',
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
   },
   walletConnect: {

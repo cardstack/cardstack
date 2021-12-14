@@ -6,7 +6,7 @@ import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { BetaTestConfig } from '../../types';
-import { assertHubBot, isBetaTester } from '../../utils';
+import { assertHubBot } from '../../utils';
 import Client, { Message } from '@cardstack/discord-bot';
 
 const log = logger('command:card-me');
@@ -22,11 +22,6 @@ export const run: Command['run'] = async (bot: Client, message: Message) => {
     return;
   }
   let dm = await createDM(message);
-
-  if (!isBetaTester(guild, member)) {
-    await sendDM(message, member, dm, `Sorry, I can only give prepaid cards to beta testers.`);
-    return;
-  }
 
   let db = await bot.getDatabaseClient();
   let betaTester = await getBetaTester(db, member.id);
