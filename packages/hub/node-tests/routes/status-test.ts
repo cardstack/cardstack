@@ -47,8 +47,7 @@ class StubWeb3 {
   }
 }
 
-// eslint-disable-next-line mocha/no-exclusive-tests
-describe.only('GET /api/status', function () {
+describe('GET /api/status', function () {
   this.beforeEach(function () {
     Sentry.init({
       dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
