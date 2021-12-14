@@ -84,7 +84,7 @@ const XDAI = {
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'xDai Chain',
-  rpcNode: 'https://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
+  rpcNode: 'https://rpc.xdaichain.com',
   rpcArchiveNode: 'https://xdai-archive.blockscout.com',
   rpcWssNode: 'wss://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
   rpcWssNodeNext: 'wss://dry-patient-snowflake.xdai.quiknode.pro/2abc5f7a8be61acf8ce70debf536ddab4d747267/',
