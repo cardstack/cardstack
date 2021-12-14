@@ -3,8 +3,8 @@
 This project includes the subgraph necessary to generate a GraphQL based query system for the cardpay protocol.
 
 The subgraph is hosted at:
-- sokol: https://thegraph.com/explorer/subgraph/habdelra/cardpay-sokol
-- xdai: https://thegraph.com/explorer/subgraph/habdelra/cardpay-xdai
+- xdai: https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai/graphql
+- sokol: https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol/graphql
 
 On these URL's you will find a GraphQL explorer to help craft your queries.
 
@@ -56,7 +56,7 @@ cd packages/cardpay-subgraph
 ## Deploying
 
 ### Authentication
-If you have never performed a deploy then you will need to perform a first time authentication for each of the graph nodes that we deploy too. Currently we deploy to 2 nodes: a graph node hosted by Cardstack and a graph node hosted by The Graph. Each has different access tokens. The access token for Cardstack can be found in the AWS secrets manager. Ask Hassan for the access token for The graph.
+If you have never performed a deploy then you will need to perform a first time authentication for each of the graph nodes that we deploy too. Currently we deploy to a graph node hosted by Cardstack. Each has different access tokens for each environment. The access token for Cardstack can be found in the AWS secrets manager in the respective environment.
 
 Once you have located your access token, from the `packages/cardpay-subgraph` directory execute:
 ```sh
@@ -64,7 +64,6 @@ $ graph auth https://graph-admin-green.stack.cards <Cardstack access token>
 $ graph auth https://graph-admin-blue.stack.cards <Cardstack access token>
 $ graph auth https://graph-admin-green.cardstack.com <Cardstack access token>
 $ graph auth https://graph-admin-blue.cardstack.com <Cardstack access token>
-$ graph auth https://api.thegraph.com/deploy/ <The Graph access token>
 ```
 
 After you have performed this authorization you will not need to perform this again for subsequent deployments.
@@ -74,17 +73,17 @@ To deploy the subgraph to both The Graph and one of our hosted graph nodes, run 
 ```
 yarn deploy-sokol-green
 ```
-which deploys to our green node and The Graph, or
+which deploys to the sokol green node, or
 ```
 yarn deploy-sokol-blue
 ```
-which deploys to our blue node and The Graph
+which deploys to the blue node
 
 To check the sync status of either node, run:
 ```
-yarn green-status
+yarn sokol-green-status
 ```
 or
 ```
-yarn blue-status
+yarn sokol-blue-status
 ```
