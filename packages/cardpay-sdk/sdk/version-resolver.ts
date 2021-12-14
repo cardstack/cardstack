@@ -100,7 +100,14 @@ export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[
   let protocolVersion = await versionManager.methods.version().call();
   let versionMap: { [version: string]: AbiItem[] } = {};
   for (let version of protocolVersions) {
-    versionMap[version.replace('v', '')] = (await import(`../contracts/abi/${version}/${contractName}.ts`)).default;
+    // we have to exclude .d.ts files because webpack tries to build
+    // these for the dynamic import case.
+    versionMap[version.replace('v', '')] = (
+      await import(
+        /* webpackExclude: /\.d\.ts$/ */
+        `../contracts/abi/${version}/${contractName}.ts`
+      )
+    ).default;
   }
   let abi = getAPIVersion(versionMap, protocolVersion);
   return abi;
