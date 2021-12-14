@@ -1,7 +1,7 @@
 .boxel-custom-radio-option {
   position: relative;
   display: block;
-  flex: var(--boxel-custom-radio-option-flex, 1);
+  flex: var(--boxel-custom-radio-option-flex, 1 0 auto);
   padding: var(--boxel-custom-radio-option-padding, var(--boxel-sp));
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
@@ -15,6 +15,10 @@
 
 .boxel-custom-radio-option--hidden-border {
   box-shadow: 0 0 0 1px transparent;
+}
+
+.boxel-custom-radio-option--fullwidth {
+  flex-basis: 100%;
 }
 
 .boxel-custom-radio-option--grid {

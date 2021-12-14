@@ -44,6 +44,7 @@
                 @disabled={{eq (format-wei-amount token.data.balance) "0.00"}}
                 @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.data.symbol)}}
                 @onChange={{fn this.chooseSource token.data}}
+                @fullWidth={{true}}
                 data-test-deposit-transaction-setup-from-option={{token.data.symbol}}
               >
                 {{#let (token-to-usd token.data.symbol token.data.balance) as |usdBalance|}}
