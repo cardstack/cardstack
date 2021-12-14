@@ -66,13 +66,3 @@ it(`can respond to a guild command`, async function () {
   await setupTest();
   expect('ping').toReturn('pong');
 });
-
-it(`can start a conversation for a beta tester that has not received an airdrop`, async function () {
-  await setupTest();
-  expect('card-drop').toMessageContentContains(`Connect your Card Wallet app to receive your prepaid card`);
-  // arg, corde asserts need to start with a command, since we have entered a DM
-  // there there is no way to make any more assertions since the following
-  // responses are just text and not commands (since bots can't DM each other
-  // corde doesn't current provide any DM support--everything is command
-  // centric)
-});
