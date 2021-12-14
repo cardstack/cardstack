@@ -104,6 +104,7 @@ import NotificationPreferenceSerializer from './services/serializers/notificatio
 import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
+import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -167,6 +168,7 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('relay', RelayService);
+  registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
@@ -350,8 +352,17 @@ export async function bootWorker() {
         let task = await container.instantiate(PersistOffChainCardSpaceTask);
         return task.perform(payload, helpers);
       },
+      'remove-old-sent-notifications': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(RemoveOldSentNotificationsTask);
+        return task.perform(payload, helpers);
+      },
       's3-put-json': s3PutJson,
     },
+    // https://github.com/graphile/worker#recurring-tasks-crontab
+    // remove old notifications at midnight every day
+    // 5am in utc equivalent to midnight in ny
+    // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
+    crontab: '0 5 * * * remove-old-sent-notifications ?max=5',
   });
 
   runner.events.on('job:error', ({ error, job }) => {
