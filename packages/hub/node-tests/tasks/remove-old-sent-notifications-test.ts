@@ -45,15 +45,15 @@ describe('RemoveOldSentNotificationsTask', function () {
   this.beforeEach(async function () {
     db = await (await getContainer().lookup('database-manager')).getClient();
 
-    // 7 days old, old
+    // 7 days 100ms, old
     for (let item of ['old 1', 'old 2']) {
       await db.query('INSERT INTO sent_push_notifications (notification_id, created_at) VALUES($1, $2)', [
         item,
-        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toUTCString(),
+        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 - 100).toUTCString(),
       ]);
     }
 
-    // 6 days old, not old yet
+    // 6 days, not old yet
     for (let item of ['recent 1', 'recent 2']) {
       await db.query('INSERT INTO sent_push_notifications (notification_id, created_at) VALUES($1, $2)', [
         item,
