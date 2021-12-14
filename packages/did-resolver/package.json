@@ -2,7 +2,7 @@
   "name": "@cardstack/did-resolver",
   "version": "0.27.43",
   "description": "A javascript resolver for the cardstack DID method",
-  "main": "./index.js",
+  "main": "./index.ts",
   "author": "Cardstack Team",
   "license": "MIT",
   "private": false,
