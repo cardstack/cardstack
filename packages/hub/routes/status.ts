@@ -42,7 +42,7 @@ export default class StatusRoute {
     let status = 'degraded';
 
     if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
-      status = 'healthy';
+      status = 'operational';
     }
 
     ctx.status = 200;

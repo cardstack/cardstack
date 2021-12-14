@@ -84,7 +84,7 @@ describe.only('GET /api/status', function () {
           type: 'status',
           attributes: {
             rpcBlockNumber: 19492430,
-            status: 'healthy',
+            status: 'operational',
             subgraphBlockNumber: 19492428,
           },
         },
