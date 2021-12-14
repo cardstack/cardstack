@@ -20,7 +20,8 @@ module.exports = {
     url: 'postgres://postgres:postgres@localhost:5432/hub_development',
     'migrations-dir': 'db/migrations',
     'migration-filename-format': 'utc',
-    'ignore-pattern': 'README.md|.*\\.ts|.*\\.js\\.map',
+    'ignore-pattern': 'README.md',
+    'check-order': false,
   },
   discord: {
     botId: '896093538297708564',

@@ -54,7 +54,7 @@ export class Compiler {
   async compile(cardSource: NewRawCard): Promise<CompiledCard<Unsaved, ModuleRef>>;
   async compile(cardSource: NewRawCard | RawCard): Promise<CompiledCard<Saved | Unsaved, ModuleRef>> {
     let options = {};
-    let modules: CompiledCard['modules'] = {};
+    let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let schemaModule: ModuleRef | undefined = await this.prepareSchema(cardSource, options, modules);
     let meta = getMeta(options);
 
@@ -181,7 +181,7 @@ export class Compiler {
   private async prepareSchema(
     cardSource: NewRawCard,
     options: any,
-    modules: CompiledCard['modules']
+    modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<LocalRef | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
@@ -253,7 +253,7 @@ export class Compiler {
     cardSource: NewRawCard,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
-    modules: CompiledCard['modules']
+    modules: CompiledCard<Unsaved, LocalRef>['modules']
   ) {
     let components: Partial<Pick<CompiledCard<Unsaved, ModuleRef>, Format>> = {};
     for (const format of FORMATS) {
@@ -267,7 +267,7 @@ export class Compiler {
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
     which: Format,
-    modules: CompiledCard['modules']
+    modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<ComponentInfo<ModuleRef>> {
     let localFilePath = cardSource[which];
 
@@ -335,7 +335,7 @@ export class Compiler {
     debugPath: string,
     localFile: string,
     format: Format,
-    modules: CompiledCard['modules']
+    modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<ComponentInfo<LocalRef>> {
     let options: CardComponentPluginOptions = {
       debugPath,
@@ -400,10 +400,11 @@ export function resolveCard(url: string, realm: string): string {
   return resolved;
 }
 
-export function defineModules<Identity extends Saved | Unsaved>(
-  card: CompiledCard<Identity, ModuleRef>,
+export function makeGloballyAddressable(
+  url: string,
+  card: CompiledCard<Saved | Unsaved, ModuleRef>,
   define: (localPath: string, type: string, source: string) => string
-): CompiledCard<Identity, GlobalRef> {
+): CompiledCard<Saved, GlobalRef> {
   let localToGlobal = new Map<string, string>();
 
   for (let [localPath, { type, source }] of Object.entries(card.modules)) {
@@ -432,7 +433,7 @@ export function defineModules<Identity extends Saved | Unsaved>(
   }
 
   return {
-    url: card.url,
+    url: url,
     realm: card.realm,
     adoptsFrom: card.adoptsFrom,
     fields: card.fields,

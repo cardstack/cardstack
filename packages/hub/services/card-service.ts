@@ -56,10 +56,9 @@ export class CardService {
   }
 
   async create(raw: NewRawCard): Promise<Card> {
-    // NEW: Compile it to make sure everything is valid
-    // `${realm}${id ?? 'NEW_CARD'}/${localFile}`
+    let compiledCard = await this.builder.compileCardFromRaw(raw);
     let rawCard = await this.realmManager.create(raw);
-    let compiled = await this.searchIndex.indexCard(rawCard);
+    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard);
     return { data: rawCard.data, compiled };
   }
 
