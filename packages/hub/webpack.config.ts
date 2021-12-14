@@ -169,9 +169,13 @@ module.exports = {
 
     rules: [
       {
-        test: /\.ts$/,
+        test: /(?<!\.d)\.ts?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.d\.ts$/,
+        loader: 'ignore-loader',
       },
       {
         test: /\.node$/,
