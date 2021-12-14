@@ -1,12 +1,4 @@
-<label class={{cn "token-option" token-option--checked=@checked token-option--disabled=@disabled}} ...attributes>
-  <Input
-    name="deposit-token"
-    class={{cn "token-option__input" token-option__input--checked=@checked}}
-    @type="radio"
-    @checked={{@checked}}
-    disabled={{@disabled}}
-    {{on "input" @onInput}}
-  />
+<div class="token-option" ...attributes>
   <div class="token-option__currency">
     {{svg-jar @token.icon class="token-option__icon" role="presentation" width="40" height="40"}}
     <div>
@@ -31,4 +23,4 @@
       {{/if}}
     </div>
   </div>
-</label>
+</div>

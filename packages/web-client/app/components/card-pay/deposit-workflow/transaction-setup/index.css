@@ -1,15 +1,3 @@
-.transaction-setup__field-info {
-  grid-column: 2;
-}
-
-.transaction-setup__radio-buttons {
+.transaction-setup__from > * + * {
   margin-top: var(--boxel-sp);
-}
-
-.transaction-setup__radio-buttons > * + * {
-  margin-top: var(--boxel-sp);
-}
-
-.transaction-setup__account {
-  margin-top: var(--boxel-sp-xs);
 }

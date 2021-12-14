@@ -28,53 +28,62 @@
             </:inner>
           </CardPay::NestedItems>
         {{else}}
-          <CardPay::AccountDisplay
-            @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
-            @address={{this.layer1Network.walletInfo.firstAddress}}
-            data-test-deposit-transaction-setup-from-address
-          />
-          <div class="transaction-setup__field-info transaction-setup__radio-buttons">
-            {{#each this.tokens as |token|}}
-              {{#let (token-to-usd token.symbol token.balance) as |usdBalance|}}
-                <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-                  @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.symbol)}}
-                  @onInput={{fn this.chooseSource token}}
-                  @balance={{format-wei-amount token.balance}}
-                  @usdBalanceLoading={{is-empty usdBalance}}
-                  @balanceInUsd={{usdBalance}}
-                  @token={{token}}
-                  @disabled={{eq (format-wei-amount token.balance) "0.00"}}
-                  data-test-deposit-transaction-setup-from-option={{token.symbol}}
-                />
-              {{/let}}
-            {{/each}}
+          <div class="transaction-setup__from">
+            <CardPay::AccountDisplay
+              @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
+              @address={{this.layer1Network.walletInfo.firstAddress}}
+              data-test-deposit-transaction-setup-from-address
+            />
+            <Boxel::CustomRadio
+              @groupDescription="Select token to deposit"
+              @items={{this.tokens}}
+              as |token|
+            >
+              <token.component
+                @name="token-selection"
+                @disabled={{eq (format-wei-amount token.data.balance) "0.00"}}
+                @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.data.symbol)}}
+                @onChange={{fn this.chooseSource token.data}}
+                data-test-deposit-transaction-setup-from-option={{token.data.symbol}}
+              >
+                {{#let (token-to-usd token.data.symbol token.data.balance) as |usdBalance|}}
+                  <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                    @balance={{format-wei-amount token.data.balance}}
+                    @usdBalanceLoading={{is-empty usdBalance}}
+                    @balanceInUsd={{usdBalance}}
+                    @token={{token.data}}
+                  />
+                {{/let}}
+              </token.component>
+            </Boxel::CustomRadio>
           </div>
         {{/if}}
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
       <CardPay::LabeledValue @label="In:" @isCompact={{true}}>
-        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-deposit-transaction-setup-to-wallet />
-        <CardPay::NestedItems class="transaction-setup__field-info">
-          <:outer>
-            <CardPay::AccountDisplay
-              {{!-- class="transaction-setup__account" --}}
-              @size="small"
-              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-              data-test-deposit-transaction-setup-to-address
-            />
-          </:outer>
-          <:inner>
-            <CardPay::AccountDisplay
-              @size={{if @isComplete "large"}}
-              @icon="depot"
-              @name="DEPOT:"
-              @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
-              @text={{unless this.layer2Network.depotSafe "New Depot"}}
-              data-test-deposit-transaction-setup-depot-address
-            />
-          </:inner>
-        </CardPay::NestedItems>
+        <div>
+          <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-deposit-transaction-setup-to-wallet />
+          <CardPay::NestedItems>
+            <:outer>
+              <CardPay::AccountDisplay
+                @size="small"
+                @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+                data-test-deposit-transaction-setup-to-address
+              />
+            </:outer>
+            <:inner>
+              <CardPay::AccountDisplay
+                @size={{if @isComplete "large"}}
+                @icon="depot"
+                @name="DEPOT:"
+                @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
+                @text={{unless this.layer2Network.depotSafe "New Depot"}}
+                data-test-deposit-transaction-setup-depot-address
+              />
+            </:inner>
+          </CardPay::NestedItems>
+        </div>
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
     {{#if this.noTokenBalance}}

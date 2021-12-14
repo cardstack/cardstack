@@ -1,11 +1,14 @@
-<Boxel::CustomRadio::Container @groupDescription={{@groupDescription}} @disabled={{@disabled}} ...attributes>
+<Boxel::CustomRadio::Container
+  @groupDescription={{@groupDescription}}
+  @disabled={{@disabled}}
+  ...attributes
+>
   {{#each @items as |item|}}
     {{yield
       (hash
         component=(component "boxel/custom-radio/item")
         data=item
         checked=(eq item.id @checkedId)
-        hiddenInput=@hiddenInput
         disabled=@disabled
       )
     }}
