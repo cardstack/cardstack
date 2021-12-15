@@ -1,7 +1,8 @@
-import { CardJSONRequest, CardJSONResponse, SerializerMap, SerializerName, Setter, CardEnv } from './interfaces';
-import serializers, { PrimitiveSerializer } from './serializers';
+import { JSONAPIDocument, SerializerMap, Setter, CardEnv, Saved, Unsaved } from './interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
+import { serializeResource } from './utils/jsonapi';
+import { deserializaAttributes, serializeAttributes } from './serializers';
 
 export interface NewCardParams {
   realm: string;
@@ -17,7 +18,7 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
-  rawServerResponse: CardJSONResponse;
+  rawServerResponse: JSONAPIDocument;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -40,7 +41,7 @@ export default class CardModel {
     );
   }
 
-  static fromResponse(cards: CardEnv, cardResponse: CardJSONResponse, component: unknown): CardModel {
+  static fromResponse(cards: CardEnv, cardResponse: JSONAPIDocument<Saved>, component: unknown): CardModel {
     return new this(cards, component, {
       type: 'loaded',
       url: cardResponse.data.id,
@@ -81,7 +82,11 @@ export default class CardModel {
     switch (this.state.type) {
       case 'loaded':
         if (!this.state.deserialized) {
-          this._data = this.deserialize(this.state);
+          this._data = deserializaAttributes(
+            this.state.rawServerResponse.data.attributes,
+            // @ts-ignore This works as expected, whats up typescript?
+            this.constructor.serializerMap
+          );
           this.state.deserialized = true;
         }
         return this._data;
@@ -101,21 +106,10 @@ export default class CardModel {
     return this.wrapperComponent;
   }
 
-  private deserialize(state: LoadedState): any {
-    let { attributes } = state.rawServerResponse.data;
-    return serializeAttributes(
-      attributes,
-      'deserialize',
-      // @ts-ignore This works as expected, whats up typescript?
-      this.constructor.serializerMap
-    );
-  }
-
-  private serialize(): CardJSONRequest {
+  private serialize(): JSONAPIDocument {
     let { data } = this;
     let attributes = serializeAttributes(
       data,
-      'serialize',
       // @ts-ignore
       this.constructor.serializerMap
     );
@@ -124,8 +118,9 @@ export default class CardModel {
     if (this.state.type === 'loaded') {
       url = this.state.url;
     }
-
-    return constructJSONAPIRequest(attributes, url);
+    return {
+      data: serializeResource('card', url, Object.keys(attributes), attributes),
+    };
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -166,7 +161,7 @@ export default class CardModel {
   }
 
   async save(): Promise<void> {
-    let response: CardJSONResponse;
+    let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
     switch (this.state.type) {
       case 'created':
@@ -197,70 +192,6 @@ export default class CardModel {
       deserialized: false,
       original,
     };
-  }
-}
-
-function constructJSONAPIRequest(attributes: any, url: string | undefined): CardJSONRequest {
-  let response: CardJSONRequest = {
-    data: {
-      type: 'card',
-      attributes,
-    },
-  };
-
-  if (url) {
-    response.data.id = url;
-  }
-
-  return response;
-}
-
-function serializeAttributes(
-  attrs: { [name: string]: any } | undefined,
-  action: 'serialize' | 'deserialize',
-  serializerMap: SerializerMap
-): any {
-  if (!attrs) {
-    return;
-  }
-  let serializerName: SerializerName;
-  for (serializerName in serializerMap) {
-    let serializer = serializers[serializerName];
-    let paths = serializerMap[serializerName];
-    if (!paths) {
-      continue;
-    }
-    for (const path of paths) {
-      serializeAttribute(attrs, path, serializer, action);
-    }
-  }
-
-  return attrs;
-}
-
-function serializeAttribute(
-  attrs: { [name: string]: any },
-  path: string,
-  serializer: PrimitiveSerializer,
-  action: 'serialize' | 'deserialize'
-) {
-  let [key, ...tail] = path.split('.');
-  let value = attrs[key];
-  if (!value) {
-    return;
-  }
-
-  if (tail.length) {
-    let tailPath = tail.join('.');
-    if (Array.isArray(value)) {
-      for (let row of value) {
-        serializeAttribute(row, tailPath, serializer, action);
-      }
-    } else {
-      serializeAttribute(attrs[key], tailPath, serializer, action);
-    }
-  } else {
-    attrs[path] = serializer[action](value);
   }
 }
 

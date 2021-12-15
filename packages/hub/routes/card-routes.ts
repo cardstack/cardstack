@@ -11,7 +11,7 @@ import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
 import { NewRawCard } from '@cardstack/core/src/interfaces';
 import { RawCardSerializer } from '@cardstack/core/src/raw-card-serializer';
-import { serializeCardForFormat } from '@cardstack/core/src/serializers';
+import { serializeCardPayloadForFormat } from '@cardstack/core/src/serializers';
 
 declare global {
   const __non_webpack_require__: any;
@@ -44,7 +44,7 @@ export default class CardRoutes {
 
     let format = getCardFormatFromRequest(ctx.query.format);
     let card = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = serializeCardForFormat(card, format);
+    ctx.body = serializeCardPayloadForFormat(card, format);
     ctx.status = 200;
   }
 
@@ -52,7 +52,7 @@ export default class CardRoutes {
     let query = qs.parse(ctx.querystring);
     assertQuery(query);
     let cards = await this.cards.as(INSECURE_CONTEXT).query(query);
-    let collection = cards.map((card) => serializeCardForFormat(card, 'embedded').data);
+    let collection = cards.map((card) => serializeCardPayloadForFormat(card, 'embedded').data);
     ctx.body = { data: collection };
     ctx.status = 200;
   }
@@ -85,7 +85,7 @@ export default class CardRoutes {
     }
 
     let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
-    ctx.body = serializeCardForFormat(createdCard, format);
+    ctx.body = serializeCardPayloadForFormat(createdCard, format);
     ctx.status = 201;
   }
 
@@ -98,7 +98,7 @@ export default class CardRoutes {
     let cardId = this.realmManager.parseCardURL(url);
     let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
     // Question: Is it safe to assume the response should be isolated?
-    ctx.body = serializeCardForFormat(card, 'isolated');
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;
   }
 
@@ -128,7 +128,7 @@ export default class CardRoutes {
     }
 
     let card = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = serializeCardForFormat(card, 'isolated');
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
   }
 
   private async getSource(ctx: RouterContext) {

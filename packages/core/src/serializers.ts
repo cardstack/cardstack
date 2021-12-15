@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { parseISO, parse, format } from 'date-fns';
 import merge from 'lodash/merge';
-import { Card, Format, CardJSONResponse } from './interfaces';
+import { Card, JSONAPIDocument, Format, SerializerMap, SerializerName } from './interfaces';
 import { serializeResource } from './utils/jsonapi';
 
 export interface PrimitiveSerializer {
@@ -31,15 +31,71 @@ const DateSerializer: PrimitiveSerializer = {
   },
 };
 
-export default {
+const SERIALIZERS = {
   datetime: DateTimeSerializer,
   date: DateSerializer,
 };
 
-export function serializeCardForFormat(card: Card, format: Format): CardJSONResponse {
-  // TODO: typing....
+export function deserializaAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
+  return _serializeAttributes(attrs, 'deserialize', serializerMap);
+}
+
+export function serializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
+  return _serializeAttributes(attrs, 'serialize', serializerMap);
+}
+
+export function _serializeAttributes(
+  attrs: { [name: string]: any } | undefined,
+  action: 'serialize' | 'deserialize',
+  serializerMap: SerializerMap
+): any {
+  if (!attrs) {
+    return;
+  }
+  let serializerName: SerializerName;
+  for (serializerName in serializerMap) {
+    let serializer = SERIALIZERS[serializerName];
+    let paths = serializerMap[serializerName];
+    if (!paths) {
+      continue;
+    }
+    for (const path of paths) {
+      serializeAttribute(attrs, path, serializer, action);
+    }
+  }
+
+  return attrs;
+}
+
+export function serializeAttribute(
+  attrs: { [name: string]: any },
+  path: string,
+  serializer: PrimitiveSerializer,
+  action: 'serialize' | 'deserialize'
+) {
+  let [key, ...tail] = path.split('.');
+  let value = attrs[key];
+  if (!value) {
+    return;
+  }
+
+  if (tail.length) {
+    let tailPath = tail.join('.');
+    if (Array.isArray(value)) {
+      for (let row of value) {
+        serializeAttribute(row, tailPath, serializer, action);
+      }
+    } else {
+      serializeAttribute(attrs[key], tailPath, serializer, action);
+    }
+  } else {
+    attrs[path] = serializer[action](value);
+  }
+}
+
+export function serializeCardPayloadForFormat(card: Card, format: Format): JSONAPIDocument {
   let componentInfo = card.compiled[format];
-  let resource = serializeResource('card', card.compiled.url, componentInfo.usedFields, card.data) as any;
+  let resource = serializeResource('card', card.compiled.url, componentInfo.usedFields, card.data);
   resource.meta = merge(
     {
       componentModule: componentInfo.moduleName.global,

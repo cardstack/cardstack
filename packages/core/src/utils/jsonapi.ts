@@ -1,20 +1,13 @@
 import set from 'lodash/set';
 import get from 'lodash/get';
-
-export interface ResourceObject {
-  id?: string;
-  type: string;
-  attributes?: { [name: string]: any };
-  relationships?: { [name: string]: any };
-  meta?: { [name: string]: any };
-}
+import { ResourceObject, Saved, Unsaved } from '../interfaces';
 
 export function serializeResource(
   type: string,
-  id: string,
+  id: string | undefined,
   attributes: (string | Record<string, string>)[],
   payload: any
-): ResourceObject {
+): ResourceObject<Saved | Unsaved> {
   let resource = {
     id,
     type,
