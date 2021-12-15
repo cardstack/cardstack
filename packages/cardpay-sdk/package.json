@@ -3,7 +3,8 @@
   "description": "An SDK for using the cardpay protocol",
   "version": "0.27.44",
   "author": "Hassan Abdel-Rahman @habdelra",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.5.0",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
@@ -26,6 +27,15 @@
     "web3-eth-contract": "1.5.2",
     "web3-provider-engine": "^16.0.1",
     "web3-utils": "1.5.2"
+  },
+  "devDependencies": {
+    "typescript": "4.2.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "tsc"
   },
   "homepage": "https://github.com/cardstack/cardstack",
   "license": "MIT",

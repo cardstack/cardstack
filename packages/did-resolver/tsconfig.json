@@ -4,6 +4,7 @@
     "module": "commonjs",
     "declaration": true,
     "typeRoots": ["../../node_modules/@types", "../../types"],
+    "outDir": "dist",
     "esModuleInterop": true,
     "sourceMap": true,
     "experimentalDecorators": true,
@@ -16,4 +17,12 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true
   },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "index.ts",
+    "node-tests"
+  ]
 }
