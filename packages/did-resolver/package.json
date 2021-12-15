@@ -2,7 +2,8 @@
   "name": "@cardstack/did-resolver",
   "version": "0.27.44",
   "description": "A javascript resolver for the cardstack DID method",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "author": "Cardstack Team",
   "license": "MIT",
   "private": false,
@@ -25,14 +26,19 @@
     "chai": "^4.3.4",
     "fast-check": "^1.26.0",
     "mocha": "^8.3.2",
-    "ts-node": "^10.3.0"
+    "ts-node": "^10.3.0",
+    "typescript": "4.2.3"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
-    "node": ">= 12"
+    "node": "^14.0.0"
   },
   "scripts": {
     "test": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.ts' --timeout 60000",
-    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000"
+    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000",
+    "prepack": "tsc"
   },
   "volta": {
     "extends": "../../package.json"
