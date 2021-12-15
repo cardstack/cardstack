@@ -1,4 +1,12 @@
 {
+// Hassan's testing mnemonic for address 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13
+// "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+// Hassan's testing mnemonic for address 0xb21851B00bd13C008f703A21DFDd292b28A736b3
+// "vicious kiwi join thing voice spice library piano panel weird sense extra"
+// Hassan's testing mnemonic for address 0x5ae158659942D346bd788b17B2307972DAEb6dDd
+// "ribbon nerve ordinary they relief device flame resemble faculty car alarm caught"
+// Justin's testing mnemonic for address 0x159ADe032073d930E85f95AbBAB9995110c43C71
+// "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay",
   "cardCli": {
     "mnemonic": "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream",
     "network": {
