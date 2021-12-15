@@ -50,9 +50,11 @@ export default class StatusRoute {
       data: {
         type: 'status',
         attributes: {
-          status,
-          subgraphBlockNumber,
-          rpcBlockNumber,
+          subgraph: {
+            status,
+            subgraphBlockNumber,
+            rpcBlockNumber,
+          },
         },
       },
     };

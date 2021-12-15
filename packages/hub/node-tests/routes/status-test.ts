@@ -82,9 +82,11 @@ describe('GET /api/status', function () {
         data: {
           type: 'status',
           attributes: {
-            rpcBlockNumber: 19492430,
-            status: 'operational',
-            subgraphBlockNumber: 19492428,
+            subgraph: {
+              rpcBlockNumber: 19492430,
+              status: 'operational',
+              subgraphBlockNumber: 19492428,
+            },
           },
         },
       })
@@ -103,9 +105,11 @@ describe('GET /api/status', function () {
         data: {
           type: 'status',
           attributes: {
-            rpcBlockNumber: 19492430,
-            status: 'degraded',
-            subgraphBlockNumber: 19492419,
+            subgraph: {
+              rpcBlockNumber: 19492430,
+              status: 'degraded',
+              subgraphBlockNumber: 19492419,
+            },
           },
         },
       })
@@ -124,9 +128,11 @@ describe('GET /api/status', function () {
         data: {
           type: 'status',
           attributes: {
-            rpcBlockNumber: 19492430,
-            status: 'degraded',
-            subgraphBlockNumber: null,
+            subgraph: {
+              rpcBlockNumber: 19492430,
+              status: 'degraded',
+              subgraphBlockNumber: null,
+            },
           },
         },
       })
@@ -153,9 +159,11 @@ describe('GET /api/status', function () {
         data: {
           type: 'status',
           attributes: {
-            rpcBlockNumber: null,
-            status: 'degraded',
-            subgraphBlockNumber: 19492428,
+            subgraph: {
+              rpcBlockNumber: null,
+              status: 'degraded',
+              subgraphBlockNumber: 19492428,
+            },
           },
         },
       })
