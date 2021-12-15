@@ -1,9 +1,3 @@
-// Hassan's testing mnemonic for address 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13
-// "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
-// Hassan's testing mnemonic for address 0xb21851B00bd13C008f703A21DFDd292b28A736b3
-// "vicious kiwi join thing voice spice library piano panel weird sense extra"
-// Hassan's testing mnemonic for address 0x5ae158659942D346bd788b17B2307972DAEb6dDd
-// "ribbon nerve ordinary they relief device flame resemble faculty car alarm caught"
 
 {
   // Use IntelliSense to learn about possible Node.js debug attributes.
@@ -82,121 +76,127 @@
         "https://hub-staging.stack.cards",
         // "http://localhost:3000",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Bridge to Layer 1",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "bridge-to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
         "10",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Bridge to Layer 2",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         // Kovan CARD Bridge args
+        // "index.ts",
         // "bridge",
         // "10000",
-        // "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
-        // "--network", "kovan",
-        // // Hassan's testing mnemonic feel free to use your own
-        // "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        // "${config:cardCli.network.l1.cardToken}",
+        // "--network", "${config:cardCli.network.l1.name}",
+        // "--mnemonic", "${config:cardCli.mnemonic}"
 
         // Kovan DAI Bridge args
+        "index.ts",
         "bridge-to-l2",
         "200",
-        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
+        "${config:cardCli.network.l1.daiToken}", // Kovan DAI 
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
         "--network",
-        "kovan",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l1.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Wait for Bridge to Layer 2",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "await-bridged-to-l2",
         "21746764", // from block
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Wait for Bridge Validators",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "await-bridged-to-l1",
         "22144982", // from block
         "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Get Withdrawal Limits",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "withdrawal-limits",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Claim Layer 1 Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "claim-tokens-bridged-to-l1",
         "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
         // encodedData
@@ -204,10 +204,9 @@
         // signatures (add each signature as a separate command line arg)
         "0x6cf76b8f7abc547f6fe6e4eff5cfbc82d9ee90e399a29de5f861c9b46b108a8f3b2da2c4736617d15a424e4ee02c6d5274f94c3c29a170ce6a9a42bcd90482511b",
         "--network",
-        "kovan",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l1.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
@@ -222,77 +221,81 @@
         "index.ts",
         "safes-view",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: View Safe",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "safe-view",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
-        // Hassan's testing mnemonic feel free to use your own
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Transfer Tokens from Safe",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "safe-transfer-tokens",
         "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
         "500", // amount (in ether units)
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Gas Estimate for Transfer Tokens from Safe",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "safe-transfer-tokens-gas-estimate",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
         "5", // amount (in ether units)
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Create Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaidcard-create",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
@@ -300,673 +303,725 @@
         "false",
         "100",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Bulk Split Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "split",
         "0xE1C3D39e2377F20325f0Fdf40b835c768E257C66", // prepaid card address
         "2000", // face value
         "21", // quantity
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Split Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaidcard-split",
         "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5", // prepaid card address
         "", // customization DID
         "100", // face values
         "100", // face values
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Transfer Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaidcard-transfer",
         "0xEB10912969E24EB119d4463dA12ae7967dd1FcC7", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Provision Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaidcard-provision",
         "0xc8b04fee58da85eab44879150cd06aafedbfa70705c9f7c1eb517aaad8f786ae", // sku
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient
         "staging", // environment
         "", // secret
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Register New Merchant",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "register-merchant",
         "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
         "",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Payment Limits",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "payment-limits",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Pay Merchant",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0x70fdd952d8b4DC0E3E91d2e7392bdb600d637b40", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: SKU Info",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "sku-info",
         "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Prepaid Card Inventory",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaid-card-inventory",
         "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Prepaid Card Inventories",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "prepaid-card-inventories",
         "staging", // environment
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Add Prepaid Card Inventory",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "add-prepaid-card-inventory",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
         "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid cards to remove
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Remove Prepaid Card Inventory",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "remove-prepaid-card-inventory",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
         "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid cards to remove
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Set Prepaid Card Ask",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "set-prepaid-card-ask",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
         "0x9df6e66eaa9809a86c87711637f857050ed2fbb7b79bb1a38560f383c3df4358", // sku
         "20",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: View Merchant Revenue",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "revenue-balances",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Claim Merchant Revenue",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "claim-revenue",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "1",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Claim Merchant Revenue Gas Estimate",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "claim-revenue-gas-estimate",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "1",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Price for face value",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "price-for-face-value",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "10000",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: New prepaid card gas fee",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "new-prepaidcard-gas-fee",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: USD Price",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "usd-price",
         "DAI",
         "5",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: ETH Price",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "eth-price",
         "DAI",
         "100",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Oracle Update Time",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "price-oracle-updated-at",
         "DAI",
         "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: View Reward Balances",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         // "--rewardProgramId",
         // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Register Reward Program",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "register-reward-program",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
         "0x159ADe032073d930E85f95AbBAB9995110c43C71",  //reward program
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Register Rewardee",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "register-rewardee",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e",
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Add Reward Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "add-reward-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", //single owner safe
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
-        "5.5",
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //address
+        "10",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Get Reward Pool Balance",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "reward-pool-balance",
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program id
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program id
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         // "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Claim Rewards",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "claim-rewards",
-        "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
-        "0x00000000000000000000000065db507b9d24f12926d08c1e8bceaa0790b6277e00000000000000000000000000000000000000000000000000000000000000320000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000000de0b6b3a7640000",
-        "0xa9f1f1201be983f72ffa81c696aa0fa1826b2c2b554ca8624c10a77a609bae06",
+        "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
+        "0x0000000000000000000000005e4e148baae93424b969a0ea67ff54c315248bba00000000000000000000000000000000000000000000000000000000000000d00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+        "0x554badb5d8f79c28610854156701ee15e624c2fec46aeca5adf4c07c54eeee27",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Get Claimable Reward Proofs",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "cwd": "${workspaceRoot}/packages/cardpay-cli",
       "env": {},
       "args": [
+        "index.ts",
         "claimable-reward-proofs",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
-        "--rewardProgramId",
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        // "--rewardProgramId",
+        // "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "--tokenAddress",
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Lock Reward Program",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "lock-reward-program",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Check if Reward Program Locked",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "is-reward-program-locked",
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Update Reward Program Admin",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "update-reward-program-admin",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Get Reward Program Admin",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "reward-program-admin",
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", //reward program
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Withdraw From Reward Safe",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "withdraw-reward-safe",
         "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         "1", // amount (in ether units)
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Add Reward Rule",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "add-reward-rule",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
         "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
         "0xefe53af1", //blob
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Get Reward Rule",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "reward-rule",
         "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Transfer Reward Safe",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "transfer-reward-safe",
         "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0",
         "0x853fD3376b6f0b2b839Bd841FbdC6C1f93B3BFBD",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Recover Reward Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
+        "index.ts",
         "recover-reward-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", // safe address (justin's depot)
-        "0x65dB507b9d24f12926d08C1E8BCeaA0790B6277e", // reward program id
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", // reward program id
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         "--amount",
         "1",
         "--network",
-        "sokol",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
-        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "${config:cardCli.mnemonic}"
       ]
     },
   ]
