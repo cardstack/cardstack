@@ -1,4 +1,19 @@
 {
+  "cardCli": {
+    "mnemonic": "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream",
+    "network": {
+      "l1": {
+        "name": "kovan",
+        "cardToken": "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
+        "daiToken": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa"
+      },
+      "l2": {
+        "name": "sokol",
+        "cardToken": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "daiToken": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1"
+      }
+    }
+  },
   "eslint.validate": ["javascript", "typescript", "json"],
   "eslint.lintTask.enable": true,
   "[javascript]": {
