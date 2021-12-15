@@ -86,13 +86,15 @@
       "request": "launch",
       "name": "Cardpay testnet: Bridge to Layer 1",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "bridge-to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
         "10",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -105,20 +107,23 @@
       "request": "launch",
       "name": "Cardpay testnet: Bridge to Layer 2",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         // Kovan CARD Bridge args
+        // "index.ts",
         // "bridge",
         // "10000",
-        // "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
+        // "${config:cardCli.network.l1.cardToken}",
         // "--network", "${config:cardCli.network.l1.name}",
         // "--mnemonic", "${config:cardCli.mnemonic}"
 
         // Kovan DAI Bridge args
+        "index.ts",
         "bridge-to-l2",
         "200",
-        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
+        "${config:cardCli.network.l1.daiToken}", // Kovan DAI 
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
         "--network",
         "${config:cardCli.network.l1.name}",
@@ -131,9 +136,11 @@
       "request": "launch",
       "name": "Cardpay testnet: Wait for Bridge to Layer 2",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "await-bridged-to-l2",
         "21746764", // from block
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
@@ -148,9 +155,11 @@
       "request": "launch",
       "name": "Cardpay testnet: Wait for Bridge Validators",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "await-bridged-to-l1",
         "22144982", // from block
         "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
@@ -165,9 +174,11 @@
       "request": "launch",
       "name": "Cardpay testnet: Get Withdrawal Limits",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "withdrawal-limits",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "--network",
@@ -181,9 +192,11 @@
       "request": "launch",
       "name": "Cardpay testnet: Claim Layer 1 Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "index.ts",
         "claim-tokens-bridged-to-l1",
         "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
         // encodedData
