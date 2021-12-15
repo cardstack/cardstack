@@ -264,3 +264,8 @@ export function getNextNonceFromEstimate(estimate: Estimate | SendPayload): BN {
 function isEventMatch(log: Log, topic: string, address: string) {
   return log.topics[0] === topic && log.address === address;
 }
+
+export function gasInToken(estimate: Estimate): BN {
+  let gasUnits = new BN(String(estimate.baseGas)).add(new BN(String(estimate.safeTxGas)));
+  return gasUnits.mul(new BN(String(estimate.gasPrice)));
+}
