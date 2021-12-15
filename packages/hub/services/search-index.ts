@@ -43,7 +43,8 @@ export class SearchIndex {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
       if (result.compileErrors) {
-        throw new Error(`found a broken card`);
+        const err = Object.assign(new Error(result.compileErrors.why), { status: result.compileErrors.status });
+        throw err;
       }
       return deserializer.deserialize(result.data.data, result.data);
     } finally {
@@ -163,7 +164,7 @@ class IndexerRun implements IndexerHandle {
       ancestors: param(null),
       data: param(null),
       searchData: param(null),
-      compileErrors: param({ why: String(err) }),
+      compileErrors: param({ why: String(err), status: err.status }),
     });
     await this.db.query(expressionToSql(expression));
   }

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
-  describe.skip('SearchIndex', function () {
+  describe('SearchIndex', function () {
     let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
