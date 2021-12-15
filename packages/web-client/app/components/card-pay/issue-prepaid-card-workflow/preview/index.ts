@@ -4,12 +4,14 @@ import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { IWorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
+  didCancel,
   task,
   TaskGenerator,
   rawTimeout,
   waitForProperty,
   race,
 } from 'ember-concurrency';
+import * as Sentry from '@sentry/browser';
 import CardCustomization, {
   PrepaidCardCustomization,
 } from '@cardstack/web-client/services/card-customization';
@@ -50,7 +52,13 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   @action issuePrepaidCard() {
     taskFor(this.issueTask)
       .perform()
-      .catch((e) => console.error(e));
+      .catch((e) => {
+        if (!didCancel(e)) {
+          console.error('Failed to complete prepaid card issuance');
+          console.error(e);
+          Sentry.captureException(e);
+        }
+      });
   }
 
   @action cancel() {
