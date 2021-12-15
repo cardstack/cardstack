@@ -2,6 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
+import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 const DEGRADED_THRESHOLD = 10;
 
@@ -40,13 +41,34 @@ export default class StatusRoute {
     }
 
     let status = 'degraded';
+    let errors = [];
 
     if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
       status = 'operational';
+    } else if (!rpcBlockNumber) {
+      errors.push({
+        id: 'subgraph',
+        source: {
+          service: 'web3-http',
+        },
+      });
+    } else if (!subgraphBlockNumber) {
+      errors.push({
+        id: 'subgraph',
+        source: {
+          service: 'subgraph',
+        },
+      });
+    } else {
+      errors.push({
+        id: 'subgraph',
+        source: {
+          pointer: '/data/attributes/subgraph/subgraphBlockNumber',
+        },
+      });
     }
 
-    ctx.status = 200;
-    ctx.body = {
+    let body: JSONAPIDocument = {
       data: {
         type: 'status',
         attributes: {
@@ -58,6 +80,13 @@ export default class StatusRoute {
         },
       },
     };
+
+    if (errors.length > 0) {
+      body.errors = errors;
+    }
+
+    ctx.status = 200;
+    ctx.body = body;
     ctx.type = 'application/vnd.api+json';
   }
 }

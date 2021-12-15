@@ -112,6 +112,14 @@ describe('GET /api/status', function () {
             },
           },
         },
+        errors: [
+          {
+            id: 'subgraph',
+            source: {
+              pointer: '/data/attributes/subgraph/subgraphBlockNumber',
+            },
+          },
+        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -135,6 +143,14 @@ describe('GET /api/status', function () {
             },
           },
         },
+        errors: [
+          {
+            id: 'subgraph',
+            source: {
+              service: 'subgraph',
+            },
+          },
+        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -166,6 +182,14 @@ describe('GET /api/status', function () {
             },
           },
         },
+        errors: [
+          {
+            id: 'subgraph',
+            source: {
+              service: 'web3-http',
+            },
+          },
+        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
