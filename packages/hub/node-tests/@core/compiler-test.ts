@@ -230,7 +230,7 @@ if (process.env.COMPILER) {
     it(`gives a good error when a card can't compile because adoptsFrom does not exist`, async function () {
       let rawCard: RawCard = { realm, id: 'post', adoptsFrom: '../post' };
       try {
-        await builder.compileCardFromRaw(rawCard);
+        await builder.compileCardFromRaw(rawCard).compile();
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
         expect(err.message).to.eq(`tried to adopt from card ${realm}post but it failed to load`);
@@ -256,7 +256,7 @@ if (process.env.COMPILER) {
         },
       };
       try {
-        await builder.compileCardFromRaw(rawCard);
+        await builder.compileCardFromRaw(rawCard).compile();
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
         expect(err.message).to.eq(`tried to lookup field 'author' but it failed to load`);

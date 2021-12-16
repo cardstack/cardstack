@@ -728,7 +728,8 @@ CREATE TABLE public.cards (
     "searchData" jsonb,
     realm text NOT NULL,
     generation integer,
-    "compileErrors" jsonb
+    "compileErrors" jsonb,
+    deps text[]
 );
 
 
@@ -1481,7 +1482,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 19	20211206195559187_card-index-generations	2021-12-15 16:26:59.71672
 20	20211207151150639_sent-push-notifications	2021-12-15 16:26:59.71672
 21	20211207190527999_create-latest-event-block	2021-12-15 16:26:59.71672
-22	20211214163123421_card-index-errors	2021-12-15 16:26:59.71672
+23	20211214163123421_card-index-errors	2021-12-16 17:33:59.571247
 \.
 
 
@@ -1489,7 +1490,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 22, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 23, true);
 
 
 --

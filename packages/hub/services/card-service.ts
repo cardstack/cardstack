@@ -56,9 +56,10 @@ export class CardService {
   }
 
   async create(raw: RawCard<Unsaved>): Promise<Card> {
-    let compiledCard = await this.builder.compileCardFromRaw(raw);
+    let compiler = this.builder.compileCardFromRaw(raw);
+    let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
-    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard);
+    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
     return { data: rawCard.data, compiled };
   }
 

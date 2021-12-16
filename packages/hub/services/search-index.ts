@@ -1,4 +1,4 @@
-import { makeGloballyAddressable } from '@cardstack/core/src/compiler';
+import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { cardURL } from '@cardstack/core/src/utils';
@@ -51,9 +51,13 @@ export class SearchIndex {
     }
   }
 
-  async indexCard(raw: RawCard, compiled: CompiledCard<Unsaved, ModuleRef>): Promise<CompiledCard> {
+  async indexCard(
+    raw: RawCard,
+    compiled: CompiledCard<Unsaved, ModuleRef>,
+    compiler: Compiler<Unsaved>
+  ): Promise<CompiledCard> {
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSave(raw, compiled);
+      return await ops.internalSave(raw, compiled, compiler);
     });
   }
 
@@ -105,20 +109,25 @@ class IndexerRun implements IndexerHandle {
 
   // available to each realm's indexer
   async save(card: RawCard): Promise<void> {
+    let compiler = await this.builder.compileCardFromRaw(card);
     try {
-      let compiledCard = await this.builder.compileCardFromRaw(card);
-      await this.internalSave(card, compiledCard);
+      let compiledCard = await compiler.compile();
+      await this.internalSave(card, compiledCard, compiler);
     } catch (err: any) {
-      await this.saveErrorState(card, err);
+      await this.saveErrorState(card, err, compiler);
     }
   }
 
   // used directly by the hub when mutating cards
-  async internalSave(rawCard: RawCard, compiledCard: CompiledCard<Unsaved, ModuleRef>): Promise<CompiledCard> {
+  async internalSave(
+    rawCard: RawCard,
+    compiledCard: CompiledCard<Unsaved, ModuleRef>,
+    compiler: Compiler<Unsaved>
+  ): Promise<CompiledCard> {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src) =>
       this.define(cardURL(rawCard), local, type, src)
     );
-    return await this.writeToIndex(rawCard, definedCard);
+    return await this.writeToIndex(rawCard, definedCard, compiler);
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string): string {
@@ -141,7 +150,11 @@ class IndexerRun implements IndexerHandle {
     return out!.code!;
   }
 
-  private async writeToIndex(card: RawCard, compiledCard: CompiledCard): Promise<CompiledCard> {
+  private async writeToIndex(
+    card: RawCard,
+    compiledCard: CompiledCard,
+    compiler: Compiler<Unsaved>
+  ): Promise<CompiledCard> {
     let expression = upsert('cards', 'cards_pkey', {
       url: param(cardURL(card)),
       realm: param(this.realmURL),
@@ -150,12 +163,13 @@ class IndexerRun implements IndexerHandle {
       data: param(serializeRawCard(card, compiledCard)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
       compileErrors: param(null),
+      deps: param(compiler.dependencies),
     });
     await this.db.query(expressionToSql(expression));
     return compiledCard;
   }
 
-  private async saveErrorState(card: RawCard, err: any): Promise<void> {
+  private async saveErrorState(card: RawCard, err: any, compiler: Compiler): Promise<void> {
     let expression = upsert('cards', 'cards_pkey', {
       url: param(cardURL(card)),
       realm: param(this.realmURL),
@@ -164,6 +178,7 @@ class IndexerRun implements IndexerHandle {
       data: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),
+      deps: param(compiler.dependencies),
     });
     await this.db.query(expressionToSql(expression));
   }

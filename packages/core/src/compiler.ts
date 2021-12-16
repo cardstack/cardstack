@@ -41,17 +41,23 @@ function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined
   return paths.filter(Boolean);
 }
 
-export class Compiler {
-  builder: Builder;
-  compiledBaseCard?: CompiledCard;
+export class Compiler<Identity extends Saved | Unsaved = Saved> {
+  private builder: Builder;
+  private cardSource: RawCard<Identity>;
 
-  constructor(params: { builder: Builder }) {
+  constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = params.builder;
+    this.cardSource = params.cardSource;
   }
 
-  async compile<Identity extends Unsaved>(cardSource: RawCard<Identity>): Promise<CompiledCard<Identity, ModuleRef>> {
+  get dependencies(): string[] {
+    return [];
+  }
+
+  async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let options = {};
     let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
+    let { cardSource } = this;
     let schemaModule: ModuleRef | undefined = await this.prepareSchema(cardSource, options, modules);
     let meta = getMeta(options);
 

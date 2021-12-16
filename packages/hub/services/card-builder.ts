@@ -25,10 +25,6 @@ export default class CardBuilder implements BuilderInterface {
 
   logger = logger;
 
-  private compiler = new Compiler({
-    builder: this,
-  });
-
   async getRawCard(url: string): Promise<RawCard> {
     return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
   }
@@ -38,11 +34,12 @@ export default class CardBuilder implements BuilderInterface {
     if (cached) {
       return cached;
     }
-    let rawCard = await this.getRawCard(url);
+    let cardSource = await this.getRawCard(url);
     let compiledCard: CompiledCard<Saved, ModuleRef> | undefined;
     let err: unknown;
     try {
-      compiledCard = await this.compiler.compile(rawCard);
+      let compiler = new Compiler({ builder: this, cardSource });
+      compiledCard = await compiler.compile();
     } catch (e) {
       err = e;
     }
@@ -78,10 +75,8 @@ export default class CardBuilder implements BuilderInterface {
     return out!.code!;
   }
 
-  async compileCardFromRaw<Identity extends Unsaved>(
-    rawCard: RawCard<Identity>
-  ): Promise<CompiledCard<Identity, ModuleRef>> {
-    return await this.compiler.compile(rawCard);
+  compileCardFromRaw<Identity extends Saved | Unsaved>(cardSource: RawCard<Identity>): Compiler<Identity> {
+    return new Compiler({ builder: this, cardSource });
   }
 }
 
