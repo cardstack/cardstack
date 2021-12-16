@@ -81,9 +81,9 @@ module(
 
       assert
         .dom('[data-test-safe-address]')
-        .containsText('Merchant address')
+        .containsText('Business address')
         .containsText(merchantAddress);
-      assert.dom('[data-test-balance-label]').containsText('Merchant balance');
+      assert.dom('[data-test-balance-label]').containsText('Business balance');
       assert
         .dom('[data-test-balance="DAI.CPXD"]')
         .containsText('125.00 DAI.CPXD');
