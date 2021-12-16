@@ -1,4 +1,4 @@
-import type { RawCard, Builder, NewRawCard, CardId } from '@cardstack/core/src/interfaces';
+import type { RawCard, Builder, Unsaved, CardId } from '@cardstack/core/src/interfaces';
 import type RealmManager from './services/realm-manager';
 import { IndexerHandle } from './services/search-index';
 
@@ -21,7 +21,7 @@ export interface CardstackContext {
 export interface RealmInterface<Meta = unknown> {
   url: string;
   read(cardId: CardId): Promise<RawCard>;
-  create(raw: NewRawCard): Promise<RawCard>;
+  create(raw: RawCard<Unsaved>): Promise<RawCard>;
   update(raw: RawCard): Promise<RawCard>;
   delete(cardId: CardId): Promise<void>;
   reindex(ops: IndexerHandle, meta: Meta | undefined): Promise<Meta>;

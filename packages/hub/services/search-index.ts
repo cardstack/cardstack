@@ -1,5 +1,5 @@
 import { makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CompiledCard, ModuleRef, RawCard, Saved, Unsaved } from '@cardstack/core/src/interfaces';
+import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -51,7 +51,7 @@ export class SearchIndex {
     }
   }
 
-  async indexCard(raw: RawCard, compiled: CompiledCard<Saved | Unsaved, ModuleRef>): Promise<CompiledCard> {
+  async indexCard(raw: RawCard, compiled: CompiledCard<Unsaved, ModuleRef>): Promise<CompiledCard> {
     return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.internalSave(raw, compiled);
     });
@@ -114,7 +114,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   // used directly by the hub when mutating cards
-  async internalSave(rawCard: RawCard, compiledCard: CompiledCard<Saved | Unsaved, ModuleRef>): Promise<CompiledCard> {
+  async internalSave(rawCard: RawCard, compiledCard: CompiledCard<Unsaved, ModuleRef>): Promise<CompiledCard> {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src) =>
       this.define(cardURL(rawCard), local, type, src)
     );

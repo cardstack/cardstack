@@ -3,7 +3,7 @@ import { sep, join } from 'path';
 import sane from 'sane';
 import walkSync from 'walk-sync';
 
-import { assertValidRawCard, CardId, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { assertValidRawCard, CardId, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 import { cardURL, ensureTrailingSlash } from '@cardstack/core/src/utils';
 
@@ -117,7 +117,7 @@ export default class FSRealm implements RealmInterface {
     return doc;
   }
 
-  private ensureCardId(raw: NewRawCard): CardId {
+  private ensureCardId(raw: RawCard<Unsaved>): CardId {
     if (raw.id) {
       return { id: raw.id, realm: this.url };
     } else {
@@ -125,7 +125,7 @@ export default class FSRealm implements RealmInterface {
     }
   }
 
-  async create(raw: NewRawCard): Promise<RawCard> {
+  async create(raw: RawCard<Unsaved>): Promise<RawCard> {
     let cardId = this.ensureCardId(raw);
     let cardDir = this.buildCardPath(cardId);
 
@@ -138,7 +138,7 @@ export default class FSRealm implements RealmInterface {
       throw new Conflict(`card ${cardURL(cardId)} already exists`);
     }
     let completeRawCard: RawCard;
-    if ('id' in raw) {
+    if (raw.id) {
       completeRawCard = raw as RawCard;
     } else {
       completeRawCard = Object.assign({}, raw, { ...cardId });

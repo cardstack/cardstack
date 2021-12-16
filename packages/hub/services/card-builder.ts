@@ -5,7 +5,6 @@ import {
   Saved,
   ModuleRef,
   Unsaved,
-  NewRawCard,
 } from '@cardstack/core/src/interfaces';
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 
@@ -79,9 +78,9 @@ export default class CardBuilder implements BuilderInterface {
     return out!.code!;
   }
 
-  async compileCardFromRaw(rawCard: NewRawCard): Promise<CompiledCard<Unsaved, ModuleRef>>;
-  async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard<Saved, ModuleRef>>;
-  async compileCardFromRaw(rawCard: NewRawCard | RawCard): Promise<CompiledCard<Unsaved | Saved, ModuleRef>> {
+  async compileCardFromRaw<Identity extends Unsaved>(
+    rawCard: RawCard<Identity>
+  ): Promise<CompiledCard<Identity, ModuleRef>> {
     return await this.compiler.compile(rawCard);
   }
 }

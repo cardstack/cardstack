@@ -1,6 +1,6 @@
 import FSRealm from '../realms/fs-realm';
 import { NotFound } from '@cardstack/core/src/utils/errors';
-import { CardId, NewRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
+import { CardId, RawCard, RealmConfig, Unsaved } from '@cardstack/core/src/interfaces';
 import { ensureTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
 import { getOwner, inject, injectionReady } from '@cardstack/di';
@@ -63,7 +63,7 @@ export default class RealmManager {
     throw new NotFound(`${targetRealm} is not a realm we know about`);
   }
 
-  async create(card: NewRawCard): Promise<RawCard> {
+  async create(card: RawCard<Unsaved>): Promise<RawCard> {
     return this.findRealm(card.realm).create(card);
   }
 

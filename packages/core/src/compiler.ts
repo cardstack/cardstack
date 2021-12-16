@@ -23,7 +23,6 @@ import {
   GlobalRef,
   LocalRef,
   ModuleRef,
-  NewRawCard,
   RawCard,
   Saved,
   Unsaved,
@@ -34,7 +33,7 @@ import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
-function getNonAssetFilePaths(sourceCard: NewRawCard): (string | undefined)[] {
+function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined)[] {
   let paths: string[] = [];
   for (const feature of FEATURE_NAMES) {
     paths.push(sourceCard[feature]);
@@ -50,9 +49,7 @@ export class Compiler {
     this.builder = params.builder;
   }
 
-  async compile(cardSource: RawCard): Promise<CompiledCard<Saved, ModuleRef>>;
-  async compile(cardSource: NewRawCard): Promise<CompiledCard<Unsaved, ModuleRef>>;
-  async compile(cardSource: NewRawCard | RawCard): Promise<CompiledCard<Saved | Unsaved, ModuleRef>> {
+  async compile<Identity extends Unsaved>(cardSource: RawCard<Identity>): Promise<CompiledCard<Identity, ModuleRef>> {
     let options = {};
     let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let schemaModule: ModuleRef | undefined = await this.prepareSchema(cardSource, options, modules);
@@ -101,7 +98,7 @@ export class Compiler {
 
     return {
       realm: cardSource.realm,
-      url: cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined,
+      url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
       serializer,
       schemaModule,
       fields,
@@ -111,7 +108,7 @@ export class Compiler {
     };
   }
 
-  private defineAssets(sourceCard: NewRawCard | RawCard, modules: CompiledCard['modules']) {
+  private defineAssets(sourceCard: RawCard<Unsaved> | RawCard, modules: CompiledCard['modules']) {
     if (!sourceCard.files) {
       return;
     }
@@ -131,7 +128,7 @@ export class Compiler {
     }
   }
 
-  private getCardParentPath(cardSource: NewRawCard, meta: PluginMeta): string | undefined {
+  private getCardParentPath(cardSource: RawCard<Unsaved>, meta: PluginMeta): string | undefined {
     let parentPath;
     let { adoptsFrom, realm, id } = cardSource;
 
@@ -152,7 +149,7 @@ export class Compiler {
     return parentPath;
   }
 
-  private async getParentCard(cardSource: NewRawCard, meta: PluginMeta): Promise<CompiledCard> {
+  private async getParentCard(cardSource: RawCard<Unsaved>, meta: PluginMeta): Promise<CompiledCard> {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
     let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
     try {
@@ -167,7 +164,7 @@ export class Compiler {
     }
   }
 
-  private getFile(cardSource: NewRawCard, path: string): string {
+  private getFile(cardSource: RawCard<Unsaved>, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
       throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`);
@@ -179,7 +176,7 @@ export class Compiler {
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
   private async prepareSchema(
-    cardSource: NewRawCard,
+    cardSource: RawCard<Unsaved>,
     options: any,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<LocalRef | undefined> {
@@ -250,7 +247,7 @@ export class Compiler {
   }
 
   private async prepareComponents(
-    cardSource: NewRawCard,
+    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
@@ -263,7 +260,7 @@ export class Compiler {
   }
 
   private async prepareComponent(
-    cardSource: NewRawCard,
+    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
     which: Format,
@@ -376,7 +373,7 @@ function hashFilenameFromFields(localFile: string, fields: CompiledCard['fields'
   return `${basename}-${hash}${extension}`;
 }
 
-function isBaseCard(cardSource: NewRawCard): boolean {
+function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
   return cardSource.id === 'base' && cardSource.realm === 'https://cardstack.com/base/';
 }
 
@@ -402,7 +399,7 @@ export function resolveCard(url: string, realm: string): string {
 
 export function makeGloballyAddressable(
   url: string,
-  card: CompiledCard<Saved | Unsaved, ModuleRef>,
+  card: CompiledCard<Unsaved, ModuleRef>,
   define: (localPath: string, type: string, source: string) => string
 ): CompiledCard<Saved, GlobalRef> {
   let localToGlobal = new Map<string, string>();

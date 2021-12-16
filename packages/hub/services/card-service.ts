@@ -1,4 +1,4 @@
-import { CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -55,7 +55,7 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
-  async create(raw: NewRawCard): Promise<Card> {
+  async create(raw: RawCard<Unsaved>): Promise<Card> {
     let compiledCard = await this.builder.compileCardFromRaw(raw);
     let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard);
