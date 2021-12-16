@@ -106,21 +106,13 @@ describe('GET /api/status', function () {
           type: 'status',
           attributes: {
             subgraph: {
+              details: 'Experiencing slow service',
               rpcBlockNumber: 19492430,
               status: 'degraded',
               subgraphBlockNumber: 19492419,
             },
           },
         },
-        errors: [
-          {
-            id: 'subgraph',
-            title: 'Experiencing slow service',
-            source: {
-              pointer: '/data/attributes/subgraph/subgraphBlockNumber',
-            },
-          },
-        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -138,21 +130,13 @@ describe('GET /api/status', function () {
           type: 'status',
           attributes: {
             subgraph: {
+              details: 'Error checking status',
               rpcBlockNumber: 19492430,
-              status: 'degraded',
+              status: 'unknown',
               subgraphBlockNumber: null,
             },
           },
         },
-        errors: [
-          {
-            id: 'subgraph',
-            title: 'Error checking status',
-            source: {
-              service: 'subgraph',
-            },
-          },
-        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -178,21 +162,13 @@ describe('GET /api/status', function () {
           type: 'status',
           attributes: {
             subgraph: {
+              details: 'Error checking status',
               rpcBlockNumber: null,
-              status: 'degraded',
+              status: 'unknown',
               subgraphBlockNumber: 19492428,
             },
           },
         },
-        errors: [
-          {
-            id: 'subgraph',
-            title: 'Error checking status',
-            source: {
-              service: 'web3-http',
-            },
-          },
-        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
 

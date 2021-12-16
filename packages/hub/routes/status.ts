@@ -40,35 +40,17 @@ export default class StatusRoute {
       });
     }
 
-    let status = 'degraded';
-    let errors = [];
+    let status;
+    let details;
 
     if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
       status = 'operational';
-    } else if (!rpcBlockNumber) {
-      errors.push({
-        id: 'subgraph',
-        title: 'Error checking status',
-        source: {
-          service: 'web3-http',
-        },
-      });
-    } else if (!subgraphBlockNumber) {
-      errors.push({
-        id: 'subgraph',
-        title: 'Error checking status',
-        source: {
-          service: 'subgraph',
-        },
-      });
+    } else if (!rpcBlockNumber || !subgraphBlockNumber) {
+      details = 'Error checking status';
+      status = 'unknown';
     } else {
-      errors.push({
-        id: 'subgraph',
-        title: 'Experiencing slow service',
-        source: {
-          pointer: '/data/attributes/subgraph/subgraphBlockNumber',
-        },
-      });
+      details = 'Experiencing slow service';
+      status = 'degraded';
     }
 
     let body: JSONAPIDocument = {
@@ -84,8 +66,8 @@ export default class StatusRoute {
       },
     };
 
-    if (errors.length > 0) {
-      body.errors = errors;
+    if (details) {
+      body.data.attributes.subgraph.details = details;
     }
 
     ctx.status = 200;
