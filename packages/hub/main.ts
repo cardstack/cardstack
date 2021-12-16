@@ -73,14 +73,13 @@ import Web3SocketService from './services/web3-socket';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog, botLog } from './utils/logger';
+import { serverLog, workerLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
 import ExchangeRatesService from './services/exchange-rates';
-import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
@@ -390,46 +389,4 @@ export async function bootWorker() {
   ).setupContractEventSubscriptions();
 
   await runner.promise;
-}
-
-export class HubBotController {
-  logger = botLog;
-  static logger = botLog;
-
-  static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
-    this.logger.info(`booting pid:${process.pid}`);
-    runInitializers();
-
-    let registry = createRegistry();
-    if (serverConfig?.registryCallback) {
-      serverConfig.registryCallback(registry);
-    }
-    let container = new Container(registry);
-    let bot: HubBot | undefined;
-
-    try {
-      bot = await container.instantiate(HubBot);
-      await bot.start();
-    } catch (e: any) {
-      this.logger.error(`Unexpected error ${e.message}`, e);
-      Sentry.withScope(function () {
-        Sentry.captureException(e);
-      });
-    }
-
-    if (!bot) {
-      throw new Error('Bot could not be created');
-    }
-    this.logger.info(`started (${bot.type}:${bot.botInstanceId})`);
-
-    return new this(bot, container);
-  }
-
-  private constructor(public bot: HubBot, public container: Container) {}
-
-  async teardown() {
-    this.logger.info('shutting down');
-    await this.bot.destroy();
-    await this.container.teardown();
-  }
 }

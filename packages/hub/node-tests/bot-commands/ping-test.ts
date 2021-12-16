@@ -1,6 +1,6 @@
-import { HubBotController } from '../../main';
 import { name as pingName, run as pingCommand } from '../../services/discord-bots/hub-bot/commands/guild/ping';
 import Bot, { MockUser, makeTestMessage, makeTestChannel } from '@cardstack/discord-bot';
+import { HubBotController } from '../../process-controllers/hub-bot-controller';
 
 describe('bot command: ping', function () {
   let botController: HubBotController;
