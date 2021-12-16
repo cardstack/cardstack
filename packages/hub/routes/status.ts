@@ -48,6 +48,7 @@ export default class StatusRoute {
     } else if (!rpcBlockNumber) {
       errors.push({
         id: 'subgraph',
+        title: 'Error checking status',
         source: {
           service: 'web3-http',
         },
@@ -55,6 +56,7 @@ export default class StatusRoute {
     } else if (!subgraphBlockNumber) {
       errors.push({
         id: 'subgraph',
+        title: 'Error checking status',
         source: {
           service: 'subgraph',
         },
@@ -62,6 +64,7 @@ export default class StatusRoute {
     } else {
       errors.push({
         id: 'subgraph',
+        title: 'Experiencing slow service',
         source: {
           pointer: '/data/attributes/subgraph/subgraphBlockNumber',
         },

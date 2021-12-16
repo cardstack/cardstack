@@ -115,6 +115,7 @@ describe('GET /api/status', function () {
         errors: [
           {
             id: 'subgraph',
+            title: 'Experiencing slow service',
             source: {
               pointer: '/data/attributes/subgraph/subgraphBlockNumber',
             },
@@ -146,6 +147,7 @@ describe('GET /api/status', function () {
         errors: [
           {
             id: 'subgraph',
+            title: 'Error checking status',
             source: {
               service: 'subgraph',
             },
@@ -185,6 +187,7 @@ describe('GET /api/status', function () {
         errors: [
           {
             id: 'subgraph',
+            title: 'Error checking status',
             source: {
               service: 'web3-http',
             },
