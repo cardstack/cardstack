@@ -3,20 +3,20 @@
     @label="Button Text"
     data-test-card-space-button-text-field
   >
-    <Boxel::CustomRadio
+    <Boxel::RadioInput
       @groupDescription="Select button text"
       @items={{this.options}}
+      @layout="grid"
       data-test-button-text-options
     as |option|>
       <option.component
         @name="deposit-token"
         @checked={{eq this.buttonTextValue option.data}}
         @onChange={{fn this.setButtonTextValue option.data}}
-        @fullWidth={{true}}
         data-test-button-text-option
       >
         {{option.data}}
       </option.component>
-    </Boxel::CustomRadio>
+    </Boxel::RadioInput>
   </CardPay::LabeledValue>
 </div>

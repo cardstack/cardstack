@@ -35,7 +35,7 @@
       {{#if @loadingCustomizations}}
         <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
-        <Boxel::CustomRadio
+        <Boxel::RadioInput
           @checkedId={{@colorScheme.id}}
           @groupDescription="Pick a background color for your card’s header"
           @items={{@colorSchemeOptions}}
@@ -48,7 +48,7 @@
             @value={{colorSchemeItem.data.id}}
             @checked={{colorSchemeItem.checked}}
             @onChange={{fn (optional @updateColorScheme) colorSchemeItem.data}}
-            @hiddenInput={{true}}
+            @hiddenCheckbox={{true}}
             @hiddenBorder={{true}}
             data-test-customization-background-selection-item={{colorSchemeItem.data.background}}
           >
@@ -57,14 +57,14 @@
               @swatchBackground={{colorSchemeItem.data.background}}
             />
           </colorSchemeItem.component>
-        </Boxel::CustomRadio>
+        </Boxel::RadioInput>
       {{/if}}
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @label="Theme">
       {{#if @loadingCustomizations}}
          <Boxel::LoadingIndicator data-test-customization-theme-loading/>
       {{else}}
-        <Boxel::CustomRadio
+        <Boxel::RadioInput
           @checkedId={{@pattern.id}}
           @groupDescription="Pick a theme for your card’s header"
           @items={{@patternOptions}}
@@ -77,7 +77,7 @@
             @value={{patternItem.data.id}}
             @checked={{patternItem.checked}}
             @onChange={{fn (optional @updatePattern) patternItem.data}}
-            @hiddenInput={{true}}
+            @hiddenCheckbox={{true}}
             @hiddenBorder={{true}}
             data-test-customization-pattern-selection-item={{or patternItem.data.patternUrl "blank"}}
           >
@@ -89,7 +89,7 @@
               @squeezed={{patternItem.checked}}
             />
           </patternItem.component>
-        </Boxel::CustomRadio>
+        </Boxel::RadioInput>
       {{/if}}
     </CardPay::LabeledValue>
   </CardPay::FieldStack>

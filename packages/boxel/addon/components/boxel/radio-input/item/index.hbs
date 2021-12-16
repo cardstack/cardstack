@@ -1,0 +1,29 @@
+{{!--
+anything that's used as a label does not have its semantics in a screenreader.
+that seems ok, since you probably shouldn't make a form work as document hierarchy.
+aria-labelledby seems friendlier to safari than the for element, but unsure about other browsers.
+--}}
+<label
+  class={{cn
+    "boxel-radio-option"
+    boxel-radio-option--checked=@checked
+    boxel-radio-option--disabled=@disabled
+    boxel-radio-option--hidden-border=@hiddenBorder
+    boxel-radio-option--has-checkbox=(not @hiddenCheckbox)
+  }}
+  ...attributes
+>
+  <Input
+    @type="radio"
+    @checked={{@checked}}
+    disabled={{@disabled}}
+    name={{@name}}
+    class={{cn
+      "boxel-radio-option__input"
+      boxel-radio-option__input--hidden-checkbox=@hiddenCheckbox
+      boxel-radio-option__input--checked=@checked
+    }}
+    {{on "change" (optional @onChange)}}
+  />
+  {{yield}}
+</label>

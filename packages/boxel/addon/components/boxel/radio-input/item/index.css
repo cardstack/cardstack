@@ -1,50 +1,41 @@
-.boxel-custom-radio-option {
+.boxel-radio-option {
   position: relative;
   display: block;
-  flex: var(--boxel-custom-radio-option-flex, 1 0 auto);
-  padding: var(--boxel-custom-radio-option-padding, var(--boxel-sp));
+  max-width: 100%;
+  padding: var(--boxel-radio-option-padding, var(--boxel-sp));
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
   transition: box-shadow var(--boxel-transition);
 }
 
-.boxel-custom-radio-option--compact {
-  --boxel-custom-radio-option-flex: 0;
-  --boxel-custom-radio-option-padding: var(--boxel-sp-xxxs);
-}
-
-.boxel-custom-radio-option--hidden-border {
+.boxel-radio-option--hidden-border {
   box-shadow: 0 0 0 1px transparent;
 }
 
-.boxel-custom-radio-option--fullwidth {
-  flex-basis: 100%;
-}
-
-.boxel-custom-radio-option--grid {
+.boxel-radio-option--has-checkbox {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: var(--boxel-sp-sm);
+  gap: var(--boxel-radio-option-gap, var(--boxel-sp-sm));
 }
 
-.boxel-custom-radio-option:hover:not(.boxel-custom-radio-option--disabled) {
+.boxel-radio-option:hover:not(.boxel-radio-option--disabled) {
   box-shadow: 0 0 0 1px var(--boxel-dark);
   cursor: pointer;
 }
 
-.boxel-custom-radio-option--checked:not(.boxel-custom-radio-option--disabled),
-.boxel-custom-radio-option:focus:not(.boxel-custom-radio-option--disabled),
-.boxel-custom-radio-option:focus-within:not(.boxel-custom-radio-option--disabled) {
+.boxel-radio-option--checked:not(.boxel-radio-option--disabled),
+.boxel-radio-option:focus:not(.boxel-radio-option--disabled),
+.boxel-radio-option:focus-within:not(.boxel-radio-option--disabled) {
   box-shadow: 0 0 0 2px var(--boxel-highlight);
   outline: 1px solid transparent;
 }
 
-.boxel-custom-radio-option--disabled > * {
+.boxel-radio-option--disabled {
   opacity: 0.5;
 }
 
-.boxel-custom-radio-option__input {
+.boxel-radio-option__input {
   appearance: none;
   -webkit-appearance: none;
   width: 1rem;
@@ -55,21 +46,21 @@
   background-color: transparent;
 }
 
-.boxel-custom-radio-option__input--checked {
+.boxel-radio-option__input--checked {
   background-color: var(--boxel-highlight);
   border-width: 3px;
 }
 
-.boxel-custom-radio-option__input:disabled {
+.boxel-radio-option__input:disabled {
   border-color: var(--boxel-purple-300);
 }
 
-.boxel-custom-radio-option__input:focus:not(:disabled) {
+.boxel-radio-option__input:focus:not(:disabled) {
   outline: 1px solid transparent;
 }
 
 /* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
-.boxel-custom-radio-option__input--hidden {
+.boxel-radio-option__input--hidden-checkbox {
   position: absolute;
   top: 0;
   left: 0;
@@ -79,6 +70,6 @@
 }
 
 /* default focus class - can be overwritten by providing @focusedClass */
-.boxel-custom-radio-option__focused-item {
+.boxel-radio-option__focused-item {
   outline: 1px solid var(--boxel-outline-color);
 }

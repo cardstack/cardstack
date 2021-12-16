@@ -1,0 +1,103 @@
+<Freestyle::Usage @name="RadioInput" @description="A radio button component with some accessibility considerations built in">
+  <:example>
+    <Boxel::RadioInput
+      @groupDescription={{this.groupDescription}}
+      @items={{this.items}}
+      @checkedId={{this.checkedId}}
+      @disabled={{this.disabled}}
+      @spacing={{this.spacing}}
+      @layout={{this.layout}}
+      @containerWidth={{this.containerWidth}}
+      @gridColumnWidth={{this.gridColumnWidth}}
+    as |item|>
+      <item.component
+        @name="example-radio-usage"
+        @checked={{item.checked}}
+        @disabled={{item.disabled}}
+        @onChange={{fn this.onChange item.data.id}}
+        @hiddenBorder={{this.hiddenBorder}}
+        @hiddenCheckbox={{this.hiddenInput}}
+      >
+        {{item.data.id}}
+      </item.component>
+    </Boxel::RadioInput>
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="groupDescription"
+      @description="Description for this group of radio buttons"
+      @value={{this.groupDescription}}
+      @onInput={{fn (mut this.groupDescription)}}
+      @optional={{true}}
+    />
+    <Args.Array
+      @name="items"
+      @description="Items which will be represented by radio buttons. Each should have a unique 'id' attribute."
+      @value={{this.items}}
+      @onInput={{fn (mut this.items)}}
+    />
+    <Args.String
+      @name="checkedId"
+      @description="The id of the currently checked/selected item."
+      @value={{this.checkedId}}
+      @onInput={{fn (mut this.checkedId)}}
+      @optional={{true}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @description="Whether selection is disabled."
+      @defaultValue="false"
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
+      @optional={{true}}
+    />
+    <Args.Bool
+      @name="hiddenInput"
+      @description="Visually hides the radio input."
+      @defaultValue="false"
+      @value={{this.hiddenInput}}
+      @onInput={{fn (mut this.hiddenInput)}}
+    />
+    <Args.Bool
+      @name="hiddenBorder"
+      @description="Visually hides the item border."
+      @defaultValue="false"
+      @value={{this.hiddenBorder}}
+      @onInput={{fn (mut this.hiddenBorder)}}
+    />
+    <Args.String
+      @name="spacing"
+      @description="Adjusts spacing level."
+      @defaultValue=""
+      @options={{array "default" "compact"}}
+      @onInput={{fn (mut this.spacing)}}
+      @value={{this.spacing}}
+    />
+    <Args.String
+      @name="layout"
+      @description="Layout of the radio buttons."
+      @defaultValue="flex"
+      @options={{array "default" "grid"}}
+      @onInput={{fn (mut this.layout)}}
+      @value={{this.layout}}
+    />
+    <Args.String
+      @name="gridColumnWidth"
+      @description="The `@layout` must be set to `grid`. Sets the minimum grid-column width. Items will expand to fill the available container width."
+      @defaultValue="100%"
+      @onInput={{fn (mut this.gridColumnWidth)}}
+      @value={{this.gridColumnWidth}}
+    />
+    <Args.String
+      @name="containerWidth"
+      @description="Width for the container. ie. `max-content`, `50%`, `400px`..."
+      @defaultValue="100%"
+      @onInput={{fn (mut this.containerWidth)}}
+      @value={{this.containerWidth}}
+    />
+    <Args.Yield
+      @description="Yields an object with the default component to use (RadioInput::Item), the data for the item passed in, and whether that item is selected"
+    />
+  </:api>
+</Freestyle::Usage>

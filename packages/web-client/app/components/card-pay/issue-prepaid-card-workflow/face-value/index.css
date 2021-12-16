@@ -38,7 +38,6 @@
 .face-value-option__amount {
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
-  white-space: nowrap;
 }
 
 .face-value-option__conversion {

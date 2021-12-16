@@ -1,4 +1,4 @@
-<Boxel::CustomRadio
+<Boxel::RadioInput
   @groupDescription="Select a wallet to connect to"
   @items={{@walletProviders}}
   @checkedId={{@currentWalletProviderId}}
@@ -14,7 +14,7 @@
     @checked={{item.checked}}
     @onChange={{fn (optional @changeWalletProvider) item.data.id}}
     @disabled={{@isConnecting}}
-    @hiddenInput={{true}}
+    @hiddenCheckbox={{true}}
     data-test-wallet-option={{item.data.id}}
   >
     <div class="card-pay-layer-one-wallet-provider-selection__item">
@@ -23,4 +23,4 @@
       <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.data.description}}</span>
     </div>
   </item.component>
-</Boxel::CustomRadio>
+</Boxel::RadioInput>

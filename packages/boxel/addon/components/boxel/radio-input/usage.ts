@@ -3,7 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import { action } from '@ember/object';
 
-export default class CustomRadioUsage extends Component {
+export default class RadioInputUsage extends Component {
   @tracked items = A([
     {
       id: 'eggs',
@@ -24,6 +24,11 @@ export default class CustomRadioUsage extends Component {
   @tracked checkedId2 = '';
   @tracked disabled = false;
   @tracked hiddenInput = false;
+  @tracked hiddenBorder = false;
+  @tracked spacing = '';
+  @tracked layout = 'default (flex)';
+  @tracked containerWidth = '';
+  @tracked gridColumnWidth = '';
 
   @action onChange(id: string): void {
     this.checkedId = id;

@@ -36,9 +36,11 @@
           />
         </CardPay::LabeledValue>
       {{else}}
-        <Boxel::CustomRadio
+        <Boxel::RadioInput
           @groupDescription="Select face value"
           @items={{this.options}}
+          @layout="grid"
+          @gridColumnWidth="48%"
           as |option|
         >
           <option.component
@@ -61,7 +63,7 @@
               </div>
             </div>
           </option.component>
-        </Boxel::CustomRadio>
+        </Boxel::RadioInput>
       {{/if}}
     </div>
     <small class="face-value-card__footnote">
