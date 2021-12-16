@@ -26,6 +26,7 @@
     "dist"
   ],
   "include": [
+    "generated",
     "contracts",
     "providers",
     "sdk",
