@@ -87,7 +87,6 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import RealmsConfig from './services/realms-config';
-import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -373,20 +372,6 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
-  let contracts = await container.lookup('contracts');
-  let web3 = await container.lookup('web3-socket');
-  let workerClient = await container.lookup('worker-client');
-
-  let latestEventBlockQueries = await container.lookup('latest-event-block-queries');
-
-  // listen for contract events
-  // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(
-    web3,
-    workerClient,
-    contracts,
-    latestEventBlockQueries
-  ).setupContractEventSubscriptions();
 
   await runner.promise;
 }
