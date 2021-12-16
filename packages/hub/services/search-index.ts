@@ -3,7 +3,7 @@ import { CompiledCard, ModuleRef, RawCard, Saved, Unsaved } from '@cardstack/cor
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { NotFound } from '@cardstack/core/src/utils/errors';
+import { CardstackError, NotFound, serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import { BROWSER, NODE } from '../interfaces';
@@ -43,8 +43,7 @@ export class SearchIndex {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
       if (result.compileErrors) {
-        const err = Object.assign(new Error(result.compileErrors.why), { status: result.compileErrors.status });
-        throw err;
+        throw CardstackError.fromSerializableError(result.compileErrors);
       }
       return deserializer.deserialize(result.data.data, result.data);
     } finally {
@@ -164,7 +163,7 @@ class IndexerRun implements IndexerHandle {
       ancestors: param(null),
       data: param(null),
       searchData: param(null),
-      compileErrors: param({ why: String(err), status: err.status }),
+      compileErrors: param(serializableError(err)),
     });
     await this.db.query(expressionToSql(expression));
   }

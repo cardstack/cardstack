@@ -20,8 +20,11 @@ if (process.env.COMPILER) {
         await cards.load(`${realmURL}example`);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
-        expect(err.message).to.eq(`Error: tried to adopt from card ${realmURL}post but it failed to load`);
+        expect(err.message).to.eq(`tried to adopt from card ${realmURL}post but it failed to load`);
         expect(err.status).to.eq(422);
+        let innerError = err.additionalErrors?.[0];
+        expect(innerError?.message).to.eq('card post not found');
+        expect(innerError?.status).to.eq(404);
       }
     });
   });
