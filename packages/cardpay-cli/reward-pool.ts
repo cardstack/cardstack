@@ -1,12 +1,7 @@
-import { getWeb3 } from './utils';
+import { getWeb3, WithSymbol, addTokenSymbol } from './utils';
 import { Proof, RewardTokenBalance, getSDK, getConstant } from '@cardstack/cardpay-sdk';
-import Web3 from 'web3';
-const { fromWei } = Web3.utils;
+import { fromWei } from 'web3-utils';
 import groupBy from 'lodash/groupBy';
-
-type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
-  tokenSymbol: string;
-};
 
 export async function rewardTokenBalances(
   network: string,
@@ -72,19 +67,10 @@ export async function addRewardTokens(
   console.log(`Added ${amount} of token ${tokenSymbol} to reward program ${rewardProgramId}`);
 }
 
-export async function rewardPoolBalance(
-  network: string,
-  rewardProgramId: string,
-  tokenAddress?: string,
-  mnemonic?: string
-): Promise<void> {
+export async function rewardPoolBalance(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  const rewardTokensAvailable = tokenAddress ? [tokenAddress] : await rewardPool.rewardTokensAvailable(rewardProgramId);
-  let promises = rewardTokensAvailable.map((tokens) => {
-    return rewardPool.balance(rewardProgramId, tokens);
-  });
-  let rewardTokenBalances = await Promise.all(promises);
+  let rewardTokenBalances = await rewardPool.balances(rewardProgramId);
   const enhancedBalance = await addTokenSymbol(rewardPool, rewardTokenBalances);
   displayRewardTokenBalance(enhancedBalance);
 }
@@ -139,20 +125,6 @@ export async function recoverRewardTokens(
   console.log(
     `Recover ${amount ? amount : ''} ${tokenSymbol} for reward program id ${rewardProgramId} to safe ${safeAddress}`
   );
-}
-
-async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
-  rewardPool: any,
-  arrWithTokenAddress: T[]
-): Promise<WithSymbol<T>[]> {
-  const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
-  const tokenMapping = await rewardPool.tokenSymbolMapping(tokenAddresses);
-  return arrWithTokenAddress.map((o) => {
-    return {
-      ...o,
-      tokenSymbol: tokenMapping[o.tokenAddress],
-    };
-  });
 }
 
 const fromProofArray = (arr: string[]): string => {

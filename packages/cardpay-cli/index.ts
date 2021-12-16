@@ -32,6 +32,7 @@ import {
   rewardRule,
   withdraw,
   transferRewardSafe,
+  viewRewardProgram,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -114,7 +115,8 @@ type Commands =
   | 'rewardRule'
   | 'withdrawRewardSafe'
   | 'transferRewardSafe'
-  | 'recoverRewardTokens';
+  | 'recoverRewardTokens'
+  | 'viewRewardProgram';
 
 let command: Commands | undefined;
 interface Options {
@@ -789,14 +791,10 @@ let {
       command = 'addRewardTokens';
     }
   )
-  .command('reward-pool-balance <rewardProgramId> [tokenAddress]', 'Get reward pool balance', (yargs) => {
+  .command('reward-pool-balance <rewardProgramId>', 'Get reward pool balance', (yargs) => {
     yargs.positional('rewardProgramId', {
       type: 'string',
       description: 'Reward program id',
-    });
-    yargs.positional('tokenAddress', {
-      type: 'string',
-      description: 'The address of the tokens that are being filled in the reward pool',
     });
     command = 'rewardPoolBalance';
   })
@@ -961,6 +959,13 @@ let {
       command = 'recoverRewardTokens';
     }
   )
+  .command('view-reward-program <rewardProgramId>', 'View reward program', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'viewRewardProgram';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1301,7 +1306,7 @@ if (!command) {
         showHelpAndExit('rewardProgramId is a required value');
         return;
       }
-      await rewardPoolBalance(network, rewardProgramId, tokenAddress, mnemonic);
+      await rewardPoolBalance(network, rewardProgramId, mnemonic);
       break;
     case 'claimRewards':
       if (rewardSafe == null) {
@@ -1431,6 +1436,13 @@ if (!command) {
         return;
       }
       await recoverRewardTokens(network, safeAddress, rewardProgramId, tokenAddress, amount, mnemonic);
+      break;
+    case 'viewRewardProgram':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await viewRewardProgram(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

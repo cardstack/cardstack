@@ -26,6 +26,14 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
 
+export interface RewardProgramInfo {
+  rewardProgramId: string;
+  rewardProgramAdmin: string;
+  locked: boolean;
+  rule: string;
+  paymentCycle: number;
+}
+
 export default class RewardManager {
   private rewardManager: Contract | undefined;
 
@@ -834,6 +842,24 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       signatures,
       nonce
     );
+  }
+
+  async getRewardProgramInfo(rewardProgramId: string): Promise<RewardProgramInfo> {
+    if (!(await this.isRewardProgram(rewardProgramId))) {
+      throw new Error('Not an existing reward program');
+    }
+    let rewardPool = await getSDK('RewardPool', this.layer2Web3);
+    const locked = await this.isLocked(rewardProgramId);
+    const rewardProgramAdmin = await this.getRewardProgramAdmin(rewardProgramId);
+    const rule = await this.getRewardRule(rewardProgramId);
+    const paymentCycle = await rewardPool.getCurrentPaymentCycle();
+    return {
+      rewardProgramId,
+      rewardProgramAdmin,
+      locked,
+      rule,
+      paymentCycle,
+    };
   }
 
   private async getRewardSafeFromTxn(txnHash: string): Promise<any> {

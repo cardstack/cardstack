@@ -1,5 +1,7 @@
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from './utils';
+import { getWeb3, WithSymbol, addTokenSymbol } from './utils';
+import { RewardProgramInfo, RewardTokenBalance } from '@cardstack/cardpay-sdk';
+import { fromWei } from 'web3-utils';
 
 export async function registerRewardProgram(
   network: string,
@@ -133,4 +135,35 @@ export async function transferRewardSafe(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Transfer reward safe ${rewardSafe} ownership to ${newOwner}`);
+}
+
+export async function viewRewardProgram(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
+  let rewardPoolAPI = await getSDK('RewardPool', web3);
+
+  const rewardProgramInfo = await rewardManagerAPI.getRewardProgramInfo(rewardProgramId);
+  let balances = await rewardPoolAPI.balances(rewardProgramId);
+  let enhancedBalances = await addTokenSymbol(rewardPoolAPI, balances);
+  displayRewardProgramInfo(rewardProgramInfo);
+  displayRewardTokenBalance(enhancedBalances);
+}
+
+function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
+  let { rewardProgramId, rewardProgramAdmin, locked, rule, paymentCycle } = rewardProgramInfo;
+  console.log(`
+RewardProgramInfo
+
+  rewardProgramId : ${rewardProgramId}
+  rewardProgramAdmin : ${rewardProgramAdmin}
+  locked : ${locked}
+  rule : ${rule ? rule : 'No rule found'}
+  paymentCycle : ${paymentCycle}`);
+}
+
+function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>[]): void {
+  console.log(`  balance:`);
+  tokenBalances.map(({ tokenSymbol, balance }) => {
+    console.log(`    ${tokenSymbol} : ${fromWei(balance)}`);
+  });
 }

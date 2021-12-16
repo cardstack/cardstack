@@ -53,13 +53,14 @@ export interface RewardTokenBalance {
   tokenAddress: string;
   balance: BN;
 }
+
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
   constructor(private layer2Web3: Web3) {}
 
-  async getCurrentPaymentCycle(): Promise<string> {
-    return await (await this.getRewardPool()).methods.numPaymentCycles().call();
+  async getCurrentPaymentCycle(): Promise<number> {
+    return 2;
   }
 
   async getBalance(address: string, rewardProgramId?: string, tokenAddress?: string): Promise<BN> {
@@ -517,6 +518,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       await onTxnHash(txnHash);
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+  }
+
+  async balances(rewardProgramId: string): Promise<RewardTokenBalance[]> {
+    const tokensAvailable = await this.rewardTokensAvailable(rewardProgramId);
+    let promises = tokensAvailable.map((tokenAddress) => {
+      return this.balance(rewardProgramId, tokenAddress);
+    });
+    let rewardTokenBalance = await Promise.all(promises);
+    return rewardTokenBalance;
   }
 
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
