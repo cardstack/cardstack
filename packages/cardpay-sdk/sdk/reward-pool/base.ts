@@ -534,12 +534,16 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await getAddress('rewardPool', this.layer2Web3);
   }
 
+  async tokenSymbol(tokenAddress: string): Promise<string> {
+    const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    return await tokenContract.methods.symbol().call();
+  }
+
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
     let o = {};
     await Promise.all(
       tokenAddresses.map(async (tokenAddress: string) => {
-        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-        const tokenSymbol = await tokenContract.methods.symbol().call();
+        let tokenSymbol = await this.tokenSymbol(tokenAddress);
         o = {
           ...o,
           [tokenAddress]: tokenSymbol,

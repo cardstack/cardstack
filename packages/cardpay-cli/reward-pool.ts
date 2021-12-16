@@ -54,17 +54,6 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
   });
 }
 
-export async function rewardTokensAvailable(
-  network: string,
-  rewardProgramId?: string,
-  address?: string,
-  mnemonic?: string
-): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
-  let rewardPool = await getSDK('RewardPool', web3);
-  await rewardPool.rewardTokensAvailable(rewardProgramId, address);
-}
-
 export async function addRewardTokens(
   network: string,
   safe: string,
@@ -79,7 +68,8 @@ export async function addRewardTokens(
   await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  console.log(`Added ${amount} of token ${tokenAddress} to reward program ${rewardProgramId}`);
+  let tokenSymbol = await rewardPool.tokenSymbol(tokenAddress);
+  console.log(`Added ${amount} of token ${tokenSymbol} to reward program ${rewardProgramId}`);
   console.log('done');
 }
 
@@ -111,8 +101,6 @@ export async function getClaimableRewardProofs(
   let rewardPool = await getSDK('RewardPool', web3);
   const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
   const enhancedProofs = await addTokenSymbol(rewardPool, proofs);
-
-  console.log(`Reward Proofs for ${address}`);
   displayProofs(enhancedProofs);
 }
 
@@ -131,7 +119,7 @@ export async function claimRewards(
   await rewardPool.claim(rewardSafeAddress, leaf, proofArray, acceptPartialClaim, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  console.log(`Claimed reward to reward safe ${rewardSafeAddress}`);
+  console.log(`Claimed reward to safe ${rewardSafeAddress}`);
   console.log('done');
 }
 
@@ -149,8 +137,9 @@ export async function recoverRewardTokens(
   await rewardPool.recoverTokens(safeAddress, rewardProgramId, tokenAddress, amount, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
+  let tokenSymbol = await rewardPool.tokenSymbol(tokenAddress);
   console.log(
-    `Recover ${amount} of ${tokenAddress} token for reward program id ${rewardProgramId} to safe ${safeAddress}`
+    `Recover ${amount ? amount : ''} ${tokenSymbol} for reward program id ${rewardProgramId} to safe ${safeAddress}`
   );
   console.log('done');
 }
