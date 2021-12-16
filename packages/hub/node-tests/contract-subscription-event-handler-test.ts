@@ -1,4 +1,4 @@
-import { ContractSubscriptionEventHandler } from '../contract-subscription-event-handler';
+import { ContractSubscriptionEventHandler } from '../services/contract-subscription-event-handler';
 import { Job, TaskSpec } from 'graphile-worker';
 import { expect } from 'chai';
 import sentryTestkit from 'sentry-testkit';

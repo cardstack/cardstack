@@ -1,11 +1,11 @@
 import autoBind from 'auto-bind';
-import WorkerClient from './services/worker-client';
+import WorkerClient from './worker-client';
 import * as Sentry from '@sentry/node';
-import Web3SocketService from './services/web3-socket';
-import { contractSubscriptionEventHandlerLog } from './utils/logger';
-import Contracts from './services/contracts';
+import Web3SocketService from './web3-socket';
+import { contractSubscriptionEventHandlerLog } from '../utils/logger';
+import Contracts from './contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
-import LatestEventBlockQueries from './services/queries/latest-event-block';
+import LatestEventBlockQueries from './queries/latest-event-block';
 
 const CONTRACT_EVENTS = [
   {
@@ -22,7 +22,6 @@ const CONTRACT_EVENTS = [
   },
 ];
 
-// DO NOT USE only for use in bootWorker to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
   #contracts: Contracts;
   #web3: Web3SocketService;
