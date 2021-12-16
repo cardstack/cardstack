@@ -54,10 +54,15 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
   });
 }
 
-export async function rewardTokensAvailable(network: string, address: string, mnemonic?: string): Promise<void> {
+export async function rewardTokensAvailable(
+  network: string,
+  rewardProgramId?: string,
+  address?: string,
+  mnemonic?: string
+): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  await rewardPool.rewardTokensAvailable(address);
+  await rewardPool.rewardTokensAvailable(rewardProgramId, address);
 }
 
 export async function addRewardTokens(
@@ -81,14 +86,17 @@ export async function addRewardTokens(
 export async function rewardPoolBalance(
   network: string,
   rewardProgramId: string,
-  tokenAddress: string,
+  tokenAddress?: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  let balance = await rewardPool.balance(rewardProgramId, tokenAddress);
-  console.log(`Balance of reward pool`);
-  const enhancedBalance = await addTokenSymbol(rewardPool, [balance]);
+  const rewardTokensAvailable = tokenAddress ? [tokenAddress] : await rewardPool.rewardTokensAvailable(rewardProgramId);
+  let promises = rewardTokensAvailable.map((tokens) => {
+    return rewardPool.balance(rewardProgramId, tokens);
+  });
+  let rewardTokenBalances = await Promise.all(promises);
+  const enhancedBalance = await addTokenSymbol(rewardPool, rewardTokenBalances);
   displayRewardTokenBalance(enhancedBalance);
 }
 

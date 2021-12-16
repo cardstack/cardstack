@@ -33,8 +33,8 @@ const SOKOL = {
   rpcArchiveNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
-  subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
-  tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
+  subgraphURL: 'https://graph-justin.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
+  tallyServiceURL: 'http://localhost/api/v1',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 };
 const KOVAN = {

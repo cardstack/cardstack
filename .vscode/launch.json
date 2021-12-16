@@ -799,7 +799,8 @@
         "index.ts",
         "reward-pool-balance",
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program id
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        // "--tokenAddress",
+        // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         // "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
         "--network",
         "${config:cardCli.network.l2.name}",

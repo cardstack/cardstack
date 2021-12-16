@@ -789,7 +789,7 @@ let {
       command = 'addRewardTokens';
     }
   )
-  .command('reward-pool-balance <rewardProgramId> <tokenAddress>', 'Get reward pool balance', (yargs) => {
+  .command('reward-pool-balance <rewardProgramId> [tokenAddress]', 'Get reward pool balance', (yargs) => {
     yargs.positional('rewardProgramId', {
       type: 'string',
       description: 'Reward program id',
@@ -1299,10 +1299,6 @@ if (!command) {
     case 'rewardPoolBalance':
       if (rewardProgramId == null) {
         showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      if (tokenAddress == null) {
-        showHelpAndExit('tokenAddress is a required value');
         return;
       }
       await rewardPoolBalance(network, rewardProgramId, tokenAddress, mnemonic);
