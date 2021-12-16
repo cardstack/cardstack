@@ -42,16 +42,16 @@ function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined
 }
 
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
-  private builder: Builder;
+  private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
-    this.builder = params.builder;
+    this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
   }
 
-  get dependencies(): string[] {
-    return [];
+  get dependencies(): Set<string> {
+    return this.builder.dependencies;
   }
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
@@ -447,4 +447,17 @@ export function makeGloballyAddressable(
     edit: ensureGlobalComponentInfo(card.edit),
     modules: card.modules,
   };
+}
+
+class TrackedBuilder implements Builder {
+  readonly dependencies = new Set<string>();
+  constructor(private realBuilder: Builder) {}
+  getCompiledCard(url: string): Promise<CompiledCard> {
+    this.dependencies.add(url);
+    return this.realBuilder.getCompiledCard(url);
+  }
+  getRawCard(url: string): Promise<RawCard> {
+    this.dependencies.add(url);
+    return this.realBuilder.getRawCard(url);
+  }
 }

@@ -80,6 +80,7 @@
     "node-fetch": "^2.6.1",
     "node-pg-migrate": "^5.9.0",
     "pg": "^8.6.0",
+    "pg-cursor": "^2.7.1",
     "pg-format": "^1.0.4",
     "qs": "^6.10.1",
     "query-string": "^7.0.0",

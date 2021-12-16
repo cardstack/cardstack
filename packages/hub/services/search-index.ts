@@ -6,11 +6,13 @@ import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { CardstackError, NotFound, serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
+import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
-import { expressionToSql, param, upsert } from '../utils/expressions';
+import { Expression, expressionToSql, param, upsert } from '../utils/expressions';
 import { serializeRawCard } from '../utils/serialization';
 import CardBuilder from './card-builder';
 import { transformSync } from '@babel/core';
+import { serverLog as logger } from '../utils/logger';
 // @ts-ignore
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
@@ -97,6 +99,8 @@ export interface IndexerHandle {
 
 class IndexerRun implements IndexerHandle {
   private generation?: number;
+  private touchCounter = 0;
+  private touched = new Map<string, number>();
 
   constructor(
     private db: PoolClient,
@@ -105,7 +109,53 @@ class IndexerRun implements IndexerHandle {
     private fileCache: SearchIndex['fileCache']
   ) {}
 
-  async finalize() {}
+  async finalize() {
+    await this.possiblyInvalidatedCards(async (cardURL: string, deps: string[]) => {
+      if (!this.isValid(cardURL, deps)) {
+        logger.trace(`reindexing %s because %s`, cardURL, deps);
+      }
+    });
+  }
+
+  // This doesn't need to recurse because we intend for the `deps` column to
+  // contain all deep references, not  just immediate references
+  private async possiblyInvalidatedCards(fn: (cardURL: string, deps: string[]) => Promise<void>) {
+    const queryBatchSize = 100;
+    let queue = [...this.touched.keys()];
+    for (let i = 0; i < queue.length; i += queryBatchSize) {
+      let queryRefs = queue.slice(i, i + queryBatchSize);
+      await this.iterateThroughRows(
+        ['select url, deps from cards where', param(queryRefs), '&&', 'deps'],
+        async (row) => await fn(row.url, row.deps)
+      );
+    }
+  }
+
+  private isValid(cardURL: string, deps: string[]): boolean {
+    let maybeTouchedAt = this.touched.get(cardURL);
+    if (maybeTouchedAt == null) {
+      // our card hasn't been updated at all, so it definitely needs to be redone
+      return false;
+    }
+    let cardTouchedAt = maybeTouchedAt;
+    return deps.every((dep) => {
+      let depTouchedAt = this.touched.get(dep);
+      depTouchedAt == null || depTouchedAt < cardTouchedAt;
+    });
+  }
+
+  private async iterateThroughRows(expression: Expression, fn: (row: Record<string, any>) => Promise<void>) {
+    const rowBatchSize = 100;
+    let { text, values } = expressionToSql(expression);
+    let cursor: Cursor = this.db.query(new Cursor(text, values) as any);
+    let rows;
+    do {
+      rows = await readCursor(cursor, rowBatchSize);
+      for (let row of rows) {
+        await fn(row);
+      }
+    } while (rows.length > 0);
+  }
 
   // available to each realm's indexer
   async save(card: RawCard): Promise<void> {
@@ -155,31 +205,35 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
+    let url = cardURL(card);
     let expression = upsert('cards', 'cards_pkey', {
-      url: param(cardURL(card)),
+      url: param(url),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
       data: param(serializeRawCard(card, compiledCard)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
       compileErrors: param(null),
-      deps: param(compiler.dependencies),
+      deps: param([...compiler.dependencies]),
     });
     await this.db.query(expressionToSql(expression));
+    this.touched.set(url, this.touchCounter++);
     return compiledCard;
   }
 
   private async saveErrorState(card: RawCard, err: any, compiler: Compiler): Promise<void> {
+    let url = cardURL(card);
     let expression = upsert('cards', 'cards_pkey', {
-      url: param(cardURL(card)),
+      url: param(url),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(null),
       data: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),
-      deps: param(compiler.dependencies),
+      deps: param([...compiler.dependencies]),
     });
+    this.touched.set(url, this.touchCounter++);
     await this.db.query(expressionToSql(expression));
   }
 
@@ -225,4 +279,16 @@ declare module '@cardstack/di' {
   interface KnownServices {
     searchIndex: SearchIndex;
   }
+}
+
+function readCursor(cursor: Cursor, rowCount: number): Promise<Record<string, any>[]> {
+  return new Promise((resolve, reject) => {
+    cursor.read(rowCount, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
 }
