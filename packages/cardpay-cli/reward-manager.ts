@@ -14,7 +14,6 @@ export async function registerRewardProgram(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Registered reward program ${rewardProgramId} with admin ${admin}`);
-  console.log('done');
 }
 
 export async function registerRewardee(
@@ -30,7 +29,6 @@ export async function registerRewardee(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
-  console.log('done');
 }
 
 export async function lockRewardProgram(
@@ -45,6 +43,7 @@ export async function lockRewardProgram(
   await rewardManagerAPI.lockRewardProgram(prepaidCard, rewardProgramId, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
+  console.log(`Locked reward program ${rewardProgramId}`);
 }
 
 export async function isRewardProgramLocked(
@@ -71,6 +70,7 @@ export async function updateRewardProgramAdmin(
   await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard, rewardProgramId, newAdmin, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
+  console.log(`Updated admin of reward program ${rewardProgramId} to ${newAdmin}`);
 }
 
 export async function addRewardRule(
@@ -86,6 +86,7 @@ export async function addRewardRule(
   await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
+  console.log(`Updated reward rule of reward program ${rewardProgramId} to ${blob}`);
 }
 
 export async function rewardProgramAdmin(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
@@ -98,8 +99,8 @@ export async function rewardProgramAdmin(network: string, rewardProgramId: strin
 export async function rewardRule(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManager = await getSDK('RewardManager', web3);
-  const admin = await rewardManager.getRewardRule(rewardProgramId);
-  console.log(`Reward Rule of ${rewardProgramId} is ${admin}`);
+  const rewardRule = await rewardManager.getRewardRule(rewardProgramId);
+  console.log(`Reward Rule of ${rewardProgramId} is ${rewardRule}`);
 }
 
 export async function withdraw(
@@ -117,7 +118,6 @@ export async function withdraw(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Withdraw ${amount} of ${tokenAddress} out of ${rewardSafe} to ${to}`);
-  console.log('done');
 }
 
 export async function transferRewardSafe(
@@ -133,5 +133,4 @@ export async function transferRewardSafe(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Transfer reward safe ${rewardSafe} ownership to ${newOwner}`);
-  console.log('done');
 }

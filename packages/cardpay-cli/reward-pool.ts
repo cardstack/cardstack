@@ -70,7 +70,6 @@ export async function addRewardTokens(
   });
   let tokenSymbol = await rewardPool.tokenSymbol(tokenAddress);
   console.log(`Added ${amount} of token ${tokenSymbol} to reward program ${rewardProgramId}`);
-  console.log('done');
 }
 
 export async function rewardPoolBalance(
@@ -120,7 +119,6 @@ export async function claimRewards(
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Claimed reward to safe ${rewardSafeAddress}`);
-  console.log('done');
 }
 
 export async function recoverRewardTokens(
@@ -141,7 +139,6 @@ export async function recoverRewardTokens(
   console.log(
     `Recover ${amount ? amount : ''} ${tokenSymbol} for reward program id ${rewardProgramId} to safe ${safeAddress}`
   );
-  console.log('done');
 }
 
 async function addTokenSymbol<T extends Proof | RewardTokenBalance>(
