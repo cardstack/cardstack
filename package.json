@@ -24,7 +24,7 @@
     "eslint-plugin-mocha": "^8.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
     "lerna": "4.0.0",
     "prettier": "^2.3.2",
     "start-server-and-test": "^1.12.0",
