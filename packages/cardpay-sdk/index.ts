@@ -3,7 +3,7 @@ export { ITokenBridgeHomeSide, BridgeValidationResult } from './sdk/token-bridge
 export { PrepaidCard } from './sdk/prepaid-card';
 export { PrepaidCardMarket } from './sdk/prepaid-card-market';
 export { RevenuePool } from './sdk/revenue-pool';
-export { RewardManager } from './sdk/reward-manager';
+export { RewardManager, RewardProgramInfo } from './sdk/reward-manager';
 export { RewardPool, Proof, RewardTokenBalance } from './sdk/reward-pool';
 export {
   ISafes,
