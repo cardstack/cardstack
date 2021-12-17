@@ -4,7 +4,7 @@
   "description": "Wallet Connect Push notification service for Firebase Cloud Functions",
   "author": "",
   "license": "MIT",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "scripts": {
     "build": "tsc",
     "serve": "concurrently --kill-others 'tsc --watch --preserveWatchOutput' 'firebase emulators:start --only functions'",
