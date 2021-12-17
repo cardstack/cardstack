@@ -158,7 +158,7 @@ RewardProgramInfo
   rewardProgramAdmin : ${rewardProgramAdmin}
   locked : ${locked}
   rule : ${rule ? rule : 'No rule found'}
-  paymentCycle : ${paymentCycle}`);
+  `);
 }
 
 function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>[]): void {
