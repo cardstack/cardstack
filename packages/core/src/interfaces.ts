@@ -191,7 +191,7 @@ export type CardOperation =
   | {
       update: {
         cardURL: string;
-        payload: JSONAPIDocument;
+        payload: JSONAPIDocument<Saved>;
       };
     };
 
