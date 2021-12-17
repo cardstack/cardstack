@@ -31,7 +31,6 @@ export interface RewardProgramInfo {
   rewardProgramAdmin: string;
   locked: boolean;
   rule: string;
-  paymentCycle: number;
 }
 
 export default class RewardManager {
@@ -848,17 +847,14 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     if (!(await this.isRewardProgram(rewardProgramId))) {
       throw new Error('Not an existing reward program');
     }
-    let rewardPool = await getSDK('RewardPool', this.layer2Web3);
     const locked = await this.isLocked(rewardProgramId);
     const rewardProgramAdmin = await this.getRewardProgramAdmin(rewardProgramId);
     const rule = await this.getRewardRule(rewardProgramId);
-    const paymentCycle = await rewardPool.getCurrentPaymentCycle();
     return {
       rewardProgramId,
       rewardProgramAdmin,
       locked,
       rule,
-      paymentCycle,
     };
   }
 
