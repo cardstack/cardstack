@@ -77,14 +77,14 @@ export class CardService {
   async query(query: Query): Promise<Card[]> {
     let client = await this.db.getPool();
     try {
-      let expression: CardExpression = ['select data from cards'];
+      let expression: CardExpression = ['select compiled from cards'];
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
-      let result = await client.query<{ data: any }>(expressionToSql(await this.prepareExpression(expression)));
+      let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       let deserializer = new RawCardDeserializer();
       return result.rows.map((row) => {
-        let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
+        let { raw, compiled } = deserializer.deserialize(row.compiled.data, row.compiled);
         if (!compiled) {
           throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }

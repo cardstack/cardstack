@@ -12,11 +12,14 @@ import { Expression, expressionToSql, param, upsert } from '../utils/expressions
 import { serializeRawCard } from '../utils/serialization';
 import CardBuilder from './card-builder';
 import { transformSync } from '@babel/core';
-import { serverLog as logger } from '../utils/logger';
+import logger from '@cardstack/logger';
+
 // @ts-ignore
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+
+const log = logger('hub/search-index');
 
 export class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -40,14 +43,14 @@ export class SearchIndex {
     try {
       let {
         rows: [result],
-      } = await db.query('SELECT data, "compileErrors" from cards where url = $1', [cardURL]);
+      } = await db.query('SELECT compiled, "compileErrors" from cards where url = $1', [cardURL]);
       if (!result) {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
       if (result.compileErrors) {
         throw CardstackError.fromSerializableError(result.compileErrors);
       }
-      return deserializer.deserialize(result.data.data, result.data);
+      return deserializer.deserialize(result.compiled.data, result.compiled);
     } finally {
       db.release();
     }
@@ -66,9 +69,11 @@ export class SearchIndex {
   private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
+      log.info(`starting to index realm`, realmURL);
       let run = new IndexerRun(db, this.builder, realmURL, this.fileCache);
       let result = await fn(run);
       await run.finalize();
+      log.info(`finished indexing realm`, realmURL);
       return result;
     } finally {
       db.release();
@@ -110,23 +115,28 @@ class IndexerRun implements IndexerHandle {
   ) {}
 
   async finalize() {
-    await this.possiblyInvalidatedCards(async (cardURL: string, deps: string[]) => {
+    await this.possiblyInvalidatedCards(async (cardURL: string, deps: string[], raw: RawCard) => {
       if (!this.isValid(cardURL, deps)) {
-        logger.trace(`reindexing %s because %s`, cardURL, deps);
+        log.trace(`reindexing %s because %s`, cardURL, deps);
+        await this.save(raw);
       }
     });
   }
 
   // This doesn't need to recurse because we intend for the `deps` column to
   // contain all deep references, not  just immediate references
-  private async possiblyInvalidatedCards(fn: (cardURL: string, deps: string[]) => Promise<void>) {
+  private async possiblyInvalidatedCards(fn: (cardURL: string, deps: string[], raw: RawCard) => Promise<void>) {
     const queryBatchSize = 100;
     let queue = [...this.touched.keys()];
     for (let i = 0; i < queue.length; i += queryBatchSize) {
       let queryRefs = queue.slice(i, i + queryBatchSize);
       await this.iterateThroughRows(
-        ['select url, deps from cards where', param(queryRefs), '&&', 'deps'],
-        async (row) => await fn(row.url, row.deps)
+        ['select url, deps, raw from cards where', param(queryRefs), '&&', 'deps'],
+        async (row) => {
+          let deserializer = new RawCardDeserializer();
+          let { raw } = deserializer.deserialize(row.raw.data, row.raw);
+          await fn(row.url, row.deps, raw);
+        }
       );
     }
   }
@@ -211,7 +221,9 @@ class IndexerRun implements IndexerHandle {
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(serializeRawCard(card, compiledCard)),
+      data: param(card.data ?? null),
+      raw: param(serializeRawCard(card)),
+      compiled: param(serializeRawCard(card, compiledCard)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
@@ -228,7 +240,9 @@ class IndexerRun implements IndexerHandle {
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(null),
-      data: param(null),
+      data: param(card.data ?? null),
+      raw: param(serializeRawCard(card)),
+      compiled: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),
       deps: param([...compiler.dependencies]),

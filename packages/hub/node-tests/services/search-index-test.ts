@@ -23,7 +23,7 @@ if (process.env.COMPILER) {
       }
     });
 
-    it.skip(`recovers automatically from a bad compile once the problem is addressed`, async function () {
+    it(`recovers automatically from a bad compile once the problem is addressed`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
         adoptsFrom: '../post',
         data: { title: 'Hello World' },
