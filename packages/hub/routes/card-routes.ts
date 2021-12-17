@@ -10,7 +10,7 @@ import { NotFound, BadRequest } from '@cardstack/core/src/utils/errors';
 import { difference } from 'lodash';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
-import { NewRawCard } from '@cardstack/core/src/interfaces';
+import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 
 declare global {
   const __non_webpack_require__: any;
@@ -74,7 +74,8 @@ export default class CardRoutes {
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let card: NewRawCard = {
+    let card: RawCard<Unsaved> = {
+      id: undefined,
       realm: realmURL,
       adoptsFrom: parentCardURL,
       data: inputData.attributes,

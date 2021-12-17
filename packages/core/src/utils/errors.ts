@@ -33,6 +33,17 @@ export class CardstackError extends Error {
       source: this.source,
     };
   }
+
+  static fromSerializableError(err: any): any {
+    if (!err || typeof err !== 'object' || !isCardstackError(err)) {
+      return err;
+    }
+    let result = new this(err.detail, { status: err.status, title: err.title, source: err.source });
+    if (err.additionalErrors) {
+      result.additionalErrors = err.additionalErrors.map((inner) => this.fromSerializableError(inner));
+    }
+    return result;
+  }
 }
 
 export class NotFound extends CardstackError {
@@ -64,6 +75,22 @@ export function printCompilerError(err: any) {
   return `${err.message}\n\n${err.stack}`;
 }
 
+export function isCardstackError(err: any): err is CardstackError {
+  return err != null && typeof err === 'object' && err.isCardstackError;
+}
+
 function isAcceptableError(err: any) {
-  return err.isCardError || err.code === 'BABEL_PARSE_ERROR';
+  return err.isCardstackError || err.code === 'BABEL_PARSE_ERROR';
+}
+
+export function serializableError(err: any): any {
+  if (!err || typeof err !== 'object' || !isCardstackError(err)) {
+    // rely on the best-effort serialization that we'll get from, for example,
+    // "pg" as it puts this object into jsonb
+    return err;
+  }
+
+  let result = Object.assign({}, err);
+  result.additionalErrors = result.additionalErrors?.map((inner) => serializableError(inner)) ?? null;
+  return result;
 }

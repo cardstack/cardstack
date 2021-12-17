@@ -45,9 +45,9 @@ export interface CardId {
   id: string;
 }
 
-export interface NewRawCard {
+export interface RawCard<Identity extends Unsaved = Saved> {
+  id: Identity;
   realm: string;
-  id?: string;
 
   // Feature Files. Value is path inside the files list
   schema?: string;
@@ -65,10 +65,6 @@ export interface NewRawCard {
 
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;
-}
-
-export interface RawCard extends NewRawCard {
-  id: string;
 }
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -119,9 +115,9 @@ export interface GlobalRef {
 }
 export type ModuleRef = LocalRef | GlobalRef;
 export type Saved = string;
-export type Unsaved = undefined;
+export type Unsaved = string | undefined;
 
-export interface CompiledCard<Identity extends Saved | Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
+export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
   url: Identity;
   realm: string;
   adoptsFrom?: CompiledCard<string, GlobalRef>;
