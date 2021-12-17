@@ -150,7 +150,7 @@ export async function viewRewardProgram(network: string, rewardProgramId: string
 }
 
 function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
-  let { rewardProgramId, rewardProgramAdmin, locked, rule, paymentCycle } = rewardProgramInfo;
+  let { rewardProgramId, rewardProgramAdmin, locked, rule } = rewardProgramInfo;
   console.log(`
 RewardProgramInfo
 
