@@ -21,19 +21,8 @@ export class HubEventListenerController {
     let container = new Container(registry);
     let handler: ContractSubscriptionEventHandler | undefined;
 
-    let contracts = await container.lookup('contracts');
-    let web3 = await container.lookup('web3-socket');
-    let workerClient = await container.lookup('worker-client');
-    let latestEventBlockQueries = await container.lookup('latest-event-block-queries');
-
     try {
-      let handler = await container.instantiate(
-        ContractSubscriptionEventHandler,
-        web3,
-        workerClient,
-        contracts,
-        latestEventBlockQueries
-      );
+      let handler = await container.instantiate(ContractSubscriptionEventHandler);
       await handler.setupContractEventSubscriptions();
     } catch (e: any) {
       this.logger.error(`Unexpected error when running ContractSubscriptionEventHandler ${e.message}`, e);

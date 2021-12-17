@@ -103,6 +103,7 @@ import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -165,6 +166,7 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
+  registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('relay', RelayService);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
