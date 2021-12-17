@@ -6,7 +6,7 @@ import { RealmInterface } from '../interfaces';
 import { getOwner, inject, injectionReady } from '@cardstack/di';
 
 export default class RealmManager {
-  realms: RealmInterface[] = [];
+  realms: RealmInterface<any>[] = [];
 
   private realmsConfig = inject('realmsConfig');
   private searchIndex = inject('searchIndex');
