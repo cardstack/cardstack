@@ -8,7 +8,7 @@ import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
-import { Expression, expressionToSql, param, upsert } from '../utils/expressions';
+import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../utils/expressions';
 import { serializeRawCard } from '../utils/serialization';
 import CardBuilder from './card-builder';
 import { transformSync } from '@babel/core';
@@ -31,7 +31,9 @@ export class SearchIndex {
     await Promise.all(
       this.realmManager.realms.map((realm) => {
         return this.runIndexing(realm.url, async (ops) => {
-          await realm.reindex(ops, undefined);
+          let meta = await ops.loadMeta();
+          let newMeta = await realm.reindex(ops, meta);
+          ops.setMeta(newMeta);
         });
       })
     );
@@ -83,15 +85,6 @@ export class SearchIndex {
   notify(_cardURL: string, _action: 'save' | 'delete'): void {
     throw new Error('not implemented');
   }
-
-  async reset() {
-    let db = await this.database.getPool();
-    try {
-      await db.query('DELETE from cards');
-    } finally {
-      db.release();
-    }
-  }
 }
 
 // this is the methods that we allow Realms to call
@@ -106,6 +99,7 @@ class IndexerRun implements IndexerHandle {
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
+  private newMeta: PgPrimitive = null;
 
   constructor(
     private db: PoolClient,
@@ -114,6 +108,25 @@ class IndexerRun implements IndexerHandle {
     private fileCache: SearchIndex['fileCache']
   ) {}
 
+  async loadMeta(): Promise<PgPrimitive> {
+    let metaResult = await this.db.query(
+      expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)])
+    );
+    return metaResult.rows[0]?.meta;
+  }
+
+  setMeta(meta: PgPrimitive) {
+    this.newMeta = meta;
+  }
+
+  private async storeMeta(): Promise<void> {
+    await this.db.query(
+      expressionToSql(
+        upsert('realm_metas', 'realm_metas_pkey', { realm: param(this.realmURL), meta: param(this.newMeta) })
+      )
+    );
+  }
+
   async finalize() {
     await this.possiblyInvalidatedCards(async (cardURL: string, deps: string[], raw: RawCard) => {
       if (!this.isValid(cardURL, deps)) {
@@ -121,6 +134,7 @@ class IndexerRun implements IndexerHandle {
         await this.save(raw);
       }
     });
+    await this.storeMeta();
   }
 
   // This doesn't need to recurse because we intend for the `deps` column to
@@ -260,7 +274,10 @@ class IndexerRun implements IndexerHandle {
   }
 
   async finishReplaceAll(): Promise<void> {
-    await this.db.query('DELETE FROM cards where realm = $1 AND generation != $2', [this.realmURL, this.generation]);
+    await this.db.query('DELETE FROM cards where realm = $1 AND (generation != $2 OR generation IS NULL)', [
+      this.realmURL,
+      this.generation,
+    ]);
   }
 }
 

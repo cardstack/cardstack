@@ -9,20 +9,27 @@ import { cardURL, ensureTrailingSlash } from '@cardstack/core/src/utils';
 
 import { RealmInterface } from '../interfaces';
 import { nanoid } from '../utils/ids';
-import { serverLog as logger } from '../utils/logger';
+import logger from '@cardstack/logger';
+import Logger from '@cardstack/logger/src/logger';
 
 import { IndexerHandle } from '../services/search-index';
 import RealmManager from '../services/realm-manager';
 
-export default class FSRealm implements RealmInterface {
+interface Meta {
+  mtime: number;
+  pid: number;
+}
+
+export default class FSRealm implements RealmInterface<Meta> {
   url: string;
   private directory: string;
-  private logger = logger;
   private watcher?: sane.Watcher;
+  private log: Logger;
 
   constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
     this.url = url;
     this.directory = ensureTrailingSlash(directory);
+    this.log = logger(`hub/fs-realm[${url}]`);
   }
 
   async ready() {
@@ -40,19 +47,33 @@ export default class FSRealm implements RealmInterface {
     this.watcher?.close();
   }
 
-  // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
-  async reindex(ops: IndexerHandle): Promise<void> {
-    this.logger.info(`Indexing realm: ${this.url}`);
+  async reindex(ops: IndexerHandle, meta: Meta | null): Promise<Meta> {
+    let fullReindex = meta?.pid !== process.pid;
+    let newestMtime = 0;
 
-    await ops.beginReplaceAll();
-    let cards = walkSync(this.directory, { globs: ['**/card.json'] });
-    for (let cardPath of cards) {
-      let id = cardPath.replace('/card.json', '');
-      this.logger.info(`--> ${id}`);
-      let rawCard = await this.read({ id, realm: this.url });
-      await ops.save(rawCard);
+    if (fullReindex) {
+      await ops.beginReplaceAll();
     }
-    await ops.finishReplaceAll();
+    this.log.trace('fullReindex=%s', fullReindex);
+    let cards = walkSync.entries(this.directory, {
+      globs: ['**/card.json'],
+      fs: undefined as any,
+    });
+    for (let { relativePath: cardPath, mtime } of cards) {
+      newestMtime = Math.max(newestMtime, mtime);
+      let id = cardPath.replace('/card.json', '');
+      if (fullReindex || meta?.mtime == null || meta.mtime < mtime) {
+        this.log.trace(`indexing %s`, id);
+        let rawCard = await this.read({ id, realm: this.url });
+        await ops.save(rawCard);
+      } else {
+        this.log.trace(`skipping %s`, id);
+      }
+    }
+    if (fullReindex) {
+      await ops.finishReplaceAll();
+    }
+    return { mtime: newestMtime, pid: process.pid };
   }
 
   private onFileChanged(action: 'save' | 'delete', filepath: string) {

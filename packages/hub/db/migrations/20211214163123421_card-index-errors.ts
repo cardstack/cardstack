@@ -12,6 +12,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     raw: { type: 'jsonb' },
     compiled: { type: 'jsonb' },
   });
+
+  pgm.createTable('realm_metas', {
+    realm: { type: 'text', primaryKey: true },
+    meta: { type: 'jsonb' },
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
@@ -19,4 +24,5 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn('cards', 'deps');
   pgm.dropColumn('cards', 'raw');
   pgm.dropColumn('cards', 'compiled');
+  pgm.dropTable('realm_metas');
 }
