@@ -25,11 +25,8 @@ import {
   registerRewardProgram,
   registerRewardee,
   lockRewardProgram,
-  isRewardProgramLocked,
   updateRewardProgramAdmin,
-  rewardProgramAdmin,
   addRewardRule,
-  rewardRule,
   withdraw,
   transferRewardSafe,
   viewRewardProgram,
@@ -108,11 +105,8 @@ type Commands =
   | 'claimRewards'
   | 'claimableRewardProofs'
   | 'lockRewardProgram'
-  | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
-  | 'rewardProgramAdmin'
   | 'addRewardRule'
-  | 'rewardRule'
   | 'withdrawRewardSafe'
   | 'transferRewardSafe'
   | 'recoverRewardTokens'
@@ -847,13 +841,6 @@ let {
     });
     command = 'lockRewardProgram';
   })
-  .command('is-reward-program-locked <rewardProgramId>', 'Check lock status of reward program', (yargs) => {
-    yargs.positional('rewardProgramId', {
-      type: 'string',
-      description: 'The reward program id.',
-    });
-    command = 'isRewardProgramLocked';
-  })
   .command(
     'update-reward-program-admin <prepaidCard> <rewardProgramId> <newAdmin>',
     'Update reward program admin',
@@ -873,13 +860,6 @@ let {
       command = 'updateRewardProgramAdmin';
     }
   )
-  .command('reward-program-admin <rewardProgramId>', 'Get reward program admin', (yargs) => {
-    yargs.positional('rewardProgramId', {
-      type: 'string',
-      description: 'The reward program id.',
-    });
-    command = 'rewardProgramAdmin';
-  })
   .command('add-reward-rule <prepaidCard> <rewardProgramId> <blob>', 'Add/Update reward rule', (yargs) => {
     yargs.positional('prepaidCard', {
       type: 'string',
@@ -894,13 +874,6 @@ let {
       description: 'Hex encoding of rule blob',
     });
     command = 'addRewardRule';
-  })
-  .command('reward-rule <rewardProgramId>', 'Get reward rule', (yargs) => {
-    yargs.positional('rewardProgramId', {
-      type: 'string',
-      description: 'The reward program id.',
-    });
-    command = 'rewardRule';
   })
   .command(
     'withdraw-reward-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
@@ -1341,13 +1314,6 @@ if (!command) {
       }
       await lockRewardProgram(network, prepaidCard, rewardProgramId, mnemonic);
       break;
-    case 'isRewardProgramLocked':
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      await isRewardProgramLocked(network, rewardProgramId, mnemonic);
-      break;
     case 'updateRewardProgramAdmin':
       if (prepaidCard == null) {
         showHelpAndExit('prepaid card is a required value');
@@ -1363,13 +1329,6 @@ if (!command) {
       }
       await updateRewardProgramAdmin(network, prepaidCard, rewardProgramId, newAdmin, mnemonic);
       break;
-    case 'rewardProgramAdmin':
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      await rewardProgramAdmin(network, rewardProgramId, mnemonic);
-      break;
     case 'addRewardRule':
       if (prepaidCard == null) {
         showHelpAndExit('prepaid card is a required value');
@@ -1384,13 +1343,6 @@ if (!command) {
         return;
       }
       await addRewardRule(network, prepaidCard, rewardProgramId, blob, mnemonic);
-      break;
-    case 'rewardRule':
-      if (rewardProgramId == null) {
-        showHelpAndExit('rewardProgramId is a required value');
-        return;
-      }
-      await rewardRule(network, rewardProgramId, mnemonic);
       break;
     case 'withdrawRewardSafe':
       if (recipient == null) {

@@ -869,24 +869,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay testnet: Check if Reward Program Locked",
-      "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
-      "env": {},
-      "args": [
-        "index.ts",
-        "is-reward-program-locked",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
-        "--network",
-        "${config:cardCli.network.l2.name}",
-        "--mnemonic",
-        "${config:cardCli.mnemonic}"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Cardpay testnet: Update Reward Program Admin",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
@@ -898,24 +880,6 @@
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
-        "--network",
-        "${config:cardCli.network.l2.name}",
-        "--mnemonic",
-        "${config:cardCli.mnemonic}"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Cardpay testnet: Get Reward Program Admin",
-      "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
-      "env": {},
-      "args": [
-        "index.ts",
-        "reward-program-admin",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -937,44 +901,6 @@
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
         "1", // amount (in ether units)
-        "--network",
-        "${config:cardCli.network.l2.name}",
-        "--mnemonic",
-        "${config:cardCli.mnemonic}"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Cardpay testnet: Add Reward Rule",
-      "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
-      "env": {},
-      "args": [
-        "index.ts",
-        "add-reward-rule",
-        "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
-        "0xefe53af1", //blob
-        "--network",
-        "${config:cardCli.network.l2.name}",
-        "--mnemonic",
-        "${config:cardCli.mnemonic}"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Cardpay testnet: Get Reward Rule",
-      "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
-      "env": {},
-      "args": [
-        "index.ts",
-        "reward-rule",
-        "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
