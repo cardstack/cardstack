@@ -61,7 +61,7 @@ if (process.env.COMPILER) {
       let response = await getSource(`${realmURL}post`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
-      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes']);
       expect(response.body.data?.attributes).to.deep.equal({
         files: postFiles,
         isolated: 'isolated.js',
@@ -79,7 +79,7 @@ if (process.env.COMPILER) {
       let response = await getSource(`${realmURL}post0`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
-      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes']);
       expect(response.body.data?.attributes).to.deep.equal({
         files: {},
         isolated: null,
