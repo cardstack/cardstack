@@ -80,6 +80,7 @@ if (process.env.COMPILER) {
           id: cardURL(PERSON_RAW_CARD),
           type: 'card',
           attributes,
+          relationships: {},
         },
       });
     });
