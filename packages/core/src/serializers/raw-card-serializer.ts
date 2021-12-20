@@ -38,7 +38,6 @@ export class RawCardSerializer {
         'embedded',
         'edit',
       ]);
-      this.doc.included.push(resource);
 
       resource.relationships ||= {};
       if (compiled.adoptsFrom) {
@@ -49,6 +48,8 @@ export class RawCardSerializer {
       resource.relationships.fields = {
         data: Object.values(compiled.fields).map((field) => this.includeField(compiled, field)),
       };
+
+      this.doc.included.push(resource);
     }
 
     return { type: 'compiled-metas', id: compiled.url };

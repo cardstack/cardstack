@@ -57,7 +57,7 @@ export function serializeAttributes(attrs: { [name: string]: any } | undefined, 
   return _serializeAttributes(attrs, 'serialize', serializerMap);
 }
 
-export function _serializeAttributes(
+function _serializeAttributes(
   attrs: { [name: string]: any } | undefined,
   action: 'serialize' | 'deserialize',
   serializerMap: SerializerMap
@@ -80,7 +80,7 @@ export function _serializeAttributes(
   return attrs;
 }
 
-export function serializeAttribute(
+function serializeAttribute(
   attrs: { [name: string]: any },
   path: string,
   serializer: PrimitiveSerializer,
@@ -129,7 +129,6 @@ export function serializeResource<Identity extends Saved | Unsaved>(
     type,
   };
   resource.attributes = {};
-  resource.relationships = {};
 
   if (!attributes) {
     attributes = Object.keys(payload);

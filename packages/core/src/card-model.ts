@@ -96,14 +96,6 @@ export default class CardModel {
     }
   }
 
-  get serializedAttributes() {
-    return serializeAttributes(
-      this.data,
-      // @ts-ignore
-      this.constructor.serializerMap
-    );
-  }
-
   private wrapperComponent: unknown | undefined;
 
   get component(): unknown {
@@ -153,6 +145,11 @@ export default class CardModel {
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
+    let attributes = serializeAttributes(
+      this.data,
+      // @ts-ignore
+      this.constructor.serializerMap
+    );
 
     switch (this.state.type) {
       case 'created':
@@ -161,7 +158,7 @@ export default class CardModel {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
             payload: {
-              data: serializeResource('card', undefined, this.serializedAttributes),
+              data: serializeResource('card', undefined, attributes),
             },
           },
         });
@@ -172,7 +169,7 @@ export default class CardModel {
           update: {
             cardURL: this.state.url,
             payload: {
-              data: serializeResource('card', this.state.url, this.serializedAttributes),
+              data: serializeResource('card', this.state.url, attributes),
             },
           },
         });
