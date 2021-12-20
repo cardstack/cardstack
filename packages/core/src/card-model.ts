@@ -1,8 +1,7 @@
-import { JSONAPIDocument, SerializerMap, Setter, CardEnv, Saved, Unsaved } from './interfaces';
+import { JSONAPIDocument, SerializerMap, Setter, CardEnv, Saved } from './interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import { serializeResource } from './utils/jsonapi';
-import { deserializaAttributes, serializeAttributes } from './serializers';
+import { deserializaAttributes, serializeAttributes, serializeResource } from './serializers';
 
 export interface NewCardParams {
   realm: string;
@@ -18,7 +17,7 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
-  rawServerResponse: JSONAPIDocument;
+  rawServerResponse: JSONAPIDocument<Saved>;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -97,6 +96,14 @@ export default class CardModel {
     }
   }
 
+  get serializedAttributes() {
+    return serializeAttributes(
+      this.data,
+      // @ts-ignore
+      this.constructor.serializerMap
+    );
+  }
+
   private wrapperComponent: unknown | undefined;
 
   get component(): unknown {
@@ -104,23 +111,6 @@ export default class CardModel {
       this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
     }
     return this.wrapperComponent;
-  }
-
-  private serialize(): JSONAPIDocument {
-    let { data } = this;
-    let attributes = serializeAttributes(
-      data,
-      // @ts-ignore
-      this.constructor.serializerMap
-    );
-
-    let url: string | undefined;
-    if (this.state.type === 'loaded') {
-      url = this.state.url;
-    }
-    return {
-      data: serializeResource('card', url, Object.keys(attributes), attributes),
-    };
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -163,13 +153,16 @@ export default class CardModel {
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
+
     switch (this.state.type) {
       case 'created':
         response = await this.cards.send({
           create: {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
-            payload: this.serialize(),
+            payload: {
+              data: serializeResource('card', undefined, this.serializedAttributes),
+            },
           },
         });
         break;
@@ -178,13 +171,16 @@ export default class CardModel {
         response = await this.cards.send({
           update: {
             cardURL: this.state.url,
-            payload: this.serialize(),
+            payload: {
+              data: serializeResource('card', this.state.url, this.serializedAttributes),
+            },
           },
         });
         break;
       default:
         throw assertNever(this.state);
     }
+
     this.state = {
       type: 'loaded',
       url: response.data.id,

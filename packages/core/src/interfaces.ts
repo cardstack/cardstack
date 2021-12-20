@@ -165,10 +165,10 @@ export interface RealmConfig {
   watch?: boolean;
 }
 
-export interface JSONAPIDocument<Identity extends Saved | Unsaved = Saved | Unsaved> {
+export interface JSONAPIDocument<Identity extends Saved | Unsaved = Saved> {
   data: ResourceObject<Identity>;
 }
-export interface ResourceObject<Identity extends Saved | Unsaved = Saved | Unsaved> {
+export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   id: Identity;
   type: string;
   attributes?: JSON.Object;
@@ -181,13 +181,13 @@ export type CardOperation =
       create: {
         targetRealm: string;
         parentCardURL: string;
-        payload: JSONAPIDocument;
+        payload: JSONAPIDocument<Unsaved>;
       };
     }
   | {
       update: {
         cardURL: string;
-        payload: JSONAPIDocument<Saved>;
+        payload: JSONAPIDocument;
       };
     };
 
@@ -195,7 +195,7 @@ export type CardOperation =
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<JSONAPIDocument<Saved>>;
+  send(operation: CardOperation): Promise<JSONAPIDocument>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
 }

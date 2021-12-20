@@ -1,17 +1,22 @@
 import * as JSON from 'json-typescript';
-import { RawCard, CompiledCard, Field } from './interfaces';
-import { serializeResource, findIncluded } from './utils/jsonapi';
+import { RawCard, CompiledCard, Field } from '../interfaces';
+import { serializeResource, findIncluded } from './index';
 
 export class RawCardSerializer {
   doc: any;
 
   serialize(card: RawCard, compiled?: CompiledCard): JSON.Object {
-    let resource = serializeResource(
-      'raw-cards',
-      `${card.realm}${card.id}`,
-      ['schema', 'isolated', 'embedded', 'edit', 'deserializer', 'adoptsFrom', 'files', 'data', 'realm'],
-      card
-    );
+    let resource = serializeResource('raw-cards', `${card.realm}${card.id}`, card, [
+      'schema',
+      'isolated',
+      'embedded',
+      'edit',
+      'deserializer',
+      'adoptsFrom',
+      'files',
+      'data',
+      'realm',
+    ]);
 
     this.doc = { data: resource };
 
@@ -26,12 +31,13 @@ export class RawCardSerializer {
 
   private includeCompiledMeta(compiled: CompiledCard) {
     if (!findIncluded(this.doc, { type: 'compiled-metas', id: compiled.url })) {
-      let resource = serializeResource(
-        'compiled-metas',
-        compiled.url,
-        ['schemaModule', 'serializer', 'isolated', 'embedded', 'edit'],
-        compiled
-      );
+      let resource = serializeResource('compiled-metas', compiled.url, compiled, [
+        'schemaModule',
+        'serializer',
+        'isolated',
+        'embedded',
+        'edit',
+      ]);
       this.doc.included.push(resource);
 
       resource.relationships ||= {};
@@ -51,7 +57,7 @@ export class RawCardSerializer {
   private includeField(parent: CompiledCard, field: Field) {
     let id = `${parent.url}/${field.name}`;
     if (!findIncluded(this.doc, { type: 'fields', id })) {
-      let resource = serializeResource('fields', id, ['name', { fieldType: 'type' }], field);
+      let resource = serializeResource('fields', id, field, ['name', { fieldType: 'type' }]);
       resource.relationships ||= {};
       resource.relationships.card = {
         data: this.includeCompiledMeta(field.card),

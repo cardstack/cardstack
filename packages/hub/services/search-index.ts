@@ -1,7 +1,6 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
-import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
-import { RawCardSerializer } from '@cardstack/core/src/raw-card-serializer';
+import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { CardstackError, NotFound, serializableError } from '@cardstack/core/src/utils/errors';
@@ -236,8 +235,8 @@ class IndexerRun implements IndexerHandle {
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
       data: param(card.data ?? null),
-      raw: param(serializeRawCard(card)),
-      compiled: param(serializeRawCard(card, compiledCard)),
+      raw: param(new RawCardSerializer().serialize(card)),
+      compiled: param(new RawCardSerializer().serialize(card, compiledCard)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
@@ -255,7 +254,7 @@ class IndexerRun implements IndexerHandle {
       generation: param(this.generation || null),
       ancestors: param(null),
       data: param(card.data ?? null),
-      raw: param(serializeRawCard(card)),
+      raw: param(new RawCardSerializer().serialize(card)),
       compiled: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),

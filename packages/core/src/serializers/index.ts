@@ -1,8 +1,21 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { parseISO, parse, format } from 'date-fns';
 import merge from 'lodash/merge';
-import { Card, JSONAPIDocument, Format, SerializerMap, SerializerName } from './interfaces';
-import { serializeResource } from './utils/jsonapi';
+import set from 'lodash/set';
+import get from 'lodash/get';
+import {
+  ResourceObject,
+  Saved,
+  Card,
+  JSONAPIDocument,
+  Format,
+  SerializerMap,
+  SerializerName,
+  Unsaved,
+} from '../interfaces';
+
+export { RawCardDeserializer } from './raw-card-deserializer';
+export { RawCardSerializer } from './raw-card-serializer';
 
 export interface PrimitiveSerializer {
   serialize(val: any): any;
@@ -93,9 +106,9 @@ export function serializeAttribute(
   }
 }
 
-export function serializeCardPayloadForFormat(card: Card, format: Format): JSONAPIDocument {
+export function serializeCardPayloadForFormat(card: Card, format: Format): JSONAPIDocument<Saved> {
   let componentInfo = card.compiled[format];
-  let resource = serializeResource('card', card.compiled.url, componentInfo.usedFields, card.data);
+  let resource = serializeResource('card', card.compiled.url, card.data, componentInfo.usedFields);
   resource.meta = merge(
     {
       componentModule: componentInfo.moduleName.global,
@@ -103,4 +116,36 @@ export function serializeCardPayloadForFormat(card: Card, format: Format): JSONA
     resource.meta
   );
   return { data: resource };
+}
+
+export function serializeResource<Identity extends Saved | Unsaved>(
+  type: string,
+  id: Identity,
+  payload: any,
+  attributes?: (string | Record<string, string>)[]
+): ResourceObject<Identity> {
+  let resource: ResourceObject<Identity> = {
+    id,
+    type,
+  };
+  resource.attributes = {};
+  resource.relationships = {};
+
+  if (!attributes) {
+    attributes = Object.keys(payload);
+  }
+
+  for (const attr of attributes) {
+    if (typeof attr === 'object') {
+      let [aliasName, name] = Object.entries(attr)[0];
+      set(resource.attributes, aliasName, get(payload, name) ?? null);
+    } else {
+      set(resource.attributes, attr, get(payload, attr) ?? null);
+    }
+  }
+  return resource;
+}
+
+export function findIncluded(doc: any, ref: { type: string; id: string }) {
+  return doc.included?.find((r: any) => r.id === ref.id && r.type === ref.type);
 }

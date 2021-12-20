@@ -1,5 +1,5 @@
 import { Card, CompiledCard, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
-import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 import {
