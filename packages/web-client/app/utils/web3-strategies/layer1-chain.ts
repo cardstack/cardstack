@@ -264,15 +264,25 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async refreshBalances() {
     if (!this.isConnected) return;
-    let balances = await Promise.all<string>([
-      this.getDefaultTokenBalance(),
-      this.getErc20Balance('DAI'),
-      this.getErc20Balance('CARD'),
-    ]);
-    let [defaultTokenBalance, daiBalance, cardBalance] = balances;
-    this.defaultTokenBalance = new BN(defaultTokenBalance);
-    this.daiBalance = new BN(daiBalance);
-    this.cardBalance = new BN(cardBalance);
+
+    try {
+      let balances = await Promise.all<string>([
+        this.getDefaultTokenBalance(),
+        this.getErc20Balance('DAI'),
+        this.getErc20Balance('CARD'),
+      ]);
+      let [defaultTokenBalance, daiBalance, cardBalance] = balances;
+      this.defaultTokenBalance = new BN(defaultTokenBalance);
+      this.daiBalance = new BN(daiBalance);
+      this.cardBalance = new BN(cardBalance);
+    } catch (e) {
+      // Incorrect chain id triggers controller:card-pay#onLayer2Incorrect to show a modal
+      if (e.message.includes('what name the network id')) {
+        // Exception being ignored: Don't know what name the network id ID is
+        Sentry.captureException(e);
+        throw e;
+      }
+    }
   }
 
   private async getErc20Balance(
