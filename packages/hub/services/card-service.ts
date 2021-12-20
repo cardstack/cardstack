@@ -1,4 +1,4 @@
-import { Card, CompiledCard, NewRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -50,11 +50,11 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
-  async create(raw: NewRawCard): Promise<Card> {
-    // NEW: Compile it to make sure everything is valid
-    // `${realm}${id ?? 'NEW_CARD'}/${localFile}`
+  async create(raw: RawCard<Unsaved>): Promise<Card> {
+    let compiler = this.builder.compileCardFromRaw(raw);
+    let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
-    let compiled = await this.searchIndex.indexCard(rawCard);
+    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
     return { data: rawCard.data, compiled };
   }
 
@@ -72,14 +72,14 @@ export class CardService {
   async query(query: Query): Promise<Card[]> {
     let client = await this.db.getPool();
     try {
-      let expression: CardExpression = ['select data from cards'];
+      let expression: CardExpression = ['select compiled from cards'];
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
-      let result = await client.query<{ data: any }>(expressionToSql(await this.prepareExpression(expression)));
+      let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       let deserializer = new RawCardDeserializer();
       return result.rows.map((row) => {
-        let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
+        let { raw, compiled } = deserializer.deserialize(row.compiled.data, row.compiled);
         if (!compiled) {
           throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }

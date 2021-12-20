@@ -1,8 +1,8 @@
 {
   "name": "discord-bot",
-  "version": "0.27.40",
+  "version": "0.28.2",
   "description": "",
-  "main": "server.js",
+  "main": "server.ts",
   "private": true,
   "scripts": {
     "start": "ts-node server.ts"

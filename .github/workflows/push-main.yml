@@ -122,6 +122,8 @@ jobs:
               - 'packages/hub/**'
               - 'packages/did-resolver/**'
               - 'packages/discord-bot/**'
+              - 'packages/cardpay-sdk/**'
+              - 'packages/did-resolver/**'
               - '.github/workflows/push-main.yml'
               - '.github/actions/deploy-hub/**'
               - 'yarn.lock'

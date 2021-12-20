@@ -1,8 +1,9 @@
 {
   "name": "@cardstack/did-resolver",
-  "version": "0.27.40",
+  "version": "0.28.2",
   "description": "A javascript resolver for the cardstack DID method",
-  "main": "./index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "author": "Cardstack Team",
   "license": "MIT",
   "private": false,
@@ -16,23 +17,28 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@cardstack/eslint-config": "0.28.2",
     "@cardstack/logger": "^0.2.1",
-    "@cardstack/eslint-config": "0.27.40",
-    "@cardstack/test-support": "0.27.40",
+    "@cardstack/test-support": "0.28.2",
     "@types/chai": "^4.2.15",
     "@types/lodash": "^4.14.169",
     "@types/mocha": "^8.2.1",
     "chai": "^4.3.4",
     "fast-check": "^1.26.0",
+    "mocha": "^8.3.2",
     "ts-node": "^10.3.0",
-    "mocha": "^8.3.2"
+    "typescript": "4.2.3"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
-    "node": ">= 12"
+    "node": "^14.0.0"
   },
   "scripts": {
     "test": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.ts' --timeout 60000",
-    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000"
+    "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000",
+    "prepack": "tsc"
   },
   "volta": {
     "extends": "../../package.json"

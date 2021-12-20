@@ -16,6 +16,7 @@ import {
   getNextNonceFromEstimate,
   executeSendWithRateLock,
   Operation,
+  gasInToken,
 } from '../utils/safe-utils';
 import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
@@ -91,11 +92,7 @@ export default class RevenuePool {
       Operation.CALL,
       tokenAddress
     );
-    let gasInToken = new BN(String(estimate.baseGas))
-      .add(new BN(String(estimate.safeTxGas)))
-      .mul(new BN(String(estimate.gasPrice)))
-      .toString();
-    return gasInToken;
+    return gasInToken(estimate).toString();
   }
 
   async claim(txnHash: string): Promise<TransactionReceipt>;
@@ -146,7 +143,7 @@ export default class RevenuePool {
       Operation.CALL,
       tokenAddress
     );
-    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = gasInToken(estimate);
     if (new BN(amount).lt(gasCost)) {
       throw new Error(
         `Revenue claim is not enough to cover the gas cost. The revenue amount to be claimed is ${fromWei(

@@ -26,7 +26,18 @@ export default class Web3HttpService {
   async isAvailable(): Promise<boolean> {
     let rpcURL = getConstantByNetwork('rpcNode', network);
     try {
-      let response = await fetch(rpcURL);
+      let response = await fetch(rpcURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 100,
+          method: 'eth_blockNumber',
+          params: [],
+        }),
+      });
       if (!response.ok) {
         log.error(`RPC node, ${rpcURL}, is not available: ${response.status}`);
       }

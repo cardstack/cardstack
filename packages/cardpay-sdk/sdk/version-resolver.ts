@@ -15,6 +15,7 @@ import { revenuePoolMeta, RevenuePool } from './revenue-pool';
 import { rewardPoolMeta, RewardPool } from './reward-pool';
 import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
+import { SUPPORTED_ABIS } from '../generated/supported-abis'; // this file is code-generated during postinstall step and the constant is a property tree of version -> contract name -> contract ABI
 
 export type SDK =
   | 'Assets'
@@ -100,7 +101,7 @@ export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[
   let protocolVersion = await versionManager.methods.version().call();
   let versionMap: { [version: string]: AbiItem[] } = {};
   for (let version of protocolVersions) {
-    versionMap[version.replace('v', '')] = (await import(`../contracts/abi/${version}/${contractName}.js`)).default;
+    versionMap[version.replace('v', '')] = SUPPORTED_ABIS[version][contractName];
   }
   let abi = getAPIVersion(versionMap, protocolVersion);
   return abi;

@@ -1,1 +1,1 @@
-worker: ts-node ./server.ts
+worker: ./node_modules/.bin/ts-node ./server.ts

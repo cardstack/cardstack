@@ -52,7 +52,12 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
   }
 
   get safeLabel() {
-    let safeType = this.safe.type;
+    let safeType: string = this.safe.type;
+
+    if (safeType === 'merchant') {
+      safeType = 'business';
+    }
+
     return capitalize(safeType).replace(/-/g, ' ');
   }
 

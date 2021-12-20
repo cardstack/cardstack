@@ -9,11 +9,6 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    this.afterEach(async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.reset();
-    });
-
     let { getContainer, realmURL, request, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
