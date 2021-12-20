@@ -462,7 +462,8 @@ class TrackedBuilder implements Builder {
     if (!card) {
       throw new Error('Should never get here');
     }
-    // TODO capture additional deps from the compiled card
+    // TODO capture additional deps from the compiled card by recusing through
+    // the adoptsFrom and field properties of the CompiledCard
     return card;
   }
 
