@@ -54,5 +54,39 @@ if (process.env.COMPILER) {
       let example = await cards.load(`${realmURL}example`);
       expect(example.data?.title).to.eq('Hello World');
     });
+
+    it(`can invalidate a card via change to a grandparent card`, async function () {
+      outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
+        adoptsFrom: '../post',
+      });
+      outputJSONSync(join(getRealmDir(), 'grandchild', 'card.json'), {
+        adoptsFrom: '../example',
+        data: { title: 'Hello World' },
+      });
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+
+      // at this point we expect loading of `grandchild` is broken
+      // because it's missing its grandparent card.
+
+      await cards.create({
+        realm: realmURL,
+        id: 'post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Post {
+              @contains(string)
+              title;
+            }
+          `,
+        },
+      });
+
+      let grandChild = await cards.load(`${realmURL}grandchild`);
+      expect(grandChild.data?.title).to.eq('Hello World');
+    });
   });
 }
