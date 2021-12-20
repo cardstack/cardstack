@@ -280,6 +280,7 @@ export default abstract class Layer1ChainWeb3Strategy
       if (e.message.includes('what name the network id')) {
         // Exception being ignored: Don't know what name the network id ID is
         Sentry.captureException(e);
+        throw e;
       }
     }
   }
