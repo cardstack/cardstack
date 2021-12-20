@@ -27,9 +27,9 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
+import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
+import { CardstackError, BadRequest, augmentBadRequest, NotFound, isCardstackError } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -452,12 +452,40 @@ export function makeGloballyAddressable(
 class TrackedBuilder implements Builder {
   readonly dependencies = new Set<string>();
   constructor(private realBuilder: Builder) {}
-  getCompiledCard(url: string): Promise<CompiledCard> {
+
+  async getCompiledCard(url: string): Promise<CompiledCard> {
     this.dependencies.add(url);
-    return this.realBuilder.getCompiledCard(url);
+    let card: CompiledCard | undefined;
+    await this.captureMissingCardDependencies(async () => {
+      card = await this.realBuilder.getCompiledCard(url);
+    });
+    if (!card) {
+      throw new Error('Should never get here');
+    }
+    // TODO capture additional deps from the compiled card
+    return card;
   }
-  getRawCard(url: string): Promise<RawCard> {
+
+  async getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
     return this.realBuilder.getRawCard(url);
+  }
+
+  // A NotFound error represents a dependency that the card has (that was unable
+  // to be resolved--but that is allowed)
+  private async captureMissingCardDependencies(fn: () => Promise<unknown>): Promise<void> {
+    try {
+      await fn();
+    } catch (e) {
+      if (isCardstackError(e)) {
+        let missingErrors = [e, ...(e.additionalErrors || [])].filter(
+          (_e) => isCardstackError(_e) && _e instanceof NotFound && _e.missingCard
+        ) as NotFound[];
+        for (let missingError of missingErrors) {
+          this.dependencies.add(cardURL(missingError.missingCard!));
+        }
+      }
+      throw e;
+    }
   }
 }

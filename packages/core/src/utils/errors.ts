@@ -1,4 +1,5 @@
 import { getReasonPhrase } from 'http-status-codes';
+import { CardId } from '../interfaces';
 
 export interface ErrorDetails {
   status?: number;
@@ -46,9 +47,18 @@ export class CardstackError extends Error {
   }
 }
 
+interface NotFoundErrorDetails extends ErrorDetails {
+  missingCard?: CardId;
+}
 export class NotFound extends CardstackError {
   status = 404;
   title = 'Not Found';
+  missingCard?: CardId;
+
+  constructor(detail: string, { status, title, source, missingCard }: NotFoundErrorDetails = {}) {
+    super(detail, { status, title, source });
+    this.missingCard = missingCard;
+  }
 }
 export class BadRequest extends CardstackError {
   status = 400;
