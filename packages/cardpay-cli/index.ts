@@ -30,6 +30,7 @@ import {
   withdraw,
   transferRewardSafe,
   viewRewardProgram,
+  viewRewardPrograms,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -110,7 +111,8 @@ type Commands =
   | 'withdrawRewardSafe'
   | 'transferRewardSafe'
   | 'recoverRewardTokens'
-  | 'viewRewardProgram';
+  | 'viewRewardProgram'
+  | 'viewRewardPrograms';
 
 let command: Commands | undefined;
 interface Options {
@@ -939,6 +941,9 @@ let {
     });
     command = 'viewRewardProgram';
   })
+  .command('view-reward-programs', 'View reward programs', () => {
+    command = 'viewRewardPrograms';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1395,6 +1400,9 @@ if (!command) {
         return;
       }
       await viewRewardProgram(network, rewardProgramId, mnemonic);
+      break;
+    case 'viewRewardPrograms':
+      await viewRewardPrograms(network, mnemonic);
       break;
     default:
       assertNever(command);

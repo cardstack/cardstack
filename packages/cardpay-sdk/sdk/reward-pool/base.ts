@@ -54,6 +54,10 @@ export interface RewardTokenBalance {
   balance: BN;
 }
 
+export type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
+  tokenSymbol: string;
+};
+
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
@@ -520,13 +524,13 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async balances(rewardProgramId: string): Promise<RewardTokenBalance[]> {
+  async balances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const tokensAvailable = await this.rewardTokensAvailable(rewardProgramId);
     let promises = tokensAvailable.map((tokenAddress) => {
       return this.balance(rewardProgramId, tokenAddress);
     });
     let rewardTokenBalance = await Promise.all(promises);
-    return rewardTokenBalance;
+    return this.addTokenSymbol(rewardTokenBalance);
   }
 
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
@@ -544,19 +548,26 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await getAddress('rewardPool', this.layer2Web3);
   }
 
-  async tokenSymbol(tokenAddress: string): Promise<string> {
-    const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-    return await tokenContract.methods.symbol().call();
+  async addTokenSymbol<T extends Proof | RewardTokenBalance>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
+    const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
+    const tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
+    return arrWithTokenAddress.map((o) => {
+      return {
+        ...o,
+        tokenSymbol: tokenMapping[o.tokenAddress],
+      };
+    });
   }
 
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
     let o = {};
+    let assets = await getSDK('Assets', this.layer2Web3);
     await Promise.all(
       tokenAddresses.map(async (tokenAddress: string) => {
-        let tokenSymbol = await this.tokenSymbol(tokenAddress);
+        let { symbol } = await assets.getTokenInfo(tokenAddress);
         o = {
           ...o,
-          [tokenAddress]: tokenSymbol,
+          [tokenAddress]: symbol,
         };
       })
     );

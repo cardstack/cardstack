@@ -1,5 +1,5 @@
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, WithSymbol, addTokenSymbol } from './utils';
+import { getWeb3 } from './utils';
 import { RewardProgramInfo, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
 
@@ -140,30 +140,34 @@ export async function transferRewardSafe(
 export async function viewRewardProgram(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManagerAPI = await getSDK('RewardManager', web3);
-  let rewardPoolAPI = await getSDK('RewardPool', web3);
-
   const rewardProgramInfo = await rewardManagerAPI.getRewardProgramInfo(rewardProgramId);
-  let balances = await rewardPoolAPI.balances(rewardProgramId);
-  let enhancedBalances = await addTokenSymbol(rewardPoolAPI, balances);
   displayRewardProgramInfo(rewardProgramInfo);
-  displayRewardTokenBalance(enhancedBalances);
+}
+
+export async function viewRewardPrograms(network: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
+  let rewardProgramIds = await rewardManagerAPI.getRewardPrograms();
+  let promises: Promise<RewardProgramInfo>[] = [];
+  rewardProgramIds.map((rewardProgramId) => {
+    promises.push(rewardManagerAPI.getRewardProgramInfo(rewardProgramId));
+  });
+  let rewardProgramInfos = await Promise.all(promises);
+  rewardProgramInfos.map((rewardProgramInfo) => displayRewardProgramInfo(rewardProgramInfo));
 }
 
 function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
-  let { rewardProgramId, rewardProgramAdmin, locked, rule } = rewardProgramInfo;
+  let { rewardProgramId, rewardProgramAdmin, locked, rule, tokenBalances } = rewardProgramInfo;
   console.log(`
-RewardProgramInfo
-
   rewardProgramId : ${rewardProgramId}
   rewardProgramAdmin : ${rewardProgramAdmin}
   locked : ${locked}
   rule : ${rule ? rule : 'No rule found'}
+  balance:
   `);
-}
-
-function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>[]): void {
   console.log(`  balance:`);
   tokenBalances.map(({ tokenSymbol, balance }) => {
     console.log(`    ${tokenSymbol} : ${fromWei(balance)}`);
   });
 }
+
