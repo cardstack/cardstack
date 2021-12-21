@@ -1,8 +1,8 @@
 import config from 'config';
 import * as Sentry from '@sentry/node';
-import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
+import { JobHelpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import { getOwner } from '@cardstack/di';
+import { Factory, getOwner } from '@cardstack/di';
 import logger from '@cardstack/logger';
 
 import { runInitializers } from './main';
@@ -44,40 +44,28 @@ export class HubWorker {
     runInitializers();
   }
 
+  instantiateTask(klass: Factory<unknown>): (payload: any, helpers: JobHelpers) => Promise<void> {
+    return async (payload: any, helpers: JobHelpers): Promise<void> => {
+      let task = (await getOwner(this).instantiate(klass)) as any;
+      return task.perform(payload, helpers);
+    };
+  }
+
   async boot() {
     let runner = await runWorkers({
       logger: new Logger(workerLogFactory),
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
-        'send-notifications': async (payload: any, helpers: Helpers) => {
-          let task = await getOwner(this).instantiate(SendNotificationsTask);
-          return task.perform(payload, helpers);
-        },
-        'notify-merchant-claim': async (payload: any) => {
-          let task = await getOwner(this).instantiate(NotifyMerchantClaimTask);
-          return task.perform(payload);
-        },
-        'notify-customer-payment': async (payload: any) => {
-          let task = await getOwner(this).instantiate(NotifyCustomerPaymentTask);
-          return task.perform(payload);
-        },
-        'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
-          let task = await getOwner(this).instantiate(PersistOffChainPrepaidCardCustomizationTask);
-          return task.perform(payload, helpers);
-        },
-        'persist-off-chain-merchant-info': async (payload: any, helpers: Helpers) => {
-          let task = await getOwner(this).instantiate(PersistOffChainMerchantInfoTask);
-          return task.perform(payload, helpers);
-        },
-        'persist-off-chain-card-space': async (payload: any, helpers: Helpers) => {
-          let task = await getOwner(this).instantiate(PersistOffChainCardSpaceTask);
-          return task.perform(payload, helpers);
-        },
-        'remove-old-sent-notifications': async (payload: any, helpers: Helpers) => {
-          let task = await getOwner(this).instantiate(RemoveOldSentNotificationsTask);
-          return task.perform(payload, helpers);
-        },
+        'send-notifications': this.instantiateTask(SendNotificationsTask),
+        'notify-merchant-claim': this.instantiateTask(NotifyMerchantClaimTask),
+        'notify-customer-payment': this.instantiateTask(NotifyCustomerPaymentTask),
+        'persist-off-chain-prepaid-card-customization': this.instantiateTask(
+          PersistOffChainPrepaidCardCustomizationTask
+        ),
+        'persist-off-chain-merchant-info': this.instantiateTask(PersistOffChainMerchantInfoTask),
+        'persist-off-chain-card-space': this.instantiateTask(PersistOffChainCardSpaceTask),
+        'remove-old-sent-notifications': this.instantiateTask(RemoveOldSentNotificationsTask),
         's3-put-json': s3PutJson,
       },
       // https://github.com/graphile/worker#recurring-tasks-crontab
