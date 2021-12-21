@@ -4,18 +4,18 @@
   --horizontal-card-gap: var(--boxel-sp-lg);
 
   width: 100%;
-  max-width: 100vw;
+  max-width: calc(var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2);
   min-height: 100vh;
   margin: auto;
   padding: var(--boxel-sp);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
 .cardstack-landing-page-org-grid {
   width: 100%;
-  max-width: calc(var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2);
   list-style-type: none;
   padding: 0;
   display: grid;
@@ -23,6 +23,10 @@
   grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
   grid-template-rows: auto auto;
   gap: var(--boxel-sp-xl) var(--horizontal-card-gap);
+}
+
+.cardstack-landing-page-footer {
+  margin-top: var(--boxel-sp-xxl);
 }
 
 @media screen and (max-width: 35rem) {
