@@ -13,6 +13,7 @@ import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
+import logger from '@cardstack/logger';
 import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
 
 import initSentry from './initializers/sentry';
@@ -70,7 +71,6 @@ import { Clock } from './services/clock';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
 import RealmManager from './services/realm-manager';
-import { serverLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
@@ -106,6 +106,8 @@ import HubBot from './services/discord-bots/hub-bot';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
+
+const serverLog = logger('hub/server');
 
 export function createRegistry(): Registry {
   let registry = new Registry();
@@ -212,9 +214,6 @@ export function createContainer(): Container {
 }
 
 export class HubServer {
-  logger = serverLog;
-  static logger = serverLog;
-
   private auth = inject('authentication-middleware', { as: 'auth' });
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
@@ -260,7 +259,7 @@ export class HubServer {
     if ((err as any).intentionalTestError) {
       return;
     }
-    this.logger.error(`Unhandled error:`, err);
+    serverLog.error(`Unhandled error:`, err);
     Sentry.withScope(function (scope) {
       scope.addEventProcessor(function (event) {
         return Sentry.Handlers.parseRequest(event, ctx.request);
@@ -271,7 +270,7 @@ export class HubServer {
 
   async listen(port = 3000) {
     let instance = this.app.listen(port);
-    this.logger.info(`\n👂 Hub listening on %s\n`, port);
+    serverLog.info(`\n👂 Hub listening on %s\n`, port);
 
     if (process.connected) {
       process.send!('hub hello');

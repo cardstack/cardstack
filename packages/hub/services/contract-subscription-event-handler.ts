@@ -1,11 +1,13 @@
 import WorkerClient from './worker-client';
 import * as Sentry from '@sentry/node';
 import Web3SocketService from './web3-socket';
-import { contractSubscriptionEventHandlerLog } from '../utils/logger';
 import Contracts from './contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
 import LatestEventBlockQueries from './queries/latest-event-block';
 import { inject } from '@cardstack/di';
+
+import logger from '@cardstack/logger';
+const log = logger('hub/contract-subscription-event-handler');
 
 const CONTRACT_EVENTS = [
   {
@@ -30,8 +32,6 @@ export class ContractSubscriptionEventHandler {
     as: 'latestEventBlockQueries',
   });
 
-  #logger = contractSubscriptionEventHandlerLog;
-
   async setupContractEventSubscriptions() {
     let web3Instance = this.web3.getInstance();
 
@@ -52,9 +52,9 @@ export class ContractSubscriptionEventHandler {
               action: 'contract-subscription-event-handler',
             },
           });
-          this.#logger.error(`Error in ${contractEvent.contractName} subscription`, error);
+          log.error(`Error in ${contractEvent.contractName} subscription`, error);
         } else {
-          this.#logger.info(
+          log.info(
             `Received ${contractEvent.contractName} event (block number ${event.blockNumber})`,
             event.transactionHash
           );
@@ -65,7 +65,7 @@ export class ContractSubscriptionEventHandler {
       });
     }
 
-    this.#logger.info('Subscribed to events');
+    log.info('Subscribed to events');
   }
 }
 
