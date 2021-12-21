@@ -39,7 +39,6 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
       console.log(`
-      paymentCycle: ${o.paymentCycle}
       proof: ${fromProofArray(o.proofArray)}
       leaf: ${o.leaf}
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
