@@ -186,7 +186,20 @@ export default abstract class Layer1ChainWeb3Strategy
       this.web3 = new Web3();
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
       this.#assetsApi = await getSDK('Assets', this.web3);
-      await this.connectionManager.connect(this.web3, walletProvider.id);
+      let completedConnectionAttempt = await this.connectionManager.connect(
+        this.web3,
+        walletProvider.id
+      );
+
+      /**
+       * If the user cancels the process midway of connection
+       * so connection effectively fails before trying
+       * we want to clean up any state that was set
+       */
+      if (!completedConnectionAttempt) {
+        this.cleanupConnectionState();
+        ConnectionManager.removeProviderFromStorage(this.chainId);
+      }
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`

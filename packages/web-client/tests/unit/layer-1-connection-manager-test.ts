@@ -31,7 +31,9 @@ class TestConnectionStrategy extends ConnectionStrategy {
     this.provider = 'PROVIDER';
   }
   async reconnect() {}
-  async connect() {}
+  async connect() {
+    return true;
+  }
   async disconnect() {}
 }
 
