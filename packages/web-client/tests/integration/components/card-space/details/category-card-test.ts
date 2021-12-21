@@ -63,6 +63,10 @@ module(
         .dom(`[data-test-category-option]:nth-child(${OPTIONS.length + 1})`)
         .containsText('Other');
 
+      await click(
+        `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
+      );
+
       assert
         .dom(
           `[data-test-category-option]:nth-child(${
@@ -91,13 +95,27 @@ module(
       );
 
       await click('[data-test-category-option]:nth-child(2)');
-      assert
-        .dom('[data-test-category-option-other] input')
-        .hasValue('Something');
+      assert.dom('[data-test-category-option-other] input').doesNotExist();
+
+      assert.notEqual(
+        workflowSession.getValue<string>('profileCategory'),
+        'Something'
+      );
 
       await click(
         `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
       );
+
+      assert
+        .dom('[data-test-category-option-other] input')
+        .hasValue('Something');
+
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput !== 'loading'
+      );
+
       assert.equal(
         workflowSession.getValue<string>('profileCategory'),
         'Something'
@@ -115,6 +133,7 @@ module(
       `);
 
       await click('[data-test-category-option-other]');
+
       assert.dom('[data-test-category-option-other] input').isFocused();
     });
 

@@ -20,20 +20,22 @@ export const OPTIONS = [
 ];
 
 class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardComponentArgs> {
+  otherRadioValue = 'other';
+
   @service declare hubAuthentication: HubAuthentication;
 
-  @tracked otherValue: string | null = null;
+  @tracked otherValue: string = '';
   @tracked categoryValidationState: InputValidationState = 'initial';
   @tracked categoryValidationMessage: string = '';
-
-  @tracked otherValueInput: HTMLElement | null = null;
+  @tracked otherIsChecked = false;
 
   options = OPTIONS;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
 
-    if (this.otherIsChecked) {
+    if (this.categoryValue && !OPTIONS.includes(this.categoryValue)) {
+      this.otherIsChecked = true;
       this.otherValue = this.categoryValue;
     }
   }
@@ -43,28 +45,33 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   }
 
   @action setCategoryValue(val: string) {
-    this.args.workflowSession.setValue('profileCategory', val);
+    if (val === this.otherRadioValue) {
+      this.otherIsChecked = true;
+      taskFor(this.validateCategoryTask).perform(this.otherValue);
+    } else {
+      this.otherIsChecked = false;
+      this.args.workflowSession.setValue('profileCategory', val);
+    }
   }
 
-  get otherIsChecked() {
-    return this.categoryValue && !OPTIONS.includes(this.categoryValue);
-  }
-
-  @action storeOtherValueInput(container: HTMLElement) {
-    this.otherValueInput = container.querySelector('input');
-  }
-
-  @action focusOtherValueInput() {
-    this.otherValueInput?.focus();
+  @action focusOtherValueInputAndMakeItValidateOnBlur(element: HTMLElement) {
+    let input = element!.querySelector('input')!;
+    /**
+     * We're assuming that browsers clean up event listeners by themselves. We do not have a closure
+     * that references this input... so we shouldn't have a memory leak.
+     */
+    input.addEventListener('blur', () => {
+      taskFor(this.validateCategoryTask).perform(this.otherValue);
+    });
+    input.focus();
   }
 
   @action onOtherValueInput(value: string) {
     this.otherValue = value;
-    taskFor(this.validateCategoryTask).perform();
+    taskFor(this.validateCategoryTask).perform(value);
   }
 
-  @restartableTask *validateCategoryTask(): any {
-    let profileCategory = this.otherValue;
+  @restartableTask *validateCategoryTask(profileCategory: string): any {
     this.categoryValidationState = 'loading';
 
     yield timeout(config.environment === 'test' ? 10 : 500); // debounce
@@ -87,10 +94,14 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
 
       let { errors } = yield response.json();
 
+      if (!this.otherIsChecked) {
+        return;
+      }
+
       if (errors.length === 0) {
         this.categoryValidationState = 'valid';
         this.categoryValidationMessage = '';
-        this.setCategoryValue(profileCategory!);
+        this.args.workflowSession.setValue('profileCategory', profileCategory);
       } else {
         this.categoryValidationState = 'invalid';
         this.categoryValidationMessage = errors[0].detail;
