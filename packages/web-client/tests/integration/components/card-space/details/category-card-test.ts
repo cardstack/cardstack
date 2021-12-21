@@ -132,8 +132,7 @@ module(
         />
       `);
 
-      await click('[data-test-category-option-other]');
-
+      await click('[data-test-category-option-other-container]');
       assert.dom('[data-test-category-option-other] input').isFocused();
     });
 
@@ -151,6 +150,7 @@ module(
         />
       `);
 
+      await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
       await waitUntil(
@@ -184,6 +184,7 @@ module(
         />
       `);
 
+      await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
       await waitUntil(
