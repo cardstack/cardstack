@@ -966,5 +966,22 @@
         "${config:cardCli.mnemonic}"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: View Reward Programs",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "view-reward-programs",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
   ]
 }
