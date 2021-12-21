@@ -4,7 +4,8 @@ import logger from '@cardstack/logger';
 import nodeCleanup from 'node-cleanup';
 import { Argv, Options } from 'yargs';
 import { createContainer, HubServer } from '../main';
-import { serverLog } from '../utils/logger';
+
+const log = logger('hub/server');
 
 export let command = 'serve';
 export let aliases = 'server';
@@ -41,7 +42,7 @@ export async function handler(argv: any) {
   try {
     server = await container.lookup('hubServer');
   } catch (err: any) {
-    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
+    log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   }
 
@@ -57,12 +58,12 @@ export async function handler(argv: any) {
     //
     // (If we weren't started under IPC, `process.connected` is
     // undefined, so this never happens.)
-    serverLog.info(`Shutting down because connected parent process has already exited.`);
+    log.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
 
   process.on('disconnect', () => {
-    serverLog.info(`Hub shutting down because connected parent process exited.`);
+    log.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
   });
 

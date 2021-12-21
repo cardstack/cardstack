@@ -15,7 +15,6 @@ import {
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
-import { serverLog } from '../utils/logger';
 import { Client } from 'pg';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 
@@ -62,6 +61,10 @@ function setupCacheDir(cardCacheDir: string): void {
     throw new Error('package.json of cardCacheDir does not have properly configured exports');
   }
 }
+
+import logger from '@cardstack/logger';
+const log = logger('hub/card-cache');
+
 export default class CardCache {
   config = inject('card-cache-config', { as: 'config' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -91,7 +94,7 @@ export default class CardCache {
   }
 
   private writeFile(fsLocation: string, source: string): void {
-    serverLog.debug(`card-cache writing`, fsLocation);
+    log.trace('writing file: %s', fsLocation);
     mkdirpSync(dirname(fsLocation));
     writeFileSync(fsLocation, source);
   }
@@ -159,13 +162,13 @@ export default class CardCache {
       if (!existsSync(loc)) {
         continue;
       }
-      serverLog.debug(`card-cache deleting`, loc);
+      log.trace(`deleting`, loc);
       removeSync(loc);
     }
   }
 
   teardown(): void {
-    serverLog.info('Cleaning cardCache dir: ' + this.dir);
+    log.debug('Cleaning Cache dir: ' + this.dir);
     for (let subDir of ENVIRONMENTS) {
       removeSync(join(this.dir, subDir));
     }
