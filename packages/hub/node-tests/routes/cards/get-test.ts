@@ -94,7 +94,7 @@ if (process.env.COMPILER) {
       // console.log(JSON.stringify(response.body, null, 2));
 
       expect(response.body).to.have.all.keys('data');
-      expect(response.body.data).to.have.keys('type', 'id', 'meta', 'relationships', 'attributes');
+      expect(response.body.data).to.have.keys('type', 'id', 'meta', 'attributes');
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Hello World',
         body: 'First post.',
