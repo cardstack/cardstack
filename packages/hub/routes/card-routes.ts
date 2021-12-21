@@ -141,6 +141,7 @@ export default class CardRoutes {
     let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
 
     if (query.include === 'compiledMeta') {
+      // TODO: Update to use search-index instead of realmManager/builder
       compiledCard = await this.builder.getCompiledCard(url);
     }
     let data = new RawCardSerializer().serialize(rawCard, compiledCard);
@@ -152,6 +153,7 @@ export default class CardRoutes {
       if (!this.config.routeCard) {
         this.routerInstance = defaultRouterInstance;
       } else {
+        // TODO: Update to use search-index instead of realmManager/builder
         let card = await this.builder.getCompiledCard(this.config.routeCard);
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const CardRouterClass = requireCard(card.schemaModule.global, this.cache.dir).default;

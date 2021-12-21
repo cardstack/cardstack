@@ -7,6 +7,11 @@ if (process.env.COMPILER) {
   describe('SearchIndex', function () {
     let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
+    this.beforeEach(async () => {
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+    });
+
     it(`gives a good error at load time when a card can't compile`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), { adoptsFrom: '../post' });
       let si = await getContainer().lookup('searchIndex');
@@ -18,7 +23,7 @@ if (process.env.COMPILER) {
         expect(err.message).to.eq(`tried to adopt from card ${realmURL}post but it failed to load`);
         expect(err.status).to.eq(422);
         let innerError = err.additionalErrors?.[0];
-        expect(innerError?.message).to.eq('card post not found');
+        expect(innerError?.message).to.eq(`Card ${realmURL}post was not found`);
         expect(innerError?.status).to.eq(404);
       }
     });

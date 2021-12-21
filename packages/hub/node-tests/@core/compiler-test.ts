@@ -38,9 +38,12 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
     });
 
     it('string card', async function () {
+      // TODO: Update to use cardService.create
       let compiled = await builder.getCompiledCard('https://cardstack.com/base/string');
       expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
       expect(compiled.embedded.inlineHBS).to.equal('{{@model}}');

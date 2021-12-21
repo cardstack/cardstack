@@ -41,6 +41,7 @@ if (process.env.COMPILER) {
           }`,
         },
       });
+      // TODO: Update to use card-service create
       compiledListCard = await builder.getCompiledCard(`${realmURL}list`);
       compiledStringCard = await builder.getCompiledCard('https://cardstack.com/base/string');
       compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
