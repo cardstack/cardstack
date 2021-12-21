@@ -54,7 +54,7 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
     }
   }
 
-  @action focusOtherValueInputAndMakeItValidateOnBlur(element: HTMLElement) {
+  @action setupOtherValueInput(element: HTMLElement) {
     let input = element!.querySelector('input')!;
     /**
      * We're assuming that browsers clean up event listeners by themselves. We do not have a closure
