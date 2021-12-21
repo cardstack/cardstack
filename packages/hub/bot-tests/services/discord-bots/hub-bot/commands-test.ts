@@ -1,11 +1,7 @@
 import { Client as DBClient } from 'pg';
 import { it, beforeStart, afterAll, expect } from 'corde';
-import config from 'config';
-import { Registry } from '@cardstack/di';
-import { BetaTestConfig } from '../../../../services/discord-bots/hub-bot/types';
-import { HubBotController } from '../../../../process-controllers/hub-bot-controller';
-
-let { sku } = config.get('betaTesting') as BetaTestConfig;
+import { Container } from '@cardstack/di';
+import { createRegistry } from '../../../../main';
 
 // The discord test driver lib, corde, is still pretty new so its a bit rough
 // around the edges. Some of our challenges are that the `describe()` doesn't
@@ -17,40 +13,26 @@ let { sku } = config.get('betaTesting') as BetaTestConfig;
 
 const TIMEOUT = 10 * 1000;
 
-class StubInventory {
-  getSKUSummaries() {
-    return Promise.resolve([
-      {
-        type: 'inventories',
-        id: sku,
-        attributes: {
-          quantity: 10,
-        },
-      },
-    ]);
-  }
-}
-
-let bot: HubBotController;
+let container: Container;
 let db: DBClient;
 beforeStart(async () => {
-  bot = await HubBotController.create({
-    registryCallback(registry: Registry) {
-      registry.register('inventory', StubInventory);
-    },
-  });
+  // warning this is not a mocha hook, so we are making a new container by hand
+  let registry = createRegistry();
+  container = new Container(registry);
+  let bot = await container.lookup('hubBot');
+  await bot.start();
 }, TIMEOUT);
 
 // Ugh, the corde before each hook doesn't seem to work
 async function setupTest() {
-  let dbManager = await bot.container.lookup('database-manager');
+  let dbManager = await container.lookup('database-manager');
   db = await dbManager.getClient();
   await db.query(`DELETE FROM dm_channels`);
   await db.query(`DELETE FROM beta_testers`);
 }
 
 afterAll(async () => {
-  await bot.teardown();
+  await container.teardown();
 }, TIMEOUT);
 
 it(`can respond to a guild command`, async function () {

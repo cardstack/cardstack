@@ -3,7 +3,7 @@ import { Client as DBClient } from 'pg';
 import config from 'config';
 import { name as commandName, run as command } from '../../services/discord-bots/hub-bot/commands/guild/card-drop';
 import * as JSONAPI from 'jsonapi-typescript';
-import Bot, {
+import {
   MockUser,
   makeTestMessage,
   makeTestChannel,
@@ -12,14 +12,12 @@ import Bot, {
   MockRole,
 } from '@cardstack/discord-bot';
 import { BetaTestConfig } from '../../services/discord-bots/hub-bot/types';
-import { HubBotController } from '../../process-controllers/hub-bot-controller';
+import { registry, setupBot } from '../helpers/server';
 
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 
 describe('bot command: card-drop', function () {
-  let botController: HubBotController;
   let db: DBClient;
-  let bot: Bot;
   let stubInventory: JSONAPI.ResourceObject[];
 
   let user: MockUser = {
@@ -39,20 +37,13 @@ describe('bot command: card-drop', function () {
   }
 
   this.beforeAll(async function () {
-    botController = await HubBotController.create({
-      registryCallback(registry) {
-        registry.register('inventory', StubInventoryService);
-      },
-    });
-    bot = botController.bot;
+    registry(this).register('inventory', StubInventoryService);
   });
 
-  this.afterAll(async function () {
-    await botController.teardown();
-  });
+  let { getContainer, getBot } = setupBot(this, 'beforeAll');
 
   this.beforeEach(async function () {
-    let dbManager = await botController.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM dm_channels`);
     await db.query(`DELETE FROM beta_testers`);
@@ -84,7 +75,7 @@ describe('bot command: card-drop', function () {
       channel,
     });
 
-    await command(bot, message);
+    await command(getBot(), message);
     expect(channel.responses).to.deep.equal([]);
     expect(dm.lastResponse).to.contain(`Connect your Card Wallet app to receive your prepaid card.`);
   });
@@ -107,7 +98,7 @@ describe('bot command: card-drop', function () {
       channel,
     });
 
-    await command(bot, message);
+    await command(getBot(), message);
     expect(channel.responses).to.deep.equal([]);
     expect(dm.lastResponse).to.equal(
       `You have already been provisioned a prepaid card. If you are having problems accessing it contact an admin for help.`
@@ -136,7 +127,7 @@ describe('bot command: card-drop', function () {
       channel,
     });
 
-    await command(bot, message);
+    await command(getBot(), message);
     expect(channel.responses).to.deep.equal([]);
     expect(dm.lastResponse).to.equal(
       `Sorry, it looks like we don't have any prepaid cards available right now, try asking me again in the future.`
@@ -157,7 +148,7 @@ describe('bot command: card-drop', function () {
       channel,
     });
 
-    await command(bot, message);
+    await command(getBot(), message);
     expect(channel.responses).to.deep.equal([]);
     expect(dm.lastResponse).to.equal(
       `Sorry, it looks like we don't have any prepaid cards available right now, try asking me again in the future.`

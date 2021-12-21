@@ -2,6 +2,7 @@ import Mocha from 'mocha';
 import { createRegistry, HubServer } from '../../main';
 import { Container, Registry } from '@cardstack/di';
 import supertest from 'supertest';
+import type HubBot from '../../services/discord-bots/hub-bot';
 
 interface InternalContext {
   registry?: Registry;
@@ -25,6 +26,7 @@ export function registry(context: object): Registry {
   return internal.registry;
 }
 
+type TestSetupType = 'beforeEach' | 'beforeAll';
 export function setupHub(mochaContext: Mocha.Suite) {
   let container: Container;
   let server: HubServer;
@@ -45,6 +47,44 @@ export function setupHub(mochaContext: Mocha.Suite) {
     },
     request() {
       return supertest(server.app.callback());
+    },
+  };
+}
+
+export function setupBot(mochaContext: Mocha.Suite, setupType: TestSetupType = 'beforeEach') {
+  let container: Container;
+  let bot: HubBot;
+
+  if (setupType === 'beforeEach') {
+    mochaContext.beforeEach(async function () {
+      let context = contextFor(mochaContext);
+      container = context.container = new Container(registry(this));
+      bot = await container.lookup('hubBot');
+      await bot.start();
+    });
+
+    mochaContext.afterEach(async function () {
+      await container.teardown();
+    });
+  } else {
+    mochaContext.beforeAll(async function () {
+      let context = contextFor(mochaContext);
+      container = context.container = new Container(registry(this));
+      bot = await container.lookup('hubBot');
+      await bot.start();
+    });
+
+    mochaContext.afterAll(async function () {
+      await container.teardown();
+    });
+  }
+
+  return {
+    getContainer() {
+      return container;
+    },
+    getBot() {
+      return bot;
     },
   };
 }
