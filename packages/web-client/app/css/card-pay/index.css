@@ -1,3 +1,10 @@
+.card-pay__body-content {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
+  max-width: calc(70.75rem + var(--boxel-sp-xl) * 2);
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .card-pay__footer {
   margin-top: var(--boxel-sp-xxl);
 }
