@@ -11,6 +11,10 @@ aria-labelledby seems friendlier to safari than the for element, but unsure abou
     boxel-radio-option--hidden-border=@hiddenBorder
     boxel-radio-option--has-checkbox=(not @hiddenCheckbox)
   }}
+  data-test-boxel-radio-option-item
+  data-test-boxel-radio-option-item-value={{@value}}
+  data-test-boxel-radio-option-item-checked={{@checked}}
+  data-test-boxel-radio-option-item-disabled={{@disabled}}
   ...attributes
 >
   <Input

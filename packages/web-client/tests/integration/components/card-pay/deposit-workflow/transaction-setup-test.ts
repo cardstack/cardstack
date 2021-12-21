@@ -235,10 +235,10 @@ module(
         .doesNotExist();
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="DAI"]`)
-        .hasClass('token-option--checked');
+        .hasClass('boxel-radio-option--checked');
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="CARD"]`)
-        .doesNotHaveClass('token-option--checked');
+        .doesNotHaveClass('boxel-radio-option--checked');
       assert
         .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
         .hasText('Continue');
@@ -269,10 +269,10 @@ module(
       await click(`[data-test-deposit-transaction-setup-from-option="CARD"]`);
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="CARD"]`)
-        .hasClass('token-option--checked');
+        .hasClass('boxel-radio-option--checked');
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="DAI"]`)
-        .doesNotHaveClass('token-option--checked');
+        .doesNotHaveClass('boxel-radio-option--checked');
 
       await click(
         `[data-test-deposit-transaction-setup] [data-test-boxel-button]`
@@ -382,13 +382,13 @@ module(
         .isDisabled();
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="DAI"]')
-        .doesNotHaveClass('token-option--checked');
+        .doesNotHaveClass('boxel-radio-option--checked');
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="CARD"] input')
         .isNotDisabled();
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="CARD"]')
-        .hasClass('token-option--checked');
+        .hasClass('boxel-radio-option--checked');
       assert
         .dom('[data-test-deposit-transaction-setup-validation]')
         .doesNotExist();
