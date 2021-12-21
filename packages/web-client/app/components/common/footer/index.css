@@ -27,6 +27,12 @@
   align-items: center;
 }
 
+.cardstack-footer__discord-icon {
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}
+
 .cardstack-footer__social-icon {
   --icon-color: currentColor;
 
