@@ -2,7 +2,7 @@
   width: 100%;
 }
 
-.cardstack-footer__bar {
+.cardstack-footer__section {
   display: flex;
   gap: var(--boxel-sp-lg);
   justify-content: space-between;
@@ -11,7 +11,7 @@
   flex-wrap: wrap;
 }
 
-.cardstack-footer__bar + .cardstack-footer__bar {
+.cardstack-footer__section + .cardstack-footer__section {
   border-top: 1px solid #585469;
 }
 
