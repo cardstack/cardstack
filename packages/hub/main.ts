@@ -13,8 +13,6 @@ import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
-import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
-import { LogLevel, LogMeta } from '@graphile/logger';
 import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
 
 import initSentry from './initializers/sentry';
@@ -71,10 +69,8 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
-import boom from './tasks/boom';
-import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog } from './utils/logger';
+import { serverLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
@@ -105,12 +101,16 @@ import NotificationPreferenceService from './services/push-notifications/prefere
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
+import { HubWorker } from './worker';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
 export function createRegistry(): Registry {
   let registry = new Registry();
+  registry.register('hubServer', HubServer);
+  registry.register('hubWorker', HubWorker);
+
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
@@ -129,7 +129,6 @@ export function createRegistry(): Registry {
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
   registry.register('upload-queries', UploadQueries);
-  registry.register('hubServer', HubServer);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
@@ -301,81 +300,4 @@ declare module '@cardstack/di' {
 export function runInitializers() {
   initSentry();
   initFirebase();
-}
-
-export async function bootWorker() {
-  runInitializers();
-
-  let workerLogFactory: LogFunctionFactory = (scope: any) => {
-    return (level: LogLevel, message: any, meta?: LogMeta) => {
-      switch (level) {
-        case LogLevel.ERROR:
-          workerLog.error(message, scope, meta);
-          break;
-        case LogLevel.WARNING:
-          workerLog.warn(message, scope, meta);
-          break;
-        case LogLevel.INFO:
-          workerLog.info(message, scope, meta);
-          break;
-        case LogLevel.DEBUG:
-          workerLog.info(message, scope, meta);
-      }
-    };
-  };
-  let dbConfig = config.get('db') as Record<string, any>;
-  let container = createContainer();
-  let runner = await runWorkers({
-    logger: new Logger(workerLogFactory),
-    connectionString: dbConfig.url,
-    taskList: {
-      boom: boom,
-      'send-notifications': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(SendNotificationsTask);
-        return task.perform(payload, helpers);
-      },
-      'notify-merchant-claim': async (payload: any) => {
-        let task = await container.instantiate(NotifyMerchantClaimTask);
-        return task.perform(payload);
-      },
-      'notify-customer-payment': async (payload: any) => {
-        let task = await container.instantiate(NotifyCustomerPaymentTask);
-        return task.perform(payload);
-      },
-      'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
-        return task.perform(payload, helpers);
-      },
-      'persist-off-chain-merchant-info': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainMerchantInfoTask);
-        return task.perform(payload, helpers);
-      },
-      'persist-off-chain-card-space': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainCardSpaceTask);
-        return task.perform(payload, helpers);
-      },
-      'remove-old-sent-notifications': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(RemoveOldSentNotificationsTask);
-        return task.perform(payload, helpers);
-      },
-      's3-put-json': s3PutJson,
-    },
-    // https://github.com/graphile/worker#recurring-tasks-crontab
-    // remove old notifications at midnight every day
-    // 5am in utc equivalent to midnight in ny
-    // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-    crontab: '0 5 * * * remove-old-sent-notifications ?max=5',
-  });
-
-  runner.events.on('job:error', ({ error, job }) => {
-    Sentry.withScope(function (scope) {
-      scope.setTags({
-        jobId: job.id,
-        jobTask: job.task_identifier,
-      });
-      Sentry.captureException(error);
-    });
-  });
-
-  await runner.promise;
 }
