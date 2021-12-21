@@ -6,7 +6,7 @@ import {
   convertRawAmountToDecimalFormat,
   fromWei,
   spendToUsd,
-  usdToSpend,
+  convertToSpend,
 } from './amount-conversion';
 import { subtract, mod, floorDivide, add, multiply, divide, fraction } from './arithmetic';
 import { greaterThan, greaterThanOrEqualTo, isEqual, isZero, lessThan } from './comparison';
@@ -70,7 +70,7 @@ export {
   convertRawAmountToDecimalFormat,
   fromWei,
   spendToUsd,
-  usdToSpend,
+  convertToSpend,
   isSupportedCurrency,
   countDecimalPlaces,
   handleSignificantDecimalsWithThreshold,

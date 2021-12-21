@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/boxel",
-  "version": "0.27.31",
+  "version": "0.28.2",
   "description": "Cardstack Boxel Design System development app.",
   "repository": "https://github.com/cardstack/boxel",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "broccoli-stew": "^3.0.0",
     "dayjs": "^1.10.4",
     "ember-animated": "^0.11.0",
-    "ember-auto-import": "^1.10.1",
+    "ember-auto-import": "^2.2.4",
     "ember-class-names-helper": "^0.2.1",
     "ember-cli-babel": "^7.26.6",
     "ember-cli-htmlbars": "^5.3.1",
@@ -45,7 +45,6 @@
     "ember-cli-typescript": "^4.1.0",
     "ember-composable-helpers": "^4.4.1",
     "ember-concurrency-decorators": "^2.0.3",
-    "ember-css-url": "^0.2.1",
     "ember-element-helper": "^0.5.0",
     "ember-event-helpers": "^0.1.1",
     "ember-keyboard": "^6.0.3",
@@ -149,7 +148,8 @@
     "prettier": "^2.3.2",
     "qunit-dom": "^1.6.0",
     "stylelint-config-standard": "^21.0.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "webpack": "^5.64.1"
   },
   "engines": {
     "node": "12.* || >= 14.*"

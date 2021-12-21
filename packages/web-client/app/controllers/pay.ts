@@ -7,7 +7,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { usdToSpend } from '@cardstack/cardpay-sdk';
+import { convertToSpend } from '@cardstack/cardpay-sdk';
 import { inject as service } from '@ember/service';
 import IsIOS from '../services/is-ios';
 import { useResource } from 'ember-resources';
@@ -17,7 +17,6 @@ import { formatAmount } from '../helpers/format-amount';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
 
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
-const minUsdAmount = spendToUsd(minSpendAmount)!;
 
 export default class PayController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
@@ -68,13 +67,15 @@ export default class PayController extends Controller {
     } else if (this.currency === 'USD') {
       let amount = Math.max(
         Number(roundAmountToNativeCurrencyDecimals(this.amount, 'USD')),
-        minUsdAmount
+        spendToUsd(minSpendAmount)!
       );
       return {
         amount,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, 'USD'),
-          secondaryAmount: `§${formatAmount(usdToSpend(Number(amount))!)}`,
+          secondaryAmount: `§${formatAmount(
+            convertToSpend(Number(amount), 'USD', 1)!
+          )}`,
         },
       };
     } else {
@@ -82,14 +83,17 @@ export default class PayController extends Controller {
       let amount: number;
       let formattedSpendAmount: string | undefined;
       if (rate) {
-        let minAmount = minUsdAmount * rate;
         amount = Number(
-          roundAmountToNativeCurrencyDecimals(
-            Math.max(this.amount, minAmount),
-            this.currency
-          )
+          roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
         );
-        formattedSpendAmount = `§${formatAmount(usdToSpend(amount / rate))}`;
+        let spendAmount = convertToSpend(amount, this.currency, rate);
+
+        if (spendAmount < minSpendAmount) {
+          amount = spendToUsd(minSpendAmount)! * rate;
+          spendAmount = convertToSpend(amount, this.currency, rate);
+        }
+
+        formattedSpendAmount = `§${formatAmount(spendAmount)}`;
       } else {
         amount = Number(
           roundAmountToNativeCurrencyDecimals(this.amount, this.currency)

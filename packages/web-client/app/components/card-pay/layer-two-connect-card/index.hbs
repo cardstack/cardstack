@@ -92,17 +92,12 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img
-              srcset="{{this.testFlightIcon}},
-                      {{this.testFlightIcon2x}} 2x"
-              src={{this.testFlightIcon}}
-              alt=""
-              role="presentation"
-              width="40px"
-              height="40px"
-            >
+            {{svg-jar "test-flight-icon" width="210px" }}
+
+            <div>
               Download TestFlight
               {{svg-jar "caret-right-large" class="layer-two-connect-card__testflight-link-icon"}}
+            </div>
           </a>
         </div>
       </ActionCardContainer::Section>

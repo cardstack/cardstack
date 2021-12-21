@@ -51,7 +51,7 @@ describe('Cardstack DID Resolver', function () {
       try {
         encodeDID({ type: 'PrepaidCardCustomization', uniqueId: 'foo' });
         expect.fail('should throw and not reach here');
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).to.eq(`uniqueId must be a flickrBase58 or RFC4122 v4-compliant UUID. Was: "foo"`);
       }
     });
@@ -77,7 +77,7 @@ describe('Cardstack DID Resolver', function () {
             try {
               encodeDID({ version, type: 'PrepaidCardCustomization' });
               expect.fail('should throw and not reach here');
-            } catch (e) {
+            } catch (e: any) {
               expect(e.message).to.eq(`version out of supported range: ${version}`);
             }
           }
@@ -131,7 +131,7 @@ describe('Cardstack DID Resolver', function () {
       try {
         await resolver.resolve(did);
         expect.fail('should throw and not reach here');
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).to.eq('Invalid DID identifier: checksum failed');
       }
     });
@@ -141,7 +141,7 @@ describe('Cardstack DID Resolver', function () {
       try {
         await resolver.resolve(did);
         expect.fail('should throw and not reach here');
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).to.eq('Invalid DID identifier: unknown type "Z"');
       }
     });

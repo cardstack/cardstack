@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { Estimate, SendPayload } from './safe-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.5/prepaid-card-manager';
+import { Estimate, SendPayload, Operation } from './safe-utils';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
@@ -30,7 +30,7 @@ export async function signPrepaidCardSendTx(
     issuingToken,
     0,
     payload.data,
-    0,
+    Operation.CALL,
     payload.safeTxGas,
     payload.dataGas,
     payload.gasPrice,
@@ -56,7 +56,7 @@ export async function signSafeTx(
     to,
     0,
     data,
-    0,
+    Operation.CALL,
     estimate.safeTxGas,
     estimate.dataGas,
     estimate.gasPrice,
@@ -74,7 +74,7 @@ export async function signSafeTxAsRSV(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -109,7 +109,7 @@ export async function signSafeTxAsBytes(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -140,7 +140,7 @@ export async function signSafeTxWithEIP1271AsBytes(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   estimate: Estimate,
   refundReceiver: string,
   nonce: any,
@@ -188,7 +188,7 @@ function safeTransactionTypedData(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   txGasEstimate: string,
   baseGasEstimate: string,
   gasPrice: string,
@@ -233,32 +233,40 @@ function safeTransactionTypedData(
   };
 }
 
-export function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let provider = web3.currentProvider;
-    if (typeof provider === 'string') {
-      throw new Error(`The provider ${web3.currentProvider} is not supported`);
-    }
-    if (provider == null) {
-      throw new Error('No provider configured');
-    }
-    //@ts-ignore TS is complaining that provider might be undefined--but the
-    //check above should prevent that from ever happening
-    provider.send(
-      {
-        jsonrpc: '2.0',
-        method: 'eth_signTypedData',
-        params: [account, data],
-        id: new Date().getTime(),
-      },
-      (err, response) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(response?.result);
+export async function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
+  let signature: string | undefined;
+  let attempts = 0;
+  do {
+    signature = await new Promise((resolve, reject) => {
+      let provider = web3.currentProvider;
+      if (typeof provider === 'string') {
+        throw new Error(`The provider ${web3.currentProvider} is not supported`);
       }
-    );
-  });
+      if (provider == null) {
+        throw new Error('No provider configured');
+      }
+      //@ts-ignore TS is complaining that provider might be undefined--but the
+      //check above should prevent that from ever happening
+      provider.send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [account, data],
+          id: new Date().getTime(),
+        },
+        (err, response) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(response?.result);
+        }
+      );
+    });
+  } while (signature == null && attempts++ < 5);
+  if (!signature) {
+    throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
+  }
+  return signature;
 }
 
 export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
@@ -279,7 +287,7 @@ export async function signRewardSafe(
   to: string,
   value: number,
   data: any,
-  operation: number,
+  operation: Operation,
   estimate: Estimate,
   txGasToken: string,
   refundReceiver: string,

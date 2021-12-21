@@ -1,5 +1,5 @@
 import { Client as DBClient } from 'pg';
-import { HubBotController } from '../../main';
+
 import config from 'config';
 import { name as commandName, run as command } from '../../services/discord-bots/hub-bot/commands/guild/card-drop';
 import * as JSONAPI from 'jsonapi-typescript';
@@ -12,8 +12,9 @@ import Bot, {
   MockRole,
 } from '@cardstack/discord-bot';
 import { BetaTestConfig } from '../../services/discord-bots/hub-bot/types';
+import { HubBotController } from '../../process-controllers/hub-bot-controller';
 
-const { sku, discordRole: betaTesterRoleName } = config.get('betaTesting') as BetaTestConfig;
+const { sku } = config.get('betaTesting') as BetaTestConfig;
 
 describe('bot command: card-drop', function () {
   let botController: HubBotController;
@@ -28,12 +29,7 @@ describe('bot command: card-drop', function () {
   };
   let mockEOA = '0x123';
   let mockTxnHash = '0x456';
-  let betaTesterRole: MockRole = {
-    id: '1',
-    name: betaTesterRoleName,
-  };
   let roles = new Collection<string, MockRole>();
-  roles.set(betaTesterRole.id, betaTesterRole);
   let guild = makeTestGuild({ roles });
 
   class StubInventoryService {
@@ -76,7 +72,7 @@ describe('bot command: card-drop', function () {
     expect(commandName).to.equal('card-drop');
   });
 
-  it(`starts a conversation with a beta tester that has not yet received an airdrop`, async function () {
+  it(`starts a conversation with user that has not yet received an airdrop`, async function () {
     let channel = makeTestChannel();
     let dm = makeTestChannel();
     let message = makeTestMessage({
@@ -91,22 +87,6 @@ describe('bot command: card-drop', function () {
     await command(bot, message);
     expect(channel.responses).to.deep.equal([]);
     expect(dm.lastResponse).to.contain(`Connect your Card Wallet app to receive your prepaid card.`);
-  });
-
-  it(`does not give prepaid cards to non-beta testers`, async function () {
-    let channel = makeTestChannel();
-    let dm = makeTestChannel();
-    let message = makeTestMessage({
-      user,
-      guild,
-      content: '!card-drop',
-      onCreateDM: () => Promise.resolve(dm),
-      channel,
-    });
-
-    await command(bot, message);
-    expect(channel.responses).to.deep.equal([]);
-    expect(dm.lastResponse).to.equal(`Sorry, I can only give prepaid cards to beta testers.`);
   });
 
   it(`does not give prepaid cards to users that already received airdrop`, async function () {

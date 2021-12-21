@@ -4,7 +4,8 @@ import { expect } from 'chai';
 
 import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import CardModel from '@cardstack/core/src/card-model';
-import { CardJSONResponse, CardOperation, Format } from '@cardstack/core/src/interfaces';
+import { CardOperation, JSONAPIDocument, Format, Saved } from '@cardstack/core/src/interfaces';
+import { cardURL } from '@cardstack/core/src/utils';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
@@ -29,7 +30,7 @@ let attributes = {
 
 let cardJSONResponse = {
   data: {
-    id: PERSON_RAW_CARD.url,
+    id: cardURL(PERSON_RAW_CARD),
     type: 'card',
     attributes,
     meta: {
@@ -43,7 +44,7 @@ class StubCards {
   async load(_url: string, _format: Format): Promise<CardModel> {
     throw new Error('unimplemented');
   }
-  async send(op: CardOperation): Promise<CardJSONResponse> {
+  async send(op: CardOperation): Promise<JSONAPIDocument<Saved>> {
     this.lastOp = op;
     return { data: { type: 'cards', id: 'x' } };
   }
@@ -76,7 +77,7 @@ if (process.env.COMPILER) {
       }
       expect(op.update.payload, 'A model can be serialized once instantiated').to.deep.equal({
         data: {
-          id: PERSON_RAW_CARD.url,
+          id: cardURL(PERSON_RAW_CARD),
           type: 'card',
           attributes,
         },

@@ -2,7 +2,6 @@ import Route from '@ember/routing/route';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
-import CardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-white-text.svg';
 import CardSpaceLogo from '@cardstack/web-client/images/icons/card-space-logo-clear-background.svg';
 import CardPayLogo from '@cardstack/web-client/images/icons/card-pay-logo.svg';
 import CardMembershipLogo from '@cardstack/web-client/images/icons/card-membership-logo.svg';
@@ -12,6 +11,10 @@ import CardSpaceImage from '@cardstack/web-client/images/illustrations/card-spac
 import CardPayImage from '@cardstack/web-client/images/illustrations/card-pay-illustration.svg';
 import CardCatalogImage from '@cardstack/web-client/images/illustrations/card-catalog-illustration.svg';
 import CardMembershipImage from '@cardstack/web-client/images/illustrations/card-membership-illustration.svg';
+import CardSpaceHor from '@cardstack/web-client/images/illustrations/card-space-illustration-horizontal.svg';
+import CardPayHor from '@cardstack/web-client/images/illustrations/card-pay-illustration-horizontal.svg';
+import CardCatalogHor from '@cardstack/web-client/images/illustrations/card-catalog-illustration-horizontal.svg';
+import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-membership-illustration-horizontal.svg';
 
 import '../css/cardstack-landing-page.css';
 
@@ -20,85 +23,89 @@ const { enableCardSpace, enableCardPay } = ENV.features;
 
 const ORGS = [
   {
-    sideImage: {
-      url: CardPayImage,
-      alt: '',
-    },
+    sideImage: CardPayImage,
+    topImage: CardPayHor,
     icon: {
       url: CardPayLogo,
       alt: 'Logo for Card Pay',
     },
     id: 'card-pay',
     name: 'Card Pay',
-    subtitle: 'For businesses & crypto enthusiasts',
-    description: 'Use this seamless payment system to',
+    subtitle: 'Fast, cheap & easy payments',
+    description: 'Launch this dApp to',
     descriptionList: [
-      'supply tokens',
-      'issue prepaid cards',
-      'manage your online store',
-      'earn or distribute rewards',
-      'etc.',
+      'Create a business account',
+      'Issue prepaid cards',
+      'View your wallet balances',
+      'Deposit or withdraw tokens',
+      'Earn rewards (coming soon)',
     ],
     cta: enableCardPay ? 'Open' : 'Launching soon',
     launched: enableCardPay,
     route: 'card-pay',
   },
   {
-    sideImage: {
-      url: CardSpaceImage,
-      alt: '',
-    },
+    sideImage: CardSpaceImage,
+    topImage: CardSpaceHor,
     icon: {
       url: CardSpaceLogo,
       alt: 'Logo for Card Space',
     },
     id: 'card-space',
     name: 'Card Space',
-    subtitle: 'For creators & businesses',
-    description: 'Set up a private or public space for your',
+    subtitle: 'Spaces for creators & businesses',
+    description: 'Create a space to',
     descriptionList: [
-      'blog',
-      'videos',
-      'online store',
-      'personal profile',
-      'etc.',
+      'Reserve your unique URL',
+      'Set up an online store',
+      'Build a personal profile',
+      'Request donations',
+      'Embed features from Card Catalog',
     ],
     cta: enableCardSpace ? 'Open' : 'Launching soon',
     launched: enableCardSpace,
     route: enableCardSpace ? 'card-space' : 'index',
   },
   {
-    sideImage: {
-      url: CardCatalogImage,
-      alt: '',
-    },
+    sideImage: CardCatalogImage,
+    topImage: CardCatalogHor,
     icon: {
       url: CardCatalogLogo,
       alt: 'Logo for Card Catalog',
     },
     id: 'card-catalog',
     name: 'Card Catalog',
-    subtitle: 'An open software marketplace for developers & designers',
-    description: '',
-    descriptionList: null,
+    subtitle: 'An open software marketplace',
+    description: 'Use the catalog to',
+    descriptionList: [
+      'Submit ideas for new dApps',
+      'Fund devs to build new features',
+      'Vote to approve / reject submissions',
+      'Purchase new cards with Card Pay',
+      'Receive grants and earnings as devs',
+    ],
     cta: 'Launching soon',
     launched: false,
     route: 'index',
   },
   {
-    sideImage: {
-      url: CardMembershipImage,
-      alt: '',
-    },
+    sideImage: CardMembershipImage,
+    topImage: CardMembershipHor,
     icon: {
       url: CardMembershipLogo,
       alt: 'Logo for Card Membership',
     },
     id: 'card-membership',
     name: 'Card Membership',
-    subtitle: 'Governance & voting for crypto enthusiasts',
-    description: '',
-    descriptionList: null,
+    subtitle: 'Memberships for DAOs, brands & NFT communities',
+    description: 'Set up a membership program to',
+    descriptionList: [
+      'Engage your users',
+      'Create special offers & rewards',
+      'Provide a DAO wallet',
+      'Bridge on-chain & in real life',
+      'Manage recurring subscriptions',
+    ],
     cta: 'Launching soon',
     launched: false,
     route: 'index',
@@ -108,7 +115,6 @@ const ORGS = [
 export default class CardstackRoute extends Route {
   async model() {
     return {
-      logo: CardstackLogo,
       orgs: ORGS,
     };
   }

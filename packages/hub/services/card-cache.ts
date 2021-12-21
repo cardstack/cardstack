@@ -1,9 +1,7 @@
-import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, NODE, ENVIRONMENTS } from '../interfaces';
+import { Environment, ENVIRONMENTS, NODE } from '../interfaces';
 import {
   writeFileSync,
-  readJSONSync,
   readFileSync,
   existsSync,
   mkdirpSync,
@@ -12,16 +10,21 @@ import {
   pathExistsSync,
   ensureDirSync,
   outputJSONSync,
+  readJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { serverLog } from '../utils/logger';
 import { Client } from 'pg';
+import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
   exports: {
+    './package.json': {
+      default: './package.json',
+    },
     '.': {
       browser: './browser',
       default: './node',
@@ -49,8 +52,7 @@ function setupCacheDir(cardCacheDir: string): void {
 
   let pkg;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    pkg = require(`${cardCacheDir}/package.json`);
+    pkg = __non_webpack_require__(`${cardCacheDir}/package.json`);
   } catch (error) {
     createMinimalPackageJSON(cardCacheDir);
     pkg = MINIMAL_PACKAGE;
@@ -118,10 +120,7 @@ export default class CardCache {
 
   setCard(cardURL: string, source: CompiledCard) {
     this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
-    this.indexCard(cardURL, source);
   }
-
-  indexCard(_cardURL: string, _source: CompiledCard): void {}
 
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));

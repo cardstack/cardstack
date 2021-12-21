@@ -2,9 +2,9 @@ import Service from '@ember/service';
 
 import {
   Format,
-  CardJSONResponse,
   CardEnv,
   CardOperation,
+  JSONAPIDocument,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -25,12 +25,12 @@ export default class Cards extends Service {
   overrideRoutingCardWith: string | undefined;
 
   async load(url: string, format: Format): Promise<CardModel> {
-    let cardResponse: CardJSONResponse;
+    let cardResponse: JSONAPIDocument;
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
       cardResponse = await builder.load(url, format);
     } else {
-      cardResponse = await fetchJSON<CardJSONResponse>(
+      cardResponse = await fetchJSON<JSONAPIDocument>(
         this.buildCardURL(url, format)
       );
     }
@@ -44,7 +44,7 @@ export default class Cards extends Service {
       return await builder.loadForRoute(this.overrideRoutingCardWith, pathname);
     } else {
       let url = `${cardServer}cardFor${pathname}`;
-      let cardResponse = await fetchJSON<CardJSONResponse>(url);
+      let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { component, Model } = await this.codeForCard(cardResponse);
       return Model.fromResponse(this.cardEnv(), cardResponse, component);
     }
@@ -85,14 +85,14 @@ export default class Cards extends Service {
     }
   }
 
-  private async send(op: CardOperation): Promise<CardJSONResponse> {
+  private async send(op: CardOperation): Promise<JSONAPIDocument> {
     if (this.operationIsLocal(op)) {
       let builder = await this.builder();
       return await builder.send(op);
     }
 
     if ('create' in op) {
-      return await fetchJSON<CardJSONResponse>(
+      return await fetchJSON<JSONAPIDocument>(
         this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
         {
           method: 'POST',
@@ -100,7 +100,7 @@ export default class Cards extends Service {
         }
       );
     } else if ('update' in op) {
-      return await fetchJSON<CardJSONResponse>(
+      return await fetchJSON<JSONAPIDocument>(
         this.buildCardURL(op.update.cardURL),
         {
           method: 'PATCH',
@@ -153,11 +153,14 @@ export default class Cards extends Service {
   }
 
   private async codeForCard(
-    card: CardJSONResponse
+    card: JSONAPIDocument
   ): Promise<{ component: unknown; Model: typeof CardModel }> {
     let componentModule = card.data?.meta?.componentModule;
     if (!componentModule) {
       throw new Error('No componentModule to load');
+    }
+    if (typeof componentModule !== 'string') {
+      throw new Error('Cards component module is not a string');
     }
     let module = await this.loadModule<{
       default: unknown;

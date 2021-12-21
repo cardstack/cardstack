@@ -122,22 +122,3 @@ export async function transferTokensGasEstimate(
     )} ${symbol}`
   );
 }
-
-export async function setSupplierInfoDID(
-  network: string,
-  safe: string,
-  infoDID: string,
-  gasToken: string,
-  mnemonic?: string
-): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
-  let safes = await getSDK('Safes', web3);
-  let assets = await getSDK('Assets', web3);
-  let { symbol } = await assets.getTokenInfo(gasToken);
-  console.log(`setting the info DID for the supplier safe ${safe} to ${infoDID} using ${symbol} token to pay for gas`);
-  let blockExplorer = await getConstant('blockExplorer', web3);
-  await safes.setSupplierInfoDID(safe, infoDID, gasToken, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-  });
-  console.log('done');
-}

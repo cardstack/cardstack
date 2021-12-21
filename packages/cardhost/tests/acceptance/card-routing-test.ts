@@ -7,17 +7,19 @@ import {
   PERSON_RAW_CARD,
 } from '@cardstack/core/tests/helpers/fixtures';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
+import { cardURL } from '@cardstack/core/src/utils';
 
 module('Acceptance | card routing', function (hooks) {
-  let personURL = PERSON_RAW_CARD.url;
-  let routeCardURL = `${LOCAL_REALM}/my-routes`;
+  let personURL = cardURL(PERSON_RAW_CARD);
+  let routeCardURL = `${LOCAL_REALM}my-routes`;
 
   setupApplicationTest(hooks);
   setupBuilder(hooks, { routingCard: routeCardURL });
 
   hooks.beforeEach(async function () {
     await this.builder.createRawCard({
-      url: routeCardURL,
+      id: 'my-routes',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `

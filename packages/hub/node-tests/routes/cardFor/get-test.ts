@@ -1,6 +1,7 @@
 import { TEST_REALM, templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
-import { registry, setupHub } from '../../helpers/server';
+import { configureHubWithCompiler } from '../../helpers/cards';
+import { registry } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
@@ -17,11 +18,12 @@ if (process.env.COMPILER) {
       );
     });
 
-    let { cards, resolveCard, request, realm } = setupHub(this);
+    let { realmURL, request, cards, resolveCard } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}routes`,
+        realm: realmURL,
+        id: 'routes',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -40,14 +42,16 @@ if (process.env.COMPILER) {
         },
       });
       await cards.create({
-        url: `${realm}homepage`,
+        realm: realmURL,
+        id: 'homepage',
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
         },
       });
       await cards.create({
-        url: `${realm}about`,
+        realm: realmURL,
+        id: 'about',
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
@@ -56,7 +60,6 @@ if (process.env.COMPILER) {
     });
 
     it('404s when you try to load a path that the router doesnt have', async function () {
-      // assert.expect(0);
       await getCardForPath('thing').expect(404);
     });
 

@@ -22,6 +22,11 @@ runs:
     - run: yarn --prefer-offline
       shell: bash
 
+    - name: Webpack build
+      run: yarn build
+      shell: bash
+      working-directory: packages/hub
+
     - name: Deploy server
       run: waypoint up --app=hub -plain
       shell: bash
@@ -38,6 +43,13 @@ runs:
 
     - name: Deploy bot
       run: waypoint up --app=hub-bot -prune-retain=0 -plain
+      shell: bash
+      env:
+        WAYPOINT_SERVER_TLS: '1'
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - name: Deploy event handler
+      run: waypoint up --app=hub-event-listener -prune-retain=0 -plain
       shell: bash
       env:
         WAYPOINT_SERVER_TLS: '1'

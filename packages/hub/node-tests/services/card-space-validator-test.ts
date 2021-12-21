@@ -71,6 +71,17 @@ describe('CardSpaceValidator', function () {
     expect(errors.donationDescription).deep.equal(['Max length is 300']);
   });
 
+  it('can check for profanity', async function () {
+    let subject = await getContainer().lookup('card-space-validator');
+
+    const cardSpace = {
+      profileName: 'fuck this is invalid',
+    } as CardSpace;
+
+    let errors = await subject.validate(cardSpace);
+    expect(errors.profileName).deep.equal(['Username is not allowed']);
+  });
+
   it('validates links', async function () {
     let subject = await getContainer().lookup('card-space-validator');
     const cardSpace: CardSpace = {

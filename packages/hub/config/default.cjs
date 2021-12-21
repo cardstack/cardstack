@@ -1,6 +1,3 @@
-const defer = require('config/defer').deferConfig;
-const { join } = require('path');
-
 module.exports = {
   hubEnvironment: 'development',
   aws: {
@@ -23,7 +20,8 @@ module.exports = {
     url: 'postgres://postgres:postgres@localhost:5432/hub_development',
     'migrations-dir': 'db/migrations',
     'migration-filename-format': 'utc',
-    'ignore-pattern': 'README.md|.*\\.ts|.*\\.js\\.map',
+    'ignore-pattern': 'README.md|.*\\.d\\.ts',
+    'check-order': false,
   },
   discord: {
     botId: '896093538297708564',
@@ -40,6 +38,12 @@ module.exports = {
     dsn: null,
     enabled: false,
     environment: null,
+  },
+  firebase: {
+    projectId: null,
+    clientEmail: null,
+    privateKey: null,
+    databaseURL: null,
   },
   wyre: {
     accountId: null,
@@ -59,7 +63,6 @@ module.exports = {
     network: 'sokol',
   },
   betaTesting: {
-    discordRole: 'Beta Tester',
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
   },
   walletConnect: {
@@ -67,18 +70,7 @@ module.exports = {
     clientURL: 'https://app.cardstack.com',
     clientName: 'Cardstack',
   },
-  compiler: {
-    realmsConfig: defer(function () {
-      return [
-        {
-          url: 'https://cardstack.com/base/',
-          directory: join(__dirname, '..', '..', 'base-cards'),
-        },
-        {
-          url: 'https://demo.com/',
-          directory: join(__dirname, '..', '..', 'demo-cards'),
-        },
-      ];
-    }),
+  web3storage: {
+    token: null,
   },
 };

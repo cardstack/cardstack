@@ -5,10 +5,26 @@
 }
 
 .image-editor__layout {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
   padding: var(--boxel-sp);
+}
+
+.image-editor__layout--errored {
+  min-height: max(60vh, 20rem);
+}
+
+.image-editor__error-overlay {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-editor__editing-section {
@@ -78,7 +94,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.3s ease-out var(--fade-out-delay), height 0s ease-out var(--fade-out-time), width 0s ease-out var(--fade-out-time);
+  transition:
+    opacity 0.3s ease-out var(--fade-out-delay),
+    height 0s ease-out var(--fade-out-time),
+    width 0s ease-out var(--fade-out-time);
 }
 
 .image-editor__loading-indicator-container--done {

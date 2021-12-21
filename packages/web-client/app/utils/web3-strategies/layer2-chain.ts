@@ -50,10 +50,11 @@ import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
-import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
-import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
-import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { IAssets } from '@cardstack/cardpay-sdk';
+import { PrepaidCard } from '@cardstack/cardpay-sdk';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
+import { getLayer2RpcWssNodeUrl } from '../features';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -155,6 +156,8 @@ export default abstract class Layer2ChainWeb3Strategy
       };
     }
     this.web3 = new Web3();
+
+    let rpcWss = getLayer2RpcWssNodeUrl(this.networkSymbol);
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
@@ -164,10 +167,7 @@ export default abstract class Layer2ChainWeb3Strategy
         ),
       },
       rpcWss: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcWssNode',
-          this.networkSymbol
-        ),
+        [networkIds[this.networkSymbol]]: rpcWss,
       },
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });

@@ -70,13 +70,25 @@ Usage:
 ## Step 4: Run migrations (if any)
 
 Connect to the instance where the app is deployed:
+
 ```sh
-waypoint exec -app=hub bash
+waypoint exec -app=hub sh
 ```
 
-Then, add node to the PATH and run the migrations:
+Then, execute the db migrate command:
+
 ```sh
-heroku@ip-10-91-1-8:/ cd /workspace
-heroku@ip-10-91-1-8:/workspace$ PATH=$PATH:/layers/heroku_nodejs-engine/nodejs/bin/;
-heroku@ip-10-91-1-8:/workspace$ npm run db:migrate up
+node dist/hub.js db migrate up
+```
+If you receive an error like:
+```sh
+Error: Not run migration 20211013155536724_card-index is preceding already run migration 20211013173917696_beta-testers
+    at checkOrder (/workspace/node_modules/node-pg-migrate/dist/runner.js:103:19)
+    at exports.default (/workspace/node_modules/node-pg-migrate/dist/runner.js:149:13)
+    at processTicksAndRejections (internal/process/task_queues.js:95:5)
+    at async Object.handler (/workspace/packages/hub/dist/hub.js:713760:9)
+  ```
+  Then include the `--no-check-order` flag:
+  ```sh
+node dist/hub.js db migrate up --no-check-order
 ```

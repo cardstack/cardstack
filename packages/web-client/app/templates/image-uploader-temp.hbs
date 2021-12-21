@@ -13,7 +13,9 @@
   @isOpen={{this.showEditor}}
   @onClose={{fn (mut this.showEditor) false}}
   @image={{this.editing}}
-  @aspectRatio={{div 16 9}}
+  @width={{160}}
+  @height={{90}}
+  @fileType={{this.fileType}}
   @saveImageEditData={{this.saveImageEditData}}
   as |preview|
 >

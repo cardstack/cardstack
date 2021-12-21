@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.5 (Debian 13.5-1.pgdg110+1)
+-- Dumped by pg_dump version 14.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -53,6 +53,30 @@ CREATE TYPE public.discord_bots_status_enum AS ENUM (
 
 
 ALTER TYPE public.discord_bots_status_enum OWNER TO postgres;
+
+--
+-- Name: notification_preferences_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.notification_preferences_status_enum AS ENUM (
+    'enabled',
+    'disabled'
+);
+
+
+ALTER TYPE public.notification_preferences_status_enum OWNER TO postgres;
+
+--
+-- Name: notification_types_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.notification_types_status_enum AS ENUM (
+    'enabled',
+    'disabled'
+);
+
+
+ALTER TYPE public.notification_types_status_enum OWNER TO postgres;
 
 --
 -- Name: wallet_orders_status_enum; Type: TYPE; Schema: public; Owner: postgres
@@ -694,6 +718,26 @@ CREATE TABLE public.card_spaces (
 ALTER TABLE public.card_spaces OWNER TO postgres;
 
 --
+-- Name: cards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cards (
+    url text NOT NULL,
+    data jsonb,
+    ancestors text[],
+    "searchData" jsonb,
+    realm text NOT NULL,
+    generation integer,
+    "compileErrors" jsonb,
+    deps text[],
+    raw jsonb,
+    compiled jsonb
+);
+
+
+ALTER TABLE public.cards OWNER TO postgres;
+
+--
 -- Name: discord_bots; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -724,6 +768,20 @@ CREATE TABLE public.dm_channels (
 ALTER TABLE public.dm_channels OWNER TO postgres;
 
 --
+-- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.latest_event_block (
+    id integer DEFAULT 1 NOT NULL,
+    block_number integer NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT latest_event_block_singleton CHECK ((id = 1))
+);
+
+
+ALTER TABLE public.latest_event_block OWNER TO postgres;
+
+--
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -739,6 +797,35 @@ CREATE TABLE public.merchant_infos (
 
 
 ALTER TABLE public.merchant_infos OWNER TO postgres;
+
+--
+-- Name: notification_preferences; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notification_preferences (
+    owner_address text NOT NULL,
+    notification_type_id uuid NOT NULL,
+    push_client_id text NOT NULL,
+    status public.notification_preferences_status_enum DEFAULT 'enabled'::public.notification_preferences_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.notification_preferences OWNER TO postgres;
+
+--
+-- Name: notification_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notification_types (
+    id uuid NOT NULL,
+    notification_type text NOT NULL,
+    default_status public.notification_types_status_enum DEFAULT 'enabled'::public.notification_types_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.notification_types OWNER TO postgres;
 
 --
 -- Name: pgmigrations; Type: TABLE; Schema: public; Owner: postgres
@@ -820,6 +907,33 @@ CREATE TABLE public.prepaid_card_patterns (
 ALTER TABLE public.prepaid_card_patterns OWNER TO postgres;
 
 --
+-- Name: push_notification_registrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.push_notification_registrations (
+    id uuid NOT NULL,
+    owner_address text NOT NULL,
+    push_client_id text NOT NULL,
+    disabled_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.push_notification_registrations OWNER TO postgres;
+
+--
+-- Name: realm_metas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.realm_metas (
+    realm text NOT NULL,
+    meta jsonb
+);
+
+
+ALTER TABLE public.realm_metas OWNER TO postgres;
+
+--
 -- Name: reservations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -835,6 +949,43 @@ CREATE TABLE public.reservations (
 
 
 ALTER TABLE public.reservations OWNER TO postgres;
+
+--
+-- Name: sent_push_notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sent_push_notifications (
+    notification_id text NOT NULL,
+    push_client_id text,
+    notification_type text,
+    notification_title text,
+    notification_body text,
+    notification_data json,
+    message_id text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.sent_push_notifications OWNER TO postgres;
+
+--
+-- Name: uploads; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.uploads (
+    id uuid NOT NULL,
+    cid text NOT NULL,
+    service text NOT NULL,
+    url text NOT NULL,
+    filename text NOT NULL,
+    size integer NOT NULL,
+    type text NOT NULL,
+    owner_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.uploads OWNER TO postgres;
 
 --
 -- Name: wallet_orders; Type: TABLE; Schema: public; Owner: postgres
@@ -942,6 +1093,14 @@ ALTER TABLE ONLY public.card_spaces
 
 
 --
+-- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT cards_pkey PRIMARY KEY (url);
+
+
+--
 -- Name: discord_bots discord_bots_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -958,11 +1117,27 @@ ALTER TABLE ONLY public.dm_channels
 
 
 --
+-- Name: latest_event_block latest_event_block_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.latest_event_block
+    ADD CONSTRAINT latest_event_block_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.merchant_infos
     ADD CONSTRAINT merchant_infos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notification_types notification_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification_types
+    ADD CONSTRAINT notification_types_pkey PRIMARY KEY (id);
 
 
 --
@@ -998,11 +1173,43 @@ ALTER TABLE ONLY public.prepaid_card_patterns
 
 
 --
+-- Name: push_notification_registrations push_notification_registrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.push_notification_registrations
+    ADD CONSTRAINT push_notification_registrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: realm_metas realm_metas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.realm_metas
+    ADD CONSTRAINT realm_metas_pkey PRIMARY KEY (realm);
+
+
+--
 -- Name: reservations reservations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.reservations
     ADD CONSTRAINT reservations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sent_push_notifications sent_push_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sent_push_notifications
+    ADD CONSTRAINT sent_push_notifications_pkey PRIMARY KEY (notification_id);
+
+
+--
+-- Name: uploads uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
 
 
 --
@@ -1050,6 +1257,27 @@ CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos US
 
 
 --
+-- Name: notification_preferences_owner_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX notification_preferences_owner_address_index ON public.notification_preferences USING btree (owner_address);
+
+
+--
+-- Name: notification_preferences_owner_address_notification_type_id_pus; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX notification_preferences_owner_address_notification_type_id_pus ON public.notification_preferences USING btree (owner_address, notification_type_id, push_client_id);
+
+
+--
+-- Name: push_notification_registrations_owner_address_push_client_id_un; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX push_notification_registrations_owner_address_push_client_id_un ON public.push_notification_registrations USING btree (owner_address, push_client_id);
+
+
+--
 -- Name: reservations_id_user_address_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1075,6 +1303,13 @@ CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.re
 --
 
 CREATE INDEX reservations_user_address_index ON public.reservations USING btree (user_address);
+
+
+--
+-- Name: sent_push_notifications_created_at_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX sent_push_notifications_created_at_index ON public.sent_push_notifications USING btree (created_at);
 
 
 --
@@ -1164,6 +1399,14 @@ ALTER TABLE ONLY public.wallet_orders
 
 
 --
+-- Name: notification_preferences notification_preferences_notification_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification_preferences
+    ADD CONSTRAINT notification_preferences_notification_type_id_fkey FOREIGN KEY (notification_type_id) REFERENCES public.notification_types(id);
+
+
+--
 -- Name: prepaid_card_customizations prepaid_card_customizations_color_scheme_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1205,8 +1448,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.5 (Debian 13.5-1.pgdg110+1)
+-- Dumped by pg_dump version 14.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1224,14 +1467,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-10-25 14:13:27.499839-04
-2	2021-10-25 14:13:27.499839-04
-3	2021-10-25 14:13:27.499839-04
-4	2021-10-25 14:13:27.499839-04
-5	2021-10-25 14:13:27.499839-04
-6	2021-10-25 14:13:27.499839-04
-7	2021-10-25 14:13:27.499839-04
-8	2021-10-25 14:13:27.499839-04
+1	2021-12-15 16:26:59.71672+00
+2	2021-12-15 16:26:59.71672+00
+3	2021-12-15 16:26:59.71672+00
+4	2021-12-15 16:26:59.71672+00
+5	2021-12-15 16:26:59.71672+00
+6	2021-12-15 16:26:59.71672+00
+7	2021-12-15 16:26:59.71672+00
+8	2021-12-15 16:26:59.71672+00
 \.
 
 
@@ -1240,18 +1483,28 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-10-25 14:13:27.499839
-2	20210614080132698_create-prepaid-card-customizations-table	2021-10-25 14:13:27.499839
-3	20210623052200757_create-graphile-worker-schema	2021-10-25 14:13:27.499839
-4	20210809113449561_merchant-infos	2021-10-25 14:13:27.499839
-5	20210817184105100_wallet-orders	2021-10-25 14:13:27.499839
-6	20210920142313915_prepaid-card-reservations	2021-10-25 14:13:27.499839
-7	20210924200122612_order-indicies	2021-10-25 14:13:27.499839
-8	20211006090701108_create-card-spaces	2021-10-25 14:13:27.499839
-9	20211013173917696_beta-testers	2021-10-25 14:13:27.499839
-10	20211014131843187_add-fields-to-card-spaces	2021-10-25 14:13:27.499839
-11	20211020231214235_discord-bots	2021-11-04 13:23:05.679077
-17	20211105180905492_wyre-price-service	2021-11-05 14:24:55.098482
+1	20210527151505645_create-prepaid-card-tables	2021-12-15 16:26:59.71672
+2	20210614080132698_create-prepaid-card-customizations-table	2021-12-15 16:26:59.71672
+3	20210623052200757_create-graphile-worker-schema	2021-12-15 16:26:59.71672
+4	20210809113449561_merchant-infos	2021-12-15 16:26:59.71672
+5	20210817184105100_wallet-orders	2021-12-15 16:26:59.71672
+6	20210920142313915_prepaid-card-reservations	2021-12-15 16:26:59.71672
+7	20210924200122612_order-indicies	2021-12-15 16:26:59.71672
+8	20211006090701108_create-card-spaces	2021-12-15 16:26:59.71672
+9	20211013155536724_card-index	2021-12-15 16:26:59.71672
+10	20211013173917696_beta-testers	2021-12-15 16:26:59.71672
+11	20211014131843187_add-fields-to-card-spaces	2021-12-15 16:26:59.71672
+12	20211020231214235_discord-bots	2021-12-15 16:26:59.71672
+13	20211105180905492_wyre-price-service	2021-12-15 16:26:59.71672
+14	20211110210324178_card-index-part-duex	2021-12-15 16:26:59.71672
+15	20211118084217151_create-uploads	2021-12-15 16:26:59.71672
+16	20211129083801382_create-push-notification-registrations	2021-12-15 16:26:59.71672
+17	20211129123635817_create-notification-types	2021-12-15 16:26:59.71672
+18	20211129130425303_create-notification-preferences	2021-12-15 16:26:59.71672
+19	20211206195559187_card-index-generations	2021-12-15 16:26:59.71672
+20	20211207151150639_sent-push-notifications	2021-12-15 16:26:59.71672
+21	20211207190527999_create-latest-event-block	2021-12-15 16:26:59.71672
+25	20211214163123421_card-index-errors	2021-12-17 16:40:35.43273
 \.
 
 
@@ -1259,7 +1512,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 17, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 25, true);
 
 
 --

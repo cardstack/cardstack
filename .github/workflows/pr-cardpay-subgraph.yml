@@ -27,4 +27,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: yarn build:subgraph
+      - run: yarn codegen:subgraph-sokol && yarn build:subgraph

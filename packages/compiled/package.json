@@ -1,11 +1,14 @@
 {
   "name": "@cardstack/compiled",
-  "version": "0.27.31",
+  "version": "0.28.2",
   "private": true,
   "keywords": [
     "ember-addon"
   ],
   "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
     ".": {
       "browser": "./browser",
       "default": "./node"
@@ -19,8 +22,8 @@
     "node": ">= 14"
   },
   "dependencies": {
-    "@cardstack/boxel": "0.27.31",
-    "@cardstack/core": "0.27.31",
+    "@cardstack/boxel": "0.28.2",
+    "@cardstack/core": "0.28.2",
     "@embroider/addon-shim": "*",
     "@glimmer/component": "^1.0.3"
   },

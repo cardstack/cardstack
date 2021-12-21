@@ -2,10 +2,11 @@
   "compilerOptions": {
     "declaration": true,
     "esModuleInterop": true,
-    "module": "es6",
+    "module": "es2020",
     "moduleResolution": "Node",
+    "outDir": "dist",
     "pretty": true,
-    "target": "ES6",
+    "target": "es2020",
     "strict": true,
     "sourceMap": true,
     "experimentalDecorators": true,
@@ -20,4 +21,15 @@
     "noImplicitReturns": true,
     "skipLibCheck": true
   },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "generated",
+    "contracts",
+    "providers",
+    "sdk",
+    "index.ts"
+  ]
 }

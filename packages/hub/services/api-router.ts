@@ -11,6 +11,7 @@ export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
+  statusRoute = inject('status-route', { as: 'statusRoute' });
   prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
   });
@@ -25,6 +26,12 @@ export default class APIRouter {
   });
   cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
+  });
+  pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
+    as: 'pushNotificationRegistrationsRoute',
+  });
+  notificationPreferencesRoute = inject('notification-preferences-route', {
+    as: 'notificationPreferencesRoute',
   });
   custodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   ordersRoute = inject('orders-route', { as: 'ordersRoute' });
@@ -41,17 +48,21 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      statusRoute,
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
       cardSpacesRoute,
       wyrePricesRoute,
+      pushNotificationRegistrationsRoute,
+      notificationPreferencesRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
+    apiSubrouter.get('/status', statusRoute.get);
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
@@ -69,8 +80,17 @@ export default class APIRouter {
       parseBody,
       cardSpacesRoute.postProfileCategoryValidation
     );
+    apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
     apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
+    apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);
+    apiSubrouter.delete(
+      '/push-notification-registrations/:push_client_id',
+      parseBody,
+      pushNotificationRegistrationsRoute.delete
+    );
+    apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
+    apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 

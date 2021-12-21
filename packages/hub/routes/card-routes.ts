@@ -1,5 +1,4 @@
 import { RouterContext } from '@koa/router';
-import { deserialize, serializeCard, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
 import { inject } from '@cardstack/di';
@@ -8,13 +7,20 @@ import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
 import { NotFound, BadRequest } from '@cardstack/core/src/utils/errors';
 import { difference } from 'lodash';
+import { assertQuery } from '@cardstack/core/src/query';
+import qs from 'qs';
+import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
+import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+
+declare global {
+  const __non_webpack_require__: any;
+}
 
 const requireCard = function (path: string, root: string): any {
-  const module = require.resolve(path, {
+  const module = __non_webpack_require__.resolve(path, {
     paths: [root],
   });
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require(module);
+  return __non_webpack_require__(module);
 };
 
 export default class CardRoutes {
@@ -36,8 +42,17 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let { data, compiled } = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = await serializeCard(url, data, compiled[format]);
+    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
+    ctx.body = serializeCardPayloadForFormat(card, format);
+    ctx.status = 200;
+  }
+
+  private async queryCards(ctx: RouterContext) {
+    let query = qs.parse(ctx.querystring);
+    assertQuery(query);
+    let cards = await this.cards.as(INSECURE_CONTEXT).query(query);
+    let collection = cards.map((card) => serializeCardPayloadForFormat(card, 'embedded').data);
+    ctx.body = { data: collection };
     ctx.status = 200;
   }
 
@@ -59,31 +74,31 @@ export default class CardRoutes {
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let card: any = {
+    let card: RawCard<Unsaved> = {
+      id: undefined,
+      realm: realmURL,
       adoptsFrom: parentCardURL,
       data: inputData.attributes,
     };
     if (inputData.id) {
-      card.url = inputData.id;
+      card.id = inputData.id.slice(realmURL.length);
     }
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card, { realmURL });
-
-    ctx.body = await serializeCard(compiled.url, outputData, compiled[format]);
+    let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
+    ctx.body = serializeCardPayloadForFormat(createdCard, format);
     ctx.status = 201;
   }
 
   private async updateCard(ctx: RouterContext) {
     let {
-      request: { body },
+      request: { body: data },
       params: { encodedCardURL: url },
     } = ctx;
 
-    let data = await deserialize(body).attributes;
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ url, data });
-
+    let cardId = this.realmManager.parseCardURL(url);
+    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
     // Question: Is it safe to assume the response should be isolated?
-    ctx.body = await serializeCard(url, outputData, compiled['isolated']);
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;
   }
 
@@ -92,7 +107,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    await this.realmManager.getRealm(url).delete(url);
+    await this.realmManager.delete(this.realmManager.parseCardURL(url));
     this.cache.deleteCard(url);
 
     ctx.status = 204;
@@ -112,10 +127,8 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let rawCard = await this.realmManager.read(url);
-    let card = await this.builder.getCompiledCard(url);
-    ctx.body = await serializeCard(url, rawCard.data, card['isolated']);
-    ctx.status = 200;
+    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
   }
 
   private async getSource(ctx: RouterContext) {
@@ -125,13 +138,13 @@ export default class CardRoutes {
     } = ctx;
 
     let compiledCard;
-    let rawCard = await this.realmManager.read(url);
+    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
 
     if (query.include === 'compiledMeta') {
       compiledCard = await this.builder.getCompiledCard(url);
     }
-
-    ctx.body = serializeRawCard(rawCard, compiledCard);
+    let data = new RawCardSerializer().serialize(rawCard, compiledCard);
+    ctx.body = data;
   }
 
   private async ensureRouterInstance(): Promise<RouterInstance> {
@@ -141,7 +154,7 @@ export default class CardRoutes {
       } else {
         let card = await this.builder.getCompiledCard(this.config.routeCard);
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const CardRouterClass = requireCard(card.schemaModule, this.cache.dir).default;
+        const CardRouterClass = requireCard(card.schemaModule.global, this.cache.dir).default;
         const cardRouterInstance = new CardRouterClass();
         assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
         this.routerInstance = cardRouterInstance;
@@ -157,7 +170,7 @@ export default class CardRoutes {
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
     koaRouter.post(`/cards/:realmURL/:parentCardURL`, parseBody, this.createDataCard);
-    koaRouter.get(`/cards/`, unimpl);
+    koaRouter.get(`/cards/`, this.queryCards);
     koaRouter.get(`/cards/:encodedCardURL`, this.getCard);
     koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCard);
     koaRouter.delete(`/cards/:encodedCardURL`, this.deleteCard);

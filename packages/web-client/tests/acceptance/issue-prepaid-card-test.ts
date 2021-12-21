@@ -545,7 +545,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance-label]`)
-      .containsText('Merchant balance');
+      .containsText('Business balance');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
       .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString());

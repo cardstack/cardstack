@@ -2,6 +2,7 @@ import BaseRoute from './base';
 import '../../css/card-pay/wallet.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const WALLET_PANEL = {
   title: 'Simple Wallet',
@@ -12,11 +13,11 @@ const WALLET_PANEL = {
     {
       workflow: 'issue-prepaid-card',
       icon: 'prepaid-cards',
-      title: 'Issue a Prepaid Card',
-      description: `Use available balance in your merchant account or depot to issue a prepaid card.`,
+      title: 'Issue a prepaid card',
+      description: `Use the available balance in your business account or depot to issue a prepaid card.`,
       bullets: [
-        'Choose your own design for your prepaid card.',
-        'Issue your own prepaid card with DAI.CPXD',
+        'Choose your own design for your prepaid card',
+        `Issue your prepaid card with ${c.layer2.daiToken}`,
       ],
       cta: 'Issue Prepaid Card',
       isCtaDisabled: false,

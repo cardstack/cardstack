@@ -1,5 +1,7 @@
-import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
+import type { RawCard, Builder, Unsaved, CardId } from '@cardstack/core/src/interfaces';
 import type RealmManager from './services/realm-manager';
+import { IndexerHandle } from './services/search-index';
+import { PgPrimitive } from './utils/expressions';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -10,18 +12,21 @@ export const ENVIRONMENTS = Object.keys(ENVIRONMENTS_OBJ) as Environment[];
 export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
 
-export interface CardStackContext {
+export interface CardstackContext {
   builder: Builder;
   cardRouter: any;
   realms: RealmManager;
   requireCard: (path: string) => any;
 }
 
-export interface RealmInterface {
-  read(cardURL: string): Promise<RawCard>;
-  create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard>;
+export interface RealmInterface<Meta = PgPrimitive> {
+  url: string;
+  read(cardId: CardId): Promise<RawCard>;
+  create(raw: RawCard<Unsaved>): Promise<RawCard>;
   update(raw: RawCard): Promise<RawCard>;
-  delete(cardURL: string): Promise<void>;
+  delete(cardId: CardId): Promise<void>;
+  reindex(ops: IndexerHandle, meta: Meta | null): Promise<Meta>;
+  teardown(): Promise<void>;
 }
 
 export interface Cache<CardType> {

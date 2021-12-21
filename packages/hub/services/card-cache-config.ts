@@ -1,14 +1,14 @@
-import { join } from 'path';
+import { dirname } from 'path';
 
 export class CardCacheConfig {
   packageName = '@cardstack/compiled';
 
   get root() {
-    return __dirname;
+    return process.cwd();
   }
 
   get cacheDirectory() {
-    return join(this.root, '..', '..', 'compiled');
+    return dirname(__non_webpack_require__.resolve('@cardstack/compiled/package.json'));
   }
 }
 

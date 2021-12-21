@@ -6,7 +6,7 @@ import { TransactionReceipt, Log } from 'web3-core';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.5/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 
@@ -27,6 +27,11 @@ export interface Estimate {
 }
 export interface SendPayload extends Estimate {
   data: any;
+}
+
+export enum Operation {
+  CALL = 0,
+  DELEGATECALL = 1,
 }
 
 export interface RelayTransaction {
@@ -71,7 +76,7 @@ export async function gasEstimate(
   to: string,
   value: string,
   data: string,
-  operation: number,
+  operation: Operation,
   gasToken: string
 ): Promise<Estimate> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
@@ -167,6 +172,7 @@ export async function executeTransaction(
   from: string,
   to: string,
   data: any,
+  operation: Operation,
   estimate: Estimate,
   nonce: BN,
   signatures: any,
@@ -184,7 +190,7 @@ export async function executeTransaction(
       to,
       value: 0, // we don't have any safe tx with a value
       data,
-      operation: 0, // all our safe txs are CALL operations
+      operation: operation,
       safeTxGas: estimate.safeTxGas,
       baseGas: estimate.baseGas,
       dataGas: estimate.dataGas,
@@ -257,4 +263,9 @@ export function getNextNonceFromEstimate(estimate: Estimate | SendPayload): BN {
 
 function isEventMatch(log: Log, topic: string, address: string) {
   return log.topics[0] === topic && log.address === address;
+}
+
+export function gasInToken(estimate: Estimate): BN {
+  let gasUnits = new BN(String(estimate.baseGas)).add(new BN(String(estimate.safeTxGas)));
+  return gasUnits.mul(new BN(String(estimate.gasPrice)));
 }

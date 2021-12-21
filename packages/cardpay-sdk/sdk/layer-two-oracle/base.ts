@@ -1,8 +1,8 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
-import PriceOracleABI from '../../contracts/abi/v0.8.5/price-oracle';
-import ExchangeABI from '../../contracts/abi/v0.8.5/exchange';
+import PriceOracleABI from '../../contracts/abi/v0.8.7/price-oracle';
+import ExchangeABI from '../../contracts/abi/v0.8.7/exchange';
 import { getOracle, getAddress } from '../../contracts/addresses';
 import BN from 'bn.js';
 import { safeFloatConvert } from '../utils/general-utils';

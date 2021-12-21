@@ -29,6 +29,7 @@ export function handleRewardProgramRegistrationFee(event: RewardProgramRegistrat
   entity.admin = admin;
   entity.transaction = txnHash;
   entity.createdAt = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.prepaidCardPayment = txnHash;
   entity.save();
 }

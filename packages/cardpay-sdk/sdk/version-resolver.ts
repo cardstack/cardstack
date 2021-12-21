@@ -1,10 +1,10 @@
 import Web3 from 'web3';
-import { AddressKeys, getAddress } from '../contracts/addresses';
+import { AddressKeys, getAddress, protocolVersions } from '../contracts/addresses';
 import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
 import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
-import { Safes, safesMeta } from './safes';
+import Safes from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
 import Assets from './assets';
@@ -15,6 +15,7 @@ import { revenuePoolMeta, RevenuePool } from './revenue-pool';
 import { rewardPoolMeta, RewardPool } from './reward-pool';
 import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
+import { SUPPORTED_ABIS } from '../generated/supported-abis'; // this file is code-generated during postinstall step and the constant is a property tree of version -> contract name -> contract ABI
 
 export type SDK =
   | 'Assets'
@@ -77,6 +78,34 @@ const cardPayVersionABI: AbiItem[] = [
     type: 'function',
   },
 ];
+const VersionManagerABI: AbiItem[] = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'version',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+];
+
+export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[]> {
+  let versionManager = new web3.eth.Contract(VersionManagerABI, await getAddress('versionManager', web3));
+  let protocolVersion = await versionManager.methods.version().call();
+  let versionMap: { [version: string]: AbiItem[] } = {};
+  for (let version of protocolVersions) {
+    versionMap[version.replace('v', '')] = SUPPORTED_ABIS[version][contractName];
+  }
+  let abi = getAPIVersion(versionMap, protocolVersion);
+  return abi;
+}
 
 export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
   let [web3] = args;
@@ -110,7 +139,7 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       apiClass = await resolveApiVersion(rewardManagerMeta, web3);
       break;
     case 'Safes':
-      apiClass = await resolveApiVersion(safesMeta, web3);
+      apiClass = Safes;
       break;
     case 'TokenBridgeForeignSide':
       apiClass = TokenBridgeForeignSide;

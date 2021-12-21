@@ -10,12 +10,14 @@ import {
 import hbs from 'htmlbars-inline-precompile';
 import { ImageUploadSuccessResult } from '@cardstack/web-client/components/image-uploader';
 
-const IMAGE = '[data-test-image-uploader-image]';
-const IMAGE_PLACEHOLDER = '[data-test-image-uploader-placeholder]';
+const IMAGE = '[data-test-avatar-image]';
+const IMAGE_LOADING = '[data-test-avatar-loading]';
+const IMAGE_PLACEHOLDER = '[data-test-avatar-placeholder]';
 const UPLOAD_BUTTON = '[data-test-image-uploader-upload-button]';
 const DELETE_BUTTON = '[data-test-image-uploader-delete-button]';
 const INPUT = '[data-test-image-uploader-file-input]';
 const REQUIREMENTS = '[data-test-image-uploader-requirements]';
+const ERROR = '[data-test-image-uploader-error]';
 
 let imageDataUri =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
@@ -45,7 +47,6 @@ module('Integration | Component | image-uploader', function (hooks) {
       this.set('image', '');
     });
     this.set('cta', 'Select a Photo');
-    this.set('imageDescription', 'Profile image');
     this.set(
       'imageRequirements',
       'Images must be in jpg or png format at least 50x50, min size 35kb, max 200kb'
@@ -54,11 +55,8 @@ module('Integration | Component | image-uploader', function (hooks) {
     await render(hbs`
     <ImageUploader
       @image={{this.image}}
-      @rounded={{this.rounded}}
-      @placeholderIcon={{this.placeholderIcon}}
       @acceptedFileTypes={{this.acceptedFileTypes}}
       @cta={{this.cta}}
-      @imageDescription={{this.imageDescription}}
       @imageRequirements={{this.imageRequirements}}
       @onUpload={{this.onUpload}}
       @onError={{this.onError}}
@@ -131,37 +129,75 @@ module('Integration | Component | image-uploader', function (hooks) {
       .containsText(
         'Images must be in jpg or png format at least 50x50, min size 35kb, max 200kb'
       );
-    assert.dom(IMAGE).hasAttribute('alt', 'Profile image');
 
     this.set(
       'imageRequirements',
       'No requirements, feel free to upload anything!'
     );
     this.set('cta', 'Set an image identity');
-    this.set('imageDescription', 'You!');
 
     assert.dom(UPLOAD_BUTTON).containsText('Set an image identity');
     assert
       .dom(REQUIREMENTS)
       .containsText('No requirements, feel free to upload anything!');
-    assert.dom(IMAGE).hasAttribute('alt', 'You!');
   });
 
-  test('it allows configuration of image placeholder', async function (assert) {
-    assert.dom(IMAGE_PLACEHOLDER).doesNotHaveClass(/--rounded/);
+  test('it allows modifying of its preview avatar via the default block', async function (assert) {
+    this.set('rounded', false);
+    this.set('image', imageDataUri);
+    this.set('imageDescription', 'Profile');
+    this.set('state', 'default');
+
+    await render(hbs`
+      <ImageUploader
+        @state={{this.state}}
+        @image={{this.image}}
+        @acceptedFileTypes={{this.acceptedFileTypes}}
+        @cta={{this.cta}}
+        @imageRequirements={{this.imageRequirements}}
+        @onUpload={{this.onUpload}}
+        @onError={{this.onError}}
+        @onRemoveImage={{this.onRemoveImage}}
+      as |ImageUploaderPreview|>
+        <ImageUploaderPreview
+          @rounded={{this.rounded}}
+          @alt={{this.imageDescription}}
+          data-test-image-uploader-preview
+        />
+      </ImageUploader>
+    `);
+
+    assert.dom(IMAGE).hasAttribute('src', imageDataUri);
+    assert.dom(IMAGE).hasAttribute('alt', 'Profile');
+    assert.dom(IMAGE_LOADING).doesNotExist();
+    assert
+      .dom('[data-test-image-uploader-preview]')
+      .doesNotHaveClass(/--rounded/);
 
     this.set('rounded', true);
+    assert.dom('[data-test-image-uploader-preview]').hasClass(/--rounded/);
 
-    assert.dom(IMAGE_PLACEHOLDER).hasClass(/--rounded/);
+    this.set('state', 'loading');
+    assert.dom(IMAGE_LOADING).isVisible();
+  });
 
-    assert
-      .dom(IMAGE_PLACEHOLDER)
-      .hasAttribute('data-test-image-uploader-placeholder', 'user');
-
-    this.set('placeholderIcon', 'success');
-
-    assert
-      .dom(IMAGE_PLACEHOLDER)
-      .hasAttribute('data-test-image-uploader-placeholder', 'success');
+  test('it can represent an error state', async function (assert) {
+    this.set('state', 'default');
+    await render(hbs`
+      <ImageUploader
+        @state={{this.state}}
+        @errorMessage="This is an error"
+        @image={{this.image}}
+        @acceptedFileTypes={{this.acceptedFileTypes}}
+        @cta={{this.cta}}
+        @imageRequirements={{this.imageRequirements}}
+        @onUpload={{this.onUpload}}
+        @onError={{this.onError}}
+        @onRemoveImage={{this.onRemoveImage}}
+      />
+    `);
+    assert.dom(ERROR).doesNotExist();
+    this.set('state', 'error');
+    assert.dom(ERROR).containsText('This is an error');
   });
 });

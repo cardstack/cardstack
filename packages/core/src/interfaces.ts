@@ -1,3 +1,4 @@
+import * as JSON from 'json-typescript';
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
@@ -40,19 +41,14 @@ export type CardData = Record<string, any>;
 
 export type Setter = (value: any) => void;
 
-/* Card type IDEAS
-  primitive:
-    Where card is a value, has validation and/or a serialize. IE: Date, string
-    Has a @value attribute
-  composite:
-    Where card is combining multifle cards, ie: A blog post
-    Has a @model attribute
-  data:
-    A card that likely adopts from a composite card, but only provides new data for it
-*/
+export interface CardId {
+  realm: string;
+  id: string;
+}
 
-export interface RawCard {
-  url: string;
+export interface RawCard<Identity extends Unsaved = Saved> {
+  id: Identity;
+  realm: string;
 
   // Feature Files. Value is path inside the files list
   schema?: string;
@@ -76,8 +72,11 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
     throw new CardstackError('A raw card that is empty is not valid');
   }
-  if (typeof obj.url !== 'string') {
-    throw new CardstackError('A card requires a URL');
+  if (typeof obj.id !== 'string') {
+    throw new CardstackError('A card requires an id');
+  }
+  if (typeof obj.realm !== 'string') {
+    throw new CardstackError('A card requires a realm');
   }
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
@@ -109,60 +108,72 @@ export interface Field {
   name: string;
 }
 
-export interface CompiledCard {
-  url: string;
-  adoptsFrom?: CompiledCard;
+export interface LocalRef {
+  local: string;
+}
+export interface GlobalRef {
+  global: string;
+}
+export type ModuleRef = LocalRef | GlobalRef;
+export type Saved = string;
+export type Unsaved = string | undefined;
+
+export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
+  url: Identity;
+  realm: string;
+  adoptsFrom?: CompiledCard<string, GlobalRef>;
   fields: {
     [key: string]: Field;
   };
-  schemaModule: string;
+  schemaModule: Ref;
   serializer?: SerializerName;
+  isolated: ComponentInfo<Ref>;
+  embedded: ComponentInfo<Ref>;
+  edit: ComponentInfo<Ref>;
 
-  isolated: ComponentInfo;
-  embedded: ComponentInfo;
-  edit: ComponentInfo;
+  modules: Record<
+    string, // local module path
+    {
+      type: string;
+      source: string;
+    }
+  >;
 }
 
-export interface ComponentInfo {
-  moduleName: string;
+export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
+  moduleName: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
-
   inlineHBS?: string;
-  sourceCardURL: string;
+
+  // the URL of the card that originally defined this component, if it's not ourself
+  inheritedFrom?: string;
+}
+
+export interface Card {
+  data: RawCard['data'];
+  compiled: CompiledCard;
 }
 
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-
-  // returns the module identifier that can be used to get this module back.
-  // It's exactly meaning depends on the environment. In node it's a path you
-  // can actually `require`.
-  define: (cardURL: string, localModule: string, type: string, source: string) => Promise<string>;
 }
 
 export interface RealmConfig {
   url: string;
-  directory?: string;
+  directory: string;
+  watch?: boolean;
 }
 
-export interface CardJSONResponse {
-  data: {
-    id: string;
-    type: string;
-    attributes?: { [name: string]: any };
-    meta?: {
-      componentModule: string;
-    };
-  };
+export interface JSONAPIDocument<Identity extends Saved | Unsaved = Saved> {
+  data: ResourceObject<Identity>;
 }
-
-export interface CardJSONRequest {
-  data: {
-    id?: string;
-    type: string;
-    attributes?: { [name: string]: any };
-  };
+export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
+  id: Identity;
+  type: string;
+  attributes?: JSON.Object;
+  relationships?: JSON.Object;
+  meta?: JSON.Object;
 }
 
 export type CardOperation =
@@ -170,21 +181,21 @@ export type CardOperation =
       create: {
         targetRealm: string;
         parentCardURL: string;
-        payload: CardJSONRequest;
+        payload: JSONAPIDocument<Unsaved>;
       };
     }
   | {
       update: {
         cardURL: string;
-        payload: CardJSONRequest;
+        payload: JSONAPIDocument;
       };
     };
 
-// this is the set of enviroment-specific capabilities a CardModel gets access
+// this is the set of environment-specific capabilities a CardModel gets access
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<CardJSONResponse>;
+  send(operation: CardOperation): Promise<JSONAPIDocument>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
 }

@@ -24,7 +24,7 @@ export default class DatabaseManager {
       let u = new URL(this.dbConfig.url);
       this.pool = new Pool({
         user: u.username,
-        host: u.host,
+        host: u.hostname,
         database: u.pathname.substr(1),
         password: u.password,
         port: parseInt(u.port),
@@ -45,6 +45,7 @@ export default class DatabaseManager {
   }
 }
 
+import '@cardstack/di';
 declare module '@cardstack/di' {
   interface KnownServices {
     'database-manager': DatabaseManager;

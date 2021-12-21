@@ -1,7 +1,12 @@
 export { ITokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
 export { ITokenBridgeHomeSide, BridgeValidationResult } from './sdk/token-bridge-home-side';
+export { PrepaidCard } from './sdk/prepaid-card';
+export { PrepaidCardMarket } from './sdk/prepaid-card-market';
+export { RevenuePool } from './sdk/revenue-pool';
+export { RewardManager } from './sdk/reward-manager';
+export { RewardPool, Proof, RewardTokenBalance } from './sdk/reward-pool';
 export {
-  Safes as ISafes,
+  ISafes,
   Safe,
   DepotSafe,
   MerchantSafe,
@@ -9,6 +14,8 @@ export {
   ExternalSafe,
   TokenInfo,
   viewSafe,
+  ViewSafeResult,
+  ViewSafesResult,
 } from './sdk/safes';
 export { ILayerOneOracle } from './sdk/layer-one-oracle';
 export { LayerTwoOracle as ILayerTwoOracle } from './sdk/layer-two-oracle';
@@ -32,9 +39,10 @@ export {
   waitForSubgraphIndex,
 } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
+export * from './sdk/currencies';
 export { query as gqlQuery } from './sdk/utils/graphql';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
-export { getSDK } from './sdk/version-resolver';
+export { getSDK, getABI } from './sdk/version-resolver';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';
 export { default as ERC677ABI } from './contracts/abi/erc-677';

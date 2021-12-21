@@ -59,7 +59,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
 
       if (!web3) {
         await message.reply(
-          'Uh Oh! Something went wrong. Please contact an admin to get help is getting a prepaid card'
+          'Uh Oh! Something went wrong. Please contact an admin to get help in getting a prepaid card'
         );
         return;
       }
@@ -115,7 +115,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       Sentry.withScope(function () {
         Sentry.captureException(e);
       });
-      await message.reply('Uh Oh! Something went wrong. Please contact an admin to get help is getting a prepaid card');
+      await message.reply('Uh Oh! Something went wrong. Please contact an admin to get help in getting a prepaid card');
     }
   } finally {
     await bot.dmChannelsDbGateway.deactivateDMConversation(channelId, message.author.id);
@@ -141,3 +141,5 @@ async function checkInventory(message: Message, bot: Bot): Promise<boolean> {
   }
   return true;
 }
+
+export const aliases = [];

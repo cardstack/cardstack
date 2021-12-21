@@ -374,6 +374,91 @@ describe('POST /api/card-spaces/validate-profile-category', async function () {
   });
 });
 
+describe('POST /api/card-spaces/validate-profile-name', async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+  let { request } = setupHub(this);
+
+  it('returns no url errors when profile name is available', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({ data: { attributes: { 'profile-name': 'Valid Profile Name' } } })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns an error when profile name is profane', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({ data: { attributes: { 'profile-name': "fuck this isn't valid" } } })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: {
+              pointer: `/data/attributes/profile-name`,
+            },
+            detail: 'Username is not allowed',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns an error when profile name is too long', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-name`)
+      .send({
+        data: { attributes: { 'profile-name': 'morethanfiftymorethanfiftymorethanfiftymorethanfiftymorethanfifty' } },
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: {
+              pointer: `/data/attributes/profile-name`,
+            },
+            detail: 'Max length is 50',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/card-spaces')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
+
 describe('PUT /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);

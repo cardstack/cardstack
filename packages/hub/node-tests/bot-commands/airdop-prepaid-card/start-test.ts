@@ -1,5 +1,4 @@
 import { Client as DBClient } from 'pg';
-import { HubBotController } from '../../../main';
 import config from 'config';
 import {
   name as commandName,
@@ -17,6 +16,7 @@ import Bot, {
   Message,
 } from '@cardstack/discord-bot';
 import { BetaTestConfig } from '../../../services/discord-bots/hub-bot/types';
+import { HubBotController } from '../../../process-controllers/hub-bot-controller';
 
 const { sku, discordRole: betaTesterRoleName } = config.get('betaTesting') as BetaTestConfig;
 
