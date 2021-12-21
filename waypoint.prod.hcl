@@ -150,7 +150,7 @@ app "hub-event-listener" {
           memory = "512"
           cluster = "hub-event-listener-prod"
           count = 1
-          subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+          subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
           task_role_name = "hub-prod-hub_ecr_task"
           disable_alb = true
       }
