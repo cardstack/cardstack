@@ -2,14 +2,13 @@ import { runInitializers, createRegistry } from '../main';
 import HubBot from '../services/discord-bots/hub-bot';
 import * as Sentry from '@sentry/node';
 import { Registry, Container } from '@cardstack/di';
-import { botLog } from '../utils/logger';
+
+import logger from '@cardstack/logger';
+export const log = logger('hub/bot');
 
 export class HubBotController {
-  logger = botLog;
-  static logger = botLog;
-
   static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
-    this.logger.info(`booting pid:${process.pid}`);
+    log.info(`booting pid:${process.pid}`);
     runInitializers();
 
     let registry = createRegistry();
@@ -23,7 +22,7 @@ export class HubBotController {
       bot = await container.instantiate(HubBot);
       await bot.start();
     } catch (e: any) {
-      this.logger.error(`Unexpected error ${e.message}`, e);
+      log.error(`Unexpected error ${e.message}`, e);
       Sentry.withScope(function () {
         Sentry.captureException(e);
       });
@@ -32,7 +31,7 @@ export class HubBotController {
     if (!bot) {
       throw new Error('Bot could not be created');
     }
-    this.logger.info(`started (${bot.type}:${bot.botInstanceId})`);
+    log.info(`started (${bot.type}:${bot.botInstanceId})`);
 
     return new this(bot, container);
   }
@@ -40,7 +39,7 @@ export class HubBotController {
   private constructor(public bot: HubBot, public container: Container) {}
 
   async teardown() {
-    this.logger.info('shutting down');
+    log.info('shutting down');
     await this.bot.destroy();
     await this.container.teardown();
   }

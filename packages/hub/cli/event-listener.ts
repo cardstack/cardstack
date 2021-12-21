@@ -1,8 +1,10 @@
 /* eslint-disable no-process-exit */
 
 import { createContainer, runInitializers } from '../main';
-import { eventListenerLog } from '../utils/logger';
 import * as Sentry from '@sentry/node';
+
+import logger from '@cardstack/logger';
+const log = logger('hub/event-listener');
 
 export const command = 'event-listener';
 export const describe = 'Boot the contract events listener (used for push notifications)';
@@ -16,7 +18,7 @@ export async function handler() {
     let eventListener = await container.lookup('contract-subscription-event-handler');
     eventListener.setupContractEventSubscriptions();
   } catch (e: any) {
-    eventListenerLog.error(`Unexpected error while running contracts event listener: ${e.message}`, e);
+    log.error(`Unexpected error while running contracts event listener: ${e.message}`, e);
     Sentry.withScope(function () {
       Sentry.captureException(e);
     });

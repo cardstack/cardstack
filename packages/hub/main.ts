@@ -13,6 +13,7 @@ import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
+import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
 import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
@@ -74,7 +75,6 @@ import Web3SocketService from './services/web3-socket';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
@@ -108,6 +108,9 @@ import { ContractSubscriptionEventHandler } from './services/contract-subscripti
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
+
+const serverLog = logger('hub/server');
+const workerLog = logger('hub/worker');
 
 export function createRegistry(): Registry {
   let registry = new Registry();
@@ -211,9 +214,6 @@ export function createContainer(): Container {
 }
 
 export class HubServer {
-  logger = serverLog;
-  static logger = serverLog;
-
   private auth = inject('authentication-middleware', { as: 'auth' });
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
@@ -259,7 +259,7 @@ export class HubServer {
     if ((err as any).intentionalTestError) {
       return;
     }
-    this.logger.error(`Unhandled error:`, err);
+    serverLog.error(`Unhandled error:`, err);
     Sentry.withScope(function (scope) {
       scope.addEventProcessor(function (event) {
         return Sentry.Handlers.parseRequest(event, ctx.request);
@@ -270,7 +270,7 @@ export class HubServer {
 
   async listen(port = 3000) {
     let instance = this.app.listen(port);
-    this.logger.info(`\n👂 Hub listening on %s\n`, port);
+    serverLog.info(`\n👂 Hub listening on %s\n`, port);
 
     if (process.connected) {
       process.send!('hub hello');

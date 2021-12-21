@@ -9,7 +9,6 @@ import {
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 
 import { inject } from '@cardstack/di';
-import { serverLog as logger } from '../utils/logger';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { BROWSER, NODE } from '../interfaces';
 import { transformSync } from '@babel/core';
@@ -18,18 +17,21 @@ import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
+import logger from '@cardstack/logger';
+const log = logger('hub/card-builder');
+
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
   cache = inject('card-cache', { as: 'cache' });
   cards = inject('card-service', { as: 'cards' });
 
-  logger = logger;
-
   async getRawCard(url: string): Promise<RawCard> {
+    log.trace('getRawCard: %s', url);
     return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
+    log.trace('getCompiledCard: %s', url);
     let cached = this.cache.getCard(url);
     if (cached) {
       return cached;
@@ -56,6 +58,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string): string {
+    log.trace('define: %s %s', cardURL, { localPath, type });
     switch (type) {
       case JS_TYPE:
         this.cache.setModule(BROWSER, cardURL, localPath, source);
