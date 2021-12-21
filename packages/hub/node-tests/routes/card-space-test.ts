@@ -335,6 +335,28 @@ describe('POST /api/card-spaces/validate-profile-category', async function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('returns an error when category name is profane', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-category`)
+      .send({ data: { attributes: { 'profile-category': "fuck this isn't valid" } } })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: {
+              pointer: `/data/attributes/profile-category`,
+            },
+            detail: 'Category is not allowed',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('returns category errors when category is invalid', async function () {
     await request()
       .post(`/api/card-spaces/validate-profile-category`)
