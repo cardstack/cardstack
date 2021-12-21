@@ -92,6 +92,6 @@ if (process.env.COMPILER) {
     it(`can invalidate a card via the update of an adoptsFrom card`);
     it(`can invalidate a card via the update of a field card`);
     it(`can invalidate a card via the update of a grandparent adoptsFrom card`);
-    it(`can invalidate a card via the update of a grandparent field card`);
+    it(`can invalidate a card via the update of a grandparent field card`); // field of a field changes
   });
 }
