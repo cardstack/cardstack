@@ -4,3 +4,4 @@ export const contractSubscriptionEventHandlerLog = logger('hub/contract-subscrip
 export const serverLog = logger('hub/server');
 export const workerLog = logger('hub/worker');
 export const botLog = logger('hub/bot');
+export const eventListenerLog = logger('hub/event-listener');

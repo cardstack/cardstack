@@ -74,14 +74,13 @@ import Web3SocketService from './services/web3-socket';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog, botLog } from './utils/logger';
+import { serverLog, workerLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
 import ExchangeRatesService from './services/exchange-rates';
-import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
@@ -89,7 +88,6 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import RealmsConfig from './services/realms-config';
-import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -106,6 +104,7 @@ import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -168,6 +167,7 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
+  registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('relay', RelayService);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
@@ -376,62 +376,6 @@ export async function bootWorker() {
       Sentry.captureException(error);
     });
   });
-  let contracts = await container.lookup('contracts');
-  let web3 = await container.lookup('web3-socket');
-  let workerClient = await container.lookup('worker-client');
-
-  let latestEventBlockQueries = await container.lookup('latest-event-block-queries');
-
-  // listen for contract events
-  // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(
-    web3,
-    workerClient,
-    contracts,
-    latestEventBlockQueries
-  ).setupContractEventSubscriptions();
 
   await runner.promise;
-}
-
-export class HubBotController {
-  logger = botLog;
-  static logger = botLog;
-
-  static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
-    this.logger.info(`booting pid:${process.pid}`);
-    runInitializers();
-
-    let registry = createRegistry();
-    if (serverConfig?.registryCallback) {
-      serverConfig.registryCallback(registry);
-    }
-    let container = new Container(registry);
-    let bot: HubBot | undefined;
-
-    try {
-      bot = await container.instantiate(HubBot);
-      await bot.start();
-    } catch (e: any) {
-      this.logger.error(`Unexpected error ${e.message}`, e);
-      Sentry.withScope(function () {
-        Sentry.captureException(e);
-      });
-    }
-
-    if (!bot) {
-      throw new Error('Bot could not be created');
-    }
-    this.logger.info(`started (${bot.type}:${bot.botInstanceId})`);
-
-    return new this(bot, container);
-  }
-
-  private constructor(public bot: HubBot, public container: Container) {}
-
-  async teardown() {
-    this.logger.info('shutting down');
-    await this.bot.destroy();
-    await this.container.teardown();
-  }
 }

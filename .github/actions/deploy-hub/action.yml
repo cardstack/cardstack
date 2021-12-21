@@ -47,3 +47,10 @@ runs:
       env:
         WAYPOINT_SERVER_TLS: '1'
         WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - name: Deploy event handler
+      run: waypoint up --app=hub-event-listener -prune-retain=0 -plain
+      shell: bash
+      env:
+        WAYPOINT_SERVER_TLS: '1'
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'

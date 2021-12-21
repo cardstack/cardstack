@@ -1,11 +1,11 @@
-import autoBind from 'auto-bind';
-import WorkerClient from './services/worker-client';
+import WorkerClient from './worker-client';
 import * as Sentry from '@sentry/node';
-import Web3SocketService from './services/web3-socket';
-import { contractSubscriptionEventHandlerLog } from './utils/logger';
-import Contracts from './services/contracts';
+import Web3SocketService from './web3-socket';
+import { contractSubscriptionEventHandlerLog } from '../utils/logger';
+import Contracts from './contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
-import LatestEventBlockQueries from './services/queries/latest-event-block';
+import LatestEventBlockQueries from './queries/latest-event-block';
+import { inject } from '@cardstack/di';
 
 const CONTRACT_EVENTS = [
   {
@@ -22,39 +22,28 @@ const CONTRACT_EVENTS = [
   },
 ];
 
-// DO NOT USE only for use in bootWorker to prevent duplicate notifications
 export class ContractSubscriptionEventHandler {
-  #contracts: Contracts;
-  #web3: Web3SocketService;
-  #workerClient: WorkerClient;
-  #latestEventBlockQueries: LatestEventBlockQueries;
+  contracts: Contracts = inject('contracts', { as: 'contracts' });
+  web3: Web3SocketService = inject('web3-socket', { as: 'web3' });
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  latestEventBlockQueries: LatestEventBlockQueries = inject('latest-event-block-queries', {
+    as: 'latestEventBlockQueries',
+  });
+
   #logger = contractSubscriptionEventHandlerLog;
 
-  constructor(
-    web3: Web3SocketService,
-    workerClient: WorkerClient,
-    contracts: Contracts,
-    latestEventBlockQueries: LatestEventBlockQueries
-  ) {
-    autoBind(this);
-    this.#contracts = contracts;
-    this.#web3 = web3;
-    this.#workerClient = workerClient;
-    this.#latestEventBlockQueries = latestEventBlockQueries;
-  }
-
   async setupContractEventSubscriptions() {
-    let web3Instance = this.#web3.getInstance();
+    let web3Instance = this.web3.getInstance();
 
     let subscriptionOptions = {};
-    let latestBlock = await this.#latestEventBlockQueries.read();
+    let latestBlock = await this.latestEventBlockQueries.read();
 
     if (latestBlock) {
       subscriptionOptions = { fromBlock: latestBlock };
     }
 
     for (let contractEvent of CONTRACT_EVENTS) {
-      let contract = await this.#contracts.getContract(web3Instance, contractEvent.abiName, contractEvent.contractName);
+      let contract = await this.contracts.getContract(web3Instance, contractEvent.abiName, contractEvent.contractName);
 
       contract.events[contractEvent.eventName](subscriptionOptions, async (error: Error, event: any) => {
         if (error) {
@@ -70,12 +59,18 @@ export class ContractSubscriptionEventHandler {
             event.transactionHash
           );
 
-          await this.#latestEventBlockQueries.update(event.blockNumber);
-          this.#workerClient.addJob(contractEvent.taskName, event.transactionHash);
+          await this.latestEventBlockQueries.update(event.blockNumber);
+          this.workerClient.addJob(contractEvent.taskName, event.transactionHash);
         }
       });
     }
 
     this.#logger.info('Subscribed to events');
+  }
+}
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    'contract-subscription-event-handler': ContractSubscriptionEventHandler;
   }
 }
