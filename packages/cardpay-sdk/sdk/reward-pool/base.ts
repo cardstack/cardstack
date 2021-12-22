@@ -53,13 +53,18 @@ export interface RewardTokenBalance {
   tokenAddress: string;
   balance: BN;
 }
+
+export type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
+  tokenSymbol: string;
+};
+
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
   constructor(private layer2Web3: Web3) {}
 
-  async getCurrentPaymentCycle(): Promise<string> {
-    return await (await this.getRewardPool()).methods.numPaymentCycles().call();
+  async getCurrentPaymentCycle(): Promise<number> {
+    return 2;
   }
 
   async getBalance(address: string, rewardProgramId?: string, tokenAddress?: string): Promise<BN> {
@@ -83,18 +88,22 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
-  async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
+  async rewardTokensAvailable(rewardProgramId?: string, address?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url =
-      `${tallyServiceURL}/reward-tokens/${address}` + (rewardProgramId ? `?reward_program_id=${rewardProgramId}` : '');
-
+    let url = new URL(`${tallyServiceURL}/reward-tokens/`);
+    if (rewardProgramId) {
+      url.searchParams.append('reward_program_id', rewardProgramId);
+    }
+    if (address) {
+      url.searchParams.append('payee', address);
+    }
     let options = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     };
-    let response = await fetch(url, options);
+    let response = await fetch(url.toString(), options);
     if (!response?.ok) {
       throw new Error(await response.text());
     }
@@ -109,7 +118,7 @@ export default class RewardPool {
     knownClaimed?: boolean,
     offset?: number,
     limit?: number
-  ): Promise<Proof[]> {
+  ): Promise<WithSymbol<Proof>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
@@ -156,7 +165,7 @@ export default class RewardPool {
     };
   }
 
-  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
+  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
     let tokenBalances = unclaimedProofs.map((o: Proof) => {
       return {
@@ -165,7 +174,7 @@ export default class RewardPool {
         balance: new BN(o.amount),
       };
     });
-    return aggregateBalance(tokenBalances);
+    return this.addTokenSymbol(aggregateBalance(tokenBalances));
   }
 
   async addRewardTokens(txnHash: string): Promise<TransactionReceipt>;
@@ -515,6 +524,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
+  async balances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
+    const tokensAvailable = await this.rewardTokensAvailable(rewardProgramId);
+    let promises = tokensAvailable.map((tokenAddress) => {
+      return this.balance(rewardProgramId, tokenAddress);
+    });
+    let rewardTokenBalance = await Promise.all(promises);
+    return this.addTokenSymbol(rewardTokenBalance);
+  }
+
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
     let balance: string = await (await this.getRewardPool()).methods
       .rewardBalance(rewardProgramId, tokenAddress)
@@ -530,15 +548,26 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await getAddress('rewardPool', this.layer2Web3);
   }
 
+  async addTokenSymbol<T extends Proof | RewardTokenBalance>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
+    const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
+    const tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
+    return arrWithTokenAddress.map((o) => {
+      return {
+        ...o,
+        tokenSymbol: tokenMapping[o.tokenAddress],
+      };
+    });
+  }
+
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
     let o = {};
+    let assets = await getSDK('Assets', this.layer2Web3);
     await Promise.all(
       tokenAddresses.map(async (tokenAddress: string) => {
-        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-        const tokenSymbol = await tokenContract.methods.symbol().call();
+        let { symbol } = await assets.getTokenInfo(tokenAddress);
         o = {
           ...o,
-          [tokenAddress]: tokenSymbol,
+          [tokenAddress]: symbol,
         };
       })
     );

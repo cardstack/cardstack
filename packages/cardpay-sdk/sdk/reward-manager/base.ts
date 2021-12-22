@@ -25,6 +25,29 @@ import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
+import { WithSymbol, RewardTokenBalance } from '@cardstack/cardpay-sdk';
+import { query } from '../utils/graphql';
+
+export interface RewardProgramInfo {
+  rewardProgramId: string;
+  rewardProgramAdmin: string;
+  locked: boolean;
+  rule: string;
+  tokenBalances: WithSymbol<RewardTokenBalance>[];
+}
+
+const rewardProgramQuery = `
+  query {
+    rewardPrograms {
+      id
+    }
+    _meta {
+       block {
+         number
+       }
+     }
+  }
+`;
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -836,6 +859,42 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     );
   }
 
+  async getRewardProgramInfo(rewardProgramId: string): Promise<RewardProgramInfo> {
+    if (!(await this.isRewardProgram(rewardProgramId))) {
+      throw new Error('Not an existing reward program');
+    }
+    const locked = await this.isLocked(rewardProgramId);
+    const rewardProgramAdmin = await this.getRewardProgramAdmin(rewardProgramId);
+    const rule = await this.getRewardRule(rewardProgramId);
+
+    let rewardPool = await getSDK('RewardPool', this.layer2Web3);
+    const tokenBalances = await rewardPool.balances(rewardProgramId);
+    return {
+      rewardProgramId,
+      rewardProgramAdmin,
+      locked,
+      rule,
+      tokenBalances,
+    };
+  }
+
+  async getRewardProgramsInfo(): Promise<RewardProgramInfo[]> {
+    let rewardProgramIds = await this.getRewardPrograms();
+    let promises: Promise<RewardProgramInfo>[] = [];
+    rewardProgramIds.map((rewardProgramId: string) => {
+      promises.push(this.getRewardProgramInfo(rewardProgramId));
+    });
+    return await Promise.all(promises);
+  }
+
+  async getRewardPrograms(): Promise<string[]> {
+    let {
+      data: { rewardPrograms },
+    } = await query(this.layer2Web3, rewardProgramQuery);
+    return rewardPrograms.reduce((accum: string[], o: any) => {
+      return [...accum, o.id];
+    }, []);
+  }
   private async getRewardSafeFromTxn(txnHash: string): Promise<any> {
     let rewardMgrAddress = await getAddress('rewardManager', this.layer2Web3);
     let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);

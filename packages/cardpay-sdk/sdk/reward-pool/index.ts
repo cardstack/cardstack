@@ -2,7 +2,7 @@ import { ContractMeta } from '../version-resolver';
 
 import v0_8_7 from './v0.8.7';
 
-export { Proof, RewardTokenBalance } from './base';
+export { Proof, RewardTokenBalance, WithSymbol } from './base';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
