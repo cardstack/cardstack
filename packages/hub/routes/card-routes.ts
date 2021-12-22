@@ -5,7 +5,7 @@ import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
-import { NotFound, BadRequest } from '@cardstack/core/src/utils/errors';
+import { NotFound, BadRequest, CardstackError } from '@cardstack/core/src/utils/errors';
 import { difference } from 'lodash';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
@@ -25,10 +25,10 @@ const requireCard = function (path: string, root: string): any {
 
 export default class CardRoutes {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private cache = inject('card-cache', { as: 'cache' });
-  private builder = inject('card-builder', { as: 'builder' });
+  private cache = inject('file-cache', { as: 'cache' });
   private cards = inject('card-service', { as: 'cards' });
   private config = inject('card-routes-config', { as: 'config' });
+  private index = inject('searchIndex', { as: 'index' });
 
   private routerInstance: undefined | RouterInstance;
 
@@ -137,13 +137,13 @@ export default class CardRoutes {
       query,
     } = ctx;
 
+    let card = await this.index.getCard(url);
     let compiledCard;
-    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
 
     if (query.include === 'compiledMeta') {
-      compiledCard = await this.builder.getCompiledCard(url);
+      compiledCard = card.compiled;
     }
-    let data = new RawCardSerializer().serialize(rawCard, compiledCard);
+    let data = new RawCardSerializer().serialize(card.raw, compiledCard);
     ctx.body = data;
   }
 
@@ -152,9 +152,12 @@ export default class CardRoutes {
       if (!this.config.routeCard) {
         this.routerInstance = defaultRouterInstance;
       } else {
-        let card = await this.builder.getCompiledCard(this.config.routeCard);
+        let { compiled } = await this.index.getCard(this.config.routeCard);
+        if (!compiled) {
+          throw new CardstackError('Routing card is not compiled!');
+        }
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const CardRouterClass = requireCard(card.schemaModule.global, this.cache.dir).default;
+        const CardRouterClass = requireCard(compiled.schemaModule.global, this.cache.dir).default;
         const cardRouterInstance = new CardRouterClass();
         assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
         this.routerInstance = cardRouterInstance;

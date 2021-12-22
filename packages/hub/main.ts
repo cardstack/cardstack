@@ -74,8 +74,8 @@ import RealmManager from './services/realm-manager';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
-import { CardCacheConfig } from './services/card-cache-config';
-import CardCache from './services/card-cache';
+import { FileCacheConfig } from './services/file-cache-config';
+import FileCache from './services/file-cache';
 import ExchangeRatesService from './services/exchange-rates';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
@@ -190,8 +190,8 @@ export function createRegistry(): Registry {
     registry.register('card-service', CardService);
     registry.register('realmsConfig', RealmsConfig);
     registry.register('realm-manager', RealmManager);
-    registry.register('card-cache-config', CardCacheConfig);
-    registry.register('card-cache', CardCache);
+    registry.register('file-cache-config', FileCacheConfig);
+    registry.register('file-cache', FileCache);
     registry.register('card-routes', CardRoutes);
     registry.register(
       'card-routes-config',

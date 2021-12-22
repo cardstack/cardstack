@@ -24,7 +24,7 @@ export class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private builder = inject('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
-  private fileCache = inject('card-cache', { as: 'fileCache' });
+  private fileCache = inject('file-cache', { as: 'fileCache' });
 
   async indexAllRealms(): Promise<void> {
     await Promise.all(

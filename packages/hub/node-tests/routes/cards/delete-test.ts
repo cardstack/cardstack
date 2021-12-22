@@ -15,7 +15,7 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { realmURL, getCardCache, request, cards, getRealmDir } = configureHubWithCompiler(this);
+    let { realmURL, getFileCache, request, cards, getRealmDir } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
       await cards.create({
@@ -60,7 +60,7 @@ if (process.env.COMPILER) {
       await getCard(`${realmURL}post0`).expect(404);
 
       expect(
-        existsSync(join(getCardCache().dir, 'node', encodeCardURL(`${realmURL}post0`))),
+        existsSync(join(getFileCache().dir, 'node', encodeCardURL(`${realmURL}post0`))),
         'Cache for card is deleted'
       ).to.be.false;
 

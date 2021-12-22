@@ -7,11 +7,6 @@ if (process.env.COMPILER) {
     let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
-    });
-
-    this.beforeEach(async function () {
       await cards.create({
         realm: realmURL,
         id: 'person',
