@@ -54,30 +54,18 @@ export function setupHub(mochaContext: Mocha.Suite) {
 export function setupBot(mochaContext: Mocha.Suite, setupType: TestSetupType = 'beforeEach') {
   let container: Container;
   let bot: HubBot;
+  let teardownType: 'afterEach' | 'afterAll' = setupType === 'beforeEach' ? 'afterEach' : 'afterAll';
 
-  if (setupType === 'beforeEach') {
-    mochaContext.beforeEach(async function () {
-      let context = contextFor(mochaContext);
-      container = context.container = new Container(registry(this));
-      bot = await container.lookup('hubBot');
-      await bot.start();
-    });
+  mochaContext[setupType](async function () {
+    let context = contextFor(mochaContext);
+    container = context.container = new Container(registry(this));
+    bot = await container.lookup('hubBot');
+    await bot.start();
+  });
 
-    mochaContext.afterEach(async function () {
-      await container.teardown();
-    });
-  } else {
-    mochaContext.beforeAll(async function () {
-      let context = contextFor(mochaContext);
-      container = context.container = new Container(registry(this));
-      bot = await container.lookup('hubBot');
-      await bot.start();
-    });
-
-    mochaContext.afterAll(async function () {
-      await container.teardown();
-    });
-  }
+  mochaContext[teardownType](async function () {
+    await container.teardown();
+  });
 
   return {
     getContainer() {
