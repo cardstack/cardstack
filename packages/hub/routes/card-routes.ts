@@ -124,7 +124,7 @@ export default class CardRoutes {
     let url = routerInstance.routeTo(pathname);
 
     if (!url) {
-      throw new NotFound(`No card defined for route ${pathname}`);
+      throw new NotFound(`No card defined for route ${pathname}`, { missingCardURL: url });
     }
 
     let card = await this.cards.as(INSECURE_CONTEXT).load(url);

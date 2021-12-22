@@ -50,7 +50,7 @@ export default class RealmManager {
         };
       }
     }
-    throw new NotFound(`card URL ${cardURL} is not in a configured realm`);
+    throw new NotFound(`card URL ${cardURL} is not in a configured realm`, { missingCardURL: cardURL });
   }
 
   private findRealm(targetRealm: string): RealmInterface {

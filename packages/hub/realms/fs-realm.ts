@@ -105,7 +105,7 @@ export default class FSRealm implements RealmInterface<Meta> {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`card ${cardId.id} not found`, { missingCard: cardId });
+      throw new NotFound(`card ${cardId.id} not found`, { missingCardURL: cardURL(cardId) });
     }
 
     for (let file of entries) {
@@ -183,8 +183,9 @@ export default class FSRealm implements RealmInterface<Meta> {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`tried to update card ${cardURL(raw)} but it does not exist`, {
-        missingCard: { realm: raw.realm, id: raw.id },
+      let url = cardURL(raw);
+      throw new NotFound(`tried to update card ${url} but it does not exist`, {
+        missingCardURL: url,
       });
     }
     if (raw.files) {
@@ -197,7 +198,8 @@ export default class FSRealm implements RealmInterface<Meta> {
   async delete(cardId: CardId): Promise<void> {
     let cardDir = this.buildCardPath(cardId);
     if (!existsSync(cardDir)) {
-      throw new NotFound(`tried to delete ${cardURL(cardId)} but it does not exist`, { missingCard: cardId });
+      let url = cardURL(cardId);
+      throw new NotFound(`tried to delete ${url} but it does not exist`, { missingCardURL: url });
     }
     removeSync(cardDir);
   }

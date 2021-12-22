@@ -27,9 +27,9 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
+import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { CardstackError, BadRequest, augmentBadRequest, NotFound, isCardstackError } from './utils/errors';
+import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -480,10 +480,10 @@ class TrackedBuilder implements Builder {
     } catch (e) {
       if (isCardstackError(e)) {
         let missingErrors = [e, ...(e.additionalErrors || [])].filter(
-          (_e) => isCardstackError(_e) && _e instanceof NotFound && _e.missingCard
-        ) as NotFound[];
+          (_e) => isCardstackError(_e) && _e.missingCardURL
+        ) as CardstackError[];
         for (let missingError of missingErrors) {
-          this.dependencies.add(cardURL(missingError.missingCard!));
+          this.dependencies.add(missingError.missingCardURL!);
         }
       }
       throw e;

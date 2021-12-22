@@ -21,7 +21,7 @@ export default class CardBuilder implements BuilderInterface {
     log.trace('getCompiledCard: %s', url);
     let { compiled } = await this.index.getCard(url);
     if (!compiled) {
-      throw new NotFound(`CardBuilder could not find ${url}`);
+      throw new NotFound(`CardBuilder could not find ${url}`, { missingCardURL: url });
     }
     return compiled;
   }

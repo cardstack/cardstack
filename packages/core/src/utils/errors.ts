@@ -1,5 +1,4 @@
 import { getReasonPhrase } from 'http-status-codes';
-import { CardId } from '../interfaces';
 
 export interface ErrorDetails {
   status?: number;
@@ -9,6 +8,7 @@ export interface ErrorDetails {
     header?: string;
     parameter?: string;
   };
+  missingCardURL?: string;
 }
 
 export class CardstackError extends Error {
@@ -16,15 +16,17 @@ export class CardstackError extends Error {
   status: number;
   title?: string;
   source?: ErrorDetails['source'];
+  missingCardURL?: string;
   isCardstackError: true = true;
   additionalErrors: (CardstackError | Error)[] | null = null;
 
-  constructor(detail: string, { status, title, source }: ErrorDetails = {}) {
+  constructor(detail: string, { status, title, source, missingCardURL }: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;
     this.status = status || 500;
     this.title = title || getReasonPhrase(this.status);
     this.source = source;
+    this.missingCardURL = missingCardURL;
   }
   toJSON() {
     return {
@@ -39,7 +41,12 @@ export class CardstackError extends Error {
     if (!err || typeof err !== 'object' || !isCardstackError(err)) {
       return err;
     }
-    let result = new this(err.detail, { status: err.status, title: err.title, source: err.source });
+    let result = new this(err.detail, {
+      status: err.status,
+      title: err.title,
+      source: err.source,
+      missingCardURL: err.missingCardURL,
+    });
     if (err.additionalErrors) {
       result.additionalErrors = err.additionalErrors.map((inner) => this.fromSerializableError(inner));
     }
@@ -47,18 +54,9 @@ export class CardstackError extends Error {
   }
 }
 
-interface NotFoundErrorDetails extends ErrorDetails {
-  missingCard?: CardId;
-}
 export class NotFound extends CardstackError {
   status = 404;
   title = 'Not Found';
-  missingCard?: CardId;
-
-  constructor(detail: string, { status, title, source, missingCard }: NotFoundErrorDetails = {}) {
-    super(detail, { status, title, source });
-    this.missingCard = missingCard;
-  }
 }
 export class BadRequest extends CardstackError {
   status = 400;

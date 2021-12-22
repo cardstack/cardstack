@@ -46,7 +46,7 @@ export class SearchIndex {
         rows: [result],
       } = await db.query('SELECT compiled, "compileErrors" from cards where url = $1', [cardURL]);
       if (!result) {
-        throw new NotFound(`Card ${cardURL} was not found`);
+        throw new NotFound(`Card ${cardURL} was not found`, { missingCardURL: cardURL });
       }
       if (result.compileErrors) {
         throw CardstackError.fromSerializableError(result.compileErrors);
