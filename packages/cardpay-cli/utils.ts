@@ -3,7 +3,6 @@ import Web3 from 'web3';
 import { AbstractProvider } from 'web3-core';
 import { HttpProvider, getConstant, networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { Proof, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 

@@ -1,6 +1,6 @@
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
-import { RewardProgramInfo, RewardTokenBalance } from '@cardstack/cardpay-sdk';
+import { RewardProgramInfo } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
 
 export async function registerRewardProgram(

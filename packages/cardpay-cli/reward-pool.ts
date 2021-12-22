@@ -1,5 +1,5 @@
-import { getWeb3, WithSymbol, addTokenSymbol } from './utils';
-import { Proof, RewardTokenBalance, getSDK, getConstant } from '@cardstack/cardpay-sdk';
+import { getWeb3 } from './utils';
+import { Proof, RewardTokenBalance, getSDK, getConstant, WithSymbol } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
 import groupBy from 'lodash/groupBy';
 
@@ -12,9 +12,8 @@ export async function rewardTokenBalances(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
-  const enhancedTokenBalances = await addTokenSymbol(rewardPool, tokenBalances);
   console.log(`Reward balances for ${address}`);
-  displayRewardTokenBalance(enhancedTokenBalances);
+  displayRewardTokenBalance(tokenBalances);
 }
 
 function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>[]): void {
@@ -58,20 +57,20 @@ export async function addRewardTokens(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
+  let assets = await getSDK('Assets', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  let tokenSymbol = await rewardPool.tokenSymbol(tokenAddress);
-  console.log(`Added ${amount} of token ${tokenSymbol} to reward program ${rewardProgramId}`);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
+  console.log(`Added ${amount} of token ${symbol} to reward program ${rewardProgramId}`);
 }
 
 export async function rewardPoolBalance(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   let rewardTokenBalances = await rewardPool.balances(rewardProgramId);
-  const enhancedBalance = await addTokenSymbol(rewardPool, rewardTokenBalances);
-  displayRewardTokenBalance(enhancedBalance);
+  displayRewardTokenBalance(rewardTokenBalances);
 }
 
 export async function getClaimableRewardProofs(
@@ -84,8 +83,7 @@ export async function getClaimableRewardProofs(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
-  const enhancedProofs = await addTokenSymbol(rewardPool, proofs);
-  displayProofs(enhancedProofs);
+  displayProofs(proofs);
 }
 
 export async function claimRewards(
@@ -116,13 +114,14 @@ export async function recoverRewardTokens(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
+  let assets = await getSDK('Assets', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   await rewardPool.recoverTokens(safeAddress, rewardProgramId, tokenAddress, amount, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  let tokenSymbol = await rewardPool.tokenSymbol(tokenAddress);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
   console.log(
-    `Recover ${amount ? amount : ''} ${tokenSymbol} for reward program id ${rewardProgramId} to safe ${safeAddress}`
+    `Recover ${amount ? amount : ''} ${symbol} for reward program id ${rewardProgramId} to safe ${safeAddress}`
   );
 }
 

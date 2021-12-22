@@ -118,7 +118,7 @@ export default class RewardPool {
     knownClaimed?: boolean,
     offset?: number,
     limit?: number
-  ): Promise<Proof[]> {
+  ): Promise<WithSymbol<Proof>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
@@ -165,7 +165,7 @@ export default class RewardPool {
     };
   }
 
-  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
+  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
     let tokenBalances = unclaimedProofs.map((o: Proof) => {
       return {
@@ -174,7 +174,7 @@ export default class RewardPool {
         balance: new BN(o.amount),
       };
     });
-    return aggregateBalance(tokenBalances);
+    return this.addTokenSymbol(aggregateBalance(tokenBalances));
   }
 
   async addRewardTokens(txnHash: string): Promise<TransactionReceipt>;
