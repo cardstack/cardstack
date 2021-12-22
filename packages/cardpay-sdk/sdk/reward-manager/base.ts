@@ -878,6 +878,15 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     };
   }
 
+  async getRewardProgramsInfo(): Promise<RewardProgramInfo[]> {
+    let rewardProgramIds = await this.getRewardPrograms();
+    let promises: Promise<RewardProgramInfo>[] = [];
+    rewardProgramIds.map((rewardProgramId: string) => {
+      promises.push(this.getRewardProgramInfo(rewardProgramId));
+    });
+    return await Promise.all(promises);
+  }
+
   async getRewardPrograms(): Promise<string[]> {
     let {
       data: { rewardPrograms },

@@ -147,12 +147,7 @@ export async function viewRewardProgram(network: string, rewardProgramId: string
 export async function viewRewardPrograms(network: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManagerAPI = await getSDK('RewardManager', web3);
-  let rewardProgramIds = await rewardManagerAPI.getRewardPrograms();
-  let promises: Promise<RewardProgramInfo>[] = [];
-  rewardProgramIds.map((rewardProgramId) => {
-    promises.push(rewardManagerAPI.getRewardProgramInfo(rewardProgramId));
-  });
-  let rewardProgramInfos = await Promise.all(promises);
+  let rewardProgramInfos = await rewardManagerAPI.getRewardProgramsInfo();
   rewardProgramInfos.map((rewardProgramInfo) => displayRewardProgramInfo(rewardProgramInfo));
 }
 
@@ -162,8 +157,8 @@ function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
   rewardProgramId : ${rewardProgramId}
   rewardProgramAdmin : ${rewardProgramAdmin}
   locked : ${locked}
-  rule : ${rule ? rule : 'No rule found'}
-  balance:
+  rule : ${rule ? rule : 'No rule'}
+  ${tokenBalances.length > 0 ? 'balance:' : 'balance: No balance'}
   `);
   tokenBalances.map(({ tokenSymbol, balance }) => {
     console.log(`    ${tokenSymbol} : ${fromWei(balance)}`);
