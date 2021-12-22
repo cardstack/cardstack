@@ -102,6 +102,7 @@ import SentPushNotificationsQueries from './services/queries/sent-push-notificat
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
+import HubBot from './services/discord-bots/hub-bot';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -112,6 +113,7 @@ export function createRegistry(): Registry {
   let registry = new Registry();
   registry.register('hubServer', HubServer);
   registry.register('hubWorker', HubWorker);
+  registry.register('hubBot', HubBot);
 
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
