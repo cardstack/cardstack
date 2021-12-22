@@ -16,7 +16,7 @@
         @disabled={{item.disabled}}
         @onChange={{fn this.onChange item.data.id}}
         @hiddenBorder={{this.hiddenBorder}}
-        @hiddenCheckbox={{this.hiddenInput}}
+        @hiddenCheckbox={{this.hiddenCheckbox}}
       >
         {{item.data.id}}
       </item.component>
@@ -53,11 +53,11 @@
       @optional={{true}}
     />
     <Args.Bool
-      @name="hiddenInput"
-      @description="Visually hides the radio input."
+      @name="hiddenCheckbox"
+      @description="Visually hides the radio checkbox input."
       @defaultValue="false"
-      @value={{this.hiddenInput}}
-      @onInput={{fn (mut this.hiddenInput)}}
+      @value={{this.hiddenCheckbox}}
+      @onInput={{fn (mut this.hiddenCheckbox)}}
     />
     <Args.Bool
       @name="hiddenBorder"

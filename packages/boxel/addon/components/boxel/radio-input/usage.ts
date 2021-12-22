@@ -22,7 +22,7 @@ export default class RadioInputUsage extends Component {
     'Select one of these options for breakfast sandwiches';
   @tracked checkedId = 'strawberry';
   @tracked disabled = false;
-  @tracked hiddenInput = false;
+  @tracked hiddenCheckbox = false;
   @tracked hiddenBorder = false;
   @tracked spacing = '';
   @tracked layout = 'default (flex)';
