@@ -1,0 +1,25 @@
+.degraded-service-banner {
+  --degraded-service-banner-text-color: var(--boxel-dark);
+  --degraded-service-banner-background-color: var(--boxel-yellow);
+  --icon-background-color: var(--degraded-service-banner-text-color);
+  --icon-color: var(--degraded-service-banner-background-color);
+
+  width: 100%;
+  min-height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--boxel-sp-xxs);
+  font: 600 var(--boxel-font-sm);
+  background: var(--degraded-service-banner-background-color);
+  color: var(--degraded-service-banner-text-color);
+}
+
+.degraded-service-banner.degraded-service-banner--severe {
+  --degraded-service-banner-text-color: var(--boxel-light);
+  --degraded-service-banner-background-color: var(--boxel-red);
+}
+
+.degraded-service-banner__icon {
+  margin-right: var(--boxel-sp-xxs);
+}

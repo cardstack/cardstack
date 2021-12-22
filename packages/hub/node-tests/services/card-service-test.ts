@@ -147,6 +147,11 @@ if (process.env.COMPILER) {
         expect(card.compiled!.adoptsFrom!.url).to.eq(`${realmURL}post`);
       });
 
+      it('returns a card from the base realm', async function () {
+        let card = await cards.load('https://cardstack.com/base/string');
+        expect(card.compiled!.url).to.eq('https://cardstack.com/base/string');
+      });
+
       it('handles missing card', async function () {
         try {
           await cards.load(`${realmURL}nonexistent`);

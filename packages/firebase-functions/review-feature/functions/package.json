@@ -1,6 +1,6 @@
 {
   "name": "review-feature",
-  "version": "0.28.1",
+  "version": "0.28.2",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
@@ -12,7 +12,7 @@
   "engines": {
     "node": "14"
   },
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "dependencies": {
     "firebase-admin": "^9.8.0",
     "firebase-functions": "^3.14.1"

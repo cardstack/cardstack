@@ -1,17 +1,20 @@
 import CardModel from '@cardstack/core/src/card-model';
 import type {
-  CardJSONResponse,
   CompiledCard,
   Format,
   RawCard,
   Builder,
   CardOperation,
   CardId,
+  JSONAPIDocument,
 } from '@cardstack/core/src/interfaces';
-import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
-import { Compiler, defineModules } from '@cardstack/core/src/compiler';
+import {
+  Compiler,
+  makeGloballyAddressable,
+} from '@cardstack/core/src/compiler';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
 import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
@@ -56,7 +59,6 @@ export default class LocalRealm implements Builder {
   private remoteRawCards = new Map<string, RawCard>();
 
   private compiledCardCache = new Map<string, CompiledCard>();
-  private compiler: Compiler;
   private localModules = new Map<string, LocalModule>();
   private deserializer = new RawCardDeserializer();
 
@@ -64,12 +66,9 @@ export default class LocalRealm implements Builder {
     if (!ownRealmURL.endsWith('/')) {
       throw new Error(`realm URLs must have trailing slash`);
     }
-    this.compiler = new Compiler({
-      builder: this,
-    });
   }
 
-  async load(url: string, format: Format): Promise<CardJSONResponse> {
+  async load(url: string, format: Format): Promise<JSONAPIDocument> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
 
@@ -142,9 +141,15 @@ export default class LocalRealm implements Builder {
     let cardId = this.parseOwnRealmURL(url);
     if (cardId) {
       let rawCard = await this.getRawCard(url);
-      let compiledCard = await this.compiler.compile(rawCard);
-      let definedCard = defineModules(compiledCard, (local, type, src) =>
-        this.define(url, local, type, src)
+      let compiler = new Compiler({
+        builder: this,
+        cardSource: rawCard,
+      });
+      let compiledCard = await compiler.compile();
+      let definedCard = makeGloballyAddressable(
+        url,
+        compiledCard,
+        (local, type, src) => this.define(url, local, type, src)
       );
       this.compiledCardCache.set(url, definedCard);
       return definedCard;
@@ -181,7 +186,7 @@ export default class LocalRealm implements Builder {
     return id;
   }
 
-  async send(op: CardOperation): Promise<CardJSONResponse> {
+  async send(op: CardOperation): Promise<JSONAPIDocument> {
     if ('create' in op) {
       let data = op.create.payload.data.attributes;
 

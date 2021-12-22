@@ -3,7 +3,7 @@ import { it, beforeStart, afterAll, expect } from 'corde';
 import config from 'config';
 import { Registry } from '@cardstack/di';
 import { BetaTestConfig } from '../../../../services/discord-bots/hub-bot/types';
-import { HubBotController } from '../../../../main';
+import { HubBotController } from '../../../../process-controllers/hub-bot-controller';
 
 let { sku } = config.get('betaTesting') as BetaTestConfig;
 

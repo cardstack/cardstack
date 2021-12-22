@@ -1,5 +1,5 @@
 import { Client as DBClient } from 'pg';
-import { HubBotController } from '../../main';
+
 import config from 'config';
 import { name as commandName, run as command } from '../../services/discord-bots/hub-bot/commands/guild/card-drop';
 import * as JSONAPI from 'jsonapi-typescript';
@@ -12,6 +12,7 @@ import Bot, {
   MockRole,
 } from '@cardstack/discord-bot';
 import { BetaTestConfig } from '../../services/discord-bots/hub-bot/types';
+import { HubBotController } from '../../process-controllers/hub-bot-controller';
 
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 

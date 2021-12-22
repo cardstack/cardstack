@@ -1,30 +1,64 @@
-import { Builder as BuilderInterface, RawCard, CompiledCard, Saved, ModuleRef } from '@cardstack/core/src/interfaces';
-import { Compiler, defineModules } from '@cardstack/core/src/compiler';
+import {
+  Builder as BuilderInterface,
+  RawCard,
+  CompiledCard,
+  Saved,
+  ModuleRef,
+  Unsaved,
+} from '@cardstack/core/src/interfaces';
+import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 
-import { transformSync } from '@babel/core';
-import { NODE, BROWSER } from '../interfaces';
-import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { inject } from '@cardstack/di';
-import { serverLog as logger } from '../utils/logger';
-
+import { JS_TYPE } from '@cardstack/core/src/utils/content';
+import { BROWSER, NODE } from '../interfaces';
+import { transformSync } from '@babel/core';
 // @ts-ignore
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
-import { cardURL } from '@cardstack/core/src/utils';
+
+import logger from '@cardstack/logger';
+const log = logger('hub/card-builder');
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
   cache = inject('card-cache', { as: 'cache' });
   cards = inject('card-service', { as: 'cards' });
 
-  logger = logger;
+  async getRawCard(url: string): Promise<RawCard> {
+    log.trace('getRawCard: %s', url);
+    return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
+  }
 
-  private compiler = new Compiler({
-    builder: this,
-  });
+  async getCompiledCard(url: string): Promise<CompiledCard> {
+    log.trace('getCompiledCard: %s', url);
+    let cached = this.cache.getCard(url);
+    if (cached) {
+      return cached;
+    }
+    let cardSource = await this.getRawCard(url);
+    let compiledCard: CompiledCard<Saved, ModuleRef> | undefined;
+    let err: unknown;
+    try {
+      let compiler = new Compiler({ builder: this, cardSource });
+      compiledCard = await compiler.compile();
+    } catch (e) {
+      err = e;
+    }
+    if (compiledCard) {
+      let definedCard = makeGloballyAddressable(url, compiledCard, (local, type, src) =>
+        this.define(url, local, type, src)
+      );
+      this.cache.setCard(url, definedCard);
+      return definedCard;
+    } else {
+      this.cache.deleteCard(url);
+      throw err;
+    }
+  }
 
   private define(cardURL: string, localPath: string, type: string, source: string): string {
+    log.trace('define: %s %s', cardURL, { localPath, type });
     switch (type) {
       case JS_TYPE:
         this.cache.setModule(BROWSER, cardURL, localPath, source);
@@ -44,37 +78,8 @@ export default class CardBuilder implements BuilderInterface {
     return out!.code!;
   }
 
-  async getRawCard(url: string): Promise<RawCard> {
-    return await this.realmManager.read(this.realmManager.parseCardURL(url.replace(/\/$/, '')));
-  }
-
-  async getCompiledCard(url: string): Promise<CompiledCard> {
-    let compiledCard = this.cache.getCard(url);
-    if (compiledCard) {
-      return compiledCard;
-    }
-    let rawCard = await this.getRawCard(url);
-    return await this.compileCardFromRaw(rawCard);
-  }
-
-  async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
-    let compiledCard: CompiledCard<Saved, ModuleRef> | undefined;
-    let err: unknown;
-    try {
-      compiledCard = await this.compiler.compile(rawCard);
-    } catch (e) {
-      err = e;
-    }
-    if (compiledCard) {
-      let definedCard = defineModules(compiledCard, (local, type, src) =>
-        this.define(cardURL(rawCard), local, type, src)
-      );
-      this.cache.setCard(cardURL(rawCard), definedCard);
-      return definedCard;
-    } else {
-      this.cache.deleteCard(cardURL(rawCard));
-      throw err;
-    }
+  compileCardFromRaw<Identity extends Saved | Unsaved>(cardSource: RawCard<Identity>): Compiler<Identity> {
+    return new Compiler({ builder: this, cardSource });
   }
 }
 

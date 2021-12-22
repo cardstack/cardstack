@@ -1,4 +1,4 @@
-import { HubBotController } from '../main';
+import { HubBotController } from '../process-controllers/hub-bot-controller';
 
 export const command = 'bot';
 export const describe = 'Boot the discord bot';

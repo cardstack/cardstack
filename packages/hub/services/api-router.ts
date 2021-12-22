@@ -11,6 +11,7 @@ export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
+  statusRoute = inject('status-route', { as: 'statusRoute' });
   prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
   });
@@ -47,6 +48,7 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      statusRoute,
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
@@ -60,6 +62,7 @@ export default class APIRouter {
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
+    apiSubrouter.get('/status', statusRoute.get);
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
