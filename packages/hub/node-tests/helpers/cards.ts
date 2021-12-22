@@ -108,6 +108,9 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
     currentCardService = await container.lookup('card-service');
     cardCacheConfig = (await container.lookup('card-cache-config')) as TestCardCacheConfig;
     cardCache = await container.lookup('card-cache');
+
+    let si = await container.lookup('searchIndex');
+    await si.indexAllRealms();
   });
 
   mochaContext.afterEach(async function () {

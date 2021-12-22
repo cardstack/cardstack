@@ -7,11 +7,6 @@ if (process.env.COMPILER) {
   describe('SearchIndex', function () {
     let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
-    this.beforeEach(async () => {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
-    });
-
     it(`gives a good error at load time when a card can't compile`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), { adoptsFrom: '../post' });
       let si = await getContainer().lookup('searchIndex');

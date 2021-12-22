@@ -38,8 +38,6 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
     });
 
     it('string card', async function () {
