@@ -1,4 +1,3 @@
-/* FIXME scandalous? */
 .radio-option.token-option {
   padding: var(--boxel-sp-xl) var(--boxel-sp);
   grid-template-columns: auto 1fr 1fr;
