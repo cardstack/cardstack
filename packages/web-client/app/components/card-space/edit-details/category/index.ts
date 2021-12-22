@@ -94,9 +94,9 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
 
       let { errors } = yield response.json();
 
-      if (!this.otherIsChecked) {
-        return;
-      }
+      // if (!this.otherIsChecked) {
+      //   return;
+      // }
 
       if (errors.length === 0) {
         this.categoryValidationState = 'valid';

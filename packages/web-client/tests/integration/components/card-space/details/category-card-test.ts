@@ -1,6 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, find, render, waitUntil } from '@ember/test-helpers';
+import {
+  click,
+  fillIn,
+  find,
+  render,
+  settled,
+  waitUntil,
+} from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { Response as MirageResponse } from 'ember-cli-mirage';
@@ -31,6 +38,10 @@ module(
           @workflowSession={{this.workflowSession}}
         />
       `);
+
+      if (window.location.href.includes('devmode')) {
+        await this.pauseTest();
+      }
 
       assert.dom('radio-option__input--checked').doesNotExist();
 
@@ -134,6 +145,56 @@ module(
 
       await click('[data-test-category-option-other-container]');
       assert.dom('[data-test-category-option-other] input').isFocused();
+    });
+
+    test('it ignores the validated other value if a preset value has been chosen in the meantime', async function (this: Context, assert) {
+      let validationResolver: Function | undefined;
+      let validationPromise = new Promise(function (resolve) {
+        validationResolver = resolve;
+      });
+
+      this.server.post(
+        '/card-spaces/validate-profile-category',
+        async function () {
+          await validationPromise;
+          return new MirageResponse(200, {}, { errors: [] });
+        }
+      );
+
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      await click('[data-test-category-option-other-container]');
+      await fillIn('[data-test-category-option-other] input', 'Something');
+
+      await click(`[data-test-category-option]:nth-child(2)`);
+
+      assert.equal(
+        workflowSession.getValue<string>('profileCategory'),
+        OPTIONS[1]
+      );
+      assert.dom('[data-test-category-option]:nth-child(2) input').isChecked();
+
+      if (validationResolver) {
+        validationResolver(true);
+      }
+
+      // Hideous, but need to wait to ensure validateCategoryTask has completed and not clobbered the static profileCategory
+      await settled();
+      await validationPromise;
+      await settled();
+
+      assert.equal(
+        workflowSession.getValue<string>('profileCategory'),
+        OPTIONS[1]
+      );
+      assert.dom('[data-test-category-option]:nth-child(2) input').isChecked();
     });
 
     test('it shows the error when custom category validation fails', async function (this: Context, assert) {
