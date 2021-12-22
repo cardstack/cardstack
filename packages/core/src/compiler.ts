@@ -462,14 +462,26 @@ class TrackedBuilder implements Builder {
     if (!card) {
       throw new Error('Should never get here');
     }
-    // TODO capture additional deps from the compiled card by recusing through
-    // the adoptsFrom and field properties of the CompiledCard
+    this.discoverDeps(card);
     return card;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
     return this.realBuilder.getRawCard(url);
+  }
+
+  private discoverDeps(card: CompiledCard): void {
+    if (card.adoptsFrom) {
+      this.dependencies.add(card.adoptsFrom.url);
+      this.discoverDeps(card.adoptsFrom);
+    }
+    for (let field of Object.values(card.fields)) {
+      if (field.card) {
+        this.dependencies.add(field.card.url);
+        this.discoverDeps(field.card);
+      }
+    }
   }
 
   // A NotFound error represents a dependency that the card has (that was unable

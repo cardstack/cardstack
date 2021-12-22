@@ -251,7 +251,7 @@ if (process.env.COMPILER) {
       it('can update a card that is only data correctly', async function () {
         // Intentionally not including the adopts from because cardhost cardService
         // doesn't include it
-        await cards.update({
+        await cards.updateData({
           realm: realmURL,
           id: 'post1',
           data: {

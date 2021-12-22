@@ -8,7 +8,7 @@ if (process.env.COMPILER) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    function updateCard(cardURL: string, payload: any) {
+    function updateCardData(cardURL: string, payload: any) {
       return request()
         .patch(`/cards/${encodeURIComponent(cardURL)}`)
         .set('Accept', 'application/json')
@@ -50,17 +50,19 @@ if (process.env.COMPILER) {
       });
     });
 
-    it('returns a 404 when trying to update from a card that doesnt exist', async function () {
+    it('returns a 404 when trying to update card data from a card that doesnt exist', async function () {
       // assert.expect(0);
-      await updateCard(`${realmURL}car0`, {
+      await updateCardData(`${realmURL}car0`, {
         data: {
           vin: '123',
         },
       }).expect(404);
     });
 
+    it('returns a 404 when trying to update card source from a card that doesnt exist');
+
     it.skip('can update an existing data only card', async function () {
-      let initialResponse = await updateCard(`${realmURL}post0`, {
+      let initialResponse = await updateCardData(`${realmURL}post0`, {
         data: {
           attributes: {
             title: 'Goodbye World!',
@@ -91,7 +93,7 @@ if (process.env.COMPILER) {
         title: 'Placeholder Title',
         body: 'Placeholder Body',
       };
-      let initialResponse = await updateCard(`${realmURL}post`, {
+      let initialResponse = await updateCardData(`${realmURL}post`, {
         data: {
           attributes,
         },

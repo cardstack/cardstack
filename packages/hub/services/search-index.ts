@@ -67,6 +67,12 @@ export class SearchIndex {
     });
   }
 
+  async indexCardData(raw: RawCard, compiled: CompiledCard): Promise<CompiledCard> {
+    return await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.internalSaveData(raw, compiled);
+    });
+  }
+
   private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
@@ -203,6 +209,10 @@ class IndexerRun implements IndexerHandle {
     return await this.writeToIndex(rawCard, definedCard, compiler);
   }
 
+  async internalSaveData(rawCard: RawCard, compiledCard: CompiledCard): Promise<CompiledCard> {
+    return await this.writeCardDataToIndex(rawCard, compiledCard);
+  }
+
   private define(cardURL: string, localPath: string, type: string, source: string): string {
     switch (type) {
       case JS_TYPE:
@@ -221,6 +231,19 @@ class IndexerRun implements IndexerHandle {
       plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
     });
     return out!.code!;
+  }
+  private async writeCardDataToIndex(card: RawCard, compiledCard: CompiledCard): Promise<CompiledCard> {
+    let url = cardURL(card);
+    let expression = upsert('cards', 'cards_pkey', {
+      url: param(url),
+      realm: param(this.realmURL),
+      generation: param(this.generation || null),
+      data: param(card.data ?? null),
+      searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
+    });
+    await this.db.query(expressionToSql(expression));
+    this.touched.set(url, this.touchCounter++);
+    return compiledCard;
   }
 
   private async writeToIndex(

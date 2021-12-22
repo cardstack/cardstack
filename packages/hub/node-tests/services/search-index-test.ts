@@ -1,7 +1,10 @@
+import { RawCard } from '@cardstack/core/src/interfaces';
+import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
 import { outputJSONSync } from 'fs-extra';
 import { join } from 'path';
 import { configureHubWithCompiler } from '../helpers/cards';
+import merge from 'lodash/merge';
 
 if (process.env.COMPILER) {
   describe('SearchIndex', function () {
@@ -44,8 +47,7 @@ if (process.env.COMPILER) {
             import { contains } from '@cardstack/types';
             import string from 'https://cardstack.com/base/string';
             export default class Post {
-              @contains(string)
-              title;
+              @contains(string) title;
             }
           `,
         },
@@ -78,8 +80,7 @@ if (process.env.COMPILER) {
             import { contains } from '@cardstack/types';
             import string from 'https://cardstack.com/base/string';
             export default class Post {
-              @contains(string)
-              title;
+              @contains(string) title;
             }
           `,
         },
@@ -89,13 +90,171 @@ if (process.env.COMPILER) {
       expect(grandChild.data?.title).to.eq('Hello World');
     });
 
-    it(`can invalidate a card via the update of an adoptsFrom card`);
-    it(`can invalidate a card via the update of a field card`);
-    it(`can invalidate a card via the update of a grandparent adoptsFrom card`);
-    it(`can invalidate a card via the update of a "grandparent" field card`); // add a new field to a field of a field
+    it(`can invalidate a card via the update of an adoptsFrom card`, async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+      let post: RawCard = {
+        realm: realmURL,
+        id: 'post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Post {
+              @contains(string) title;
+            }
+          `,
+        },
+      };
+      await cards.create(post);
+      await cards.create({
+        realm: realmURL,
+        id: 'example',
+        adoptsFrom: '../post',
+      });
 
-    // make sure we can recurse up the adoptsFrom and through fields simultaneously
-    it(`can invalidate a card via the update of an "uncle" field card`); // adoptsFrom of a field changes
-    it(`can invalidate a card via the update of an "uncle" adoptsFrom card`); // add a new field to a field of an adoptsFrom
+      // add an "author" field to the parent card and observe that the child card inherits this field
+      post.files = {
+        'schema.js': `
+          import { contains } from '@cardstack/types';
+          import string from 'https://cardstack.com/base/string';
+          export default class Post {
+            @contains(string) title;
+            @contains(string) author;
+          }
+        `,
+      };
+      await cards.update(post);
+
+      let example = await cards.load(`${realmURL}example`);
+      expect(example.compiled.fields.author.card.url).to.eq('https://cardstack.com/base/string');
+    });
+
+    it(`can invalidate a card via the update of a field card`, async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+      await cards.create(ADDRESS_RAW_CARD);
+      await cards.create(PERSON_RAW_CARD);
+
+      // add a "country" field to the address field card and observe that the person card includes the new address field
+      await cards.update(
+        merge({}, ADDRESS_RAW_CARD, {
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              import date from "https://cardstack.com/base/date";
+
+              export default class Address {
+                @contains(string) street;
+                @contains(string) city;
+                @contains(string) state;
+                @contains(string) zip;
+                @contains(date) settlementDate;
+                @contains(string) country;
+              }
+            `,
+          },
+        })
+      );
+      let person = await cards.load(`${PERSON_RAW_CARD.realm}${PERSON_RAW_CARD.id}`);
+      expect(person.compiled.fields.address.card.fields.country.card.url).to.eq('https://cardstack.com/base/string');
+    });
+
+    it(`can invalidate a card via the update of a grandparent adoptsFrom card`, async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+      let post: RawCard = {
+        realm: realmURL,
+        id: 'post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Post {
+              @contains(string) title;
+            }
+          `,
+        },
+      };
+      await cards.create(post);
+      await cards.create({
+        realm: realmURL,
+        id: 'example',
+        adoptsFrom: '../post',
+      });
+      await cards.create({
+        realm: realmURL,
+        id: 'grandchild',
+        adoptsFrom: '../example',
+      });
+
+      // add an "author" field to the parent card and observe that the grandchild card inherits this field
+      post.files = {
+        'schema.js': `
+          import { contains } from '@cardstack/types';
+          import string from 'https://cardstack.com/base/string';
+          export default class Post {
+            @contains(string) title;
+            @contains(string) author;
+          }
+        `,
+      };
+      await cards.update(post);
+
+      let grandchild = await cards.load(`${realmURL}grandchild`);
+      expect(grandchild.compiled.fields.author.card.url).to.eq('https://cardstack.com/base/string');
+    });
+
+    it(`can invalidate a card via the update of a field of a field card`, async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.indexAllRealms();
+      await cards.create(ADDRESS_RAW_CARD);
+      await cards.create(PERSON_RAW_CARD);
+      await cards.create({
+        realm: realmURL,
+        id: 'post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+	          import person from "https://cardstack.local/person";
+            export default class Post {
+              @contains(string) title;
+              @contains(person) author;
+            }
+          `,
+        },
+      });
+
+      // add a "country" field to the address field card and observe that the post card includes the new address field via the author field
+      await cards.update(
+        merge({}, ADDRESS_RAW_CARD, {
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              import date from "https://cardstack.com/base/date";
+
+              export default class Address {
+                @contains(string) street;
+                @contains(string) city;
+                @contains(string) state;
+                @contains(string) zip;
+                @contains(date) settlementDate;
+                @contains(string) country;
+              }
+            `,
+          },
+        })
+      );
+      let post = await cards.load(`${realmURL}post`);
+      expect(post.compiled.fields.author.card.fields.address.card.fields.country.card.url).to.eq(
+        'https://cardstack.com/base/string'
+      );
+    });
   });
 }

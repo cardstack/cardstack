@@ -59,12 +59,19 @@ export class CardService {
   }
 
   async update(raw: RawCard): Promise<Card> {
+    let compiler = this.builder.compileCardFromRaw(raw);
+    let compiledCard = await compiler.compile();
     let originalRaw = await this.realmManager.read(raw);
     await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let compiled = await this.builder.getCompiledCard(cardURL(raw));
+    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
+    return { data: raw.data, compiled };
+  }
 
-    // TODO:
-    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
+  async updateData(raw: RawCard): Promise<Card> {
+    let originalRaw = await this.realmManager.read(raw);
+    await this.realmManager.update(Object.assign({}, originalRaw, raw));
+    let originalCompiled = await this.builder.getCompiledCard(cardURL(raw));
+    let compiled = await this.searchIndex.indexCardData(raw, originalCompiled);
 
     return { data: raw.data, compiled };
   }

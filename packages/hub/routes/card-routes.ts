@@ -89,14 +89,14 @@ export default class CardRoutes {
     ctx.status = 201;
   }
 
-  private async updateCard(ctx: RouterContext) {
+  private async updateCardData(ctx: RouterContext) {
     let {
       request: { body: data },
       params: { encodedCardURL: url },
     } = ctx;
 
     let cardId = this.realmManager.parseCardURL(url);
-    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
+    let card = await this.cards.as(INSECURE_CONTEXT).updateData({ ...cardId, data });
     // Question: Is it safe to assume the response should be isolated?
     ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;
@@ -175,7 +175,7 @@ export default class CardRoutes {
     koaRouter.post(`/cards/:realmURL/:parentCardURL`, parseBody, this.createDataCard);
     koaRouter.get(`/cards/`, this.queryCards);
     koaRouter.get(`/cards/:encodedCardURL`, this.getCard);
-    koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCard);
+    koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCardData);
     koaRouter.delete(`/cards/:encodedCardURL`, this.deleteCard);
 
     // the 'sources' section of the API deals in RawCards. It's where you can do
