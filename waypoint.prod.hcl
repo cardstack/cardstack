@@ -123,3 +123,41 @@ app "hub-bot" {
         }
     }
 }
+
+app "hub-event-listener" {
+  path = "./packages/hub"
+
+  build {
+      use "docker" {
+        dockerfile = "Dockerfile"
+        build_args = {
+            hub_command = "event-listener"
+        }
+      }
+
+      registry {
+          use "aws-ecr" {
+              region     = "us-east-1"
+              repository = "hub-event-listener-prod"
+              tag        = "latest"
+          }
+      }
+  }
+
+  deploy {
+      use "aws-ecs" {
+          region = "us-east-1"
+          memory = "512"
+          cluster = "hub-event-listener-prod"
+          count = 1
+          subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
+          task_role_name = "hub-prod-hub_ecr_task"
+          disable_alb = true
+      }
+
+      hook {
+          when    = "before"
+          command = ["./scripts/purge-services.sh", "hub-event-listener-prod", "waypoint-hub-event-listener", "1"] # need this to purge old ecs services
+      }
+  }
+}

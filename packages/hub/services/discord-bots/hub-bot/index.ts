@@ -2,10 +2,14 @@ import DiscordBot from '@cardstack/discord-bot';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import { DiscordBotConfig } from '@cardstack/discord-bot/types';
+import logger from '@cardstack/logger';
+import { runInitializers } from '../../../main';
 
 import * as AirDropPrepaidCardStart from './commands/dm/airdrop-prepaidcard/start';
 import * as Ping from './commands/guild/ping';
 import * as CardDrop from './commands/guild/card-drop';
+
+const log = logger('hub/bot');
 
 export default class HubBot extends DiscordBot {
   type = 'hub-bot';
@@ -33,4 +37,20 @@ export default class HubBot extends DiscordBot {
   cardpay = inject('cardpay');
   discordBotsDbGateway = inject('hub-discord-bots-db-gateway', { as: 'discordBotsDbGateway' });
   dmChannelsDbGateway = inject('hub-dm-channels-db-gateway', { as: 'dmChannelsDbGateway' });
+
+  constructor() {
+    super();
+    runInitializers();
+  }
+
+  async teardown() {
+    log.info('shutting down');
+    await this.destroy();
+  }
+}
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    hubBot: HubBot;
+  }
 }

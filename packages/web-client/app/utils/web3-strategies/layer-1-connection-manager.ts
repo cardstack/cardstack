@@ -149,8 +149,10 @@ export class ConnectionManager {
 
   async connect(web3: Web3, providerId: WalletProviderId) {
     await this.setup(providerId);
+    if (!this.strategy)
+      throw new Error('Failed to setup strategy in layer 1 connection manager');
     web3.setProvider(this.provider);
-    await this.strategy?.connect();
+    return await this.strategy.connect();
   }
 
   async reconnect(web3: Web3, providerId: WalletProviderId, session?: any) {
@@ -247,7 +249,10 @@ export abstract class ConnectionStrategy
   abstract providerId: WalletProviderId;
   abstract setup(session?: any): Promise<any>;
   abstract reconnect(): Promise<void>;
-  abstract connect(): Promise<void>;
+  /**
+   * Returns true if connect calls go through without errors/cancelation by user
+   */
+  abstract connect(): Promise<boolean>;
   abstract disconnect(): Promise<void>;
 
   // concrete classes may optionally implement these methods
@@ -342,9 +347,22 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       this.onConnect(accounts);
     } else {
       // otherwise we want to trigger the extension prompt
-      await this.provider.request({
-        method: 'eth_requestAccounts',
-      });
+      try {
+        await this.provider.request({
+          method: 'eth_requestAccounts',
+        });
+      } catch (e) {
+        /**
+         * Based on examples from https://docs.metamask.io/guide/ethereum-provider.html#using-the-provider
+         * 4001 is the EIP-1193 userRejectedRequest error
+         * If this happens, the user rejected the connection request.
+         */
+        if (e.code === 4001) {
+          return false;
+        } else {
+          throw e;
+        }
+      }
     }
 
     let chainId = parseInt(
@@ -354,6 +372,8 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
     );
 
     this.onChainChanged(chainId);
+
+    return true;
   }
 
   // metamask actually doesn't allow you to disconnect via its API
@@ -467,7 +487,17 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async connect() {
-    return await this.provider.enable();
+    try {
+      await this.provider.enable();
+      return true;
+    } catch (e) {
+      // check modal_closed event in WalletConnectProvider for message to match
+      // for user closing the modal
+      if (e.message === 'User closed modal') {
+        return false;
+      }
+      throw e;
+    }
   }
 
   async disconnect() {

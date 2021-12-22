@@ -1,7 +1,6 @@
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-template';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import CardBuilder from '../../services/card-builder';
 import { configureHubWithCompiler } from '../helpers/cards';
 
 function importAndChooseName() {
@@ -10,16 +9,14 @@ function importAndChooseName() {
 
 if (process.env.COMPILER) {
   describe('Glimmer CardTemplatePlugin', function () {
-    let builder: CardBuilder;
     let options: Options;
     let defaultFieldFormat: Options['defaultFieldFormat'];
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-    let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
+    let { realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async () => {
-      builder = await getContainer().lookup('card-builder');
       await cards.create({
         realm: realmURL,
         id: 'list',
@@ -41,9 +38,12 @@ if (process.env.COMPILER) {
           }`,
         },
       });
-      compiledListCard = await builder.getCompiledCard(`${realmURL}list`);
-      compiledStringCard = await builder.getCompiledCard('https://cardstack.com/base/string');
-      compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
+      let listCard = await cards.load(`${realmURL}list`);
+      compiledListCard = listCard.compiled;
+      let stringCard = await cards.load('https://cardstack.com/base/string');
+      compiledStringCard = stringCard.compiled;
+      let dateCard = await cards.load('https://cardstack.com/base/date');
+      compiledDateCard = dateCard.compiled;
     });
 
     this.beforeEach(function () {
@@ -347,9 +347,9 @@ if (process.env.COMPILER) {
         },
       });
 
-      let card = await builder.getCompiledCard(`${realmURL}post-list`);
+      let { compiled } = await cards.load(`${realmURL}post-list`);
       transform(template, {
-        fields: card.fields,
+        fields: compiled.fields,
         usageMeta,
         defaultFieldFormat,
         importAndChooseName,

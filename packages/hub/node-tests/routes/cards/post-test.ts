@@ -114,7 +114,7 @@ if (process.env.COMPILER) {
             },
             {
               code: 404,
-              detail: 'card URL https://not-created.com/post is not in a configured realm',
+              detail: 'Card https://not-created.com/post was not found',
               title: 'Not Found',
             },
           ],

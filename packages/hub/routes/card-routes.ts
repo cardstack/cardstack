@@ -1,15 +1,15 @@
 import { RouterContext } from '@koa/router';
-import { deserialize, serializeCard, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
 import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
-import { NotFound, BadRequest } from '@cardstack/core/src/utils/errors';
+import { NotFound, BadRequest, CardstackError } from '@cardstack/core/src/utils/errors';
 import { difference } from 'lodash';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
+import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 
 declare global {
@@ -25,10 +25,10 @@ const requireCard = function (path: string, root: string): any {
 
 export default class CardRoutes {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private cache = inject('card-cache', { as: 'cache' });
-  private builder = inject('card-builder', { as: 'builder' });
+  private cache = inject('file-cache', { as: 'cache' });
   private cards = inject('card-service', { as: 'cards' });
   private config = inject('card-routes-config', { as: 'config' });
+  private index = inject('searchIndex', { as: 'index' });
 
   private routerInstance: undefined | RouterInstance;
 
@@ -42,8 +42,8 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let { data, compiled } = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = { data: serializeCard(url, data, compiled[format]) };
+    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
+    ctx.body = serializeCardPayloadForFormat(card, format);
     ctx.status = 200;
   }
 
@@ -51,7 +51,7 @@ export default class CardRoutes {
     let query = qs.parse(ctx.querystring);
     assertQuery(query);
     let cards = await this.cards.as(INSECURE_CONTEXT).query(query);
-    let collection = cards.map((card) => serializeCard(card.compiled.url, card.data, card.compiled['embedded']));
+    let collection = cards.map((card) => serializeCardPayloadForFormat(card, 'embedded').data);
     ctx.body = { data: collection };
     ctx.status = 200;
   }
@@ -84,24 +84,21 @@ export default class CardRoutes {
       card.id = inputData.id.slice(realmURL.length);
     }
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card);
-
-    ctx.body = { data: serializeCard(compiled.url, outputData, compiled[format]) };
+    let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
+    ctx.body = serializeCardPayloadForFormat(createdCard, format);
     ctx.status = 201;
   }
 
   private async updateCard(ctx: RouterContext) {
     let {
-      request: { body },
+      request: { body: data },
       params: { encodedCardURL: url },
     } = ctx;
 
-    let data = await deserialize(body).attributes;
     let cardId = this.realmManager.parseCardURL(url);
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
-
+    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
     // Question: Is it safe to assume the response should be isolated?
-    ctx.body = { data: serializeCard(url, outputData, compiled['isolated']) };
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;
   }
 
@@ -130,10 +127,8 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
-    let card = await this.builder.getCompiledCard(url);
-    ctx.body = { data: serializeCard(url, rawCard.data, card['isolated']) };
-    ctx.status = 200;
+    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
+    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
   }
 
   private async getSource(ctx: RouterContext) {
@@ -142,14 +137,14 @@ export default class CardRoutes {
       query,
     } = ctx;
 
+    let card = await this.index.getCard(url);
     let compiledCard;
-    let rawCard = await this.realmManager.read(this.realmManager.parseCardURL(url));
 
     if (query.include === 'compiledMeta') {
-      compiledCard = await this.builder.getCompiledCard(url);
+      compiledCard = card.compiled;
     }
-
-    ctx.body = serializeRawCard(rawCard, compiledCard);
+    let data = new RawCardSerializer().serialize(card.raw, compiledCard);
+    ctx.body = data;
   }
 
   private async ensureRouterInstance(): Promise<RouterInstance> {
@@ -157,9 +152,12 @@ export default class CardRoutes {
       if (!this.config.routeCard) {
         this.routerInstance = defaultRouterInstance;
       } else {
-        let card = await this.builder.getCompiledCard(this.config.routeCard);
+        let { compiled } = await this.index.getCard(this.config.routeCard);
+        if (!compiled) {
+          throw new CardstackError('Routing card is not compiled!');
+        }
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const CardRouterClass = requireCard(card.schemaModule.global, this.cache.dir).default;
+        const CardRouterClass = requireCard(compiled.schemaModule.global, this.cache.dir).default;
         const cardRouterInstance = new CardRouterClass();
         assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
         this.routerInstance = cardRouterInstance;

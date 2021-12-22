@@ -1,11 +1,11 @@
 import { Environment } from '../../interfaces';
 import { expect } from 'chai';
-import CardCache from '../../services/card-cache';
+import FileCache from '../../services/file-cache';
 import { setupHub } from '../helpers/server';
 
 if (process.env.COMPILER) {
-  describe('CardCache', function () {
-    let cache: CardCache;
+  describe('FileCache', function () {
+    let cache: FileCache;
     let env: Environment = 'node';
     let moduleName = 'isolated.js';
     let cardURL = 'https://acard.com/verycard';
@@ -13,7 +13,7 @@ if (process.env.COMPILER) {
     let { getContainer } = setupHub(this);
 
     this.beforeEach(async function () {
-      cache = await getContainer().lookup('card-cache');
+      cache = await getContainer().lookup('file-cache');
     });
 
     it('.setModule', function () {

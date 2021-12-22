@@ -18,7 +18,7 @@ if (process.env.COMPILER) {
         expect(err.message).to.eq(`tried to adopt from card ${realmURL}post but it failed to load`);
         expect(err.status).to.eq(422);
         let innerError = err.additionalErrors?.[0];
-        expect(innerError?.message).to.eq('card post not found');
+        expect(innerError?.message).to.eq(`Card ${realmURL}post was not found`);
         expect(innerError?.status).to.eq(404);
       }
     });

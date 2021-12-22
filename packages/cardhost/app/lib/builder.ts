@@ -1,14 +1,14 @@
 import CardModel from '@cardstack/core/src/card-model';
 import type {
-  CardJSONResponse,
   CompiledCard,
   Format,
   RawCard,
   Builder,
   CardOperation,
   CardId,
+  JSONAPIDocument,
 } from '@cardstack/core/src/interfaces';
-import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
+import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import {
@@ -68,7 +68,7 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async load(url: string, format: Format): Promise<CardJSONResponse> {
+  async load(url: string, format: Format): Promise<JSONAPIDocument> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
 
@@ -186,7 +186,7 @@ export default class LocalRealm implements Builder {
     return id;
   }
 
-  async send(op: CardOperation): Promise<CardJSONResponse> {
+  async send(op: CardOperation): Promise<JSONAPIDocument> {
     if ('create' in op) {
       let data = op.create.payload.data.attributes;
 
