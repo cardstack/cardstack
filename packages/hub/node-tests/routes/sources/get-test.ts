@@ -81,7 +81,7 @@ if (process.env.COMPILER) {
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
       expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes']);
       expect(response.body.data?.attributes).to.deep.equal({
-        files: {},
+        files: null,
         isolated: null,
         schema: null,
         embedded: null,
