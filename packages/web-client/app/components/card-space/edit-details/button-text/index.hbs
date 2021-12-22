@@ -6,18 +6,17 @@
   >
     <div data-test-button-text-options>
       {{#each this.options as |option|}}
-        <label class={{cn 'card-space-button-text-field__option' card-space-button-text-field__option--checked=@checked}} data-test-button-text-option>
-          {{#let (eq this.buttonTextValue option) as |checked|}}
-            <Input
-              name="deposit-token"
-              class={{cn "card-space-button-text-field__input" card-space-button-text-field__input--checked=checked}}
-              @type="radio"
-              @checked={{checked}}
-              {{on 'input' (fn this.setButtonTextValue option)}}
-            />
+        {{#let (eq this.buttonTextValue option) as |checked|}}
+          <Common::RadioOption
+            @name='button-text'
+            @checked={{checked}}
+            @onInput={{fn this.setButtonTextValue option}}
+            class='card-space-button-text-field__option'
+            data-test-button-text-option
+          >
             {{option}}
-          {{/let}}
-        </label>
+          </Common::RadioOption>
+        {{/let}}
       {{/each}}
     </div>
   </CardPay::LabeledValue>
