@@ -1,6 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { baseCardURL } from '@cardstack/core/src/compiler';
-import CardBuilder from '../../services/card-builder';
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { RawCard } from '@cardstack/core/src/interfaces';
@@ -32,17 +31,10 @@ const PERSON_CARD: RawCard = {
 
 if (process.env.COMPILER) {
   describe('Compiler', function () {
-    let builder: CardBuilder;
-
-    let { getContainer, cards } = configureHubWithCompiler(this);
-
-    this.beforeEach(async () => {
-      builder = await getContainer().lookup('card-builder');
-    });
+    let { cards, getCardCache } = configureHubWithCompiler(this);
 
     it('string card', async function () {
-      // TODO: Update to use cardService.create
-      let compiled = await builder.getCompiledCard('https://cardstack.com/base/string');
+      let { compiled } = await cards.load('https://cardstack.com/base/string');
       expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
       expect(compiled.embedded.inlineHBS).to.equal('{{@model}}');
       expect(compiled.embedded.usedFields).to.deep.equal([]);
@@ -50,7 +42,7 @@ if (process.env.COMPILER) {
     });
 
     it('date card', async function () {
-      let compiled = await builder.getCompiledCard('https://cardstack.com/base/date');
+      let { compiled } = await cards.load('https://cardstack.com/base/date');
       expect(compiled.serializer, 'Date card has date serializer').to.equal('date');
     });
 
@@ -66,42 +58,42 @@ if (process.env.COMPILER) {
           export default @adopts(date) class FancyDate { }`,
         },
       });
-      let compiled = await builder.getCompiledCard(`${realm}fancy-date`);
+      let { compiled } = await cards.load(`${realm}fancy-date`);
       expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
     });
 
     it('CompiledCard fields', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
+      let { compiled } = await cards.load(cardURL(PERSON_CARD));
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
     });
 
     it('CompiledCard embedded view', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
+      let { compiled } = await cards.load(cardURL(PERSON_CARD));
 
-      expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
+      expect(getCardCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
-      expect(builder.cache.getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
+      expect(getCardCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
         PERSON_CARD.files!['embedded.css']
       );
     });
 
     it('CompiledCard edit view', async function () {
       await cards.create(PERSON_CARD);
-      let compiled = await builder.getCompiledCard(cardURL(PERSON_CARD));
+      let { compiled } = await cards.load(cardURL(PERSON_CARD));
 
       expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
       expect(
-        builder.cache.getModule(compiled.edit.moduleName.global),
+        getCardCache().getModule(compiled.edit.moduleName.global),
         'Edit template is rendered for text'
       ).to.containsSource(
         '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
       );
       expect(
-        builder.cache.getModule(compiled.edit.moduleName.global),
+        getCardCache().getModule(compiled.edit.moduleName.global),
         'Edit template is rendered for date'
       ).to.containsSource(
         '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
@@ -135,12 +127,12 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard(`${realm}post`);
+      let { compiled } = await cards.load(`${realm}post`);
       expect(compiled.fields).to.have.all.keys('title', 'author');
 
       expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
 
-      expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
+      expect(getCardCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
         `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><HttpsCardstackComBaseDateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
       );
 
@@ -208,13 +200,13 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard(`${realm}post-list`);
+      let { compiled } = await cards.load(`${realm}post-list`);
       expect(compiled.fields).to.have.all.keys('posts');
 
       expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
 
       expect(
-        builder.cache.getModule(compiled.isolated.moduleName.global),
+        getCardCache().getModule(compiled.isolated.moduleName.global),
         'Isolated template includes PostField component'
       ).to.containsSource(
         `{{#each @model.posts as |Post|}}<HttpsCardstackLocalPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`
@@ -223,7 +215,7 @@ if (process.env.COMPILER) {
       expect(compiled.embedded.usedFields).to.deep.equal(['posts.title']);
 
       expect(
-        builder.cache.getModule(compiled.embedded.moduleName.global),
+        getCardCache().getModule(compiled.embedded.moduleName.global),
         'Embedded template inlines post title'
       ).to.containsSource(`<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`);
     });
@@ -231,7 +223,7 @@ if (process.env.COMPILER) {
     it(`gives a good error when a card can't compile because adoptsFrom does not exist`, async function () {
       let rawCard: RawCard = { realm, id: 'post', adoptsFrom: '../post' };
       try {
-        await builder.compileCardFromRaw(rawCard).compile();
+        await cards.create(rawCard);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
         expect(err.message).to.eq(`tried to adopt from card ${realm}post but it failed to load`);
@@ -257,7 +249,7 @@ if (process.env.COMPILER) {
         },
       };
       try {
-        await builder.compileCardFromRaw(rawCard).compile();
+        await cards.create(rawCard);
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
         expect(err.message).to.eq(`tried to lookup field 'author' but it failed to load`);
@@ -290,8 +282,8 @@ if (process.env.COMPILER) {
       });
 
       it('iterators of fields and inlines templates', async function () {
-        let compiled = await builder.getCompiledCard(`${realm}post`);
-        expect(builder.cache.getModule(compiled.embedded.moduleName.global)).to.containsSource(
+        let { compiled } = await cards.load(`${realm}post`);
+        expect(getCardCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label></article>'
         );
       });
@@ -331,13 +323,13 @@ if (process.env.COMPILER) {
         await cards.create(fancyPostCard);
         await cards.create(timelyPostCard);
 
-        let timelyCompiled = await builder.getCompiledCard(cardURL(timelyPostCard));
-        let fancyCompiled = await builder.getCompiledCard(cardURL(fancyPostCard));
+        let { compiled: timelyCompiled } = await cards.load(cardURL(timelyPostCard));
+        let { compiled: fancyCompiled } = await cards.load(cardURL(fancyPostCard));
 
-        expect(builder.cache.getModule(timelyCompiled.embedded.moduleName.global)).to.containsSource(
+        expect(getCardCache().getModule(timelyCompiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
         );
-        expect(builder.cache.getModule(fancyCompiled.embedded.moduleName.global)).to.containsSource(
+        expect(getCardCache().getModule(fancyCompiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
         );
       });
