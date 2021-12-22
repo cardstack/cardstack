@@ -28,6 +28,8 @@
 }
 
 .cardstack-footer__discord-icon {
+  --icon-color: var(--boxel-highlight);
+
   width: var(--boxel-icon-sm);
   height: var(--boxel-icon-sm);
   margin-right: var(--boxel-sp-xxs);
