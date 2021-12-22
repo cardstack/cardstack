@@ -165,9 +165,7 @@ function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
   rule : ${rule ? rule : 'No rule found'}
   balance:
   `);
-  console.log(`  balance:`);
   tokenBalances.map(({ tokenSymbol, balance }) => {
     console.log(`    ${tokenSymbol} : ${fromWei(balance)}`);
   });
 }
-
