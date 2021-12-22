@@ -25,8 +25,7 @@ const requireCard = function (path: string, root: string): any {
 
 export default class CardRoutes {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private cache = inject('card-cache', { as: 'cache' });
-  private builder = inject('card-builder', { as: 'builder' });
+  private cache = inject('file-cache', { as: 'cache' });
   private cards = inject('card-service', { as: 'cards' });
   private config = inject('card-routes-config', { as: 'config' });
   private index = inject('searchIndex', { as: 'index' });

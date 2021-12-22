@@ -8,7 +8,7 @@ const log = logger('hub/card-builder');
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
-  cache = inject('card-cache', { as: 'cache' });
+  cache = inject('file-cache', { as: 'cache' });
   cards = inject('card-service', { as: 'cards' });
   index = inject('searchIndex', { as: 'index' });
 
