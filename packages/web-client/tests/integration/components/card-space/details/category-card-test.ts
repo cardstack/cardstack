@@ -39,10 +39,6 @@ module(
         />
       `);
 
-      if (window.location.href.includes('devmode')) {
-        await this.pauseTest();
-      }
-
       assert.dom('radio-option__input--checked').doesNotExist();
 
       OPTIONS.forEach(function (buttonText, index) {
