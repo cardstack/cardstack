@@ -53,12 +53,19 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.claimGasEstimate`](#revenuepoolclaimgasestimate)
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
-  - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
-- [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
+  - [`RewardPool.rewardTokenBalances`](#rewardpoolrewardtokenbalances)
+  - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
+  - [`RewardPool.balances`](#rewardpoolbalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
+  - [`RewardPool.getProofs`](#rewardpoolgetproofs)
+  - [`RewardPool.recoverTokens`](#rewardpoolrecovertokens)
 - [`RewardManager`](#rewardmanager)
-- [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
-- [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
+  - [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
+  - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
+  - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
+  - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -716,7 +723,6 @@ This call returns the balance of ALL tokens in the RewardPool for prepaid card o
 ```ts
 interface RewardTokenBalance {
   rewardProgramId: string,
-  tokenSymbol: string;
   tokenAddress: string;
   balance: BN;
 }
@@ -766,6 +772,23 @@ await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
 ### `RewardPool.getProofs`
 
 The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner; Once a proof is used it cannot be it will be `knownClaimed=true` and it cannot be re-used.
+
+```js
+interface Proof {
+  rootHash: string;
+  paymentCycle: number;
+  tokenAddress: string;
+  payee: string;
+  proofArray: string[];
+  timestamp: string;
+  blockNumber: number;
+  rewardProgramId: string;
+  amount: BN;
+  leaf: string;
+}
+```
+
+`
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
@@ -834,6 +857,25 @@ await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
 ## `RewardManager.addRewardRule`
 
 The `AddRewardRule` API is used to add a reward rule for a reward program using a prepaid card. The reward rule is specified as a blob of bytes which tally will parse to understand how to compute rewards for the reward program. Each reward program will only ever have a single reward rule -- a single blob. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+```
+
+## `RewardManager.getRewardProgramsInfo`
+
+The `getRewardProgramsInfo` is a catch-all query that enlist all information about reward programs that have been registered. 
+
+```ts
+interface RewardProgramInfo {
+  rewardProgramId: string;
+  rewardProgramAdmin: string;
+  locked: boolean;
+  rule: string;
+  tokenBalances: WithSymbol<RewardTokenBalance>[];
+}
+```
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
