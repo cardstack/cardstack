@@ -239,6 +239,7 @@ class IndexerRun implements IndexerHandle {
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       data: param(card.data ?? null),
+      raw: param(new RawCardSerializer().serialize(card)),
       searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
     });
     await this.db.query(expressionToSql(expression));

@@ -69,11 +69,11 @@ export class CardService {
 
   async updateData(raw: RawCard): Promise<Card> {
     let originalRaw = await this.realmManager.read(raw);
-    await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let originalCompiled = await this.builder.getCompiledCard(cardURL(raw));
-    let compiled = await this.searchIndex.indexCardData(raw, originalCompiled);
+    let updatedRaw = await this.realmManager.update(Object.assign({}, originalRaw, raw));
+    let originalCompiled = await this.builder.getCompiledCard(cardURL(updatedRaw));
+    let compiled = await this.searchIndex.indexCardData(updatedRaw, originalCompiled);
 
-    return { data: raw.data, compiled };
+    return { data: updatedRaw.data, compiled };
   }
 
   async query(query: Query): Promise<Card[]> {
