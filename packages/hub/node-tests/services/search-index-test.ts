@@ -6,6 +6,41 @@ import { join } from 'path';
 import { configureHubWithCompiler } from '../helpers/cards';
 import merge from 'lodash/merge';
 
+// So we are using a nonce here with the card fixtures to make sure that the
+// file realm meta doesn't bite us. The file realm meta will only index cards
+// newer than the last mtime, but that mtime has a resolution of a single
+// second. for tests that run faster than that, it means the the indexing may
+// skip a truly changed card because it is the same mtime as the file realm meta
+// which was updated less than 1 second ago because tests run quickly.
+let nonce = 0;
+function getRawCards(): { personRawCard: RawCard; addressRawCard: RawCard } {
+  let addressRawCard = Object.assign({}, ADDRESS_RAW_CARD, { id: `address-${nonce++}` });
+  return {
+    addressRawCard,
+    personRawCard: merge(
+      {},
+      PERSON_RAW_CARD,
+      { id: `person-${nonce++}` },
+      {
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import date from "https://cardstack.com/base/date";
+            import address from "${addressRawCard.realm}${addressRawCard.id}";
+
+            export default class Person {
+              @contains(string) name;
+              @contains(date) birthdate;
+              @contains(address) address;
+            }
+            `,
+        },
+      }
+    ),
+  };
+}
+
 if (process.env.COMPILER) {
   describe('SearchIndex', function () {
     let { getRealmDir, getContainer, realmURL, cards } = configureHubWithCompiler(this);
@@ -91,8 +126,6 @@ if (process.env.COMPILER) {
     });
 
     it(`can invalidate a card via the update of an adoptsFrom card`, async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
       let post: RawCard = {
         realm: realmURL,
         id: 'post',
@@ -132,14 +165,13 @@ if (process.env.COMPILER) {
     });
 
     it(`can invalidate a card via the update of a field card`, async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
-      await cards.create(ADDRESS_RAW_CARD);
-      await cards.create(PERSON_RAW_CARD);
+      let { addressRawCard, personRawCard } = getRawCards();
+      await cards.create(addressRawCard);
+      await cards.create(personRawCard);
 
       // add a "country" field to the address field card and observe that the person card includes the new address field
       await cards.update(
-        merge({}, ADDRESS_RAW_CARD, {
+        merge({}, addressRawCard, {
           files: {
             'schema.js': `
               import { contains } from "@cardstack/types";
@@ -158,13 +190,11 @@ if (process.env.COMPILER) {
           },
         })
       );
-      let person = await cards.load(`${PERSON_RAW_CARD.realm}${PERSON_RAW_CARD.id}`);
+      let person = await cards.load(`${personRawCard.realm}${personRawCard.id}`);
       expect(person.compiled.fields.address.card.fields.country.card.url).to.eq('https://cardstack.com/base/string');
     });
 
     it(`can invalidate a card via the update of a grandparent adoptsFrom card`, async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
       let post: RawCard = {
         realm: realmURL,
         id: 'post',
@@ -209,10 +239,9 @@ if (process.env.COMPILER) {
     });
 
     it(`can invalidate a card via the update of a field of a field card`, async function () {
-      let si = await getContainer().lookup('searchIndex');
-      await si.indexAllRealms();
-      await cards.create(ADDRESS_RAW_CARD);
-      await cards.create(PERSON_RAW_CARD);
+      let { addressRawCard, personRawCard } = getRawCards();
+      await cards.create(addressRawCard);
+      await cards.create(personRawCard);
       await cards.create({
         realm: realmURL,
         id: 'post',
@@ -221,7 +250,7 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from '@cardstack/types';
             import string from 'https://cardstack.com/base/string';
-	          import person from "https://cardstack.local/person";
+	          import person from "${personRawCard.realm}${personRawCard.id}";
             export default class Post {
               @contains(string) title;
               @contains(person) author;
@@ -232,7 +261,7 @@ if (process.env.COMPILER) {
 
       // add a "country" field to the address field card and observe that the post card includes the new address field via the author field
       await cards.update(
-        merge({}, ADDRESS_RAW_CARD, {
+        merge({}, addressRawCard, {
           files: {
             'schema.js': `
               import { contains } from "@cardstack/types";
