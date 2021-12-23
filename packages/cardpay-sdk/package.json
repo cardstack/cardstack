@@ -3,7 +3,7 @@
   "description": "An SDK for using the cardpay protocol",
   "version": "0.28.11",
   "author": "Hassan Abdel-Rahman @habdelra",
-  "main": "./dist/index.js",
+  "main": "./dist/esm/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
