@@ -5,6 +5,13 @@
   "author": "Hassan Abdel-Rahman @habdelra",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.5.0",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
@@ -32,6 +39,7 @@
     "web3-utils": "1.5.2"
   },
   "devDependencies": {
+    "tsup": "^5.11.7",
     "typescript": "4.2.3"
   },
   "files": [
@@ -39,7 +47,7 @@
   ],
   "scripts": {
     "postinstall": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
-    "prepack": "rm -rf ./dist && tsc"
+    "prepack": "rm -rf ./dist && tsup ./index.ts --format esm,cjs --dts --legacy-output"
   },
   "homepage": "https://github.com/cardstack/cardstack",
   "license": "MIT",
