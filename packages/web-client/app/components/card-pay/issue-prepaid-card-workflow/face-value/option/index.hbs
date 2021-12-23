@@ -1,10 +1,10 @@
 <div class="face-value-option">
   {{svg-jar "spend" width="20" height="20" role="presentation"}}
   <div class="face-value-option__amount">
-    §{{format-amount @spendFaceValue}} SPEND
+    §{{format-amount @spendAmount}} SPEND
   </div>
   <div class="face-value-option__conversion">
-    ${{spend-to-usd @spendFaceValue}} USD
+    ${{spend-to-usd @spendAmount}} USD
   </div>
   <div class="face-value-option__conversion">
     ≈ {{@approxTokenAmount}} {{@tokenSymbol}}*

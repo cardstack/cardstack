@@ -40,22 +40,24 @@
               @layout="grid"
               as |token|
             >
-              <token.component
-                @name="token-selection"
-                @disabled={{eq (format-wei-amount token.data.balance) "0.00"}}
-                @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.data.symbol)}}
-                @onChange={{fn this.chooseSource token.data}}
-                data-test-deposit-transaction-setup-from-option={{token.data.symbol}}
-              >
-                {{#let (token-to-usd token.data.symbol token.data.balance) as |usdBalance|}}
-                  <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-                    @balance={{format-wei-amount token.data.balance}}
-                    @usdBalanceLoading={{is-empty usdBalance}}
-                    @balanceInUsd={{usdBalance}}
-                    @token={{token.data}}
-                  />
-                {{/let}}
-              </token.component>
+              {{#let token.data as |t|}}
+                <token.component
+                  @name="token-selection"
+                  @disabled={{eq (format-wei-amount t.balance) "0.00"}}
+                  @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol t.symbol)}}
+                  @onChange={{fn this.chooseSource t}}
+                  data-test-deposit-transaction-setup-from-option={{t.symbol}}
+                >
+                  {{#let (token-to-usd t.symbol t.balance) as |usdBalance|}}
+                    <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                      @balance={{format-wei-amount t.balance}}
+                      @usdBalanceLoading={{is-empty usdBalance}}
+                      @balanceInUsd={{usdBalance}}
+                      @token={{t}}
+                    />
+                  {{/let}}
+                </token.component>
+              {{/let}}
             </Boxel::RadioInput>
           </div>
         {{/if}}

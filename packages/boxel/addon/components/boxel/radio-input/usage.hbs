@@ -3,21 +3,17 @@
     <Boxel::RadioInput
       @groupDescription={{this.groupDescription}}
       @items={{this.items}}
+      @name="example-radio-usage"
       @checkedId={{this.checkedId}}
       @disabled={{this.disabled}}
-      @spacing={{this.spacing}}
+      @hiddenBorder={{this.hiddenBorder}}
+      @hiddenCheckbox={{this.hiddenCheckbox}}
       @layout={{this.layout}}
+      @spacing={{this.spacing}}
       @containerWidth={{this.containerWidth}}
       @gridColumnWidth={{this.gridColumnWidth}}
     as |item|>
-      <item.component
-        @name="example-radio-usage"
-        @checked={{item.checked}}
-        @disabled={{item.disabled}}
-        @onChange={{fn this.onChange item.data.id}}
-        @hiddenBorder={{this.hiddenBorder}}
-        @hiddenCheckbox={{this.hiddenCheckbox}}
-      >
+      <item.component @onChange={{fn this.onChange item.data.id}}>
         {{item.data.id}}
       </item.component>
     </Boxel::RadioInput>

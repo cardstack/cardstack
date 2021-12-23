@@ -36,27 +36,26 @@
         <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
         <Boxel::RadioInput
-          @checkedId={{@colorScheme.id}}
           @groupDescription="Pick a background color for your card’s header"
           @items={{@colorSchemeOptions}}
+          @checkedId={{@colorScheme.id}}
           @spacing="compact"
-          as |colorSchemeItem|
+          @hiddenCheckbox={{true}}
+          @hiddenBorder={{true}}
+          as |option|
         >
-          <colorSchemeItem.component
-            @name="prepaid-card-background-selection"
-            @id={{colorSchemeItem.data.id}}
-            @value={{colorSchemeItem.data.id}}
-            @checked={{colorSchemeItem.checked}}
-            @onChange={{fn (optional @updateColorScheme) colorSchemeItem.data}}
-            @hiddenCheckbox={{true}}
-            @hiddenBorder={{true}}
-            data-test-customization-background-selection-item={{colorSchemeItem.data.background}}
-          >
-            <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
-              @type="background"
-              @swatchBackground={{colorSchemeItem.data.background}}
-            />
-          </colorSchemeItem.component>
+          {{#let option.data as |item|}}
+            <option.component
+              @name="prepaid-card-background-selection"
+              @onChange={{fn (optional @updateColorScheme) item}}
+              data-test-customization-background-selection-item={{item.background}}
+            >
+              <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+                @type="background"
+                @swatchBackground={{item.background}}
+              />
+            </option.component>
+          {{/let}}
         </Boxel::RadioInput>
       {{/if}}
     </CardPay::LabeledValue>
@@ -65,30 +64,29 @@
          <Boxel::LoadingIndicator data-test-customization-theme-loading/>
       {{else}}
         <Boxel::RadioInput
-          @checkedId={{@pattern.id}}
           @groupDescription="Pick a theme for your card’s header"
           @items={{@patternOptions}}
+          @checkedId={{@pattern.id}}
           @spacing="compact"
-          as |patternItem|
+          @hiddenCheckbox={{true}}
+          @hiddenBorder={{true}}
+          as |option|
         >
-          <patternItem.component
-            @name="prepaid-card-pattern-selection"
-            @id={{patternItem.data.id}}
-            @value={{patternItem.data.id}}
-            @checked={{patternItem.checked}}
-            @onChange={{fn (optional @updatePattern) patternItem.data}}
-            @hiddenCheckbox={{true}}
-            @hiddenBorder={{true}}
-            data-test-customization-pattern-selection-item={{or patternItem.data.patternUrl "blank"}}
-          >
-            {{!-- rerenders appear to cause flashes if we use a background image --}}
-            <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
-              @type="theme"
-              @swatchImage={{patternItem.data.patternUrl}}
-              @blank={{eq patternItem.data.patternUrl null}}
-              @squeezed={{patternItem.checked}}
-            />
-          </patternItem.component>
+          {{#let option.data as |item|}}
+            <option.component
+              @name="prepaid-card-pattern-selection"
+              @onChange={{fn (optional @updatePattern) item}}
+              data-test-customization-pattern-selection-item={{or item.patternUrl "blank"}}
+            >
+              {{!-- rerenders appear to cause flashes if we use a background image --}}
+              <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+                @type="theme"
+                @swatchImage={{item.patternUrl}}
+                @blank={{eq item.patternUrl null}}
+                @squeezed={{option.checked}}
+              />
+            </option.component>
+          {{/let}}
         </Boxel::RadioInput>
       {{/if}}
     </CardPay::LabeledValue>

@@ -31,7 +31,7 @@
   outline: 1px solid transparent;
 }
 
-.boxel-radio-option--disabled {
+.boxel-radio-option--disabled > * {
   opacity: 0.5;
 }
 

@@ -9,14 +9,16 @@
       @layout="grid"
       data-test-button-text-options
     as |option|>
-      <option.component
-        @name="button-text"
-        @checked={{eq this.buttonTextValue option.data}}
-        @onChange={{fn this.setButtonTextValue option.data}}
-        data-test-button-text-option
-      >
-        {{option.data}}
-      </option.component>
+      {{#let option.data as |text|}}
+        <option.component
+          @name="button-text"
+          @checked={{eq this.buttonTextValue text}}
+          @onChange={{fn this.setButtonTextValue text}}
+          data-test-button-text-option
+        >
+          {{text}}
+        </option.component>
+      {{/let}}
     </Boxel::RadioInput>
   </CardPay::LabeledValue>
 </div>

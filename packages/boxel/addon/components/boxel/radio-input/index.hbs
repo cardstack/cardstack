@@ -7,16 +7,16 @@
   @gridColumnWidth={{@gridColumnWidth}}
   ...attributes
 >
-  {{#each @items as |item|}}
-    {{yield
-      (hash
-        component=(component "boxel/radio-input/item")
-        data=item
-        checked=(eq item.id @checkedId)
+  {{#each @items as |item i|}}
+    {{yield (hash
+      component=(component "boxel/radio-input/item"
+        name=@name
         disabled=@disabled
-        hiddenBorder=@hiddenBorder
         hiddenCheckbox=@hiddenCheckbox
+        hiddenBorder=@hiddenBorder
+        checked=(if @checkedId (eq @checkedId item.id))
       )
-    }}
+      data=item
+      index=i)}}
   {{/each}}
 </Boxel::RadioInput::Container>

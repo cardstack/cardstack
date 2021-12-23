@@ -43,17 +43,20 @@
           @gridColumnWidth="48%"
           as |option|
         >
-          {{#let option.data.spendAmount this.selectedFaceValue.spendAmount as |spendAmount selectedSpendAmount|}}
+          {{#let option.data as |item|}}
             <option.component
               @name="face-value-selection"
-              @disabled={{option.data.isOptionDisabled}}
-              @checked={{eq spendAmount selectedSpendAmount}}
-              @onChange={{fn this.chooseFaceValue option.data}}
-              @spendFaceValue={{spendAmount}}
-              @approxTokenAmount={{option.data.approxTokenAmount}}
-              @tokenSymbol={{this.fundingTokenSymbol}}
-              data-test-face-value-option={{spendAmount}}
-            />
+              @disabled={{item.isOptionDisabled}}
+              @checked={{eq item.spendAmount this.selectedFaceValue.spendAmount}}
+              @onChange={{fn this.chooseFaceValue item}}
+              data-test-face-value-option={{item.spendAmount}}
+            >
+              <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
+                @spendAmount={{item.spendAmount}}
+                @approxTokenAmount={{item.approxTokenAmount}}
+                @tokenSymbol={{this.fundingTokenSymbol}}
+              />
+            </option.component>
           {{/let}}
         </Boxel::RadioInput>
       {{/if}}

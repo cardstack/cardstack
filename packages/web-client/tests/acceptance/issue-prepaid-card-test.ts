@@ -363,7 +363,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.dom(`[${FACEVALUE_OPTION}]`).exists({ count: 6 });
     assert
-      .dom(`[${FACEVALUE_OPTION}] [data-test-boxel-radio-option-checked]`)
+      .dom(`[${FACEVALUE_OPTION}][data-test-boxel-radio-option-checked]`)
       .doesNotExist();
     assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isNotDisabled();
     assert.dom(`[${FACEVALUE_OPTION}="50000"] input`).isDisabled();
@@ -375,7 +375,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await click(`[${FACEVALUE_OPTION}="5000"]`);
     assert.dom(`[${FACEVALUE_OPTION}="5000"] input`).isChecked();
     assert
-      .dom(`[${FACEVALUE_OPTION}] [data-test-boxel-radio-option-checked]`)
+      .dom(`[${FACEVALUE_OPTION}][data-test-boxel-radio-option-checked]`)
       .exists({ count: 1 });
 
     await click(
