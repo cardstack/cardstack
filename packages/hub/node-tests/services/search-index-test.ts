@@ -1,45 +1,8 @@
-import { RawCard } from '@cardstack/core/src/interfaces';
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
 import { outputFileSync, outputJSONSync } from 'fs-extra';
 import { join } from 'path';
 import { configureHubWithCompiler } from '../helpers/cards';
-import merge from 'lodash/merge';
-
-// So we are using a nonce here with the card fixtures to make sure that the
-// file realm meta doesn't bite us. The file realm meta will only index cards
-// newer than the last mtime, but that mtime has a resolution of a single
-// second. for tests that run faster than that, it means the the indexing may
-// skip a truly changed card because it is the same mtime as the file realm meta
-// which was updated less than 1 second ago because tests run quickly.
-let nonce = 100;
-function getRawCards(): { personRawCard: RawCard; addressRawCard: RawCard } {
-  let addressRawCard = Object.assign({}, ADDRESS_RAW_CARD, { id: `address-${nonce++}` });
-  return {
-    addressRawCard,
-    personRawCard: merge(
-      {},
-      PERSON_RAW_CARD,
-      { id: `person-${nonce++}` },
-      {
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-            import date from "https://cardstack.com/base/date";
-            import address from "${addressRawCard.realm}${addressRawCard.id}";
-
-            export default class Person {
-              @contains(string) name;
-              @contains(date) birthdate;
-              @contains(address) address;
-            }
-            `,
-        },
-      }
-    ),
-  };
-}
 
 if (process.env.COMPILER) {
   describe('SearchIndex', function () {
@@ -240,33 +203,33 @@ if (process.env.COMPILER) {
     });
 
     it(`can invalidate a card via the update of a field of a field card`, async function () {
+      outputJSONSync(join(getRealmDir(), 'address', 'card.json'), { schema: 'schema.js' });
+      outputFileSync(join(getRealmDir(), 'address', 'schema.js'), ADDRESS_RAW_CARD.files['schema.js']);
+      outputJSONSync(join(getRealmDir(), 'person', 'card.json'), { schema: 'schema.js' });
+      outputFileSync(join(getRealmDir(), 'person', 'schema.js'), PERSON_RAW_CARD.files['schema.js']);
+      outputJSONSync(join(getRealmDir(), 'post', 'card.json'), { schema: 'schema.js' });
+      outputFileSync(
+        join(getRealmDir(), 'post', 'schema.js'),
+        `
+        import { contains } from '@cardstack/types';
+        import string from 'https://cardstack.com/base/string';
+        import person from '${PERSON_RAW_CARD.realm}${PERSON_RAW_CARD.id}';
+        export default class Post {
+          @contains(string) title;
+          @contains(person) author;
+        }
+      `
+      );
       let si = await getContainer().lookup('searchIndex');
       await si.indexAllRealms();
-      let { addressRawCard, personRawCard } = getRawCards();
-      await cards.create(addressRawCard);
-      await cards.create(personRawCard);
-      await cards.create({
+
+      // add a "country" field to the address field card and observe that the post card includes the new address field via the author field
+      await cards.update({
         realm: realmURL,
-        id: 'post',
+        id: 'address',
         schema: 'schema.js',
         files: {
           'schema.js': `
-            import { contains } from '@cardstack/types';
-            import string from 'https://cardstack.com/base/string';
-	          import person from "${personRawCard.realm}${personRawCard.id}";
-            export default class Post {
-              @contains(string) title;
-              @contains(person) author;
-            }
-          `,
-        },
-      });
-
-      // add a "country" field to the address field card and observe that the post card includes the new address field via the author field
-      await cards.update(
-        merge({}, addressRawCard, {
-          files: {
-            'schema.js': `
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
               import date from "https://cardstack.com/base/date";
@@ -280,9 +243,8 @@ if (process.env.COMPILER) {
                 @contains(string) country;
               }
             `,
-          },
-        })
-      );
+        },
+      });
       let post = await cards.load(`${realmURL}post`);
       expect(post.compiled.fields.author.card.fields.address.card.fields.country.card.url).to.eq(
         'https://cardstack.com/base/string'
