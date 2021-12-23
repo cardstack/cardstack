@@ -13,6 +13,8 @@
 /.eslintignore
 /.eslintrc.js
 /.gitignore
+/.prettierignore
+/.prettierrc.js
 /.template-lintrc.js
 /.watchmanconfig
 /bower.json
@@ -35,6 +37,7 @@ yarn.lock
 /ember-cli-build.js
 /testem.js
 /tests/
+/yarn-error.log
 /yarn.lock
 .gitkeep
 

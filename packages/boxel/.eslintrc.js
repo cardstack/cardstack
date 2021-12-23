@@ -71,5 +71,10 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
       },
     },
+    {
+      // Test files:
+      files: ['tests/**/*-test.{js,ts}'],
+      extends: ['plugin:qunit/recommended'],
+    },
   ],
 };
