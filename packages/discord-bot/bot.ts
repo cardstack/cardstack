@@ -51,7 +51,10 @@ export class Bot extends Client {
   status: DiscordBotStatus = 'disconnected';
   botInstanceId: SUUID = shortUuid().generate();
   messageProcessingVerifier!: MessageVerificationScheduler;
+
   async start(): Promise<void> {
+    log.info(`booting pid:${process.pid}`);
+
     if (!this.config) {
       throw new Error('config property must be set before starting the bot');
     }
@@ -73,6 +76,8 @@ export class Bot extends Client {
     await this.updateStatus('connected');
     await this.wireDiscordEventHandling();
     await this.attemptToBecomeListener();
+
+    log.info(`started (${this.type}:${this.botInstanceId})`);
   }
 
   async updateStatus(status: DiscordBotStatus): Promise<void> {

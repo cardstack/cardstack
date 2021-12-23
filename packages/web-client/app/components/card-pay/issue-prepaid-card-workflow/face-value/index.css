@@ -28,25 +28,6 @@
   margin: 0 var(--boxel-sp-xs);
 }
 
-.face-value-option {
-  opacity: var(--option-opacity, 1);
-  display: inline-grid;
-  grid-template-columns: auto 1fr;
-  column-gap: var(--boxel-sp-xs);
-}
-
-.face-value-option__amount {
-  font: 600 var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
-.face-value-option__conversion {
-  grid-column: 2;
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
 .face-value-card__selected-amount-display {
   display: flex;
   align-items: center;

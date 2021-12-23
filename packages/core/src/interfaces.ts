@@ -1,3 +1,4 @@
+import * as JSON from 'json-typescript';
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
@@ -148,6 +149,11 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   inheritedFrom?: string;
 }
 
+export interface Card {
+  data: RawCard['data'];
+  compiled: CompiledCard;
+}
+
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
@@ -159,23 +165,15 @@ export interface RealmConfig {
   watch?: boolean;
 }
 
-export interface CardJSONResponse {
-  data: {
-    id: string;
-    type: string;
-    attributes?: { [name: string]: any };
-    meta?: {
-      componentModule: string;
-    };
-  };
+export interface JSONAPIDocument<Identity extends Saved | Unsaved = Saved> {
+  data: ResourceObject<Identity>;
 }
-
-export interface CardJSONRequest {
-  data: {
-    id?: string;
-    type: string;
-    attributes?: { [name: string]: any };
-  };
+export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
+  id: Identity;
+  type: string;
+  attributes?: JSON.Object;
+  relationships?: JSON.Object;
+  meta?: JSON.Object;
 }
 
 export type CardOperation =
@@ -183,13 +181,13 @@ export type CardOperation =
       create: {
         targetRealm: string;
         parentCardURL: string;
-        payload: CardJSONRequest;
+        payload: JSONAPIDocument<Unsaved>;
       };
     }
   | {
       update: {
         cardURL: string;
-        payload: CardJSONRequest;
+        payload: JSONAPIDocument;
       };
     };
 
@@ -197,7 +195,7 @@ export type CardOperation =
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<CardJSONResponse>;
+  send(operation: CardOperation): Promise<JSONAPIDocument>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
 }

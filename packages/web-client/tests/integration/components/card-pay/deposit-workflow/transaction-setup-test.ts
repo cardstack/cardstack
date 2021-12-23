@@ -235,10 +235,22 @@ module(
         .doesNotExist();
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="DAI"]`)
+<<<<<<< HEAD
         .hasClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .hasClass('token-option--checked');
+=======
+        .hasClass('radio-option--checked');
+>>>>>>> origin/main
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="CARD"]`)
+<<<<<<< HEAD
         .doesNotHaveClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .doesNotHaveClass('token-option--checked');
+=======
+        .doesNotHaveClass('radio-option--checked');
+>>>>>>> origin/main
       assert
         .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
         .hasText('Continue');
@@ -269,10 +281,22 @@ module(
       await click(`[data-test-deposit-transaction-setup-from-option="CARD"]`);
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="CARD"]`)
+<<<<<<< HEAD
         .hasClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .hasClass('token-option--checked');
+=======
+        .hasClass('radio-option--checked');
+>>>>>>> origin/main
       assert
         .dom(`[data-test-deposit-transaction-setup-from-option="DAI"]`)
+<<<<<<< HEAD
         .doesNotHaveClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .doesNotHaveClass('token-option--checked');
+=======
+        .doesNotHaveClass('radio-option--checked');
+>>>>>>> origin/main
 
       await click(
         `[data-test-deposit-transaction-setup] [data-test-boxel-button]`
@@ -382,13 +406,25 @@ module(
         .isDisabled();
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="DAI"]')
+<<<<<<< HEAD
         .doesNotHaveClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .doesNotHaveClass('token-option--checked');
+=======
+        .doesNotHaveClass('radio-option--checked');
+>>>>>>> origin/main
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="CARD"] input')
         .isNotDisabled();
       assert
         .dom('[data-test-deposit-transaction-setup-from-option="CARD"]')
+<<<<<<< HEAD
         .hasClass('boxel-radio-option--checked');
+||||||| merged common ancestors
+        .hasClass('token-option--checked');
+=======
+        .hasClass('radio-option--checked');
+>>>>>>> origin/main
       assert
         .dom('[data-test-deposit-transaction-setup-validation]')
         .doesNotExist();

@@ -15,6 +15,27 @@
   color: var(--degraded-service-banner-text-color);
 }
 
+.degraded-service-banner__container {
+  max-width: calc(var(--degraded-service-banner-icon-area-width) + 80ch);
+  display: flex;
+}
+
+.degraded-service-banner__icon-area {
+  --degraded-service-banner-icon-area-width: 1.7rem;
+
+  display: flex;
+  align-items: center;
+  width: var(--degraded-service-banner-icon-area-width);
+}
+
+.degraded-service-banner__container a {
+  text-decoration: underline;
+}
+
+.degraded-service-banner__container a:hover {
+  color: inherit;
+}
+
 .degraded-service-banner.degraded-service-banner--severe {
   --degraded-service-banner-text-color: var(--boxel-light);
   --degraded-service-banner-background-color: var(--boxel-red);

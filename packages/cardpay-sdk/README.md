@@ -53,12 +53,19 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.claimGasEstimate`](#revenuepoolclaimgasestimate)
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
-  - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
-- [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
+  - [`RewardPool.rewardTokenBalances`](#rewardpoolrewardtokenbalances)
+  - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
+  - [`RewardPool.balances`](#rewardpoolbalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
+  - [`RewardPool.getProofs`](#rewardpoolgetproofs)
+  - [`RewardPool.recoverTokens`](#rewardpoolrecovertokens)
 - [`RewardManager`](#rewardmanager)
-- [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
-- [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
+  - [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
+  - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
+  - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
+  - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -710,31 +717,41 @@ This method returns a promise for a web3 transaction receipt.
 
 The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
 
-### `RewardPool.rewardTokenBalance`
-This call returns the balance of a token in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and , reward token address, and reward program id. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
+### `RewardPool.rewardTokenBalances`
+This call returns the balance of ALL tokens in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and , reward token address, and reward program id. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
 
 ```ts
 interface RewardTokenBalance {
   rewardProgramId: string,
-  tokenSymbol: string;
   tokenAddress: string;
   balance: BN;
 }
 ```
 
 ```js
-let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAddress, rewardProgramId);
-//You can also use rewardTokenBalances()
+let rewardPool = await getSDK('RewardPool', web3);
 let balanceForAllTokens = await rewardPool.rewardTokenBalances(address, rewardProgramId)
+// You can also use `rewardTokenBalance` for a single token
+let balanceForSingleToken = await rewardPool.rewardTokenBalance(address,tokenAddress,rewardProgramId);
 ```
 
-## `RewardPool.addRewardTokens`
+
+### `RewardPool.addRewardTokens`
 
 The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, the sdk supports using single-owner safe like depot safe or merchant safe to send funds (the protocol supports prepaid card payments too). If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this function not only the rewardProgramAdmin.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
 await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount)
+```
+
+### `RewardPool.balances`
+
+The `Balances` API is used to query the token balances inside the reward pool. When queried for a particular reward program, the user will receive an array of ERC677 token balances. This is useful if a rewardProgramAdmin wants to assess how much is left inside the pool for the reward program they manage.
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+await rewardPool.balances(rewardProgramId)
 ```
 
 ### `RewardPool.claim`
@@ -744,12 +761,47 @@ The `Claim` API is used by the rewardee to claim rewards for a reward program id
 Pre-requisite for this action:
 - reward program has to be registered
 - rewardee has to register and create safe for that particular reward program. The funds will be claimed into this safe -- reward safe
-- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs` or `rewardPool.getProofsWithBalance`
+- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs` 
 - reward pool has to be filled with reward token for that reward program
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
 await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
+```
+
+### `RewardPool.getProofs`
+
+The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner; Once a proof is used it cannot be it will be `knownClaimed=true` and it cannot be re-used.
+
+```js
+interface Proof {
+  rootHash: string;
+  paymentCycle: number;
+  tokenAddress: string;
+  payee: string;
+  proofArray: string[];
+  timestamp: string;
+  blockNumber: number;
+  rewardProgramId: string;
+  amount: BN;
+  leaf: string;
+}
+```
+
+`
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+await rewardPool.getProofs(address, rewardProgramId?, tokenAddress?, knownClaimed?)
+```
+
+### `RewardPool.recoverTokens`
+
+The `RecoverTokens` API is used by the rewardProgramAdmin to recover the tokens that are previously added inside the pool. This function can be called at anytime throughout the lifecycle of the reward program. The funds recovered will be used to pay for the gas fees to execute the transaction. 
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+await rewardPool.recoverTokens(safe, rewardProgramId, tokenAddress, amount?)
 ```
 
 ## `RewardManager`
@@ -805,6 +857,25 @@ await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
 ## `RewardManager.addRewardRule`
 
 The `AddRewardRule` API is used to add a reward rule for a reward program using a prepaid card. The reward rule is specified as a blob of bytes which tally will parse to understand how to compute rewards for the reward program. Each reward program will only ever have a single reward rule -- a single blob. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+```
+
+## `RewardManager.getRewardProgramsInfo`
+
+The `getRewardProgramsInfo` is a catch-all query that enlist all information about reward programs that have been registered. 
+
+```ts
+interface RewardProgramInfo {
+  rewardProgramId: string;
+  rewardProgramAdmin: string;
+  locked: boolean;
+  rule: string;
+  tokenBalances: WithSymbol<RewardTokenBalance>[];
+}
+```
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);

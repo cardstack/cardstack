@@ -65,7 +65,7 @@ const MERCHANT_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 const OTHER_MERCHANT_DID =
   'did:cardstack:1mwMdyaSSE13eHk4Dtbk75GE58960e58910b5a66';
 
-const RADIO_OPTION = 'data-test-boxel-radio-option-item';
+const FACEVALUE_OPTION = 'data-test-face-value-option';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -361,21 +361,23 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-balance-view-token-amount]')
       .containsText('499.00 DAI');
 
-    assert.dom('[data-test-face-value-display]').doesNotExist();
-    assert.dom(`[${RADIO_OPTION}]`).exists({ count: 6 });
-    assert.dom(`[${RADIO_OPTION}-checked]`).doesNotExist();
-    assert.dom(`[${RADIO_OPTION}-value="10000"] input`).isNotDisabled();
-    assert.dom(`[${RADIO_OPTION}-value="50000"] input`).isDisabled();
-    assert.dom(`[${RADIO_OPTION}-value="50000"]`).containsText('50,000 SPEND');
-    assert.dom(`[${RADIO_OPTION}-value="50000"]`).containsText('$500 USD');
+    assert.dom(`[${FACEVALUE_OPTION}]`).exists({ count: 6 });
     assert
-      .dom(`[${RADIO_OPTION}-value="50000"]`)
-      .containsText('≈ 500 DAI.CPXD');
-    assert.dom(`[${RADIO_OPTION}-value="10000"] input`).isNotDisabled();
-    assert.dom(`[${RADIO_OPTION}-value="5000"] input`).isNotDisabled();
-    await click(`[${RADIO_OPTION}-value="5000"]`);
-    assert.dom(`[${RADIO_OPTION}-value="5000"] input`).isChecked();
-    assert.dom(`[${RADIO_OPTION}-checked]`).exists({ count: 1 });
+      .dom(`[${FACEVALUE_OPTION}] [data-test-boxel-radio-option-checked]`)
+      .doesNotExist();
+    assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isNotDisabled();
+    assert.dom(`[${FACEVALUE_OPTION}="50000"] input`).isDisabled();
+    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('50,000 SPEND');
+    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('$500 USD');
+    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('≈ 500 DAI.CPXD');
+    assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isNotDisabled();
+    assert.dom(`[${FACEVALUE_OPTION}="5000"] input`).isNotDisabled();
+    await click(`[${FACEVALUE_OPTION}="5000"]`);
+    assert.dom(`[${FACEVALUE_OPTION}="5000"] input`).isChecked();
+    assert
+      .dom(`[${FACEVALUE_OPTION}] [data-test-boxel-radio-option-checked]`)
+      .exists({ count: 1 });
+
     await click(
       `${postableSel(
         2,
@@ -383,7 +385,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom(`[${RADIO_OPTION}]`).doesNotExist();
+    assert.dom(`[${FACEVALUE_OPTION}]`).doesNotExist();
     assert.dom('[data-test-face-value-display]').containsText('5,000 SPEND');
     await click(
       `${postableSel(
@@ -392,8 +394,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    await click(`[${RADIO_OPTION}-value="10000"]`);
-    assert.dom(`[${RADIO_OPTION}-value="10000"] input`).isChecked();
+    await click(`[${FACEVALUE_OPTION}="10000"]`);
+    assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isChecked();
     await click(
       `${postableSel(
         2,

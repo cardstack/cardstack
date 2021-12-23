@@ -21,10 +21,9 @@ describe('HubDiscordBotsDatabaseGateway', function () {
   describe('updateStatus', function () {
     it('adds a database row if none present', async function () {
       let client = await dbManager.getClient();
-      let rows = (await client.query('SELECT * FROM discord_bots')).rows;
-      expect(rows.length).to.equal(0);
+      await client.query(`DELETE FROM discord_bots`);
       await subject.updateStatus('connecting', 'test-bot', botId);
-      rows = (await client.query('SELECT * FROM discord_bots')).rows;
+      let rows = (await client.query('SELECT * FROM discord_bots')).rows;
       expect(rows.length).to.equal(1);
       expect(rows[0].bot_id).to.equal(botId);
       expect(rows[0].bot_type).to.equal('test-bot');
@@ -34,6 +33,7 @@ describe('HubDiscordBotsDatabaseGateway', function () {
 
     it('updates the database row if already present', async function () {
       let client = await dbManager.getClient();
+      await client.query(`DELETE FROM discord_bots`);
       await subject.updateStatus('connecting', 'test-bot', botId);
       await subject.updateStatus('connected', 'test-bot', botId);
       let rows = (await client.query('SELECT * FROM discord_bots')).rows;

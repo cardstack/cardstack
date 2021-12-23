@@ -1,0 +1,40 @@
+<CardPay::LabeledValue
+  @label='Category'
+  data-test-card-space-category-field
+>
+  <div data-test-category-options>
+    {{#each this.options as |option|}}
+      {{#let (and (eq this.categoryValue option) (not this.otherIsChecked)) as |checked|}}
+        <Common::RadioOption
+          @name='category'
+          @checked={{checked}}
+          @onInput={{fn this.setCategoryValue option}}
+          class='card-space-category-field__option'
+          data-test-category-option
+        >
+          {{option}}
+        </Common::RadioOption>
+      {{/let}}
+    {{/each}}
+    <Common::RadioOption
+      @name='category'
+      @checked={{this.otherIsChecked}}
+      @onInput={{fn this.setCategoryValue this.otherRadioValue}}
+      class='card-space-category-field__option card-space-category-field__other-container'
+      data-test-category-option data-test-category-option-other-container
+    >
+      <span class='card-space-category-field__other-label'>Other:</span>
+      {{#if this.otherIsChecked}}
+        <Common::ValidationStateInput
+          class='card-space-category-field__other'
+          @state={{this.categoryValidationState}}
+          @value={{readonly this.otherValue}}
+          @onInput={{this.onOtherValueInput}}
+          @errorMessage={{this.categoryValidationMessage}}
+          {{did-insert this.setupOtherValueInput}}
+          data-test-category-option-other
+        />
+      {{/if}}
+    </Common::RadioOption>
+  </div>
+</CardPay::LabeledValue>

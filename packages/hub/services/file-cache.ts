@@ -1,5 +1,5 @@
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, ENVIRONMENTS, NODE } from '../interfaces';
+import { Environment, ENVIRONMENTS } from '../interfaces';
 import {
   writeFileSync,
   readFileSync,
@@ -10,14 +10,11 @@ import {
   pathExistsSync,
   ensureDirSync,
   outputJSONSync,
-  readJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
-import { serverLog } from '../utils/logger';
 import { Client } from 'pg';
-import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
@@ -62,8 +59,12 @@ function setupCacheDir(cardCacheDir: string): void {
     throw new Error('package.json of cardCacheDir does not have properly configured exports');
   }
 }
-export default class CardCache {
-  config = inject('card-cache-config', { as: 'config' });
+
+import logger from '@cardstack/logger';
+const log = logger('hub/file-cache');
+
+export default class FileCache {
+  config = inject('file-cache-config', { as: 'config' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   client!: Client;
 
@@ -76,7 +77,7 @@ export default class CardCache {
   }
 
   async ready() {
-    await injectionReady(this, 'card-cache-config');
+    await injectionReady(this, 'file-cache-config');
     setupCacheDir(this.dir);
     await injectionReady(this, 'database-manager');
     this.client = await this.databaseManager.getClient();
@@ -91,7 +92,7 @@ export default class CardCache {
   }
 
   private writeFile(fsLocation: string, source: string): void {
-    serverLog.debug(`card-cache writing`, fsLocation);
+    log.trace('writing file: %s', fsLocation);
     mkdirpSync(dirname(fsLocation));
     writeFileSync(fsLocation, source);
   }
@@ -118,10 +119,6 @@ export default class CardCache {
     return this.readFile(this.getFileLocation('assets', cardURL, filename));
   }
 
-  setCard(cardURL: string, source: CompiledCard) {
-    this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
-  }
-
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));
   }
@@ -142,16 +139,6 @@ export default class CardCache {
     return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
   }
 
-  getCard(cardURL: string, env: Environment = NODE): CompiledCard | undefined {
-    let loc = this.getFileLocation(env, encodeCardURL(cardURL), 'compiled.json');
-
-    if (existsSync(loc)) {
-      return readJSONSync(loc);
-    }
-
-    return;
-  }
-
   deleteCard(cardURL: string): void {
     for (const env of ENVIRONMENTS) {
       let loc = this.getCardLocation(env, cardURL);
@@ -159,13 +146,13 @@ export default class CardCache {
       if (!existsSync(loc)) {
         continue;
       }
-      serverLog.debug(`card-cache deleting`, loc);
+      log.trace(`deleting`, loc);
       removeSync(loc);
     }
   }
 
   teardown(): void {
-    serverLog.info('Cleaning cardCache dir: ' + this.dir);
+    log.debug('Cleaning Cache dir: ' + this.dir);
     for (let subDir of ENVIRONMENTS) {
       removeSync(join(this.dir, subDir));
     }
@@ -175,6 +162,6 @@ export default class CardCache {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'card-cache': CardCache;
+    'file-cache': FileCache;
   }
 }
