@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/cardpay-sdk",
   "description": "An SDK for using the cardpay protocol",
-  "version": "0.28.13",
+  "version": "0.28.14",
   "author": "Hassan Abdel-Rahman @habdelra",
   "main": "./dist/esm/index.js",
   "types": "./dist/index.d.ts",
