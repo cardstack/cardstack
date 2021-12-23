@@ -149,6 +149,19 @@ class IndexerRun implements IndexerHandle {
     let queue = [...this.touched.keys()];
     for (let i = 0; i < queue.length; i += queryBatchSize) {
       let queryRefs = queue.slice(i, i + queryBatchSize);
+
+      // TODO For each set of invalidations you may have graphs of dependencies:
+      // e.g. the card that was changed in the index was a grandparent card,
+      // whose parent, and grandchild were invalidated. We need to compile the
+      // parent card before the grandchild, as when the grandchild is compiled,
+      // it will use the parent's compiled card from the index. if we don't
+      // compile the parent card first, then the grandchild card will not
+      // contain the updated source from the original invalidation. In order to
+      // accomplish this consider converting the invalidated cards into a
+      // consumption graph, and then traverse it in such a way that we compiled
+      // the consumed cards before the consumer cards. (this is a pattern we
+      // used in CatalogJS that might be wroth repurposing)
+
       await this.iterateThroughRows(
         ['select url, deps, raw from cards where', param(queryRefs), '&&', 'deps'],
         async (row) => {
