@@ -14,7 +14,7 @@ import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/web-client/config/environment';
 import { formatAmount } from '../helpers/format-amount';
-import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
+import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
 
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 
