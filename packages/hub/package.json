@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.28.6",
+  "version": "0.28.7",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -31,13 +31,13 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
-    "@cardstack/cardpay-sdk": "0.28.6",
-    "@cardstack/compiled": "0.28.6",
-    "@cardstack/core": "0.28.6",
-    "@cardstack/db": "0.28.6",
-    "@cardstack/di": "0.28.6",
-    "@cardstack/did-resolver": "0.28.6",
-    "@cardstack/discord-bot": "0.28.6",
+    "@cardstack/cardpay-sdk": "0.28.7",
+    "@cardstack/compiled": "0.28.7",
+    "@cardstack/core": "0.28.7",
+    "@cardstack/db": "0.28.7",
+    "@cardstack/di": "0.28.7",
+    "@cardstack/did-resolver": "0.28.7",
+    "@cardstack/discord-bot": "0.28.7",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
@@ -100,8 +100,8 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.28.6",
-    "@cardstack/test-support": "0.28.6",
+    "@cardstack/eslint-config": "0.28.7",
+    "@cardstack/test-support": "0.28.7",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",
