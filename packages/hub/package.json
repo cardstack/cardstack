@@ -1,9 +1,10 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.28.2",
+  "version": "0.28.15",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
+  "private": true,
   "keywords": [],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
@@ -31,13 +32,13 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
-    "@cardstack/cardpay-sdk": "0.28.2",
-    "@cardstack/compiled": "0.28.2",
-    "@cardstack/core": "0.28.2",
-    "@cardstack/db": "0.28.2",
-    "@cardstack/di": "0.28.2",
-    "@cardstack/did-resolver": "0.28.2",
-    "@cardstack/discord-bot": "0.28.2",
+    "@cardstack/cardpay-sdk": "0.28.15",
+    "@cardstack/compiled": "0.28.15",
+    "@cardstack/core": "0.28.15",
+    "@cardstack/db": "0.28.15",
+    "@cardstack/di": "0.28.15",
+    "@cardstack/did-resolver": "0.28.15",
+    "@cardstack/discord-bot": "0.28.15",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
@@ -100,8 +101,8 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.28.2",
-    "@cardstack/test-support": "0.28.2",
+    "@cardstack/eslint-config": "0.28.15",
+    "@cardstack/test-support": "0.28.15",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",

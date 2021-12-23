@@ -16,7 +16,7 @@ import {
   ViewSafeResult,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
-import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
+import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
 import {
   createMerchantSafe,
   getFilenameFromDid,

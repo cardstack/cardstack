@@ -9,7 +9,7 @@ To install the Cardpay CLI run the following command:
 ```sh
 curl -o- -L https://install.cardstack.com/install-cardpay.sh | bash
 ```
-This will install the Cardpay CLI to your ~/.cardpay folder, as well as add the `cardpay` bin to your $PATH env var.
+This will install the Cardpay CLI to your ~/.cardpay folder, as well as add the `cardpay` bin to your $PATH env var. Note that node ver 14+ is required to be installed on your system in order for the Cardpay CLI to run.
 
 # Running
 To run the Cardpay CLI type:
