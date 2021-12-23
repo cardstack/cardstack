@@ -56,12 +56,12 @@ module('Unit | Milestone model', function (hooks) {
     });
 
     test('timestamps are set on postable once they are part of visiblePostables', function (assert) {
-      assert.ok(!postable1.timestamp);
-      assert.ok(!postable2.timestamp);
-      assert.ok(!postable3.timestamp);
+      assert.notOk(postable1.timestamp);
+      assert.notOk(postable2.timestamp);
+      assert.notOk(postable3.timestamp);
       subject.visiblePostables; // invoke for side effect
       assert.ok(postable1.timestamp);
-      assert.ok(!postable2.timestamp);
+      assert.notOk(postable2.timestamp);
       postable1.isComplete = true;
       subject.visiblePostables; // invoke for side effect
       assert.ok(postable3.timestamp);
@@ -70,10 +70,10 @@ module('Unit | Milestone model', function (hooks) {
 
     test('isComplete is false until all postables complete (except excluded)', function (assert) {
       subject.visiblePostables; // invoke for side effect
-      assert.ok(!subject.isComplete);
+      assert.notOk(subject.isComplete);
       postable1.isComplete = true;
       subject.visiblePostables; // invoke for side effect
-      assert.ok(!subject.isComplete);
+      assert.notOk(subject.isComplete);
       postable3.isComplete = true;
       subject.visiblePostables; // invoke for side effect
       assert.ok(subject.isComplete);

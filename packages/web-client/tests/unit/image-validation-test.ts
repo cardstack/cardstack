@@ -49,6 +49,7 @@ module('Unit | image-validation', function (hooks) {
     assert.deepEqual(validator.fileType, config.fileType);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It throws when set up with invalid config', async function (assert) {
     let invalidConfigs: Record<string, Partial<ImageRequirements>> = {
       width: {
@@ -96,10 +97,9 @@ module('Unit | image-validation', function (hooks) {
   test('It can detect a valid image', async function (assert) {
     let validator = new ImageValidation(config);
     let result = await validator.validate(image);
-    assert.ok(
-      result.valid && result.fileType && result.fileSize && result.imageSize,
-      'Validation succeeds'
-    );
+    let valid =
+      result.valid && result.fileType && result.fileSize && result.imageSize;
+    assert.ok(valid, 'Validation succeeds');
   });
 
   test('It can detect invalid image file type', async function (assert) {
@@ -124,6 +124,7 @@ module('Unit | image-validation', function (hooks) {
     );
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It can detect invalid image size', async function (assert) {
     let failingConfigs: Record<string, Partial<ImageRequirements>> = {
       minWidthFails: {
@@ -167,6 +168,7 @@ module('Unit | image-validation', function (hooks) {
     }
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It can detect invalid file size', async function (assert) {
     let failingConfigs: Record<string, Partial<ImageRequirements>> = {
       minFileSizeFails: {

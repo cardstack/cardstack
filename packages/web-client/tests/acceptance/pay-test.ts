@@ -96,6 +96,7 @@ module('Acceptance | pay', function (hooks) {
     });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It displays merchant info correctly in a non-iOS environment', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
 
@@ -117,6 +118,7 @@ module('Acceptance | pay', function (hooks) {
     await percySnapshot(assert);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It displays merchant info correctly on iOS', async function (assert) {
     let isIOSService = this.owner.lookup('service:is-ios');
     sinon.stub(isIOSService, 'isIOS').returns(true);

@@ -33,6 +33,7 @@ module('Acceptance | create card space', function (hooks) {
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
+  // eslint-disable-next-line qunit/require-expect
   test('initiating workflow without wallet connections', async function (assert) {
     let subdomain = ''; // TODO: replace this when other parts of the form are filled out
 

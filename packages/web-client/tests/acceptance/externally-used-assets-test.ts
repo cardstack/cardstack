@@ -17,6 +17,7 @@ const EXTERNALLY_USED_ASSET_PATHS = [
 ];
 
 module('Acceptance | externally used assets', function () {
+  // eslint-disable-next-line qunit/require-expect
   test('Each of the assets provided exists', async function (assert) {
     const container = document.querySelector((config as any).APP.rootElement)!;
     container.style.overflow = 'visible';

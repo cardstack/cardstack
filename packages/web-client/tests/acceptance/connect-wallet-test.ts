@@ -48,6 +48,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('Connecting a layer 2 wallet via Card Wallet mobile app', async function (assert) {
     await visit('/');
     assert.equal(currentURL(), '/');

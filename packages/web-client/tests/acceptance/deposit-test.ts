@@ -41,6 +41,7 @@ function cancelationPostableSel(postableIndex: number) {
 module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
 
+  // eslint-disable-next-line qunit/require-expect
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay/deposit-withdrawal');
     assert.equal(currentURL(), '/card-pay/deposit-withdrawal');

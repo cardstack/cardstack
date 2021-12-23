@@ -16,6 +16,6 @@ module('Unit | WorkflowMessage model', function (hooks) {
       author: participant,
       message: 'Hello, world',
     });
-    assert.equal(subject.isComplete, true);
+    assert.true(subject.isComplete);
   });
 });

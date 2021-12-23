@@ -177,6 +177,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   });
 
   test('it throws an error if a token other than DAI, DAI.CPXD, CARD, CARD.CPXD, or ETH is requested', async function (assert) {
+    assert.expect(1);
     setupOnerror(function (err: Error) {
       assert.equal(
         err.message,

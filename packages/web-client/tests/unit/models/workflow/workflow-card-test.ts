@@ -33,7 +33,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    assert.equal(subject.isComplete, false);
+    assert.false(subject.isComplete);
   });
 
   test('when onComplete is called, isComplete is set to true', async function (assert) {
@@ -43,7 +43,7 @@ module('Unit | WorkflowCard model', function (hooks) {
     });
     subject.onComplete();
     await settled();
-    assert.equal(subject.isComplete, true);
+    assert.true(subject.isComplete);
   });
 
   test("when onComplete is called, the card's check method is called and the card's workflow is canceled", async function (assert) {
@@ -72,8 +72,8 @@ module('Unit | WorkflowCard model', function (hooks) {
 
     subject.onComplete();
     await settled();
-    assert.equal(subject.isComplete, false);
-    assert.equal(wf.isCanceled, true);
+    assert.false(subject.isComplete);
+    assert.true(wf.isCanceled);
     assert.equal(wf.cancelationReason, 'TEST');
   });
 
@@ -90,6 +90,6 @@ module('Unit | WorkflowCard model', function (hooks) {
     let wf = new CustomWorkflowStub(this.owner);
     subject.setWorkflow(wf);
     subject.onIncomplete();
-    assert.equal(subject.isComplete, false);
+    assert.false(subject.isComplete);
   });
 });

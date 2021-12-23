@@ -46,7 +46,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
   });
 
   test('It should not have a providerId at instantiation', async function (assert) {
-    assert.ok(!subject.providerId, 'There is no providerId at instantiation');
+    assert.notOk(subject.providerId, 'There is no providerId at instantiation');
   });
 
   test("It should have a providerId, and assign web3's provider after calling connect", async function (assert) {
@@ -87,7 +87,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
 
     subject.reset();
 
-    assert.ok(!subject.providerId, 'There is no providerId after reset');
+    assert.notOk(subject.providerId, 'There is no providerId after reset');
   });
 
   test('It calls the cross-tab-connection callback upon connected messages, if not already connected', async function (assert) {

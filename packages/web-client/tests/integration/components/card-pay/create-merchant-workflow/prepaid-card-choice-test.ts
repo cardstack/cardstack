@@ -284,7 +284,7 @@ module(
         this.set('frozen', true);
         assert.dom('[data-test-create-merchant-button]').isDisabled();
 
-        assert.equal(workflow.isCanceled, true);
+        assert.true(workflow.isCanceled);
         assert.equal(workflow.cancelationReason, 'UNAUTHENTICATED');
       });
 

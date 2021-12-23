@@ -30,25 +30,20 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
   });
 
   test('it can initialize with a non-authenticated state when layer 2 is not connected', async function (assert) {
     await layer2Service.test__simulateAccountsChanged([]);
 
-    assert.ok(!layer2Service.isConnected, 'Layer 2 is not connected');
+    assert.notOk(layer2Service.isConnected, 'Layer 2 is not connected');
 
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 
   test('it can initialize with a non-authenticated state when there is no initial auth token', async function (assert) {
@@ -56,10 +51,8 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 
   test('it can initialize with a non-authenticated state when the initial auth token is not valid', async function (assert) {
@@ -69,28 +62,21 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 
   // test being able to clear auth token
   test('its state becomes non-authenticated when the auth token is cleared', async function (assert) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
 
     hubAuthentication.authToken = null;
 
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 
   // test ensureAuthenticated
@@ -98,11 +84,8 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
 
     let authenticateStub = sinon
       .stub(layer2Service, 'authenticate')
@@ -110,22 +93,16 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     await hubAuthentication.ensureAuthenticated();
 
     assert.ok(authenticateStub.notCalled, 'Did not fetch a new auth token');
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
   });
 
   test('it can fetch a new auth token when an existing one is invalid', async function (assert) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
 
     sinon
       .stub(layer2Service, 'checkHubAuthenticationValid')
@@ -139,11 +116,8 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       authenticateStub.calledOnce,
       'Called the authenticate method to get a new auth token'
     );
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
   });
 
   test("it can fetch a new auth token when one doesn't exist", async function (assert) {
@@ -151,10 +125,8 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
 
     let authenticateStub = sinon
       .stub(layer2Service, 'authenticate')
@@ -165,22 +137,16 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       authenticateStub.calledOnce,
       'Called the authenticate method to get a new auth token'
     );
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
   });
 
   test('it throws an error when fetching a new auth token fails with an empty string', async function (assert) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
 
     sinon.stub(layer2Service, 'authenticate').returns(Promise.resolve(''));
     sinon
@@ -192,21 +158,16 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       /Failed to fetch auth token/,
       'It fails with the error message for a falsey auth token'
     );
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 
   test('it throws an error when errors are thrown while fetching a new auth token', async function (assert) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');
     await settled();
 
-    assert.ok(
-      hubAuthentication.authToken === HUB_AUTH_TOKEN &&
-        hubAuthentication.isAuthenticated,
-      'authenticated'
-    );
+    assert.equal(hubAuthentication.authToken, HUB_AUTH_TOKEN);
+    assert.true(hubAuthentication.isAuthenticated);
 
     sinon.stub(layer2Service, 'authenticate').throws(new Error('A test error'));
     sinon
@@ -218,9 +179,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       /A test error/,
       'It fails with the error message from our stubbed function'
     );
-    assert.ok(
-      !hubAuthentication.authToken && !hubAuthentication.isAuthenticated,
-      'not authenticated'
-    );
+    assert.notOk(hubAuthentication.authToken);
+    assert.false(hubAuthentication.isAuthenticated, 'not authenticated');
   });
 });

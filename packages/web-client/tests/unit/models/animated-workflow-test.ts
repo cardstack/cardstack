@@ -89,7 +89,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.ok(!workflow.isCanceled, "Workflow isn't canceled at the start");
+    assert.notOk(workflow.isCanceled, "Workflow isn't canceled at the start");
     assert.equal(
       animatedWorkflow.isCanceled,
       workflow.isCanceled,
