@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/cardpay-cli",
   "description": "CLI tool for basic actions in the Cardpay ecosystem",
-  "version": "0.28.7",
+  "version": "0.28.8",
   "author": "Dominic Sherman @DominicSherman",
   "repository": "cardstack/cardstack",
   "scripts": {
@@ -17,6 +17,7 @@
     "pub:invalidate": "aws cloudfront create-invalidation --distribution-id ETWZIWCWU250B --paths \"/cardpay.tgz\" \"/install-cardpay.sh\" > /dev/null",
     "pub:clean": "rm -rf ./dist"
   },
+  "private": true,
   "bin": {
     "cardpay": "./cardpay.js"
   },
@@ -27,7 +28,7 @@
     "typescript": "4.2.3"
   },
   "dependencies": {
-    "@cardstack/cardpay-sdk": "0.28.7",
+    "@cardstack/cardpay-sdk": "0.28.8",
     "@truffle/hdwallet-provider": "^1.5.0",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
     "@types/bn.js": "^5.1.0",
