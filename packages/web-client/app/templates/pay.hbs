@@ -1,4 +1,13 @@
-{{page-title (concat "Pay Business: " (or this.merchantInfo.name @model.merchantSafe.address)) replace=true}}
+{{#let (concat "Pay Business: " (or this.merchantInfo.name @model.merchantSafe.address)) as |title|}}
+  {{page-title title replace=true}}
+
+  <InHead>
+    {{!-- template-lint-disable no-forbidden-elements --}}
+    <meta property='og:title' content={{title}} />
+    <meta property='og:type' content='website' />
+    <meta property='og:url' content={{this.paymentURL}} />
+  </InHead>
+{{/let}}
 
 <div class="merchant-payment-request-page">
   <CardPay::MerchantPaymentRequestHeader/>
