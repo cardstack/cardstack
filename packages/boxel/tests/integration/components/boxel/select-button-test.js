@@ -24,7 +24,7 @@ module('Integration | Component | SelectButton', function (hooks) {
     this.set('onclick', () => (clicked = true));
     await render(hbs`<Boxel::SelectButton {{on 'click' (fn this.onclick) }}/>`);
     await click(SELECT_BUTTON_SELECTOR);
-    assert.equal(clicked, true);
+    assert.true(clicked);
   });
 
   test('It can be disabled via html attribute', async function (assert) {
