@@ -38,7 +38,7 @@
     "dist"
   ],
   "scripts": {
-    "postinstall": "node bin/codegen.js",
+    "postinstall": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
     "prepack": "rm -rf ./dist && tsc"
   },
   "homepage": "https://github.com/cardstack/cardstack",

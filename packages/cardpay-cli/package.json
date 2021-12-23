@@ -18,9 +18,6 @@
     "pub:clean": "rm -rf ./dist"
   },
   "private": true,
-  "bin": {
-    "cardpay": "./cardpay.js"
-  },
   "license": "MIT",
   "devDependencies": {
     "@types/yargs": "^16.0.0",
