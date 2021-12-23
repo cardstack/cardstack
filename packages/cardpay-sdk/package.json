@@ -39,7 +39,7 @@
   ],
   "scripts": {
     "postinstall": "node bin/codegen.js",
-    "prepack": "tsc"
+    "prepack": "rm -rf ./dist && tsc"
   },
   "homepage": "https://github.com/cardstack/cardstack",
   "license": "MIT",
