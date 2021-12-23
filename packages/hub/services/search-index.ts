@@ -57,6 +57,12 @@ export class SearchIndex {
     }
   }
 
+  async deleteCard(raw: RawCard) {
+    await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.delete(cardURL(raw));
+    });
+  }
+
   async indexCard(
     raw: RawCard,
     compiled: CompiledCard<Unsaved, ModuleRef>,
@@ -264,8 +270,9 @@ class IndexerRun implements IndexerHandle {
     await this.db.query(expressionToSql(expression));
   }
 
-  async delete(cardURL: string): Promise<void> {
-    await this.db.query(`DELETE from cards where url=$1`, [cardURL]);
+  async delete(url: string): Promise<void> {
+    await this.db.query('DELETE FROM cards where url = $1', [url]);
+    this.fileCache.deleteCard(url);
   }
 
   async beginReplaceAll(): Promise<void> {

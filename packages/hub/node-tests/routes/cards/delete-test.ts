@@ -28,10 +28,8 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             export default class Post {
-              @contains(string)
-              title;
-              @contains(string)
-              body;
+              @contains(string) title;
+              @contains(string) body;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
@@ -53,7 +51,7 @@ if (process.env.COMPILER) {
       await deleteCard(`${realmURL}car0`).expect(404);
     });
 
-    it.skip('can delete an existing card that has no children', async function () {
+    it('can delete an existing card that has no children', async function () {
       await getCard(`${realmURL}post0`).expect(200);
 
       await deleteCard(`${realmURL}post0`).expect(204);

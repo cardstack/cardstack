@@ -69,6 +69,11 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
+  async delete(raw: RawCard): Promise<void> {
+    await this.realmManager.delete(raw);
+    await this.searchIndex.deleteCard(raw);
+  }
+
   async query(query: Query): Promise<Card[]> {
     let client = await this.db.getPool();
     try {
