@@ -43,7 +43,7 @@ if (process.env.COMPILER) {
       );
       expect(rows.length).to.eq(2);
       expect(rows[0].url).to.eq(`${realmURL}parent`);
-      expect(rows[0].url).to.eq(`${realmURL}grandchild`);
+      expect(rows[1].url).to.eq(`${realmURL}grandchild`);
     });
 
     it('can retrieve cards deps from the index in descending order', async function () {
@@ -53,7 +53,7 @@ if (process.env.COMPILER) {
       );
       expect(rows.length).to.eq(2);
       expect(rows[0].url).to.eq(`${realmURL}grandchild`);
-      expect(rows[0].url).to.eq(`${realmURL}parent`);
+      expect(rows[1].url).to.eq(`${realmURL}parent`);
     });
   });
 }
