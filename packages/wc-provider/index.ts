@@ -83,6 +83,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     this.rpcWss = rpcWss;
     this.chainId = chainId;
     this.websocketProvider = websocketProvider;
+    this.bindSocketListeners();
     this.bridge = opts.connector ? opts.connector.bridge : opts.bridge || 'https://bridge.walletconnect.org';
     this.qrcode = typeof opts.qrcode === 'undefined' || opts.qrcode !== false;
     this.qrcodeModal = opts.qrcodeModal || this.qrcodeModal;
@@ -500,6 +501,22 @@ class WalletConnectProvider extends ExtendedProviderEngine {
         }
       },
     };
+  }
+
+  bindSocketListeners() {
+    // @ts-ignore
+    this.websocketProvider.on('close', this.onWebsocketClose.bind(this));
+    this.websocketProvider.on('connect', this.onWebsocketConnect.bind(this));
+  }
+
+  async onWebsocketConnect() {
+    // @ts-ignore
+    this.emit('websocket-connected');
+  }
+
+  async onWebsocketClose(event: CloseEvent) {
+    // @ts-ignore
+    this.emit('websocket-disconnected', event);
   }
 }
 
