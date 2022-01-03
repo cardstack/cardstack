@@ -107,8 +107,8 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    await this.realmManager.delete(this.realmManager.parseCardURL(url));
-    this.cache.deleteCard(url);
+    let cardId = this.realmManager.parseCardURL(url);
+    await this.cards.as(INSECURE_CONTEXT).delete(cardId);
 
     ctx.status = 204;
     ctx.body = null;
