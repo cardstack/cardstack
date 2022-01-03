@@ -501,45 +501,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       },
     };
   }
-
-  // bindSocketListeners() {
-  //   this.websocketProvider.on('close', this.onWebsocketClose.bind(this));
-  //   this.websocketProvider.on('connect', this.onWebsocketConnect.bind(this));
-  // }
-
-  // async onWebsocketConnect() {
-  // TODO: add a hook to call a provided connect callback
-  // console.log('websocket connected', this.websocketProvider.connection.url);
-  // Sentry.addBreadcrumb({
-  //   type: 'debug',
-  //   message: 'Websocket connected',
-  //   data: {
-  //     url: this.websocketProvider.connection.url,
-  //   },
-  //   level: Sentry.Severity.Info,
-  // });
-  // }
-
-  // async onWebsocketClose(_event: CloseEvent) {
-  // TODO: add a hook to call a provided close callback
-  // console.log('websocket closed', this.websocketProvider.connection.url);
-  // Sentry.addBreadcrumb({
-  //   type: 'debug',
-  //   message: 'Websocket connection closed',
-  //   data: {
-  //     code: event.code,
-  //     reason: event.reason,
-  //     wasClean: event.wasClean,
-  //     url: this.websocketProvider.connection.url,
-  //   },
-  //   // unsure about 1001 since this could also happen due to server failure
-  //   // but also can happen due to closing the tab normally
-  //   // unlike other codes which will only get here after the websocket provider
-  //   // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
-  //   level: [1000, 1001].includes(event.code) ? Sentry.Severity.Info : Sentry.Severity.Error,
-  // });
-  // this.emit('websocket-disconnected');
-  // }
 }
 
 export default WalletConnectProvider;
