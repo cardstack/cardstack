@@ -29,7 +29,7 @@ import {
 } from './interfaces';
 import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
+import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -454,10 +454,22 @@ class TrackedBuilder implements Builder {
   constructor(private realBuilder: Builder) {}
   getCompiledCard(url: string): Promise<CompiledCard> {
     this.dependencies.add(url);
-    return this.realBuilder.getCompiledCard(url);
+    return this.trapErrorDeps(() => this.realBuilder.getCompiledCard(url));
   }
   getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
-    return this.realBuilder.getRawCard(url);
+    return this.trapErrorDeps(() => this.realBuilder.getRawCard(url));
+  }
+  private async trapErrorDeps<Result>(fn: () => Promise<Result>): Promise<Result> {
+    try {
+      return await fn();
+    } catch (err: any) {
+      if (isCardstackError(err) && err.deps) {
+        for (let url of err.deps) {
+          this.dependencies.add(url);
+        }
+      }
+      throw err;
+    }
   }
 }

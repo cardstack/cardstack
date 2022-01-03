@@ -45,12 +45,16 @@ export class SearchIndex {
     try {
       let {
         rows: [result],
-      } = await db.query('SELECT compiled, "compileErrors" from cards where url = $1', [cardURL]);
+      } = await db.query('SELECT compiled, "compileErrors", deps from cards where url = $1', [cardURL]);
       if (!result) {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
       if (result.compileErrors) {
-        throw CardstackError.fromSerializableError(result.compileErrors);
+        let err = CardstackError.fromSerializableError(result.compileErrors);
+        if (result.deps) {
+          err.deps = result.deps;
+        }
+        throw err;
       }
       return deserializer.deserialize(result.compiled.data, result.compiled);
     } finally {
