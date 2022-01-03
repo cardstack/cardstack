@@ -277,7 +277,7 @@ class IndexerRun implements IndexerHandle {
   async delete(url: string): Promise<void> {
     this.touched.set(url, this.touchCounter++);
     await this.db.query('DELETE FROM cards where url = $1', [url]);
-    this.fileCache.deleteCard(url);
+    this.fileCache.deleteCardModules(url);
   }
 
   async beginReplaceAll(): Promise<void> {
