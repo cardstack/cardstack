@@ -1,11 +1,3 @@
 # `wc-provider`
 
-> TODO: description
-
-## Usage
-
-```
-const wcProvider = require('wc-provider');
-
-// TODO: DEMONSTRATE API
-```
+A basic WalletConnect provider that uses a websocket connection to minimize HTTP polling.
