@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import WalletConnectProvider from '@cardstack/wc-provider';
 import { networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import { AbstractProvider } from 'web3-core';
 import config from 'config';
@@ -21,9 +21,12 @@ export default class WalletConnectService {
         icons: [],
         name: clientName,
       },
-      qrcode: false,
+      chainId: networkIds[network],
       rpc: {
         [networkIds[network]]: getConstantByNetwork('rpcNode', network),
+      },
+      rpcWss: {
+        [networkIds[network]]: getConstantByNetwork('rpcWssNode', network),
       },
       bridge,
     });
