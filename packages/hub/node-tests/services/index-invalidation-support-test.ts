@@ -2,7 +2,7 @@ import { Client } from 'pg';
 import { configureHubWithCompiler } from '../helpers/cards';
 
 if (process.env.COMPILER) {
-  describe('Index invalidation DB support', function () {
+  describe.only('Index invalidation DB support', function () {
     let client: Client;
     let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
 
@@ -36,7 +36,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    it.only('can retrieve cards deps from the index in ascending order', async function () {
+    it('can retrieve cards deps from the index in ascending order', async function () {
       let grandparentURL = `${realmURL}grandparent`;
       let { rows } = await client.query(
         `select url, (url, deps)::card_dep as c_dep from cards where '{${grandparentURL}}' && deps order by c_dep using >^;`

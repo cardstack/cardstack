@@ -52,10 +52,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createOperator('?-', { left: 'card_dep', right: 'card_dep', procedure: 'card_eq' });
   pgm.sql(`
   create operator class card_ops for type card_dep using btree family card_fam as
-    operator 1 <^ ,
-    operator 3 ?- ,
-    operator 5 >^ ,
-    function 1 deps_cmp(card_dep, card_dep) ;
+    operator 1 <^,
+    operator 3 ?-,
+    operator 5 >^,
+    function 1 deps_cmp(card_dep, card_dep);
   `);
 }
 
