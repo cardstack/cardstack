@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { IConnector } from '@walletconnect/types';
-import WalletConnectProvider from '../wc-provider';
+import WalletConnectProvider from '@cardstack/wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';

@@ -29,6 +29,7 @@
     "@cardstack/boxel": "0.28.15",
     "@cardstack/cardpay-sdk": "0.28.15",
     "@cardstack/did-resolver": "0.28.15",
+    "@cardstack/wc-provider": "0.28.15",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.0",
     "@ember/test-helpers": "^2.4.0",
