@@ -34,6 +34,16 @@ if (process.env.COMPILER) {
         realm: realmURL,
         adoptsFrom: '../parent',
       });
+      await cards.create({
+        id: 'greatgrandchild',
+        realm: realmURL,
+        adoptsFrom: '../grandchild',
+      });
+      await cards.create({
+        id: 'greatgreatgrandchild',
+        realm: realmURL,
+        adoptsFrom: '../greatgrandchild',
+      });
     });
 
     it('can retrieve cards deps from the index in ascending order', async function () {
@@ -41,9 +51,11 @@ if (process.env.COMPILER) {
       let { rows } = await client.query(
         `select url, (url, deps)::card_dep as c_dep from cards where '{${grandparentURL}}' && deps order by c_dep using >^;`
       );
-      expect(rows.length).to.eq(2);
+      expect(rows.length).to.eq(4);
       expect(rows[0].url).to.eq(`${realmURL}parent`);
       expect(rows[1].url).to.eq(`${realmURL}grandchild`);
+      expect(rows[2].url).to.eq(`${realmURL}greatgrandchild`);
+      expect(rows[3].url).to.eq(`${realmURL}greatgreatgrandchild`);
     });
 
     it('can retrieve cards deps from the index in descending order', async function () {
@@ -51,9 +63,11 @@ if (process.env.COMPILER) {
       let { rows } = await client.query(
         `select url, (url, deps)::card_dep as c_dep from cards where '{${grandparentURL}}' && deps order by c_dep using <^;`
       );
-      expect(rows.length).to.eq(2);
-      expect(rows[0].url).to.eq(`${realmURL}grandchild`);
-      expect(rows[1].url).to.eq(`${realmURL}parent`);
+      expect(rows.length).to.eq(4);
+      expect(rows[0].url).to.eq(`${realmURL}greatgreatgrandchild`);
+      expect(rows[1].url).to.eq(`${realmURL}greatgrandchild`);
+      expect(rows[2].url).to.eq(`${realmURL}grandchild`);
+      expect(rows[3].url).to.eq(`${realmURL}parent`);
     });
   });
 }
