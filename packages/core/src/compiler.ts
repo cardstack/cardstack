@@ -452,13 +452,27 @@ export function makeGloballyAddressable(
 class TrackedBuilder implements Builder {
   readonly dependencies = new Set<string>();
   constructor(private realBuilder: Builder) {}
-  getCompiledCard(url: string): Promise<CompiledCard> {
+  async getCompiledCard(url: string): Promise<CompiledCard> {
     this.dependencies.add(url);
-    return this.trapErrorDeps(() => this.realBuilder.getCompiledCard(url));
+    let card = await this.trapErrorDeps(() => this.realBuilder.getCompiledCard(url));
+    this.discoverDeps(card);
+    return card;
   }
   getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
     return this.trapErrorDeps(() => this.realBuilder.getRawCard(url));
+  }
+  private discoverDeps(card: CompiledCard): void {
+    if (card.adoptsFrom) {
+      this.dependencies.add(card.adoptsFrom.url);
+      this.discoverDeps(card.adoptsFrom);
+    }
+    for (let field of Object.values(card.fields)) {
+      if (field.card) {
+        this.dependencies.add(field.card.url);
+        this.discoverDeps(field.card);
+      }
+    }
   }
   private async trapErrorDeps<Result>(fn: () => Promise<Result>): Promise<Result> {
     try {

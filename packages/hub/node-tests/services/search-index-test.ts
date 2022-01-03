@@ -55,7 +55,7 @@ if (process.env.COMPILER) {
       expect(example.data?.title).to.eq('Hello World');
     });
 
-    it.only(`can invalidate a card via creation of non-existent grandparent card`, async function () {
+    it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
         adoptsFrom: '../post',
       });
