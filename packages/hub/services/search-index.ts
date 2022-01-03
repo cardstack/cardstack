@@ -153,6 +153,31 @@ class IndexerRun implements IndexerHandle {
   // This doesn't need to recurse because we intend for the `deps` column to
   // contain all deep references, not  just immediate references
   private async possiblyInvalidatedCards(fn: (cardURL: string, deps: string[], raw: RawCard) => Promise<void>) {
+    let query = `
+    
+    create type card_dep as ( url text, deps text[] );
+    
+    create function deps_cmp(card_dep, card_dep) returns integer
+      as '
+      select case
+        when $1.url = any($2.deps)
+          then 1
+        when $2.url = any($1.deps)
+          then -1
+        else
+          case
+            when $1.url < $2.url
+              then -1
+            when $2.url < $1.url
+               then 1
+            else
+               0
+            end
+        end
+      ;'
+      language sql;
+    `;
+
     const queryBatchSize = 100;
     let queue = [...this.touched.keys()];
     for (let i = 0; i < queue.length; i += queryBatchSize) {
