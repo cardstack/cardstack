@@ -16,6 +16,7 @@
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "lib": ["ES2020"]
   },
   "exclude": ["../*/dist", "../*/tmp", "../*/node_modules", "node_modules", "tmp"]
 }
