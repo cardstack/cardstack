@@ -109,7 +109,14 @@ if (process.env.COMPILER) {
         (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realmURL}post0`
       );
 
-      expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializer', 'isolated', 'embedded', 'edit']);
+      expect(compiledMeta?.attributes).to.have.all.keys([
+        'schemaModule',
+        'serializer',
+        'isolated',
+        'embedded',
+        'edit',
+        'deps',
+      ]);
 
       expect(compiledMeta?.relationships).to.deep.equal({
         adoptsFrom: {

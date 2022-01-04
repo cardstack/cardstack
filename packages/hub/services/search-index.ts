@@ -158,7 +158,13 @@ class IndexerRun implements IndexerHandle {
     for (let i = 0; i < queue.length; i += queryBatchSize) {
       let queryRefs = queue.slice(i, i + queryBatchSize);
       await this.iterateThroughRows(
-        ['select url, deps, raw from cards where', param(queryRefs), '&&', 'deps'],
+        [
+          'select url, deps, raw, (url, deps)::card_dep as c_dep from cards where',
+          param(queryRefs),
+          '&&',
+          'deps',
+          'order by c_dep using >^',
+        ],
         async (row) => {
           let deserializer = new RawCardDeserializer();
           let { raw } = deserializer.deserialize(row.raw.data, row.raw);
