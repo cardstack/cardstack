@@ -20,11 +20,16 @@ import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 const log = logger('hub/search-index');
 
+function assertNever(value: never) {
+  throw new Error(`unsupported operation ${value}`);
+}
 export class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private builder = inject('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
   private fileCache = inject('file-cache', { as: 'fileCache' });
+  private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
+  private notifyQueuePromise: Promise<void> = Promise.resolve();
 
   async indexAllRealms(): Promise<void> {
     await Promise.all(
@@ -36,6 +41,53 @@ export class SearchIndex {
         });
       })
     );
+  }
+
+  notify(cardURL: string, action: 'save' | 'delete'): void {
+    log.trace('notify', cardURL);
+    this.notifyQueue.push({ cardURL, action });
+    (async () => this.drainNotifyQueue())();
+  }
+
+  flushNotifications(): Promise<void> {
+    return this.notifyQueuePromise;
+  }
+
+  async teardown(): Promise<void> {
+    await this.notifyQueuePromise;
+  }
+
+  private async drainNotifyQueue(): Promise<void> {
+    await this.notifyQueuePromise;
+
+    let queueDrained: () => void;
+    this.notifyQueuePromise = new Promise<void>((res) => (queueDrained = res));
+
+    while (this.notifyQueue.length > 0) {
+      let { cardURL, action } = this.notifyQueue.shift()!;
+      log.trace('drainNotifyQueue', cardURL);
+      await this.indexCardFromNotification(cardURL, action);
+    }
+    queueDrained!();
+  }
+
+  private async indexCardFromNotification(cardURL: string, action: 'save' | 'delete') {
+    let cardID = this.realmManager.parseCardURL(cardURL);
+    await this.runIndexing(cardID.realm, async (ops) => {
+      switch (action) {
+        case 'save': {
+          let rawCard = await this.realmManager.read(cardID);
+          await ops.save(rawCard);
+          break;
+        }
+        case 'delete': {
+          await ops.delete(cardURL);
+          break;
+        }
+        default:
+          assertNever(action);
+      }
+    });
   }
 
   async deleteCard(raw: RawCard) {
@@ -69,10 +121,6 @@ export class SearchIndex {
     } finally {
       db.release();
     }
-  }
-
-  notify(_cardURL: string, _action: 'save' | 'delete'): void {
-    throw new Error('not implemented');
   }
 }
 

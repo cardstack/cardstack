@@ -80,6 +80,7 @@ export default class FSRealm implements RealmInterface<Meta> {
   }
 
   private onFileChanged(action: 'save' | 'delete', filepath: string) {
+    this.log.trace('onFileChange', filepath);
     let segments = filepath.split(sep);
     if (!this.notify || shouldIgnoreChange(segments)) {
       // top-level files in the realm are not cards, we're assuming all
@@ -92,6 +93,7 @@ export default class FSRealm implements RealmInterface<Meta> {
       let fullpath = join(this.directory, filepath);
       let lastMTime = this.recentWrites.get(fullpath);
       if (lastMTime != null && statSync(fullpath).mtime.getTime() < lastMTime + 10) {
+        this.log.trace('onChangeNotifySuppressed');
         return;
       }
     }
@@ -103,6 +105,7 @@ export default class FSRealm implements RealmInterface<Meta> {
       // but we need to implement single file deletion too and that needs to get
       // tracked separately
       if (this.recentDeleted.has(cardDir)) {
+        this.log.trace('onChangeNotifySuppressed');
         return;
       }
     }

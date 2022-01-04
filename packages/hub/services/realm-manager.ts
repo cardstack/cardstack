@@ -1,7 +1,7 @@
 import FSRealm from '../realms/fs-realm';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 import { CardId, RawCard, RealmConfig, Unsaved } from '@cardstack/core/src/interfaces';
-import { ensureTrailingSlash } from '@cardstack/core/src/utils';
+import { ensureTrailingSlash, removeTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
 import { getOwner, inject, injectionReady } from '@cardstack/di';
 
@@ -38,7 +38,7 @@ export default class RealmManager {
   }
 
   private notify(cardURL: string, action: 'save' | 'delete'): void {
-    this.searchIndex.notify(cardURL, action);
+    this.searchIndex.notify(removeTrailingSlash(cardURL), action);
   }
 
   parseCardURL(cardURL: string): CardId {
