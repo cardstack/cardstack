@@ -38,6 +38,7 @@ export default class APIRouter {
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
+  checklyWebhookRoute = inject('checkly-webhook-route', { as: 'checklyWebhookRoute' });
   routes() {
     let {
       boomRoute,
@@ -56,6 +57,7 @@ export default class APIRouter {
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
+      checklyWebhookRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -92,6 +94,7 @@ export default class APIRouter {
     apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
     apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
+    apiSubrouter.post('/checkly-webhook', parseBody, checklyWebhookRoute.post);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();

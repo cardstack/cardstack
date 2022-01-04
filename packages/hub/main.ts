@@ -104,6 +104,7 @@ import { ContractSubscriptionEventHandler } from './services/contract-subscripti
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
+import ChecklyWebhookRoute from './routes/checkly-webhook';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -189,6 +190,7 @@ export function createRegistry(): Registry {
   registry.register('wyre-prices-route', WyrePricesRoute);
   registry.register('web3-storage', Web3Storage);
   registry.register('statuspage-api', StatuspageApi);
+  registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
