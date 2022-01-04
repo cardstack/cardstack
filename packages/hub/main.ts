@@ -103,6 +103,7 @@ import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notification
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
+import StatuspageApi from './services/statuspage-api';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -187,6 +188,7 @@ export function createRegistry(): Registry {
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
   registry.register('web3-storage', Web3Storage);
+  registry.register('statuspage-api', StatuspageApi);
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
