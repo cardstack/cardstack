@@ -3,7 +3,7 @@ import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/i
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { CardstackError, NotFound, serializableError } from '@cardstack/core/src/utils/errors';
+import { serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
@@ -36,30 +36,6 @@ export class SearchIndex {
         });
       })
     );
-  }
-
-  async getCard(cardURL: string): Promise<{ raw: RawCard; compiled: CompiledCard | undefined }> {
-    log.trace('getCard', cardURL);
-    let db = await this.database.getPool();
-    let deserializer = new RawCardDeserializer();
-    try {
-      let {
-        rows: [result],
-      } = await db.query('SELECT compiled, "compileErrors", deps from cards where url = $1', [cardURL]);
-      if (!result) {
-        throw new NotFound(`Card ${cardURL} was not found`);
-      }
-      if (result.compileErrors) {
-        let err = CardstackError.fromSerializableError(result.compileErrors);
-        if (result.deps) {
-          err.deps = result.deps;
-        }
-        throw err;
-      }
-      return deserializer.deserialize(result.compiled.data, result.compiled);
-    } finally {
-      db.release();
-    }
   }
 
   async deleteCard(raw: RawCard) {

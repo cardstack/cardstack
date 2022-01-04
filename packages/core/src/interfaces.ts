@@ -152,7 +152,7 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
 }
 
 export interface Card {
-  data: RawCard['data'];
+  raw: RawCard;
   compiled: CompiledCard;
 }
 

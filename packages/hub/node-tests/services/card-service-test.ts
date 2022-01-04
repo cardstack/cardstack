@@ -137,7 +137,7 @@ if (process.env.COMPILER) {
     describe('.load()', function () {
       it('returns a card thats been indexed', async function () {
         let card = await cards.load(`${realmURL}post1`);
-        expect(card.data!.title).to.eq('Hello again');
+        expect(card.raw.data!.title).to.eq('Hello again');
         expect(card.compiled!.url).to.eq(`${realmURL}post1`);
         expect(card.compiled!.adoptsFrom!.url).to.eq(`${realmURL}post`);
       });
