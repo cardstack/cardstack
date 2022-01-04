@@ -2,6 +2,7 @@
   display: inline-grid;
   grid-template-columns: auto 1fr;
   column-gap: var(--boxel-sp-xs);
+  width: max-content;
 }
 
 .face-value-option__amount {

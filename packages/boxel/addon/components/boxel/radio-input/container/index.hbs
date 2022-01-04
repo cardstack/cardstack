@@ -6,11 +6,8 @@
   <div class={{cn
       "boxel-radio-fieldset__container"
       boxel-radio-fieldset__container--compact=(eq @spacing "compact")
-      boxel-radio-fieldset__container--grid=(eq @layout "grid")
-    }}
-    style={{css-var
-      grid-col-width=@gridColumnWidth
-      boxel-radio-container-width=(or @containerWidth "100%")
+      boxel-radio-fieldset__container--horizontal=(eq @orientation "horizontal")
+      boxel-radio-fieldset__container--vertical=(eq @orientation "vertical")
     }}
   >
     {{yield}}

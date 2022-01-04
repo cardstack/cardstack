@@ -22,15 +22,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--boxel-radio-gap);
-  width: var(--boxel-radio-container-width, 100%);
+  width: 100%;
   max-width: 100%;
 }
 
-.boxel-radio-fieldset__container--grid {
-  --boxel-radio-default-container-width: 100%;
-
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--grid-col-width, 100%), 100%), 1fr));
+.boxel-radio-fieldset__container--vertical {
+  flex-direction: column;
 }
 
 .boxel-radio-fieldset__container--compact {
@@ -39,10 +36,6 @@
   --boxel-radio-option-gap: var(--boxel-sp-xxxs);
 }
 
-.boxel-radio-fieldset__container > * {
+.boxel-radio-fieldset__container--horizontal > * {
   flex: 1;
-}
-
-.boxel-radio-fieldset__container--compact > * {
-  flex: 0;
 }

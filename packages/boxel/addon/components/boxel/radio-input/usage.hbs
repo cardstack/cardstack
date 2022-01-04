@@ -8,10 +8,8 @@
       @disabled={{this.disabled}}
       @hideBorder={{this.hideBorder}}
       @hideRadio={{this.hideRadio}}
-      @layout={{this.layout}}
+      @orientation={{this.orientation}}
       @spacing={{this.spacing}}
-      @containerWidth={{this.containerWidth}}
-      @gridColumnWidth={{this.gridColumnWidth}}
     as |item|>
       <item.component @onChange={{fn this.onChange item.data.id}}>
         {{item.data.text}}
@@ -50,7 +48,7 @@
     />
     <Args.Bool
       @name="hideRadio"
-      @description="Visually hides the radio checkbox input"
+      @description="Visually hides the radio input circle"
       @defaultValue="false"
       @value={{this.hideRadio}}
       @onInput={{fn (mut this.hideRadio)}}
@@ -71,26 +69,12 @@
       @value={{this.spacing}}
     />
     <Args.String
-      @name="layout"
-      @description="Layout of the radio buttons"
-      @defaultValue="flex"
-      @options={{array "default" "grid"}}
-      @onInput={{fn (mut this.layout)}}
-      @value={{this.layout}}
-    />
-    <Args.String
-      @name="gridColumnWidth"
-      @description="The `@layout` must be set to `grid`. Sets the minimum grid-column width. Items will expand to fill the available container width"
-      @defaultValue="100%"
-      @onInput={{fn (mut this.gridColumnWidth)}}
-      @value={{this.gridColumnWidth}}
-    />
-    <Args.String
-      @name="containerWidth"
-      @description="Width for the container. ie. `max-content`, `50%`, `400px`..."
-      @defaultValue="100%"
-      @onInput={{fn (mut this.containerWidth)}}
-      @value={{this.containerWidth}}
+      @name="orientation"
+      @description="Orientation of the radio buttons"
+      @defaultValue="horizontal"
+      @options={{array "horizontal" "vertical" "default"}}
+      @onInput={{fn (mut this.orientation)}}
+      @value={{this.orientation}}
     />
     <Args.Yield
       @description="Yields an object with the default component to use (RadioInput::Item), the data for the item passed in, and whether that item is selected"

@@ -24,9 +24,7 @@ export default class RadioInputUsage extends Component {
   @tracked hideRadio = false;
   @tracked hideBorder = false;
   @tracked spacing = '';
-  @tracked layout = 'default (flex)';
-  @tracked containerWidth = '';
-  @tracked gridColumnWidth = '';
+  @tracked orientation = 'horizontal';
 
   @action onChange(id: string): void {
     this.checkedId = id;
