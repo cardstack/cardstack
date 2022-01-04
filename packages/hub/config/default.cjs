@@ -73,4 +73,8 @@ module.exports = {
   web3storage: {
     token: null,
   },
+  statuspage: {
+    apiKey: null,
+    pageId: null,
+  },
 };

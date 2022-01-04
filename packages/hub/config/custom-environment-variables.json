@@ -54,6 +54,10 @@
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"
   },
+  "statuspage": {
+    "pageId": "STATUSPAGE_PAGE_ID",
+    "apiKey": "STATUSPAGE_API_KEY"
+  },
   "firebase": {
     "projectId": "FIREBASE_PROJECT_ID",
     "clientEmail": "FIREBASE_CLIENT_EMAIL",
