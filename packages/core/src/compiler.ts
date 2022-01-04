@@ -98,7 +98,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
       if (unexpectedFields.length) {
-        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on this card`);
+        throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
       }
     }
 

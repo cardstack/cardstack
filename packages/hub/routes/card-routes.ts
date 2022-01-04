@@ -57,30 +57,22 @@ export default class CardRoutes {
 
   private async createCardFromData(ctx: RouterContext) {
     let {
-      request: { body },
+      request: {
+        body: { data },
+      },
       params: { parentCardURL, realmURL },
     } = ctx;
 
-    if (typeof body === 'string') {
-      throw new Error('Request body is a string and it shouldnt be');
-    }
-
-    let unexpectedFields = difference(Object.keys(body), ['adoptsFrom', 'data', 'url']);
-    if (unexpectedFields.length) {
-      throw new BadRequest(`Payload contains keys that we do not allow: ${unexpectedFields.join(',')}`);
-    }
-
-    let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
     let card: RawCard<Unsaved> = {
       id: undefined,
       realm: realmURL,
       adoptsFrom: parentCardURL,
-      data: inputData.attributes,
+      data: data.attributes,
     };
-    if (inputData.id) {
-      card.id = inputData.id.slice(realmURL.length);
+    if (data.id) {
+      card.id = data.id.slice(realmURL.length);
     }
 
     let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
@@ -90,12 +82,14 @@ export default class CardRoutes {
 
   private async updateCardData(ctx: RouterContext) {
     let {
-      request: { body: data },
+      request: {
+        body: { data },
+      },
       params: { encodedCardURL: url },
     } = ctx;
 
     let cardId = this.realmManager.parseCardURL(url);
-    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
+    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data: data.attributes });
     // Question: Is it safe to assume the response should be isolated?
     ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;

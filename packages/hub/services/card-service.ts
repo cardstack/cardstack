@@ -18,6 +18,7 @@ import {
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import { cardURL } from '@cardstack/core/src/utils';
 import logger from '@cardstack/logger';
+import { merge } from 'lodash';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -84,14 +85,12 @@ export class CardService {
     return { raw: rawCard, compiled };
   }
 
-  async update(raw: RawCard): Promise<Card> {
-    let originalRaw = await this.realmManager.read(raw);
-    await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let compiled = await this.builder.getCompiledCard(cardURL(raw));
-
-    // TODO:
-    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
-
+  async update(partialRaw: RawCard): Promise<Card> {
+    let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
+    let compiler = this.builder.compileCardFromRaw(raw);
+    let compiledCard = await compiler.compile();
+    await this.realmManager.update(raw);
+    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
     return { raw, compiled };
   }
 
