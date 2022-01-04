@@ -39,6 +39,7 @@ export class SearchIndex {
   }
 
   async getCard(cardURL: string): Promise<{ raw: RawCard; compiled: CompiledCard | undefined }> {
+    log.trace('getCard', cardURL);
     let db = await this.database.getPool();
     let deserializer = new RawCardDeserializer();
     try {
@@ -57,11 +58,20 @@ export class SearchIndex {
     }
   }
 
+  async deleteCard(raw: RawCard) {
+    let url = cardURL(raw);
+    log.trace('deleteCard', url);
+    await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.delete(url);
+    });
+  }
+
   async indexCard(
     raw: RawCard,
     compiled: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
+    log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.internalSave(raw, compiled, compiler);
     });
@@ -70,11 +80,11 @@ export class SearchIndex {
   private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
-      log.info(`starting to index realm`, realmURL);
+      log.trace(`starting to index realm`, realmURL);
       let run = new IndexerRun(db, this.builder, realmURL, this.fileCache);
       let result = await fn(run);
       await run.finalize();
-      log.info(`finished indexing realm`, realmURL);
+      log.trace(`finished indexing realm`, realmURL);
       return result;
     } finally {
       db.release();
@@ -264,8 +274,10 @@ class IndexerRun implements IndexerHandle {
     await this.db.query(expressionToSql(expression));
   }
 
-  async delete(cardURL: string): Promise<void> {
-    await this.db.query(`DELETE from cards where url=$1`, [cardURL]);
+  async delete(url: string): Promise<void> {
+    this.touched.set(url, this.touchCounter++);
+    await this.db.query('DELETE FROM cards where url = $1', [url]);
+    this.fileCache.deleteCardModules(url);
   }
 
   async beginReplaceAll(): Promise<void> {
