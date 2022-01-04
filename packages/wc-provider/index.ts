@@ -219,7 +219,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       }
       return this.formatResponse(payload, result);
     } catch (error) {
-      // @ts-ignore
       this.emit('error', error);
       throw error;
     }
@@ -249,7 +248,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     }
     if (!this.http) {
       const error = new Error('HTTP Connection not available');
-      // @ts-ignore
       this.emit('error', error);
       throw error;
     }
@@ -291,7 +289,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
                 this.updateState(payload.params[0]);
               }
               // Emit connect event
-              // @ts-ignore
               this.emit('connect');
               this.triggerConnect(wc);
               resolve(wc);
@@ -315,7 +312,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     const wc = await this.getWalletConnector();
     wc.on('disconnect', (error) => {
       if (error) {
-        // @ts-ignore
         this.emit('error', error);
         return;
       }
@@ -323,7 +319,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     });
     wc.on('session_update', (error, payload) => {
       if (error) {
-        // @ts-ignore
         this.emit('error', error);
         return;
       }
@@ -335,9 +330,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   async onDisconnect() {
     // tslint:disable-next-line:await-promise
     await this.stop();
-    // @ts-ignore
     this.emit('close', 1000, 'Connection closed');
-    // @ts-ignore
     this.emit('disconnect', 1000, 'Connection disconnected');
   }
 
@@ -346,19 +339,16 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     // Check if accounts changed and trigger event
     if (!this.accounts || (accounts && this.accounts !== accounts)) {
       this.accounts = accounts;
-      // @ts-ignore
       this.emit('accountsChanged', accounts);
     }
     // Check if chainId changed and trigger event
     if (!this.chainId || (chainId && this.chainId !== chainId)) {
       this.chainId = chainId;
-      // @ts-ignore
       this.emit('chainChanged', chainId);
     }
     // Check if networkId changed and trigger event
     if (!this.networkId || (networkId && this.networkId !== networkId)) {
       this.networkId = networkId;
-      // @ts-ignore
       this.emit('networkChanged', networkId);
     }
     // Handle rpcUrl update
@@ -372,7 +362,6 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       this.rpcUrl = rpcUrl;
       this.updateHttpConnection();
     } else {
-      // @ts-ignore
       this.emit('error', new Error(`No RPC Url available for chainId: ${chainId}`));
     }
   }
@@ -380,14 +369,8 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   updateHttpConnection() {
     if (this.rpcUrl) {
       this.http = new HttpConnection(this.rpcUrl);
-      this.http.on('payload', (payload) =>
-        // @ts-ignore
-        this.emit('payload', payload)
-      );
-      this.http.on('error', (error) =>
-        // @ts-ignore
-        this.emit('error', error)
-      );
+      this.http.on('payload', (payload) => this.emit('payload', payload));
+      this.http.on('error', (error) => this.emit('error', error));
     }
   }
 
@@ -510,12 +493,10 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   }
 
   async onWebsocketConnect() {
-    // @ts-ignore
     this.emit('websocket-connected');
   }
 
   async onWebsocketClose(event: CloseEvent) {
-    // @ts-ignore
     this.emit('websocket-disconnected', event);
   }
 }
