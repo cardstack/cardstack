@@ -111,6 +111,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       adoptsFrom: parentCard,
       ...components,
       modules,
+      deps: [...this.dependencies],
     };
   }
 
@@ -446,6 +447,7 @@ export function makeGloballyAddressable(
     embedded: ensureGlobalComponentInfo(card.embedded),
     edit: ensureGlobalComponentInfo(card.edit),
     modules: card.modules,
+    deps: card.deps,
   };
 }
 
@@ -455,24 +457,14 @@ class TrackedBuilder implements Builder {
   async getCompiledCard(url: string): Promise<CompiledCard> {
     this.dependencies.add(url);
     let card = await this.trapErrorDeps(() => this.realBuilder.getCompiledCard(url));
-    this.discoverDeps(card);
+    for (let depUrl of card.deps) {
+      this.dependencies.add(depUrl);
+    }
     return card;
   }
   getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
     return this.trapErrorDeps(() => this.realBuilder.getRawCard(url));
-  }
-  private discoverDeps(card: CompiledCard): void {
-    if (card.adoptsFrom) {
-      this.dependencies.add(card.adoptsFrom.url);
-      this.discoverDeps(card.adoptsFrom);
-    }
-    for (let field of Object.values(card.fields)) {
-      if (field.card) {
-        this.dependencies.add(field.card.url);
-        this.discoverDeps(field.card);
-      }
-    }
   }
   private async trapErrorDeps<Result>(fn: () => Promise<Result>): Promise<Result> {
     try {

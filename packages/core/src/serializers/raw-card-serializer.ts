@@ -37,6 +37,7 @@ export class RawCardSerializer {
         'isolated',
         'embedded',
         'edit',
+        'deps',
       ]);
 
       resource.relationships ||= {};

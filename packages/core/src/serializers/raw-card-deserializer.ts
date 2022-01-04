@@ -69,6 +69,7 @@ export class RawCardDeserializer {
       edit: attrs?.edit,
       fields: {},
       modules: attrs?.modules,
+      deps: attrs?.deps,
     };
     this.shared.set(compiled.url, compiled);
 
