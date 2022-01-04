@@ -12,7 +12,7 @@
   box-shadow: 0 0 0 1px transparent;
 }
 
-.boxel-radio-option--has-checkbox {
+.boxel-radio-option--has-radio {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -60,7 +60,7 @@
 }
 
 /* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
-.boxel-radio-option__input--hidden-checkbox {
+.boxel-radio-option__input--hidden-radio {
   position: absolute;
   top: 0;
   left: 0;

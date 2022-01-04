@@ -40,8 +40,8 @@
           @items={{@colorSchemeOptions}}
           @checkedId={{@colorScheme.id}}
           @spacing="compact"
-          @hiddenCheckbox={{true}}
-          @hiddenBorder={{true}}
+          @hideRadio={{true}}
+          @hideBorder={{true}}
           as |option|
         >
           {{#let option.data as |item|}}
@@ -68,8 +68,8 @@
           @items={{@patternOptions}}
           @checkedId={{@pattern.id}}
           @spacing="compact"
-          @hiddenCheckbox={{true}}
-          @hiddenBorder={{true}}
+          @hideRadio={{true}}
+          @hideBorder={{true}}
           as |option|
         >
           {{#let option.data as |item|}}

@@ -6,8 +6,8 @@
       @name="example-radio-usage"
       @checkedId={{this.checkedId}}
       @disabled={{this.disabled}}
-      @hiddenBorder={{this.hiddenBorder}}
-      @hiddenCheckbox={{this.hiddenCheckbox}}
+      @hideBorder={{this.hideBorder}}
+      @hideRadio={{this.hideRadio}}
       @layout={{this.layout}}
       @spacing={{this.spacing}}
       @containerWidth={{this.containerWidth}}
@@ -49,18 +49,18 @@
       @optional={{true}}
     />
     <Args.Bool
-      @name="hiddenCheckbox"
+      @name="hideRadio"
       @description="Visually hides the radio checkbox input"
       @defaultValue="false"
-      @value={{this.hiddenCheckbox}}
-      @onInput={{fn (mut this.hiddenCheckbox)}}
+      @value={{this.hideRadio}}
+      @onInput={{fn (mut this.hideRadio)}}
     />
     <Args.Bool
-      @name="hiddenBorder"
+      @name="hideBorder"
       @description="Visually hides the item border"
       @defaultValue="false"
-      @value={{this.hiddenBorder}}
-      @onInput={{fn (mut this.hiddenBorder)}}
+      @value={{this.hideBorder}}
+      @onInput={{fn (mut this.hideBorder)}}
     />
     <Args.String
       @name="spacing"

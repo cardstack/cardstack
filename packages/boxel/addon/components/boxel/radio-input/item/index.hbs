@@ -8,8 +8,8 @@ aria-labelledby seems friendlier to safari than the for element, but unsure abou
     "boxel-radio-option"
     boxel-radio-option--checked=@checked
     boxel-radio-option--disabled=@disabled
-    boxel-radio-option--hidden-border=@hiddenBorder
-    boxel-radio-option--has-checkbox=(not @hiddenCheckbox)
+    boxel-radio-option--hidden-border=@hideBorder
+    boxel-radio-option--has-radio=(not @hideRadio)
   }}
   data-test-boxel-radio-option
   data-test-boxel-radio-option-checked={{@checked}}
@@ -20,7 +20,7 @@ aria-labelledby seems friendlier to safari than the for element, but unsure abou
     name={{@name}}
     class={{cn
       "boxel-radio-option__input"
-      boxel-radio-option__input--hidden-checkbox=@hiddenCheckbox
+      boxel-radio-option__input--hidden-radio=@hideRadio
       boxel-radio-option__input--checked=@checked
     }}
     @type="radio"

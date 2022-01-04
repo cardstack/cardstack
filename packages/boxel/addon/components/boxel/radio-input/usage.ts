@@ -21,8 +21,8 @@ export default class RadioInputUsage extends Component {
     'Select one of these options for breakfast sandwiches';
   @tracked checkedId = this.items[0].id;
   @tracked disabled = false;
-  @tracked hiddenCheckbox = false;
-  @tracked hiddenBorder = false;
+  @tracked hideRadio = false;
+  @tracked hideBorder = false;
   @tracked spacing = '';
   @tracked layout = 'default (flex)';
   @tracked containerWidth = '';
