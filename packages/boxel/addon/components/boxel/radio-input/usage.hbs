@@ -14,7 +14,7 @@
       @gridColumnWidth={{this.gridColumnWidth}}
     as |item|>
       <item.component @onChange={{fn this.onChange item.data.id}}>
-        {{item.data.id}}
+        {{item.data.text}}
       </item.component>
     </Boxel::RadioInput>
   </:example>
@@ -27,22 +27,22 @@
       @onInput={{fn (mut this.groupDescription)}}
       @optional={{true}}
     />
-    <Args.Array
+    <Args.Object
       @name="items"
-      @description="Items which will be represented by radio buttons. Each should have a unique 'id' attribute."
+      @description="Items which will be represented by radio buttons. Each should have a unique 'id' attribute"
       @value={{this.items}}
       @onInput={{fn (mut this.items)}}
     />
     <Args.String
       @name="checkedId"
-      @description="The id of the currently checked/selected item."
+      @description="The id of the currently checked/selected item"
       @value={{this.checkedId}}
       @onInput={{fn (mut this.checkedId)}}
       @optional={{true}}
     />
     <Args.Bool
       @name="disabled"
-      @description="Whether selection is disabled."
+      @description="Whether selection is disabled"
       @defaultValue="false"
       @value={{this.disabled}}
       @onInput={{fn (mut this.disabled)}}
@@ -50,21 +50,21 @@
     />
     <Args.Bool
       @name="hiddenCheckbox"
-      @description="Visually hides the radio checkbox input."
+      @description="Visually hides the radio checkbox input"
       @defaultValue="false"
       @value={{this.hiddenCheckbox}}
       @onInput={{fn (mut this.hiddenCheckbox)}}
     />
     <Args.Bool
       @name="hiddenBorder"
-      @description="Visually hides the item border."
+      @description="Visually hides the item border"
       @defaultValue="false"
       @value={{this.hiddenBorder}}
       @onInput={{fn (mut this.hiddenBorder)}}
     />
     <Args.String
       @name="spacing"
-      @description="Adjusts spacing level."
+      @description="Adjusts spacing level"
       @defaultValue=""
       @options={{array "default" "compact"}}
       @onInput={{fn (mut this.spacing)}}
@@ -72,7 +72,7 @@
     />
     <Args.String
       @name="layout"
-      @description="Layout of the radio buttons."
+      @description="Layout of the radio buttons"
       @defaultValue="flex"
       @options={{array "default" "grid"}}
       @onInput={{fn (mut this.layout)}}
@@ -80,7 +80,7 @@
     />
     <Args.String
       @name="gridColumnWidth"
-      @description="The `@layout` must be set to `grid`. Sets the minimum grid-column width. Items will expand to fill the available container width."
+      @description="The `@layout` must be set to `grid`. Sets the minimum grid-column width. Items will expand to fill the available container width"
       @defaultValue="100%"
       @onInput={{fn (mut this.gridColumnWidth)}}
       @value={{this.gridColumnWidth}}

@@ -1,26 +1,25 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { A } from '@ember/array';
 import { action } from '@ember/object';
 
 export default class RadioInputUsage extends Component {
-  @tracked items = A([
+  @tracked items = [
     {
       id: 'eggs',
-      text: 'eggs',
+      text: 'Eggs',
     },
     {
       id: 'tofu',
-      text: 'tofu',
+      text: 'Tofu',
     },
     {
       id: 'strawberry',
-      text: 'strawberry',
+      text: 'Strawberry',
     },
-  ]);
+  ];
   @tracked groupDescription =
     'Select one of these options for breakfast sandwiches';
-  @tracked checkedId = 'strawberry';
+  @tracked checkedId = this.items[0].id;
   @tracked disabled = false;
   @tracked hiddenCheckbox = false;
   @tracked hiddenBorder = false;
