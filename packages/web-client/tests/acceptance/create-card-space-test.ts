@@ -16,6 +16,7 @@ import {
   createDepotSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -29,6 +30,7 @@ function epiloguePostableSel(postableIndex: number): string {
 
 module('Acceptance | create card space', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
