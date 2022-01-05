@@ -144,12 +144,14 @@ export default class RewardPool {
     if (!response?.ok) {
       throw new Error(await response.text());
     }
-    return json['results'].map((o: any) => {
-      return {
-        ...o,
-        amount: new BN(o.amount.toString()),
-      };
-    });
+    return this.addTokenSymbol(
+      json['results'].map((o: any) => {
+        return {
+          ...o,
+          amount: new BN(o.amount.toString()),
+        };
+      })
+    );
   }
 
   async rewardTokenBalance(
