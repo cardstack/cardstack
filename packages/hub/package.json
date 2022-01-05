@@ -58,6 +58,7 @@
     "auto-bind": "^4.0.0",
     "config": "^3.3.6",
     "corde": "^4.4.1",
+    "crypto": "^1.0.1",
     "dag-map": "^2.0.2",
     "did-resolver": "^3.1.0",
     "dotenv": "^10.0.0",

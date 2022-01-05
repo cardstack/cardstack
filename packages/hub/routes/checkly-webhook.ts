@@ -2,6 +2,8 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import StatuspageApi from '../services/statuspage-api';
+import crypto from 'crypto';
+import config from 'config';
 
 type CheckName = 'hub-prod subgraph / RPC node block number diff within threshold';
 type Checks = {
@@ -26,6 +28,15 @@ export default class ChecklyWebhookRoute {
   }
 
   async post(ctx: Koa.Context) {
+    let signature = ctx.headers['x-checkly-signature'] as string;
+    let isTestEnv = process.env.NODE_ENV === 'test';
+
+    if (!isTestEnv && (!signature || !this.isVerifiedPayload(JSON.stringify(ctx.request.body), signature))) {
+      ctx.status = 401;
+      ctx.body = 'Invalid signature';
+      return;
+    }
+
     let checkName = ctx.request.body.check_name as keyof Checks;
     let check = this.checks[checkName];
 
@@ -42,6 +53,12 @@ export default class ChecklyWebhookRoute {
     ctx.status = 200;
     ctx.body = {};
     ctx.type = 'application/vnd.api+json';
+  }
+
+  private isVerifiedPayload(payload: string, signature: string) {
+    const hmac = crypto.createHmac('sha256', config.get('checkly.webhookSecret'));
+    const digest = hmac.update(payload).digest('hex');
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
   }
 }
 
