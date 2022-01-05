@@ -5,10 +5,11 @@ import StatuspageApi from '../services/statuspage-api';
 import crypto from 'crypto';
 import config from 'config';
 
+// Check names and component names should map to the names and components in Checkly
 type CheckName = 'hub-prod subgraph / RPC node block number diff within threshold';
 type Checks = {
   [key in CheckName]: {
-    componentName: string; // Component name in Checkly
+    componentName: 'Subgraph'; // Component name in Checkly
     incidentMessage: string; // Will be shown in Statuspage
   };
 };
@@ -48,10 +49,14 @@ export default class ChecklyWebhookRoute {
       } else if (alertType == 'ALERT_RECOVERY') {
         await this.statuspageApi.resolveIncident(check.componentName);
       }
+
+      ctx.status = 200;
+      ctx.body = {};
+    } else {
+      ctx.status = 422;
+      ctx.body = { error: `Unrecognized check name: ${checkName}` };
     }
 
-    ctx.status = 200;
-    ctx.body = {};
     ctx.type = 'application/vnd.api+json';
   }
 
