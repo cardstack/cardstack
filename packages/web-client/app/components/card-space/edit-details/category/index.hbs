@@ -9,14 +9,38 @@
     data-test-category-options
   as |option|>
     {{#let option.data as |category|}}
-      <option.component
-        @name="category"
-        @checked={{eq this.categoryValue category}}
-        @onChange={{fn this.setCategoryValue category}}
-        data-test-category-option={{category}}
-      >
-        {{category}}
-      </option.component>
+      {{#if (eq category "Other")}}
+        <option.component
+          @name="category"
+          @checked={{this.otherIsChecked}}
+          @onChange={{fn this.setCategoryValue this.otherRadioValue}}
+          data-test-category-option data-test-category-option-other-container
+        >
+          {{#if this.otherIsChecked}}
+            <span class="card-space-category-field__other-label">Other:</span>
+            <Common::ValidationStateInput
+              class="card-space-category-field__other"
+              @state={{this.categoryValidationState}}
+              @value={{readonly this.otherValue}}
+              @onInput={{this.onOtherValueInput}}
+              @errorMessage={{this.categoryValidationMessage}}
+              {{did-insert this.setupOtherValueInput}}
+              data-test-category-option-other
+            />
+          {{else}}
+            Other (Custom)
+          {{/if}}
+        </option.component>
+      {{else}}
+        <option.component
+          @name="category"
+          @checked={{eq this.categoryValue category}}
+          @onChange={{fn this.setCategoryValue category}}
+          data-test-category-option
+        >
+          {{category}}
+        </option.component>
+      {{/if}}
     {{/let}}
   </Boxel::RadioInput>
 </CardPay::LabeledValue>
