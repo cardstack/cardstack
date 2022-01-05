@@ -29,6 +29,22 @@ jobs:
       - name: Test
         run: yarn test:boxel
 
+  check-if-requires-preview:
+    name: Check if a preview deploy is required
+    runs-on: ubuntu-latest
+    outputs:
+      boxel-files-changed: ${{ steps.boxel-files-that-changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get boxel files that changed
+        id: boxel-files-that-changed
+        uses: tj-actions/changed-files@v1.1.2
+        with:
+          files: |
+            ^packages/boxel
+
   deploy-boxel-preview:
     name: Deploy a preview to S3
     runs-on: ubuntu-latest
