@@ -15,12 +15,16 @@ import {
   expressionToSql,
   Expression,
 } from '../utils/expressions';
-import { BadRequest } from '@cardstack/core/src/utils/errors';
+import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import { cardURL } from '@cardstack/core/src/utils';
+import logger from '@cardstack/logger';
+import { merge } from 'lodash';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
 export const INSECURE_CONTEXT = {};
+
+const log = logger('hub/card-service');
 
 export default class CardServiceFactory {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -42,12 +46,35 @@ export class CardService {
     private db: CardServiceFactory['db']
   ) {}
 
-  async load(url: string): Promise<Card> {
-    let { raw, compiled } = await this.searchIndex.getCard(url);
-    if (!compiled) {
-      throw new Error(`bug: database entry for ${url} is missing the compiled card`);
+  async load(cardURL: string): Promise<Card> {
+    log.trace('load', cardURL);
+    let db = await this.db.getPool();
+    let deserializer = new RawCardDeserializer();
+    try {
+      let {
+        rows: [result],
+      } = await db.query('SELECT compiled, "compileErrors", deps from cards where url = $1', [cardURL]);
+      if (!result) {
+        throw new NotFound(`Card ${cardURL} was not found`);
+      }
+      if (result.compileErrors) {
+        let err = CardstackError.fromSerializableError(result.compileErrors);
+        if (result.deps) {
+          err.deps = result.deps;
+        }
+        throw err;
+      }
+      let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
+      if (!compiled) {
+        throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
+      }
+      return {
+        compiled,
+        raw,
+      };
+    } finally {
+      db.release();
     }
-    return { data: raw.data, compiled };
   }
 
   async create(raw: RawCard<Unsaved>): Promise<Card> {
@@ -55,18 +82,16 @@ export class CardService {
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
-    return { data: rawCard.data, compiled };
+    return { raw: rawCard, compiled };
   }
 
-  async update(raw: RawCard): Promise<Card> {
-    let originalRaw = await this.realmManager.read(raw);
-    await this.realmManager.update(Object.assign({}, originalRaw, raw));
-    let compiled = await this.builder.getCompiledCard(cardURL(raw));
-
-    // TODO:
-    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
-
-    return { data: raw.data, compiled };
+  async update(partialRaw: RawCard): Promise<Card> {
+    let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
+    let compiler = this.builder.compileCardFromRaw(raw);
+    let compiledCard = await compiler.compile();
+    await this.realmManager.update(raw);
+    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
+    return { raw, compiled };
   }
 
   async delete(raw: RawCard): Promise<void> {
@@ -88,7 +113,7 @@ export class CardService {
         if (!compiled) {
           throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }
-        return { data: raw.data, compiled };
+        return { raw, compiled };
       });
     } finally {
       client.release();

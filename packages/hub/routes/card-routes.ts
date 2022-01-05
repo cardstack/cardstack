@@ -5,8 +5,7 @@ import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
-import { NotFound, BadRequest, CardstackError } from '@cardstack/core/src/utils/errors';
-import { difference } from 'lodash';
+import { NotFound, CardstackError } from '@cardstack/core/src/utils/errors';
 import { assertQuery } from '@cardstack/core/src/query';
 import qs from 'qs';
 import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
@@ -28,7 +27,6 @@ export default class CardRoutes {
   private cache = inject('file-cache', { as: 'cache' });
   private cards = inject('card-service', { as: 'cards' });
   private config = inject('card-routes-config', { as: 'config' });
-  private index = inject('searchIndex', { as: 'index' });
 
   private routerInstance: undefined | RouterInstance;
 
@@ -56,32 +54,24 @@ export default class CardRoutes {
     ctx.status = 200;
   }
 
-  private async createDataCard(ctx: RouterContext) {
+  private async createCardFromData(ctx: RouterContext) {
     let {
-      request: { body },
+      request: {
+        body: { data },
+      },
       params: { parentCardURL, realmURL },
     } = ctx;
 
-    if (typeof body === 'string') {
-      throw new Error('Request body is a string and it shouldnt be');
-    }
-
-    let unexpectedFields = difference(Object.keys(body), ['adoptsFrom', 'data', 'url']);
-    if (unexpectedFields.length) {
-      throw new BadRequest(`Payload contains keys that we do not allow: ${unexpectedFields.join(',')}`);
-    }
-
-    let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
     let card: RawCard<Unsaved> = {
       id: undefined,
       realm: realmURL,
       adoptsFrom: parentCardURL,
-      data: inputData.attributes,
+      data: data.attributes,
     };
-    if (inputData.id) {
-      card.id = inputData.id.slice(realmURL.length);
+    if (data.id) {
+      card.id = data.id.slice(realmURL.length);
     }
 
     let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
@@ -89,14 +79,16 @@ export default class CardRoutes {
     ctx.status = 201;
   }
 
-  private async updateCard(ctx: RouterContext) {
+  private async updateCardData(ctx: RouterContext) {
     let {
-      request: { body: data },
+      request: {
+        body: { data },
+      },
       params: { encodedCardURL: url },
     } = ctx;
 
     let cardId = this.realmManager.parseCardURL(url);
-    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data });
+    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data: data.attributes });
     // Question: Is it safe to assume the response should be isolated?
     ctx.body = serializeCardPayloadForFormat(card, 'isolated');
     ctx.status = 200;
@@ -137,7 +129,7 @@ export default class CardRoutes {
       query,
     } = ctx;
 
-    let card = await this.index.getCard(url);
+    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
     let compiledCard;
 
     if (query.include === 'compiledMeta') {
@@ -152,7 +144,7 @@ export default class CardRoutes {
       if (!this.config.routeCard) {
         this.routerInstance = defaultRouterInstance;
       } else {
-        let { compiled } = await this.index.getCard(this.config.routeCard);
+        let { compiled } = await this.cards.as(INSECURE_CONTEXT).load(this.config.routeCard);
         if (!compiled) {
           throw new CardstackError('Routing card is not compiled!');
         }
@@ -172,10 +164,10 @@ export default class CardRoutes {
 
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
-    koaRouter.post(`/cards/:realmURL/:parentCardURL`, parseBody, this.createDataCard);
+    koaRouter.post(`/cards/:realmURL/:parentCardURL`, parseBody, this.createCardFromData);
     koaRouter.get(`/cards/`, this.queryCards);
     koaRouter.get(`/cards/:encodedCardURL`, this.getCard);
-    koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCard);
+    koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCardData);
     koaRouter.delete(`/cards/:encodedCardURL`, this.deleteCard);
 
     // the 'sources' section of the API deals in RawCards. It's where you can do

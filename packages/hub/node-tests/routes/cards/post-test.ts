@@ -121,21 +121,6 @@ if (process.env.COMPILER) {
         });
     });
 
-    it('Errors when you try to include other fields', async function () {
-      // assert.expect(0);
-      await postCard(`${realmURL}post`, Object.assign({ isolated: 'isolated.js' }, PAYLOAD))
-        .expect(400)
-        .expect({
-          errors: [
-            {
-              code: 400,
-              detail: 'Payload contains keys that we do not allow: isolated',
-              title: 'Bad Request',
-            },
-          ],
-        });
-    });
-
     it('errors when you try to post attributes that dont exist on parent card', async function () {
       // assert.expect(0);
       await postCard(`${realmURL}post`, {

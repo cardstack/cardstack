@@ -18,6 +18,11 @@ export class CardstackError extends Error {
   isCardstackError: true = true;
   additionalErrors: (CardstackError | Error)[] | null = null;
 
+  // If this error originated from a row in the search index that has stored
+  // `compilerErrors`, this propagates forward the card URLs that were
+  // dependencies of the failed compile.
+  deps?: string[];
+
   constructor(detail: string, { status, title, source }: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;

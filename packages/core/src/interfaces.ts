@@ -138,6 +138,8 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
       source: string;
     }
   >;
+
+  deps: string[];
 }
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
@@ -150,7 +152,7 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
 }
 
 export interface Card {
-  data: RawCard['data'];
+  raw: RawCard;
   compiled: CompiledCard;
 }
 
