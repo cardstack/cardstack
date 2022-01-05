@@ -21,6 +21,7 @@ import {
   createDepotSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -40,6 +41,7 @@ function cancelationPostableSel(postableIndex: number) {
 
 module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay/deposit-withdrawal');

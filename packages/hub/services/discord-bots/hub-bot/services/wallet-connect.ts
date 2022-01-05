@@ -15,6 +15,7 @@ const { network } = config.get('web3') as Web3Config;
 export default class WalletConnectService {
   async getWeb3(message: Message): Promise<Web3 | undefined> {
     let provider = new WalletConnectProvider({
+      pollingInterval: 30000,
       clientMeta: {
         description: '',
         url: clientURL,

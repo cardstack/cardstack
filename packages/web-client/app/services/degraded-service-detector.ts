@@ -52,7 +52,7 @@ export default class DegradedServiceDetector extends Service {
       let response = await fetch(statusPageUrl);
       data = await response.json();
     } catch (e) {
-      console.error('Failed to fetch exchange rates');
+      console.error('Failed to fetch unresolved status page incidents');
       Sentry.captureException(e);
 
       return null;

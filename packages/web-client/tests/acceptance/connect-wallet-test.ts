@@ -11,9 +11,11 @@ import percySnapshot from '@percy/ember';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 module('Acceptance | Connect Wallet', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('Connecting a layer 1 wallet via Metamask', async function (assert) {
     await visit('/');
