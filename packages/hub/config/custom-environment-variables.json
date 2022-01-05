@@ -57,6 +57,9 @@
     "pageId": "STATUSPAGE_PAGE_ID",
     "apiKey": "STATUSPAGE_API_KEY"
   },
+  "checkly": {
+    "webhookSecret": "CHECKLY_WEBHOOK_SECRET"
+  },
   "firebase": {
     "projectId": "FIREBASE_PROJECT_ID",
     "clientEmail": "FIREBASE_CLIENT_EMAIL",
