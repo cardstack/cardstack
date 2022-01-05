@@ -17,6 +17,11 @@ jobs:
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
+          echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> $GITHUB_ENV
+          echo "FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }}" >> $GITHUB_ENV
+          echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
