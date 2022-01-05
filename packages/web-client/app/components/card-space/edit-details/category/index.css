@@ -1,38 +1,7 @@
-.radio-option.card-space-category-field__option {
-  grid-template-columns: auto 1fr;
-}
-
-.card-space-category-field__option + .card-space-category-field__option {
-  margin-top: var(--boxel-sp);
-}
-
-.radio-option.card-space-category-field__other-container {
+.card-space-category-field__other-container {
   display: grid;
-  grid-template-areas:
-    'radio label input'
-    '.     .     validation';
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr;
+  align-items: center;
   position: relative;
   gap: 0 var(--boxel-sp);
-}
-
-.card-space-category-field__other {
-  display: contents;
-}
-
-.card-space-category-field__other-label {
-  grid-area: label;
-  align-self: center;
-}
-
-.card-space-category-field__option .boxel-input {
-  grid-area: input;
-}
-
-.card-space-category-field__option .validation-state-input-group__icon {
-  grid-area: input;
-}
-
-.card-space-category-field__option .boxel-input__error-message {
-  grid-area: validation;
 }

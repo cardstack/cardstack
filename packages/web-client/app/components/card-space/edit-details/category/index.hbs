@@ -17,18 +17,20 @@
           data-test-category-option data-test-category-option-other-container
         >
           {{#if this.otherIsChecked}}
-            <span class="card-space-category-field__other-label">Other:</span>
-            <Common::ValidationStateInput
-              class="card-space-category-field__other"
-              @state={{this.categoryValidationState}}
-              @value={{readonly this.otherValue}}
-              @onInput={{this.onOtherValueInput}}
-              @errorMessage={{this.categoryValidationMessage}}
-              {{did-insert this.setupOtherValueInput}}
-              data-test-category-option-other
-            />
+            <div class="card-space-category-field__other-container">
+              <span class="card-space-category-field__other-label">Other:</span>
+              <Common::ValidationStateInput
+                class="card-space-category-field__other"
+                @state={{this.categoryValidationState}}
+                @value={{readonly this.otherValue}}
+                @onInput={{this.onOtherValueInput}}
+                @errorMessage={{this.categoryValidationMessage}}
+                {{did-insert this.setupOtherValueInput}}
+                data-test-category-option-other
+              />
+            </div>
           {{else}}
-            Other (Custom)
+            {{category}}
           {{/if}}
         </option.component>
       {{else}}
