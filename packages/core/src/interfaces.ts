@@ -3,6 +3,8 @@ import difference from 'lodash/difference';
 import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
 
+export { Query } from './query';
+
 const componentFormats = {
   isolated: '',
   embedded: '',
@@ -167,9 +169,24 @@ export interface RealmConfig {
   watch?: boolean;
 }
 
+export type ResourceCollection = ResourceObject<Saved>[];
+
 export interface JSONAPIDocument<Identity extends Saved | Unsaved = Saved> {
-  data: ResourceObject<Identity>;
+  data: ResourceObject<Identity> | ResourceCollection;
 }
+
+export function assertDocumentDataIsCollection(data: JSONAPIDocument['data']): asserts data is ResourceCollection {
+  if (!Array.isArray(data)) {
+    throw new CardstackError('JSONAPIDocument was a single resource. We expected a collection');
+  }
+}
+
+export function assertDocumentDataIsResource(data: JSONAPIDocument['data']): asserts data is ResourceObject {
+  if (Array.isArray(data)) {
+    throw new CardstackError('JSONAPIDocument was Collection. We expected a single resource');
+  }
+}
+
 export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   id: Identity;
   type: string;

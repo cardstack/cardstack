@@ -57,6 +57,11 @@ export function parseQueryString(querystring: string): Query {
   assertQuery(query);
   return query;
 }
+
+export function buildQueryString(query: Query): string {
+  return `?${qs.stringify(query)}`;
+}
+
 export function assertQuery(query: any, pointer: string[] = ['']): asserts query is Query {
   if (typeof query !== 'object' || query == null) {
     throw new CardstackError('missing query object', {

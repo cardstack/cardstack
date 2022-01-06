@@ -5,6 +5,10 @@ import {
   CardEnv,
   CardOperation,
   JSONAPIDocument,
+  Query,
+  ResourceObject,
+  assertDocumentDataIsResource,
+  assertDocumentDataIsCollection,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -17,6 +21,8 @@ import { tracked } from '@glimmer/tracking';
 import type Builder from 'cardhost/lib/builder';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
+
+import { buildQueryString } from '@cardstack/core/src/query';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -31,11 +37,15 @@ export default class Cards extends Service {
       cardResponse = await builder.load(url, format);
     } else {
       cardResponse = await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL(url, format)
+        this.buildCardURL({ url, query: { format } })
       );
     }
-    let { component, Model } = await this.codeForCard(cardResponse);
-    return Model.fromResponse(this.cardEnv(), cardResponse, component);
+
+    let { data } = cardResponse;
+    assertDocumentDataIsResource(data);
+
+    let { component, Model } = await this.codeForCard(data);
+    return Model.fromResponse(this.cardEnv(), data, component);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -45,9 +55,29 @@ export default class Cards extends Service {
     } else {
       let url = `${cardServer}cardFor${pathname}`;
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
-      let { component, Model } = await this.codeForCard(cardResponse);
-      return Model.fromResponse(this.cardEnv(), cardResponse, component);
+      let { data } = cardResponse;
+      assertDocumentDataIsResource(data);
+      let { component, Model } = await this.codeForCard(data);
+      return Model.fromResponse(this.cardEnv(), data, component);
     }
+  }
+
+  async query(query: Query): Promise<CardModel[]> {
+    // if (this.inLocalRealm(url)) {
+    //   let builder = await this.builder();
+    //   cardResponse = await builder.load(url, format);
+    // } else {
+    let { data } = await fetchJSON<JSONAPIDocument>(
+      this.buildCardURL({ query })
+    );
+    assertDocumentDataIsCollection(data);
+
+    return await Promise.all(
+      data.map(async (cardResponse) => {
+        let { component, Model } = await this.codeForCard(cardResponse);
+        return Model.fromResponse(this.cardEnv(), cardResponse, component);
+      })
+    );
   }
 
   private inLocalRealm(cardURL: string): boolean {
@@ -101,7 +131,7 @@ export default class Cards extends Service {
       );
     } else if ('update' in op) {
       return await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL(op.update.cardURL),
+        this.buildCardURL({ url: op.update.cardURL }),
         {
           method: 'PATCH',
           body: JSON.stringify(op.update.payload),
@@ -131,10 +161,15 @@ export default class Cards extends Service {
     ].join('');
   }
 
-  private buildCardURL(url: string, format?: Format): string {
-    let fullURL = [cardServer, 'cards/', encodeURIComponent(url)];
-    if (format) {
-      fullURL.push('?' + new URLSearchParams({ format }).toString());
+  private buildCardURL(
+    opts: { url?: string; query?: Query & { format?: Format } } = {}
+  ): string {
+    let fullURL = [cardServer, 'cards/'];
+    if (opts.url) {
+      fullURL.push(encodeURIComponent(opts.url));
+    }
+    if (opts.query) {
+      fullURL.push(buildQueryString(opts.query));
     }
     return fullURL.join('');
   }
@@ -153,9 +188,9 @@ export default class Cards extends Service {
   }
 
   private async codeForCard(
-    card: JSONAPIDocument
+    card: ResourceObject
   ): Promise<{ component: unknown; Model: typeof CardModel }> {
-    let componentModule = card.data?.meta?.componentModule;
+    let componentModule = card.meta?.componentModule;
     if (!componentModule) {
       throw new Error('No componentModule to load');
     }
