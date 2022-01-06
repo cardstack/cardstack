@@ -2,6 +2,7 @@ import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import isEqual from 'lodash/isEqual';
 import { assertJSONValue, assertJSONPrimitive } from './json-validation';
+import qs from 'qs';
 
 export interface Query {
   filter?: Filter;
@@ -51,6 +52,11 @@ export interface RangeFilter extends TypedFilter {
   };
 }
 
+export function parseQueryString(querystring: string): Query {
+  let query = qs.parse(querystring);
+  assertQuery(query);
+  return query;
+}
 export function assertQuery(query: any, pointer: string[] = ['']): asserts query is Query {
   if (typeof query !== 'object' || query == null) {
     throw new CardstackError('missing query object', {
