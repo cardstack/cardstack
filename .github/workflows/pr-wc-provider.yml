@@ -26,6 +26,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - name: Hub Tests
+      - name: WC Provider Tests
         run: yarn test
         working-directory: packages/wc-provider
