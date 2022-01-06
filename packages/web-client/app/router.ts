@@ -15,6 +15,9 @@ Router.map(function () {
   });
   this.route('card-space', function () {
     this.route('profile-card-temp');
+    this.route('userspace', {
+      path: '/:username',
+    });
   });
   this.route('image-uploader-temp');
   this.route('pay', {

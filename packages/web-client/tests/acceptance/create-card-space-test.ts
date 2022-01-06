@@ -165,8 +165,9 @@ module('Acceptance | create card space', function (hooks) {
     await waitFor(epiloguePostableSel(2));
 
     await percySnapshot(assert);
-    // TODO
-    // await click('[data-test-card-space-next-step="visit-space"]');
+
+    await click('[data-test-card-space-next-step="visit-space"]');
+    assert.equal(currentURL(), '/card-space/usernametodo');
   });
 
   module('tests with layer 2 already connected', function (hooks) {

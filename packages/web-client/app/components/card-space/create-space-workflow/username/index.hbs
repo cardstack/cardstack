@@ -12,8 +12,8 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
         data-test-card-space-username-save-button
+        {{on 'click' this.save}}
       >
         Continue
       </d.ActionButton>
