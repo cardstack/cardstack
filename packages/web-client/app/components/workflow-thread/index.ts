@@ -14,13 +14,17 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
   @cached
   get workflow() {
-    return new AnimatedWorkflow(this.args.workflow);
+    return new AnimatedWorkflow(
+      this.args.workflow,
+      this.threadAnimationInterval
+    );
   }
   reducedMotionMediaQuery = window?.matchMedia(
     '(prefers-reduced-motion: reduce)'
   );
   @tracked autoscroll = false;
-  @tracked threadAnimationInterval = '0ms';
+  @tracked cssThreadAnimationInterval = '0ms';
+  threadAnimationInterval = 0; // intentionally not tracked, so that we don't recompute the AnimatedWorkflow
   appVersion = config.version;
 
   constructor(owner: unknown, args: any) {
@@ -43,14 +47,15 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
       // if prefers-reduced-motion, don't autoscroll, and release postables as soon as available
       // this puts control on when and how to scroll in users' hands
       this.autoscroll = false;
-      this.workflow.interval = 0;
-      this.threadAnimationInterval = `0ms`;
+      this.threadAnimationInterval = 0;
+      this.cssThreadAnimationInterval = '0ms';
     } else {
       // otherwise, turn on autoscrolling and use the interval defined in config
       this.autoscroll = true;
-      this.workflow.interval = interval;
-      this.threadAnimationInterval = `${interval}ms`;
+      this.threadAnimationInterval = interval;
+      this.cssThreadAnimationInterval = `${interval}ms`;
     }
+    this.workflow.interval = this.threadAnimationInterval;
   }
 
   @action focus(element: HTMLElement): void {
