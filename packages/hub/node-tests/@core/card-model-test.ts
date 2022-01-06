@@ -59,7 +59,7 @@ if (process.env.COMPILER) {
   describe('CardModel', function () {
     it('.data', async function () {
       let stub = new StubCards();
-      let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
+      let model = PersonCardModel.fromResponse(stub, cardJSONResponse.data, fakeComponent);
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);
@@ -68,7 +68,7 @@ if (process.env.COMPILER) {
 
     it('.serialize', async function () {
       let stub = new StubCards();
-      let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
+      let model = PersonCardModel.fromResponse(stub, cardJSONResponse.data, fakeComponent);
 
       await model.save();
       let op = stub.lastOp;

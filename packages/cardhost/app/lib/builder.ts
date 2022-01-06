@@ -1,5 +1,5 @@
 import CardModel from '@cardstack/core/src/card-model';
-import type {
+import {
   CompiledCard,
   Format,
   RawCard,
@@ -7,6 +7,7 @@ import type {
   CardOperation,
   CardId,
   JSONAPIDocument,
+  assertDocumentDataIsResource,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
@@ -188,7 +189,9 @@ export default class LocalRealm implements Builder {
 
   async send(op: CardOperation): Promise<JSONAPIDocument> {
     if ('create' in op) {
-      let data = op.create.payload.data.attributes;
+      let resource = op.create.payload.data;
+      assertDocumentDataIsResource(resource);
+      let data = resource.attributes;
 
       let id = this.generateId();
 
@@ -206,7 +209,9 @@ export default class LocalRealm implements Builder {
       if (!cardId) {
         throw new Error(`${url} is not in this realm`);
       }
-      let data = op.update.payload.data.attributes;
+      let resource = op.update.payload.data;
+      assertDocumentDataIsResource(resource);
+      let data = resource.attributes;
       let existingRawCard = this.rawCards.get(cardId.id);
       if (!existingRawCard) {
         throw new Error(

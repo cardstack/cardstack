@@ -181,7 +181,10 @@ export function assertDocumentDataIsCollection(data: JSONAPIDocument['data']): a
   }
 }
 
-export function assertDocumentDataIsResource(data: JSONAPIDocument['data']): asserts data is ResourceObject {
+// since the assert type is parameterized, we can't use theJSONAPIDocument['data'] shorthand
+export function assertDocumentDataIsResource<Identity extends Saved | Unsaved = Saved>(
+  data: ResourceObject<Identity> | ResourceCollection
+): asserts data is ResourceObject<Identity> {
   if (Array.isArray(data)) {
     throw new CardstackError('JSONAPIDocument was Collection. We expected a single resource');
   }
