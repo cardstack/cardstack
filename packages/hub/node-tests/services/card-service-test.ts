@@ -247,6 +247,32 @@ if (process.env.COMPILER) {
       });
     });
 
+    describe('create()', function () {
+      it('can create a card with a linksTo field', async function () {
+        let card = await cards.create({
+          realm: realmURL,
+          id: undefined,
+          data: {
+            author: 'https://cardstack.local/person-0',
+          },
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+               import { linksTo } from '@cardstack/types';
+               import Person from 'https://cardstack.local/person';
+
+               export default class Post {
+                 @linksTo(Person)
+                 author;
+               }
+            `,
+          },
+        });
+
+        expect(card).to.be.ok;
+      });
+    });
+
     describe('update()', function () {
       it('can update a card that is only data correctly', async function () {
         // Intentionally not including the adopts from because cardhost cardService

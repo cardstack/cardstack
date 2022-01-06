@@ -102,8 +102,9 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
     }
   }
 }
+
 export interface Field {
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  type: 'contains' | 'containsMany' | 'linksTo';
   card: CompiledCard;
   name: string;
 }
@@ -154,6 +155,12 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
 export interface Card {
   raw: RawCard;
   compiled: CompiledCard;
+  content: CardContent;
+}
+
+export interface CardContent {
+  data: Record<string, any>;
+  modules: Record<string, ComponentInfo>;
 }
 
 export interface Builder {
