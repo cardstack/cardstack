@@ -2,7 +2,7 @@
   "compilerOptions": {
     "declaration": false,
     "esModuleInterop": true,
-    "module": "es2020",
+    "module": "commonjs",
     "moduleResolution": "Node",
     "outDir": "dist",
     "pretty": true,
@@ -25,5 +25,5 @@
     }
   },
   "exclude": ["node_modules"],
-  "include": ["index.ts"]
+  "include": ["index.ts", "tests/wallet-connect-provider-test.ts"]
 }
