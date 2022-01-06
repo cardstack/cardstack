@@ -18,7 +18,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { tracked } from '@glimmer/tracking';
+import { tracked, cached } from '@glimmer/tracking';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
@@ -261,22 +261,25 @@ class DepositWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
-  @tracked workflow: DepositWorkflow | null = null;
 
-  constructor(owner: unknown, args: {}) {
-    super(owner, args);
+  @tracked isInitializing = true;
 
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new DepositWorkflow(getOwner(this), workflowPersistenceId);
-
-    this.restore(workflow);
+  get workflowPersistenceId() {
+    return this.router.currentRoute.queryParams['flow-id']!;
   }
 
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  @cached
+  get workflow() {
+    return new DepositWorkflow(getOwner(this), this.workflowPersistenceId);
+  }
+  constructor(owner: unknown, args: {}) {
+    super(owner, args);
+    this.restore();
+  }
+
+  async restore() {
+    await this.workflow.restore();
+    this.isInitializing = false;
   }
 
   @action onDisconnect() {

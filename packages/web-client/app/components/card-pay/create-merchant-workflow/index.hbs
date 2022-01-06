@@ -1,10 +1,10 @@
-{{#if this.workflow}}
+{{#unless this.isInitializing}}
   <WorkflowThread
     class="create-merchant-workflow"
     @workflow={{this.workflow}}
     @onClose={{@onClose}}
   />
-{{/if}}
+{{/unless}}
 <Listener
   @emitter={{this.layer2Network}}
   @event="disconnect"

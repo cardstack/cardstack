@@ -23,7 +23,7 @@ import {
   conditionalCancelationMessage,
 } from '@cardstack/web-client/models/workflow';
 
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import {
   convertAmountToNativeDisplay,
   fromWei,
@@ -367,25 +367,28 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
 
-  @tracked workflow: IssuePrepaidCardWorkflow | null = null;
+  @tracked isInitializing = true;
+
+  get workflowPersistenceId() {
+    return this.router.currentRoute.queryParams['flow-id']!;
+  }
+
+  @cached
+  get workflow() {
+    return new IssuePrepaidCardWorkflow(
+      getOwner(this),
+      this.workflowPersistenceId
+    );
+  }
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new IssuePrepaidCardWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
+    this.restore();
   }
 
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  async restore() {
+    await this.workflow.restore();
+    this.isInitializing = false;
   }
 
   @action onDisconnect() {

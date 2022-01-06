@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { Workflow } from '@cardstack/web-client/models/workflow';
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import config from '@cardstack/web-client/config/environment';
 let interval = config.threadAnimationInterval;
 
@@ -12,7 +12,10 @@ interface WorkflowThreadArgs {
 
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
-  workflow = new AnimatedWorkflow(this.args.workflow);
+  @cached
+  get workflow() {
+    return new AnimatedWorkflow(this.args.workflow);
+  }
   reducedMotionMediaQuery = window?.matchMedia(
     '(prefers-reduced-motion: reduce)'
   );

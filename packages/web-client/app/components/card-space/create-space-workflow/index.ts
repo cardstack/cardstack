@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
+import { tracked, cached } from '@glimmer/tracking';
 import RouterService from '@ember/routing/router-service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
@@ -248,26 +248,26 @@ class CreateSpaceWorkflowComponent extends Component {
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
 
-  @tracked workflow: CreateSpaceWorkflow | null = null;
   @tracked detailsEditFormShown: boolean = true;
+  @tracked isInitializing = true;
+
+  get workflowPersistenceId() {
+    return this.router.currentRoute.queryParams['flow-id']!;
+  }
+
+  @cached
+  get workflow() {
+    return new CreateSpaceWorkflow(getOwner(this), this.workflowPersistenceId);
+  }
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new CreateSpaceWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
+    this.restore();
   }
 
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  async restore() {
+    await this.workflow.restore();
+    this.isInitializing = false;
   }
 
   @action onDisconnect() {

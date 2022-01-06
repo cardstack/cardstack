@@ -26,7 +26,7 @@ import HubAuthentication from '@cardstack/web-client/services/hub-authentication
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
-import { tracked } from '@glimmer/tracking';
+import { tracked, cached } from '@glimmer/tracking';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
@@ -298,25 +298,29 @@ class CreateMerchantWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
-  @tracked workflow: CreateMerchantWorkflow | null = null;
+
+  @tracked isInitializing = true;
+
+  get workflowPersistenceId() {
+    return this.router.currentRoute.queryParams['flow-id']!;
+  }
+
+  @cached
+  get workflow() {
+    return new CreateMerchantWorkflow(
+      getOwner(this),
+      this.workflowPersistenceId
+    );
+  }
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new CreateMerchantWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
+    this.restore();
   }
 
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  async restore() {
+    await this.workflow.restore();
+    this.isInitializing = false;
   }
 
   @action onDisconnect() {

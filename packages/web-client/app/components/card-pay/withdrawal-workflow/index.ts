@@ -20,7 +20,7 @@ import RouterService from '@ember/routing/router-service';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 import BN from 'bn.js';
-import { tracked } from '@glimmer/tracking';
+import { tracked, cached } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';
 import {
   rawTimeout,
@@ -380,26 +380,27 @@ with Card Pay.`,
 export default class WithdrawalWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @tracked workflow: WithdrawalWorkflow | null = null;
   @service declare router: RouterService;
+
+  @tracked isInitializing = true;
+
+  get workflowPersistenceId() {
+    return this.router.currentRoute.queryParams['flow-id']!;
+  }
+
+  @cached
+  get workflow() {
+    return new WithdrawalWorkflow(getOwner(this), this.workflowPersistenceId);
+  }
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new WithdrawalWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
+    this.restore();
   }
 
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  async restore() {
+    await this.workflow.restore();
+    this.isInitializing = false;
   }
 
   @action onDisconnect() {
