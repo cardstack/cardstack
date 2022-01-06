@@ -9,7 +9,7 @@ export default function initFirebase() {
       credential: admin.credential.cert({
         projectId: config.get('firebase.projectId'),
         clientEmail: config.get('firebase.clientEmail'),
-        privateKey: config.get('firebase.privateKey'),
+        privateKey: (config.get('firebase.privateKey') as string).replace(/\\n/g, '\n'),
       }),
       databaseURL: config.get('firebase.databaseURL'),
     });
