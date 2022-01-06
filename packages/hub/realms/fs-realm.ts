@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync } from 'fs-extra';
+import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync, statSync } from 'fs-extra';
 import { sep, join } from 'path';
 import sane from 'sane';
 import walkSync from 'walk-sync';
@@ -25,6 +25,9 @@ export default class FSRealm implements RealmInterface<Meta> {
   private directory: string;
   private watcher?: sane.Watcher;
   private log: Logger;
+
+  private recentWrites = new Map<string, number>();
+  private recentDeleted = new Set<string>();
 
   constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
     this.url = url;
@@ -77,12 +80,36 @@ export default class FSRealm implements RealmInterface<Meta> {
   }
 
   private onFileChanged(action: 'save' | 'delete', filepath: string) {
+    this.log.trace('onFileChange', filepath);
     let segments = filepath.split(sep);
     if (!this.notify || shouldIgnoreChange(segments)) {
       // top-level files in the realm are not cards, we're assuming all
       // cards are directories under the realm.
       return;
     }
+
+    if (action === 'save') {
+      // echo suppression based on close-enough mtime of the new file
+      let fullpath = join(this.directory, filepath);
+      let lastMTime = this.recentWrites.get(fullpath);
+      if (lastMTime != null && statSync(fullpath).mtime.getTime() < lastMTime + 10) {
+        this.log.trace('onChangeNotifySuppressed');
+        return;
+      }
+    }
+
+    if (action === 'delete') {
+      // echo suppression for recently deleted files
+      let cardDir = join(this.directory, segments[0]);
+      // todo: this is good enough for now because we only delete whole cards,
+      // but we need to implement single file deletion too and that needs to get
+      // tracked separately
+      if (this.recentDeleted.has(cardDir)) {
+        this.log.trace('onChangeNotifySuppressed');
+        return;
+      }
+    }
+
     let url = new URL(segments[0] + '/', this.url).href;
     this.notify(url, action);
   }
@@ -177,8 +204,11 @@ export default class FSRealm implements RealmInterface<Meta> {
 
   private write(cardDir: string, raw: RawCard) {
     let payload = this.payload(raw);
+    let names = [];
     try {
-      writeJsonSync(join(cardDir, 'card.json'), payload);
+      let filename = join(cardDir, 'card.json');
+      writeJsonSync(filename, payload);
+      names.push(filename);
     } catch (err: any) {
       if (err.code !== 'ENOENT') {
         throw err;
@@ -187,9 +217,16 @@ export default class FSRealm implements RealmInterface<Meta> {
     }
     if (raw.files) {
       for (let [name, contents] of Object.entries(raw.files)) {
-        outputFileSync(join(cardDir, name), contents);
+        let filename = join(cardDir, name);
+        outputFileSync(filename, contents);
+        names.push(filename);
       }
     }
+    let time = Date.now();
+    for (let filename of names) {
+      this.recentWrites.set(filename, time);
+    }
+    this.recentDeleted.delete(cardDir);
   }
 
   async delete(cardId: CardId): Promise<void> {
@@ -198,6 +235,7 @@ export default class FSRealm implements RealmInterface<Meta> {
       throw new NotFound(`tried to delete ${cardURL(cardId)} but it does not exist`);
     }
     removeSync(cardDir);
+    this.recentDeleted.add(cardDir);
   }
 }
 

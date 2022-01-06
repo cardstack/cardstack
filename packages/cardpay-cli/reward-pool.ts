@@ -30,6 +30,11 @@ function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenBalance>
 }
 
 function displayProofs(proofs: WithSymbol<Proof>[]): void {
+  if (proofs.length == 0) {
+    console.log(`
+    No proofs to display
+    `);
+  }
   const groupedByRewardProgram = groupBy(proofs, (a) => a.rewardProgramId);
   Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
     console.log(`---------------------------------------------------------------------

@@ -3,7 +3,7 @@ import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/i
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { CardstackError, NotFound, serializableError } from '@cardstack/core/src/utils/errors';
+import { serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
@@ -20,11 +20,16 @@ import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 const log = logger('hub/search-index');
 
+function assertNever(value: never) {
+  throw new Error(`unsupported operation ${value}`);
+}
 export class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private builder = inject('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
   private fileCache = inject('file-cache', { as: 'fileCache' });
+  private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
+  private notifyQueuePromise: Promise<void> = Promise.resolve();
 
   async indexAllRealms(): Promise<void> {
     await Promise.all(
@@ -38,23 +43,59 @@ export class SearchIndex {
     );
   }
 
-  async getCard(cardURL: string): Promise<{ raw: RawCard; compiled: CompiledCard | undefined }> {
-    let db = await this.database.getPool();
-    let deserializer = new RawCardDeserializer();
-    try {
-      let {
-        rows: [result],
-      } = await db.query('SELECT compiled, "compileErrors" from cards where url = $1', [cardURL]);
-      if (!result) {
-        throw new NotFound(`Card ${cardURL} was not found`);
-      }
-      if (result.compileErrors) {
-        throw CardstackError.fromSerializableError(result.compileErrors);
-      }
-      return deserializer.deserialize(result.compiled.data, result.compiled);
-    } finally {
-      db.release();
+  notify(cardURL: string, action: 'save' | 'delete'): void {
+    log.trace('notify', cardURL);
+    this.notifyQueue.push({ cardURL, action });
+    (async () => this.drainNotifyQueue())();
+  }
+
+  flushNotifications(): Promise<void> {
+    return this.notifyQueuePromise;
+  }
+
+  async teardown(): Promise<void> {
+    await this.notifyQueuePromise;
+  }
+
+  private async drainNotifyQueue(): Promise<void> {
+    await this.notifyQueuePromise;
+
+    let queueDrained: () => void;
+    this.notifyQueuePromise = new Promise<void>((res) => (queueDrained = res));
+
+    while (this.notifyQueue.length > 0) {
+      let { cardURL, action } = this.notifyQueue.shift()!;
+      log.trace('drainNotifyQueue', cardURL);
+      await this.indexCardFromNotification(cardURL, action);
     }
+    queueDrained!();
+  }
+
+  private async indexCardFromNotification(cardURL: string, action: 'save' | 'delete') {
+    let cardID = this.realmManager.parseCardURL(cardURL);
+    await this.runIndexing(cardID.realm, async (ops) => {
+      switch (action) {
+        case 'save': {
+          let rawCard = await this.realmManager.read(cardID);
+          await ops.save(rawCard);
+          break;
+        }
+        case 'delete': {
+          await ops.delete(cardURL);
+          break;
+        }
+        default:
+          assertNever(action);
+      }
+    });
+  }
+
+  async deleteCard(raw: RawCard) {
+    let url = cardURL(raw);
+    log.trace('deleteCard', url);
+    await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.delete(url);
+    });
   }
 
   async indexCard(
@@ -62,6 +103,7 @@ export class SearchIndex {
     compiled: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
+    log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.internalSave(raw, compiled, compiler);
     });
@@ -70,19 +112,15 @@ export class SearchIndex {
   private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
-      log.info(`starting to index realm`, realmURL);
+      log.trace(`starting to index realm`, realmURL);
       let run = new IndexerRun(db, this.builder, realmURL, this.fileCache);
       let result = await fn(run);
       await run.finalize();
-      log.info(`finished indexing realm`, realmURL);
+      log.trace(`finished indexing realm`, realmURL);
       return result;
     } finally {
       db.release();
     }
-  }
-
-  notify(_cardURL: string, _action: 'save' | 'delete'): void {
-    throw new Error('not implemented');
   }
 }
 
@@ -144,7 +182,13 @@ class IndexerRun implements IndexerHandle {
     for (let i = 0; i < queue.length; i += queryBatchSize) {
       let queryRefs = queue.slice(i, i + queryBatchSize);
       await this.iterateThroughRows(
-        ['select url, deps, raw from cards where', param(queryRefs), '&&', 'deps'],
+        [
+          'select url, deps, raw, (url, deps)::card_dep as c_dep from cards where',
+          param(queryRefs),
+          '&&',
+          'deps',
+          'order by c_dep using >^',
+        ],
         async (row) => {
           let deserializer = new RawCardDeserializer();
           let { raw } = deserializer.deserialize(row.raw.data, row.raw);
@@ -264,8 +308,10 @@ class IndexerRun implements IndexerHandle {
     await this.db.query(expressionToSql(expression));
   }
 
-  async delete(cardURL: string): Promise<void> {
-    await this.db.query(`DELETE from cards where url=$1`, [cardURL]);
+  async delete(url: string): Promise<void> {
+    this.touched.set(url, this.touchCounter++);
+    await this.db.query('DELETE FROM cards where url = $1', [url]);
+    this.fileCache.deleteCardModules(url);
   }
 
   async beginReplaceAll(): Promise<void> {

@@ -108,7 +108,7 @@ function serializeAttribute(
 
 export function serializeCardPayloadForFormat(card: Card, format: Format): JSONAPIDocument<Saved> {
   let componentInfo = card.compiled[format];
-  let resource = serializeResource('card', card.compiled.url, card.data, componentInfo.usedFields);
+  let resource = serializeResource('card', card.compiled.url, card.raw.data, componentInfo.usedFields);
   resource.meta = merge(
     {
       componentModule: componentInfo.moduleName.global,

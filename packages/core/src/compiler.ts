@@ -29,7 +29,7 @@ import {
 } from './interfaces';
 import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
+import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -98,7 +98,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
       if (unexpectedFields.length) {
-        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on this card`);
+        throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
       }
     }
 
@@ -111,6 +111,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       adoptsFrom: parentCard,
       ...components,
       modules,
+      deps: [...this.dependencies],
     };
   }
 
@@ -446,18 +447,35 @@ export function makeGloballyAddressable(
     embedded: ensureGlobalComponentInfo(card.embedded),
     edit: ensureGlobalComponentInfo(card.edit),
     modules: card.modules,
+    deps: card.deps,
   };
 }
 
 class TrackedBuilder implements Builder {
   readonly dependencies = new Set<string>();
   constructor(private realBuilder: Builder) {}
-  getCompiledCard(url: string): Promise<CompiledCard> {
+  async getCompiledCard(url: string): Promise<CompiledCard> {
     this.dependencies.add(url);
-    return this.realBuilder.getCompiledCard(url);
+    let card = await this.trapErrorDeps(() => this.realBuilder.getCompiledCard(url));
+    for (let depUrl of card.deps) {
+      this.dependencies.add(depUrl);
+    }
+    return card;
   }
   getRawCard(url: string): Promise<RawCard> {
     this.dependencies.add(url);
-    return this.realBuilder.getRawCard(url);
+    return this.trapErrorDeps(() => this.realBuilder.getRawCard(url));
+  }
+  private async trapErrorDeps<Result>(fn: () => Promise<Result>): Promise<Result> {
+    try {
+      return await fn();
+    } catch (err: any) {
+      if (isCardstackError(err) && err.deps) {
+        for (let url of err.deps) {
+          this.dependencies.add(url);
+        }
+      }
+      throw err;
+    }
   }
 }

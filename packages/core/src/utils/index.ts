@@ -18,6 +18,10 @@ export function ensureTrailingSlash(p: string): string {
   return p.replace(/\/$/, '') + '/';
 }
 
+export function removeTrailingSlash(p: string): string {
+  return p.replace(/\/$/, '');
+}
+
 export function getBasenameAndExtension(filename: string): {
   basename: string;
   extension: string;

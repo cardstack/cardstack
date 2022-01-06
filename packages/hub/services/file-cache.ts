@@ -139,7 +139,7 @@ export default class FileCache {
     return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
   }
 
-  deleteCard(cardURL: string): void {
+  deleteCardModules(cardURL: string): void {
     for (const env of ENVIRONMENTS) {
       let loc = this.getCardLocation(env, cardURL);
 
