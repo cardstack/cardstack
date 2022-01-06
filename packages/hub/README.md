@@ -159,6 +159,8 @@ Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
 
 ### Setup AWS Session Manager ssh config
 
+Install the [AWS Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) if you don’t already have it.
+
 Add the following to your `~/.ssh/config` file:
 
 ```
