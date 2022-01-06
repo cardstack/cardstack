@@ -334,5 +334,36 @@ if (process.env.COMPILER) {
         );
       });
     });
+
+    describe('linksTo', function () {
+      let postCard: RawCard = {
+        realm,
+        id: 'post',
+        schema: 'schema.js',
+        embedded: 'embedded.js',
+        files: {
+          'schema.js': `
+          import { linksTo } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          export default class Post {
+            @linksTo(string)
+            title;
+          }`,
+          'embedded.js': templateOnlyComponentTemplate(`<@fields.title />`),
+        },
+      };
+
+      this.beforeEach(async function () {
+        await cards.create(postCard);
+      });
+
+      it('Can understand linksTo fields', async function () {
+        let { compiled } = await cards.load(`${realm}post`);
+
+        expect(compiled.fields.title.name).to.eq('title');
+        expect(compiled.fields.title.type).to.eq('linksTo');
+        expect(compiled.embedded.usedFields).to.have.members(['linksTo']);
+      });
+    });
   });
 }
