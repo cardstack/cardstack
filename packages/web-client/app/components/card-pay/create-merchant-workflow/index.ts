@@ -1,5 +1,3 @@
-import Component from '@glimmer/component';
-import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import {
   convertAmountToNativeDisplay,
@@ -24,10 +22,9 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { taskFor } from 'ember-concurrency-ts';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import RouterService from '@ember/routing/router-service';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
-import { tracked, cached } from '@glimmer/tracking';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
+import RestorableWorkflowComponent from '../restorable-workflow-component';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -294,33 +291,11 @@ class CreateMerchantWorkflow extends Workflow {
   }
 }
 
-class CreateMerchantWorkflowComponent extends Component {
+class CreateMerchantWorkflowComponent extends RestorableWorkflowComponent<CreateMerchantWorkflow> {
   @service declare layer2Network: Layer2Network;
-  @service declare workflowPersistence: WorkflowPersistence;
-  @service declare router: RouterService;
 
-  @tracked isInitializing = true;
-
-  get workflowPersistenceId() {
-    return this.router.currentRoute.queryParams['flow-id']!;
-  }
-
-  @cached
-  get workflow() {
-    return new CreateMerchantWorkflow(
-      getOwner(this),
-      this.workflowPersistenceId
-    );
-  }
-
-  constructor(owner: unknown, args: {}) {
-    super(owner, args);
-    this.restore();
-  }
-
-  async restore() {
-    await this.workflow.restore();
-    this.isInitializing = false;
+  get workflowClass() {
+    return CreateMerchantWorkflow;
   }
 
   @action onDisconnect() {
