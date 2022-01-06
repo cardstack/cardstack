@@ -3,7 +3,8 @@ import admin from 'firebase-admin';
 import config from 'config';
 
 export default function initFirebase() {
-  if (config.get('firebase.projectId')) {
+  // apps.length check is to prevent "multiple initialization error" when running tests
+  if (config.get('firebase.projectId') && admin.apps.length === 0) {
     initializeApp({
       credential: admin.credential.cert({
         projectId: config.get('firebase.projectId'),
