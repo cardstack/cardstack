@@ -5,7 +5,7 @@
   "description": "WalletConnect provider that uses websockets rather than http",
   "author": "Aierie <michael.khor@cardstack.com>",
   "homepage": "https://github.com/cardstack/cardstack#readme",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "./index.ts",
   "exports": {
     ".": {
