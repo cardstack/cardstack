@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { IConnector } from '@walletconnect/types';
-import WalletConnectProvider from '../wc-provider';
+import WalletConnectProvider from '@cardstack/wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
@@ -55,6 +55,7 @@ import { PrepaidCard } from '@cardstack/cardpay-sdk';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import { getLayer2RpcWssNodeUrl } from '../features';
+import * as Sentry from '@sentry/browser';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -172,9 +173,39 @@ export default abstract class Layer2ChainWeb3Strategy
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });
 
-    this.provider.on('websocket-disconnected', () => {
+    this.provider.on('websocket-connected', () => {
+      console.log('websocket connected');
+      Sentry.addBreadcrumb({
+        type: 'debug',
+        message: 'Websocket connected',
+        data: {
+          url: rpcWss,
+        },
+        level: Sentry.Severity.Info,
+      });
+    });
+
+    this.provider.on('websocket-disconnected', (event: CloseEvent) => {
       this.simpleEmitter.emit('websocket-disconnected');
       this.disconnect();
+      console.log('websocket disconnected');
+      Sentry.addBreadcrumb({
+        type: 'debug',
+        message: 'Websocket connection closed',
+        data: {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+          url: rpcWss,
+        },
+        // unsure about 1001 since this could also happen due to server failure
+        // but also can happen due to closing the tab normally
+        // unlike other codes which will only get here after the websocket provider
+        // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
+        level: [1000, 1001].includes(event.code)
+          ? Sentry.Severity.Info
+          : Sentry.Severity.Error,
+      });
     });
 
     this.web3.setProvider(this.provider as any);

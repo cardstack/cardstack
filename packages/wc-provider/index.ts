@@ -1,12 +1,7 @@
 import WalletConnect from '@walletconnect/client';
 import QRCodeModal from '@walletconnect/qrcode-modal';
 import HttpConnection from '@walletconnect/http-connection';
-import {
-  payloadId,
-  signingMethods,
-  parsePersonalSign,
-  getRpcUrl,
-} from '@walletconnect/utils';
+import { payloadId, signingMethods, parsePersonalSign, getRpcUrl } from '@walletconnect/utils';
 import {
   IRPCMap,
   IConnector,
@@ -15,14 +10,20 @@ import {
   IWalletConnectProviderOptions,
   IQRCodeModalOptions,
 } from '@walletconnect/types';
-import * as Sentry from '@sentry/browser';
 
+// @ts-ignore
 import CacheSubprovider from 'web3-provider-engine/subproviders/cache';
+// @ts-ignore
 import FixtureSubprovider from 'web3-provider-engine/subproviders/fixture';
+// @ts-ignore
 import FilterSubprovider from 'web3-provider-engine/subproviders/filters';
+// @ts-ignore
 import HookedWalletSubprovider from 'web3-provider-engine/subproviders/hooked-wallet';
+// @ts-ignore
 import NonceSubprovider from 'web3-provider-engine/subproviders/nonce-tracker';
+// @ts-ignore
 import SubscriptionsSubprovider from 'web3-provider-engine/subproviders/subscriptions';
+
 import { JsonRpcRequest, JsonRpcResponse } from 'json-rpc-engine';
 import { Provider } from 'eth-block-tracker';
 import { JsonRpcPayload } from 'web3-core-helpers';
@@ -32,8 +33,7 @@ import BlockTracker, {
   WebsocketProvider,
 } from './block-tracker';
 
-export interface ICardstackWalletConnectProviderOptions
-  extends IWalletConnectProviderOptions {
+export interface ICardstackWalletConnectProviderOptions extends IWalletConnectProviderOptions {
   rpcWss: IRPCMap;
 }
 
@@ -78,18 +78,13 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       req: JsonRpcRequest<T>,
       cb: (err: Error, res: JsonRpcResponse<U>) => void
     ): void {
-      this.send(
-        req as unknown as JsonRpcPayload,
-        cb as (error: Error | null, result?: unknown) => void
-      );
+      this.send(req as unknown as JsonRpcPayload, cb as (error: Error | null, result?: unknown) => void);
     };
     this.rpcWss = rpcWss;
     this.chainId = chainId;
     this.websocketProvider = websocketProvider;
     this.bindSocketListeners();
-    this.bridge = opts.connector
-      ? opts.connector.bridge
-      : opts.bridge || 'https://bridge.walletconnect.org';
+    this.bridge = opts.connector ? opts.connector.bridge : opts.bridge || 'https://bridge.walletconnect.org';
     this.qrcode = typeof opts.qrcode === 'undefined' || opts.qrcode !== false;
     this.qrcodeModal = opts.qrcodeModal || this.qrcodeModal;
     this.qrcodeModalOptions = opts.qrcodeModalOptions;
@@ -104,15 +99,8 @@ class WalletConnectProvider extends ExtendedProviderEngine {
         clientMeta: opts?.clientMeta,
       });
     this.rpc = opts.rpc || null;
-    if (
-      !this.rpc &&
-      (!opts.infuraId ||
-        typeof opts.infuraId !== 'string' ||
-        !opts.infuraId.trim())
-    ) {
-      throw new Error(
-        'Missing one of the required parameters: rpc or infuraId'
-      );
+    if (!this.rpc && (!opts.infuraId || typeof opts.infuraId !== 'string' || !opts.infuraId.trim())) {
+      throw new Error('Missing one of the required parameters: rpc or infuraId');
     }
     this.infuraId = opts.infuraId || '';
     this.initialize();
@@ -237,10 +225,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   }
 
   async handleOtherRequests(payload: any): Promise<IJsonRpcResponseSuccess> {
-    if (
-      !signingMethods.includes(payload.method) &&
-      payload.method.startsWith('eth_')
-    ) {
+    if (!signingMethods.includes(payload.method) && payload.method.startsWith('eth_')) {
       return this.handleReadRequests(payload);
     }
     const wc = await this.getWalletConnector();
@@ -279,9 +264,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
 
   // disableSessionCreation - if true, getWalletConnector won't try to create a new session
   // in case the connector is disconnected
-  getWalletConnector(
-    opts: { disableSessionCreation?: boolean } = {}
-  ): Promise<IConnector> {
+  getWalletConnector(opts: { disableSessionCreation?: boolean } = {}): Promise<IConnector> {
     const { disableSessionCreation = false } = opts;
     return new Promise((resolve, reject) => {
       const wc = this.wc;
@@ -349,6 +332,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
     await this.stop();
     this.emit('close', 1000, 'Connection closed');
     this.emit('disconnect', 1000, 'Connection disconnected');
+    this.connected = false;
   }
 
   async updateState(sessionParams: any) {
@@ -379,10 +363,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       this.rpcUrl = rpcUrl;
       this.updateHttpConnection();
     } else {
-      this.emit(
-        'error',
-        new Error(`No RPC Url available for chainId: ${chainId}`)
-      );
+      this.emit('error', new Error(`No RPC Url available for chainId: ${chainId}`));
     }
   }
 
@@ -458,10 +439,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
           cb(error);
         }
       },
-      processMessage: async (
-        msgParams: { from: string; data: string },
-        cb: any
-      ) => {
+      processMessage: async (msgParams: { from: string; data: string }, cb: any) => {
         try {
           const wc = await this.getWalletConnector();
           const result = await wc.signMessage([msgParams.from, msgParams.data]);
@@ -470,16 +448,10 @@ class WalletConnectProvider extends ExtendedProviderEngine {
           cb(error);
         }
       },
-      processPersonalMessage: async (
-        msgParams: { from: string; data: string },
-        cb: any
-      ) => {
+      processPersonalMessage: async (msgParams: { from: string; data: string }, cb: any) => {
         try {
           const wc = await this.getWalletConnector();
-          const result = await wc.signPersonalMessage([
-            msgParams.data,
-            msgParams.from,
-          ]);
+          const result = await wc.signPersonalMessage([msgParams.data, msgParams.from]);
           cb(null, result);
         } catch (error) {
           cb(error);
@@ -503,16 +475,10 @@ class WalletConnectProvider extends ExtendedProviderEngine {
           cb(error);
         }
       },
-      processTypedMessage: async (
-        msgParams: { from: string; data: string },
-        cb: any
-      ) => {
+      processTypedMessage: async (msgParams: { from: string; data: string }, cb: any) => {
         try {
           const wc = await this.getWalletConnector();
-          const result = await wc.signTypedData([
-            msgParams.from,
-            msgParams.data,
-          ]);
+          const result = await wc.signTypedData([msgParams.from, msgParams.data]);
           cb(null, result);
         } catch (error) {
           cb(error);
@@ -522,42 +488,17 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   }
 
   bindSocketListeners() {
+    // @ts-ignore
     this.websocketProvider.on('close', this.onWebsocketClose.bind(this));
     this.websocketProvider.on('connect', this.onWebsocketConnect.bind(this));
   }
 
   async onWebsocketConnect() {
-    console.log('websocket connected', this.websocketProvider.connection.url);
-    Sentry.addBreadcrumb({
-      type: 'debug',
-      message: 'Websocket connected',
-      data: {
-        url: this.websocketProvider.connection.url,
-      },
-      level: Sentry.Severity.Info,
-    });
+    this.emit('websocket-connected');
   }
 
   async onWebsocketClose(event: CloseEvent) {
-    console.log('websocket closed', this.websocketProvider.connection.url);
-    Sentry.addBreadcrumb({
-      type: 'debug',
-      message: 'Websocket connection closed',
-      data: {
-        code: event.code,
-        reason: event.reason,
-        wasClean: event.wasClean,
-        url: this.websocketProvider.connection.url,
-      },
-      // unsure about 1001 since this could also happen due to server failure
-      // but also can happen due to closing the tab normally
-      // unlike other codes which will only get here after the websocket provider
-      // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
-      level: [1000, 1001].includes(event.code)
-        ? Sentry.Severity.Info
-        : Sentry.Severity.Error,
-    });
-    this.emit('websocket-disconnected');
+    this.emit('websocket-disconnected', event);
   }
 }
 

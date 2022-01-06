@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "declaration": true,
+    "declaration": false,
     "esModuleInterop": true,
-    "module": "es2020",
+    "module": "commonjs",
     "moduleResolution": "Node",
     "outDir": "dist",
     "pretty": true,
@@ -24,15 +24,6 @@
       "web3-provider-engine": ["../../types/web3-provider-engine"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "include": [
-    "generated",
-    "contracts",
-    "providers",
-    "sdk",
-    "index.ts"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["index.ts", "tests/wallet-connect-provider-test.ts"]
 }

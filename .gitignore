@@ -92,6 +92,8 @@ package-lock.json
 /packages/cardpay-subgraph/abis/generated/
 /packages/cardpay-subgraph/src/generated/
 
+/packages/wc-provider/**/*.d.ts
+
 # unconventional js
 /blueprints/*/files/
 /vendor/
