@@ -3,7 +3,8 @@ import json
 from pathlib import Path
 
 from .programs.usage import UsageRewardProgram
-
+from .payment_tree import PaymentTree, Payment
+import pyarrow.parquet as pq
 
 def run_reward_program(
     parameters_file: str = typer.Option(
@@ -34,9 +35,10 @@ def run_reward_program(
     else:
         raise ValueError(f"Unknown reward program type: {reward_program_type}")
     program.set_parameters(**program_parameters)
-    results = program.run(run_parameters["payment_cycle"])
-    results.to_parquet(Path(output_location) / "results.parquet")
-    results.to_csv(Path(output_location) / "results.csv")
+    results_df = program.run(run_parameters["payment_cycle"])
+    tree = PaymentTree(results_df.to_dict("records"))
+    table = tree.as_arrow()
+    pq.write_table(table, Path(output_location) / "results.parquet")
 
 
 def cli():

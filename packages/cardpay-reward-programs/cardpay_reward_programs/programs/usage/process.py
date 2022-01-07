@@ -44,19 +44,19 @@ class UsageRewardProgram:
         select
         prepaid_card_owner as payee,
 
-        ? * 
+        (? * 
         1 + (1-(percent_rank() over (order by sum(spend_amount_uint64)  desc))) * (?)
         *
-        1 + (1-(percent_rank() over (order by count(*)  desc))) * (?) as amount,
+        1 + (1-(percent_rank() over (order by count(*)  desc))) * (?))::integer as amount,
 
         count(*) as transactions,
         sum(spend_amount_uint64) as total_spent,
         
         ? as "rewardProgramID",
-        ? as "paymentCycleNumber",
+        ?::integer as "paymentCycle",
         ? as token,
-        ? as "validFrom",
-        ? as "validTo"
+        ?::integer as "validFrom",
+        ?::integer as "validTo"
 
         from {table_query}
         where block_number_uint64 >= ? and block_number_uint64 < ?
