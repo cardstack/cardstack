@@ -2,6 +2,18 @@
 const { SourceMapDevToolPlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const { sync: glob } = require('glob');
+const { basename } = require('path');
+
+const tsMigrations = glob(`${__dirname}/db/migrations/*.ts`);
+const tsMigrationEntrypoints: { [entrypoint: string]: string } = {};
+for (let migrationFile of tsMigrations) {
+  if (migrationFile.endsWith('.d.ts')) {
+    continue;
+  }
+  let migration = basename(migrationFile, '.ts');
+  tsMigrationEntrypoints[`db/migrations/${migration}`] = `./db/migrations/${migration}.ts`;
+}
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -108,6 +120,10 @@ module.exports = {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
     'bot-tests': './bot-tests/entrypoint.ts',
+
+    // we add entrypoints for each of the TS migration files as well since we
+    // run the migration via the webpack build from waypoint
+    ...tsMigrationEntrypoints,
   },
 
   target: 'node14',
