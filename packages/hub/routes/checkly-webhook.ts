@@ -4,6 +4,7 @@ import { inject } from '@cardstack/di';
 import StatuspageApi from '../services/statuspage-api';
 import crypto from 'crypto';
 import config from 'config';
+import { DEGRADED_THRESHOLD as degradedSubgraphThreshold } from '../routes/status';
 
 // Check names and component names should map to the names and components in Checkly
 type CheckName = 'hub-prod subgraph / RPC node block number diff within threshold';
@@ -20,7 +21,7 @@ export default class ChecklyWebhookRoute {
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {
       componentName: 'Subgraph',
-      incidentMessage: 'Subgraph block number is behind RPC block number by more than 10 blocks',
+      incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
     },
   };
 
