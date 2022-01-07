@@ -16,7 +16,7 @@ import transformCardComponent, {
 import {
   Builder,
   CompiledCard,
-  ComponentInfo,
+  CompilerComponentInfo,
   FEATURE_NAMES,
   Format,
   FORMATS,
@@ -272,7 +272,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     parentCard: CompiledCard | undefined,
     which: Format,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ): Promise<ComponentInfo<ModuleRef>> {
+  ): Promise<CompilerComponentInfo<ModuleRef>> {
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
@@ -340,7 +340,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     localFile: string,
     format: Format,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ): Promise<ComponentInfo<LocalRef>> {
+  ): Promise<CompilerComponentInfo<LocalRef>> {
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
@@ -356,7 +356,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       type: JS_TYPE,
       source: code,
     };
-    let componentInfo: ComponentInfo<LocalRef> = {
+    let componentInfo: CompilerComponentInfo<LocalRef> = {
       moduleName: { local: moduleName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
@@ -427,7 +427,7 @@ export function makeGloballyAddressable(
     return { global: globalRef };
   }
 
-  function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
+  function ensureGlobalComponentInfo(info: CompilerComponentInfo<ModuleRef>): CompilerComponentInfo<GlobalRef> {
     return {
       moduleName: ensureGlobal(info.moduleName),
       usedFields: info.usedFields,

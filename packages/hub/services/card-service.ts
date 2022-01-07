@@ -1,4 +1,12 @@
-import { Card, CompiledCard, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
+import {
+  Card,
+  CompiledCard,
+  Unsaved,
+  RawCard,
+  CardContent,
+  CompilerComponentInfo,
+  ComponentInfo,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -71,6 +79,7 @@ export class CardService {
       return {
         compiled,
         raw,
+        content: this.contentFromCompiled(raw, compiled),
       };
     } finally {
       db.release();
@@ -82,7 +91,7 @@ export class CardService {
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
-    return { raw: rawCard, compiled };
+    return { raw: rawCard, compiled, content: this.contentFromCompiled(rawCard, compiled) };
   }
 
   async update(partialRaw: RawCard): Promise<Card> {
@@ -91,7 +100,7 @@ export class CardService {
     let compiledCard = await compiler.compile();
     await this.realmManager.update(raw);
     let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
-    return { raw, compiled };
+    return { raw, compiled, content: this.contentFromCompiled(raw, compiled) };
   }
 
   async delete(raw: RawCard): Promise<void> {
@@ -113,11 +122,21 @@ export class CardService {
         if (!compiled) {
           throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }
-        return { raw, compiled };
+        return { raw, compiled, content: this.contentFromCompiled(raw, compiled) };
       });
     } finally {
       client.release();
     }
+  }
+
+  private contentFromCompiled(raw: RawCard, compiled: CompiledCard): CardContent {
+    return {
+      data: raw.data ?? {},
+      schemaModule: compiled.schemaModule,
+      isolated: contentPartOfComponentInfo(compiled.isolated),
+      embedded: contentPartOfComponentInfo(compiled.embedded),
+      edit: contentPartOfComponentInfo(compiled.edit),
+    };
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
@@ -225,4 +244,8 @@ function cardHasType(card: CompiledCard, url: string): boolean {
   } else {
     return cardHasType(card.adoptsFrom, url);
   }
+}
+
+function contentPartOfComponentInfo(info: CompilerComponentInfo): ComponentInfo {
+  return { moduleName: info.moduleName, usedFields: info.usedFields };
 }

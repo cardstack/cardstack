@@ -52,7 +52,7 @@ if (process.env.COMPILER) {
       });
 
       let example = await cards.load(`${realmURL}example`);
-      expect(example.raw.data?.title).to.eq('Hello World');
+      expect(example.content.data.title).to.eq('Hello World');
     });
 
     it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
@@ -85,7 +85,7 @@ if (process.env.COMPILER) {
       });
 
       let grandChild = await cards.load(`${realmURL}grandchild`);
-      expect(grandChild.raw.data?.title).to.eq('Hello World');
+      expect(grandChild.content.data.title).to.eq('Hello World');
     });
 
     it(`can invalidate a card via the update of an adoptsFrom card`, async function () {

@@ -46,6 +46,8 @@ export interface CardId {
   id: string;
 }
 
+// RawCard represents the card "as authored". Nothing is preprocessed or
+// compiled, no other dependent data is included, no derived state is present.
 export interface RawCard<Identity extends Unsaved = Saved> {
   id: Identity;
   realm: string;
@@ -119,6 +121,9 @@ export type ModuleRef = LocalRef | GlobalRef;
 export type Saved = string;
 export type Unsaved = string | undefined;
 
+// CompiledCard is everything you need when operating at the level of code &
+// schema changes. It should not be needed just to render and edit data of
+// cards.
 export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
   url: Identity;
   realm: string;
@@ -128,9 +133,10 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   };
   schemaModule: Ref;
   serializer?: SerializerName;
-  isolated: ComponentInfo<Ref>;
-  embedded: ComponentInfo<Ref>;
-  edit: ComponentInfo<Ref>;
+
+  isolated: CompilerComponentInfo<Ref>;
+  embedded: CompilerComponentInfo<Ref>;
+  edit: CompilerComponentInfo<Ref>;
 
   modules: Record<
     string, // local module path
@@ -146,21 +152,37 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   moduleName: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
+}
+
+export interface CompilerComponentInfo<Ref extends ModuleRef = GlobalRef> extends ComponentInfo<Ref> {
+  // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;
 
   // the URL of the card that originally defined this component, if it's not ourself
   inheritedFrom?: string;
 }
 
+// Plan: create, read, and update methods that return this will probably
+// bifurcate into methods that return just CardContent or return { raw, compiled
+// }
 export interface Card {
   raw: RawCard;
   compiled: CompiledCard;
   content: CardContent;
 }
 
-export interface CardContent {
+// This is all the thing you need to render and edit data for a card. It's not
+// enough to recompile code & schema -- for that you need CompiledCard.
+export interface CardContent<Ref extends ModuleRef = GlobalRef> {
+  // Unlike the data in RawCard, this is the fully expanded veresion that
+  // includes computed values and the data from linked cards.
   data: Record<string, any>;
-  modules: Record<string, ComponentInfo>;
+
+  isolated: ComponentInfo<Ref>;
+  embedded: ComponentInfo<Ref>;
+  edit: ComponentInfo<Ref>;
+
+  schemaModule: Ref;
 }
 
 export interface Builder {

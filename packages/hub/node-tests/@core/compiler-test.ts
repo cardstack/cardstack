@@ -362,7 +362,7 @@ if (process.env.COMPILER) {
 
         expect(compiled.fields.title.name).to.eq('title');
         expect(compiled.fields.title.type).to.eq('linksTo');
-        expect(compiled.embedded.usedFields).to.have.members(['linksTo']);
+        expect(compiled.embedded.usedFields).to.have.members(['title']);
       });
     });
   });

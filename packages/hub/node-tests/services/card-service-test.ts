@@ -137,7 +137,7 @@ if (process.env.COMPILER) {
     describe('.load()', function () {
       it('returns a card thats been indexed', async function () {
         let card = await cards.load(`${realmURL}post1`);
-        expect(card.raw.data!.title).to.eq('Hello again');
+        expect(card.content.data.title).to.eq('Hello again');
         expect(card.compiled!.url).to.eq(`${realmURL}post1`);
         expect(card.compiled!.adoptsFrom!.url).to.eq(`${realmURL}post`);
       });
@@ -253,7 +253,7 @@ if (process.env.COMPILER) {
           realm: realmURL,
           id: undefined,
           data: {
-            author: 'https://cardstack.local/person-0',
+            author: 'https://cardstack.local/sue',
           },
           schema: 'schema.js',
           files: {
@@ -268,8 +268,20 @@ if (process.env.COMPILER) {
             `,
           },
         });
+        expect(card.content.data.author.name).to.equal('Sue');
+        expect(card.content.data.id).to.equal('https://cardstack.local/sue');
 
-        expect(card).to.be.ok;
+        // NEXT steps to make this pass:
+        //   The work of embedding related records (and later running computed)
+        //   should happen something like this:
+        //
+        // let updater = new Updater(modules: Omit<CardContent, 'data'>);
+        // try {
+        //   let content = await updater.run(data: RawCard["data"])
+        //   let deps = updater.dependencies();
+        // } catch (err: any) {
+        //   let deps = updater.dependencies(); // dep tracking works even in failure
+        // }
       });
     });
 
