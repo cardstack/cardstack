@@ -5,12 +5,12 @@ import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
 
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
-import { BetaTestConfig } from '../../types';
+import { CardDropConfig } from '../../types';
 import { assertHubBot } from '../../utils';
 import Client, { Message } from '@cardstack/discord-bot';
 
 const log = logger('command:card-me');
-const { sku } = config.get('betaTesting') as BetaTestConfig;
+const { sku } = config.get('cardDrop') as CardDropConfig;
 
 export const name: Command['name'] = 'card-drop';
 export const description: Command['description'] = 'Airdrop Cardstack prepaid cards';
