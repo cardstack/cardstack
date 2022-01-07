@@ -1223,11 +1223,11 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
--- Name: card_drop_recipients beta_testers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: card_drop_recipients card_drop_recipients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.card_drop_recipients
-    ADD CONSTRAINT beta_testers_pkey PRIMARY KEY (user_id);
+    ADD CONSTRAINT card_drop_recipients_pkey PRIMARY KEY (user_id);
 
 
 --
@@ -1652,7 +1652,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 47	20211207190527999_create-latest-event-block	2022-01-03 16:22:49.63704
 48	20211214163123421_card-index-errors	2022-01-03 16:22:49.63704
 51	20220103201128435_invalidation-ordering	2022-01-05 12:53:32.343481
-52	20220107151914576_rename-beta-testers-table	2022-01-07 10:33:34.480683
+54	20220107151914576_rename-beta-testers-table	2022-01-07 10:49:15.639171
 \.
 
 
@@ -1660,7 +1660,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 52, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 54, true);
 
 
 --
