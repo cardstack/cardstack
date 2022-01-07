@@ -38,7 +38,7 @@ export default class APIRouter {
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
-  checklyWebhookRoute = inject('checkly-webhook-route', { as: 'checklyWebhookRoute' });
+
   routes() {
     let {
       boomRoute,
