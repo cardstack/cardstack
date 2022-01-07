@@ -29,6 +29,9 @@ module.exports = {
       filename: '[name].js.map',
       noSources: true,
       moduleFilenameTemplate: '[absolute-resource-path]',
+      // don't make source maps for the ts-migrations, node-pg-migrate gets
+      // confused when it sees these
+      exclude: Object.keys(tsMigrationEntrypoints).map((i) => `${i}.js`),
     }),
 
     // graphile-worker contains standalone sql files that it expects to be able
