@@ -18,9 +18,9 @@ describe('POST /api/checkly-webhook', async function () {
 
   it('returns 200 when processing a check', async function () {
     await request()
-      .post('/api/checkly-webhook')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
+      .post('/callbacks/checkly')
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
       .send({
         check_name: 'hub-prod subgraph / RPC node block number diff within threshold',
         alert_type: 'ALERT_FAILURE',
@@ -30,9 +30,9 @@ describe('POST /api/checkly-webhook', async function () {
 
   it('returns 422 when processing an unrecognized check', async function () {
     await request()
-      .post('/api/checkly-webhook')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
+      .post('/callbacks/checkly')
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
       .send({
         check_name: 'abc123',
         alert_type: 'ALERT_FAILURE',

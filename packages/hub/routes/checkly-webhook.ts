@@ -57,7 +57,7 @@ export default class ChecklyWebhookRoute {
       ctx.body = { error: `Unrecognized check name: ${checkName}` };
     }
 
-    ctx.type = 'application/vnd.api+json';
+    ctx.type = 'application/json';
   }
 
   private isVerifiedPayload(payload: string, signature: string) {
