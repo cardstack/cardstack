@@ -1,5 +1,3 @@
-import Component from '@glimmer/component';
-import { getOwner } from '@ember/application';
 import {
   Workflow,
   Milestone,
@@ -17,9 +15,8 @@ import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { tracked } from '@glimmer/tracking';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
+import RestorableWorkflowComponent from '../restorable-workflow-component';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -256,27 +253,12 @@ class DepositWorkflow extends Workflow {
   }
 }
 
-class DepositWorkflowComponent extends Component {
+class DepositWorkflowComponent extends RestorableWorkflowComponent<DepositWorkflow> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @service declare workflowPersistence: WorkflowPersistence;
-  @service declare router: RouterService;
-  @tracked workflow: DepositWorkflow | null = null;
 
-  constructor(owner: unknown, args: {}) {
-    super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new DepositWorkflow(getOwner(this), workflowPersistenceId);
-
-    this.restore(workflow);
-  }
-
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  get workflowClass() {
+    return DepositWorkflow;
   }
 
   @action onDisconnect() {

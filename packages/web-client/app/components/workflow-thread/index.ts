@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { Workflow } from '@cardstack/web-client/models/workflow';
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import config from '@cardstack/web-client/config/environment';
 let interval = config.threadAnimationInterval;
 
@@ -12,12 +12,19 @@ interface WorkflowThreadArgs {
 
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
-  workflow = new AnimatedWorkflow(this.args.workflow);
+  @cached
+  get workflow() {
+    return new AnimatedWorkflow(
+      this.args.workflow,
+      this.threadAnimationInterval
+    );
+  }
   reducedMotionMediaQuery = window?.matchMedia(
     '(prefers-reduced-motion: reduce)'
   );
   @tracked autoscroll = false;
-  @tracked threadAnimationInterval = '0ms';
+  @tracked cssThreadAnimationInterval = '0ms';
+  threadAnimationInterval = 0; // intentionally not tracked, so that we don't recompute the AnimatedWorkflow
   appVersion = config.version;
 
   constructor(owner: unknown, args: any) {
@@ -40,14 +47,14 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
       // if prefers-reduced-motion, don't autoscroll, and release postables as soon as available
       // this puts control on when and how to scroll in users' hands
       this.autoscroll = false;
-      this.workflow.interval = 0;
-      this.threadAnimationInterval = `0ms`;
+      this.threadAnimationInterval = 0;
     } else {
       // otherwise, turn on autoscrolling and use the interval defined in config
       this.autoscroll = true;
-      this.workflow.interval = interval;
-      this.threadAnimationInterval = `${interval}ms`;
+      this.threadAnimationInterval = interval;
     }
+    this.cssThreadAnimationInterval = `${this.threadAnimationInterval}ms`;
+    this.workflow.interval = this.threadAnimationInterval;
   }
 
   @action focus(element: HTMLElement): void {

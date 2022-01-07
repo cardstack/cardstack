@@ -1,9 +1,6 @@
-import Component from '@glimmer/component';
-import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 
@@ -23,13 +20,13 @@ import {
   conditionalCancelationMessage,
 } from '@cardstack/web-client/models/workflow';
 
-import { tracked } from '@glimmer/tracking';
 import {
   convertAmountToNativeDisplay,
   fromWei,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
+import RestorableWorkflowComponent from '../restorable-workflow-component';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
@@ -362,30 +359,11 @@ class IssuePrepaidCardWorkflow extends Workflow {
   }
 }
 
-class IssuePrepaidCardWorkflowComponent extends Component {
+class IssuePrepaidCardWorkflowComponent extends RestorableWorkflowComponent<IssuePrepaidCardWorkflow> {
   @service declare layer2Network: Layer2Network;
-  @service declare workflowPersistence: WorkflowPersistence;
-  @service declare router: RouterService;
 
-  @tracked workflow: IssuePrepaidCardWorkflow | null = null;
-
-  constructor(owner: unknown, args: {}) {
-    super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new IssuePrepaidCardWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
-  }
-
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  get workflowClass() {
+    return IssuePrepaidCardWorkflow;
   }
 
   @action onDisconnect() {

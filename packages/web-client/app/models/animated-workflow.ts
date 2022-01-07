@@ -147,8 +147,9 @@ export default class AnimatedWorkflow {
   #listenersToCleanUp: UnbindEventListener[] = [];
   interval = 0;
 
-  constructor(model: Workflow) {
+  constructor(model: Workflow, interval = 0) {
     this.model = model;
+    this.interval = interval;
     this.#listenersToCleanUp.push(
       this.model.on(
         'visible-postables-will-change',

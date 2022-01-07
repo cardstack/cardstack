@@ -1,10 +1,10 @@
-{{#if this.workflow}}
+{{#unless this.isInitializing}}
   <WorkflowThread
     class="create-space-workflow"
     @workflow={{this.workflow}}
     @onClose={{@onClose}}
   />
-{{/if}}
+{{/unless}}
 
 {{!-- TODO: remove this and place it in a better place when we have solved the Boxel modal layer problem --}}
 {{!-- template-lint-disable no-inline-styles --}}

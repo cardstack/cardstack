@@ -1,5 +1,3 @@
-import Component from '@glimmer/component';
-import { getOwner } from '@ember/application';
 import {
   IWorkflowMessage,
   Milestone,
@@ -16,7 +14,6 @@ import {
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
-import RouterService from '@ember/routing/router-service';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 import BN from 'bn.js';
@@ -32,6 +29,7 @@ import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
+import RestorableWorkflowComponent from '../restorable-workflow-component';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -377,29 +375,12 @@ with Card Pay.`,
   }
 }
 
-export default class WithdrawalWorkflowComponent extends Component {
+export default class WithdrawalWorkflowComponent extends RestorableWorkflowComponent<WithdrawalWorkflow> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @tracked workflow: WithdrawalWorkflow | null = null;
-  @service declare router: RouterService;
 
-  constructor(owner: unknown, args: {}) {
-    super(owner, args);
-
-    let workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    let workflow = new WithdrawalWorkflow(
-      getOwner(this),
-      workflowPersistenceId
-    );
-
-    this.restore(workflow);
-  }
-
-  async restore(workflow: any) {
-    await workflow.restore();
-    this.workflow = workflow;
+  get workflowClass() {
+    return WithdrawalWorkflow;
   }
 
   @action onDisconnect() {
