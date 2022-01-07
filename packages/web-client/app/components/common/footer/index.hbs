@@ -1,6 +1,6 @@
 <footer class="cardstack-footer" ...attributes>
-  <div class="cardstack-footer__section">
-    <div class="cardstack-footer__horizontal-stack">
+  <div class="cardstack-footer__section cardstack-footer__section--top">
+    <div class="cardstack-footer__important-links">
       <a href="https://support.cardstack.com" target="_blank" rel="noopener noreferrer" >
         Support
       </a>
@@ -18,14 +18,15 @@
     </Boxel::Button>
   </div>
   <div class="cardstack-footer__section cardstack-footer__section--bottom">
-    <div class="cardstack-footer__fine-print cardstack-footer__horizontal-stack">
+    <div class="cardstack-footer__fine-print">
       {{svg-jar "cardstack" class="cardstack-footer__logo"}}
       <span>
         © {{this.currentYear}} Cardstack Foundation.
+        <br>
         Cardstack® is a registered trademark.
       </span>
     </div>
-    <div class="cardstack-footer__horizontal-stack">
+    <div class="cardstack-footer__socials">
       <a href="https://twitter.com/cardstack" target="_blank" rel="noopener noreferrer" >
         <span class="boxel-sr-only">Cardstack Twitter</span>
         {{svg-jar "twitter-logo" class="cardstack-footer__social-icon"}}
