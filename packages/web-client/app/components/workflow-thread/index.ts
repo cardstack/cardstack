@@ -48,13 +48,12 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
       // this puts control on when and how to scroll in users' hands
       this.autoscroll = false;
       this.threadAnimationInterval = 0;
-      this.cssThreadAnimationInterval = '0ms';
     } else {
       // otherwise, turn on autoscrolling and use the interval defined in config
       this.autoscroll = true;
       this.threadAnimationInterval = interval;
-      this.cssThreadAnimationInterval = `${interval}ms`;
     }
+    this.cssThreadAnimationInterval = `${this.threadAnimationInterval}ms`;
     this.workflow.interval = this.threadAnimationInterval;
   }
 
