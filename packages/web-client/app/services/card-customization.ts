@@ -89,7 +89,6 @@ export default class CardCustomization extends Service {
         }
       }
     }
-    return Promise.resolve();
   }
 
   @task *fetchPatternOptionsTask(): any {
