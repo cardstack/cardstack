@@ -18,7 +18,7 @@ import {
 import { CardDropConfig } from '../../../services/discord-bots/hub-bot/types';
 import { registry, setupBot } from '../../helpers/server';
 
-const { sku, discordRole: betaTesterRoleName } = config.get('cardDrop') as CardDropConfig;
+const { sku } = config.get('cardDrop') as CardDropConfig;
 
 describe('bot command: airdrop-prepaidcard:start', function () {
   let db: DBClient;
@@ -34,12 +34,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   let mockEOA = '0x123';
   let mockTxnHash = '0x456';
   let mockPrepaidCardAddress = '0x789';
-  let betaTesterRole: MockRole = {
-    id: '1',
-    name: betaTesterRoleName,
-  };
   let roles = new Collection<string, MockRole>();
-  roles.set(betaTesterRole.id, betaTesterRole);
   let guild = makeTestGuild({ roles });
 
   class StubInventoryService {
