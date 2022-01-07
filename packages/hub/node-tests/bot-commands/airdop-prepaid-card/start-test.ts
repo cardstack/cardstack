@@ -15,10 +15,10 @@ import {
   MockChannel,
   Message,
 } from '@cardstack/discord-bot';
-import { BetaTestConfig } from '../../../services/discord-bots/hub-bot/types';
+import { CardDropConfig } from '../../../services/discord-bots/hub-bot/types';
 import { registry, setupBot } from '../../helpers/server';
 
-const { sku, discordRole: betaTesterRoleName } = config.get('betaTesting') as BetaTestConfig;
+const { sku, discordRole: betaTesterRoleName } = config.get('cardDrop') as CardDropConfig;
 
 describe('bot command: airdrop-prepaidcard:start', function () {
   let db: DBClient;
@@ -93,7 +93,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM dm_channels`);
-    await db.query(`DELETE FROM beta_testers`);
+    await db.query(`DELETE FROM card_drop_recipients`);
 
     await db.query(`INSERT INTO dm_channels (channel_id, user_id, command) VALUES ($1, $2, $3)`, [
       dm.id,
@@ -181,7 +181,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     );
     expect(dm.responses[3].image.url).to.equal(`attachment://${sku}.png`);
 
-    let { rows } = await db.query(`SELECT * FROM beta_testers WHERE user_id = $1`, [user.id]);
+    let { rows } = await db.query(`SELECT * FROM card_drop_recipients WHERE user_id = $1`, [user.id]);
     expect(rows.length).to.equal(1);
 
     let [row] = rows;
@@ -192,7 +192,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   });
 
   it(`will not prompt for a QR code if the system already has collected the EOA`, async function () {
-    await db.query(`INSERT INTO beta_testers (user_id, user_name, address) VALUES ($1, $2, $3)`, [
+    await db.query(`INSERT INTO card_drop_recipients (user_id, user_name, address) VALUES ($1, $2, $3)`, [
       user.id,
       user.username,
       mockEOA,

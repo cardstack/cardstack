@@ -9,7 +9,7 @@ interface BetaTester {
 }
 
 export async function getBetaTester(db: DBClient, userId: string): Promise<BetaTester | undefined> {
-  let query = `SELECT * FROM beta_testers WHERE user_id = $1`;
+  let query = `SELECT * FROM card_drop_recipients WHERE user_id = $1`;
   let { rows } = await db.query(query, [userId]);
   if (rows.length === 0) {
     return undefined;
@@ -26,7 +26,7 @@ export async function getBetaTester(db: DBClient, userId: string): Promise<BetaT
 }
 
 export async function setBetaTester(db: DBClient, userId: string, userName: string): Promise<void> {
-  let query = `INSERT INTO beta_testers (user_id, user_name)
+  let query = `INSERT INTO card_drop_recipients (user_id, user_name)
     VALUES ($1, $2)
     ON CONFLICT (user_id)
     DO UPDATE SET
@@ -36,12 +36,12 @@ export async function setBetaTester(db: DBClient, userId: string, userName: stri
 }
 
 export async function setBetaTesterAddress(db: DBClient, userId: string, address: string): Promise<void> {
-  let query = `UPDATE beta_testers SET address = $2 WHERE user_id = $1`;
+  let query = `UPDATE card_drop_recipients SET address = $2 WHERE user_id = $1`;
   await db.query(query, [userId, address]);
 }
 
 export async function setBetaTesterAirdropTxnHash(db: DBClient, userId: string, txnHash: string): Promise<void> {
-  let query = `UPDATE beta_testers SET airdrop_txn_hash = $2 WHERE user_id = $1`;
+  let query = `UPDATE card_drop_recipients SET airdrop_txn_hash = $2 WHERE user_id = $1`;
   await db.query(query, [userId, txnHash]);
 }
 
@@ -50,6 +50,6 @@ export async function setBetaTesterAirdropPrepaidCard(
   userId: string,
   prepaidCard: string
 ): Promise<void> {
-  let query = `UPDATE beta_testers SET airdrop_prepaid_card = $2 WHERE user_id = $1`;
+  let query = `UPDATE card_drop_recipients SET airdrop_prepaid_card = $2 WHERE user_id = $1`;
   await db.query(query, [userId, prepaidCard]);
 }

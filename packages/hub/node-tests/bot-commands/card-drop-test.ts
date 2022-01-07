@@ -11,10 +11,10 @@ import {
   Collection,
   MockRole,
 } from '@cardstack/discord-bot';
-import { BetaTestConfig } from '../../services/discord-bots/hub-bot/types';
+import { CardDropConfig } from '../../services/discord-bots/hub-bot/types';
 import { registry, setupBot } from '../helpers/server';
 
-const { sku } = config.get('betaTesting') as BetaTestConfig;
+const { sku } = config.get('cardDrop') as CardDropConfig;
 
 describe('bot command: card-drop', function () {
   let db: DBClient;
@@ -46,7 +46,7 @@ describe('bot command: card-drop', function () {
     let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM dm_channels`);
-    await db.query(`DELETE FROM beta_testers`);
+    await db.query(`DELETE FROM card_drop_recipients`);
 
     stubInventory = [
       {
@@ -81,12 +81,10 @@ describe('bot command: card-drop', function () {
   });
 
   it(`does not give prepaid cards to users that already received airdrop`, async function () {
-    await db.query(`INSERT INTO beta_testers (user_id, user_name, address, airdrop_txn_hash) VALUES ($1, $2, $3, $4)`, [
-      user.id,
-      user.username,
-      mockEOA,
-      mockTxnHash,
-    ]);
+    await db.query(
+      `INSERT INTO card_drop_recipients (user_id, user_name, address, airdrop_txn_hash) VALUES ($1, $2, $3, $4)`,
+      [user.id, user.username, mockEOA, mockTxnHash]
+    );
     let channel = makeTestChannel();
     let dm = makeTestChannel();
     let message = makeTestMessage({

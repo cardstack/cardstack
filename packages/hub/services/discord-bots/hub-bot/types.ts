@@ -1,4 +1,4 @@
-export interface BetaTestConfig {
+export interface CardDropConfig {
   sku: string;
   discordRole: string;
 }
