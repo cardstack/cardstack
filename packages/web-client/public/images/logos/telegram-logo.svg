@@ -1,21 +1,21 @@
 <svg id="Telegram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.621 15.341">
   <defs>
-    <clipPath id="clip-path">
+    <clipPath id="telegram-logo-clippath">
       <path id="Path_3878" data-name="Path 3878" fill="none" clip-rule="evenodd"
         d="M104.571-10.778a.192.192 0 0 1-.094-.137.123.123 0 0 1 .016-.078L104.48-11l-.472 4.457s-.062.43.155.566c.169.107.51.033 1.184-.566a42.074 42.074 0 0 1 2.658-2.162l-.234-.144c-1.41-.863-2.7-1.63-3.2-1.93"
         transform="translate(-104 11)" />
     </clipPath>
-    <clipPath id="clip-path-2">
+    <clipPath id="telegram-logo-clippath-2">
       <path id="Path_3880" data-name="Path 3880" fill="none" clip-rule="evenodd"
         d="M116.585-17.67a.4.4 0 0 0-.271-.295 1.4 1.4 0 0 0-.733.052s-16.316 5.857-17.248 6.5c-.2.14-.268.221-.3.316-.161.462.341.665.341.665l4.205 1.368h.038a.35.35 0 0 0 .175-.016c.957-.6 9.625-6.07 10.125-6.254.079-.023.137 0 .122.058-.2.7-7.729 7.384-7.729 7.384a.362.362 0 0 0-.047.078.126.126 0 0 0-.013.073.182.182 0 0 0 .079.128c.419.28 1.488 1 2.661 1.8l.195.134c1.446 1 3 2.1 3.674 2.677a1.168 1.168 0 0 0 .852.328.959.959 0 0 0 .815-.723s2.973-11.95 3.073-13.551c.009-.157.023-.257.024-.365a1.35 1.35 0 0 0-.037-.371"
         transform="translate(-98 18)" />
     </clipPath>
   </defs>
-  <g id="Group_6141" data-name="Group 6141" transform="translate(5.608 6.543)" style="clip-path:url(#clip-path)">
+  <g id="Group_6141" data-name="Group 6141" transform="translate(5.608 6.543)" style="clip-path:url(#telegram-logo-clippath)">
     <path id="Path_3877" data-name="Path 3877" fill="var(--icon-color,#fff)" d="M99-16h13.352v14.411H99Z"
       transform="translate(-103.673 11.327)" />
   </g>
-  <g id="Group_6142" data-name="Group 6142" style="clip-path:url(#clip-path-2)">
+  <g id="Group_6142" data-name="Group 6142" style="clip-path:url(#telegram-logo-clippath-2)">
     <path id="Path_3879" data-name="Path 3879" fill="var(--icon-color,#fff)" d="M93-23h27.968V1.687H93Z"
       transform="translate(-97.673 18.327)" />
   </g>
