@@ -57,7 +57,6 @@ export default class APIRouter {
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
-      checklyWebhookRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -94,7 +93,6 @@ export default class APIRouter {
     apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
     apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
-    apiSubrouter.post('/checkly-webhook', parseBody, checklyWebhookRoute.post);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
