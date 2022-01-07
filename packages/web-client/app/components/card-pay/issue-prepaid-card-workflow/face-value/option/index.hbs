@@ -1,25 +1,12 @@
-<Common::RadioOption
-  @name='funding-amount'
-  @checked={{@checked}}
-  @disabled={{@disabled}}
-  @onInput={{@onInput}}
-  class={{cn
-    'face-value-option'
-    face-value-option--checked=@checked
-    face-value-option--disabled=@disabled
-  }}
-  data-test-face-value-option={{@spendFaceValue}}
->
-  <div class="face-value-option__value">
-    {{svg-jar "spend" width="20" height="20" role="presentation"}}
-    <div class="face-value-option__amount">
-      §{{format-amount @spendFaceValue}} SPEND
-    </div>
-    <div class="face-value-option__conversion">
-      ${{@usdAmount}} USD
-    </div>
-    <div class="face-value-option__conversion">
-      ≈ {{@approxTokenAmount}} {{@tokenSymbol}}*
-    </div>
+<div class="face-value-option">
+  {{svg-jar "spend" width="20" height="20" role="presentation"}}
+  <div class="face-value-option__amount">
+    §{{format-amount @spendAmount}} SPEND
   </div>
-</Common::RadioOption>
+  <div class="face-value-option__conversion">
+    ${{spend-to-usd @spendAmount}} USD
+  </div>
+  <div class="face-value-option__conversion">
+    ≈ {{@approxTokenAmount}} {{@tokenSymbol}}*
+  </div>
+</div>

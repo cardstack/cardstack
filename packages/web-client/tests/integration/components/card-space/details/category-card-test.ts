@@ -39,7 +39,7 @@ module(
         />
       `);
 
-      assert.dom('radio-option__input--checked').doesNotExist();
+      assert.dom('boxel-radio-option__input--checked').doesNotExist();
 
       OPTIONS.forEach(function (buttonText, index) {
         assert
@@ -67,18 +67,14 @@ module(
       `);
 
       assert
-        .dom(`[data-test-category-option]:nth-child(${OPTIONS.length + 1})`)
+        .dom(`[data-test-category-option]:nth-child(${OPTIONS.length})`)
         .containsText('Other');
 
-      await click(
-        `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
-      );
+      await click(`[data-test-category-option]:nth-child(${OPTIONS.length})`);
 
       assert
         .dom(
-          `[data-test-category-option]:nth-child(${
-            OPTIONS.length + 1
-          }) [data-test-category-option-other]`
+          `[data-test-category-option]:nth-child(${OPTIONS.length}) [data-test-category-option-other]`
         )
         .exists();
 
@@ -91,10 +87,8 @@ module(
       );
 
       assert
-        .dom(
-          `[data-test-category-option]:nth-child(${OPTIONS.length + 1}) input`
-        )
-        .hasClass('radio-option__input--checked');
+        .dom(`[data-test-category-option]:nth-child(${OPTIONS.length}) input`)
+        .hasClass('boxel-radio-option__input--checked');
 
       assert.equal(
         workflowSession.getValue<string>('profileCategory'),
@@ -109,9 +103,7 @@ module(
         'Something'
       );
 
-      await click(
-        `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
-      );
+      await click(`[data-test-category-option]:nth-child(${OPTIONS.length})`);
 
       assert
         .dom('[data-test-category-option-other] input')
@@ -277,7 +269,7 @@ module(
 
       assert
         .dom('[data-test-category-option]:nth-child(2) input')
-        .hasClass('radio-option__input--checked');
+        .hasClass('boxel-radio-option__input--checked');
     });
 
     test('it restores custom input from session', async function (assert) {
@@ -292,10 +284,8 @@ module(
       `);
 
       assert
-        .dom(
-          `[data-test-category-option]:nth-child(${OPTIONS.length + 1}) input`
-        )
-        .hasClass('radio-option__input--checked');
+        .dom(`[data-test-category-option]:nth-child(${OPTIONS.length}) input`)
+        .hasClass('boxel-radio-option__input--checked');
 
       assert.dom('[data-test-category-option-other] input').hasValue('Hello');
     });

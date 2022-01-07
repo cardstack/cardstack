@@ -1,30 +1,24 @@
-<Boxel::CustomRadio 
-  class="card-pay-layer-one-wallet-provider-selection__details"
-  @groupDescription="Select a wallet to connect to" 
-  @items={{@walletProviders}} 
-  @checkedId={{@currentWalletProviderId}}
+<Boxel::RadioInput
+  @groupDescription="Select a wallet to connect to"
+  @items={{@walletProviders}}
   @disabled={{@isConnecting}}
+  @checkedId={{@currentWalletProviderId}}
+  @hideRadio={{true}}
   ...attributes
   data-test-wallet-selection
-  as |item|
+  as |option|
 >
-  <item.component
-    @name="wallet-provider-selection"
-    @id={{item.data.id}}
-    @value={{item.data.name}}
-    @checked={{item.checked}}
-    @onChange={{fn (optional @changeWalletProvider) item.data.id}}
-    @focusedClass="card-pay-layer-one-wallet-provider-selection__item--focused"
-    @checkedClass="card-pay-layer-one-wallet-provider-selection__item--checked"
-    class={{cn 
-      "card-pay-layer-one-wallet-provider-selection__item"
-      card-pay-layer-one-wallet-provider-selection__item-disabled=@isConnecting
-    }}
-    data-test-wallet-option={{item.data.id}}
-  >
-    {{!-- semantics are swallowed by label element so not using hx elements here --}}
-    <img src={{item.data.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
-    <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.data.name}}</span>
-    <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.data.description}}</span>
-  </item.component>
-</Boxel::CustomRadio>
+  {{#let option.data as |item|}}
+    <option.component
+      @name="wallet-provider-selection"
+      @onChange={{fn (optional @changeWalletProvider) item.id}}
+      data-test-wallet-option={{item.id}}
+    >
+      <div class="card-pay-layer-one-wallet-provider-selection__item">
+        <img src={{item.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
+        <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.name}}</span>
+        <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.description}}</span>
+      </div>
+    </option.component>
+  {{/let}}
+</Boxel::RadioInput>
