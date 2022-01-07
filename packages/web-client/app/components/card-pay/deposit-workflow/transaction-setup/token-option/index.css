@@ -1,6 +1,9 @@
-.radio-option.token-option {
-  padding: var(--boxel-sp-xl) var(--boxel-sp);
-  grid-template-columns: auto 1fr 1fr;
+.token-option {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--boxel-sp);
+  padding: var(--boxel-sp);
 }
 
 .token-option__currency {

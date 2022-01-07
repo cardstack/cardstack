@@ -1,23 +1,24 @@
 <div class="card-space-url-form">
   <CardPay::LabeledValue
-    @fieldMode="edit"
     @label="Button Text"
     data-test-card-space-button-text-field
   >
-    <div data-test-button-text-options>
-      {{#each this.options as |option|}}
-        {{#let (eq this.buttonTextValue option) as |checked|}}
-          <Common::RadioOption
-            @name='button-text'
-            @checked={{checked}}
-            @onInput={{fn this.setButtonTextValue option}}
-            class='card-space-button-text-field__option'
-            data-test-button-text-option
-          >
-            {{option}}
-          </Common::RadioOption>
-        {{/let}}
-      {{/each}}
-    </div>
+    <Boxel::RadioInput
+      @groupDescription="Select button text"
+      @items={{this.options}}
+      @orientation="vertical"
+      data-test-button-text-options
+    as |option|>
+      {{#let option.data as |text|}}
+        <option.component
+          @name="button-text"
+          @checked={{eq this.buttonTextValue text}}
+          @onChange={{fn this.setButtonTextValue text}}
+          data-test-button-text-option
+        >
+          {{text}}
+        </option.component>
+      {{/let}}
+    </Boxel::RadioInput>
   </CardPay::LabeledValue>
 </div>

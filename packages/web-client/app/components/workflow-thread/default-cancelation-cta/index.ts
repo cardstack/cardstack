@@ -2,9 +2,9 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
+import * as short from 'short-uuid';
 
-class WorkflowThreadDisconnectionComponent extends Component {
+class WorkflowThreadDefaultCancelationCta extends Component {
   @service declare router: RouterService;
 
   get currentWorkflow() {
@@ -13,17 +13,12 @@ class WorkflowThreadDisconnectionComponent extends Component {
 
   @action async restartWorkflow() {
     const { queryParams } = this.router.currentRoute;
-    delete queryParams['flow-id']; // Persistence id
-
     await this.router.transitionTo({
-      queryParams: { flow: null, 'flow-id': null },
-    });
-    next(this, () => {
-      this.router.transitionTo({
-        queryParams,
-      });
+      queryParams: Object.assign({}, queryParams, {
+        'flow-id': short.generate(),
+      }),
     });
   }
 }
 
-export default WorkflowThreadDisconnectionComponent;
+export default WorkflowThreadDefaultCancelationCta;

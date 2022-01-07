@@ -31,6 +31,10 @@
       "*": [
         "types/*"
       ],
+      "@glimmer/tracking": [
+        "../../node_modules/ember-cached-decorator-polyfill",
+        "../../node_modules/@glimmer/tracking/dist/types"
+      ],
       "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
       "@cardstack/web-client/mirage/*": ["mirage/*"],
       "web3-provider-engine": ["../../types/web3-provider-engine"],
