@@ -129,6 +129,12 @@ module.exports = {
     ...tsMigrationEntrypoints,
   },
 
+  output: {
+    library: {
+      type: 'commonjs',
+    },
+  },
+
   target: 'node14',
 
   node: {
