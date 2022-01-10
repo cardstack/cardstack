@@ -8,6 +8,7 @@ import {
   waitFor,
 } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
+import config from '@cardstack/web-client/config/environment';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { setupHubAuthenticationToken } from '../helpers/setup';
@@ -166,8 +167,10 @@ module('Acceptance | create card space', function (hooks) {
 
     await percySnapshot(assert);
 
-    await click('[data-test-card-space-next-step="visit-space"]');
-    assert.equal(currentURL(), '/card-space/usernametodo');
+    let spaceHostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
+    assert
+      .dom('[data-test-card-space-next-step="visit-space"]')
+      .hasAttribute('href', new RegExp(spaceHostname.replace(/\./g, '\\.')));
   });
 
   module('tests with layer 2 already connected', function (hooks) {
