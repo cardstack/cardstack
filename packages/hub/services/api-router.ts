@@ -38,6 +38,7 @@ export default class APIRouter {
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
+
   routes() {
     let {
       boomRoute,
