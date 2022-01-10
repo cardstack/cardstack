@@ -34,6 +34,10 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
     }[safe.type];
   }
 
+  get isDepot() {
+    return this.args.safe.type === 'depot';
+  }
+
   get data() {
     if (this.args.safe.type === 'merchant') {
       let merchant = this.args.safe as MerchantSafe;
