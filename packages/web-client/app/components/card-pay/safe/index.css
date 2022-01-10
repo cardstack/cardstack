@@ -140,7 +140,7 @@
   font-weight: 700;
 }
 
-.card-pay-safe__safe-footer {
+.card-pay-safe__footer {
   margin-top: auto;
   color: var(--boxel-dark);
   padding: var(--boxel-sp-xl) var(--boxel-sp-lg) var(--boxel-sp-sm);
@@ -150,7 +150,7 @@
   align-items: flex-end;
 }
 
-.card-pay-safe__safe-footer-value {
+.card-pay-safe__footer-value {
   font: 700 var(--boxel-font-sm);
   max-width: 12rem;
   white-space: nowrap;

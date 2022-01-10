@@ -72,13 +72,13 @@
     {{/each}}
   </section>
   {{#unless this.isDepot}}
-    <section class="card-pay-safe__safe-footer">
+    <section class="card-pay-safe__footer">
       <div>
-        <div class="card-pay-safe__safe-footer-label">Business ID</div>
-        <div class="card-pay-safe__safe-footer-value" title={{this.data.info.id}} data-test-safe-footer-business-id>{{this.data.info.id}}</div>
+        <div>Business ID</div>
+        <div class="card-pay-safe__footer-value" title={{this.data.info.id}} data-test-safe-footer-business-id>{{this.data.info.id}}</div>
       </div>
       <div data-test-safe-footer-managers>
-        <span class="card-pay-safe__safe-footer-value">{{@safe.owners.length}}</span>
+        <span class="card-pay-safe__footer-value">{{@safe.owners.length}}</span>
         {{if (eq @safe.owners.length 1) "Manager" "Managers"}}
         {{svg-jar "user-avatar" width="16" height="14" class="card-pay-safe__manager-icon"}}
       </div>
