@@ -30,7 +30,7 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitFor('[data-test-boxel-validation-state-input="initial"]');
+      await waitFor('[data-test-boxel-validation-state-input="valid"]');
 
       assert
         .dom('[data-test-boxel-validation-state-input]')
@@ -56,7 +56,7 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitFor('[data-test-boxel-validation-state-input="initial"]');
+      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
 
       assert
         .dom('[data-test-boxel-validation-state-input]')
