@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="18.693" height="15.19">
   <defs>
     <clipPath id="twitter-logo-clippath">
-      <path data-name="Path 13099"
+      <path
         d="M18.177-17.721a7.642 7.642 0 0 1-2.435.931 3.831 3.831 0 0 0-2.8-1.21 3.835 3.835 0 0 0-3.835 3.834 3.825 3.825 0 0 0 .1.874A10.888 10.888 0 0 1 1.3-17.3a3.816 3.816 0 0 0-.517 1.93 3.835 3.835 0 0 0 1.706 3.192 3.827 3.827 0 0 1-1.737-.48v.049A3.837 3.837 0 0 0 3.828-8.85a3.81 3.81 0 0 1-1.01.135 3.825 3.825 0 0 1-.718-.069 3.84 3.84 0 0 0 3.578 2.663A7.692 7.692 0 0 1 .915-4.479 7.9 7.9 0 0 1 0-4.532 10.86 10.86 0 0 0 5.879-2.81 10.836 10.836 0 0 0 16.79-13.721c0-.166 0-.331-.01-.5a7.791 7.791 0 0 0 1.913-1.979 7.639 7.639 0 0 1-2.2.6 3.845 3.845 0 0 0 1.687-2.122"
         transform="translate(0 18)" style="fill:none;clip-rule:evenodd" />
     </clipPath>
   </defs>
   <g style="clip-path:url(#twitter-logo-clippath)">
-    <path data-name="Path 13098" d="M-5-23h28.039V1.537H-5Z" transform="translate(.327 18.327)" style="fill:var(--icon-color,#fff)" />
+    <path  d="M-5-23h28.039V1.537H-5Z" transform="translate(.327 18.327)" style="fill:var(--icon-color,#fff)" />
   </g>
 </svg>

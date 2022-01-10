@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.982 11.99">
   <g transform="translate(-2 -12)" fill="var(--icon-color, #fff)">
-    <circle id="Ellipse_1379" data-name="Ellipse 1379" class="cls-1" cx="5.995" cy="5.995" r="5.995"
+    <circle id="Ellipse_1379"  class="cls-1" cx="5.995" cy="5.995" r="5.995"
       transform="translate(2 12)" />
-    <ellipse id="Ellipse_1380" data-name="Ellipse 1380" class="cls-1" cx="2.997" cy="5.495" rx="2.997" ry="5.495"
+    <ellipse id="Ellipse_1380"  class="cls-1" cx="2.997" cy="5.495" rx="2.997" ry="5.495"
       transform="translate(14.989 12.5)" />
-    <ellipse id="Ellipse_1381" data-name="Ellipse 1381" class="cls-1" cx=".999" cy="4.996" rx=".999" ry="4.996"
+    <ellipse id="Ellipse_1381"  class="cls-1" cx=".999" cy="4.996" rx=".999" ry="4.996"
       transform="translate(21.983 12.999)" />
   </g>
 </svg>
