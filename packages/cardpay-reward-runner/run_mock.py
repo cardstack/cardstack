@@ -1,6 +1,7 @@
 from os import environ
 from tempfile import TemporaryDirectory
-from pathlib import Path
+from typing import Any
+from cloudpathlib import AnyPath, CloudPath
 import shutil
 import json
 import boto3
@@ -10,19 +11,17 @@ import docker
 
 client = docker.from_env()
 
-output_dir = Path("out")
-
 
 def get_max_block(program):
     return get_rule(program)["max_block"]
 
 
 def get_programs():
-    return list(json.load(open(Path("config") / "reward_mock.json")).keys())
+    return list(json.load(open(AnyPath("config") / "reward_mock.json")).keys())
 
 
 def get_rule(program):
-    return json.load(open(Path("config") / "reward_mock.json"))[program]
+    return json.load(open(AnyPath("config") / "reward_mock.json"))[program]
 
 
 def get_access_credentials():
@@ -46,7 +45,7 @@ def get_access_credentials():
 
 
 def run_all(output_location: str, max_block: int = 24589499):
-
+    output_location = AnyPath(output_location)
     for program in get_programs():
         rule = get_rule(program)
         print(rule)
@@ -55,18 +54,19 @@ def run_all(output_location: str, max_block: int = 24589499):
             min(rule["core"]["valid_to"], max_block),
             rule["core"]["payment_cycle_length"],
         ):
-            output_location = (
-                output_dir
+            cycle_output_location = (
+                output_location
                 / f"rewardProgramID={rule['core']['reward_program_id']}"
                 / f"paymentCycle={payment_cycle}"
             )
-            if not output_location.exists():
+            if not cycle_output_location.exists():
                 print(
                     f"Running program {rule['core']['reward_program_id']} for payment cycle {payment_cycle}"
                 )
                 rule["run"] = {"payment_cycle": payment_cycle}
                 with TemporaryDirectory() as tmpdir:
-                    config_location = Path(tmpdir) / "parameters.json"
+                    tmpdir_path = AnyPath(tmpdir)
+                    config_location = tmpdir_path / "parameters.json"
                     with open(config_location, "w") as f:
                         json.dump(rule, f)
 
@@ -81,13 +81,10 @@ def run_all(output_location: str, max_block: int = 24589499):
                             environment=get_access_credentials(),
                         )
                     )
-
-                    shutil.copytree(
-                        tmpdir,
-                        output_dir
-                        / f"rewardProgramID={rule['core']['reward_program_id']}"
-                        / f"paymentCycle={payment_cycle}",
-                    )
+                    if isinstance(cycle_output_location, CloudPath):
+                        cycle_output_location.upload_from(tmpdir_path)
+                    else:
+                        shutil.copytree(tmpdir, cycle_output_location)
 
 
 if __name__ == "__main__":
