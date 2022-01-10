@@ -4,15 +4,20 @@ import { inject } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import CardsService from '../services/cards';
+import { action } from '@ember/object';
 
-export default class ApplicationController extends Controller {
+export default class PlaygroundController extends Controller {
   @inject declare cards: CardsService;
 
-  @tracked models: CardModel[] | undefined;
+  @tracked selected: CardModel | undefined;
 
-  @task async queryUsersTask(): Promise<void> {
-    this.models = await this.cards.query({
+  @task async queryUsersTask(): Promise<CardModel[]> {
+    return await this.cards.query({
       filter: { type: 'https://demo.com/user' },
     });
+  }
+
+  @action onChange(card: CardModel) {
+    this.selected = card;
   }
 }

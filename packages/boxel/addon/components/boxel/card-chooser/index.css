@@ -1,0 +1,33 @@
+.boxel-card-chooser {
+  position: relative;
+}
+
+.boxel-card-chooser__selected-row {
+  display: flex;
+}
+
+.boxel-card-chooser__options-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: var(--boxel-layer-modal-default);
+  box-shadow: var(--box-shadow);
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
+}
+
+.boxel-card-chooser__option {
+  display: flex;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.boxel-card-chooser__option:nth-child(odd) {
+  background: var(--boxel-light-100);
+}
+
+.boxel-card-chooser__option:hover {
+  background-color: var(--boxel-highlight);
+}

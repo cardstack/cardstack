@@ -1,0 +1,36 @@
+<div
+  class={{cn
+    "boxel-card-chooser"
+    boxel-card-chooser--open=this.isOpen
+  }}
+...attributes>
+  <div class="boxel-card-chooser__selected-row">
+    {{#if @selected}}
+      <@selected.component />
+    {{/if}}
+
+    <Boxel::Button
+      @size="small"
+      @loading={{this.isLoading}}
+      {{on "click" this.openCardOptions}}
+    >
+      Choose {{if @type (capitalize @type) "Card"}}
+    </Boxel::Button>
+  </div>
+
+  {{#if this.isOpen}}
+    <div class="boxel-card-chooser__options-menu">
+      {{#each this.selectableCards as |card|}}
+        {{!-- template-lint-disable no-invalid-interactive --}}
+        <div class="boxel-card-chooser__option"
+          {{on "click" (fn this.chooseCard card)}}
+        >
+          <Boxel::SelectButton
+            @isSelected={{eq card.url @selected.url}}
+          />
+        <card.component />
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</div>

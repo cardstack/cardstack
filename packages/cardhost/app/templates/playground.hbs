@@ -1,18 +1,5 @@
 <h1>Basic Card Chooser</h1>
 
-<button {{on 'click' (perform this.queryUsersTask)}}>Query Users</button>
-
-{{#if this.queryUsersTask.isRunning}}
-  {{!-- template-lint-disable no-obsolete-elements --}}
-  <blink>Loading...</blink>
-{{/if}}
-
-{{#each this.models as |model|}}
-  <model.component />
-{{else}}
-  No Users....yet
-{{/each}}
-
 {{!--
 # NEEDS:
 - List to iterator over
@@ -21,10 +8,11 @@
 - Embeded card view
 
  --}}
-{{!-- <PowerSelect
-  @options={{this.countries}}
-  @selected={{this.destination}}
-  @onChange={{this.foo}} as |country|>
-  <img src={{country.flagUrl}} class="icon-flag" alt="Flag of {{country.name}}">
-  <strong>{{country.name}}</strong>
-</PowerSelect> --}}
+ <div style="width: 400px">
+  <Boxel::CardChooser
+    @type="user"
+    @onFetchCardsTask={{this.queryUsersTask}}
+    @selected={{this.selected}}
+    @onChange={{this.onChange}}
+  />
+ </div>
