@@ -1,5 +1,5 @@
-name: beta_rewards
-subgraph: habdelra/cardpay-xdai
+name: staging_rewards
+subgraph: habdelra/cardpay-sokol
 tables:
   prepaid_card_payment:
     column_mappings:
