@@ -1,6 +1,8 @@
 .card-pay-safe-balances__container {
   --card-width: 22.75rem;
 
+  display: flex;
+  flex-direction: column;
   width: var(--card-width);
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
@@ -136,4 +138,26 @@
   --balance-line-height: 1.2;
 
   font-weight: 700;
+}
+
+.card-pay-safe-balances__safe-footer {
+  margin-top: auto;
+  color: var(--boxel-dark);
+  padding: var(--boxel-sp-xl) var(--boxel-sp-lg) var(--boxel-sp-sm);
+  font: var(--boxel-font-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-pay-safe-balances__safe-footer-value {
+  font: 700 var(--boxel-font-sm);
+  max-width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-pay-safe-balances__manager-icon {
+  vertical-align: top;
 }
