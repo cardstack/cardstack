@@ -3,6 +3,7 @@
     "core": {
       "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
       "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+      "docker_image": "reward_programs",
       "payment_cycle_length": 32768,
       "valid_from": 24000000,
       "valid_to": 26000000
@@ -22,6 +23,7 @@
     "core": {
       "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
       "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
+      "docker_image": "reward_programs",
       "payment_cycle_length": 32768,
       "valid_from": 24000000,
       "valid_to": 26000000
