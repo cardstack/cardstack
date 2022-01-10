@@ -1,4 +1,6 @@
 import Route from '@ember/routing/route';
+import config from '@cardstack/web-client/config/environment';
+import Controller from '@ember/controller';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
@@ -117,5 +119,18 @@ export default class CardstackRoute extends Route {
     return {
       orgs: ORGS,
     };
+  }
+
+  renderTemplate(controller: Controller) {
+    if (window.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
+      let username = window.location.hostname.replace(
+        `.${config.cardSpaceHostnameSuffix}`,
+        ''
+      );
+
+      this.render('card-space.userspace', { model: { username } });
+    } else {
+      super.renderTemplate(controller, null);
+    }
   }
 }
