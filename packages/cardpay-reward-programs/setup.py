@@ -20,7 +20,8 @@ setup(
         "eth_abi",
         "eth_typing",
         "merklelib",
-        "pysha3"
+        "pysha3",
+        "pyarrow"
     ],
     extras_require={
         "explore": [
