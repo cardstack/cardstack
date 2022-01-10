@@ -81,29 +81,23 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       )
       .exists();
 
-    assert.dom('[data-test-safe-balances]').exists({ count: 2 });
+    assert.dom('[data-test-safe]').exists({ count: 2 });
 
-    let depotSafeSel = `[data-test-safe-balances]:nth-of-type(1)`;
+    let depotSafeSel = `[data-test-safe]:nth-of-type(1)`;
 
     assert.dom(depotSafeSel).containsText('0x1234...abcd');
 
+    assert.dom(`${depotSafeSel} [data-test-safe-count]`).containsText('2');
+    assert.dom(`${depotSafeSel} [data-test-safe-token]`).exists({ count: 2 });
     assert
-      .dom(`${depotSafeSel} [data-test-safe-balances-count]`)
-      .containsText('2');
-    assert
-      .dom(`${depotSafeSel} [data-test-safe-balances-token]`)
-      .exists({ count: 2 });
-    assert
-      .dom(`${depotSafeSel} [data-test-safe-balances-usd-total]`)
+      .dom(`${depotSafeSel} [data-test-safe-usd-total]`)
       .containsText(`$116.41 USD`);
 
-    let merchantSafeSel = `[data-test-safe-balances]:nth-of-type(2)`;
+    let merchantSafeSel = `[data-test-safe]:nth-of-type(2)`;
 
     assert.dom(merchantSafeSel).containsText('0x2126...6F33');
 
-    assert
-      .dom(`${merchantSafeSel} [data-test-safe-balances-count]`)
-      .containsText('1');
+    assert.dom(`${merchantSafeSel} [data-test-safe-count]`).containsText('1');
 
     let secondAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6EbAAAA';
     layer2Service.test__simulateRemoteAccountSafes(secondAddress, [
@@ -119,7 +113,7 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([secondAddress]);
     await settled();
 
-    assert.dom('[data-test-safe-balances]').exists({ count: 1 });
+    assert.dom('[data-test-safe]').exists({ count: 1 });
   });
 
   test('Depot balance section when user has no depot', async function (this: Context, assert) {

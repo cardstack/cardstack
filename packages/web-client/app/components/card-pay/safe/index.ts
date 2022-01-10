@@ -7,21 +7,21 @@ import BN from 'bn.js';
 import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
 import { useResource } from 'ember-resources';
 
-interface CardPaySafeBalancesComponentArgs {
+interface CardPaySafeComponentArgs {
   safe: Safe;
 }
 
 type SupportedSafe = DepotSafe | MerchantSafe;
 
-export default class CardPaySafeBalancesComponent extends Component<CardPaySafeBalancesComponentArgs> {
+export default class CardPaySafeComponent extends Component<CardPaySafeComponentArgs> {
   @service declare tokenToUsd: TokenToUsd;
 
-  constructor(owner: unknown, args: CardPaySafeBalancesComponentArgs) {
+  constructor(owner: unknown, args: CardPaySafeComponentArgs) {
     super(owner, args);
 
     if (!isSupportedSafe(args.safe)) {
       throw new Error(
-        `CardPay::SafeBalances does not support a safe type of ${args.safe.type}`
+        `CardPay::Safe does not support a safe type of ${args.safe.type}`
       );
     }
   }

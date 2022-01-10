@@ -69,7 +69,7 @@
       </header>
       <section class="card-pay-dashboard__payments-cards">
         {{#each this.merchantSafes as |merchantSafe|}}
-          <CardPay::SafeBalances @safe={{merchantSafe}} />
+          <CardPay::Safe @safe={{merchantSafe}} />
         {{/each}}
       </section>
     </section>

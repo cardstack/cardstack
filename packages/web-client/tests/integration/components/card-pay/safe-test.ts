@@ -21,7 +21,7 @@ interface Context extends MirageTestContext {}
 
 const EXAMPLE_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 
-module('Integration | Component | card-pay/safe-balances', function (hooks) {
+module('Integration | Component | card-pay/safe', function (hooks) {
   setupRenderingTest(hooks);
   setupMirage(hooks);
 
@@ -59,32 +59,30 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       })
     );
     await render(hbs`
-      <CardPay::SafeBalances
+      <CardPay::Safe
         @safe={{this.safe}}
       />
     `);
 
-    assert.dom('[data-test-safe-balances]').containsText('0xB236...6666');
+    assert.dom('[data-test-safe]').containsText('0xB236...6666');
     assert
-      .dom('[data-test-safe-balances-network]')
+      .dom('[data-test-safe-network]')
       .containsText(`On ${c.layer2.shortName}`);
-    assert.dom('[data-test-safe-balances-count]').containsText('2');
-    assert.dom('[data-test-safe-balances-type]').containsText('Depot');
+    assert.dom('[data-test-safe-count]').containsText('2');
+    assert.dom('[data-test-safe-type]').containsText('Depot');
 
-    assert.dom('[data-test-safe-balances-title]').containsText('Depot');
-    assert.dom('[data-test-safe-balances-logo=depot]').exists();
-    assert.dom('[data-test-safe-balances-link]').doesNotExist();
+    assert.dom('[data-test-safe-title]').containsText('Depot');
+    assert.dom('[data-test-safe-logo=depot]').exists();
+    assert.dom('[data-test-safe-link]').doesNotExist();
 
-    assert
-      .dom('[data-test-safe-balances-usd-total]')
-      .containsText('$150.02 USD');
+    assert.dom('[data-test-safe-usd-total]').containsText('$150.02 USD');
 
     assert
-      .dom('[data-test-safe-balances-token="DAI.CPXD"]')
+      .dom('[data-test-safe-token="DAI.CPXD"]')
       .containsText('250.11 DAI.CPXD')
       .containsText('$50.02 USD');
     assert
-      .dom('[data-test-safe-balances-token="CARD.CPXD"]')
+      .dom('[data-test-safe-token="CARD.CPXD"]')
       .containsText('500.00 CARD.CPXD')
       .containsText('$100.00 USD');
   });
@@ -101,21 +99,21 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       })
     );
     await render(hbs`
-      <CardPay::SafeBalances
+      <CardPay::Safe
         @safe={{this.safe}}
       />
     `);
-    assert.dom('[data-test-safe-balances-count]').containsText('1');
-    assert.dom('[data-test-safe-balances-type]').containsText('Business');
+    assert.dom('[data-test-safe-count]').containsText('1');
+    assert.dom('[data-test-safe-type]').containsText('Business');
 
     await settled();
-    assert.dom('[data-test-safe-balances-title]').containsText('Mandello');
+    assert.dom('[data-test-safe-title]').containsText('Mandello');
     assert
-      .dom('[data-test-safe-balances-link]')
+      .dom('[data-test-safe-link]')
       .containsText('cardstack.xyz/mandello1')
       .hasAttribute('href', 'https://cardstack.xyz/mandello1');
 
-    assert.dom('[data-test-safe-balances-header]').hasStyle({
+    assert.dom('[data-test-safe-header]').hasStyle({
       'background-color': new TinyColor('#00ffc1').toRgbString(),
       color: new TinyColor('#000001').toRgbString(),
     });
@@ -133,7 +131,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     setupOnerror(function (err: Error) {
       assert.equal(
         err.message,
-        'CardPay::SafeBalances does not support a safe type of prepaid-card'
+        'CardPay::Safe does not support a safe type of prepaid-card'
       );
     });
     this.set(
@@ -152,7 +150,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       })
     );
     await render(hbs`
-      <CardPay::SafeBalances
+      <CardPay::Safe
         @safe={{this.safe}}
       />
     `);

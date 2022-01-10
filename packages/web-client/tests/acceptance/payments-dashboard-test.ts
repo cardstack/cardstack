@@ -63,16 +63,12 @@ module('Acceptance | payments dashboard', function (hooks) {
 
     await waitFor('[data-test-merchants-section]');
     assert
-      .dom('[data-test-merchants-section] [data-test-safe-balances]')
+      .dom('[data-test-merchants-section] [data-test-safe]')
       .exists({ count: 1 });
 
-    assert.dom('[data-test-safe-balances-title]').containsText('Mandello');
-    assert
-      .dom('[data-test-safe-balances-footer-business-id]')
-      .containsText('mandello1');
-    assert
-      .dom('[data-test-safe-balances-footer-managers]')
-      .containsText('1 Manager');
+    assert.dom('[data-test-safe-title]').containsText('Mandello');
+    assert.dom('[data-test-safe-footer-business-id]').containsText('mandello1');
+    assert.dom('[data-test-safe-footer-managers]').containsText('1 Manager');
     assert.dom('[data-test-merchant-logo-background="#00ffcc"]').exists();
     assert.dom('[data-test-merchant-logo-text-color="#000000"]').exists();
 
