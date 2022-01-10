@@ -1,13 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import {
-  click,
-  fillIn,
-  find,
-  render,
-  settled,
-  waitUntil,
-} from '@ember/test-helpers';
+import { click, fillIn, render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { Response as MirageResponse } from 'ember-cli-mirage';
@@ -79,12 +72,7 @@ module(
         .exists();
 
       await fillIn('[data-test-category-option-other] input', 'Something');
-
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'initial'
-      );
+      await waitFor('[data-test-boxel-validation-state-input="valid"]');
 
       assert
         .dom(`[data-test-category-option]:nth-child(${OPTIONS.length}) input`)
@@ -109,11 +97,7 @@ module(
         .dom('[data-test-category-option-other] input')
         .hasValue('Something');
 
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'loading'
-      );
+      await waitFor('[data-test-boxel-validation-state-input="valid"]');
 
       assert.equal(
         workflowSession.getValue<string>('profileCategory'),
@@ -202,15 +186,11 @@ module(
       await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'initial'
-      );
+      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
 
       assert
-        .dom('[data-test-validation-state-input]')
-        .hasAttribute('data-test-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-validation-state-input]')
+        .hasAttribute('data-test-boxel-validation-state-input', 'invalid');
 
       assert
         .dom(
@@ -236,15 +216,11 @@ module(
       await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'initial'
-      );
+      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
 
       assert
-        .dom('[data-test-validation-state-input]')
-        .hasAttribute('data-test-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-validation-state-input]')
+        .hasAttribute('data-test-boxel-validation-state-input', 'invalid');
 
       assert
         .dom(
