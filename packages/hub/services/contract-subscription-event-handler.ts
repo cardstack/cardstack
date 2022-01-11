@@ -67,8 +67,8 @@ export class ContractSubscriptionEventHandler {
       });
     }
 
-    log.info('Subscribed to events');
     this.healthCheck.run('Cardstack Contract Event Listener', config.get('healthCheckPort'));
+    log.info('Subscribed to events');
   }
 }
 

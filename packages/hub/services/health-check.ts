@@ -5,9 +5,11 @@ import DatabaseManager from '@cardstack/db';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { httpLogging } from '../middleware';
+import { Server } from 'http';
 
 const log = logger('routes/health-check');
 export default class HealthCheck {
+  private healthCheckServer: Server | undefined;
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   routes(name: string = 'Cardstack Hub') {
     let healthCheckRouter = new Router();
@@ -25,6 +27,11 @@ export default class HealthCheck {
   // containers that would not otherwise run a web server (like the bot, or
   // worker)
   run(name: string, port: number) {
+    if (this.healthCheckServer) {
+      // server is already running
+      return;
+    }
+
     let app = new Koa();
     app.use(httpLogging);
     app.use(this.routes(name)); // Setup health-check at "/"
@@ -40,8 +47,14 @@ export default class HealthCheck {
         Sentry.captureException(err);
       });
     });
-    app.listen(port);
+    this.healthCheckServer = app.listen(port);
     log.info(`Health check listening on port ${port}`);
+  }
+
+  teardown() {
+    if (this.healthCheckServer) {
+      this.healthCheckServer.close();
+    }
   }
 }
 
