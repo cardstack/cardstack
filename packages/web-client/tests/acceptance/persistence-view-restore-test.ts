@@ -7,6 +7,7 @@ import {
   settled,
   triggerEvent,
   visit,
+  waitFor,
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
@@ -418,14 +419,7 @@ module('Acceptance | persistence view and restore', function () {
         `[data-test-merchant-customization-merchant-id-field] input`,
         'mandello1'
       );
-      await waitUntil(
-        () =>
-          (
-            document.querySelector(
-              '[data-test-validation-state-input]'
-            ) as HTMLElement
-          ).dataset.testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-validation-state-input="valid"]');
       await click(`[data-test-merchant-customization-save-details]`);
 
       assert.dom('[data-test-workflow-tracker-count]').containsText('1');

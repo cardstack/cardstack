@@ -1,0 +1,21 @@
+<div class="boxel-validation-state-input-group" ...attributes>
+  <Boxel::Input
+    class="boxel-validation-state-input-group__input"
+    @id={{@id}}
+    @value={{@value}}
+    @required={{true}}
+    @onInput={{@onInput}}
+    @onBlur={{@onBlur}}
+    @invalid={{this.isInvalid}}
+    @errorMessage={{@errorMessage}}
+    @helperText={{@helperText}}
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    data-test-boxel-validation-state-input={{@state}}
+  />
+  {{#if this.icon}}
+    {{svg-jar this.icon class="boxel-validation-state-input-group__icon" role="presentation"}}
+  {{/if}}
+</div>

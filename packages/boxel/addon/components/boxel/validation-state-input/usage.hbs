@@ -1,0 +1,55 @@
+<Freestyle::Usage @name="ValidationStateInput">
+  <:example>
+    <label for={{this.id}} class="boxel-sr-only">Label</label>
+    <Boxel::ValidationStateInput
+      @id={{this.id}}
+      @state={{this.state}}
+      @value={{this.value}}
+      @onInput={{this.set}}
+      @onBlur={{this.validate}}
+      @errorMessage={{this.errorMessage}}
+      @helperText={{this.helperText}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="id"
+      @description="The id of the input"
+      @onInput={{fn (mut this.id)}}
+      @value={{this.id}}
+    />
+    <Args.String
+      @name="state"
+      @description="The validation state of the input"
+      @options={{array "valid" "invalid" "loading" "initial" "default"}}
+      @onInput={{fn (mut this.state)}}
+      @value={{this.state}}
+    />
+    <Args.String
+      @name="helperText"
+      @description="Helper message to display below the input"
+      @value={{this.helperText}}
+      @onInput={{fn (mut this.helperText)}}
+    />
+    <Args.String
+      @name="errorMessage"
+      @description="Error message to display when the input is invalid"
+      @value={{this.errorMessage}}
+      @onInput={{fn (mut this.errorMessage)}}
+    />
+    <Args.Action
+      @name="onInput"
+      @description="Action to call when the input value changes"
+    />
+    <Args.Action
+      @name="onBlur"
+      @description="Action to call when the input loses focus"
+    />
+    <Args.String
+      @name="value"
+      @description="The value of the input"
+      @value={{this.value}}
+      @onInput={{this.set}}
+    />
+  </:api>
+</Freestyle::Usage>

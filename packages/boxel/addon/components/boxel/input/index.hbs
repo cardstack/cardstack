@@ -15,6 +15,7 @@
       data-test-boxel-input
       data-test-boxel-input-id={{@id}}
       {{on "input" (pick "target.value" (optional @onInput))}}
+      {{on "blur" (optional @onBlur)}}
       ...attributes
     />
     {{#if shouldShowErrorMessage}}

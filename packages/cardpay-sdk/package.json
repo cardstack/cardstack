@@ -46,7 +46,8 @@
   ],
   "scripts": {
     "clean": "rm -rf dist generated",
-    "postinstall": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
+    "postinstall": "yarn codegen",
+    "codegen": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
     "prepack": "rm -rf ./dist && tsup ./index.ts --format esm,cjs --dts --legacy-output"
   },
   "homepage": "https://github.com/cardstack/cardstack",
