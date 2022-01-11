@@ -19,7 +19,7 @@
           {{#if this.otherIsChecked}}
             <div class="card-space-category-field__other-container">
               <span class="card-space-category-field__other-label">Other:</span>
-              <Common::ValidationStateInput
+              <Boxel::ValidationStateInput
                 class="card-space-category-field__other"
                 @state={{this.categoryValidationState}}
                 @value={{readonly this.otherValue}}

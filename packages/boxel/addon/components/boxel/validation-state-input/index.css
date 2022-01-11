@@ -1,4 +1,4 @@
-.validation-state-input-group {
+.boxel-validation-state-input-group {
   --input-height: 2.5rem;
   --input-icon-size: var(--boxel-icon-sm);
   --input-icon-space: var(--boxel-sp-xs);
@@ -9,14 +9,14 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.validation-state-input-group__input {
+.boxel-validation-state-input-group__input {
   height: var(--input-height);
   padding-right: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
   font: inherit;
   letter-spacing: inherit;
 }
 
-.validation-state-input-group__icon {
+.boxel-validation-state-input-group__icon {
   position: absolute;
   width: var(--input-icon-size);
   height: var(--input-height);
