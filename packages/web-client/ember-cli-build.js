@@ -56,6 +56,7 @@ module.exports = function (defaults) {
             https: false,
             os: false,
             crypto: false,
+            vm: false,
           },
         },
         module: {
