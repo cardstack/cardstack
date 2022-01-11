@@ -1,6 +1,8 @@
 <Freestyle::Usage @name="ValidationStateInput">
   <:example>
+    <label for={{this.id}} class="boxel-sr-only">Label</label>
     <Boxel::ValidationStateInput
+      @id={{this.id}}
       @state={{this.state}}
       @value={{this.value}}
       @onInput={{this.set}}
@@ -10,6 +12,12 @@
     />
   </:example>
   <:api as |Args|>
+    <Args.String
+      @name="id"
+      @description="The id of the input"
+      @onInput={{fn (mut this.id)}}
+      @value={{this.id}}
+    />
     <Args.String
       @name="state"
       @description="The validation state of the input"
