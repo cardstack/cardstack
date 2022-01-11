@@ -33,6 +33,7 @@ module.exports = {
         '@typescript-eslint/consistent-type-exports': 'error',
       },
       parserOptions: {
+        tsconfigRootDir: __dirname,
         project: ['./tsconfig.json'],
       },
     },
