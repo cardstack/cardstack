@@ -136,10 +136,11 @@ if (process.env.COMPILER) {
 
     describe('.load()', function () {
       it('returns a card thats been indexed', async function () {
-        let card = await cards.load(`${realmURL}post1`);
-        expect(card.content.data.title).to.eq('Hello again');
-        expect(card.compiled!.url).to.eq(`${realmURL}post1`);
-        expect(card.compiled!.adoptsFrom!.url).to.eq(`${realmURL}post`);
+        let card = await cards.loadData(`${realmURL}post1`, 'isolated');
+        expect(card.data.title).to.eq('Hello again');
+        expect(card.url).to.eq(`${realmURL}post1`);
+        let { compiled } = await cards.load(`${realmURL}post1`);
+        expect(compiled.adoptsFrom!.url).to.eq(`${realmURL}post`);
       });
 
       it('returns a card from the base realm', async function () {
@@ -160,22 +161,22 @@ if (process.env.COMPILER) {
 
     describe('.query()', function () {
       it(`can filter by card type`, async function () {
-        let matching = await cards.query({
+        let matching = await cards.query('embedded', {
           filter: { type: `${realmURL}post` },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post1`, `${realmURL}post0`]);
+        expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post1`, `${realmURL}post0`]);
       });
 
       it(`can filter on a card's own fields using gt`, async function () {
-        let matching = await cards.query({
+        let matching = await cards.query('embedded', {
           filter: { on: `${realmURL}post`, range: { views: { gt: 7 } } },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`]);
+        expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post0`]);
       });
 
       it(`gives a good error when query refers to missing card`, async function () {
         try {
-          await cards.query({
+          await cards.query('embedded', {
             filter: { on: `${realmURL}nonexistent`, eq: { nonExistentField: 'hello' } },
           });
           throw new Error('failed to throw expected exception');
@@ -187,7 +188,7 @@ if (process.env.COMPILER) {
 
       it(`gives a good error when query refers to missing field`, async function () {
         try {
-          await cards.query({
+          await cards.query('embedded', {
             filter: { on: `${realmURL}post`, eq: { 'author.nonExistentField': 'hello' } },
           });
           throw new Error('failed to throw expected exception');
@@ -200,17 +201,17 @@ if (process.env.COMPILER) {
       });
 
       it(`can filter on a nested field using eq`, async function () {
-        let matching = await cards.query({
+        let matching = await cards.query('embedded', {
           filter: {
             on: `${realmURL}post`,
             eq: { 'author.name': 'Sue' },
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`]);
+        expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post0`]);
       });
 
       it(`can negate a filter`, async function () {
-        let matching = await cards.query({
+        let matching = await cards.query('embedded', {
           filter: {
             every: [
               {
@@ -225,11 +226,11 @@ if (process.env.COMPILER) {
             ],
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post1`]);
+        expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post1`]);
       });
 
       it(`can combine multiple types`, async function () {
-        let matching = await cards.query({
+        let matching = await cards.query('embedded', {
           filter: {
             any: [
               {
@@ -243,13 +244,13 @@ if (process.env.COMPILER) {
             ],
           },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realmURL}post0`, `${realmURL}book0`]);
+        expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post0`, `${realmURL}book0`]);
       });
     });
 
     describe('create()', function () {
-      it('can create a card with a linksTo field', async function () {
-        let card = await cards.create({
+      it.skip('can create a card with a linksTo field', async function () {
+        await cards.create({
           realm: realmURL,
           id: undefined,
           data: {
@@ -268,8 +269,10 @@ if (process.env.COMPILER) {
             `,
           },
         });
-        expect(card.content.data.author.name).to.equal('Sue');
-        expect(card.content.data.id).to.equal('https://cardstack.local/sue');
+
+        let card = await cards.loadData('https://cardstack.local/sue', 'isolated');
+        expect(card.data.author.name).to.equal('Sue');
+        expect(card.data.id).to.equal('https://cardstack.local/sue');
 
         // NEXT steps to make this pass:
         //   The work of embedding related records (and later running computed)

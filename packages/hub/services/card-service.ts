@@ -6,6 +6,7 @@ import {
   CardContent,
   CompilerComponentInfo,
   ComponentInfo,
+  Format,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
@@ -79,7 +80,6 @@ export class CardService {
       return {
         compiled,
         raw,
-        content: this.contentFromCompiled(raw, compiled),
       };
     } finally {
       db.release();
@@ -91,7 +91,7 @@ export class CardService {
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
-    return { raw: rawCard, compiled, content: this.contentFromCompiled(rawCard, compiled) };
+    return { raw: rawCard, compiled };
   }
 
   async update(partialRaw: RawCard): Promise<Card> {
@@ -100,7 +100,7 @@ export class CardService {
     let compiledCard = await compiler.compile();
     await this.realmManager.update(raw);
     let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
-    return { raw, compiled, content: this.contentFromCompiled(raw, compiled) };
+    return { raw, compiled };
   }
 
   async delete(raw: RawCard): Promise<void> {
@@ -108,7 +108,28 @@ export class CardService {
     await this.searchIndex.deleteCard(raw);
   }
 
-  async query(query: Query): Promise<Card[]> {
+  async loadData(cardURL: string, format: Format): Promise<CardContent> {
+    let { raw, compiled } = await this.load(cardURL);
+    return this.contentFromCompiled(raw, compiled, format);
+  }
+
+  async createData(
+    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
+    format: Format
+  ): Promise<CardContent> {
+    let { raw, compiled } = await this.create(rawData);
+    return this.contentFromCompiled(raw, compiled, format);
+  }
+
+  async updateData(
+    partialRawData: Pick<RawCard, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
+    format: Format
+  ): Promise<CardContent> {
+    let { raw, compiled } = await this.update(partialRawData);
+    return this.contentFromCompiled(raw, compiled, format);
+  }
+
+  async query(format: Format, query: Query): Promise<CardContent[]> {
     let client = await this.db.getPool();
     try {
       let expression: CardExpression = ['select compiled from cards'];
@@ -122,20 +143,22 @@ export class CardService {
         if (!compiled) {
           throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
         }
-        return { raw, compiled, content: this.contentFromCompiled(raw, compiled) };
+        return this.contentFromCompiled(raw, compiled, format);
       });
     } finally {
       client.release();
     }
   }
 
-  private contentFromCompiled(raw: RawCard, compiled: CompiledCard): CardContent {
+  private contentFromCompiled(raw: RawCard, compiled: CompiledCard, format: Format): CardContent {
     return {
       data: raw.data ?? {},
       schemaModule: compiled.schemaModule,
       isolated: contentPartOfComponentInfo(compiled.isolated),
       embedded: contentPartOfComponentInfo(compiled.embedded),
       edit: contentPartOfComponentInfo(compiled.edit),
+      url: compiled.url,
+      format,
     };
   }
 

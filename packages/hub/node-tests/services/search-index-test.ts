@@ -51,8 +51,8 @@ if (process.env.COMPILER) {
         },
       });
 
-      let example = await cards.load(`${realmURL}example`);
-      expect(example.content.data.title).to.eq('Hello World');
+      let example = await cards.loadData(`${realmURL}example`, 'isolated');
+      expect(example.data.title).to.eq('Hello World');
     });
 
     it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
@@ -84,8 +84,8 @@ if (process.env.COMPILER) {
         },
       });
 
-      let grandChild = await cards.load(`${realmURL}grandchild`);
-      expect(grandChild.content.data.title).to.eq('Hello World');
+      let grandChild = await cards.loadData(`${realmURL}grandchild`, 'isolated');
+      expect(grandChild.data.title).to.eq('Hello World');
     });
 
     it(`can invalidate a card via the update of an adoptsFrom card`, async function () {

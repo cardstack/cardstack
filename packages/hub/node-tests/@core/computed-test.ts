@@ -44,8 +44,8 @@ if (process.env.COMPILER) {
     });
 
     it(`can access a one-level-deep computed field`, async function () {
-      let card = await cards.load(`${realm}arthur`);
-      expect(card.content.data.fullName).to.equal('Arthur Faulkner');
+      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      expect(card.data.fullName).to.equal('Arthur Faulkner');
     });
   });
 }

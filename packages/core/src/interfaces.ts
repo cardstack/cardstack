@@ -162,13 +162,9 @@ export interface CompilerComponentInfo<Ref extends ModuleRef = GlobalRef> extend
   inheritedFrom?: string;
 }
 
-// Plan: create, read, and update methods that return this will probably
-// bifurcate into methods that return just CardContent or return { raw, compiled
-// }
 export interface Card {
   raw: RawCard;
   compiled: CompiledCard;
-  content: CardContent;
 }
 
 // This is all the thing you need to render and edit data for a card. It's not
@@ -183,6 +179,9 @@ export interface CardContent<Ref extends ModuleRef = GlobalRef> {
   edit: ComponentInfo<Ref>;
 
   schemaModule: Ref;
+
+  format: Format;
+  url: string;
 }
 
 export interface Builder {

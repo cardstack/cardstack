@@ -40,16 +40,16 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = serializeCardPayloadForFormat(card, format);
+    let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, format);
+    ctx.body = serializeCardPayloadForFormat(card);
     ctx.status = 200;
   }
 
   private async queryCards(ctx: RouterContext) {
     let query = qs.parse(ctx.querystring);
     assertQuery(query);
-    let cards = await this.cards.as(INSECURE_CONTEXT).query(query);
-    let collection = cards.map((card) => serializeCardPayloadForFormat(card, 'embedded').data);
+    let cards = await this.cards.as(INSECURE_CONTEXT).query('embedded', query);
+    let collection = cards.map((card) => serializeCardPayloadForFormat(card).data);
     ctx.body = { data: collection };
     ctx.status = 200;
   }
@@ -74,8 +74,8 @@ export default class CardRoutes {
       card.id = data.id.slice(realmURL.length);
     }
 
-    let createdCard = await this.cards.as(INSECURE_CONTEXT).create(card);
-    ctx.body = serializeCardPayloadForFormat(createdCard, format);
+    let createdCard = await this.cards.as(INSECURE_CONTEXT).createData(card, format);
+    ctx.body = serializeCardPayloadForFormat(createdCard);
     ctx.status = 201;
   }
 
@@ -88,9 +88,8 @@ export default class CardRoutes {
     } = ctx;
 
     let cardId = this.realmManager.parseCardURL(url);
-    let card = await this.cards.as(INSECURE_CONTEXT).update({ ...cardId, data: data.attributes });
-    // Question: Is it safe to assume the response should be isolated?
-    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
+    let card = await this.cards.as(INSECURE_CONTEXT).updateData({ ...cardId, data: data.attributes }, 'isolated');
+    ctx.body = serializeCardPayloadForFormat(card);
     ctx.status = 200;
   }
 
@@ -119,8 +118,8 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let card = await this.cards.as(INSECURE_CONTEXT).load(url);
-    ctx.body = serializeCardPayloadForFormat(card, 'isolated');
+    let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, 'isolated');
+    ctx.body = serializeCardPayloadForFormat(card);
   }
 
   private async getSource(ctx: RouterContext) {
