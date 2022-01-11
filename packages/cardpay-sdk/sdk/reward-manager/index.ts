@@ -2,7 +2,7 @@ import { ContractMeta } from '../version-resolver';
 
 import v0_8_7 from './v0.8.7';
 
-export { RewardProgramInfo } from './base';
+export type { RewardProgramInfo } from './base';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously

@@ -8,20 +8,22 @@ import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-per
 import { setOwner } from '@ember/application';
 export { Milestone } from './workflow/milestone';
 export { default as PostableCollection } from './workflow/postable-collection';
-export { WorkflowMessage, IWorkflowMessage } from './workflow/workflow-message';
+export type { IWorkflowMessage } from './workflow/workflow-message';
+export { WorkflowMessage } from './workflow/workflow-message';
 export { default as NetworkAwareWorkflowMessage } from './workflow/network-aware-message';
-export {
+export type {
   CheckResult,
-  WorkflowCard,
   WorkflowCardComponentArgs,
 } from './workflow/workflow-card';
+export { WorkflowCard } from './workflow/workflow-card';
 export { default as NetworkAwareWorkflowCard } from './workflow/network-aware-card';
-export { Participant, WorkflowPostable } from './workflow/workflow-postable';
-export {
+export type { Participant } from './workflow/workflow-postable';
+export { WorkflowPostable } from './workflow/workflow-postable';
+export type {
   WorkflowSessionDictionary,
   IWorkflowSession,
-  default as WorkflowSession,
 } from './workflow/workflow-session';
+export { default as WorkflowSession } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
 export {
   conditionalCancelationMessage,

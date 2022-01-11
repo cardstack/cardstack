@@ -30,6 +30,10 @@ module.exports = {
           'error',
           { argsIgnorePattern: '^_' },
         ],
+        '@typescript-eslint/consistent-type-exports': 'error',
+      },
+      parserOptions: {
+        project: ['./tsconfig.json'],
       },
     },
     // node files
