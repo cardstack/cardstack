@@ -106,7 +106,7 @@ function serializeAttribute(
 }
 
 export function serializeCardPayloadForFormat(card: CardContent): JSONAPIDocument<Saved> {
-  let componentInfo = card[card.format];
+  let { componentInfo } = card;
   let resource = serializeResource('card', card.url, card.data, componentInfo.usedFields);
   resource.meta = merge(
     {

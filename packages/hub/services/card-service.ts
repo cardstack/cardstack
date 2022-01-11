@@ -154,9 +154,7 @@ export class CardService {
     return {
       data: raw.data ?? {},
       schemaModule: compiled.schemaModule,
-      isolated: contentPartOfComponentInfo(compiled.isolated),
-      embedded: contentPartOfComponentInfo(compiled.embedded),
-      edit: contentPartOfComponentInfo(compiled.edit),
+      componentInfo: contentPartOfComponentInfo(compiled[format]),
       url: compiled.url,
       format,
     };

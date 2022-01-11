@@ -169,16 +169,13 @@ export interface Card {
 
 // This is all the thing you need to render and edit data for a card. It's not
 // enough to recompile code & schema -- for that you need CompiledCard.
-export interface CardContent<Ref extends ModuleRef = GlobalRef> {
-  // Unlike the data in RawCard, this is the fully expanded veresion that
+export interface CardContent {
+  // Unlike the data in RawCard, this is the fully expanded version that
   // includes computed values and the data from linked cards.
   data: Record<string, any>;
 
-  isolated: ComponentInfo<Ref>;
-  embedded: ComponentInfo<Ref>;
-  edit: ComponentInfo<Ref>;
-
-  schemaModule: Ref;
+  componentInfo: ComponentInfo<GlobalRef>;
+  schemaModule: GlobalRef;
 
   format: Format;
   url: string;
