@@ -1,5 +1,13 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import {
+  CompiledCard,
+  ComponentInfo,
+  Format,
+  FORMATS,
+  ModuleRef,
+  RawCard,
+  Unsaved,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -149,7 +157,7 @@ class IndexerRun implements IndexerHandle {
     let metaResult = await this.db.query(
       expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)])
     );
-    return metaResult.rows[0]?.meta;
+    return metaResult.rows[0].meta;
   }
 
   setMeta(meta: PgPrimitive) {
@@ -268,23 +276,26 @@ class IndexerRun implements IndexerHandle {
   }
 
   private async writeToIndex(
-    card: RawCard,
+    rawCard: RawCard,
     compiledCard: CompiledCard,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let url = cardURL(card);
+    let url = cardURL(rawCard);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(card.data ?? null),
-      raw: param(new RawCardSerializer().serialize(card)),
-      compiled: param(new RawCardSerializer().serialize(card, compiledCard)),
-      searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
+      data: param(rawCard.data ?? null),
+      raw: param(new RawCardSerializer().serialize(rawCard)),
+      compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
+      searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
+      schemaModule: param(compiledCard.schemaModule.global),
+      componentInfos: param(getComponentModules(compiledCard)),
     });
+
     await this.db.query(expressionToSql(expression));
     this.touched.set(url, this.touchCounter++);
     return compiledCard;
@@ -302,6 +313,8 @@ class IndexerRun implements IndexerHandle {
       compiled: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),
+      schemaModule: param(null),
+      componentInfos: param(null),
       deps: param([...compiler.dependencies]),
     });
     this.touched.set(url, this.touchCounter++);
@@ -349,6 +362,20 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
   }
 
   return result;
+}
+
+function getComponentModules(card: CompiledCard): Record<string, any> {
+  let infos: [Format, ComponentInfo][] = [];
+  for (const format of FORMATS) {
+    infos.push([
+      format,
+      {
+        moduleName: card[format].moduleName,
+        usedFields: card[format].usedFields,
+      },
+    ]);
+  }
+  return Object.fromEntries(infos);
 }
 
 declare module '@cardstack/di' {

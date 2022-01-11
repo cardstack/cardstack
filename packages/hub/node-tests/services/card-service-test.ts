@@ -134,7 +134,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    describe('.load()', function () {
+    describe('.load() & .loadData()', function () {
       it('returns a card thats been indexed', async function () {
         let card = await cards.loadData(`${realmURL}post1`, 'isolated');
         expect(card.data.title).to.eq('Hello again');

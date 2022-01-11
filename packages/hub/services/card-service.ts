@@ -25,7 +25,6 @@ import {
   Expression,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
-import { cardURL } from '@cardstack/core/src/utils';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 
@@ -57,12 +56,33 @@ export class CardService {
 
   async load(cardURL: string): Promise<Card> {
     log.trace('load', cardURL);
-    let db = await this.db.getPool();
     let deserializer = new RawCardDeserializer();
+    let result = await this.loadCardFromDB('SELECT compiled, "compileErrors" from cards where url = $1', cardURL);
+    let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
+    if (!compiled) {
+      throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
+    }
+    return {
+      compiled,
+      raw,
+    };
+  }
+
+  async loadData(cardURL: string, format: Format): Promise<CardContent> {
+    log.trace('loadData', cardURL);
+    let result = await this.loadCardFromDB(
+      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors" from cards where url = $1',
+      cardURL
+    );
+    return this.contentFromIndex(format, result);
+  }
+
+  private async loadCardFromDB(query: string, cardURL: string): Promise<Record<string, any>> {
+    let db = await this.db.getPool();
     try {
       let {
         rows: [result],
-      } = await db.query('SELECT compiled, "compileErrors", deps from cards where url = $1', [cardURL]);
+      } = await db.query(query, [cardURL]);
       if (!result) {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
@@ -73,14 +93,7 @@ export class CardService {
         }
         throw err;
       }
-      let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
-      if (!compiled) {
-        throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
-      }
-      return {
-        compiled,
-        raw,
-      };
+      return result;
     } finally {
       db.release();
     }
@@ -94,6 +107,14 @@ export class CardService {
     return { raw: rawCard, compiled };
   }
 
+  async createData(
+    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
+    format: Format
+  ): Promise<CardContent> {
+    let { raw, compiled } = await this.create(rawData);
+    return this.contentFromCompiled(raw, compiled, format);
+  }
+
   async update(partialRaw: RawCard): Promise<Card> {
     let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
     let compiler = this.builder.compileCardFromRaw(raw);
@@ -101,24 +122,6 @@ export class CardService {
     await this.realmManager.update(raw);
     let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
     return { raw, compiled };
-  }
-
-  async delete(raw: RawCard): Promise<void> {
-    await this.realmManager.delete(raw);
-    await this.searchIndex.deleteCard(raw);
-  }
-
-  async loadData(cardURL: string, format: Format): Promise<CardContent> {
-    let { raw, compiled } = await this.load(cardURL);
-    return this.contentFromCompiled(raw, compiled, format);
-  }
-
-  async createData(
-    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
-    format: Format
-  ): Promise<CardContent> {
-    let { raw, compiled } = await this.create(rawData);
-    return this.contentFromCompiled(raw, compiled, format);
   }
 
   async updateData(
@@ -129,27 +132,41 @@ export class CardService {
     return this.contentFromCompiled(raw, compiled, format);
   }
 
+  async delete(raw: RawCard): Promise<void> {
+    await this.realmManager.delete(raw);
+    await this.searchIndex.deleteCard(raw);
+  }
+
   async query(format: Format, query: Query): Promise<CardContent[]> {
     let client = await this.db.getPool();
     try {
-      let expression: CardExpression = ['select compiled from cards'];
+      let expression: CardExpression = ['select url, data, "schemaModule", "componentInfos" from cards'];
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
-      let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      let deserializer = new RawCardDeserializer();
+      let result = await client.query(expressionToSql(await this.prepareExpression(expression)));
       return result.rows.map((row) => {
-        let { raw, compiled } = deserializer.deserialize(row.compiled.data, row.compiled);
-        if (!compiled) {
-          throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
-        }
-        return this.contentFromCompiled(raw, compiled, format);
+        return this.contentFromIndex(format, row);
       });
     } finally {
       client.release();
     }
   }
 
+  private contentFromIndex(format: Format, result: any): CardContent {
+    return {
+      data: result.data ?? {},
+      schemaModule: result.schemaModule,
+      componentInfo: result.componentInfos[format],
+      url: result.url,
+      format,
+    };
+  }
+
+  /**
+   * @deprecated Functions needing this method should be updated to use more
+   * optimized queries. Look at the loadData function for how
+   */
   private contentFromCompiled(raw: RawCard, compiled: CompiledCard, format: Format): CardContent {
     return {
       data: raw.data ?? {},
