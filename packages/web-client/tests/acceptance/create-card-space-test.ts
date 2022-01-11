@@ -18,6 +18,8 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import { LocationService } from '@cardstack/web-client/services/location';
+import Service from '@ember/service';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -29,12 +31,20 @@ function epiloguePostableSel(postableIndex: number): string {
   return `[data-test-epilogue][data-test-postable="${postableIndex}"]`;
 }
 
+class MockLocation extends Service implements LocationService {
+  hostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
+}
+
 module('Acceptance | create card space', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+  hooks.beforeEach(function () {
+    this.owner.register('service:location', MockLocation);
+  });
 
   test('initiating workflow without wallet connections', async function (assert) {
     let subdomain = ''; // TODO: replace this when other parts of the form are filled out

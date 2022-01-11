@@ -1,6 +1,8 @@
 import Route from '@ember/routing/route';
 import config from '@cardstack/web-client/config/environment';
 import Controller from '@ember/controller';
+import { inject as service } from '@ember/service';
+import { LocationService } from '../services/location';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
@@ -115,6 +117,8 @@ const ORGS = [
 ];
 
 export default class CardstackRoute extends Route {
+  @service declare location: LocationService;
+
   async model() {
     return {
       orgs: ORGS,
@@ -122,13 +126,13 @@ export default class CardstackRoute extends Route {
   }
 
   renderTemplate(controller: Controller) {
-    if (window.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
-      let username = window.location.hostname.replace(
+    if (this.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
+      let username = this.location.hostname.replace(
         `.${config.cardSpaceHostnameSuffix}`,
         ''
       );
 
-      this.render('card-space.userspace', { model: { username } });
+      this.render('view-card-space', { model: { username } });
     } else {
       super.renderTemplate(controller, null);
     }
