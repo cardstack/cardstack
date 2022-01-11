@@ -11,7 +11,7 @@ const log = logger('routes/health-check');
 export default class HealthCheck {
   private healthCheckServer: Server | undefined;
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
-  routes(name: string = 'Cardstack Hub') {
+  routes(name = 'Cardstack Hub') {
     let healthCheckRouter = new Router();
     healthCheckRouter.all('/', async (ctx: Koa.Context) => {
       let db = await this.databaseManager.getClient();
