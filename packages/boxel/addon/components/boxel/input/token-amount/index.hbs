@@ -1,0 +1,22 @@
+<div class="boxel-token-amount-input-group" ...attributes>
+  {{svg-jar @icon class="boxel-token-amount-input-group__icon" role="presentation"}}
+  <Boxel::Input
+    class="boxel-token-amount-input-group__input"
+    @id={{@id}}
+    @value={{@value}}
+    @required={{unless @disabled true}}
+    @onInput={{@onInput}}
+    @onBlur={{fn (optional @onInput @value)}}
+    @invalid={{unless @disabled @invalid}}
+    @errorMessage={{@errorMessage}}
+    @helperText={{@helperText}}
+    @disabled={{@disabled}}
+    placeholder="0.00"
+    autocomplete="off"
+    inputmode="decimal"
+    data-test-boxel-token-amount-input
+  />
+  <div class="boxel-token-amount-input-group__symbol">
+    {{@symbol}}
+  </div>
+</div>
