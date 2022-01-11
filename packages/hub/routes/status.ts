@@ -4,7 +4,7 @@ import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 
-const DEGRADED_THRESHOLD = 10;
+export const DEGRADED_THRESHOLD = 10;
 
 export default class StatusRoute {
   subgraph = inject('subgraph');

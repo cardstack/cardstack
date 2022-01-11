@@ -7,5 +7,6 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function () {
+  this.route('playground');
   this.route('delegate', { path: '/*pathname' });
 });

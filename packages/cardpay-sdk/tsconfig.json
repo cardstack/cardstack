@@ -19,7 +19,10 @@
     "strictPropertyInitialization": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "web3-provider-engine": ["../../types/web3-provider-engine"]
+    }
   },
   "exclude": [
     "node_modules",

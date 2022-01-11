@@ -47,12 +47,18 @@
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"
   },
-  "betaTesting": {
-    "sku": "BETA_TEST_SKU",
-    "discordRole": "CARDBOT_BETA_TESTER_ROLE"
+  "cardDrop": {
+    "sku": "CARD_DROP_SKU"
   },
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"
+  },
+  "statuspage": {
+    "pageId": "STATUSPAGE_PAGE_ID",
+    "apiKey": "STATUSPAGE_API_KEY"
+  },
+  "checkly": {
+    "webhookSecret": "CHECKLY_WEBHOOK_SECRET"
   },
   "firebase": {
     "projectId": "FIREBASE_PROJECT_ID",

@@ -11,7 +11,6 @@
         <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
           <:outer>
             <CardPay::AccountDisplay
-              {{!-- class="transaction-setup__account" --}}
               @size="small"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-choose-balance-from-address

@@ -23,7 +23,8 @@ enum NativeCurrency {
 
 type Currency = CryptoCurrency | NativeCurrency;
 
-export { CryptoCurrency, NativeCurrency, Currency };
+export type { Currency };
+export { CryptoCurrency, NativeCurrency };
 
 interface CurrencyInfo {
   alignment: string;

@@ -1,4 +1,4 @@
-{{#if this.workflow}}
+{{#unless this.isInitializing}}
   <WorkflowThread class="issue-prepaid-card-workflow" @workflow={{this.workflow}} @onClose={{@onClose}}>
     <:before-content>
       <Boxel::ExpandableBanner
@@ -26,7 +26,7 @@
       </Boxel::ExpandableBanner>
     </:before-content>
   </WorkflowThread>
-{{/if}}
+{{/unless}}
 <Listener
   @emitter={{this.layer2Network}}
   @event="disconnect"

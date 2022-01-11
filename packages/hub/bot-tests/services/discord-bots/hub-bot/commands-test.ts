@@ -28,7 +28,7 @@ async function setupTest() {
   let dbManager = await container.lookup('database-manager');
   db = await dbManager.getClient();
   await db.query(`DELETE FROM dm_channels`);
-  await db.query(`DELETE FROM beta_testers`);
+  await db.query(`DELETE FROM card_drop_recipients`);
 }
 
 afterAll(async () => {

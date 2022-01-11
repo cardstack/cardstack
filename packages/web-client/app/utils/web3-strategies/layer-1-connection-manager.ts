@@ -1,5 +1,5 @@
 import detectEthereumProvider from '@metamask/detect-provider';
-import WalletConnectProvider from '../wc-provider';
+import WalletConnectProvider from '@cardstack/wc-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import config from '../../config/environment';
 import CustomStorageWalletConnect, {

@@ -1,0 +1,15 @@
+<fieldset class="boxel-radio-fieldset" disabled={{@disabled}} ...attributes>
+  <legend class="boxel-radio-fieldset__legend">
+    {{@groupDescription}}
+  </legend>
+  {{!-- this div is necessary because Chrome has a special case for fieldsets and it breaks grid auto placement --}}
+  <div class={{cn
+      "boxel-radio-fieldset__container"
+      boxel-radio-fieldset__container--compact=(eq @spacing "compact")
+      boxel-radio-fieldset__container--horizontal=(eq @orientation "horizontal")
+      boxel-radio-fieldset__container--vertical=(eq @orientation "vertical")
+    }}
+  >
+    {{yield}}
+  </div>
+</fieldset>

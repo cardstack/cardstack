@@ -33,6 +33,7 @@ export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean 
       count: Infinity,
       dbClient,
       checkOrder,
+      verbose: true,
     });
     container.teardown();
   } catch (e) {

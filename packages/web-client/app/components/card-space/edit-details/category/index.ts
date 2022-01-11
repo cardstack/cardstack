@@ -17,6 +17,7 @@ export const OPTIONS = [
   'Education',
   'Fashion',
   'Writing',
+  'Other',
 ];
 
 class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardComponentArgs> {

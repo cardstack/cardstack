@@ -1,4 +1,12 @@
-import { JSONAPIDocument, SerializerMap, Setter, CardEnv, Saved } from './interfaces';
+import {
+  JSONAPIDocument,
+  SerializerMap,
+  Setter,
+  CardEnv,
+  Saved,
+  ResourceObject,
+  assertDocumentDataIsResource,
+} from './interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
 import { deserializaAttributes, serializeAttributes, serializeResource } from './serializers';
@@ -17,7 +25,7 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
-  rawServerResponse: JSONAPIDocument<Saved>;
+  rawServerResponse: ResourceObject<Saved>;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -40,10 +48,10 @@ export default class CardModel {
     );
   }
 
-  static fromResponse(cards: CardEnv, cardResponse: JSONAPIDocument<Saved>, component: unknown): CardModel {
+  static fromResponse(cards: CardEnv, cardResponse: ResourceObject, component: unknown): CardModel {
     return new this(cards, component, {
       type: 'loaded',
-      url: cardResponse.data.id,
+      url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
       deserialized: false,
       original: undefined,
@@ -82,7 +90,7 @@ export default class CardModel {
       case 'loaded':
         if (!this.state.deserialized) {
           this._data = deserializaAttributes(
-            this.state.rawServerResponse.data.attributes,
+            this.state.rawServerResponse.attributes,
             // @ts-ignore This works as expected, whats up typescript?
             this.constructor.serializerMap
           );
@@ -178,10 +186,13 @@ export default class CardModel {
         throw assertNever(this.state);
     }
 
+    let { data } = response;
+    assertDocumentDataIsResource(data);
+
     this.state = {
       type: 'loaded',
-      url: response.data.id,
-      rawServerResponse: cloneDeep(response),
+      url: data.id,
+      rawServerResponse: cloneDeep(data),
       deserialized: false,
       original,
     };

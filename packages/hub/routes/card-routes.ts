@@ -6,8 +6,7 @@ import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
 import { NotFound, CardstackError } from '@cardstack/core/src/utils/errors';
-import { assertQuery } from '@cardstack/core/src/query';
-import qs from 'qs';
+import { parseQueryString } from '@cardstack/core/src/query';
 import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 
@@ -46,8 +45,7 @@ export default class CardRoutes {
   }
 
   private async queryCards(ctx: RouterContext) {
-    let query = qs.parse(ctx.querystring);
-    assertQuery(query);
+    let query = parseQueryString(ctx.querystring);
     let cards = await this.cards.as(INSECURE_CONTEXT).query('embedded', query);
     let collection = cards.map((card) => serializeCardPayloadForFormat(card).data);
     ctx.body = { data: collection };

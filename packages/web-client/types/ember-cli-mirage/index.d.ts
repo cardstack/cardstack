@@ -146,18 +146,16 @@ interface Server extends MirageServer<Registry> {
   ): Instantiated<I, D>;
 }
 
+export type { Instantiate, ModelInstance, Server };
 export {
   ActiveModelSerializer,
   Collection,
   Factory,
-  Instantiate,
   JSONAPISerializer,
   Model,
-  ModelInstance,
   Response,
   RestSerializer,
   Serializer,
-  Server,
 };
 
 /**

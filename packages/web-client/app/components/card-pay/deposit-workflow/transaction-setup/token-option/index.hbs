@@ -1,11 +1,5 @@
-<Common::RadioOption
-  @name='deposit-token'
-  @checked={{@checked}}
-  @disabled={{@disabled}}
-  @onInput={{@onInput}}
-  class='token-option'
-  data-test-deposit-transaction-setup-from-option={{@token.symbol}}
->
+
+<div class="token-option" ...attributes>
   <div class="token-option__currency">
     {{svg-jar @token.icon class="token-option__icon" role="presentation" width="40" height="40"}}
     <div>
@@ -24,10 +18,10 @@
     </div>
     <div class="token-option__usd-balance" data-test-usd-balance={{@token.symbol}}>
       {{#if @usdBalanceLoading}}
-        <Boxel::LoadingIndicator class="token-option__loading-indicator"  data-test-usd-balance-loading/>
+        <Boxel::LoadingIndicator class="token-option__loading-indicator"  data-test-usd-balance-loading />
       {{else}}
         {{format-usd @balanceInUsd}}
       {{/if}}
     </div>
   </div>
-</Common::RadioOption>
+</div>

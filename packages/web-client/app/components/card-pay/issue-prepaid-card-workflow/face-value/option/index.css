@@ -1,17 +1,8 @@
-.radio-option.face-value-option {
-  --option-opacity: 1;
-  --option-input-border-color: var(--boxel-dark);
-
-  display: inline-grid;
-  grid-template-columns: auto 1fr;
-  column-gap: var(--boxel-sp-xl);
-}
-
-.face-value-option__value {
-  opacity: var(--option-opacity, 1);
+.face-value-option {
   display: inline-grid;
   grid-template-columns: auto 1fr;
   column-gap: var(--boxel-sp-xs);
+  width: max-content;
 }
 
 .face-value-option__amount {
@@ -24,12 +15,4 @@
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
-}
-
-.face-value-option--disabled {
-  --option-opacity: 0.5;
-  --option-input-border-color: var(--boxel-light-500);
-
-  pointer-events: none;
-  box-shadow: 0 0 0 1px var(--boxel-light-300);
 }

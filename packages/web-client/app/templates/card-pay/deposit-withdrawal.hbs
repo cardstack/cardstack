@@ -46,7 +46,7 @@
 
       <section class='card-pay-dashboard__deposit-withdrawal-cards'>
         {{#each this.safes as |safe|}}
-          <CardPay::SafeBalances @safe={{safe}} />
+          <CardPay::Safe @safe={{safe}} />
         {{/each}}
       </section>
     </section>

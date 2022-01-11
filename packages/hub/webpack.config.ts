@@ -2,6 +2,18 @@
 const { SourceMapDevToolPlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const { sync: glob } = require('glob');
+const { basename } = require('path');
+
+const tsMigrations = glob(`${__dirname}/db/migrations/*.ts`);
+const tsMigrationEntrypoints: { [entrypoint: string]: string } = {};
+for (let migrationFile of tsMigrations) {
+  if (migrationFile.endsWith('.d.ts')) {
+    continue;
+  }
+  let migration = basename(migrationFile, '.ts');
+  tsMigrationEntrypoints[`db/migrations/${migration}`] = `./db/migrations/${migration}.ts`;
+}
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -17,6 +29,9 @@ module.exports = {
       filename: '[name].js.map',
       noSources: true,
       moduleFilenameTemplate: '[absolute-resource-path]',
+      // don't make source maps for the ts-migrations, node-pg-migrate gets
+      // confused when it sees these
+      exclude: Object.keys(tsMigrationEntrypoints).map((i) => `${i}.js`),
     }),
 
     // graphile-worker contains standalone sql files that it expects to be able
@@ -108,6 +123,16 @@ module.exports = {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
     'bot-tests': './bot-tests/entrypoint.ts',
+
+    // we add entrypoints for each of the TS migration files as well since we
+    // run the migration via the webpack build from waypoint
+    ...tsMigrationEntrypoints,
+  },
+
+  output: {
+    library: {
+      type: 'commonjs',
+    },
   },
 
   target: 'node14',
