@@ -60,12 +60,15 @@ module('Acceptance | payments dashboard', function (hooks) {
     });
 
     await visit('/card-pay/payments');
-    assert.dom('[data-test-merchants-section]').exists();
-    await waitFor('[data-test-merchant-dashboard-card]');
+
+    await waitFor('[data-test-merchants-section]');
     assert
-      .dom('[data-test-merchants-section] [data-test-merchant-dashboard-card]')
+      .dom('[data-test-merchants-section] [data-test-safe]')
       .exists({ count: 1 });
-    assert.dom('[data-test-merchant="Mandello"]').exists();
+
+    assert.dom('[data-test-safe-title]').containsText('Mandello');
+    assert.dom('[data-test-safe-footer-business-id]').containsText('mandello1');
+    assert.dom('[data-test-safe-footer-managers]').containsText('1 Manager');
     assert.dom('[data-test-merchant-logo-background="#00ffcc"]').exists();
     assert.dom('[data-test-merchant-logo-text-color="#000000"]').exists();
 
