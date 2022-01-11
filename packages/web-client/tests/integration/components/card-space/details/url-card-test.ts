@@ -30,11 +30,11 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert
-        .dom('[data-test-boxel-validation-state-input]')
-        .hasAttribute('data-test-boxel-validation-state-input', 'valid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'valid');
     });
 
     test('it validates bad input', async function (this: Context, assert) {
@@ -56,11 +56,11 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
 
       assert
-        .dom('[data-test-boxel-validation-state-input]')
-        .hasAttribute('data-test-boxel-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'invalid');
 
       assert
         .dom(

@@ -419,7 +419,7 @@ module('Acceptance | persistence view and restore', function () {
         `[data-test-merchant-customization-merchant-id-field] input`,
         'mandello1'
       );
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       await click(`[data-test-merchant-customization-save-details]`);
 
       assert.dom('[data-test-workflow-tracker-count]').containsText('1');
