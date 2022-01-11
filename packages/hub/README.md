@@ -155,6 +155,15 @@ Hub > const workerClient = await container.lookup('worker-client');
 Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
 ```
 
+To connect to a console in a remote environment (staging/production), use waypoint:
+
+```sh
+waypoint exec -app=hub sh
+node --no-deprecation --experimental-repl-await ./dist/hub.js console
+
+Hub >
+```
+
 ## Connecting to the database staging|production database on AWS
 
 ### Setup AWS Session Manager ssh config
