@@ -4,4 +4,12 @@ module.exports = {
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
+  overrides: [
+    {
+      files: ['*.ts'],
+      rules: {
+        '@typescript-eslint/consistent-type-exports': 'error',
+      },
+    },
+  ],
 };
