@@ -81,6 +81,49 @@ module.exports = function (defaults) {
             process: 'process/browser',
           }),
         ],
+        ignoreWarnings: [
+          {
+            /**
+             * Typescript export not recognized as type
+             */
+            module: /node_modules\/ember-link\//,
+            message:
+              /export 'LinkParams' \(reexported as 'LinkParams'\) was not found in/,
+          },
+          {
+            /**
+             * Typescript export not recognized as type
+             */
+            module: /node_modules\/ember-link\//,
+            message:
+              /export 'UILinkParams' \(reexported as 'UILinkParams'\) was not found in/,
+          },
+          {
+            /**
+             * Helper that doesn't explicitly provide a named export
+             */
+            module: /helpers\/if-key/,
+            message:
+              /export 'ifKey' \(reexported as 'ifKey'\) was not found in/,
+          },
+          {
+            /**
+             * Helper that doesn't explicitly provide a named export
+             */
+            module: /helpers\/unique-id/,
+            message:
+              /export 'uniqueId' \(reexported as 'uniqueId'\) was not found in/,
+          },
+          {
+            /**
+             * ember-cli-mirage made a mistake here I think?
+             * _DbCollection exists, but not _dbCollection
+             */
+            module: /node_modules\/ember-cli-mirage/,
+            message:
+              /export '_dbCollection' \(reexported as 'default'\) was not found in /,
+          },
+        ],
       },
     },
   });
