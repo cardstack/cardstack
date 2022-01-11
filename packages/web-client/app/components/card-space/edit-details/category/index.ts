@@ -8,7 +8,6 @@ import { taskFor } from 'ember-concurrency-ts';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
-import { InputValidationState } from '@cardstack/web-client/components/common/validation-state-input';
 
 export const OPTIONS = [
   'Music',
@@ -26,7 +25,7 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   @service declare hubAuthentication: HubAuthentication;
 
   @tracked otherValue: string = '';
-  @tracked categoryValidationState: InputValidationState = 'initial';
+  @tracked categoryValidationState = 'initial';
   @tracked categoryValidationMessage: string = '';
   @tracked otherIsChecked = false;
 
