@@ -16,13 +16,13 @@ const listenerDetailsStr = execute(`aws elbv2 describe-listeners --listener-arns
 console.log(`listener details: ${listenerDetailsStr}`);
 const listenerDetails = JSON.parse(listenerDetailsStr);
 
-let targetGroups = listenerDetails.Listeners[0].DefaultActions[0].ForwardConfig.TargetGroups;
+const targetGroups = listenerDetails.Listeners[0].DefaultActions[0].ForwardConfig.TargetGroups;
 
 // annoyingly waypoint is immediately setting traffic to 100% on the new target
 // group _before_ it is healthy. so we switch the traffic to continue to flow to
 // the old target group while the new one spins up
-let oldTargetGroup = targetGroups.find((t) => t.Weight === 0).TargetGroupArn;
-let newTargetGroup = targetGroups.find((t) => t.Weight === 100).TargetGroupArn;
+const oldTargetGroup = targetGroups.find((t) => t.Weight === 0).TargetGroupArn;
+const newTargetGroup = targetGroups.find((t) => t.Weight === 100).TargetGroupArn;
 
 // use the old target group while we wait for the new one to spin up
 modifyTargetGroups(listenerArn, [
@@ -42,7 +42,7 @@ async function waitForHealthy(targetGroupArn) {
   console.log(`waiting for healthy target group: ${targetGroupArn}`);
   let healthCheck;
   do {
-    let healthCheckStr = execute(`aws elbv2 describe-target-health --target-group-arn ${targetGroupArn}`);
+    const healthCheckStr = execute(`aws elbv2 describe-target-health --target-group-arn ${targetGroupArn}`);
     console.log(`health check results: ${healthCheckStr}`);
     healthCheck = JSON.parse(healthCheckStr);
     await new Promise((res) => setTimeout(res, 1000));
@@ -50,7 +50,7 @@ async function waitForHealthy(targetGroupArn) {
 }
 
 function modifyTargetGroups(listenerArn, targetGroups) {
-  let command = `aws elbv2 modify-listener \
+  const command = `aws elbv2 modify-listener \
 --listener-arn "${listenerArn}" \
 --default-actions \
   '[{ \
