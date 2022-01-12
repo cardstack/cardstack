@@ -13,7 +13,7 @@ let rpcURL = getConstantByNetwork('rpcWssNode', network);
 let log = Logger('service:web3-socket');
 
 export default class Web3SocketService {
-  private web3: Web3 | undefined;
+  web3: Web3 | undefined;
 
   getInstance() {
     if (!this.web3) {
@@ -34,6 +34,16 @@ export default class Web3SocketService {
 
   initializeWeb3() {
     let web3 = new Web3();
+    /**
+     * ERROR and CLOSE are tacked on dynamically and not properly typed
+     * + the on method is incorrect.
+     */
+    type CorrectedProvider = InstanceType<typeof Web3['providers']['WebsocketProvider']> & {
+      ERROR: string;
+      CLOSE: string;
+      on(...args: any[]): void;
+    };
+
     let provider = new Web3.providers.WebsocketProvider(rpcURL, {
       timeout: 30000,
       reconnect: {
@@ -48,13 +58,32 @@ export default class Web3SocketService {
         maxReceivedFrameSize: 100000000,
         maxReceivedMessageSize: 100000000,
       },
+    }) as unknown as CorrectedProvider;
+
+    provider.on(provider.ERROR, function (error: Error) {
+      log.error('Web 3 websocket provider error', error);
+      Sentry.captureException(error, {
+        tags: {
+          action: 'web3-socket-connection',
+        },
+      });
+    });
+
+    /**
+     * This is actually a websocket close event
+     */
+    provider.on(provider.CLOSE, function (event: any) {
+      log.error('Web 3 websocket provider connection is closed', event);
+      Sentry.captureException(event, {
+        tags: {
+          action: 'web3-socket-connection',
+        },
+      });
     });
     web3.setProvider(provider);
 
     return web3;
   }
-
-  // TODO: disconnect handling. This should also log to Sentry. Maybe in a separate PR?
 }
 
 declare module '@cardstack/di' {
