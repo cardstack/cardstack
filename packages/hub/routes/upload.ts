@@ -6,6 +6,7 @@ import shortUuid from 'short-uuid';
 import { unlink } from 'fs';
 import * as Sentry from '@sentry/node';
 import { ensureLoggedIn } from './utils/auth';
+import { handleError } from './utils/error';
 
 export interface Upload {
   id: string;
@@ -43,8 +44,7 @@ export default class UploadRouter {
       }
 
       if (await this.uploadQueries.isAbusing(ctx.state.userAddress)) {
-        ctx.body = `Too many uploads. Try again later.`;
-        ctx.status = 429;
+        handleError(ctx, 429, 'Too many uploads', `Too many uploads. Try again later.`);
         return;
       }
 
@@ -52,8 +52,7 @@ export default class UploadRouter {
       let filenames: string[] = Object.keys(contextFiles);
 
       if (filenames.length !== 1) {
-        ctx.body = `Expected 1 file, got ${filenames.length} files`;
-        ctx.status = 422;
+        handleError(ctx, 422, 'Invalid upload', `Expected 1 file, got ${filenames.length} files`);
         return;
       }
 
@@ -65,8 +64,7 @@ export default class UploadRouter {
         let validationError = this.validate(size, type);
 
         if (validationError) {
-          ctx.body = validationError;
-          ctx.status = 422;
+          handleError(ctx, 422, 'Invalid upload', validationError);
           return;
         }
 
@@ -86,12 +84,20 @@ export default class UploadRouter {
           ownerAddress: '0x0',
         });
 
-        ctx.body = url;
-        ctx.status = 200;
+        ctx.body = {
+          data: {
+            type: 'uploaded-asset',
+            attributes: {
+              url,
+            },
+          },
+        };
+        ctx.append('Location', url);
+        ctx.type = 'application/vnd.api+json';
+        ctx.status = 201;
       } catch (error) {
         Sentry.captureException(error);
-        ctx.body = `Unexpected error while uploading`;
-        ctx.status = 422;
+        handleError(ctx, 422, 'Invalid upload', `Unexpected error while uploading`);
       } finally {
         console.log(file.path);
         unlink(file.path, () => {});
