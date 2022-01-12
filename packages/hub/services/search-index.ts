@@ -156,11 +156,14 @@ class IndexerRun implements IndexerHandle {
     private fileCache: SearchIndex['fileCache']
   ) {}
 
-  async loadMeta(): Promise<PgPrimitive> {
-    let metaResult = await this.db.query(
-      expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)])
-    );
-    return metaResult.rows[0].meta;
+  async loadMeta(): Promise<PgPrimitive | undefined> {
+    let {
+      rows: [result],
+    } = await this.db.query(expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)]));
+    if (!result) {
+      return;
+    }
+    return result.meta;
   }
 
   setMeta(meta: PgPrimitive) {
