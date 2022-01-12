@@ -109,7 +109,7 @@ describe('Web3Socket', function () {
       reason: 'Testing',
       wasClean: false,
     });
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(originalReport.tags).to.deep.equal({
       action: 'web3-socket-connection',
     });
   });
