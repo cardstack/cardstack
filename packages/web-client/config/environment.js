@@ -17,7 +17,7 @@ const universalLinkHostnamesByTarget = {
 };
 
 const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
-const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'space.stack.cards';
+const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
 const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
 
 const cardSpaceHostnameSuffixesByTarget = {
