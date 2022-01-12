@@ -1,5 +1,6 @@
 module.exports = {
   hubEnvironment: 'development',
+  healthCheckPort: 3000,
   aws: {
     config: {
       credentials: {

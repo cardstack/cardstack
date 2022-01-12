@@ -25,6 +25,7 @@ const CONTRACT_EVENTS = [
 ];
 
 export class ContractSubscriptionEventHandler {
+  private healthCheck = inject('health-check', { as: 'healthCheck' });
   contracts: Contracts = inject('contracts', { as: 'contracts' });
   web3: Web3SocketService = inject('web3-socket', { as: 'web3' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
@@ -65,6 +66,7 @@ export class ContractSubscriptionEventHandler {
       });
     }
 
+    this.healthCheck.run('Cardstack Contract Event Listener');
     log.info('Subscribed to events');
   }
 }
