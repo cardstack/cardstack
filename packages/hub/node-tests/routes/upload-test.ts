@@ -54,13 +54,16 @@ describe('POST /upload', function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
 
-    await request()
+    let response = await request()
       .post('/upload')
       .set('Content-Type', 'multipart/form-data')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
-      .attach('cat.jpeg', path.resolve(__dirname, '../mock-data/cat.jpeg'))
-      .expect(200)
-      .expect('https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
+      .attach('cat.jpeg', path.resolve(__dirname, '../mock-data/cat.jpeg'));
+
+    expect(response.status, '201');
+    expect(response.headers['Location'], 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
+    expect(response.body.data.attributes.url, 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
+    expect(response.body.data.attributes.id, 'CID');
 
     let queryResult = await db.query('SELECT id FROM uploads WHERE url = $1', [
       'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg',

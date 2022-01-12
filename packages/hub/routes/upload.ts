@@ -84,8 +84,18 @@ export default class UploadRouter {
           ownerAddress: '0x0',
         });
 
-        ctx.body = url;
-        ctx.status = 200;
+        ctx.body = {
+          data: {
+            type: 'uploaded-asset',
+            id: cid,
+            attributes: {
+              url,
+            },
+          },
+        };
+        ctx.append('Location', url);
+        ctx.type = 'application/vnd.api+json';
+        ctx.status = 201;
       } catch (error) {
         Sentry.captureException(error);
         handleError(ctx, 422, 'Invalid upload', `Unexpected error while uploading`);
