@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { httpLogging } from '../middleware';
 import { Server } from 'http';
+import config from 'config';
 
 const log = logger('routes/health-check');
 export default class HealthCheck {
@@ -26,7 +27,7 @@ export default class HealthCheck {
   // This is a convenience method for running a health check server for
   // containers that would not otherwise run a web server (like the bot, or
   // worker)
-  run(name: string, port: number) {
+  run(name: string) {
     if (this.healthCheckServer) {
       // server is already running
       return;
@@ -47,6 +48,7 @@ export default class HealthCheck {
         Sentry.captureException(err);
       });
     });
+    let port = config.get('healthCheckPort');
     this.healthCheckServer = app.listen(port);
     log.info(`Health check listening on port ${port}`);
   }

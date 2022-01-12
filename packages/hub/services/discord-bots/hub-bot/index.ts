@@ -46,7 +46,7 @@ export default class HubBot extends DiscordBot {
 
   async start() {
     await super.start();
-    this.healthCheck.run('Cardstack Hub-Bot', config.get('healthCheckPort'));
+    this.healthCheck.run('Cardstack Hub-Bot');
   }
 
   async teardown() {

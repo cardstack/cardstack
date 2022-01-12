@@ -88,7 +88,7 @@ export class HubWorker {
       });
     });
 
-    this.healthCheck.run('Cardstack Worker', config.get('healthCheckPort'));
+    this.healthCheck.run('Cardstack Worker');
     await runner.promise;
   }
 }

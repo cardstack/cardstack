@@ -1,6 +1,5 @@
 import WorkerClient from './worker-client';
 import * as Sentry from '@sentry/node';
-import config from 'config';
 import Web3SocketService from './web3-socket';
 import Contracts from './contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
@@ -67,7 +66,7 @@ export class ContractSubscriptionEventHandler {
       });
     }
 
-    this.healthCheck.run('Cardstack Contract Event Listener', config.get('healthCheckPort'));
+    this.healthCheck.run('Cardstack Contract Event Listener');
     log.info('Subscribed to events');
   }
 }
