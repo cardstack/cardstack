@@ -37,16 +37,10 @@ export default class HubBot extends DiscordBot {
   cardpay = inject('cardpay');
   discordBotsDbGateway = inject('hub-discord-bots-db-gateway', { as: 'discordBotsDbGateway' });
   dmChannelsDbGateway = inject('hub-dm-channels-db-gateway', { as: 'dmChannelsDbGateway' });
-  private healthCheck = inject('health-check', { as: 'healthCheck' });
 
   constructor() {
     super();
     runInitializers();
-  }
-
-  async start() {
-    await super.start();
-    this.healthCheck.run('Cardstack Hub-Bot');
   }
 
   async teardown() {

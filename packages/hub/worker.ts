@@ -4,8 +4,6 @@ import { JobHelpers, LogFunctionFactory, Logger, run as runWorkers } from 'graph
 import { LogLevel, LogMeta } from '@graphile/logger';
 import { Factory, getOwner } from '@cardstack/di';
 import logger from '@cardstack/logger';
-import { inject } from '@cardstack/di';
-
 import { runInitializers } from './main';
 
 // Tasks
@@ -41,8 +39,6 @@ const workerLogFactory: LogFunctionFactory = (scope: any) => {
 };
 
 export class HubWorker {
-  private healthCheck = inject('health-check', { as: 'healthCheck' });
-
   constructor() {
     runInitializers();
   }
@@ -88,7 +84,6 @@ export class HubWorker {
       });
     });
 
-    this.healthCheck.run('Cardstack Worker');
     await runner.promise;
   }
 }

@@ -1,6 +1,5 @@
 {
   "hubEnvironment": "HUB_ENVIRONMENT",
-  "healthCheckPort": "HEALTH_CHECK_PORT",
   "aws": {
     "config": {
       "credentials": {
