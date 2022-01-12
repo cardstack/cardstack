@@ -40,6 +40,7 @@ export class SearchIndex {
   private notifyQueuePromise: Promise<void> = Promise.resolve();
 
   async indexAllRealms(): Promise<void> {
+    log.trace('indexAllRealms: begin');
     await Promise.all(
       this.realmManager.realms.map((realm) => {
         return this.runIndexing(realm.url, async (ops) => {
@@ -49,6 +50,7 @@ export class SearchIndex {
         });
       })
     );
+    log.trace('indexAllRealms: end');
   }
 
   notify(cardURL: string, action: 'save' | 'delete'): void {
@@ -81,6 +83,7 @@ export class SearchIndex {
 
   private async indexCardFromNotification(cardURL: string, action: 'save' | 'delete') {
     let cardID = this.realmManager.parseCardURL(cardURL);
+    log.trace('indexCardFromNotification', cardURL);
     await this.runIndexing(cardID.realm, async (ops) => {
       switch (action) {
         case 'save': {
@@ -165,6 +168,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   private async storeMeta(): Promise<void> {
+    log.trace('Storing meta');
     await this.db.query(
       expressionToSql(
         upsert('realm_metas', 'realm_metas_pkey', { realm: param(this.realmURL), meta: param(this.newMeta) })
@@ -239,6 +243,7 @@ class IndexerRun implements IndexerHandle {
       let compiledCard = await compiler.compile();
       await this.internalSave(card, compiledCard, compiler);
     } catch (err: any) {
+      log.trace('Save: Error during compile', cardURL(card));
       await this.saveErrorState(card, err, compiler);
     }
   }
@@ -281,6 +286,7 @@ class IndexerRun implements IndexerHandle {
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
+    log.trace('Writing card to index', url);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
       realm: param(this.realmURL),

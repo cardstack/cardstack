@@ -57,7 +57,7 @@ export class CardService {
   async load(cardURL: string): Promise<Card> {
     log.trace('load', cardURL);
     let deserializer = new RawCardDeserializer();
-    let result = await this.loadCardFromDB('SELECT compiled, "compileErrors" from cards where url = $1', cardURL);
+    let result = await this.loadCardFromDB('SELECT compiled, "compileErrors", deps from cards where url = $1', cardURL);
     let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
     if (!compiled) {
       throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
@@ -69,9 +69,10 @@ export class CardService {
   }
 
   async loadData(cardURL: string, format: Format): Promise<CardContent> {
-    log.trace('loadData', cardURL);
+    log.trace('load', cardURL);
+
     let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors" from cards where url = $1',
+      'SELECT url, data, "schemaModule", "componentInfos" , "compileErrors", deps from cards where url = $1',
       cardURL
     );
     return this.contentFromIndex(format, result);
@@ -107,14 +108,6 @@ export class CardService {
     return { raw: rawCard, compiled };
   }
 
-  async createData(
-    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
-    format: Format
-  ): Promise<CardContent> {
-    let { raw, compiled } = await this.create(rawData);
-    return this.contentFromCompiled(raw, compiled, format);
-  }
-
   async update(partialRaw: RawCard): Promise<Card> {
     let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
     let compiler = this.builder.compileCardFromRaw(raw);
@@ -122,6 +115,19 @@ export class CardService {
     await this.realmManager.update(raw);
     let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
     return { raw, compiled };
+  }
+
+  async delete(raw: RawCard): Promise<void> {
+    await this.realmManager.delete(raw);
+    await this.searchIndex.deleteCard(raw);
+  }
+
+  async createData(
+    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
+    format: Format
+  ): Promise<CardContent> {
+    let { raw, compiled } = await this.create(rawData);
+    return this.contentFromCompiled(raw, compiled, format);
   }
 
   async updateData(
@@ -132,11 +138,6 @@ export class CardService {
     return this.contentFromCompiled(raw, compiled, format);
   }
 
-  async delete(raw: RawCard): Promise<void> {
-    await this.realmManager.delete(raw);
-    await this.searchIndex.deleteCard(raw);
-  }
-
   async query(format: Format, query: Query): Promise<CardContent[]> {
     let client = await this.db.getPool();
     try {
@@ -144,7 +145,7 @@ export class CardService {
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
-      let result = await client.query(expressionToSql(await this.prepareExpression(expression)));
+      let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return result.rows.map((row) => {
         return this.contentFromIndex(format, row);
       });
@@ -153,7 +154,7 @@ export class CardService {
     }
   }
 
-  private contentFromIndex(format: Format, result: any): CardContent {
+  private contentFromIndex(format: Format, result: Record<string, any>): CardContent {
     return {
       data: result.data ?? {},
       schemaModule: result.schemaModule,
