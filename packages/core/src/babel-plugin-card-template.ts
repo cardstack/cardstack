@@ -4,7 +4,7 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
 // @ts-ignore
-import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import exportFromPlugin from '@babel/plugin-proposal-export-default-from';
 
 import { NodePath, transformSync } from '@babel/core';
 import * as t from '@babel/types';
@@ -32,12 +32,10 @@ interface State {
   neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
 }
 
-const BASE_MODEL_VAR_NAME = 'BaseModel';
-
 export default function (templateSource: string, options: CardComponentPluginOptions): string {
   try {
     let out = transformSync(templateSource, {
-      plugins: [[babelPluginCardTemplate, options], classPropertiesPlugin],
+      plugins: [[babelPluginCardTemplate, options], exportFromPlugin],
       // HACK: The / resets the relative path setup, removing the cwd of the hub.
       // This allows the error module to look a lot more like the card URL.
       filename: '/' + options.debugPath.replace(/^\//, ''),
@@ -55,14 +53,11 @@ export function babelPluginCardTemplate() {
         enter(_path: NodePath, state: State) {
           state.insideExportDefault = false;
           state.neededImports = new Map();
-          state.neededImports.set(BASE_MODEL_VAR_NAME, {
-            moduleSpecifier: '@cardstack/core/src/card-model',
-            exportedName: 'default',
-          });
         },
         exit(path: NodePath<t.Program>, state: State) {
           addImports(state.neededImports, path);
-          addModelClass(path, state);
+          addSerializerMap(path, state);
+          addBaseModelExport(path);
         },
       },
 
@@ -95,17 +90,24 @@ function addImports(neededImports: State['neededImports'], path: NodePath<t.Prog
   }
 }
 
-function addModelClass(path: NodePath<t.Program>, state: State) {
+function addBaseModelExport(path: NodePath<t.Program>) {
+  path.node.body.push(
+    t.exportNamedDeclaration(
+      null,
+      [t.exportDefaultSpecifier(t.identifier('Model'))],
+      t.stringLiteral('@cardstack/core/src/card-model')
+    )
+  );
+}
+
+function addSerializerMap(path: NodePath<t.Program>, state: State) {
   let serializerMapPropertyDefinition = buildSerializerMapProp(state.opts.fields, state.opts.usedFields);
-  let classBody = t.classBody([serializerMapPropertyDefinition]);
 
   path.node.body.push(
     t.exportNamedDeclaration(
-      t.classDeclaration(
-        t.identifier(findVariableName('Model', path, state.neededImports)),
-        t.identifier(BASE_MODEL_VAR_NAME),
-        classBody
-      )
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier('serializerMap'), t.objectExpression(serializerMapPropertyDefinition)),
+      ])
     )
   );
 }
@@ -113,7 +115,7 @@ function addModelClass(path: NodePath<t.Program>, state: State) {
 function buildSerializerMapProp(
   fields: CompiledCard['fields'],
   usedFields: CardComponentPluginOptions['usedFields']
-): t.ClassProperty {
+): t.ObjectExpression['properties'] {
   let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
   let props: t.ObjectExpression['properties'] = [];
 
@@ -129,14 +131,8 @@ function buildSerializerMapProp(
     }
     props.push(t.objectProperty(t.identifier(serializer), t.arrayExpression(fieldListElements)));
   }
-  return t.classProperty(
-    t.identifier('serializerMap'),
-    t.objectExpression(props),
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
+
+  return props;
 }
 
 function callExpressionEnter(path: NodePath<t.CallExpression>, state: State) {
