@@ -7,6 +7,8 @@ const certificateArn = execute(
 const listenerArn = execute(
   `cat waypoint.hcl | grep listener_arn | grep "/${appName}/" | awk '{ print $3 }' | sed 's/"//g'`
 );
+
+// fixes this issue: https://github.com/hashicorp/waypoint/issues/1568
 const fixCmd = `aws elbv2 modify-listener --listener-arn ${listenerArn} --protocol HTTPS --port 443 --certificates CertificateArn=${certificateArn} --output=table`;
 execute(fixCmd, { env: { ...process.env, PAGER: '' } });
 
@@ -15,9 +17,14 @@ console.log(`listener details: ${listenerDetailsStr}`);
 const listenerDetails = JSON.parse(listenerDetailsStr);
 
 let targetGroups = listenerDetails.Listeners[0].DefaultActions[0].ForwardConfig.TargetGroups;
+
+// annoyingly waypoint is immediately setting traffic to 100% on the new target
+// group _before_ it is healthy. so we switch the traffic to continue to flow to
+// the old target group while the new one spins up
 let oldTargetGroup = targetGroups.find((t) => t.Weight === 0).TargetGroupArn;
 let newTargetGroup = targetGroups.find((t) => t.Weight === 100).TargetGroupArn;
 
+// use the old target group while we wait for the new one to spin up
 modifyTargetGroups(listenerArn, [
   { TargetGroupArn: oldTargetGroup, Weight: 100 },
   { TargetGroupArn: newTargetGroup, Weight: 0 },
@@ -25,6 +32,7 @@ modifyTargetGroups(listenerArn, [
 
 await waitForHealthy(newTargetGroup);
 
+// switch to the new target group
 modifyTargetGroups(listenerArn, [
   { TargetGroupArn: newTargetGroup, Weight: 100 },
   { TargetGroupArn: oldTargetGroup, Weight: 0 },
