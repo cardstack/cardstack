@@ -63,7 +63,6 @@ describe('POST /upload', function () {
     expect(response.status, '201');
     expect(response.headers['Location'], 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
     expect(response.body.data.attributes.url, 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
-    expect(response.body.data.attributes.id, 'CID');
 
     let queryResult = await db.query('SELECT id FROM uploads WHERE url = $1', [
       'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg',

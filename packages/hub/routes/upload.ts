@@ -87,7 +87,6 @@ export default class UploadRouter {
         ctx.body = {
           data: {
             type: 'uploaded-asset',
-            id: cid,
             attributes: {
               url,
             },
