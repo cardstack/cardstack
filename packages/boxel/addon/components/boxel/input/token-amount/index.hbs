@@ -6,7 +6,7 @@
     @value={{@value}}
     @required={{unless @disabled true}}
     @onInput={{@onInput}}
-    @onBlur={{fn (optional @onInput @value)}}
+    @onBlur={{fn @onInput @value}}
     @invalid={{unless @disabled @invalid}}
     @errorMessage={{@errorMessage}}
     @helperText={{@helperText}}

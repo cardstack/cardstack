@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 export default class BoxelInputTokenAmountUsage extends Component {
   @tracked id = 'boxel-token-amount-input-usage';
@@ -10,4 +11,8 @@ export default class BoxelInputTokenAmountUsage extends Component {
   @tracked invalid = false;
   @tracked icon = 'card';
   @tracked symbol = 'CARD';
+
+  @action set(amount: string): void {
+    this.value = amount;
+  }
 }
