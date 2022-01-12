@@ -78,7 +78,15 @@ describe('POST /upload', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .attach('image', buffer, 'cat.gif')
       .expect(422)
-      .expect('File type unsupported. Allowed types: JPG, JPEG, PNG');
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid upload',
+            detail: 'File type unsupported. Allowed types: JPG, JPEG, PNG',
+          },
+        ],
+      });
   });
 
   it('rejects a large file', async function () {
@@ -91,7 +99,15 @@ describe('POST /upload', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .attach('image', buffer, 'cat.png')
       .expect(422)
-      .expect('File is too large. Max file size is 1MB.');
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid upload',
+            detail: 'File is too large. Max file size is 1MB.',
+          },
+        ],
+      });
   });
 
   it('detects abuse', async function () {
