@@ -43,7 +43,7 @@ app "hub" {
 
         hook {
             when    = "after"
-            command = ["./scripts/fix-listener.sh", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }
