@@ -290,7 +290,7 @@ export default abstract class Layer1ChainWeb3Strategy
       this.cardBalance = new BN(cardBalance);
     } catch (e) {
       // Incorrect chain id triggers controller:card-pay#onLayer2Incorrect to show a modal
-      if (e.message.includes('what name the network id')) {
+      if (!e.message.includes('what name the network id')) {
         // Exception being ignored: Don't know what name the network id ID is
         Sentry.captureException(e);
         throw e;
