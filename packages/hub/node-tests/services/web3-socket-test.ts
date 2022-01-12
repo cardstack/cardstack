@@ -101,15 +101,15 @@ describe('Web3Socket', function () {
       return !!testkit.reports().length;
     }, 15000);
 
-    let originalReport = testkit
+    let testCaseReport = testkit
       .reports()
       .find((v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing')!;
-    expect(originalReport?.extra?.__serialized__).to.deep.equal({
+    expect(testCaseReport?.extra?.__serialized__).to.deep.equal({
       code: 1000,
       reason: 'Testing',
       wasClean: false,
     });
-    expect(originalReport.tags).to.deep.equal({
+    expect(testCaseReport.tags).to.deep.equal({
       action: 'web3-socket-connection',
     });
   });
