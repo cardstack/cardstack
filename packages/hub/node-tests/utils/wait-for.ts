@@ -17,6 +17,7 @@ export default function waitFor(
     async function rerun() {
       if (tries > maxTries) {
         reject(new Error(`Could not meet expectation within ${timeout}ms`));
+        return;
       }
       // eslint-disable-next-line no-use-before-define
       setTimeout(runExpectation, interval);
