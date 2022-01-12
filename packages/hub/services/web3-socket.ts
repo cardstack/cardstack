@@ -8,19 +8,19 @@ interface Web3Config {
   network: string;
 }
 
-const { network } = config.get('web3') as Web3Config;
-let rpcURL = getConstantByNetwork('rpcWssNode', network);
 let log = Logger('service:web3-socket');
+const { network } = config.get('web3') as Web3Config;
 
 export default class Web3SocketService {
   web3: Web3 | undefined;
+  rpcURL = getConstantByNetwork('rpcWssNode', network);
 
   getInstance() {
     if (!this.web3) {
       try {
         this.web3 = this.initializeWeb3();
       } catch (e) {
-        log.error(`Error encountered while trying to connect to rpc node with url ${rpcURL}`, e);
+        log.error(`Error encountered while trying to connect to rpc node with url ${this.rpcURL}`, e);
         Sentry.captureException(e, {
           tags: {
             action: 'web3-socket-connection',
@@ -44,7 +44,7 @@ export default class Web3SocketService {
       on(...args: any[]): void;
     };
 
-    let provider = new Web3.providers.WebsocketProvider(rpcURL, {
+    let provider = new Web3.providers.WebsocketProvider(this.rpcURL, {
       timeout: 30000,
       reconnect: {
         auto: true,

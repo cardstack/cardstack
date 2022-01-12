@@ -2,37 +2,43 @@ import Web3SocketService from '../../services/web3-socket';
 import sentryTestkit from 'sentry-testkit';
 import * as Sentry from '@sentry/node';
 import waitFor from '../utils/wait-for';
+import { server as WebsocketServer } from 'websocket';
+import http from 'http';
 
 const { testkit, sentryTransport } = sentryTestkit();
 const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
 describe('Web3Socket', function () {
   let subject: Web3SocketService;
-  this.beforeAll(function () {
+  let wsServer: WebsocketServer;
+  let httpServer: http.Server;
+
+  this.beforeEach(function () {
+    httpServer = http.createServer(function (_, response) {
+      response.end();
+    });
+    httpServer.listen(8545);
+    wsServer = new WebsocketServer({
+      httpServer,
+      autoAcceptConnections: true,
+    });
+    wsServer.on('request', function (request: any) {
+      request.accept('echo-protocol', request.origin);
+    });
+    subject = new Web3SocketService();
+    subject.rpcURL = 'ws://localhost:8545';
     Sentry.init({
       dsn: DUMMY_DSN,
       release: 'test',
       tracesSampleRate: 1,
       transport: sentryTransport,
     });
-  });
-  this.beforeEach(function () {
-    subject = new Web3SocketService();
     testkit.reset();
   });
   this.afterEach(async function () {
-    let connection = (subject.web3?.currentProvider as unknown as any)?.connection;
-    if (connection) {
-      if (connection.readyState === connection.OPEN) connection.close(1000, 'Closing because test is done');
-      // hack to make sure cleanup is properly done after tests
-      // https://github.com/theturtle32/WebSocket-Node/issues/426
-      connection._client.on('httpResponse', (r: any) => {
-        r.destroy();
-      });
-      connection._client.on('connect', (c: any) => {
-        c.close();
-      });
-    }
+    (subject.web3?.currentProvider as any)?.disconnect?.();
+    wsServer.shutDown();
+    httpServer.close();
   });
 
   it('reports to sentry when web3 initialization fails', async function () {
@@ -53,6 +59,15 @@ describe('Web3Socket', function () {
     let web3 = subject.getInstance();
 
     let provider: any = web3.currentProvider;
+    // we explicitly wait for the provider to be connected
+    // to avoid trying to disconnect from a connecting state at the
+    // end of this test
+    await new Promise<void>((resolve) => {
+      provider.on('connect', function () {
+        resolve();
+      });
+      if (provider.connected) resolve();
+    });
     provider.emit(provider.ERROR, new Error('A test error'));
 
     await waitFor(() => testkit.reports().length > 0);
@@ -67,16 +82,30 @@ describe('Web3Socket', function () {
     let web3 = subject.getInstance();
 
     let provider: any = web3.currentProvider;
+    // we explicitly wait for the provider to be connected
+    // to avoid trying to disconnect from a connecting state at the
+    // end of this test
+    await new Promise<void>((resolve) => {
+      provider.on('connect', function () {
+        resolve();
+      });
+      if (provider.connected) resolve();
+    });
     provider.emit(provider.CLOSE, {
-      code: 1006,
+      code: 1000,
       reason: 'Testing',
       wasClean: false,
     });
 
-    await waitFor(() => testkit.reports().length > 0);
+    await waitFor(() => {
+      return !!testkit.reports().length;
+    }, 15000);
 
-    expect(testkit.reports()[0]?.originalReport?.extra?.__serialized__).to.deep.equal({
-      code: 1006,
+    let originalReport = testkit
+      .reports()
+      .find((v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing')!;
+    expect(originalReport?.extra?.__serialized__).to.deep.equal({
+      code: 1000,
       reason: 'Testing',
       wasClean: false,
     });
