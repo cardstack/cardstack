@@ -140,7 +140,7 @@ module(
       // the save details button enabled
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
       let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
@@ -152,7 +152,7 @@ module(
         .dom('[data-test-merchant]')
         .hasAttribute('data-test-merchant', 'HELLO!')
         .containsText('HELLO!');
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       for (let invalidEntry of MERCHANT_NAME_INVALID_INPUTS) {
@@ -176,7 +176,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       for (let invalidEntry of MERCHANT_ID_INVALID_INPUTS) {
@@ -196,7 +196,7 @@ module(
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
 
       await fillIn(merchantIdInput, 'existing');
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText(
@@ -206,13 +206,13 @@ module(
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
       await fillIn(merchantIdInput, 'unique');
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       // www is hardcoded to be forbidden in mirage
       await fillIn(merchantIdInput, 'www');
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('This Business ID is not allowed');
@@ -230,7 +230,7 @@ module(
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
 
       await fillIn(merchantIdInput, 'existing');
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('There was an error validating business ID uniqueness');
@@ -249,7 +249,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
 
@@ -265,7 +265,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
 

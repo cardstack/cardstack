@@ -91,7 +91,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           '[data-test-deposit-transaction-setup-is-complete] [data-test-balance-display-amount]'
         )
         .hasText('250.50 DAI');
-      assert.dom('[data-test-token-amount-input]').hasValue('10');
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('10');
       assert.dom('[data-test-unlock-button]').hasText('Unlock');
     });
 

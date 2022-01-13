@@ -237,7 +237,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .isDisabled(
         'Set amount button is disabled until amount has been entered'
       );
-    await fillIn('[data-test-token-amount-input]', '200');
+    await fillIn('[data-test-boxel-input-token-amount]', '200');
     assert
       .dom(
         `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`

@@ -183,7 +183,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-source-token="DAI"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
-    await fillIn('[data-test-token-amount-input]', '250');
+    await fillIn('[data-test-boxel-input-token-amount]', '250');
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
@@ -200,7 +200,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-button]`)
       .hasClass('boxel-button--loading');
     assert
-      .dom('[data-test-token-amount-input]')
+      .dom('[data-test-boxel-input-token-amount]')
       .doesNotExist('Input field is no longer available when unlocking');
 
     assert.dom('[data-test-deposit-amount-entered]').containsText('250.00 DAI');
@@ -222,7 +222,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-success-message]`)
       .exists('There should be a success message after unlocking');
     assert
-      .dom('[data-test-token-amount-input]')
+      .dom('[data-test-boxel-input-token-amount]')
       .doesNotExist('Input field is no longer available after unlocking');
     assert
       .dom(`${post} [data-test-deposit-button]`)
