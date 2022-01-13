@@ -191,3 +191,38 @@ app "cardie" {
         }
     }
 }
+
+app "cardpay-subgraph-extraction" {
+    path = "./packages/cardpay-subgraph-extraction"
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "cardpay-staging-subgraph-extraction"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "cardpay-staging-subgraph-extraction"
+            count = 1
+            subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
+            task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
+            disable_alb = true
+        }
+
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subgraph-extraction","1"] # need this to purge old ecs services
+        }
+    }
+}
