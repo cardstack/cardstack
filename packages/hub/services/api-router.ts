@@ -76,7 +76,7 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
 
-    apiSubrouter.get('/card-spaces/:username', cardSpacesRoute.get);
+    apiSubrouter.get('/card-spaces/:domain', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
     apiSubrouter.post(
       '/card-spaces/validate-profile-category',

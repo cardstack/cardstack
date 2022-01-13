@@ -50,8 +50,8 @@ export default class CardSpacesRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let username = ctx.params.username;
-    let cardSpace = (await this.cardSpaceQueries.query({ url: `${username}.card.space` }))[0] as CardSpace;
+    let domain = ctx.params.domain;
+    let cardSpace = (await this.cardSpaceQueries.query({ url: domain }))[0] as CardSpace;
 
     if (!cardSpace) {
       ctx.status = 404;

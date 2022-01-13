@@ -39,7 +39,7 @@ class StubWorkerClient {
   }
 }
 
-describe('GET /api/card-spaces/:username', function () {
+describe('GET /api/card-spaces/:domain', function () {
   let { request, getContainer } = setupHub(this);
 
   it('fetches a card space', async function () {
@@ -59,7 +59,7 @@ describe('GET /api/card-spaces/:username', function () {
     await (await getContainer().lookup('card-space-queries')).insert(cardSpace);
 
     await request()
-      .get('/api/card-spaces/satoshi')
+      .get('/api/card-spaces/satoshi.card.space')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -96,7 +96,7 @@ describe('GET /api/card-spaces/:username', function () {
 
   it('returns 404 when user does not exist', async function () {
     await request()
-      .get('/api/card-spaces/satoshi')
+      .get('/api/card-spaces/satoshi.card.space')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(404);
