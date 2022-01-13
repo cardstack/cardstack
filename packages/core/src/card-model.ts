@@ -31,11 +31,15 @@ export interface LoadedState {
 }
 
 export default class CardModel {
-  static serializerMap: SerializerMap;
   setters: Setter;
   private declare _data: any;
 
-  constructor(private cards: CardEnv, private innerComponent: unknown, private state: CreatedState | LoadedState) {
+  constructor(
+    private cards: CardEnv,
+    private innerComponent: unknown,
+    private serializerMap: SerializerMap,
+    private state: CreatedState | LoadedState
+  ) {
     this.setters = this.makeSetter();
     Object.defineProperty(
       this,
@@ -48,8 +52,13 @@ export default class CardModel {
     );
   }
 
-  static fromResponse(cards: CardEnv, cardResponse: ResourceObject, component: unknown): CardModel {
-    return new this(cards, component, {
+  static fromResponse(
+    cards: CardEnv,
+    cardResponse: ResourceObject,
+    component: unknown,
+    serializerMap: SerializerMap
+  ): CardModel {
+    return new this(cards, component, serializerMap, {
       type: 'loaded',
       url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
@@ -78,7 +87,7 @@ export default class CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    return new (this.constructor as typeof CardModel)(this.cards, this.innerComponent, {
+    return new (this.constructor as typeof CardModel)(this.cards, this.innerComponent, this.serializerMap, {
       type: 'created',
       realm,
       parentCardURL: this.state.url,
@@ -89,11 +98,7 @@ export default class CardModel {
     switch (this.state.type) {
       case 'loaded':
         if (!this.state.deserialized) {
-          this._data = deserializaAttributes(
-            this.state.rawServerResponse.attributes,
-            // @ts-ignore This works as expected, whats up typescript?
-            this.constructor.serializerMap
-          );
+          this._data = deserializaAttributes(this.state.rawServerResponse.attributes, this.serializerMap);
           this.state.deserialized = true;
         }
         return this._data;
@@ -153,11 +158,7 @@ export default class CardModel {
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
-    let attributes = serializeAttributes(
-      this.data,
-      // @ts-ignore
-      this.constructor.serializerMap
-    );
+    let attributes = serializeAttributes(this.data, this.serializerMap);
 
     switch (this.state.type) {
       case 'created':

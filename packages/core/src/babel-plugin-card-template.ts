@@ -3,9 +3,6 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
-// @ts-ignore
-import exportFromPlugin from '@babel/plugin-proposal-export-default-from';
-
 import { NodePath, transformSync } from '@babel/core';
 import * as t from '@babel/types';
 
@@ -35,7 +32,7 @@ interface State {
 export default function (templateSource: string, options: CardComponentPluginOptions): string {
   try {
     let out = transformSync(templateSource, {
-      plugins: [[babelPluginCardTemplate, options], exportFromPlugin],
+      plugins: [[babelPluginCardTemplate, options]],
       // HACK: The / resets the relative path setup, removing the cwd of the hub.
       // This allows the error module to look a lot more like the card URL.
       filename: '/' + options.debugPath.replace(/^\//, ''),
@@ -94,7 +91,7 @@ function addBaseModelExport(path: NodePath<t.Program>) {
   path.node.body.push(
     t.exportNamedDeclaration(
       null,
-      [t.exportDefaultSpecifier(t.identifier('Model'))],
+      [t.exportSpecifier(t.identifier('default'), t.identifier('Model'))],
       t.stringLiteral('@cardstack/core/src/card-model')
     )
   );

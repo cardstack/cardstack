@@ -9,6 +9,7 @@ import {
   ResourceObject,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
+  SerializerMap,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -44,8 +45,8 @@ export default class Cards extends Service {
     let { data } = cardResponse;
     assertDocumentDataIsResource(data);
 
-    let { component, Model } = await this.codeForCard(data);
-    return Model.fromResponse(this.cardEnv(), data, component);
+    let { component, Model, serializerMap } = await this.codeForCard(data);
+    return Model.fromResponse(this.cardEnv(), data, component, serializerMap);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -57,8 +58,8 @@ export default class Cards extends Service {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      let { component, Model } = await this.codeForCard(data);
-      return Model.fromResponse(this.cardEnv(), data, component);
+      let { component, Model, serializerMap } = await this.codeForCard(data);
+      return Model.fromResponse(this.cardEnv(), data, component, serializerMap);
     }
   }
 
@@ -74,8 +75,15 @@ export default class Cards extends Service {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        let { component, Model } = await this.codeForCard(cardResponse);
-        return Model.fromResponse(this.cardEnv(), cardResponse, component);
+        let { component, Model, serializerMap } = await this.codeForCard(
+          cardResponse
+        );
+        return Model.fromResponse(
+          this.cardEnv(),
+          cardResponse,
+          component,
+          serializerMap
+        );
       })
     );
   }
@@ -187,9 +195,11 @@ export default class Cards extends Service {
     );
   }
 
-  private async codeForCard(
-    card: ResourceObject
-  ): Promise<{ component: unknown; Model: typeof CardModel }> {
+  private async codeForCard(card: ResourceObject): Promise<{
+    component: unknown;
+    Model: typeof CardModel;
+    serializerMap: SerializerMap;
+  }> {
     let componentModule = card.meta?.componentModule;
     if (!componentModule) {
       throw new Error('No componentModule to load');
@@ -200,10 +210,12 @@ export default class Cards extends Service {
     let module = await this.loadModule<{
       default: unknown;
       Model: typeof CardModel;
+      serializerMap: SerializerMap;
     }>(componentModule);
     return {
       component: module.default,
       Model: module.Model,
+      serializerMap: module.serializerMap,
     };
   }
 

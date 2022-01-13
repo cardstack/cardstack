@@ -44,11 +44,8 @@ if (process.env.COMPILER) {
       ]);
     });
 
-    it.only('modifies the source', async function () {
-      expect(code).to.containsSource(
-        // eslint-disable-next-line no-useless-escape
-        `export Model from \"@cardstack/core/src/card-model\";`
-      );
+    it('modifies the source', async function () {
+      expect(code).to.containsSource(`export { default as Model } from "@cardstack/core/src/card-model";`);
       expect(code).to.containsSource(
         `export const serializerMap = {
           date: ["birthdate", "address.settlementDate"]
