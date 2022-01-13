@@ -53,10 +53,10 @@ export default class CardSpacesRoute {
     let username = ctx.params.username;
     let cardSpace = (await this.cardSpaceQueries.query({ url: `${username}.card.space` }))[0] as CardSpace;
 
-    // if (!cardSpace) {
-    //   ctx.status = 404;
-    //   return;
-    // }
+    if (!cardSpace) {
+      ctx.status = 404;
+      return;
+    }
 
     let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
 

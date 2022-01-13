@@ -93,6 +93,14 @@ describe('GET /api/card-spaces/:username', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+
+  it('returns 404 when user does not exist', async function () {
+    await request()
+      .get('/api/card-spaces/satoshi')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(404);
+  });
 });
 
 describe('POST /api/card-spaces', function () {
