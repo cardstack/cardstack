@@ -301,6 +301,7 @@ class IndexerRun implements IndexerHandle {
       searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
+
       schemaModule: param(compiledCard.schemaModule.global),
       componentInfos: param(getComponentModules(compiledCard)),
     });
@@ -381,6 +382,7 @@ function getComponentModules(card: CompiledCard): Record<string, any> {
       {
         moduleName: card[format].moduleName,
         usedFields: card[format].usedFields,
+        serializerMap: card[format].serializerMap,
       },
     ]);
   }

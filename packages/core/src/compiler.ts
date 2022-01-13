@@ -361,6 +361,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       moduleName: { local: moduleName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
+      serializerMap: options.serializerMap,
     };
 
     return componentInfo;
@@ -434,6 +435,7 @@ export function makeGloballyAddressable(
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
+      serializerMap: info.serializerMap,
     };
   }
 
