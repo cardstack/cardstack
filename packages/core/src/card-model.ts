@@ -34,7 +34,7 @@ export default class CardModel {
   setters: Setter;
   private declare _data: any;
 
-  constructor(
+  private constructor(
     private cards: CardEnv,
     private innerComponent: unknown,
     private serializerMap: SerializerMap,
