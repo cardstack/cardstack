@@ -35,6 +35,7 @@
     "postinstall": "cd ./packages/cardpay-sdk && yarn codegen; cd -",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
+    "build:hub": "cd ./packages/hub && yarn build",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "cd packages/cardhost && yarn lint",
