@@ -245,5 +245,5 @@ export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
   send(operation: CardOperation): Promise<JSONAPIDocument>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
-  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
+  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor | void;
 }

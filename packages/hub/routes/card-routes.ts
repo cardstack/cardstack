@@ -40,14 +40,14 @@ export default class CardRoutes {
 
     let format = getCardFormatFromRequest(ctx.query.format);
     let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, format);
-    ctx.body = serializeCardPayloadForFormat(card);
+    ctx.body = serializeCardPayloadForFormat(card.cardContent);
     ctx.status = 200;
   }
 
   private async queryCards(ctx: RouterContext) {
     let query = parseQueryString(ctx.querystring);
     let cards = await this.cards.as(INSECURE_CONTEXT).query('embedded', query);
-    let collection = cards.map((card) => serializeCardPayloadForFormat(card).data);
+    let collection = cards.map((card) => serializeCardPayloadForFormat(card.cardContent).data);
     ctx.body = { data: collection };
     ctx.status = 200;
   }
@@ -117,7 +117,7 @@ export default class CardRoutes {
     }
 
     let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, 'isolated');
-    ctx.body = serializeCardPayloadForFormat(card);
+    ctx.body = serializeCardPayloadForFormat(card.cardContent);
   }
 
   private async getSource(ctx: RouterContext) {

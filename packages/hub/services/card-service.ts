@@ -18,6 +18,8 @@ import {
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
+import { CardEnv } from '@cardstack/core/src/interfaces';
+import CardModel from '@cardstack/core/src/card-model';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -59,14 +61,14 @@ export class CardService {
     };
   }
 
-  async loadData(cardURL: string, format: Format): Promise<CardContent> {
+  async loadData(cardURL: string, format: Format): Promise<CardModel> {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(
       'SELECT url, data, "schemaModule", "componentInfos" , "compileErrors", deps from cards where url = $1',
       cardURL
     );
-    return this.contentFromIndex(format, result);
+    return CardModel.fromDatabase(this.cardEnv(), format, result);
   }
 
   private async loadCardFromDB(query: string, cardURL: string): Promise<Record<string, any>> {
@@ -129,7 +131,7 @@ export class CardService {
     return this.contentFromCompiled(raw, compiled, format);
   }
 
-  async query(format: Format, query: Query): Promise<CardContent[]> {
+  async query(format: Format, query: Query): Promise<CardModel[]> {
     let client = await this.db.getPool();
     try {
       let expression: CardExpression = ['select url, data, "schemaModule", "componentInfos" from cards'];
@@ -138,21 +140,25 @@ export class CardService {
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return result.rows.map((row) => {
-        return this.contentFromIndex(format, row);
+        return CardModel.fromDatabase(this.cardEnv(), format, row);
       });
     } finally {
       client.release();
     }
   }
 
-  private contentFromIndex(format: Format, result: Record<string, any>): CardContent {
+  private cardEnv(): CardEnv {
     return {
-      data: result.data ?? {},
-      schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      url: result.url,
-      format,
+      load: this.loadData.bind(this),
+      send() {
+        throw new Error('TODO: We should be using cardEnv.send in this environment');
+      },
+      prepareComponent() {
+        // Intentionally a noop for now
+      },
+      tracked(_target: CardModel, _prop: string, _desc: PropertyDescriptor) {
+        // Intentionally a noop for now
+      },
     };
   }
 
