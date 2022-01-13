@@ -6,7 +6,7 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 import { NodePath, transformSync } from '@babel/core';
 import * as t from '@babel/types';
 
-import { CompiledCard, SerializerName, Format } from './interfaces';
+import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
@@ -19,6 +19,7 @@ export interface CardComponentPluginOptions {
   // these are for gathering output
   usedFields: string[];
   inlineHBS: string | undefined;
+  serializerMap: SerializerMap;
 }
 
 interface State {
@@ -98,7 +99,10 @@ function addBaseModelExport(path: NodePath<t.Program>) {
 }
 
 function addSerializerMap(path: NodePath<t.Program>, state: State) {
-  let serializerMapPropertyDefinition = buildSerializerMapProp(state.opts.fields, state.opts.usedFields);
+  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
+  state.opts.serializerMap = serializerMap;
+
+  let serializerMapPropertyDefinition = buildSerializerMapProp(serializerMap);
 
   path.node.body.push(
     t.exportNamedDeclaration(
@@ -109,11 +113,7 @@ function addSerializerMap(path: NodePath<t.Program>, state: State) {
   );
 }
 
-function buildSerializerMapProp(
-  fields: CompiledCard['fields'],
-  usedFields: CardComponentPluginOptions['usedFields']
-): t.ObjectExpression['properties'] {
-  let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
+function buildSerializerMapProp(serializerMap: SerializerMap): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
 
   for (let serializer in serializerMap) {

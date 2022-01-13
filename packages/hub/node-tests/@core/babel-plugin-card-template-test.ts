@@ -24,6 +24,7 @@ if (process.env.COMPILER) {
         inlineHBS: undefined,
         defaultFieldFormat: 'embedded',
         usedFields: [],
+        serializerMap: {},
       };
       let src = templateOnlyComponentTemplate(
         '<div><h1><@fields.name /></h1><@fields.birthdate /> <@fields.address /></div>'
@@ -42,6 +43,10 @@ if (process.env.COMPILER) {
         'address.zip',
         'address.settlementDate',
       ]);
+    });
+
+    it('includes the serializerMap', async function () {
+      expect(options.serializerMap).to.deep.equal({ date: ['birthdate', 'address.settlementDate'] });
     });
 
     it('modifies the source', async function () {

@@ -347,6 +347,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
+      serializerMap: {},
     };
 
     let code: string;
