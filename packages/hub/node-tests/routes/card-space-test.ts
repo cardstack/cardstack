@@ -1,4 +1,5 @@
 import { Job, TaskSpec } from 'graphile-worker';
+import { CardSpace } from '../../routes/card-spaces';
 import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
@@ -37,6 +38,62 @@ class StubWorkerClient {
     return Promise.resolve({} as Job);
   }
 }
+
+describe('GET /api/card-spaces/:username', function () {
+  let { request, getContainer } = setupHub(this);
+
+  it('fetches a card space', async function () {
+    const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
+    const cardSpace: CardSpace = {
+      id,
+      profileName: 'Satoshi Nakamoto',
+      url: 'satoshi.card.space',
+      profileDescription: "Satoshi's place",
+      profileCategory: 'entertainment',
+      profileImageUrl: 'https://test.com/test1.png',
+      profileCoverImageUrl: 'https://test.com/test2.png',
+      profileButtonText: 'Visit this Space',
+      ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+    };
+
+    await (await getContainer().lookup('card-space-queries')).insert(cardSpace);
+
+    await request()
+      .get('/api/card-spaces/satoshi')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        meta: {
+          network: 'sokol',
+        },
+        data: {
+          type: 'card-spaces',
+          id,
+          attributes: {
+            did: 'did:cardstack:1csqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
+            'profile-name': 'Satoshi Nakamoto',
+            url: 'satoshi.card.space',
+            'profile-description': "Satoshi's place",
+            'profile-category': 'entertainment',
+            'profile-cover-image-url': 'https://test.com/test2.png',
+            'profile-button-text': 'Visit this Space',
+            'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+            'bio-description': null,
+            'bio-title': null,
+            'donation-description': null,
+            'donation-suggestion-amount-1': null,
+            'donation-suggestion-amount-2': null,
+            'donation-suggestion-amount-3': null,
+            'donation-suggestion-amount-4': null,
+            'donation-title': null,
+            links: [],
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
 
 describe('POST /api/card-spaces', function () {
   this.beforeEach(function () {

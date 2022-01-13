@@ -49,6 +49,22 @@ export default class CardSpacesRoute {
     autoBind(this);
   }
 
+  async get(ctx: Koa.Context) {
+    let username = ctx.params.username;
+    let cardSpace = (await this.cardSpaceQueries.query({ url: `${username}.card.space` }))[0] as CardSpace;
+
+    // if (!cardSpace) {
+    //   ctx.status = 404;
+    //   return;
+    // }
+
+    let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
+
+    ctx.status = 200;
+    ctx.body = serialized;
+    ctx.type = 'application/vnd.api+json';
+  }
+
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;

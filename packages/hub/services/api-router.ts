@@ -75,6 +75,8 @@ export default class APIRouter {
     apiSubrouter.get('/orders/:order_id', ordersRoute.get);
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
+
+    apiSubrouter.get('/card-spaces/:username', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
     apiSubrouter.post(
       '/card-spaces/validate-profile-category',
@@ -84,6 +86,7 @@ export default class APIRouter {
     apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
     apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
+
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);
     apiSubrouter.delete(
       '/push-notification-registrations/:push_client_id',
