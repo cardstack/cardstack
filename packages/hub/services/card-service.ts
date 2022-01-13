@@ -1,13 +1,4 @@
-import {
-  Card,
-  CompiledCard,
-  Unsaved,
-  RawCard,
-  CardContent,
-  CompilerComponentInfo,
-  ComponentInfo,
-  Format,
-} from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard, CardContent, Format } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -158,7 +149,8 @@ export class CardService {
     return {
       data: result.data ?? {},
       schemaModule: result.schemaModule,
-      componentInfo: result.componentInfos[format],
+      usedFields: result.componentInfos[format].usedFields,
+      componentModule: result.componentInfos[format].moduleName.global,
       url: result.url,
       format,
     };
@@ -171,8 +163,9 @@ export class CardService {
   private contentFromCompiled(raw: RawCard, compiled: CompiledCard, format: Format): CardContent {
     return {
       data: raw.data ?? {},
-      schemaModule: compiled.schemaModule,
-      componentInfo: contentPartOfComponentInfo(compiled[format]),
+      schemaModule: compiled.schemaModule.global,
+      usedFields: compiled[format].usedFields,
+      componentModule: compiled[format].moduleName.global,
       url: compiled.url,
       format,
     };
@@ -283,8 +276,4 @@ function cardHasType(card: CompiledCard, url: string): boolean {
   } else {
     return cardHasType(card.adoptsFrom, url);
   }
-}
-
-function contentPartOfComponentInfo(info: CompilerComponentInfo): ComponentInfo {
-  return { moduleName: info.moduleName, usedFields: info.usedFields };
 }

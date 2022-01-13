@@ -136,9 +136,9 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   schemaModule: Ref;
   serializer?: SerializerName;
 
-  isolated: CompilerComponentInfo<Ref>;
-  embedded: CompilerComponentInfo<Ref>;
-  edit: CompilerComponentInfo<Ref>;
+  isolated: ComponentInfo<Ref>;
+  embedded: ComponentInfo<Ref>;
+  edit: ComponentInfo<Ref>;
 
   modules: Record<
     string, // local module path
@@ -154,9 +154,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   moduleName: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
-}
 
-export interface CompilerComponentInfo<Ref extends ModuleRef = GlobalRef> extends ComponentInfo<Ref> {
   // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;
 
@@ -176,8 +174,9 @@ export interface CardContent {
   // includes computed values and the data from linked cards.
   data: Record<string, any>;
 
-  componentInfo: ComponentInfo<GlobalRef>;
-  schemaModule: GlobalRef;
+  schemaModule: string;
+  componentModule: string;
+  usedFields: string[];
 
   format: Format;
   url: string;
