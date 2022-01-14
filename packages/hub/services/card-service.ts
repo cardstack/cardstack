@@ -66,7 +66,7 @@ export class CardService {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos" from cards where url = $1',
+      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors" from cards where url = $1',
       cardURL
     );
     return await CardModel.fromDatabase(this.cardEnv(), format, result);
