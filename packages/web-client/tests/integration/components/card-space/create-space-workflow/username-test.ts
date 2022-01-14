@@ -147,6 +147,8 @@ module(
         />
       `);
 
+      assert.dom(SAVE_BUTTON).isDisabled();
+
       await fillIn(USERNAME_INPUT, 'Hello there');
       assert.dom(USERNAME_INPUT).hasValue('Hello there');
 
