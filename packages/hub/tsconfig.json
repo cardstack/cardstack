@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "es2020",
-    "declaration": true,
+    "declaration": false,
     "moduleResolution": "node",
     "typeRoots": ["../../node_modules/@types", "../../types"],
     "esModuleInterop": true,
