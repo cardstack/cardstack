@@ -48,7 +48,7 @@ const SERIALIZERS = {
   date: DateSerializer,
 };
 
-export function deserializaAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
+export function deserializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
   return _serializeAttributes(attrs, 'deserialize', serializerMap);
 }
 

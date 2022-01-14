@@ -14,7 +14,7 @@ import {
 } from './interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import { deserializaAttributes, serializeAttributes, serializeResource } from './serializers';
+import { deserializeAttributes, serializeAttributes, serializeResource } from './serializers';
 
 export interface NewCardParams {
   realm: string;
@@ -140,7 +140,7 @@ export default class CardModel {
     switch (this.state.type) {
       case 'client-loaded':
         if (!this.state.deserialized) {
-          this._data = deserializaAttributes(this.state.rawServerResponse.attributes, this.serializerMap);
+          this._data = deserializeAttributes(this.state.rawServerResponse.attributes, this.serializerMap);
           this.state.deserialized = true;
         }
         return this._data;
@@ -153,6 +153,11 @@ export default class CardModel {
     }
   }
 
+  /**
+   * @deprecated temporary scaffolding until card-service's CardContent => CardModel
+   * refactor complete. Consumers of CardModel should be refactored to use `data`
+   * and other TBD methods instead of this.
+   */
   get cardContent(): CardContent {
     if (this.state.type === 'created' || this.state.type === 'client-loaded') {
       throw new Error('Dont use this right now');
