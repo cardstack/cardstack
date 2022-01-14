@@ -20,6 +20,7 @@ import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import { CardEnv } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
+import { cardURL } from '@cardstack/core/src/utils';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -65,10 +66,10 @@ export class CardService {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos" , "compileErrors", deps from cards where url = $1',
+      'SELECT url, data, "schemaModule", "componentInfos" from cards where url = $1',
       cardURL
     );
-    return CardModel.fromDatabase(this.cardEnv(), format, result);
+    return await CardModel.fromDatabase(this.cardEnv(), format, result);
   }
 
   private async loadCardFromDB(query: string, cardURL: string): Promise<Record<string, any>> {
@@ -118,9 +119,13 @@ export class CardService {
   async createData(
     rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
     format: Format
-  ): Promise<CardContent> {
-    let { raw, compiled } = await this.create(rawData);
-    return this.contentFromCompiled(raw, compiled, format);
+  ): Promise<CardModel> {
+    let { raw } = await this.create(rawData);
+    let result = await this.loadCardFromDB(
+      'SELECT url, data, "schemaModule", "componentInfos" from cards where url = $1',
+      cardURL(raw)
+    );
+    return await CardModel.fromDatabase(this.cardEnv(), format, result);
   }
 
   async updateData(
@@ -139,9 +144,11 @@ export class CardService {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return result.rows.map((row) => {
-        return CardModel.fromDatabase(this.cardEnv(), format, row);
-      });
+      return Promise.all(
+        result.rows.map((row) => {
+          return CardModel.fromDatabase(this.cardEnv(), format, row);
+        })
+      );
     } finally {
       client.release();
     }

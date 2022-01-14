@@ -65,7 +65,7 @@ if (process.env.COMPILER) {
       expect(existsSync(join(getRealmDir(), 'post0')), 'card is deleted from realm').to.be.false;
     });
 
-    it('can delete an existing card that has children', async function () {
+    it.only('can delete an existing card that has children', async function () {
       await getCard(`${realmURL}post`).expect(200);
       await deleteCard(`${realmURL}post`).expect(204);
       await getCard(`${realmURL}post`).expect(404); // Deleted card is deleted!

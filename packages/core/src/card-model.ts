@@ -84,6 +84,9 @@ export default class CardModel {
   }
 
   static fromDatabase(cards: CardEnv, format: Format, result: Record<string, any>): CardModel {
+    if (!result.componentInfos) {
+      debugger;
+    }
     return new this(cards, {
       type: 'hub-loaded',
       url: result.url,

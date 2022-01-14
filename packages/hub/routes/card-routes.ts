@@ -73,7 +73,7 @@ export default class CardRoutes {
     }
 
     let createdCard = await this.cards.as(INSECURE_CONTEXT).createData(card, format);
-    ctx.body = serializeCardPayloadForFormat(createdCard);
+    ctx.body = serializeCardPayloadForFormat(createdCard.cardContent);
     ctx.status = 201;
   }
 
