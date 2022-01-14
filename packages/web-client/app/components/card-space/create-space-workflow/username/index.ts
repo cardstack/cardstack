@@ -43,10 +43,9 @@ export default class UsernameComponent extends Component<WorkflowCardComponentAr
     this.profileImage =
       this.args.workflowSession.getValue<string>('profileImageUrl') ?? '';
     let username = this.args.workflowSession.getValue<string>('username');
+    this.username = username ?? '';
     if (!this.args.isComplete && username) {
       taskFor(this.updateUsernameTask).perform(username);
-    } else {
-      this.username = username ?? '';
     }
   }
 
