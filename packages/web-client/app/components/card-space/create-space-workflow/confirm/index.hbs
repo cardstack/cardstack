@@ -3,24 +3,38 @@
   @isComplete={{@isComplete}}
   data-test-card-space-creation-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Select a payment method">
+  <ActionCardContainer::Section @title="Create card space">
+
+    {{#if this.errors}}
+      <p>Errors:</p>
+      {{#each this.errors as |error|}}
+        {{error.source.pointer}}: {{error.detail}}
+      {{/each}}
+    {{/if}}
   </ActionCardContainer::Section>
 
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.ctaState}}
     @disabled={{@frozen}}
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.createCardSpace}}
         data-test-card-space-creation-button
       >
         Create Card Space
       </d.ActionButton>
     </:default>
+
+    <:in-progress as |i|>
+      <i.ActionButton>
+        Creating…
+      </i.ActionButton>
+    </:in-progress>
+
     <:memorialized as |m|>
       <m.ActionStatusArea>
-        Confirmed
+        Card Space Created
       </m.ActionStatusArea>
     </:memorialized>
   </Boxel::ActionChin>

@@ -139,29 +139,15 @@ class CreateSpaceWorkflow extends Workflow {
           cardName: 'CARD_SPACE_BADGE',
           componentName: 'card-space/create-space-workflow/badge',
         }),
-        new WorkflowMessage({
-          message: `On to the next step: You need to pay a small protocol fee to create your Card Space. Please select a prepaid card with a spendable balance from your ${c.layer2.fullName} wallet.`,
-        }),
         new WorkflowCard({
           cardName: 'CARD_SPACE_CONFIRM',
           componentName: 'card-space/create-space-workflow/confirm',
-        }),
-        new WorkflowMessage({
-          message: `Thank you for your payment.`,
         }),
       ],
       completedDetail: 'Card Space created',
     }),
   ];
   epilogue = new PostableCollection([
-    new WorkflowMessage({
-      message: `This is the remaining balance on your prepaid card:`,
-    }),
-    // TODO
-    // new WorkflowCard({
-    //   cardName: 'EPILOGUE_PREPAID_CARD_BALANCE',
-    //   componentName: 'card-pay/prepaid-card-balance',
-    // }),
     new WorkflowMessage({
       message: `Congrats, you have created your Card Space!`,
     }),
