@@ -11,6 +11,7 @@ import setupBuilder from '../helpers/setup-builder';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
+import { cardURL } from '@cardstack/core/src/utils';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -49,18 +50,19 @@ module('@core | compiler-basics', function (hooks) {
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
-      await this.cardService.loadModule(compiled.isolated.moduleName),
+      await this.cardService.loadModule(compiled.isolated.moduleName.global),
       'Isolated module exists'
     );
     assert.ok(
-      await this.cardService.loadModule(compiled.embedded.moduleName),
+      await this.cardService.loadModule(compiled.embedded.moduleName.global),
       'Embedded module exists'
     );
   });
 
   test('Names and defines a module for the model', async function (assert) {
-    let card = {
-      url: PERSON_RAW_CARD.url,
+    let card: RawCard = {
+      id: PERSON_RAW_CARD.id,
+      realm: PERSON_RAW_CARD.realm,
       schema: 'schema.js',
       files: {
         'schema.js': `export default class Post {}`,
@@ -68,8 +70,10 @@ module('@core | compiler-basics', function (hooks) {
     };
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
-    let source = await this.cardService.loadModule<any>(compiled.schemaModule);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let source = await this.cardService.loadModule<any>(
+      compiled.schemaModule.global
+    );
     assert.equal(
       source.default.toString(),
       'class Post {}',
@@ -78,8 +82,9 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('Generates inlineHBS for templates without', async function (assert) {
-    let card = {
-      url: `${LOCAL_REALM}/string`,
+    let card: RawCard = {
+      id: 'string',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       embedded: 'embedded.js',
       files: {
@@ -89,7 +94,7 @@ module('@core | compiler-basics', function (hooks) {
     };
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
     assert.equal(
       compiled.embedded.inlineHBS,
       `{{@model}}`,
@@ -99,15 +104,16 @@ module('@core | compiler-basics', function (hooks) {
 
   test('it discovers three kinds of fields', async function (assert) {
     await this.builder.createRawCard(PERSON_RAW_CARD);
-    let card = {
-      url: `${LOCAL_REALM}/post`,
+    let card: RawCard = {
+      id: 'post',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
           import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
-          import person from "${LOCAL_REALM}/person";
+          import person from "${LOCAL_REALM}person";
 
           export default class Post {
             @contains(string)
@@ -125,13 +131,14 @@ module('@core | compiler-basics', function (hooks) {
     };
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title', 'author', 'date']);
   });
 
   test('it discovers a string literal field', async function (assert) {
-    let card = {
-      url: `${LOCAL_REALM}/post`,
+    let card: RawCard = {
+      id: 'post',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -147,13 +154,14 @@ module('@core | compiler-basics', function (hooks) {
 
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
   test('it discovers a field whose import comes before the field decorator', async function (assert) {
-    let card = {
-      url: `${LOCAL_REALM}/post`,
+    let card: RawCard = {
+      id: 'post',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -169,13 +177,14 @@ module('@core | compiler-basics', function (hooks) {
 
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
   test('it discovers the field type of contains', async function (assert) {
-    let card = {
-      url: `${LOCAL_REALM}/post`,
+    let card: RawCard = {
+      id: 'post',
+      realm: LOCAL_REALM,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -191,7 +200,7 @@ module('@core | compiler-basics', function (hooks) {
 
     this.builder.createRawCard(card);
 
-    let compiled = await this.builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(cardURL(card));
     let title = compiled.fields.title;
     assert.equal(title.type, 'contains');
     assert.equal(title.card.url, 'https://cardstack.com/base/string');
@@ -199,8 +208,9 @@ module('@core | compiler-basics', function (hooks) {
 
   module('data', function () {
     test('it accepts data and returns the values', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         data: {
           title: 'Hello World',
@@ -219,7 +229,7 @@ module('@core | compiler-basics', function (hooks) {
 
       this.builder.createRawCard(card);
 
-      let raw = await this.builder.getRawCard(card.url);
+      let raw = await this.builder.getRawCard(cardURL(card));
       assert.deepEqual(raw.data, { title: 'Hello World' });
     });
   });
@@ -230,7 +240,8 @@ module('@core | compiler-basics', function (hooks) {
 
     hooks.beforeEach(async function () {
       card = {
-        url: `${LOCAL_REALM}/post`,
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -252,12 +263,12 @@ module('@core | compiler-basics', function (hooks) {
       };
 
       this.builder.createRawCard(card);
-      compiled = await this.builder.getCompiledCard(card.url);
+      compiled = await this.builder.getCompiledCard(cardURL(card));
     });
 
     test('it inlines a simple field template', async function (assert) {
       assert.ok(
-        compiled.isolated.moduleName.includes(`/isolated`),
+        compiled.isolated.moduleName.global.includes(`/isolated`),
         'templateModule for "isolated" is full url'
       );
     });
@@ -265,10 +276,12 @@ module('@core | compiler-basics', function (hooks) {
     test('it inlines a compound field template', async function (assert) {
       this.builder.createRawCard(PERSON_RAW_CARD);
 
-      let compiled = await this.builder.getCompiledCard(PERSON_RAW_CARD.url);
+      let compiled = await this.builder.getCompiledCard(
+        cardURL(PERSON_RAW_CARD)
+      );
 
       let code = await this.cardService.loadModule<any>(
-        compiled.embedded.moduleName
+        compiled.embedded.moduleName.global
       );
 
       assert.equal(code.default.moduleName, '@glimmer/component/template-only');
@@ -277,8 +290,9 @@ module('@core | compiler-basics', function (hooks) {
 
   module('errors', function () {
     test('field must be called', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -292,7 +306,7 @@ module('@core | compiler-basics', function (hooks) {
       this.builder.createRawCard(card);
       assert.expect(1);
       try {
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator must be called/.test(err.message),
@@ -302,8 +316,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field must be a decorator', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -319,7 +334,7 @@ module('@core | compiler-basics', function (hooks) {
       assert.expect(1);
       this.builder.createRawCard(card);
       try {
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator must be used as a decorator/.test(
@@ -331,8 +346,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field must be on a class property', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -348,7 +364,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator can only go on class properties/.test(
@@ -360,8 +376,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field must have static name', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -381,7 +398,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /field names must not be dynamically computed/.test(err.message),
@@ -391,8 +408,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field cannot be weird type', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -412,7 +430,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /field names must be identifiers or string literals/.test(
@@ -424,8 +442,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field with wrong number of arguments', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -443,7 +462,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /contains decorator accepts exactly one argument/.test(err.message),
@@ -453,8 +472,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('hasMany with wrong number of arguments', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -472,7 +492,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@hasMany decorator accepts exactly one argument/.test(err.message),
@@ -482,8 +502,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field with wrong argument syntax', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -501,7 +522,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument must be an identifier/.test(err.message),
@@ -511,8 +532,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field with undefined type', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -529,7 +551,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument is not defined/.test(err.message),
@@ -539,8 +561,9 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('field with card type that was not imported', async function (assert) {
-      let card = {
-        url: `${LOCAL_REALM}/post`,
+      let card: RawCard = {
+        id: 'post',
+        realm: LOCAL_REALM,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -557,7 +580,7 @@ module('@core | compiler-basics', function (hooks) {
       try {
         this.builder.createRawCard(card);
 
-        await this.builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument must come from a module default export/.test(

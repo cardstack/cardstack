@@ -233,32 +233,40 @@ function safeTransactionTypedData(
   };
 }
 
-export function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let provider = web3.currentProvider;
-    if (typeof provider === 'string') {
-      throw new Error(`The provider ${web3.currentProvider} is not supported`);
-    }
-    if (provider == null) {
-      throw new Error('No provider configured');
-    }
-    //@ts-ignore TS is complaining that provider might be undefined--but the
-    //check above should prevent that from ever happening
-    provider.send(
-      {
-        jsonrpc: '2.0',
-        method: 'eth_signTypedData',
-        params: [account, data],
-        id: new Date().getTime(),
-      },
-      (err, response) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(response?.result);
+export async function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
+  let signature: string | undefined;
+  let attempts = 0;
+  do {
+    signature = await new Promise((resolve, reject) => {
+      let provider = web3.currentProvider;
+      if (typeof provider === 'string') {
+        throw new Error(`The provider ${web3.currentProvider} is not supported`);
       }
-    );
-  });
+      if (provider == null) {
+        throw new Error('No provider configured');
+      }
+      //@ts-ignore TS is complaining that provider might be undefined--but the
+      //check above should prevent that from ever happening
+      provider.send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [account, data],
+          id: new Date().getTime(),
+        },
+        (err, response) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(response?.result);
+        }
+      );
+    });
+  } while (signature == null && attempts++ < 5);
+  if (!signature) {
+    throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
+  }
+  return signature;
 }
 
 export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {

@@ -16,7 +16,7 @@ import {
   ViewSafeResult,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
-import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
+import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
 import {
   createMerchantSafe,
   getFilenameFromDid,
@@ -160,6 +160,41 @@ module('Acceptance | pay', function (hooks) {
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it renders appropriate meta tags', async function (assert) {
+    const floatingSpendAmount = 279.17;
+    const roundedSpendAmount = Math.ceil(floatingSpendAmount);
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
+    );
+    await waitFor(MERCHANT);
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: spendSymbol,
+      amount: roundedSpendAmount,
+    });
+
+    let expectedPath = expectedUrl.substring(
+      expectedUrl.indexOf(universalLinkDomain) + universalLinkDomain.length
+    );
+
+    assert
+      .dom(
+        `meta[property='og:title'][content='Pay Business: ${merchantName}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[property='og:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
   });
 
   test('it rounds floating point SPEND amounts', async function (assert) {

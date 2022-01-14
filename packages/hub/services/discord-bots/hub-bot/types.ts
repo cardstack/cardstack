@@ -1,6 +1,5 @@
-export interface BetaTestConfig {
+export interface CardDropConfig {
   sku: string;
-  discordRole: string;
 }
 
 export interface Web3Config {

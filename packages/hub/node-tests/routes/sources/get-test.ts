@@ -31,14 +31,16 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: postFiles,
       });
 
       await cards.create({
-        url: `${realmURL}post0`,
+        realm: realmURL,
+        id: 'post0',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -59,7 +61,7 @@ if (process.env.COMPILER) {
       let response = await getSource(`${realmURL}post`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
-      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes']);
       expect(response.body.data?.attributes).to.deep.equal({
         files: postFiles,
         isolated: 'isolated.js',
@@ -69,6 +71,7 @@ if (process.env.COMPILER) {
         deserializer: null,
         adoptsFrom: null,
         data: null,
+        realm: realmURL,
       });
     });
 
@@ -76,9 +79,9 @@ if (process.env.COMPILER) {
       let response = await getSource(`${realmURL}post0`).expect(200);
 
       expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
-      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+      expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes']);
       expect(response.body.data?.attributes).to.deep.equal({
-        files: {},
+        files: null,
         isolated: null,
         schema: null,
         embedded: null,
@@ -86,6 +89,7 @@ if (process.env.COMPILER) {
         deserializer: null,
         adoptsFrom: '../post',
         data: { title: 'Hello World', body: 'First post.' },
+        realm: realmURL,
       });
     });
 
@@ -105,7 +109,14 @@ if (process.env.COMPILER) {
         (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realmURL}post0`
       );
 
-      expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializer', 'isolated', 'embedded', 'edit']);
+      expect(compiledMeta?.attributes).to.have.all.keys([
+        'schemaModule',
+        'serializer',
+        'isolated',
+        'embedded',
+        'edit',
+        'deps',
+      ]);
 
       expect(compiledMeta?.relationships).to.deep.equal({
         adoptsFrom: {

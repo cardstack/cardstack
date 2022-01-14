@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
--- Dumped by pg_dump version 13.4
+-- Dumped from database version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,11 +33,23 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
+
+--
+-- Name: card_dep; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.card_dep AS (
+	url text,
+	deps text[]
+);
+
+
+ALTER TYPE public.card_dep OWNER TO postgres;
 
 --
 -- Name: discord_bots_status_enum; Type: TYPE; Schema: public; Owner: postgres
@@ -586,6 +598,78 @@ $$;
 ALTER FUNCTION graphile_worker.tg_jobs__notify_new_jobs() OWNER TO postgres;
 
 --
+-- Name: add(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.add(integer, integer) RETURNS integer
+    LANGUAGE sql IMMUTABLE STRICT
+    AS $_$select $1 + $2;$_$;
+
+
+ALTER FUNCTION public.add(integer, integer) OWNER TO postgres;
+
+--
+-- Name: card_eq(public.card_dep, public.card_dep); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.card_eq(public.card_dep, public.card_dep) RETURNS boolean
+    LANGUAGE sql
+    AS $_$select deps_cmp($1, $2) = 0;$_$;
+
+
+ALTER FUNCTION public.card_eq(public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: card_gt(public.card_dep, public.card_dep); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.card_gt(public.card_dep, public.card_dep) RETURNS boolean
+    LANGUAGE sql
+    AS $_$select deps_cmp($1, $2) > 0;$_$;
+
+
+ALTER FUNCTION public.card_gt(public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: card_lt(public.card_dep, public.card_dep); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.card_lt(public.card_dep, public.card_dep) RETURNS boolean
+    LANGUAGE sql
+    AS $_$select deps_cmp($1, $2) < 0;$_$;
+
+
+ALTER FUNCTION public.card_lt(public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: deps_cmp(public.card_dep, public.card_dep); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.deps_cmp(public.card_dep, public.card_dep) RETURNS integer
+    LANGUAGE sql
+    AS $_$
+    select case
+      when $1.url = any($2.deps)
+        then 1
+      when $2.url = any($1.deps)
+        then -1
+      else
+        case
+          when $1.url < $2.url
+            then -1
+          when $2.url < $1.url
+            then 1
+          else
+            0
+          end
+      end
+    ;
+  $_$;
+
+
+ALTER FUNCTION public.deps_cmp(public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
 -- Name: discord_bots_updated_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -609,6 +693,68 @@ CREATE FUNCTION public.discord_bots_updated_trigger() RETURNS trigger
 
 
 ALTER FUNCTION public.discord_bots_updated_trigger() OWNER TO postgres;
+
+--
+-- Name: <^; Type: OPERATOR; Schema: public; Owner: postgres
+--
+
+CREATE OPERATOR public.<^ (
+    FUNCTION = public.card_lt,
+    LEFTARG = public.card_dep,
+    RIGHTARG = public.card_dep
+);
+
+
+ALTER OPERATOR public.<^ (public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: >^; Type: OPERATOR; Schema: public; Owner: postgres
+--
+
+CREATE OPERATOR public.>^ (
+    FUNCTION = public.card_gt,
+    LEFTARG = public.card_dep,
+    RIGHTARG = public.card_dep
+);
+
+
+ALTER OPERATOR public.>^ (public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: ?-; Type: OPERATOR; Schema: public; Owner: postgres
+--
+
+CREATE OPERATOR public.?- (
+    FUNCTION = public.card_eq,
+    LEFTARG = public.card_dep,
+    RIGHTARG = public.card_dep
+);
+
+
+ALTER OPERATOR public.?- (public.card_dep, public.card_dep) OWNER TO postgres;
+
+--
+-- Name: card_fam; Type: OPERATOR FAMILY; Schema: public; Owner: postgres
+--
+
+CREATE OPERATOR FAMILY public.card_fam USING btree;
+
+
+ALTER OPERATOR FAMILY public.card_fam USING btree OWNER TO postgres;
+
+--
+-- Name: card_ops; Type: OPERATOR CLASS; Schema: public; Owner: postgres
+--
+
+CREATE OPERATOR CLASS public.card_ops
+    FOR TYPE public.card_dep USING btree FAMILY public.card_fam AS
+    OPERATOR 1 public.<^(public.card_dep,public.card_dep) ,
+    OPERATOR 3 public.?-(public.card_dep,public.card_dep) ,
+    OPERATOR 5 public.>^(public.card_dep,public.card_dep) ,
+    FUNCTION 1 (public.card_dep, public.card_dep) public.deps_cmp(public.card_dep,public.card_dep);
+
+
+ALTER OPERATOR CLASS public.card_ops USING btree OWNER TO postgres;
 
 --
 -- Name: job_queues; Type: TABLE; Schema: graphile_worker; Owner: postgres
@@ -671,10 +817,10 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
--- Name: beta_testers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: card_drop_recipients; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.beta_testers (
+CREATE TABLE public.card_drop_recipients (
     user_id text NOT NULL,
     user_name text NOT NULL,
     address text,
@@ -685,7 +831,7 @@ CREATE TABLE public.beta_testers (
 );
 
 
-ALTER TABLE public.beta_testers OWNER TO postgres;
+ALTER TABLE public.card_drop_recipients OWNER TO postgres;
 
 --
 -- Name: card_spaces; Type: TABLE; Schema: public; Owner: postgres
@@ -727,7 +873,11 @@ CREATE TABLE public.cards (
     ancestors text[],
     "searchData" jsonb,
     realm text NOT NULL,
-    generation integer
+    generation integer,
+    "compileErrors" jsonb,
+    deps text[],
+    raw jsonb,
+    compiled jsonb
 );
 
 
@@ -762,6 +912,20 @@ CREATE TABLE public.dm_channels (
 
 
 ALTER TABLE public.dm_channels OWNER TO postgres;
+
+--
+-- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.latest_event_block (
+    id integer DEFAULT 1 NOT NULL,
+    block_number integer NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT latest_event_block_singleton CHECK ((id = 1))
+);
+
+
+ALTER TABLE public.latest_event_block OWNER TO postgres;
 
 --
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
@@ -904,6 +1068,18 @@ CREATE TABLE public.push_notification_registrations (
 ALTER TABLE public.push_notification_registrations OWNER TO postgres;
 
 --
+-- Name: realm_metas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.realm_metas (
+    realm text NOT NULL,
+    meta jsonb
+);
+
+
+ALTER TABLE public.realm_metas OWNER TO postgres;
+
+--
 -- Name: reservations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -919,6 +1095,24 @@ CREATE TABLE public.reservations (
 
 
 ALTER TABLE public.reservations OWNER TO postgres;
+
+--
+-- Name: sent_push_notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sent_push_notifications (
+    notification_id text NOT NULL,
+    push_client_id text,
+    notification_type text,
+    notification_title text,
+    notification_body text,
+    notification_data json,
+    message_id text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.sent_push_notifications OWNER TO postgres;
 
 --
 -- Name: uploads; Type: TABLE; Schema: public; Owner: postgres
@@ -1029,11 +1223,11 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
--- Name: beta_testers beta_testers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: card_drop_recipients card_drop_recipients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.beta_testers
-    ADD CONSTRAINT beta_testers_pkey PRIMARY KEY (user_id);
+ALTER TABLE ONLY public.card_drop_recipients
+    ADD CONSTRAINT card_drop_recipients_pkey PRIMARY KEY (user_id);
 
 
 --
@@ -1066,6 +1260,14 @@ ALTER TABLE ONLY public.discord_bots
 
 ALTER TABLE ONLY public.dm_channels
     ADD CONSTRAINT dm_channels_pkey PRIMARY KEY (channel_id);
+
+
+--
+-- Name: latest_event_block latest_event_block_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.latest_event_block
+    ADD CONSTRAINT latest_event_block_pkey PRIMARY KEY (id);
 
 
 --
@@ -1125,11 +1327,27 @@ ALTER TABLE ONLY public.push_notification_registrations
 
 
 --
+-- Name: realm_metas realm_metas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.realm_metas
+    ADD CONSTRAINT realm_metas_pkey PRIMARY KEY (realm);
+
+
+--
 -- Name: reservations reservations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.reservations
     ADD CONSTRAINT reservations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sent_push_notifications sent_push_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sent_push_notifications
+    ADD CONSTRAINT sent_push_notifications_pkey PRIMARY KEY (notification_id);
 
 
 --
@@ -1231,6 +1449,13 @@ CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.re
 --
 
 CREATE INDEX reservations_user_address_index ON public.reservations USING btree (user_address);
+
+
+--
+-- Name: sent_push_notifications_created_at_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX sent_push_notifications_created_at_index ON public.sent_push_notifications USING btree (created_at);
 
 
 --
@@ -1369,8 +1594,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
--- Dumped by pg_dump version 13.4
+-- Dumped from database version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1388,14 +1613,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-11-29 17:02:42.091944-05
-2	2021-11-29 17:02:42.091944-05
-3	2021-11-29 17:02:42.091944-05
-4	2021-11-29 17:02:42.091944-05
-5	2021-11-29 17:02:42.091944-05
-6	2021-11-29 17:02:42.091944-05
-7	2021-11-29 17:02:42.091944-05
-8	2021-11-29 17:02:42.091944-05
+1	2021-10-25 14:13:27.499839-04
+2	2021-10-25 14:13:27.499839-04
+3	2021-10-25 14:13:27.499839-04
+4	2021-10-25 14:13:27.499839-04
+5	2021-10-25 14:13:27.499839-04
+6	2021-10-25 14:13:27.499839-04
+7	2021-10-25 14:13:27.499839-04
+8	2021-10-25 14:13:27.499839-04
 \.
 
 
@@ -1404,25 +1629,30 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-08-02 16:26:07.752752
-2	20210614080132698_create-prepaid-card-customizations-table	2021-08-02 16:26:07.752752
-3	20210623052200757_create-graphile-worker-schema	2021-08-02 16:26:07.752752
-5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
-6	20210817184105100_wallet-orders	2021-08-25 08:15:41.07505
-7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
-8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
-13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
-21	20211020231214235_discord-bots	2021-11-18 11:18:35.492811
-14	20211013155536724_card-index	2021-10-18 09:59:34.440379
-19	20211013173917696_beta-testers	2021-11-18 11:18:35.492811
-20	20211014131843187_add-fields-to-card-spaces	2021-11-18 11:18:35.492811
-42	20211105180905492_wyre-price-service	2021-11-30 14:56:46.211409
-43	20211110210324178_card-index-part-duex	2021-11-30 14:56:46.211409
-44	20211118084217151_create-uploads	2021-11-30 14:56:46.211409
-45	20211129083801382_create-push-notification-registrations	2021-11-30 14:56:46.211409
-46	20211129123635817_create-notification-types	2021-11-30 14:56:46.211409
-51	20211129130425303_create-notification-preferences	2021-12-03 10:12:08.511999
-52	20211206195559187_card-index-generations	2021-12-08 10:33:57.847407
+1	20210527151505645_create-prepaid-card-tables	2021-10-25 14:13:27.499839
+2	20210614080132698_create-prepaid-card-customizations-table	2021-10-25 14:13:27.499839
+3	20210623052200757_create-graphile-worker-schema	2021-10-25 14:13:27.499839
+4	20210809113449561_merchant-infos	2021-10-25 14:13:27.499839
+5	20210817184105100_wallet-orders	2021-10-25 14:13:27.499839
+6	20210920142313915_prepaid-card-reservations	2021-10-25 14:13:27.499839
+7	20210924200122612_order-indicies	2021-10-25 14:13:27.499839
+8	20211006090701108_create-card-spaces	2021-10-25 14:13:27.499839
+9	20211013173917696_beta-testers	2021-10-25 14:13:27.499839
+10	20211014131843187_add-fields-to-card-spaces	2021-10-25 14:13:27.499839
+11	20211020231214235_discord-bots	2021-11-04 13:23:05.679077
+17	20211105180905492_wyre-price-service	2021-11-05 14:24:55.098482
+18	20211013155536724_card-index	2021-11-30 13:54:08.761974
+19	20211110210324178_card-index-part-duex	2021-11-30 13:54:08.761974
+20	20211118084217151_create-uploads	2021-11-30 13:54:08.761974
+21	20211129083801382_create-push-notification-registrations	2021-12-08 16:54:01.261791
+22	20211129123635817_create-notification-types	2021-12-08 16:54:01.320453
+23	20211129130425303_create-notification-preferences	2021-12-08 16:54:01.335368
+24	20211206195559187_card-index-generations	2021-12-08 16:54:01.358891
+46	20211207151150639_sent-push-notifications	2022-01-03 16:22:49.63704
+47	20211207190527999_create-latest-event-block	2022-01-03 16:22:49.63704
+48	20211214163123421_card-index-errors	2022-01-03 16:22:49.63704
+51	20220103201128435_invalidation-ordering	2022-01-05 12:53:32.343481
+54	20220107151914576_rename-beta-testers-table	2022-01-07 10:49:15.639171
 \.
 
 
@@ -1430,7 +1660,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 26, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 54, true);
 
 
 --

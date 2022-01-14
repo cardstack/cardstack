@@ -16,6 +16,7 @@ interface UrlsOptions {
   googlePlayLink: string | undefined;
   testFlightLink: string;
   discordSupportChannelUrl: string;
+  statusPageUrl: string;
 }
 
 /**
@@ -30,6 +31,7 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   universalLinkDomain: string;
+  cardSpaceHostnameSuffix: string;
   chains: ChainsOptions;
   features: FeaturesOptions;
   version: string;

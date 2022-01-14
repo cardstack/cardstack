@@ -43,7 +43,7 @@ app "hub" {
 
         hook {
             when    = "after"
-            command = ["./scripts/fix-listener.sh", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }
@@ -124,6 +124,44 @@ app "hub-bot" {
     }
 }
 
+app "hub-event-listener" {
+  path = "./packages/hub"
+
+  build {
+      use "docker" {
+        dockerfile = "Dockerfile"
+        build_args = {
+            hub_command = "event-listener"
+        }
+      }
+
+      registry {
+          use "aws-ecr" {
+              region     = "us-east-1"
+              repository = "hub-event-listener-staging"
+              tag        = "latest"
+          }
+      }
+  }
+
+  deploy {
+      use "aws-ecs" {
+          region = "us-east-1"
+          memory = "512"
+          cluster = "hub-event-listener-staging"
+          count = 1
+          subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+          task_role_name = "hub-staging-hub_ecr_task"
+          disable_alb = true
+      }
+
+      hook {
+          when    = "before"
+          command = ["./scripts/purge-services.sh", "hub-event-listener-staging", "waypoint-hub-event-listener", "1"] # need this to purge old ecs services
+      }
+  }
+}
+
 app "cardie" {
     path = "./packages/cardie"
 
@@ -150,6 +188,41 @@ app "cardie" {
             subnets = ["subnet-89968ba2"]
             task_role_name = "cardie-ecr-task"
             disable_alb = true
+        }
+    }
+}
+
+app "cardpay-subgraph-extraction" {
+    path = "./packages/cardpay-subgraph-extraction"
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "cardpay-staging-subgraph-extraction"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "cardpay-staging-subgraph-extraction"
+            count = 1
+            subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
+            task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
+            disable_alb = true
+        }
+
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subgraph-extraction","1"] # need this to purge old ecs services
         }
     }
 }

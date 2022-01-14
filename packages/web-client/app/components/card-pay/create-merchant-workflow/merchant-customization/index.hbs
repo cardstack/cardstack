@@ -61,17 +61,13 @@
           @label="Business ID"
           data-test-merchant-customization-merchant-id-field
         >
-          <Common::ValidationStateInput
+          <Boxel::Input::ValidationState
             @state={{this.merchantIdInputState}}
             @value={{this.merchantId}}
             @onInput={{this.onMerchantIdInput}}
+            @onBlur={{this.validateMerchantId}}
             @errorMessage={{this.merchantIdValidationMessage}}
             @helperText="This is a unique ID that will be used to identify your business in the Cardstack network. Please note that this ID cannot be changed once the business has been created."
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            {{on "blur" this.validateMerchantId}}
           />
         </CardPay::LabeledValue>
         <CardPay::LabeledValue

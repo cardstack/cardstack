@@ -53,6 +53,9 @@ package-lock.json
 /packages/cardpay-sdk/**/*.d.ts
 /packages/cardpay-sdk/**/*.js
 /packages/cardpay-sdk/**/*.js.map
+/packages/cardpay-sdk/generated/
+# Let's keep this though!
+!/packages/cardpay-sdk/bin/*.js
 
 /packages/cardpay-cli/**/*.d.ts
 /packages/cardpay-cli/**/*.js
@@ -83,10 +86,13 @@ package-lock.json
 !/packages/cardpay-subgraph/pre-codegen.js
 !/packages/cardpay-subgraph/etc/**/*.js
 
+
 # generated files for the subgraph
 /packages/cardpay-subgraph/subgraph.yaml
 /packages/cardpay-subgraph/abis/generated/
 /packages/cardpay-subgraph/src/generated/
+
+/packages/wc-provider/**/*.d.ts
 
 # unconventional js
 /blueprints/*/files/

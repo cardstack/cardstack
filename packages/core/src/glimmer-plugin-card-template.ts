@@ -33,7 +33,7 @@ export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
-  moduleName?: string;
+  debugPath?: string;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -87,7 +87,7 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
           ast: [cardTransformPlugin(options)],
         },
         meta: {
-          moduleName: options.moduleName,
+          moduleName: options.debugPath,
         },
       })
     );
@@ -417,7 +417,7 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName, 'default');
+  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName.global, 'default');
 
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);

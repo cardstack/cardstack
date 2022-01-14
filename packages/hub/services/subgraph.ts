@@ -51,6 +51,28 @@ const provisionedPrepaidCardQuery = `
   }
 `;
 
+export interface MetaSubgraph {
+  data: {
+    _meta: {
+      hasIndexingErrors: boolean;
+      block: {
+        number: number;
+      };
+    };
+  };
+}
+
+const metaQuery = `
+  query {
+    _meta {
+      hasIndexingErrors
+      block {
+        number
+      }
+    }
+  }
+`;
+
 export default class Subgraph {
   // we use the subgraph to wait for the prepaid card provisioning to be mined
   // so that the SDK safe API results are consistent with the new prepaid card
@@ -112,6 +134,10 @@ export default class Subgraph {
       }
     `
     )) as InventorySubgraph;
+  }
+
+  async getMeta() {
+    return (await gqlQuery(network, metaQuery)) as MetaSubgraph;
   }
 }
 

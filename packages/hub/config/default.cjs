@@ -20,7 +20,8 @@ module.exports = {
     url: 'postgres://postgres:postgres@localhost:5432/hub_development',
     'migrations-dir': 'db/migrations',
     'migration-filename-format': 'utc',
-    'ignore-pattern': 'README.md|.*\\.ts|.*\\.js\\.map',
+    'ignore-pattern': 'README.md|.*\\.d\\.ts',
+    'check-order': false,
   },
   discord: {
     botId: '896093538297708564',
@@ -61,8 +62,7 @@ module.exports = {
   web3: {
     network: 'sokol',
   },
-  betaTesting: {
-    discordRole: 'Beta Tester',
+  cardDrop: {
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
   },
   walletConnect: {
@@ -72,5 +72,9 @@ module.exports = {
   },
   web3storage: {
     token: null,
+  },
+  statuspage: {
+    apiKey: null,
+    pageId: null,
   },
 };

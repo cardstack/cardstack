@@ -180,14 +180,7 @@ module('Acceptance | create merchant', function (hooks) {
       `[data-test-merchant-customization-merchant-id-field] input`,
       'mandello1'
     );
-    await waitUntil(
-      () =>
-        (
-          document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement
-        ).dataset.testValidationStateInput === 'valid'
-    );
+    await waitFor('[data-test-boxel-input-validation-state="valid"]');
     await click(`[data-test-merchant-customization-save-details]`);
 
     await waitFor(milestoneCompletedSel(1));
@@ -329,14 +322,7 @@ module('Acceptance | create merchant', function (hooks) {
         `[data-test-merchant-customization-merchant-id-field] input`,
         'abc123'
       );
-      await waitUntil(
-        () =>
-          (
-            document.querySelector(
-              '[data-test-validation-state-input]'
-            ) as HTMLElement
-          ).dataset.testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       await click(`[data-test-merchant-customization-save-details]`);
 
       let prepaidCardChoice = postableSel(2, 2);

@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, find, render, waitUntil } from '@ember/test-helpers';
+import { click, fillIn, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
@@ -140,11 +140,7 @@ module(
       // the save details button enabled
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
       let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
@@ -156,6 +152,7 @@ module(
         .dom('[data-test-merchant]')
         .hasAttribute('data-test-merchant', 'HELLO!')
         .containsText('HELLO!');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       for (let invalidEntry of MERCHANT_NAME_INVALID_INPUTS) {
@@ -179,11 +176,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       for (let invalidEntry of MERCHANT_ID_INVALID_INPUTS) {
@@ -203,11 +196,7 @@ module(
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
 
       await fillIn(merchantIdInput, 'existing');
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'invalid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText(
@@ -217,21 +206,13 @@ module(
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
       await fillIn(merchantIdInput, 'unique');
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       // www is hardcoded to be forbidden in mirage
       await fillIn(merchantIdInput, 'www');
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'invalid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('This Business ID is not allowed');
@@ -249,11 +230,7 @@ module(
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
 
       await fillIn(merchantIdInput, 'existing');
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'invalid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('There was an error validating business ID uniqueness');
@@ -272,11 +249,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
 
@@ -292,11 +265,7 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput === 'valid'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
 

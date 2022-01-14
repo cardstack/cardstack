@@ -34,13 +34,13 @@ class StubCardPay {
   }
 }
 
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
+let addedJobIdentifiers: string[] = [];
+let addedJobPayloads: string[] = [];
 
 class StubWorkerClient {
   async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
+    addedJobIdentifiers.push(identifier);
+    addedJobPayloads.push(payload);
     return Promise.resolve({} as Job);
   }
 }
@@ -58,6 +58,12 @@ class StubMerchantInfo {
   }
 }
 
+class StubNotificationPreferenceService {
+  async getEligiblePushClientIds(_ownerAddress: string, _notificationType: string) {
+    return ['123', '456'];
+  }
+}
+
 describe('NotifyCustomerPaymentTask', function () {
   this.beforeEach(function () {
     mockData.value = undefined;
@@ -65,12 +71,13 @@ describe('NotifyCustomerPaymentTask', function () {
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('merchant-info', StubMerchantInfo);
     registry(this).register('worker-client', StubWorkerClient);
+    registry(this).register('notification-preference-service', StubNotificationPreferenceService);
   });
   let { getContainer } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    addedJobIdentifiers = [];
+    addedJobPayloads = [];
   });
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
@@ -96,11 +103,21 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform('a');
 
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `Mandello received a payment of §2324`,
-    });
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notificationBody: 'Mandello received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '123',
+      },
+      {
+        notificationBody: 'Mandello received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '456',
+      },
+    ]);
   });
 
   it('omits the merchant name and logs an error when fetching it fails', async function () {
@@ -134,11 +151,21 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform('a');
 
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `You received a payment of §2324`,
-    });
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '123',
+      },
+      {
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '456',
+      },
+    ]);
 
     await waitFor(() => testkit.reports().length > 0);
 
@@ -170,11 +197,21 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform('a');
 
-    expect(lastAddedJobIdentifier).to.equal('send-notifications');
-    expect(lastAddedJobPayload).to.deep.equal({
-      notifiedAddress: 'eoa-address',
-      message: `You received a payment of §2324`,
-    });
+    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(addedJobPayloads).to.deep.equal([
+      {
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::123::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '123',
+      },
+      {
+        notificationBody: 'You received a payment of §2324',
+        notificationId: 'sokol::a::456::eoa-address',
+        notificationType: 'customer_payment',
+        pushClientId: '456',
+      },
+    ]);
   });
 
   it('throws when the transaction is not found on the subgraph', async function () {
@@ -183,8 +220,8 @@ describe('NotifyCustomerPaymentTask', function () {
     return expect(task.perform('a'))
       .to.be.rejectedWith(`Subgraph did not return information for prepaid card payment with transaction hash: "a"`)
       .then(() => {
-        expect(lastAddedJobIdentifier).to.be.undefined;
-        expect(lastAddedJobPayload).to.be.undefined;
+        expect(addedJobIdentifiers).to.deep.equal([]);
+        expect(addedJobPayloads).to.deep.equal([]);
       });
   });
 });

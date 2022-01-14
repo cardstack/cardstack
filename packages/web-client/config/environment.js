@@ -1,8 +1,10 @@
 'use strict';
-const {
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-} = require('@cardstack/cardpay-sdk/index');
+
+// Note that the SDK (which holds these constants) is a TS lib, so we can't
+// require it in this CJS file.
+const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
+const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME =
+  'wallet-staging.stack.cards';
 
 const infuraIdsByTarget = {
   staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
@@ -12,6 +14,16 @@ const infuraIdsByTarget = {
 const universalLinkHostnamesByTarget = {
   staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+};
+
+const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
+const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
+const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
+
+const cardSpaceHostnameSuffixesByTarget = {
+  production: CARD_SPACE_HOSTNAME_SUFFIX,
+  staging: CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
+  test: CARD_SPACE_HOSTNAME_TEST_SUFFIX,
 };
 
 const pkg = require('../package.json');
@@ -27,6 +39,9 @@ module.exports = function (environment) {
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+    cardSpaceHostnameSuffix:
+      cardSpaceHostnameSuffixesByTarget[process.env.DEPLOY_TARGET] ??
+      CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
@@ -80,6 +95,7 @@ module.exports = function (environment) {
       testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
       discordSupportChannelUrl:
         'https://discord.com/channels/584043165066199050/899645340746141806',
+      statusPageUrl: 'https://status.cardstack.com',
     },
     // basically our favicons for now
     walletConnectIcons: [

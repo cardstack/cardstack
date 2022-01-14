@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { fillIn, find, render, waitUntil } from '@ember/test-helpers';
+import { fillIn, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { Response as MirageResponse } from 'ember-cli-mirage';
@@ -30,15 +30,11 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'initial'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert
-        .dom('[data-test-validation-state-input]')
-        .hasAttribute('data-test-validation-state-input', 'valid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'valid');
     });
 
     test('it validates bad input', async function (this: Context, assert) {
@@ -60,15 +56,11 @@ module(
 
       await fillIn('[data-test-card-space-url-field] input', 'satoshi');
 
-      await waitUntil(
-        () =>
-          (find('[data-test-validation-state-input]') as HTMLElement).dataset
-            .testValidationStateInput !== 'initial'
-      );
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
 
       assert
-        .dom('[data-test-validation-state-input]')
-        .hasAttribute('data-test-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'invalid');
 
       assert
         .dom(

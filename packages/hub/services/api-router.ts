@@ -11,6 +11,7 @@ export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
+  statusRoute = inject('status-route', { as: 'statusRoute' });
   prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
   });
@@ -37,6 +38,7 @@ export default class APIRouter {
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
+
   routes() {
     let {
       boomRoute,
@@ -47,6 +49,7 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      statusRoute,
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
@@ -60,6 +63,7 @@ export default class APIRouter {
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
+    apiSubrouter.get('/status', statusRoute.get);
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
@@ -72,6 +76,11 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
+    apiSubrouter.post(
+      '/card-spaces/validate-profile-category',
+      parseBody,
+      cardSpacesRoute.postProfileCategoryValidation
+    );
     apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
     apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);

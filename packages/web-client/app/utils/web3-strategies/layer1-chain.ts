@@ -186,7 +186,20 @@ export default abstract class Layer1ChainWeb3Strategy
       this.web3 = new Web3();
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
       this.#assetsApi = await getSDK('Assets', this.web3);
-      await this.connectionManager.connect(this.web3, walletProvider.id);
+      let completedConnectionAttempt = await this.connectionManager.connect(
+        this.web3,
+        walletProvider.id
+      );
+
+      /**
+       * If the user cancels the process midway of connection
+       * so connection effectively fails before trying
+       * we want to clean up any state that was set
+       */
+      if (!completedConnectionAttempt) {
+        this.cleanupConnectionState();
+        ConnectionManager.removeProviderFromStorage(this.chainId);
+      }
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
@@ -264,15 +277,25 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async refreshBalances() {
     if (!this.isConnected) return;
-    let balances = await Promise.all<string>([
-      this.getDefaultTokenBalance(),
-      this.getErc20Balance('DAI'),
-      this.getErc20Balance('CARD'),
-    ]);
-    let [defaultTokenBalance, daiBalance, cardBalance] = balances;
-    this.defaultTokenBalance = new BN(defaultTokenBalance);
-    this.daiBalance = new BN(daiBalance);
-    this.cardBalance = new BN(cardBalance);
+
+    try {
+      let balances = await Promise.all<string>([
+        this.getDefaultTokenBalance(),
+        this.getErc20Balance('DAI'),
+        this.getErc20Balance('CARD'),
+      ]);
+      let [defaultTokenBalance, daiBalance, cardBalance] = balances;
+      this.defaultTokenBalance = new BN(defaultTokenBalance);
+      this.daiBalance = new BN(daiBalance);
+      this.cardBalance = new BN(cardBalance);
+    } catch (e) {
+      // Incorrect chain id triggers controller:card-pay#onLayer2Incorrect to show a modal
+      if (!e.message.includes('what name the network id')) {
+        // Exception being ignored: Don't know what name the network id ID is
+        Sentry.captureException(e);
+        throw e;
+      }
+    }
   }
 
   private async getErc20Balance(

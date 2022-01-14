@@ -1,6 +1,11 @@
 /* eslint-disable no-process-exit */
-
+// make sure the side-effect of `import 'load-dotenv'` happens before config is
+// imported. since imports are statically resolved, using dotenv.config() before
+// the import config, will not actually mean that dotenv.config() is called
+// before the config is imported.
+import './load-dotenv';
 import config from 'config';
+
 import Koa from 'koa';
 import { environment, httpLogging, errorMiddleware } from './middleware';
 import cors from '@koa/cors';
@@ -8,8 +13,7 @@ import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
-import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
-import { LogLevel, LogMeta } from '@graphile/logger';
+import logger from '@cardstack/logger';
 import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
 
 import initSentry from './initializers/sentry';
@@ -25,6 +29,7 @@ import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
+import StatusRoute from './routes/status';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
@@ -65,17 +70,13 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
-import boom from './tasks/boom';
-import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog, botLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
-import { CardCacheConfig } from './services/card-cache-config';
-import CardCache from './services/card-cache';
+import { FileCacheConfig } from './services/file-cache-config';
+import FileCache from './services/file-cache';
 import ExchangeRatesService from './services/exchange-rates';
-import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
@@ -83,7 +84,6 @@ import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import RealmsConfig from './services/realms-config';
-import { ContractSubscriptionEventHandler } from './contract-subscription-event-handler';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -91,16 +91,32 @@ import PushNotificationRegistrationSerializer from './services/serializers/push-
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
+import Contracts from './services/contracts';
+import LatestEventBlockQueries from './services/queries/latest-event-block';
 import NotificationTypeQueries from './services/queries/notification-type';
 import NotificationPreferenceQueries from './services/queries/notification-preference';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
 import NotificationPreferencesRoute from './routes/notification-preferences';
+import NotificationPreferenceService from './services/push-notifications/preferences';
+import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
+import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
+import { HubWorker } from './worker';
+import HubBot from './services/discord-bots/hub-bot';
+import StatuspageApi from './services/statuspage-api';
+import ChecklyWebhookRoute from './routes/checkly-webhook';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
+const serverLog = logger('hub/server');
+
 export function createRegistry(): Registry {
   let registry = new Registry();
+  registry.register('hubServer', HubServer);
+  registry.register('hubWorker', HubWorker);
+  registry.register('hubBot', HubBot);
+
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
@@ -108,6 +124,7 @@ export function createRegistry(): Registry {
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
+  registry.register('contracts', Contracts);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -118,11 +135,11 @@ export function createRegistry(): Registry {
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
   registry.register('upload-queries', UploadQueries);
-  registry.register('hubServer', HubServer);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
+  registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
@@ -154,10 +171,15 @@ export function createRegistry(): Registry {
   registry.register('notification-preferences-route', NotificationPreferencesRoute);
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
+  registry.register('notification-preference-service', NotificationPreferenceService);
+  registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('relay', RelayService);
+  registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
+  registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
+  registry.register('status-route', StatusRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
@@ -167,13 +189,15 @@ export function createRegistry(): Registry {
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
   registry.register('web3-storage', Web3Storage);
+  registry.register('statuspage-api', StatuspageApi);
+  registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);
     registry.register('realmsConfig', RealmsConfig);
     registry.register('realm-manager', RealmManager);
-    registry.register('card-cache-config', CardCacheConfig);
-    registry.register('card-cache', CardCache);
+    registry.register('file-cache-config', FileCacheConfig);
+    registry.register('file-cache', FileCache);
     registry.register('card-routes', CardRoutes);
     registry.register(
       'card-routes-config',
@@ -194,9 +218,6 @@ export function createContainer(): Container {
 }
 
 export class HubServer {
-  logger = serverLog;
-  static logger = serverLog;
-
   private auth = inject('authentication-middleware', { as: 'auth' });
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
@@ -242,7 +263,7 @@ export class HubServer {
     if ((err as any).intentionalTestError) {
       return;
     }
-    this.logger.error(`Unhandled error:`, err);
+    serverLog.error(`Unhandled error:`, err);
     Sentry.withScope(function (scope) {
       scope.addEventProcessor(function (event) {
         return Sentry.Handlers.parseRequest(event, ctx.request);
@@ -253,7 +274,7 @@ export class HubServer {
 
   async listen(port = 3000) {
     let instance = this.app.listen(port);
-    this.logger.info(`\n👂 Hub listening on %s\n`, port);
+    serverLog.info(`\n👂 Hub listening on %s\n`, port);
 
     if (process.connected) {
       process.send!('hub hello');
@@ -284,120 +305,4 @@ declare module '@cardstack/di' {
 export function runInitializers() {
   initSentry();
   initFirebase();
-}
-
-export async function bootWorker() {
-  runInitializers();
-
-  let workerLogFactory: LogFunctionFactory = (scope: any) => {
-    return (level: LogLevel, message: any, meta?: LogMeta) => {
-      switch (level) {
-        case LogLevel.ERROR:
-          workerLog.error(message, scope, meta);
-          break;
-        case LogLevel.WARNING:
-          workerLog.warn(message, scope, meta);
-          break;
-        case LogLevel.INFO:
-          workerLog.info(message, scope, meta);
-          break;
-        case LogLevel.DEBUG:
-          workerLog.info(message, scope, meta);
-      }
-    };
-  };
-  let dbConfig = config.get('db') as Record<string, any>;
-  let container = createContainer();
-  let runner = await runWorkers({
-    logger: new Logger(workerLogFactory),
-    connectionString: dbConfig.url,
-    taskList: {
-      boom: boom,
-      'send-notifications': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(SendNotificationsTask);
-        return task.perform(payload, helpers);
-      },
-      'notify-merchant-claim': async (payload: any) => {
-        let task = await container.instantiate(NotifyMerchantClaimTask);
-        return task.perform(payload);
-      },
-      'notify-customer-payment': async (payload: any) => {
-        let task = await container.instantiate(NotifyCustomerPaymentTask);
-        return task.perform(payload);
-      },
-      'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
-        return task.perform(payload, helpers);
-      },
-      'persist-off-chain-merchant-info': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainMerchantInfoTask);
-        return task.perform(payload, helpers);
-      },
-      'persist-off-chain-card-space': async (payload: any, helpers: Helpers) => {
-        let task = await container.instantiate(PersistOffChainCardSpaceTask);
-        return task.perform(payload, helpers);
-      },
-      's3-put-json': s3PutJson,
-    },
-  });
-
-  runner.events.on('job:error', ({ error, job }) => {
-    Sentry.withScope(function (scope) {
-      scope.setTags({
-        jobId: job.id,
-        jobTask: job.task_identifier,
-      });
-      Sentry.captureException(error);
-    });
-  });
-  let web3 = await container.lookup('web3-socket');
-  let workerClient = await container.lookup('worker-client');
-
-  // listen for contract events
-  // internally this talks to the worker client
-  await new ContractSubscriptionEventHandler(web3, workerClient).setupContractEventSubscriptions();
-
-  await runner.promise;
-}
-
-export class HubBotController {
-  logger = botLog;
-  static logger = botLog;
-
-  static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
-    this.logger.info(`booting pid:${process.pid}`);
-    runInitializers();
-
-    let registry = createRegistry();
-    if (serverConfig?.registryCallback) {
-      serverConfig.registryCallback(registry);
-    }
-    let container = new Container(registry);
-    let bot: HubBot | undefined;
-
-    try {
-      bot = await container.instantiate(HubBot);
-      await bot.start();
-    } catch (e: any) {
-      this.logger.error(`Unexpected error ${e.message}`, e);
-      Sentry.withScope(function () {
-        Sentry.captureException(e);
-      });
-    }
-
-    if (!bot) {
-      throw new Error('Bot could not be created');
-    }
-    this.logger.info(`started (${bot.type}:${bot.botInstanceId})`);
-
-    return new this(bot, container);
-  }
-
-  private constructor(public bot: HubBot, public container: Container) {}
-
-  async teardown() {
-    this.logger.info('shutting down');
-    await this.bot.destroy();
-    await this.container.teardown();
-  }
 }

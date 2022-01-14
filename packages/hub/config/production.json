@@ -17,7 +17,7 @@
     "url":"https://api.sendwyre.com",
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
   },
-  "betaTesting": {
+  "cardDrop": {
     "sku": "0x2a635070ac5332e28e657bfd717363165dba145ddc6d5eca39b12faacb861149"
   }
 }

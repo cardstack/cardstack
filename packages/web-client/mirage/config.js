@@ -3,6 +3,7 @@ import {
   defaultCreatedPrepaidCardDID,
 } from '@cardstack/web-client/utils/test-factories';
 import { nativeCurrencies } from '@cardstack/cardpay-sdk';
+import config from '@cardstack/web-client/config/environment';
 
 export default function () {
   this.namespace = 'api';
@@ -82,6 +83,16 @@ export default function () {
     function (schema, { params: { idWithExtension } }) {
       let [id] = idWithExtension.split('.');
       return schema.merchantInfos.find(id);
+    }
+  );
+
+  // prevent sporadic test failure because of degradation banner
+  this.get(
+    `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`,
+    function () {
+      return {
+        incidents: [],
+      };
     }
   );
 

@@ -1,6 +1,7 @@
 .org-card__container {
   width: 33.125rem;
   min-height: 18.75rem;
+  height: 100%;
   display: flex;
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
@@ -8,10 +9,12 @@
   color: var(--boxel-dark);
 }
 
-.org-card__side-image {
-  width: 11.25rem;
-  flex-shrink: 0;
-  background: var(--boxel-navy);
+.org-card__image {
+  width: 17rem;
+  background-color: var(--boxel-navy);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .org-card__icon {
@@ -38,8 +41,7 @@
   color: var(--boxel-purple-500);
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-  margin-bottom: 0;
-  margin-top: var(--boxel-sp);
+  margin: var(--boxel-sp) 0;
 }
 
 .org-card__description-list {
@@ -68,4 +70,16 @@
 
 .org-card__cta--disabled-link {
   color: var(--boxel-purple-600);
+}
+
+@media screen and (max-width: 35rem) {
+  .org-card__container {
+    flex-flow: column;
+    width: 100%;
+  }
+
+  .org-card__image {
+    width: 100%;
+    height: 10rem;
+  }
 }

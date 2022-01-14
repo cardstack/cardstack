@@ -4,7 +4,8 @@ import { templateOnlyComponentTemplate } from './templates';
 export const TEST_REALM = 'https://cardstack.local/';
 
 export const ADDRESS_RAW_CARD = {
-  url: `${TEST_REALM}address`,
+  realm: TEST_REALM,
+  id: 'address',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -28,7 +29,8 @@ export const ADDRESS_RAW_CARD = {
 };
 
 export const PERSON_RAW_CARD = {
-  url: `${TEST_REALM}person`,
+  realm: TEST_REALM,
+  id: 'person',
   schema: 'schema.js',
   isolated: 'isolated.js',
   files: {

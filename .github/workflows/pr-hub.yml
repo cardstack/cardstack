@@ -5,8 +5,10 @@ on:
     branches: [main]
     paths:
       - 'packages/hub/**'
+      - 'packages/cardpay-sdk/**'
       - 'packages/discord-bot/**'
       - 'packages/did-resolver/**'
+      - 'packages/wc-provider/**'
       - 'packages/test-support/**'
       - 'packages/core/**'
       - 'packages/eslint-config/**'

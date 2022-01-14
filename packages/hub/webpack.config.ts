@@ -2,6 +2,18 @@
 const { SourceMapDevToolPlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const { sync: glob } = require('glob');
+const { basename } = require('path');
+
+const tsMigrations = glob(`${__dirname}/db/migrations/*.ts`);
+const tsMigrationEntrypoints: { [entrypoint: string]: string } = {};
+for (let migrationFile of tsMigrations) {
+  if (migrationFile.endsWith('.d.ts')) {
+    continue;
+  }
+  let migration = basename(migrationFile, '.ts');
+  tsMigrationEntrypoints[`db/migrations/${migration}`] = `./db/migrations/${migration}.ts`;
+}
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -17,6 +29,9 @@ module.exports = {
       filename: '[name].js.map',
       noSources: true,
       moduleFilenameTemplate: '[absolute-resource-path]',
+      // don't make source maps for the ts-migrations, node-pg-migrate gets
+      // confused when it sees these
+      exclude: Object.keys(tsMigrationEntrypoints).map((i) => `${i}.js`),
     }),
 
     // graphile-worker contains standalone sql files that it expects to be able
@@ -30,12 +45,94 @@ module.exports = {
         },
       ],
     }),
+
+    // place the db migrations into the dist folder so that node-pg-migrate can
+    // find them
+    new CopyPlugin({
+      patterns: [
+        {
+          // we are @cardstack/hub, so there is no need to declare ourselves as a dep
+          // eslint-disable-next-line node/no-extraneous-require
+          from: path.join(path.dirname(require.resolve('@cardstack/hub/package.json')), 'db', 'migrations', '*.js'),
+        },
+      ],
+    }),
+
+    // copy image assets that the hub hosts into dist
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(
+            // we are @cardstack/hub, so there is no need to declare ourselves as a dep
+            // eslint-disable-next-line node/no-extraneous-require
+            path.dirname(require.resolve('@cardstack/hub/package.json')),
+            'services',
+            'discord-bots',
+            'hub-bot',
+            'assets',
+            '**',
+            '*.*'
+          ),
+        },
+      ],
+    }),
+
+    // copy over pkgs necessary for node-pg-migrate to work. these will be added
+    // to the docker image's file system
+    ...[
+      'node-pg-migrate',
+      'pg',
+      'pg-connection-string',
+      'pg-format',
+      'pg-int8',
+      'pg-pool',
+      'pg-protocol',
+      'pg-types',
+      'pgpass',
+      'postgres-array',
+      'postgres-bytea',
+      'postgres-date',
+      'postgres-interval',
+      'buffer-writer',
+      'packet-reader',
+      'xtend',
+      'split2',
+      'readable-stream',
+      'inherits',
+      'string_decoder',
+      'util-deprecate',
+      'lodash',
+      'fs-extra',
+      'graceful-fs',
+      'jsonfile',
+      'universalify',
+    ].map(
+      (pkg) =>
+        new CopyPlugin({
+          patterns: [
+            {
+              from: path.dirname(require.resolve(`${pkg}/package.json`)),
+              to: pkg,
+            },
+          ],
+        })
+    ),
   ],
 
   entry: {
     hub: './cli.ts',
     tests: './node-tests/entrypoint.ts',
     'bot-tests': './bot-tests/entrypoint.ts',
+
+    // we add entrypoints for each of the TS migration files as well since we
+    // run the migration via the webpack build from waypoint
+    ...tsMigrationEntrypoints,
+  },
+
+  output: {
+    library: {
+      type: 'commonjs',
+    },
   },
 
   target: 'node14',
@@ -82,6 +179,11 @@ module.exports = {
     // corde wants to insert itself at runtime, as it drives the bot tests. We
     // don't want to compile it in.
     corde: 'commonjs corde',
+
+    // node-pg-migrate has very specific logic for how it determines the path of
+    // the migration files which rely on a relative path calculation from
+    // __dirname
+    'node-pg-migrate': 'commonjs node-pg-migrate',
   },
 
   module: {
@@ -92,9 +194,13 @@ module.exports = {
 
     rules: [
       {
-        test: /\.ts$/,
+        test: /(?<!\.d)\.ts?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.d\.ts$/,
+        loader: 'ignore-loader',
       },
       {
         test: /\.node$/,

@@ -5,6 +5,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 
 import { createDepotSafe } from '@cardstack/web-client/utils/test-factories';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 const MODAL = '[data-test-network-problem-modal]';
 const MODAL_TITLE = '[data-test-network-problem-modal-title]';
@@ -16,6 +17,8 @@ const MODAL_IS_DISMISSABLE_ATTRIBUTE =
 
 module('Acceptance | network-problems', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
+
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   let layer2Service: Layer2TestWeb3Strategy;
   let layer1Service: Layer1TestWeb3Strategy;

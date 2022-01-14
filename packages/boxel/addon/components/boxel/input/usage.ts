@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-export default class extends Component {
+export default class BoxelInputUsage extends Component {
   @tracked id = 'sample-input';
   @tracked value = '';
   @tracked disabled = false;

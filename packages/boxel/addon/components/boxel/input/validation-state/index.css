@@ -1,0 +1,26 @@
+.boxel-validation-state-input-group {
+  --input-height: 2.5rem;
+  --input-icon-size: var(--boxel-icon-sm);
+  --input-icon-space: var(--boxel-sp-xs);
+
+  position: relative;
+  font-family: var(--boxel-font-family);
+  line-height: calc(27 / 20);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-validation-state-input-group__input {
+  height: var(--input-height);
+  padding-right: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.boxel-validation-state-input-group__icon {
+  position: absolute;
+  width: var(--input-icon-size);
+  height: var(--input-height);
+  right: var(--input-icon-space);
+  top: 0;
+  user-select: none;
+}

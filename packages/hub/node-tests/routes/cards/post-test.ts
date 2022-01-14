@@ -31,7 +31,8 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realmURL}post`,
+        realm: realmURL,
+        id: 'post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -86,7 +87,8 @@ if (process.env.COMPILER) {
 
     it('Errors when you provide an ID that alreay exists', async function () {
       await cards.create({
-        url: `${realmURL}post-is-the-most`,
+        realm: realmURL,
+        id: 'post-is-the-most',
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -112,23 +114,8 @@ if (process.env.COMPILER) {
             },
             {
               code: 404,
-              detail: 'https://not-created.com/post/ is not a realm we know about',
+              detail: 'Card https://not-created.com/post was not found',
               title: 'Not Found',
-            },
-          ],
-        });
-    });
-
-    it('Errors when you try to include other fields', async function () {
-      // assert.expect(0);
-      await postCard(`${realmURL}post`, Object.assign({ isolated: 'isolated.js' }, PAYLOAD))
-        .expect(400)
-        .expect({
-          errors: [
-            {
-              code: 400,
-              detail: 'Payload contains keys that we do not allow: isolated',
-              title: 'Bad Request',
             },
           ],
         });

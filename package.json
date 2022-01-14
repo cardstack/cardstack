@@ -12,8 +12,8 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@types/node": "14.14.35",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
-    "@typescript-eslint/parser": "^4.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
     "babel-eslint": "^10.1.0",
     "discord.js": "^12.5.3",
     "ember-template-lint": "^3.1.1",
@@ -24,26 +24,26 @@
     "eslint-plugin-mocha": "^8.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
     "lerna": "4.0.0",
     "prettier": "^2.3.2",
     "start-server-and-test": "^1.12.0",
     "typescript": "4.2.3"
   },
   "scripts": {
-    "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace",
-    "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
-    "prepare": "npm run compile",
+    "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
+    "postinstall": "cd ./packages/cardpay-sdk && yarn codegen; cd -",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
-    "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "cd packages/cardhost && yarn lint",
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
     "lint:hbs": "cd packages/web-client && ember-template-lint .",
+    "lint:typecheck": "./scripts/typecheck-all.sh",
     "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
     "start:hub": "cd packages/hub && yarn start",
     "console:hub": "cd packages/hub && yarn console",
@@ -78,7 +78,8 @@
   },
   "workspaces": {
     "packages": [
-      "packages/**"
+      "packages/*",
+      "packages/firebase-functions/**"
     ],
     "nohoist": [
       "**/@types/loader-utils"

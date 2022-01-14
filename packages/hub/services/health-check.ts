@@ -11,7 +11,7 @@ export default class HealthCheck {
       let db = await this.databaseManager.getClient();
       await db.query('SELECT 1');
       ctx.status = 200;
-      ctx.body = 'Cardstack Hub is up and running at ' + new Date().toISOString();
+      ctx.body = `Cardstack Hub is up and running at ${new Date().toISOString()}`;
     });
 
     return healthCheckRouter.routes();

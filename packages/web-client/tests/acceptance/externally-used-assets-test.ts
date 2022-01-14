@@ -14,6 +14,8 @@ const EXTERNALLY_USED_ASSET_PATHS = [
   // icons used for WalletConnect (we control this, see config.walletConnectIcons)
   '/images/icon-apple-256x256.png',
   '/images/icon-favicon-32x32.png',
+  // open graph card pay logo
+  '/images/logos/card-pay-logo.png',
 ];
 
 module('Acceptance | externally used assets', function () {

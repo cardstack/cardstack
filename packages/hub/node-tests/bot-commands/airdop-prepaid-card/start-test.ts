@@ -1,12 +1,11 @@
 import { Client as DBClient } from 'pg';
-import { HubBotController } from '../../../main';
 import config from 'config';
 import {
   name as commandName,
   run as command,
 } from '../../../services/discord-bots/hub-bot/commands/dm/airdrop-prepaidcard/start';
 import * as JSONAPI from 'jsonapi-typescript';
-import Bot, {
+import {
   MockUser,
   makeTestMessage,
   makeTestChannel,
@@ -16,14 +15,13 @@ import Bot, {
   MockChannel,
   Message,
 } from '@cardstack/discord-bot';
-import { BetaTestConfig } from '../../../services/discord-bots/hub-bot/types';
+import { CardDropConfig } from '../../../services/discord-bots/hub-bot/types';
+import { registry, setupBot } from '../../helpers/server';
 
-const { sku, discordRole: betaTesterRoleName } = config.get('betaTesting') as BetaTestConfig;
+const { sku } = config.get('cardDrop') as CardDropConfig;
 
 describe('bot command: airdrop-prepaidcard:start', function () {
-  let botController: HubBotController;
   let db: DBClient;
-  let bot: Bot;
   let dm: MockChannel;
   let stubInventory: JSONAPI.ResourceObject[];
   let walletConnectDeferred: Promise<any>;
@@ -36,12 +34,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   let mockEOA = '0x123';
   let mockTxnHash = '0x456';
   let mockPrepaidCardAddress = '0x789';
-  let betaTesterRole: MockRole = {
-    id: '1',
-    name: betaTesterRoleName,
-  };
   let roles = new Collection<string, MockRole>();
-  roles.set(betaTesterRole.id, betaTesterRole);
   let guild = makeTestGuild({ roles });
 
   class StubInventoryService {
@@ -82,27 +75,20 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   }
 
   this.beforeAll(async function () {
-    botController = await HubBotController.create({
-      registryCallback(registry) {
-        registry.register('inventory', StubInventoryService);
-        registry.register('wallet-connect', StubWalletConnectService);
-        registry.register('relay', StubRelayService);
-        registry.register('cardpay', StubCardpaySDK);
-      },
-    });
-    bot = botController.bot;
+    registry(this).register('inventory', StubInventoryService);
+    registry(this).register('wallet-connect', StubWalletConnectService);
+    registry(this).register('relay', StubRelayService);
+    registry(this).register('cardpay', StubCardpaySDK);
   });
 
-  this.afterAll(async function () {
-    await botController.teardown();
-  });
+  let { getContainer, getBot } = setupBot(this, 'beforeAll');
 
   this.beforeEach(async function () {
     dm = makeTestChannel();
-    let dbManager = await botController.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM dm_channels`);
-    await db.query(`DELETE FROM beta_testers`);
+    await db.query(`DELETE FROM card_drop_recipients`);
 
     await db.query(`INSERT INTO dm_channels (channel_id, user_id, command) VALUES ($1, $2, $3)`, [
       dm.id,
@@ -134,7 +120,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       channel: dm,
     });
 
-    await command(bot, message, [dm.id]);
+    await command(getBot(), message, [dm.id]);
     expect(dm.lastResponse).to.equal(`ok, if you change your mind type \`!card-drop\` in the public channel.`);
   });
 
@@ -147,7 +133,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       channel: dm,
     });
 
-    await command(bot, message, [dm.id]);
+    await command(getBot(), message, [dm.id]);
     expect(dm.lastResponse).to.equal(`I didn't catch that--are you ready to continue?`);
   });
 
@@ -174,7 +160,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       },
     });
 
-    await command(bot, message, [dm.id]);
+    await command(getBot(), message, [dm.id]);
     expect(dm.responses.length).to.equal(4);
     expect(dm.responses[0]).to.equal(`<qr code image>`);
     expect(dm.responses[1]).to.equal(
@@ -190,7 +176,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     );
     expect(dm.responses[3].image.url).to.equal(`attachment://${sku}.png`);
 
-    let { rows } = await db.query(`SELECT * FROM beta_testers WHERE user_id = $1`, [user.id]);
+    let { rows } = await db.query(`SELECT * FROM card_drop_recipients WHERE user_id = $1`, [user.id]);
     expect(rows.length).to.equal(1);
 
     let [row] = rows;
@@ -201,7 +187,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   });
 
   it(`will not prompt for a QR code if the system already has collected the EOA`, async function () {
-    await db.query(`INSERT INTO beta_testers (user_id, user_name, address) VALUES ($1, $2, $3)`, [
+    await db.query(`INSERT INTO card_drop_recipients (user_id, user_name, address) VALUES ($1, $2, $3)`, [
       user.id,
       user.username,
       mockEOA,
@@ -215,7 +201,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       channel: dm,
     });
 
-    await command(bot, message, [dm.id]);
+    await command(getBot(), message, [dm.id]);
     expect(dm.responses.length).to.equal(3);
     expect(dm.responses[0]).to.equal(
       `Great! I see your wallet address is ${mockEOA}. I'm sending you a prepaid card, hang on...`

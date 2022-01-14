@@ -1,7 +1,15 @@
-import { CardJSONRequest, CardJSONResponse, SerializerMap, SerializerName, Setter, CardEnv } from './interfaces';
-import serializers, { PrimitiveSerializer } from './serializers';
+import {
+  JSONAPIDocument,
+  SerializerMap,
+  Setter,
+  CardEnv,
+  Saved,
+  ResourceObject,
+  assertDocumentDataIsResource,
+} from './interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
+import { deserializaAttributes, serializeAttributes, serializeResource } from './serializers';
 
 export interface NewCardParams {
   realm: string;
@@ -17,7 +25,7 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
-  rawServerResponse: CardJSONResponse;
+  rawServerResponse: ResourceObject<Saved>;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -40,10 +48,10 @@ export default class CardModel {
     );
   }
 
-  static fromResponse(cards: CardEnv, cardResponse: CardJSONResponse, component: unknown): CardModel {
+  static fromResponse(cards: CardEnv, cardResponse: ResourceObject, component: unknown): CardModel {
     return new this(cards, component, {
       type: 'loaded',
-      url: cardResponse.data.id,
+      url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
       deserialized: false,
       original: undefined,
@@ -81,7 +89,11 @@ export default class CardModel {
     switch (this.state.type) {
       case 'loaded':
         if (!this.state.deserialized) {
-          this._data = this.deserialize(this.state);
+          this._data = deserializaAttributes(
+            this.state.rawServerResponse.attributes,
+            // @ts-ignore This works as expected, whats up typescript?
+            this.constructor.serializerMap
+          );
           this.state.deserialized = true;
         }
         return this._data;
@@ -99,33 +111,6 @@ export default class CardModel {
       this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
     }
     return this.wrapperComponent;
-  }
-
-  private deserialize(state: LoadedState): any {
-    let { attributes } = state.rawServerResponse.data;
-    return serializeAttributes(
-      attributes,
-      'deserialize',
-      // @ts-ignore This works as expected, whats up typescript?
-      this.constructor.serializerMap
-    );
-  }
-
-  private serialize(): CardJSONRequest {
-    let { data } = this;
-    let attributes = serializeAttributes(
-      data,
-      'serialize',
-      // @ts-ignore
-      this.constructor.serializerMap
-    );
-
-    let url: string | undefined;
-    if (this.state.type === 'loaded') {
-      url = this.state.url;
-    }
-
-    return constructJSONAPIRequest(attributes, url);
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -166,15 +151,23 @@ export default class CardModel {
   }
 
   async save(): Promise<void> {
-    let response: CardJSONResponse;
+    let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
+    let attributes = serializeAttributes(
+      this.data,
+      // @ts-ignore
+      this.constructor.serializerMap
+    );
+
     switch (this.state.type) {
       case 'created':
         response = await this.cards.send({
           create: {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
-            payload: this.serialize(),
+            payload: {
+              data: serializeResource('card', undefined, attributes),
+            },
           },
         });
         break;
@@ -183,84 +176,26 @@ export default class CardModel {
         response = await this.cards.send({
           update: {
             cardURL: this.state.url,
-            payload: this.serialize(),
+            payload: {
+              data: serializeResource('card', this.state.url, attributes),
+            },
           },
         });
         break;
       default:
         throw assertNever(this.state);
     }
+
+    let { data } = response;
+    assertDocumentDataIsResource(data);
+
     this.state = {
       type: 'loaded',
-      url: response.data.id,
-      rawServerResponse: cloneDeep(response),
+      url: data.id,
+      rawServerResponse: cloneDeep(data),
       deserialized: false,
       original,
     };
-  }
-}
-
-function constructJSONAPIRequest(attributes: any, url: string | undefined): CardJSONRequest {
-  let response: CardJSONRequest = {
-    data: {
-      type: 'card',
-      attributes,
-    },
-  };
-
-  if (url) {
-    response.data.id = url;
-  }
-
-  return response;
-}
-
-function serializeAttributes(
-  attrs: { [name: string]: any } | undefined,
-  action: 'serialize' | 'deserialize',
-  serializerMap: SerializerMap
-): any {
-  if (!attrs) {
-    return;
-  }
-  let serializerName: SerializerName;
-  for (serializerName in serializerMap) {
-    let serializer = serializers[serializerName];
-    let paths = serializerMap[serializerName];
-    if (!paths) {
-      continue;
-    }
-    for (const path of paths) {
-      serializeAttribute(attrs, path, serializer, action);
-    }
-  }
-
-  return attrs;
-}
-
-function serializeAttribute(
-  attrs: { [name: string]: any },
-  path: string,
-  serializer: PrimitiveSerializer,
-  action: 'serialize' | 'deserialize'
-) {
-  let [key, ...tail] = path.split('.');
-  let value = attrs[key];
-  if (!value) {
-    return;
-  }
-
-  if (tail.length) {
-    let tailPath = tail.join('.');
-    if (Array.isArray(value)) {
-      for (let row of value) {
-        serializeAttribute(row, tailPath, serializer, action);
-      }
-    } else {
-      serializeAttribute(attrs[key], tailPath, serializer, action);
-    }
-  } else {
-    attrs[path] = serializer[action](value);
   }
 }
 

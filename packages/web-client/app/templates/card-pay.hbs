@@ -1,5 +1,7 @@
 {{page-title "Card Pay" replace=true}}
 
+<Common::DegradedServiceBanner />
+
 <Boxel::Dashboard @darkTheme={{true}} class="card-pay" data-test-card-pay>
   <:header>
     <CardPay::Header
@@ -27,7 +29,10 @@
   </:header>
 
   <:body>
-    {{outlet}}
+    <div class="card-pay__body-content">
+      {{outlet}}
+      <Common::Footer class="card-pay__footer" />
+    </div>
   </:body>
 </Boxel::Dashboard>
 

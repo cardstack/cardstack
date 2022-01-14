@@ -7,6 +7,7 @@ on:
       - 'packages/boxel/**'
       - 'packages/cardpay-sdk/**'
       - 'packages/did-resolver/**'
+      - 'packages/wc-provider/**'
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
       - '.github/workflows/pr-web-client.yml'
@@ -30,7 +31,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: yarn global add @percy/cli
+      # using yarn to install @percy/cli suddenly started causing V8 out of
+      # memory errors. According to https://stackoverflow.com/a/56568741 likely
+      # there is a dependency cycle that yarn can't see through. However, npm
+      # has the ability to collapse these cycles. So we are using npm to install
+      # percy
+      - run: npm install -g @percy/cli
       - name: Run tests
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}

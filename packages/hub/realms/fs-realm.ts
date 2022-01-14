@@ -1,28 +1,38 @@
-import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync } from 'fs-extra';
+import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync, statSync } from 'fs-extra';
 import { sep, join } from 'path';
 import sane from 'sane';
 import walkSync from 'walk-sync';
 
-import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { assertValidRawCard, CardId, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
-import { ensureTrailingSlash } from '@cardstack/core/src/utils';
+import { cardURL, ensureTrailingSlash } from '@cardstack/core/src/utils';
 
 import { RealmInterface } from '../interfaces';
 import { nanoid } from '../utils/ids';
-import { serverLog as logger } from '../utils/logger';
+import logger from '@cardstack/logger';
+import Logger from '@cardstack/logger/src/logger';
 
 import { IndexerHandle } from '../services/search-index';
 import RealmManager from '../services/realm-manager';
 
-export default class FSRealm implements RealmInterface {
+interface Meta {
+  mtime: number;
+  pid: number;
+}
+
+export default class FSRealm implements RealmInterface<Meta> {
   url: string;
   private directory: string;
-  private logger = logger;
   private watcher?: sane.Watcher;
+  private log: Logger;
+
+  private recentWrites = new Map<string, number>();
+  private recentDeleted = new Set<string>();
 
   constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
     this.url = url;
     this.directory = ensureTrailingSlash(directory);
+    this.log = logger(`hub/fs-realm[${url}]`);
   }
 
   async ready() {
@@ -40,38 +50,79 @@ export default class FSRealm implements RealmInterface {
     this.watcher?.close();
   }
 
-  // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
-  async reindex(ops: IndexerHandle): Promise<void> {
-    this.logger.info(`Indexing realm: ${this.url}`);
+  async reindex(ops: IndexerHandle, meta: Meta | null): Promise<Meta> {
+    let fullReindex = meta?.pid !== process.pid;
+    let newestMtime = 0;
 
-    await ops.beginReplaceAll();
-    let cards = walkSync(this.directory, { globs: ['**/card.json'] });
-    for (let cardPath of cards) {
-      let fullCardUrl = new URL(cardPath.replace('/card.json', ''), this.url).href;
-      this.logger.info(`--> ${fullCardUrl}`);
-      let rawCard = await this.read(fullCardUrl);
-      await ops.save(rawCard);
+    if (fullReindex) {
+      await ops.beginReplaceAll();
     }
-    await ops.finishReplaceAll();
+    this.log.trace('fullReindex=%s', fullReindex);
+    let cards = walkSync.entries(this.directory, {
+      globs: ['**/card.json'],
+      fs: undefined as any,
+    });
+    for (let { relativePath: cardPath, mtime } of cards) {
+      newestMtime = Math.max(newestMtime, mtime);
+      let id = cardPath.replace('/card.json', '');
+      if (fullReindex || meta?.mtime == null || meta.mtime < mtime) {
+        this.log.trace(`indexing %s`, id);
+        let rawCard = await this.read({ id, realm: this.url });
+        await ops.save(rawCard);
+      } else {
+        this.log.trace(`skipping %s`, id);
+      }
+    }
+    if (fullReindex) {
+      await ops.finishReplaceAll();
+    }
+    return { mtime: newestMtime, pid: process.pid };
   }
 
   private onFileChanged(action: 'save' | 'delete', filepath: string) {
+    this.log.trace('onFileChange', filepath);
     let segments = filepath.split(sep);
     if (!this.notify || shouldIgnoreChange(segments)) {
       // top-level files in the realm are not cards, we're assuming all
       // cards are directories under the realm.
       return;
     }
+
+    if (action === 'save') {
+      // echo suppression based on close-enough mtime of the new file
+      let fullpath = join(this.directory, filepath);
+      let lastMTime = this.recentWrites.get(fullpath);
+      if (lastMTime != null && statSync(fullpath).mtime.getTime() < lastMTime + 10) {
+        this.log.trace('onChangeNotifySuppressed');
+        return;
+      }
+    }
+
+    if (action === 'delete') {
+      // echo suppression for recently deleted files
+      let cardDir = join(this.directory, segments[0]);
+      // todo: this is good enough for now because we only delete whole cards,
+      // but we need to implement single file deletion too and that needs to get
+      // tracked separately
+      if (this.recentDeleted.has(cardDir)) {
+        this.log.trace('onChangeNotifySuppressed');
+        return;
+      }
+    }
+
     let url = new URL(segments[0] + '/', this.url).href;
     this.notify(url, action);
   }
 
-  private buildCardPath(cardURL: string, ...paths: string[]): string {
-    return join(this.directory, cardURL.replace(this.url, ''), ...(paths || ''));
+  private buildCardPath(cardId: CardId, ...paths: string[]): string {
+    if (cardId.realm !== this.url) {
+      throw new Error(`realm ${this.url} does not contain card ${cardURL(cardId)}`);
+    }
+    return join(this.directory, cardId.id, ...(paths || ''));
   }
 
-  async read(cardURL: string): Promise<RawCard> {
-    let dir = this.buildCardPath(cardURL);
+  async read(cardId: CardId): Promise<RawCard> {
+    let dir = this.buildCardPath(cardId);
     let files: any = {};
 
     let entries: string[];
@@ -81,7 +132,7 @@ export default class FSRealm implements RealmInterface {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`card ${cardURL} not found`);
+      throw new NotFound(`card ${cardId.id} not found`);
     }
 
     for (let file of entries) {
@@ -91,7 +142,7 @@ export default class FSRealm implements RealmInterface {
 
     let cardJSON = files['card.json'];
     if (!cardJSON) {
-      throw new CardstackError(`${cardURL} is missing card.json`);
+      throw new CardstackError(`${cardId.id} is missing card.json`);
     }
 
     delete files['card.json'];
@@ -101,7 +152,7 @@ export default class FSRealm implements RealmInterface {
     } catch (e: any) {
       throw augmentBadRequest(e);
     }
-    Object.assign(card, { files, url: cardURL });
+    Object.assign(card, { files, id: cardId.id, realm: cardId.realm });
     assertValidRawCard(card);
 
     return card;
@@ -114,17 +165,17 @@ export default class FSRealm implements RealmInterface {
     return doc;
   }
 
-  private ensureCardURL(raw: RawCard | Omit<RawCard, 'url'>): string {
-    if ('url' in raw) {
-      return raw.url;
+  private ensureCardId(raw: RawCard<Unsaved>): CardId {
+    if (raw.id) {
+      return { id: raw.id, realm: this.url };
     } else {
-      return this.url + nanoid();
+      return { id: nanoid(), realm: this.url };
     }
   }
 
-  async create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard> {
-    let url = this.ensureCardURL(raw);
-    let cardDir = this.buildCardPath(url);
+  async create(raw: RawCard<Unsaved>): Promise<RawCard> {
+    let cardId = this.ensureCardId(raw);
+    let cardDir = this.buildCardPath(cardId);
 
     try {
       mkdirSync(cardDir);
@@ -132,13 +183,13 @@ export default class FSRealm implements RealmInterface {
       if (err.code !== 'EEXIST') {
         throw err;
       }
-      throw new Conflict(`card ${url} already exists`);
+      throw new Conflict(`card ${cardURL(cardId)} already exists`);
     }
     let completeRawCard: RawCard;
-    if ('url' in raw) {
-      completeRawCard = raw;
+    if (raw.id) {
+      completeRawCard = raw as RawCard;
     } else {
-      completeRawCard = Object.assign({}, raw, { url });
+      completeRawCard = Object.assign({}, raw, { ...cardId });
     }
 
     this.write(cardDir, completeRawCard);
@@ -146,34 +197,45 @@ export default class FSRealm implements RealmInterface {
   }
 
   async update(raw: RawCard): Promise<RawCard> {
-    let cardDir = this.buildCardPath(raw.url);
+    let cardDir = this.buildCardPath(raw);
     this.write(cardDir, raw);
     return raw;
   }
 
   private write(cardDir: string, raw: RawCard) {
     let payload = this.payload(raw);
+    let names = [];
     try {
-      writeJsonSync(join(cardDir, 'card.json'), payload);
+      let filename = join(cardDir, 'card.json');
+      writeJsonSync(filename, payload);
+      names.push(filename);
     } catch (err: any) {
       if (err.code !== 'ENOENT') {
         throw err;
       }
-      throw new NotFound(`tried to update card ${raw.url} but it does not exist`);
+      throw new NotFound(`tried to update card ${cardURL(raw)} but it does not exist`);
     }
     if (raw.files) {
       for (let [name, contents] of Object.entries(raw.files)) {
-        outputFileSync(join(cardDir, name), contents);
+        let filename = join(cardDir, name);
+        outputFileSync(filename, contents);
+        names.push(filename);
       }
     }
+    let time = Date.now();
+    for (let filename of names) {
+      this.recentWrites.set(filename, time);
+    }
+    this.recentDeleted.delete(cardDir);
   }
 
-  async delete(cardURL: string): Promise<void> {
-    let cardDir = this.buildCardPath(cardURL);
+  async delete(cardId: CardId): Promise<void> {
+    let cardDir = this.buildCardPath(cardId);
     if (!existsSync(cardDir)) {
-      throw new NotFound(`tried to delete ${cardURL} but it does not exist`);
+      throw new NotFound(`tried to delete ${cardURL(cardId)} but it does not exist`);
     }
     removeSync(cardDir);
+    this.recentDeleted.add(cardDir);
   }
 }
 

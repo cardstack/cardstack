@@ -6,16 +6,12 @@
   >
     <div class="card-space-url-form__row">
       <div class="card-space-url-form__subdomain">
-        <Common::ValidationStateInput
+        <Boxel::Input::ValidationState
           @state={{this.urlValidationState}}
           @value={{this.subdomain}}
           @onInput={{this.onSubdomainInput}}
           @errorMessage={{this.urlValidationMessage}}
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          {{on "blur" this.validateUrl}}
+          @onBlur={{this.validateUrl}}
         />
       </div>
       <div class="card-space-url-form__domain">

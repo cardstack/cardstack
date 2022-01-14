@@ -1,23 +1,22 @@
 {
   "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
     "declaration": true,
+    "typeRoots": ["node_modules/@types", "types"],
     "esModuleInterop": true,
-    "module": "es6",
-    "moduleResolution": "Node",
-    "pretty": true,
-    "target": "ES6",
-    "strict": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "allowUnreachableCode": false,
+    "strict": true,
     "noUnusedLocals": true,
+    "resolveJsonModule": true,
     "noUnusedParameters": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "paths": {
+      "web3-provider-engine": ["../../types/web3-provider-engine"]
+    }
   },
 }

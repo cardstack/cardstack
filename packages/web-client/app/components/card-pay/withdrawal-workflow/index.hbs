@@ -1,4 +1,4 @@
-{{#if this.workflow}}
+{{#unless this.isInitializing}}
   <WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}} @onClose={{@onClose}}>
     <:before-content>
       <Boxel::ExpandableBanner
@@ -15,7 +15,7 @@
       </Boxel::ExpandableBanner>
     </:before-content>
   </WorkflowThread>
-{{/if}}
+{{/unless}}
 
 <Listener
   @emitter={{this.layer1Network}}

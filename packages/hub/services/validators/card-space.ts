@@ -99,8 +99,14 @@ export default class CardSpaceValidator {
       }
     }
 
-    if (cardSpace.profileCategory && cardSpace.profileCategory.length > MAX_SHORT_FIELD_LENGTH) {
-      errors.profileCategory.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    if (cardSpace.profileCategory) {
+      if (cardSpace.profileCategory.length > MAX_SHORT_FIELD_LENGTH) {
+        errors.profileCategory.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+      }
+
+      if (this.reservedWords.isProfane(cardSpace.profileCategory)) {
+        errors.profileCategory.push('Category is not allowed');
+      }
     }
 
     if (cardSpace.url) {

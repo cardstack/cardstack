@@ -1,0 +1,20 @@
+<Boxel::RadioInput::Container
+  @groupDescription={{@groupDescription}}
+  @disabled={{@disabled}}
+  @spacing={{@spacing}}
+  @orientation={{or @orientation "horizontal"}}
+  ...attributes
+>
+  {{#each @items as |item i|}}
+    {{yield (hash
+      component=(component "boxel/radio-input/item"
+        name=@name
+        disabled=@disabled
+        hideRadio=@hideRadio
+        hideBorder=@hideBorder
+        checked=(if @checkedId (eq @checkedId item.id))
+      )
+      data=item
+      index=i)}}
+  {{/each}}
+</Boxel::RadioInput::Container>

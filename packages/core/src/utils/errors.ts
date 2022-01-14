@@ -18,6 +18,11 @@ export class CardstackError extends Error {
   isCardstackError: true = true;
   additionalErrors: (CardstackError | Error)[] | null = null;
 
+  // If this error originated from a row in the search index that has stored
+  // `compilerErrors`, this propagates forward the card URLs that were
+  // dependencies of the failed compile.
+  deps?: string[];
+
   constructor(detail: string, { status, title, source }: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;
@@ -32,6 +37,17 @@ export class CardstackError extends Error {
       code: this.status,
       source: this.source,
     };
+  }
+
+  static fromSerializableError(err: any): any {
+    if (!err || typeof err !== 'object' || !isCardstackError(err)) {
+      return err;
+    }
+    let result = new this(err.detail, { status: err.status, title: err.title, source: err.source });
+    if (err.additionalErrors) {
+      result.additionalErrors = err.additionalErrors.map((inner) => this.fromSerializableError(inner));
+    }
+    return result;
   }
 }
 
@@ -64,6 +80,22 @@ export function printCompilerError(err: any) {
   return `${err.message}\n\n${err.stack}`;
 }
 
+export function isCardstackError(err: any): err is CardstackError {
+  return err != null && typeof err === 'object' && err.isCardstackError;
+}
+
 function isAcceptableError(err: any) {
-  return err.isCardError || err.code === 'BABEL_PARSE_ERROR';
+  return err.isCardstackError || err.code === 'BABEL_PARSE_ERROR';
+}
+
+export function serializableError(err: any): any {
+  if (!err || typeof err !== 'object' || !isCardstackError(err)) {
+    // rely on the best-effort serialization that we'll get from, for example,
+    // "pg" as it puts this object into jsonb
+    return err;
+  }
+
+  let result = Object.assign({}, err);
+  result.additionalErrors = result.additionalErrors?.map((inner) => serializableError(inner)) ?? null;
+  return result;
 }
