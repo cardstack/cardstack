@@ -35,9 +35,13 @@ These correspond to roughly one month, two days, and one and a half hours of blo
 
 ### Exporting data
 
-To export the data for all config files, run
+To export the data for all config files on a regular schedule, run
 
     python export.py
 
 You can specify the database string, config locations and the output location if required (see the `--help` for more information).
-Locations can be cloud or local.
+Locations can be cloud or local. It will default to a log level of INFO but can be changed with the LOGLEVEL environment variable.
+
+This will start an infinite loop running all the config files in the config directory, each set to run twice per minimum partition size if it's partitioned on `block_number`, assuming each block takes 5s. If no duration is identified it will run once per hour.
+
+The timing is not exact, as they will run sequentially, and it will not run faster than once per 10s.
