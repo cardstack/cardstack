@@ -19,7 +19,6 @@ import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import { CardEnv } from '@cardstack/core/src/interfaces';
-import { cardURL } from '@cardstack/core/src/utils';
 import CardModelForHub from '../lib/card-model-for-hub';
 
 // This is a placeholder because we haven't built out different per-user
@@ -51,7 +50,7 @@ export class CardService {
   async load(cardURL: string): Promise<Card> {
     log.trace('load', cardURL);
     let deserializer = new RawCardDeserializer();
-    let result = await this.loadCardFromDB('SELECT compiled, "compileErrors", deps from cards where url = $1', cardURL);
+    let result = await this.loadCardFromDB(['compiled'], cardURL);
     let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
     if (!compiled) {
       throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
@@ -65,19 +64,21 @@ export class CardService {
   async loadData(cardURL: string, format: Format): Promise<CardModel> {
     log.trace('load', cardURL);
 
-    let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
-      cardURL
-    );
+    let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
     return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
   }
 
-  private async loadCardFromDB(query: string, cardURL: string): Promise<Record<string, any>> {
+  private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
     let db = await this.db.getPool();
+    let _columns = [...new Set([...columns, 'compileErrors', 'deps'])].map(
+      // add double quotes to deal with mixed case columns and commas separators
+      (c, index, all) => `"${c}"${index !== all.length - 1 ? ',' : ''}`
+    );
+    let expression: Expression = ['select', ..._columns, 'from cards where url =', param(cardURL)];
     try {
       let {
         rows: [result],
-      } = await db.query(query, [cardURL]);
+      } = await db.query(expressionToSql(expression));
       if (!result) {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
@@ -120,11 +121,11 @@ export class CardService {
     rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
     format: Format
   ): Promise<CardModel> {
-    let { raw } = await this.create(rawData);
-    let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
-      cardURL(raw)
-    );
+    let {
+      compiled: { url },
+    } = await this.create(rawData);
+    let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], url);
+
     return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
   }
 
@@ -165,6 +166,9 @@ export class CardService {
     });
   }
 
+  // TODO  I think we can refactor this out, the CardModelForHub already has a
+  // hub environment specific implementation so there probably isn't a reason to
+  // have a separate object that holds environment implementation.
   private cardEnv(): CardEnv {
     return {
       load: this.loadData.bind(this),

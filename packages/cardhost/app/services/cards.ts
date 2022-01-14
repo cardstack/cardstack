@@ -117,6 +117,9 @@ export default class Cards extends Service {
     return cardURL.startsWith(this.localRealmURL);
   }
 
+  // TODO  I think we can refactor this out, the CardModelForBrowser already has a
+  // browser environment specific implementation so there probably isn't a reason to
+  // have a separate object that holds environment implementation.
   private cardEnv(): CardEnv {
     return {
       load: this.load.bind(this),
