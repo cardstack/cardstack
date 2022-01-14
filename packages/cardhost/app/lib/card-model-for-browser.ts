@@ -6,15 +6,16 @@ import {
   Saved,
   ResourceObject,
   assertDocumentDataIsResource,
-  CompiledCard,
-  ComponentInfo,
-  RawCard,
-  Format,
   CardContent,
-} from './interfaces';
+  CardModel,
+} from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import { deserializeAttributes, serializeAttributes, serializeResource } from './serializers';
+import {
+  deserializeAttributes,
+  serializeAttributes,
+  serializeResource,
+} from '@cardstack/core/src/serializers';
 
 export interface NewCardParams {
   realm: string;
@@ -29,32 +30,35 @@ export interface CreatedState {
   serializerMap: SerializerMap;
 }
 
-export interface ClientLoadedState {
-  type: 'client-loaded';
+export interface LoadedState {
+  type: 'loaded';
   url: string;
   serializerMap: SerializerMap;
   rawServerResponse: ResourceObject<Saved>;
   innerComponent: unknown;
   deserialized: boolean;
-  original: CardModel | undefined; // This looks unused? Can we remove?
+  original: CardModel | undefined;
 }
 
-interface HubLoadedState {
-  type: 'hub-loaded';
-  url: string;
-  format: Format;
-  serializerMap: SerializerMap;
-  rawData: NonNullable<RawCard['data']>;
-  schemaModule: CompiledCard['schemaModule']['global'];
-  componentModule: ComponentInfo['moduleName']['global'];
-  usedFields: ComponentInfo['usedFields'];
-}
-
-export default class CardModel {
+export default class CardModelForBrowser implements CardModel {
   setters: Setter;
   private declare _data: any;
+  private state: CreatedState | LoadedState;
+  private wrapperComponent: unknown | undefined;
 
-  private constructor(private cards: CardEnv, private state: CreatedState | ClientLoadedState | HubLoadedState) {
+  constructor(
+    private cards: CardEnv,
+    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>
+  ) {
+    if (state.type == 'created') {
+      this.state = state;
+    } else {
+      this.state = {
+        ...state,
+        deserialized: false,
+        original: undefined,
+      };
+    }
     this.setters = this.makeSetter();
     let prop = cards.tracked(this, '_data', {
       enumerable: true,
@@ -66,41 +70,11 @@ export default class CardModel {
     }
   }
 
-  static fromResponse(
-    cards: CardEnv,
-    cardResponse: ResourceObject,
-    innerComponent: unknown,
-    serializerMap: SerializerMap
-  ): CardModel {
-    return new this(cards, {
-      type: 'client-loaded',
-      url: cardResponse.id,
-      rawServerResponse: cloneDeep(cardResponse),
-      deserialized: false,
-      original: undefined,
-      innerComponent,
-      serializerMap,
-    });
-  }
-
-  static fromDatabase(cards: CardEnv, format: Format, result: Record<string, any>): CardModel {
-    return new this(cards, {
-      type: 'hub-loaded',
-      url: result.url,
-      format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      serializerMap: result.componentInfos[format].serializerMap,
-    });
-  }
-
   adoptIntoRealm(realm: string): CardModel {
-    if (this.state.type !== 'client-loaded') {
+    if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    return new (this.constructor as typeof CardModel)(this.cards, {
+    return new (this.constructor as typeof CardModelForBrowser)(this.cards, {
       type: 'created',
       realm,
       parentCardURL: this.state.url,
@@ -110,9 +84,6 @@ export default class CardModel {
   }
 
   get innerComponent(): unknown {
-    if (this.state.type === 'hub-loaded') {
-      throw new Error('Hub does not have use of innerComponent');
-    }
     return this.state.innerComponent;
   }
 
@@ -122,30 +93,36 @@ export default class CardModel {
 
   get url(): string {
     if (this.state.type === 'created') {
-      throw new Error(`bug: card in state ${this.state.type} does not have a url`);
+      throw new Error(
+        `bug: card in state ${this.state.type} does not have a url`
+      );
     }
     return this.state.url;
   }
 
   async editable(): Promise<CardModel> {
-    if (this.state.type !== 'client-loaded') {
+    if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);
     }
-    let editable = await this.cards.load(this.state.url, 'edit');
-    (editable.state as ClientLoadedState).original = this;
+    let editable = (await this.cards.load(
+      this.state.url,
+      'edit'
+    )) as CardModelForBrowser;
+    (editable.state as LoadedState).original = this;
     return editable;
   }
 
   get data(): any {
     switch (this.state.type) {
-      case 'client-loaded':
+      case 'loaded':
         if (!this.state.deserialized) {
-          this._data = deserializeAttributes(this.state.rawServerResponse.attributes, this.serializerMap);
+          this._data = deserializeAttributes(
+            this.state.rawServerResponse.attributes,
+            this.serializerMap
+          );
           this.state.deserialized = true;
         }
         return this._data;
-      case 'hub-loaded':
-        return this.state.rawData;
       case 'created':
         return this._data;
       default:
@@ -159,24 +136,15 @@ export default class CardModel {
    * and other TBD methods instead of this.
    */
   get cardContent(): CardContent {
-    if (this.state.type === 'created' || this.state.type === 'client-loaded') {
-      throw new Error('Dont use this right now');
-    }
-    return {
-      data: this.state.rawData,
-      schemaModule: this.state.schemaModule,
-      usedFields: this.state.usedFields,
-      componentModule: this.state.componentModule,
-      url: this.state.url,
-      format: this.state.format,
-    };
+    throw new Error('Dont use this right now');
   }
-
-  private wrapperComponent: unknown | undefined;
 
   get component(): unknown {
     if (!this.wrapperComponent) {
-      this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
+      this.wrapperComponent = this.cards.prepareComponent(
+        this,
+        this.innerComponent
+      );
     }
     return this.wrapperComponent;
   }
@@ -235,7 +203,7 @@ export default class CardModel {
           },
         });
         break;
-      case 'client-loaded':
+      case 'loaded':
         original = this.state.original;
         response = await this.cards.send({
           update: {
@@ -246,8 +214,6 @@ export default class CardModel {
           },
         });
         break;
-      case 'hub-loaded':
-        throw new Error('unimplemented');
       default:
         throw assertNever(this.state);
     }
@@ -258,7 +224,7 @@ export default class CardModel {
     let { serializerMap, innerComponent } = this.state;
 
     this.state = {
-      type: 'client-loaded',
+      type: 'loaded',
       url: data.id,
       rawServerResponse: cloneDeep(data),
       deserialized: false,

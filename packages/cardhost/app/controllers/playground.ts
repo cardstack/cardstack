@@ -1,4 +1,4 @@
-import CardModel from '@cardstack/core/src/card-model';
+import { CardModel } from '@cardstack/core/src/interfaces';
 import Controller from '@ember/controller';
 import { inject } from '@ember/service';
 import { tracked } from '@glimmer/tracking';

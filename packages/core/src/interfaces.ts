@@ -1,6 +1,5 @@
 import * as JSON from 'json-typescript';
 import difference from 'lodash/difference';
-import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
 
 export { Query } from './query';
@@ -187,6 +186,25 @@ export interface CardContent {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
+}
+
+export interface CardModel {
+  setters: Setter | undefined;
+  adoptIntoRealm: (realm: string) => CardModel;
+  editable: () => Promise<CardModel>;
+  innerComponent: unknown;
+  serializerMap: SerializerMap;
+  url: string;
+  data: any;
+  component: unknown;
+  save: () => Promise<void>;
+
+  /**
+   * @deprecated temporary scaffolding until card-service's CardContent => CardModel
+   * refactor complete. Consumers of CardModel should be refactored to use `data`
+   * and other TBD methods instead of this.
+   */
+  cardContent: CardContent;
 }
 
 export interface RealmConfig {

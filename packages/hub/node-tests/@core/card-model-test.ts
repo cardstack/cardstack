@@ -2,18 +2,16 @@
 import { parse, isSameDay } from 'date-fns';
 import { expect } from 'chai';
 
-import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
-import CardModel from '@cardstack/core/src/card-model';
-import { CardOperation, JSONAPIDocument, Format, Saved } from '@cardstack/core/src/interfaces';
+import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
+import { CardOperation, JSONAPIDocument, Format, Saved, CardModel } from '@cardstack/core/src/interfaces';
 import { cardURL } from '@cardstack/core/src/utils';
+import { configureHubWithCompiler } from '../helpers/cards';
+import merge from 'lodash/merge';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
-
-const serializerMap = {
-  date: ['birthdate', 'address.settlementDate'],
-};
 
 let attributes = {
   name: 'Bob Barker',
@@ -23,17 +21,6 @@ let attributes = {
     city: 'Los Angeles',
     state: 'CA',
     settlementDate: '1990-01-01',
-  },
-};
-
-let cardJSONResponse = {
-  data: {
-    id: cardURL(PERSON_RAW_CARD),
-    type: 'card',
-    attributes,
-    meta: {
-      componentModule: '',
-    },
   },
 };
 
@@ -51,22 +38,57 @@ class StubCards {
     return desc;
   }
 }
-const fakeComponent: unknown = {};
 
 if (process.env.COMPILER) {
-  describe('CardModel', function () {
+  describe('CardModelForHub', function () {
+    let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
+    let cardDBResult: Record<string, any>;
+
+    this.beforeEach(async function () {
+      let dbManager = await getContainer().lookup('database-manager');
+      let db = await dbManager.getClient();
+
+      await cards.create(ADDRESS_RAW_CARD);
+      await cards.create(
+        merge({}, PERSON_RAW_CARD, {
+          files: {
+            // make sure to use the birthdate and address fields
+            'isolated.js': templateOnlyComponentTemplate(
+              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/><@fields.birthdate/><@fields.address/></div>`,
+              { IsolatedStyles: './isolated.css' }
+            ),
+          },
+        })
+      );
+      await cards.create({
+        id: 'bob-barker',
+        realm: realmURL,
+        adoptsFrom: '../person',
+        data: attributes,
+      });
+
+      let {
+        rows: [result],
+      } = await db.query(
+        'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
+        [`${realmURL}bob-barker`]
+      );
+      cardDBResult = result;
+    });
+
     it('.data', async function () {
       let stub = new StubCards();
-      let model = CardModel.fromResponse(stub, cardJSONResponse.data, fakeComponent, serializerMap);
+      let model = cards.makeCardModelFromDatabase(stub, 'isolated', cardDBResult);
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);
       expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
     });
 
-    it('.serialize', async function () {
+    // Add this back in after we implement CardModelForHub.save()
+    it.skip('.serialize', async function () {
       let stub = new StubCards();
-      let model = CardModel.fromResponse(stub, cardJSONResponse.data, fakeComponent, serializerMap);
+      let model = cards.makeCardModelFromDatabase(stub, 'isolated', cardDBResult);
 
       await model.save();
       let op = stub.lastOp;

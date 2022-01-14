@@ -7,11 +7,11 @@ import {
   JSONAPIDocument,
   Query,
   ResourceObject,
+  CardModel,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
   SerializerMap,
 } from '@cardstack/core/src/interfaces';
-import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -24,6 +24,8 @@ import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 import { buildQueryString } from '@cardstack/core/src/query';
+import CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
+import { cloneDeep } from 'lodash';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -45,8 +47,13 @@ export default class Cards extends Service {
     let { data } = cardResponse;
     assertDocumentDataIsResource(data);
 
-    let { component, Model, serializerMap } = await this.codeForCard(data);
-    return Model.fromResponse(this.cardEnv(), data, component, serializerMap);
+    let { component, serializerMap } = await this.codeForCard(data);
+    return this.makeCardModelFromResponse(
+      this.cardEnv(),
+      data,
+      component,
+      serializerMap
+    );
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -58,8 +65,13 @@ export default class Cards extends Service {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      let { component, Model, serializerMap } = await this.codeForCard(data);
-      return Model.fromResponse(this.cardEnv(), data, component, serializerMap);
+      let { component, serializerMap } = await this.codeForCard(data);
+      return this.makeCardModelFromResponse(
+        this.cardEnv(),
+        data,
+        component,
+        serializerMap
+      );
     }
   }
 
@@ -75,10 +87,8 @@ export default class Cards extends Service {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        let { component, Model, serializerMap } = await this.codeForCard(
-          cardResponse
-        );
-        return Model.fromResponse(
+        let { component, serializerMap } = await this.codeForCard(cardResponse);
+        return this.makeCardModelFromResponse(
           this.cardEnv(),
           cardResponse,
           component,
@@ -86,6 +96,21 @@ export default class Cards extends Service {
         );
       })
     );
+  }
+
+  makeCardModelFromResponse(
+    cards: CardEnv,
+    cardResponse: ResourceObject,
+    innerComponent: unknown,
+    serializerMap: SerializerMap
+  ): CardModel {
+    return new CardModelForBrowser(cards, {
+      type: 'loaded',
+      url: cardResponse.id,
+      rawServerResponse: cloneDeep(cardResponse),
+      innerComponent,
+      serializerMap,
+    });
   }
 
   private inLocalRealm(cardURL: string): boolean {
@@ -197,7 +222,6 @@ export default class Cards extends Service {
 
   private async codeForCard(card: ResourceObject): Promise<{
     component: unknown;
-    Model: typeof CardModel;
     serializerMap: SerializerMap;
   }> {
     let componentModule = card.meta?.componentModule;
@@ -209,12 +233,10 @@ export default class Cards extends Service {
     }
     let module = await this.loadModule<{
       default: unknown;
-      Model: typeof CardModel;
       serializerMap: SerializerMap;
     }>(componentModule);
     return {
       component: module.default,
-      Model: module.Model,
       serializerMap: module.serializerMap,
     };
   }

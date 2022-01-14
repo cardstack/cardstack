@@ -1,4 +1,3 @@
-import CardModel from '@cardstack/core/src/card-model';
 import {
   CompiledCard,
   Format,
@@ -8,6 +7,7 @@ import {
   CardId,
   JSONAPIDocument,
   assertDocumentDataIsResource,
+  CardModel,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';

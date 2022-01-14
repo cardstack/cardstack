@@ -1,4 +1,4 @@
-import { Card, CompiledCard, Unsaved, RawCard, CardContent, Format } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard, CardContent, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -19,8 +19,8 @@ import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import { CardEnv } from '@cardstack/core/src/interfaces';
-import CardModel from '@cardstack/core/src/card-model';
 import { cardURL } from '@cardstack/core/src/utils';
+import CardModelForHub from '../lib/card-model-for-hub';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -66,10 +66,10 @@ export class CardService {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors" from cards where url = $1',
+      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
       cardURL
     );
-    return await CardModel.fromDatabase(this.cardEnv(), format, result);
+    return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
   }
 
   private async loadCardFromDB(query: string, cardURL: string): Promise<Record<string, any>> {
@@ -122,10 +122,10 @@ export class CardService {
   ): Promise<CardModel> {
     let { raw } = await this.create(rawData);
     let result = await this.loadCardFromDB(
-      'SELECT url, data, "schemaModule", "componentInfos" from cards where url = $1',
+      'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
       cardURL(raw)
     );
-    return await CardModel.fromDatabase(this.cardEnv(), format, result);
+    return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
   }
 
   async updateData(
@@ -144,14 +144,25 @@ export class CardService {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return Promise.all(
-        result.rows.map((row) => {
-          return CardModel.fromDatabase(this.cardEnv(), format, row);
-        })
-      );
+      return result.rows.map((row) => {
+        return this.makeCardModelFromDatabase(this.cardEnv(), format, row);
+      });
     } finally {
       client.release();
     }
+  }
+
+  makeCardModelFromDatabase(cards: CardEnv, format: Format, result: Record<string, any>): CardModel {
+    return new CardModelForHub(cards, {
+      type: 'loaded',
+      url: result.url,
+      format,
+      rawData: result.data ?? {},
+      schemaModule: result.schemaModule,
+      usedFields: result.componentInfos[format].usedFields,
+      componentModule: result.componentInfos[format].moduleName.global,
+      serializerMap: result.componentInfos[format].serializerMap,
+    });
   }
 
   private cardEnv(): CardEnv {

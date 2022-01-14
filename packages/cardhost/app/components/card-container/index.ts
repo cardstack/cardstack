@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { inject } from '@ember/service';
 import ModalService from 'cardhost/services/modal';
 import type RouterService from '@ember/routing/router-service';
-import CardModel from '@cardstack/core/src/card-model';
+import { CardModel } from '@cardstack/core/src/interfaces';
 import { LOCAL_REALM, DEMO_REALM } from 'cardhost/lib/builder';
 import './index.css';
 

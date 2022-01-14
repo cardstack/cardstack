@@ -5,9 +5,8 @@ import type RouterService from '@ember/routing/router-service';
 
 import { task } from 'ember-concurrency';
 
-import CardModel from '@cardstack/core/src/card-model';
 import CardsService from './cards';
-import { Format } from '@cardstack/core/src/interfaces';
+import { Format, CardModel } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
 
 type State =
