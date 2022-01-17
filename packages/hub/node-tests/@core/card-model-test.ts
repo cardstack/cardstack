@@ -77,18 +77,42 @@ if (process.env.COMPILER) {
     });
 
     it('.data', async function () {
-      let stub = new StubCards();
-      let model = cards.makeCardModelFromDatabase(stub, 'isolated', cardDBResult);
+      let model = cards.makeCardModelFromDatabase('isolated', cardDBResult);
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);
       expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
     });
 
+    it('.url on new card throws error', async function () {
+      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
+      let model = parentCard.adoptIntoRealm(realmURL);
+      try {
+        model.url;
+        throw new Error('did not throw expected error');
+      } catch (e: any) {
+        expect(e.message).to.equal(`bug: card in state created does not have a url`);
+      }
+    });
+
+    it('.save() new card', async function () {
+      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
+      let model = parentCard.adoptIntoRealm(realmURL);
+      model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
+      expect(model.data.address.settlementDate instanceof Date).to.be.true;
+      expect(isSameDay(model.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      await model.save();
+
+      let kirito = await cards.loadData(model.url, 'isolated');
+      expect(kirito.data.name).to.equal('Kirito');
+      expect(kirito.data.address.settlementDate instanceof Date).to.be.true;
+      expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+    });
+
     // Add this back in after we implement CardModelForHub.save()
     it.skip('.serialize', async function () {
       let stub = new StubCards();
-      let model = cards.makeCardModelFromDatabase(stub, 'isolated', cardDBResult);
+      let model = cards.makeCardModelFromDatabase('isolated', cardDBResult);
 
       await model.save();
       let op = stub.lastOp;

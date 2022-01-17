@@ -8,6 +8,7 @@ import {
   assertDocumentDataIsResource,
   CardContent,
   CardModel,
+  RawCardData,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
@@ -81,6 +82,10 @@ export default class CardModelForBrowser implements CardModel {
       innerComponent: this.innerComponent,
       serializerMap: this.serializerMap,
     });
+  }
+
+  setData(_data: RawCardData) {
+    throw new Error('unimplemented');
   }
 
   get innerComponent(): unknown {

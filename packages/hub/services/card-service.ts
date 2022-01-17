@@ -18,7 +18,6 @@ import {
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
-import { CardEnv } from '@cardstack/core/src/interfaces';
 import CardModelForHub from '../lib/card-model-for-hub';
 
 // This is a placeholder because we haven't built out different per-user
@@ -65,7 +64,7 @@ export class CardService {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
+    return this.makeCardModelFromDatabase(format, result);
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -117,6 +116,8 @@ export class CardService {
     await this.searchIndex.deleteCard(raw);
   }
 
+  // Question for Ed: as we are refactoring to use CardModel as primary
+  // interface, do we still need these card service data mutators?
   async createData(
     rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
     format: Format
@@ -124,9 +125,10 @@ export class CardService {
     let {
       compiled: { url },
     } = await this.create(rawData);
+    // TODO don't make an extra query here--create a mechanism to build a CardModel from a RawCard/CompiledCard
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], url);
 
-    return this.makeCardModelFromDatabase(this.cardEnv(), format, result);
+    return this.makeCardModelFromDatabase(format, result);
   }
 
   async updateData(
@@ -146,15 +148,15 @@ export class CardService {
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return result.rows.map((row) => {
-        return this.makeCardModelFromDatabase(this.cardEnv(), format, row);
+        return this.makeCardModelFromDatabase(format, row);
       });
     } finally {
       client.release();
     }
   }
 
-  makeCardModelFromDatabase(cards: CardEnv, format: Format, result: Record<string, any>): CardModel {
-    return new CardModelForHub(cards, {
+  makeCardModelFromDatabase(format: Format, result: Record<string, any>): CardModel {
+    return new CardModelForHub(this, {
       type: 'loaded',
       url: result.url,
       format,
@@ -164,24 +166,6 @@ export class CardService {
       componentModule: result.componentInfos[format].moduleName.global,
       serializerMap: result.componentInfos[format].serializerMap,
     });
-  }
-
-  // TODO  I think we can refactor this out, the CardModelForHub already has a
-  // hub environment specific implementation so there probably isn't a reason to
-  // have a separate object that holds environment implementation.
-  private cardEnv(): CardEnv {
-    return {
-      load: this.loadData.bind(this),
-      send() {
-        throw new Error('TODO: We should be using cardEnv.send in this environment');
-      },
-      prepareComponent() {
-        // Intentionally a noop for now
-      },
-      tracked(_target: CardModel, _prop: string, _desc: PropertyDescriptor) {
-        // Intentionally a noop for now
-      },
-    };
   }
 
   /**

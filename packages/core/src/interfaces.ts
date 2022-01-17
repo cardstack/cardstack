@@ -47,6 +47,8 @@ export interface CardId {
   id: string;
 }
 
+export type RawCardData = Record<string, any>;
+
 // RawCard represents the card "as authored". Nothing is preprocessed or
 // compiled, no other dependent data is included, no derived state is present.
 export interface RawCard<Identity extends Unsaved = Saved> {
@@ -68,7 +70,7 @@ export interface RawCard<Identity extends Unsaved = Saved> {
   files?: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
-  data?: Record<string, any> | undefined;
+  data?: RawCardData | undefined;
 }
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -196,6 +198,7 @@ export interface CardModel {
   serializerMap: SerializerMap;
   url: string;
   data: any;
+  setData: (data: RawCardData) => void;
   component: unknown;
   save: () => Promise<void>;
 

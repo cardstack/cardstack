@@ -1,14 +1,16 @@
 import {
   CardModel,
   SerializerMap,
-  CardEnv,
   CompiledCard,
   ComponentInfo,
   RawCard,
   Format,
   CardContent,
+  RawCardData,
 } from '@cardstack/core/src/interfaces';
-import { deserializeAttributes } from '@cardstack/core/src/serializers';
+import { deserializeAttributes, serializeAttributes } from '@cardstack/core/src/serializers';
+import { CardService } from '../services/card-service';
+import cloneDeep from 'lodash/cloneDeep';
 // import { tracked } from '@glimmer/tracking';
 
 export interface NewCardParams {
@@ -19,8 +21,10 @@ export interface NewCardParams {
 export interface CreatedState {
   type: 'created';
   realm: string;
+  id?: string;
   parentCardURL: string;
   serializerMap: SerializerMap;
+  deserialized: boolean;
 }
 
 interface LoadedState {
@@ -41,7 +45,7 @@ export default class CardModelForHub implements CardModel {
   private _data: any;
   private state: CreatedState | LoadedState;
 
-  constructor(private cards: CardEnv, state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
+  constructor(private cardService: CardService, state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
     if (state.type == 'created') {
       this.state = state;
     } else {
@@ -53,15 +57,17 @@ export default class CardModelForHub implements CardModel {
     }
   }
 
-  adoptIntoRealm(realm: string): CardModel {
+  adoptIntoRealm(realm: string, id?: string): CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    return new (this.constructor as typeof CardModelForHub)(this.cards, {
+    return new (this.constructor as typeof CardModelForHub)(this.cardService, {
       type: 'created',
       realm,
+      id,
       parentCardURL: this.state.url,
       serializerMap: this.serializerMap,
+      deserialized: true,
     });
   }
 
@@ -81,27 +87,20 @@ export default class CardModelForHub implements CardModel {
   }
 
   async editable(): Promise<CardModel> {
-    if (this.state.type !== 'loaded') {
-      throw new Error(`tried to derive an editable card from an unsaved card`);
-    }
-    let editable = (await this.cards.load(this.state.url, 'edit')) as CardModelForHub;
-    (editable.state as LoadedState).original = this;
-    return editable;
+    throw new Error('Hub does not have use of editable');
+  }
+
+  setData(data: RawCardData): void {
+    this._data = data;
+    this.state.deserialized = true;
   }
 
   get data(): any {
-    switch (this.state.type) {
-      case 'loaded':
-        if (!this.state.deserialized) {
-          this._data = deserializeAttributes(this.state.rawData, this.serializerMap);
-          this.state.deserialized = true;
-        }
-        return this._data;
-      case 'created':
-        throw new Error('unimplemented');
-      default:
-        throw assertNever(this.state);
+    if (!this.state.deserialized && this.state.type === 'loaded') {
+      this._data = deserializeAttributes(this.state.rawData, this.serializerMap);
+      this.state.deserialized = true;
     }
+    return this._data;
   }
 
   /**
@@ -123,17 +122,39 @@ export default class CardModelForHub implements CardModel {
     };
   }
 
-  private wrapperComponent: unknown | undefined;
-
   get component(): unknown {
-    if (!this.wrapperComponent) {
-      this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
-    }
-    return this.wrapperComponent;
+    throw new Error('Hub does not have use of component');
   }
 
   async save(): Promise<void> {
-    throw new Error('unimplemented');
+    switch (this.state.type) {
+      case 'created':
+        {
+          let { raw, compiled } = await this.cardService.create({
+            id: this.state.id,
+            realm: this.state.realm,
+            adoptsFrom: this.state.parentCardURL,
+            data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
+          });
+          this.state = {
+            type: 'loaded',
+            format: 'isolated',
+            url: compiled.url,
+            serializerMap: compiled['isolated'].serializerMap,
+            rawData: raw.data ?? {},
+            schemaModule: compiled.schemaModule.global,
+            componentModule: compiled['isolated'].moduleName.global,
+            usedFields: compiled['isolated'].usedFields,
+            original: undefined,
+            deserialized: false,
+          };
+        }
+        break;
+      case 'loaded':
+        throw new Error('unimplemented');
+      default:
+        throw assertNever(this.state);
+    }
   }
 }
 
