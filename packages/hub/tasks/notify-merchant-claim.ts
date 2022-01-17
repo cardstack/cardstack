@@ -114,6 +114,9 @@ export default class NotifyMerchantClaim {
         }),
         pushClientId,
         notificationBody,
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
       };
 

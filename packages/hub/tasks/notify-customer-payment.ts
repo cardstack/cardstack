@@ -137,6 +137,7 @@ export default class NotifyCustomerPayment {
     let spendAmount = result.spendAmount;
     let notificationBody = `${merchantName} received a payment of §${spendAmount}`;
     let notificationData = {
+      notificationType: 'customer_payment',
       transactionInformation: JSON.stringify(omit(result, 'merchant')),
     };
 
