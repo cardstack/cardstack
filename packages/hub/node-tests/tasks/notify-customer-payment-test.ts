@@ -115,6 +115,7 @@ describe('NotifyCustomerPaymentTask', function () {
       },
     };
     const mockNotificationData = {
+      notificationType: 'customer_payment',
       transactionInformation: JSON.stringify({
         id: 'the-transaction-hash',
         timestamp: '1641555875',
@@ -213,6 +214,7 @@ describe('NotifyCustomerPaymentTask', function () {
       },
     };
     const mockNotificationData = {
+      notificationType: 'customer_payment',
       transactionInformation: JSON.stringify({
         id: 'the-transaction-hash',
         timestamp: '1641555875',
@@ -308,6 +310,7 @@ describe('NotifyCustomerPaymentTask', function () {
       },
     };
     const mockNotificationData = {
+      notificationType: 'customer_payment',
       transactionInformation: JSON.stringify({
         id: 'the-transaction-hash',
         timestamp: '1641555875',
