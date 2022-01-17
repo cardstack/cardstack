@@ -13,6 +13,7 @@
       {{#if this.safe}}
         <ActionCardContainer::Section
           @title="Remaining Balance"
+          {{did-insert this.layer2Network.refreshSafesAndBalances}}
         >
           <CardPay::FieldStack>
             <CardPay::LabeledValue
