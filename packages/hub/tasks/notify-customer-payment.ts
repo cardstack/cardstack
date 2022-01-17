@@ -136,6 +136,7 @@ export default class NotifyCustomerPayment {
 
     let spendAmount = result.spendAmount;
     let notificationBody = `${merchantName} received a payment of §${spendAmount}`;
+    let notificationData = omit(result, 'merchant');
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
@@ -148,7 +149,7 @@ export default class NotifyCustomerPayment {
         pushClientId,
         notificationBody,
         notificationType: 'customer_payment',
-        notificationData: omit(result, 'merchant'),
+        notificationData,
       };
       await this.workerClient.addJob('send-notifications', notification, {
         jobKey: notification.notificationId,
