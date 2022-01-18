@@ -5,12 +5,17 @@ import {
   ComponentInfo,
   RawCard,
   Format,
+  ResourceObject,
+  Saved,
+  Unsaved,
   CardContent,
   RawCardData,
 } from '@cardstack/core/src/interfaces';
-import { deserializeAttributes, serializeAttributes } from '@cardstack/core/src/serializers';
+import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
 import { CardService } from '../services/card-service';
 import cloneDeep from 'lodash/cloneDeep';
+import merge from 'lodash/merge';
+import { cardURL } from '@cardstack/core/src/utils';
 // import { tracked } from '@glimmer/tracking';
 
 export interface NewCardParams {
@@ -29,7 +34,8 @@ export interface CreatedState {
 
 interface LoadedState {
   type: 'loaded';
-  url: string;
+  id: string;
+  realm: string;
   format: Format;
   serializerMap: SerializerMap;
   rawData: NonNullable<RawCard['data']>;
@@ -61,11 +67,13 @@ export default class CardModelForHub implements CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
+    // assert the card is in isolated format, and then the used fields for the
+    // new card are the same as the used fields for the parent card. Now we have usedFields for cards in a 'created' state...
     return new (this.constructor as typeof CardModelForHub)(this.cardService, {
       type: 'created',
       realm,
       id,
-      parentCardURL: this.state.url,
+      parentCardURL: this.url,
       serializerMap: this.serializerMap,
       deserialized: true,
     });
@@ -83,7 +91,14 @@ export default class CardModelForHub implements CardModel {
     if (this.state.type === 'created') {
       throw new Error(`bug: card in state ${this.state.type} does not have a url`);
     }
-    return this.state.url;
+    return cardURL(this.state);
+  }
+
+  get format(): Format {
+    if (this.state.type === 'created') {
+      return 'isolated';
+    }
+    return this.state.format;
   }
 
   async editable(): Promise<CardModel> {
@@ -117,7 +132,7 @@ export default class CardModelForHub implements CardModel {
       schemaModule: this.state.schemaModule,
       usedFields: this.state.usedFields,
       componentModule: this.state.componentModule,
-      url: this.state.url,
+      url: this.url,
       format: this.state.format,
     };
   }
@@ -126,35 +141,61 @@ export default class CardModelForHub implements CardModel {
     throw new Error('Hub does not have use of component');
   }
 
+  serialize(): ResourceObject<Saved | Unsaved> {
+    if (this.state.type === 'created') {
+      throw new Error('unimplemented');
+    }
+    let { usedFields, componentModule } = this.state;
+    let resource = serializeResource(
+      'card',
+      this.url,
+      serializeAttributes(cloneDeep(this.data), this.serializerMap),
+      usedFields
+    );
+    resource.meta = merge(
+      {
+        componentModule,
+      },
+      resource.meta
+    );
+    return resource;
+  }
+
   async save(): Promise<void> {
+    let raw: RawCard, compiled: CompiledCard;
     switch (this.state.type) {
       case 'created':
-        {
-          let { raw, compiled } = await this.cardService.create({
-            id: this.state.id,
-            realm: this.state.realm,
-            adoptsFrom: this.state.parentCardURL,
-            data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
-          });
-          this.state = {
-            type: 'loaded',
-            format: 'isolated',
-            url: compiled.url,
-            serializerMap: compiled['isolated'].serializerMap,
-            rawData: raw.data ?? {},
-            schemaModule: compiled.schemaModule.global,
-            componentModule: compiled['isolated'].moduleName.global,
-            usedFields: compiled['isolated'].usedFields,
-            original: undefined,
-            deserialized: false,
-          };
-        }
+        ({ raw, compiled } = await this.cardService.create({
+          id: this.state.id,
+          realm: this.state.realm,
+          adoptsFrom: this.state.parentCardURL,
+          data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
+        }));
         break;
       case 'loaded':
-        throw new Error('unimplemented');
+        // TODO let's use a bifurcated indexer so that we don't need to perform an unnecessary compile
+        ({ raw, compiled } = await this.cardService.update({
+          id: this.state.id,
+          realm: this.state.realm,
+          data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
+        }));
+        break;
       default:
         throw assertNever(this.state);
     }
+    this.state = {
+      type: 'loaded',
+      format: this.format,
+      id: raw.id,
+      realm: raw.realm,
+      serializerMap: compiled['isolated'].serializerMap,
+      rawData: raw.data ?? {},
+      schemaModule: compiled.schemaModule.global,
+      componentModule: compiled['isolated'].moduleName.global,
+      usedFields: compiled['isolated'].usedFields,
+      original: undefined,
+      deserialized: false,
+    };
   }
 }
 

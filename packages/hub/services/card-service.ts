@@ -125,16 +125,18 @@ export class CardService {
     let {
       compiled: { url },
     } = await this.create(rawData);
-    // TODO don't make an extra query here--create a mechanism to build a CardModel from a RawCard/CompiledCard
+    // TODO don't make an extra query here--create a mechanism to build a
+    // CardModel from a RawCard/CompiledCard. currently an example of this is in
+    // the CardModelForHub.save()
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], url);
 
     return this.makeCardModelFromDatabase(format, result);
   }
 
-  async updateData(
-    partialRawData: Pick<RawCard, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
-    format: Format
-  ): Promise<CardContent> {
+  async updateData(partialRawData: Pick<RawCard, 'id' | 'realm' | 'data'>, format: Format): Promise<CardContent> {
+    // TODO don't recompile the card--only data is changing. This will require
+    // bifurcating the indexer so that we can pass in only data to re-index a
+    // card that already exists
     let { raw, compiled } = await this.update(partialRawData);
     return this.contentFromCompiled(raw, compiled, format);
   }
@@ -156,9 +158,11 @@ export class CardService {
   }
 
   makeCardModelFromDatabase(format: Format, result: Record<string, any>): CardModel {
+    let cardId = this.realmManager.parseCardURL(result.url);
     return new CardModelForHub(this, {
       type: 'loaded',
-      url: result.url,
+      id: cardId.id,
+      realm: cardId.realm,
       format,
       rawData: result.data ?? {},
       schemaModule: result.schemaModule,

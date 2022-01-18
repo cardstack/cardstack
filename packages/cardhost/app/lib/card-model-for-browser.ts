@@ -4,11 +4,13 @@ import {
   Setter,
   CardEnv,
   Saved,
+  Unsaved,
   ResourceObject,
   assertDocumentDataIsResource,
   CardContent,
   CardModel,
   RawCardData,
+  Format,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
@@ -33,6 +35,7 @@ export interface CreatedState {
 
 export interface LoadedState {
   type: 'loaded';
+  format: Format;
   url: string;
   serializerMap: SerializerMap;
   rawServerResponse: ResourceObject<Saved>;
@@ -103,6 +106,13 @@ export default class CardModelForBrowser implements CardModel {
       );
     }
     return this.state.url;
+  }
+
+  get format(): Format {
+    if (this.state.type === 'created') {
+      return 'isolated';
+    }
+    return this.state.format;
   }
 
   async editable(): Promise<CardModel> {
@@ -191,6 +201,10 @@ export default class CardModelForBrowser implements CardModel {
     return s;
   }
 
+  serialize(): ResourceObject<Saved | Unsaved> {
+    throw new Error('unimplemented');
+  }
+
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
@@ -203,6 +217,7 @@ export default class CardModelForBrowser implements CardModel {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
             payload: {
+              // TODO use this.serialize
               data: serializeResource('card', undefined, attributes),
             },
           },
@@ -214,6 +229,7 @@ export default class CardModelForBrowser implements CardModel {
           update: {
             cardURL: this.state.url,
             payload: {
+              // TODO use this.serialize
               data: serializeResource('card', this.state.url, attributes),
             },
           },
@@ -230,6 +246,7 @@ export default class CardModelForBrowser implements CardModel {
 
     this.state = {
       type: 'loaded',
+      format: this.format,
       url: data.id,
       rawServerResponse: cloneDeep(data),
       deserialized: false,

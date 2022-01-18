@@ -3,17 +3,17 @@ import { parse, isSameDay } from 'date-fns';
 import { expect } from 'chai';
 
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
-import { CardOperation, JSONAPIDocument, Format, Saved, CardModel } from '@cardstack/core/src/interfaces';
-import { cardURL } from '@cardstack/core/src/utils';
 import { configureHubWithCompiler } from '../helpers/cards';
 import merge from 'lodash/merge';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
+import cloneDeep from 'lodash/cloneDeep';
+import set from 'lodash/set';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
 
-let attributes = {
+let attributes: Record<string, any> = {
   name: 'Bob Barker',
   birthdate: '1923-12-12',
   address: {
@@ -24,23 +24,8 @@ let attributes = {
   },
 };
 
-class StubCards {
-  lastOp: CardOperation | undefined;
-  async load(_url: string, _format: Format): Promise<CardModel> {
-    throw new Error('unimplemented');
-  }
-  async send(op: CardOperation): Promise<JSONAPIDocument<Saved>> {
-    this.lastOp = op;
-    return { data: { type: 'cards', id: 'x' } };
-  }
-  prepareComponent() {}
-  tracked(_target: CardModel, _prop: string, desc: PropertyDescriptor) {
-    return desc;
-  }
-}
-
 if (process.env.COMPILER) {
-  describe('CardModelForHub', function () {
+  describe.only('CardModelForHub', function () {
     let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
     let cardDBResult: Record<string, any>;
 
@@ -51,11 +36,15 @@ if (process.env.COMPILER) {
       await cards.create(ADDRESS_RAW_CARD);
       await cards.create(
         merge({}, PERSON_RAW_CARD, {
+          embedded: 'embedded.js',
           files: {
             // make sure to use the birthdate and address fields
             'isolated.js': templateOnlyComponentTemplate(
-              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/><@fields.birthdate/><@fields.address/></div>`,
-              { IsolatedStyles: './isolated.css' }
+              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/><@fields.birthdate/><@fields.address/></div>`
+            ),
+            // address field is not used in the embedded view
+            'embedded.js': templateOnlyComponentTemplate(
+              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/><@fields.birthdate/></div>`
             ),
           },
         })
@@ -95,7 +84,7 @@ if (process.env.COMPILER) {
       }
     });
 
-    it('.save() new card', async function () {
+    it('.save() created card', async function () {
       let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
       let model = parentCard.adoptIntoRealm(realmURL);
       model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
@@ -109,23 +98,85 @@ if (process.env.COMPILER) {
       expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
     });
 
-    // Add this back in after we implement CardModelForHub.save()
-    it.skip('.serialize', async function () {
-      let stub = new StubCards();
-      let model = cards.makeCardModelFromDatabase('isolated', cardDBResult);
+    it('.save() loaded card - isolated', async function () {
+      let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      model.setData({ name: 'Robert Barker' });
+      await model.save();
+
+      expect(model.format).to.equal('isolated');
+      expect(model.data.name).to.equal('Robert Barker');
+      expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
+
+      model.setData({ birthdate: p('2022-02-22') });
+
+      expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
 
       await model.save();
-      let op = stub.lastOp;
-      if (!op || !('update' in op)) {
-        throw new Error(`did not find create operation`);
-      }
-      expect(op.update.payload, 'A model can be serialized once instantiated').to.deep.equal({
-        data: {
-          id: cardURL(PERSON_RAW_CARD),
-          type: 'card',
-          attributes,
-        },
+
+      expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+
+      let savedModel = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      expect(savedModel.data.name).to.equal('Robert Barker');
+      expect(isSameDay(savedModel.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      let embedded = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      expect(embedded.data.name).to.equal('Robert Barker');
+      expect(isSameDay(embedded.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+    });
+
+    it('.save() loaded card - embedded', async function () {
+      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      model.setData({ name: 'Robert Barker' });
+      await model.save();
+
+      expect(model.data.name).to.equal('Robert Barker');
+      expect(model.format).to.equal('embedded');
+
+      let savedModel = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      expect(savedModel.data.name).to.equal('Robert Barker');
+      let isolated = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      expect(isolated.data.name).to.equal('Robert Barker');
+    });
+
+    it.skip('setData of unused field', async function () {
+      // Should we throw? the expectation is that we are only invalidating used
+      // fields, and things that depend on used fields. Setting data on a unused
+      // field may break the assumptions of the whoever is using this.
+    });
+
+    it('.serialize isolated card', async function () {
+      let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      let result = model.serialize();
+
+      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/isolated-');
+      delete result.meta;
+
+      let expectedAttributes = cloneDeep(attributes);
+      set(expectedAttributes, 'address.zip', null);
+
+      expect(result).to.deep.equal({
+        id: `${realmURL}bob-barker`,
+        type: 'card',
+        attributes: expectedAttributes,
       });
     });
+
+    it('.serialize embedded card', async function () {
+      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      let result = model.serialize();
+
+      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/embedded-');
+      delete result.meta;
+
+      let expectedAttributes = cloneDeep(attributes);
+      delete expectedAttributes.address;
+
+      expect(result).to.deep.equal({
+        id: `${realmURL}bob-barker`,
+        type: 'card',
+        attributes: expectedAttributes,
+      });
+    });
+
+    it('.serialize card model in created state');
   });
 }

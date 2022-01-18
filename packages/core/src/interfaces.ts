@@ -198,7 +198,9 @@ export interface CardModel {
   serializerMap: SerializerMap;
   url: string;
   data: any;
+  format: Format;
   setData: (data: RawCardData) => void;
+  serialize: () => ResourceObject<Saved | Unsaved>;
   component: unknown;
   save: () => Promise<void>;
 
