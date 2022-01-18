@@ -202,6 +202,7 @@ export interface CardModel {
   setData: (data: RawCardData) => void;
   serialize: () => ResourceObject<Saved | Unsaved>;
   component: unknown;
+  usedFields: ComponentInfo['usedFields'];
   save: () => Promise<void>;
 
   /**

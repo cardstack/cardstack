@@ -177,6 +177,20 @@ if (process.env.COMPILER) {
       });
     });
 
-    it('.serialize card model in created state');
+    it('.serialize card model in created state', async function () {
+      let parent = await cards.loadData(`${realmURL}person`, 'isolated');
+      let model = parent.adoptIntoRealm(realmURL);
+      model.setData(attributes);
+      let result = model.serialize();
+
+      let expectedAttributes = cloneDeep(attributes);
+      set(expectedAttributes, 'address.zip', null);
+
+      expect(result).to.deep.equal({
+        id: undefined,
+        type: 'card',
+        attributes: expectedAttributes,
+      });
+    });
   });
 }

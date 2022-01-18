@@ -11,6 +11,7 @@ import {
   CardModel,
   RawCardData,
   Format,
+  ComponentInfo,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
@@ -203,6 +204,12 @@ export default class CardModelForBrowser implements CardModel {
 
   serialize(): ResourceObject<Saved | Unsaved> {
     throw new Error('unimplemented');
+  }
+
+  get usedFields(): ComponentInfo['usedFields'] {
+    // the server just gives the browser whatever fields are appropriate for the
+    // format and the browser just has to accept that
+    throw new Error('used fields are not supported in browser');
   }
 
   async save(): Promise<void> {

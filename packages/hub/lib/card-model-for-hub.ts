@@ -29,6 +29,7 @@ export interface CreatedState {
   id?: string;
   parentCardURL: string;
   serializerMap: SerializerMap;
+  usedFields: ComponentInfo['usedFields'];
   deserialized: boolean;
 }
 
@@ -67,12 +68,14 @@ export default class CardModelForHub implements CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    // assert the card is in isolated format, and then the used fields for the
-    // new card are the same as the used fields for the parent card. Now we have usedFields for cards in a 'created' state...
+    if (this.format !== 'isolated') {
+      throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
+    }
     return new (this.constructor as typeof CardModelForHub)(this.cardService, {
       type: 'created',
       realm,
       id,
+      usedFields: this.usedFields,
       parentCardURL: this.url,
       serializerMap: this.serializerMap,
       deserialized: true,
@@ -99,6 +102,10 @@ export default class CardModelForHub implements CardModel {
       return 'isolated';
     }
     return this.state.format;
+  }
+
+  get usedFields(): ComponentInfo['usedFields'] {
+    return this.state.usedFields;
   }
 
   async editable(): Promise<CardModel> {
@@ -143,7 +150,12 @@ export default class CardModelForHub implements CardModel {
 
   serialize(): ResourceObject<Saved | Unsaved> {
     if (this.state.type === 'created') {
-      throw new Error('unimplemented');
+      return serializeResource(
+        'card',
+        undefined,
+        serializeAttributes(cloneDeep(this.data), this.serializerMap),
+        this.usedFields
+      );
     }
     let { usedFields, componentModule } = this.state;
     let resource = serializeResource(
