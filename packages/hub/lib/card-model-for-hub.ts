@@ -198,17 +198,21 @@ export default class CardModelForHub implements CardModel {
         }));
         break;
       case 'loaded':
-        let original = await this.env.loadData(this.url, this.format);
-        let updatedData = merge(
-          {
-            id: this.state.id,
-            realm: this.state.realm,
-          },
-          { data: original.data },
-          { data: this.data }
-        );
-        raw = await this.env.realmManager.update(updatedData);
-        compiled = await this.env.searchIndex.indexData(raw);
+        {
+          let original = await this.env.loadData(this.url, this.format);
+          let updatedRawCard = merge(
+            {
+              id: this.state.id,
+              realm: this.state.realm,
+            },
+            { data: original.data },
+            { data: this.data }
+          );
+
+          serializeAttributes(updatedRawCard.data, this.serializerMap);
+          raw = await this.env.realmManager.update(updatedRawCard);
+          compiled = await this.env.searchIndex.indexData(raw);
+        }
         break;
       default:
         throw assertNever(this.state);

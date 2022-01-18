@@ -326,30 +326,23 @@ class IndexerRun implements IndexerHandle {
   private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
-    let {
-      rows: [result],
-    } = await this.db.query('select compiled from cards where url = $1', [url]);
-    if (!result) {
-      throw new Error(`Could not find compiled card for url ${url}`);
-    }
-    let compiledCard = result as CompiledCard;
-    await this.db.query(
-      expressionToSql([
-        'update cards set generation =',
-        param(this.generation || null),
-        'data =',
-        param(rawCard.data ?? null),
-        'raw =',
-        param(new RawCardSerializer().serialize(rawCard)),
-        'searchData =',
-        param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
-        'where url =',
-        param(url),
-      ])
-    );
+    let compiled = await this.builder.getCompiledCard(url);
+    let sql = expressionToSql([
+      'UPDATE cards SET generation =',
+      param(this.generation || null),
+      ', data =',
+      param(rawCard.data ?? null),
+      ', raw =',
+      param(new RawCardSerializer().serialize(rawCard)),
+      ', "searchData" =',
+      param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+      'WHERE url =',
+      param(url),
+    ]);
+    await this.db.query(sql);
 
     this.touched.set(url, this.touchCounter++);
-    return compiledCard;
+    return compiled;
   }
 
   private async saveErrorState(card: RawCard, err: any, compiler: Compiler): Promise<void> {
