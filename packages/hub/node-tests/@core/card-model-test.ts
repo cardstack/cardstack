@@ -98,7 +98,7 @@ if (process.env.COMPILER) {
       expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
     });
 
-    it('.save() loaded card - isolated', async function () {
+    it.only('.save() loaded card - isolated', async function () {
       let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
       model.setData({ name: 'Robert Barker' });
       await model.save();
@@ -118,6 +118,8 @@ if (process.env.COMPILER) {
       let savedModel = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
       expect(savedModel.data.name).to.equal('Robert Barker');
       expect(isSameDay(savedModel.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      // fields that were not specified in setData should be unchanged
+      expect(savedModel.data.address.city).to.equal('Los Angeles');
       let embedded = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
       expect(embedded.data.name).to.equal('Robert Barker');
       expect(isSameDay(embedded.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
@@ -191,6 +193,8 @@ if (process.env.COMPILER) {
         type: 'card',
         attributes: expectedAttributes,
       });
+
+      // do we want to also include the meta.componentModule in this state?
     });
   });
 }

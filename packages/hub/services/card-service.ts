@@ -1,4 +1,4 @@
-import { Card, CompiledCard, Unsaved, RawCard, CardContent, Format, CardModel } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
@@ -133,13 +133,17 @@ export class CardService {
     return this.makeCardModelFromDatabase(format, result);
   }
 
-  async updateData(partialRawData: Pick<RawCard, 'id' | 'realm' | 'data'>, format: Format): Promise<CardContent> {
-    // TODO don't recompile the card--only data is changing. This will require
-    // bifurcating the indexer so that we can pass in only data to re-index a
-    // card that already exists
-    let { raw, compiled } = await this.update(partialRawData);
-    return this.contentFromCompiled(raw, compiled, format);
-  }
+  // Same question for Ed as above: do we really even want this here? probably
+  // for updating data consumers should be using the card model.
+
+  // async updateData(patchedData: Pick<RawCard, 'id' | 'realm' | 'data'>, format: Format): Promise<CardModel> {
+  //   let original = await this.loadData(cardURL(patchedData), format);
+  //   let updatedData = merge({}, { data: original.data }, patchedData);
+  //   let raw = await this.realmManager.update(updatedData);
+  //   let compiled = await this.searchIndex.indexData(raw);
+
+  //   return this.makeCardModelFromCard(format, { raw, compiled });
+  // }
 
   async query(format: Format, query: Query): Promise<CardModel[]> {
     let client = await this.db.getPool();
@@ -159,32 +163,25 @@ export class CardService {
 
   makeCardModelFromDatabase(format: Format, result: Record<string, any>): CardModel {
     let cardId = this.realmManager.parseCardURL(result.url);
-    return new CardModelForHub(this, {
-      type: 'loaded',
-      id: cardId.id,
-      realm: cardId.realm,
-      format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      serializerMap: result.componentInfos[format].serializerMap,
-    });
-  }
-
-  /**
-   * @deprecated Functions needing this method should be updated to use more
-   * optimized queries. Look at the loadData function for how
-   */
-  private contentFromCompiled(raw: RawCard, compiled: CompiledCard, format: Format): CardContent {
-    return {
-      data: raw.data ?? {},
-      schemaModule: compiled.schemaModule.global,
-      usedFields: compiled[format].usedFields,
-      componentModule: compiled[format].moduleName.global,
-      url: compiled.url,
-      format,
-    };
+    return new CardModelForHub(
+      {
+        create: this.create.bind(this),
+        loadData: this.loadData.bind(this),
+        realmManager: this.realmManager,
+        searchIndex: this.searchIndex,
+      },
+      {
+        type: 'loaded',
+        id: cardId.id,
+        realm: cardId.realm,
+        format,
+        rawData: result.data ?? {},
+        schemaModule: result.schemaModule,
+        usedFields: result.componentInfos[format].usedFields,
+        componentModule: result.componentInfos[format].moduleName.global,
+        serializerMap: result.componentInfos[format].serializerMap,
+      }
+    );
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {

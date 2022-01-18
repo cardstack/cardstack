@@ -120,6 +120,13 @@ export class SearchIndex {
     });
   }
 
+  async indexData(raw: RawCard): Promise<CompiledCard> {
+    log.trace('indexData', cardURL(raw));
+    return await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.internalSaveData(raw);
+    });
+  }
+
   private async runIndexing<Out>(realmURL: string, fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
@@ -263,6 +270,11 @@ class IndexerRun implements IndexerHandle {
     return await this.writeToIndex(rawCard, definedCard, compiler);
   }
 
+  // used directly by the hub when mutating card data only
+  async internalSaveData(rawCard: RawCard): Promise<CompiledCard> {
+    return await this.writeDataToIndex(rawCard);
+  }
+
   private define(cardURL: string, localPath: string, type: string, source: string): string {
     switch (type) {
       case JS_TYPE:
@@ -307,6 +319,35 @@ class IndexerRun implements IndexerHandle {
     });
 
     await this.db.query(expressionToSql(expression));
+    this.touched.set(url, this.touchCounter++);
+    return compiledCard;
+  }
+
+  private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
+    let url = cardURL(rawCard);
+    log.trace('Writing card to index', url);
+    let {
+      rows: [result],
+    } = await this.db.query('select compiled from cards where url = $1', [url]);
+    if (!result) {
+      throw new Error(`Could not find compiled card for url ${url}`);
+    }
+    let compiledCard = result as CompiledCard;
+    await this.db.query(
+      expressionToSql([
+        'update cards set generation =',
+        param(this.generation || null),
+        'data =',
+        param(rawCard.data ?? null),
+        'raw =',
+        param(new RawCardSerializer().serialize(rawCard)),
+        'searchData =',
+        param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
+        'where url =',
+        param(url),
+      ])
+    );
+
     this.touched.set(url, this.touchCounter++);
     return compiledCard;
   }

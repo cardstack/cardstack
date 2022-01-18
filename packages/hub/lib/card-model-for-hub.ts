@@ -10,12 +10,14 @@ import {
   Unsaved,
   CardContent,
   RawCardData,
+  Card,
 } from '@cardstack/core/src/interfaces';
 import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
-import { CardService } from '../services/card-service';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
+import RealmManager from '../services/realm-manager';
+import { SearchIndex } from '../services/search-index';
 // import { tracked } from '@glimmer/tracking';
 
 export interface NewCardParams {
@@ -47,12 +49,19 @@ interface LoadedState {
   original: CardModel | undefined;
 }
 
+export interface CardServiceEnv {
+  create: (raw: RawCard<Unsaved>) => Promise<Card>;
+  loadData: (cardURL: string, format: Format) => Promise<CardModel>;
+  realmManager: RealmManager;
+  searchIndex: SearchIndex;
+}
+
 export default class CardModelForHub implements CardModel {
   setters: undefined;
   private _data: any;
   private state: CreatedState | LoadedState;
 
-  constructor(private cardService: CardService, state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
+  constructor(private env: CardServiceEnv, state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
     if (state.type == 'created') {
       this.state = state;
     } else {
@@ -71,7 +80,7 @@ export default class CardModelForHub implements CardModel {
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
     }
-    return new (this.constructor as typeof CardModelForHub)(this.cardService, {
+    return new (this.constructor as typeof CardModelForHub)(this.env, {
       type: 'created',
       realm,
       id,
@@ -112,9 +121,9 @@ export default class CardModelForHub implements CardModel {
     throw new Error('Hub does not have use of editable');
   }
 
-  setData(data: RawCardData): void {
+  setData(data: RawCardData, deserialized = true): void {
     this._data = data;
-    this.state.deserialized = true;
+    this.state.deserialized = deserialized;
   }
 
   get data(): any {
@@ -177,7 +186,11 @@ export default class CardModelForHub implements CardModel {
     let raw: RawCard, compiled: CompiledCard;
     switch (this.state.type) {
       case 'created':
-        ({ raw, compiled } = await this.cardService.create({
+        // TODO: I think we can refactor this so that we use the same logic as
+        // the update case--since we are only changing data we can rely upon our
+        // paren't compiled card instead of having to do a new compile for this
+        // card.
+        ({ raw, compiled } = await this.env.create({
           id: this.state.id,
           realm: this.state.realm,
           adoptsFrom: this.state.parentCardURL,
@@ -185,12 +198,17 @@ export default class CardModelForHub implements CardModel {
         }));
         break;
       case 'loaded':
-        // TODO let's use a bifurcated indexer so that we don't need to perform an unnecessary compile
-        ({ raw, compiled } = await this.cardService.update({
-          id: this.state.id,
-          realm: this.state.realm,
-          data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
-        }));
+        let original = await this.env.loadData(this.url, this.format);
+        let updatedData = merge(
+          {
+            id: this.state.id,
+            realm: this.state.realm,
+          },
+          { data: original.data },
+          { data: this.data }
+        );
+        raw = await this.env.realmManager.update(updatedData);
+        compiled = await this.env.searchIndex.indexData(raw);
         break;
       default:
         throw assertNever(this.state);

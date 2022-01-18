@@ -85,9 +85,11 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    let cardId = this.realmManager.parseCardURL(url);
-    let card = await this.cards.as(INSECURE_CONTEXT).updateData({ ...cardId, data: data.attributes }, 'isolated');
-    ctx.body = serializeCardPayloadForFormat(card);
+    let format = getCardFormatFromRequest(ctx.query.format);
+    let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, format);
+    card.setData(data.attributes);
+    await card.save();
+    ctx.body = { data: card.serialize() };
     ctx.status = 200;
   }
 
