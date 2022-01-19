@@ -845,7 +845,8 @@ CREATE TABLE public.card_spaces (
     donation_suggestion_amount_1 integer,
     donation_suggestion_amount_2 integer,
     donation_suggestion_amount_3 integer,
-    donation_suggestion_amount_4 integer
+    donation_suggestion_amount_4 integer,
+    url text NOT NULL
 );
 
 
@@ -1259,14 +1260,6 @@ ALTER TABLE ONLY public.latest_event_block
 
 
 --
--- Name: merchant_infos merchant_infos_owner_address_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.merchant_infos
-    ADD CONSTRAINT merchant_infos_owner_address_unique UNIQUE (owner_address);
-
-
---
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1382,13 +1375,6 @@ CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_
 --
 
 CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btree (bot_type, status);
-
-
---
--- Name: merchant_infos_owner_address_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX merchant_infos_owner_address_index ON public.merchant_infos USING btree (owner_address);
 
 
 --
@@ -1533,14 +1519,6 @@ ALTER TABLE ONLY public.card_spaces
 
 
 --
--- Name: card_spaces fk_owner_address; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.card_spaces
-    ADD CONSTRAINT fk_owner_address FOREIGN KEY (owner_address) REFERENCES public.merchant_infos(owner_address);
-
-
---
 -- Name: wallet_orders fk_reservation_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1657,7 +1635,6 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 22	20211214163123421_card-index-errors	2022-01-12 15:29:55.727589
 23	20220103201128435_invalidation-ordering	2022-01-12 15:29:55.727589
 24	20220107151914576_rename-beta-testers-table	2022-01-12 15:29:55.727589
-25	20220118195234716_merchant-to-card-space	2022-01-18 16:52:41.019442
 \.
 
 
@@ -1665,7 +1642,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 25, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 26, true);
 
 
 --
