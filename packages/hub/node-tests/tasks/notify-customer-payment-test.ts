@@ -82,21 +82,70 @@ describe('NotifyCustomerPaymentTask', function () {
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
     mockData.value = {
-      prepaidCardOwner: {
-        id: 'prepaid-card-eoa-address',
-      },
+      id: 'the-transaction-hash',
+      timestamp: '1641555875',
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+      issuingTokenUSDPrice: '1',
       merchant: {
         id: 'eoa-address',
       },
       merchantSafe: {
         id: 'merchant-safe-address',
-        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
+        infoDid: 'merchant-did',
+      },
+      prepaidCard: {
+        id: 'prepaid-card-address',
+        customizationDID: 'prepaid-card-did',
+      },
+      transaction: {
+        merchantFeePayments: [
+          {
+            feeCollected: '5000000000000000',
+            issuingToken: {
+              symbol: 'DAI',
+            },
+          },
+        ],
       },
       issuingToken: {
+        id: 'dai-token-address',
+        name: 'Dai Stablecoin.CPXD',
         symbol: 'DAI.CPXD',
       },
-      spendAmount: '2324',
-      issuingTokenAmount: '23240000000000000000',
+    };
+    const mockNotificationData = {
+      notificationType: 'customer_payment',
+      transactionInformation: JSON.stringify({
+        id: 'the-transaction-hash',
+        timestamp: '1641555875',
+        spendAmount: '2324',
+        issuingTokenAmount: '23240000000000000000',
+        issuingTokenUSDPrice: '1',
+        merchantSafe: {
+          id: 'merchant-safe-address',
+          infoDid: 'merchant-did',
+        },
+        prepaidCard: {
+          id: 'prepaid-card-address',
+          customizationDID: 'prepaid-card-did',
+        },
+        transaction: {
+          merchantFeePayments: [
+            {
+              feeCollected: '5000000000000000',
+              issuingToken: {
+                symbol: 'DAI',
+              },
+            },
+          ],
+        },
+        issuingToken: {
+          id: 'dai-token-address',
+          name: 'Dai Stablecoin.CPXD',
+          symbol: 'DAI.CPXD',
+        },
+      }),
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
@@ -110,12 +159,14 @@ describe('NotifyCustomerPaymentTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
+        notificationData: mockNotificationData,
       },
       {
         notificationBody: 'Mandello received a payment of §2324',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',
+        notificationData: mockNotificationData,
       },
     ]);
   });
@@ -130,21 +181,70 @@ describe('NotifyCustomerPaymentTask', function () {
 
     merchantInfoShouldError = true;
     mockData.value = {
-      prepaidCardOwner: {
-        id: 'prepaid-card-eoa-address',
-      },
+      id: 'the-transaction-hash',
+      timestamp: '1641555875',
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+      issuingTokenUSDPrice: '1',
       merchant: {
         id: 'eoa-address',
       },
       merchantSafe: {
         id: 'merchant-safe-address',
-        infoDid: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
+        infoDid: 'merchant-did',
+      },
+      prepaidCard: {
+        id: 'prepaid-card-address',
+        customizationDID: 'prepaid-card-did',
+      },
+      transaction: {
+        merchantFeePayments: [
+          {
+            feeCollected: '5000000000000000',
+            issuingToken: {
+              symbol: 'DAI',
+            },
+          },
+        ],
       },
       issuingToken: {
+        id: 'dai-token-address',
+        name: 'Dai Stablecoin.CPXD',
         symbol: 'DAI.CPXD',
       },
-      spendAmount: '2324',
-      issuingTokenAmount: '23240000000000000000',
+    };
+    const mockNotificationData = {
+      notificationType: 'customer_payment',
+      transactionInformation: JSON.stringify({
+        id: 'the-transaction-hash',
+        timestamp: '1641555875',
+        spendAmount: '2324',
+        issuingTokenAmount: '23240000000000000000',
+        issuingTokenUSDPrice: '1',
+        merchantSafe: {
+          id: 'merchant-safe-address',
+          infoDid: 'merchant-did',
+        },
+        prepaidCard: {
+          id: 'prepaid-card-address',
+          customizationDID: 'prepaid-card-did',
+        },
+        transaction: {
+          merchantFeePayments: [
+            {
+              feeCollected: '5000000000000000',
+              issuingToken: {
+                symbol: 'DAI',
+              },
+            },
+          ],
+        },
+        issuingToken: {
+          id: 'dai-token-address',
+          name: 'Dai Stablecoin.CPXD',
+          symbol: 'DAI.CPXD',
+        },
+      }),
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
@@ -158,12 +258,14 @@ describe('NotifyCustomerPaymentTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
+        notificationData: mockNotificationData,
       },
       {
         notificationBody: 'You received a payment of §2324',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',
+        notificationData: mockNotificationData,
       },
     ]);
 
@@ -176,21 +278,68 @@ describe('NotifyCustomerPaymentTask', function () {
 
   it('omits the merchant name when there is no DID', async function () {
     mockData.value = {
-      prepaidCardOwner: {
-        id: 'prepaid-card-eoa-address',
-      },
+      id: 'the-transaction-hash',
+      timestamp: '1641555875',
+      spendAmount: '2324',
+      issuingTokenAmount: '23240000000000000000',
+      issuingTokenUSDPrice: '1',
       merchant: {
         id: 'eoa-address',
       },
       merchantSafe: {
         id: 'merchant-safe-address',
-        infoDid: undefined,
+      },
+      prepaidCard: {
+        id: 'prepaid-card-address',
+        customizationDID: 'prepaid-card-did',
+      },
+      transaction: {
+        merchantFeePayments: [
+          {
+            feeCollected: '5000000000000000',
+            issuingToken: {
+              symbol: 'DAI',
+            },
+          },
+        ],
       },
       issuingToken: {
+        id: 'dai-token-address',
+        name: 'Dai Stablecoin.CPXD',
         symbol: 'DAI.CPXD',
       },
-      spendAmount: '2324',
-      issuingTokenAmount: '23240000000000000000',
+    };
+    const mockNotificationData = {
+      notificationType: 'customer_payment',
+      transactionInformation: JSON.stringify({
+        id: 'the-transaction-hash',
+        timestamp: '1641555875',
+        spendAmount: '2324',
+        issuingTokenAmount: '23240000000000000000',
+        issuingTokenUSDPrice: '1',
+        merchantSafe: {
+          id: 'merchant-safe-address',
+        },
+        prepaidCard: {
+          id: 'prepaid-card-address',
+          customizationDID: 'prepaid-card-did',
+        },
+        transaction: {
+          merchantFeePayments: [
+            {
+              feeCollected: '5000000000000000',
+              issuingToken: {
+                symbol: 'DAI',
+              },
+            },
+          ],
+        },
+        issuingToken: {
+          id: 'dai-token-address',
+          name: 'Dai Stablecoin.CPXD',
+          symbol: 'DAI.CPXD',
+        },
+      }),
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
@@ -204,12 +353,14 @@ describe('NotifyCustomerPaymentTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
+        notificationData: mockNotificationData,
       },
       {
         notificationBody: 'You received a payment of §2324',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',
+        notificationData: mockNotificationData,
       },
     ]);
   });

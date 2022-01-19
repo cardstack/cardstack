@@ -108,6 +108,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your Mandello business account',
         notificationId: 'sokol::a::123::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '123',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
@@ -115,6 +118,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your Mandello business account',
         notificationId: 'sokol::a::456::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '456',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
@@ -156,6 +162,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::123::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '123',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
@@ -163,6 +172,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::456::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '456',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
@@ -202,6 +214,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::123::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '123',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
@@ -209,6 +224,9 @@ describe('NotifyMerchantClaimTask', function () {
       {
         notificationBody: 'You just claimed 1155 DAI.CPXD from your business account',
         notificationId: 'sokol::a::456::eoa-address',
+        notificationData: {
+          notificationType: 'merchant_claim',
+        },
         notificationType: 'merchant_claim',
         pushClientId: '456',
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
