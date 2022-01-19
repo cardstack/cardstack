@@ -7,7 +7,7 @@ import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
 import { NotFound, CardstackError, isCardstackError, UnprocessableEntity } from '@cardstack/core/src/utils/errors';
 import { parseQueryString } from '@cardstack/core/src/query';
-import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
+import { RawCardSerializer } from '@cardstack/core/src/serializers';
 
 declare global {
   const __non_webpack_require__: any;
@@ -39,14 +39,14 @@ export default class CardRoutes {
 
     let format = getCardFormatFromRequest(ctx.query.format);
     let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, format);
-    ctx.body = serializeCardPayloadForFormat(card.cardContent);
+    ctx.body = { data: card.serialize() };
     ctx.status = 200;
   }
 
   private async queryCards(ctx: RouterContext) {
     let query = parseQueryString(ctx.querystring);
     let cards = await this.cards.as(INSECURE_CONTEXT).query('embedded', query);
-    let collection = cards.map((card) => serializeCardPayloadForFormat(card.cardContent).data);
+    let collection = cards.map((card) => card.serialize());
     ctx.body = { data: collection };
     ctx.status = 200;
   }
@@ -123,7 +123,7 @@ export default class CardRoutes {
     }
 
     let card = await this.cards.as(INSECURE_CONTEXT).loadData(url, 'isolated');
-    ctx.body = serializeCardPayloadForFormat(card.cardContent);
+    ctx.body = { data: card.serialize() };
   }
 
   private async getSource(ctx: RouterContext) {

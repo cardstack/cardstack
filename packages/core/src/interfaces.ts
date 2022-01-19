@@ -204,13 +204,6 @@ export interface CardModel {
   component: unknown;
   usedFields: ComponentInfo['usedFields'];
   save: () => Promise<void>;
-
-  /**
-   * @deprecated temporary scaffolding until card-service's CardContent => CardModel
-   * refactor complete. Consumers of CardModel should be refactored to use `data`
-   * and other TBD methods instead of this.
-   */
-  cardContent: CardContent;
 }
 
 export interface RealmConfig {

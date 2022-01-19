@@ -8,7 +8,6 @@ import {
   ResourceObject,
   Saved,
   Unsaved,
-  CardContent,
   RawCardData,
   Card,
 } from '@cardstack/core/src/interfaces';
@@ -166,25 +165,6 @@ export default class CardModelForHub implements CardModel {
       this.state.deserialized = true;
     }
     return this._data;
-  }
-
-  /**
-   * @deprecated temporary scaffolding until card-service's CardContent => CardModel
-   * refactor complete. Consumers of CardModel should be refactored to use `data`
-   * and other TBD methods instead of this.
-   */
-  get cardContent(): CardContent {
-    if (this.state.type === 'created') {
-      throw new Error('Dont use this right now');
-    }
-    return {
-      data: this.state.rawData,
-      schemaModule: this.state.schemaModule,
-      usedFields: this.state.usedFields,
-      componentModule: this.state.componentModule,
-      url: this.url,
-      format: this.state.format,
-    };
   }
 
   get component(): unknown {

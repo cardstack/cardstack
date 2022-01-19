@@ -7,7 +7,6 @@ import {
   Unsaved,
   ResourceObject,
   assertDocumentDataIsResource,
-  CardContent,
   CardModel,
   RawCardData,
   Format,
@@ -158,15 +157,6 @@ export default class CardModelForBrowser implements CardModel {
       default:
         throw assertNever(this.state);
     }
-  }
-
-  /**
-   * @deprecated temporary scaffolding until card-service's CardContent => CardModel
-   * refactor complete. Consumers of CardModel should be refactored to use `data`
-   * and other TBD methods instead of this.
-   */
-  get cardContent(): CardContent {
-    throw new Error('Dont use this right now');
   }
 
   get component(): unknown {
