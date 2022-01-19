@@ -4,11 +4,71 @@
   data-test-card-space-username-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Pick a username">
+    {{#if @isComplete}}
+      <CardPay::LabeledValue
+        @fieldMode="view"
+        @label="Username"
+        @value={{this.username}}
+        data-test-card-space-username
+      />
+      <CardPay::LabeledValue
+        @fieldMode="view"
+        @label="Profile Picture (Optional)"
+      >
+      {{#if this.profileImage}}
+        <Avatar
+          @src={{this.profileImage}}
+          @alt="Profile"
+          @rounded={{true}}
+          data-test-card-space-avatar
+        />
+      {{else}}
+        No profile picture
+      {{/if}}
+      </CardPay::LabeledValue>
+    {{else}}
+      <CardPay::LabeledValue
+        @fieldMode="edit"
+        @label="Username"
+        data-test-card-space-username-field
+      >
+        <Boxel::Input::ValidationState
+          @state={{this.usernameInputState}}
+          @errorMessage={{this.usernameInputErrorMessage}}
+          @value={{this.username}}
+          @onInput={{this.updateUsername}}
+          data-test-card-space-username-input
+        />
+      </CardPay::LabeledValue>
+      <CardPay::LabeledValue
+        @fieldMode="view"
+        @label="Profile Picture (Optional)"
+      >
+        <ImageUploader
+          @state={{this.imageUploadState}}
+          @errorMessage={{this.imageUploadErrorMessage}}
+          @image={{this.profileImage}}
+          @cta="Select a Photo"
+          @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+          @acceptedFileTypes={{this.acceptedFileTypes}}
+          @onUpload={{this.onUpload}}
+          @onError={{this.logUploadError}}
+          @onRemoveImage={{this.onImageRemoved}}
+          data-test-card-space-image-uploader
+        as |ImageUploaderAvatar|>
+          <ImageUploaderAvatar
+            @alt="Profile"
+            @rounded={{true}}
+            data-test-card-space-image-uploader-avatar
+          />
+        </ImageUploader>
+      </CardPay::LabeledValue>
+      {{/if}}
   </ActionCardContainer::Section>
 
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @disabled={{or @frozen this.disableCompletion}}
   >
     <:default as |d|>
       <d.ActionButton
@@ -21,10 +81,29 @@
     <:memorialized as |m|>
       <m.ActionButton
         data-test-card-space-username-edit-button
-        {{on "click" @onIncomplete}}
+        {{on "click" this.edit}}
       >
         Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>
+
+
+{{#in-element this.imageEditorElement}}
+  <ImageEditor
+    @isOpen={{this.showEditor}}
+    @onClose={{fn (mut this.showEditor) false}}
+    @image={{this.processedImage.preview}}
+    @fileType={{this.processedImage.type}}
+    @width={{this.desiredWidth}}
+    @height={{this.desiredHeight}}
+    @saveImageEditData={{perform this.saveImageEditDataTask}}
+    as |preview|
+  >
+    <CardSpace::ProfileCard
+      @profilePhoto={{preview}}
+      data-test-card-space-profile-card-preview
+    />
+  </ImageEditor>
+{{/in-element}}

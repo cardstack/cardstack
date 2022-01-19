@@ -236,6 +236,7 @@ module('Acceptance | create card space persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT'],
         },
+        username: 'Username',
       });
 
       workflowPersistenceService.persistData('abc123', {
