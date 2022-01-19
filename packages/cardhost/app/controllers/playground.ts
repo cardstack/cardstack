@@ -11,7 +11,7 @@ export default class ApplicationController extends Controller {
   @tracked models: CardModel[] | undefined;
 
   @task async queryUsersTask(): Promise<void> {
-    this.models = await this.cards.query({
+    this.models = await this.cards.query('embedded', {
       filter: { type: 'https://demo.com/user' },
     });
   }

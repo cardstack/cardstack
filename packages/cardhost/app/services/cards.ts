@@ -52,7 +52,8 @@ export default class Cards extends Service {
       this.cardEnv(),
       data,
       component,
-      serializerMap
+      serializerMap,
+      format
     );
   }
 
@@ -70,12 +71,13 @@ export default class Cards extends Service {
         this.cardEnv(),
         data,
         component,
-        serializerMap
+        serializerMap,
+        'isolated'
       );
     }
   }
 
-  async query(query: Query): Promise<CardModel[]> {
+  async query(format: Format, query: Query): Promise<CardModel[]> {
     // if (this.inLocalRealm(url)) {
     //   let builder = await this.builder();
     //   cardResponse = await builder.load(url, format);
@@ -92,7 +94,8 @@ export default class Cards extends Service {
           this.cardEnv(),
           cardResponse,
           component,
-          serializerMap
+          serializerMap,
+          format
         );
       })
     );
@@ -102,7 +105,8 @@ export default class Cards extends Service {
     cards: CardEnv,
     cardResponse: ResourceObject,
     innerComponent: unknown,
-    serializerMap: SerializerMap
+    serializerMap: SerializerMap,
+    format: Format
   ): CardModel {
     return new CardModelForBrowser(cards, {
       type: 'loaded',
@@ -110,6 +114,7 @@ export default class Cards extends Service {
       rawServerResponse: cloneDeep(cardResponse),
       innerComponent,
       serializerMap,
+      format,
     });
   }
 

@@ -65,7 +65,8 @@ module('@core | card-model-for-browser', function (_hooks) {
       stub,
       cardJSONResponse.data,
       fakeComponent,
-      serializerMap
+      serializerMap,
+      'isolated'
     );
     assert.equal(
       model.data.name,
@@ -93,7 +94,8 @@ module('@core | card-model-for-browser', function (_hooks) {
       stub,
       cardJSONResponse.data,
       fakeComponent,
-      serializerMap
+      serializerMap,
+      'isolated'
     );
 
     await model.save();
