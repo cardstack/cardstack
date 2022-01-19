@@ -90,20 +90,25 @@ module('Acceptance | create card space', function (hooks) {
     await click(`[data-test-authentication-button]`);
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
-    // // Username step
+    // // Display name step
     await waitFor(postableSel(1, 3));
-    assert.dom(postableSel(1, 2)).containsText(`Please pick a username`);
-    assert.dom(postableSel(1, 3)).containsText(`Pick a username`);
+    assert.dom(postableSel(1, 2)).containsText(`Please pick a display name`);
+    assert.dom(postableSel(1, 3)).containsText(`Pick a display name`);
 
-    await fillIn('[data-test-card-space-username-input] input', 'Hello there');
+    await fillIn(
+      '[data-test-card-space-display-name-input] input',
+      'Hello there'
+    );
 
-    await waitFor('[data-test-card-space-username-save-button]:not(:disabled)');
+    await waitFor(
+      '[data-test-card-space-display-name-save-button]:not(:disabled)'
+    );
 
-    await click('[data-test-card-space-username-save-button]');
-    assert.dom('[data-test-card-space-username-is-complete]').exists();
+    await click('[data-test-card-space-display-name-save-button]');
+    assert.dom('[data-test-card-space-display-name-is-complete]').exists();
 
     await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText(`Username picked`);
+    assert.dom(milestoneCompletedSel(1)).containsText(`Display name picked`);
 
     // // Milestone 3
     // // Details step
@@ -173,7 +178,7 @@ module('Acceptance | create card space', function (hooks) {
 
     // TODO: fix this assertion after we have fixed the subdomain/business ID
     // things
-    // let spaceHostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
+    // let spaceHostname = `displayNametodo.${config.cardSpaceHostnameSuffix}`;
     // assert
     //   .dom('[data-test-card-space-next-step="visit-space"]')
     //   .hasAttribute('href', new RegExp(spaceHostname.replace(/\./g, '\\.')));
@@ -225,8 +230,8 @@ module('Acceptance | create card space', function (hooks) {
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       await waitFor(postableSel(1, 1));
-      assert.dom(postableSel(1, 0)).containsText(`Please pick a username`);
-      assert.dom(postableSel(1, 1)).containsText(`Pick a username`);
+      assert.dom(postableSel(1, 0)).containsText(`Please pick a display name`);
+      assert.dom(postableSel(1, 1)).containsText(`Pick a display name`);
 
       let workflowPersistenceService = this.owner.lookup(
         'service:workflow-persistence'

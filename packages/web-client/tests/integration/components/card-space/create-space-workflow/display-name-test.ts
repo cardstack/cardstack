@@ -8,21 +8,21 @@ import { setupHubAuthenticationToken } from '@cardstack/web-client/tests/helpers
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { createDepotSafe } from '@cardstack/web-client/utils/test-factories';
 import config from '@cardstack/web-client/config/environment';
-import { IMAGE_EDITOR_ELEMENT_ID } from '@cardstack/web-client/components/card-space/create-space-workflow/username';
+import { IMAGE_EDITOR_ELEMENT_ID } from '@cardstack/web-client/components/card-space/create-space-workflow/display-name';
 import { mockPngUpload } from '@cardstack/web-client/components/image-uploader';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 
-const USERNAME_FIELD = '[data-test-card-space-username-field]';
-const USERNAME = '[data-test-card-space-username]';
-const USERNAME_INPUT = '[data-test-card-space-username-input] input';
+const DISPLAY_NAME_FIELD = '[data-test-card-space-display-name-field]';
+const DISPLAY_NAME = '[data-test-card-space-display-name]';
+const DISPLAY_NAME_INPUT = '[data-test-card-space-display-name-input] input';
 const IMAGE_UPLOADER = '[data-test-card-space-image-uploader]';
 const IMAGE_UPLOADER_ERROR_MESSAGE = '[data-test-image-uploader-error]';
 const IMAGE_UPLOADER_AVATAR =
   '[data-test-card-space-image-uploader-avatar] [data-test-avatar-image]';
 const AVATAR = '[data-test-card-space-avatar] [data-test-avatar-image]';
 const IMAGE_EDITOR_SAVE_BUTTON = '[data-test-image-editor-save-button]';
-const EDIT_BUTTON = '[data-test-card-space-username-edit-button]';
-const SAVE_BUTTON = '[data-test-card-space-username-save-button]';
+const EDIT_BUTTON = '[data-test-card-space-display-name-edit-button]';
+const SAVE_BUTTON = '[data-test-card-space-display-name-save-button]';
 const PROFILE_CARD_PREVIEW = '[data-test-card-space-profile-card-preview]';
 
 const sampleImage =
@@ -31,7 +31,7 @@ const uploadResultImage =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
 module(
-  'Integration | Component | card-space/create-space-workflow/username',
+  'Integration | Component | card-space/create-space-workflow/display-name',
   function (this: MirageTestContext, hooks) {
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -72,7 +72,7 @@ module(
 
     test('it renders the card in its default, empty state', async function (assert) {
       await render(hbs`
-        <CardSpace::CreateSpaceWorkflow::Username
+        <CardSpace::CreateSpaceWorkflow::DisplayName
           @workflowSession={{this.session}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -80,7 +80,7 @@ module(
         />
       `);
 
-      assert.dom(USERNAME_INPUT).hasNoValue();
+      assert.dom(DISPLAY_NAME_INPUT).hasNoValue();
       assert.dom(IMAGE_UPLOADER).exists();
       assert.dom(SAVE_BUTTON).containsText('Continue');
       assert.dom(EDIT_BUTTON).doesNotExist();
@@ -88,12 +88,12 @@ module(
 
     test('it renders the card in a filled in, memorialized state', async function (assert) {
       session.setValue({
-        username: 'monchi',
+        displayName: 'monchi',
         profileImageUrl: sampleImage,
       });
       this.set('isComplete', true);
       await render(hbs`
-        <CardSpace::CreateSpaceWorkflow::Username
+        <CardSpace::CreateSpaceWorkflow::DisplayName
           @workflowSession={{this.session}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -101,19 +101,19 @@ module(
         />
       `);
 
-      assert.dom(USERNAME).containsText('monchi');
+      assert.dom(DISPLAY_NAME).containsText('monchi');
       assert.dom(AVATAR).hasAttribute('src', sampleImage);
       assert.dom(EDIT_BUTTON).containsText('Edit');
 
       // assert that we can get back to an edit state with the appropriate information still there
       await click(EDIT_BUTTON);
-      assert.dom(USERNAME_INPUT).hasValue('monchi');
+      assert.dom(DISPLAY_NAME_INPUT).hasValue('monchi');
       assert.dom(IMAGE_UPLOADER_AVATAR).hasAttribute('src', sampleImage);
       assert.dom(SAVE_BUTTON).exists();
       assert.dom(EDIT_BUTTON).doesNotExist();
     });
 
-    test('it prevents submission of an invalid username', async function (this: MirageTestContext, assert) {
+    test('it prevents submission of an invalid display name', async function (this: MirageTestContext, assert) {
       this.server.post(
         '/card-spaces/validate-profile-name',
         function (_schema, request) {
@@ -129,8 +129,8 @@ module(
               errors: [
                 {
                   status: '422',
-                  title: 'Test invalid username',
-                  detail: 'Test invalid username',
+                  title: 'Test invalid display name',
+                  detail: 'Test invalid display name',
                 },
               ],
             };
@@ -139,7 +139,7 @@ module(
       );
 
       await render(hbs`
-        <CardSpace::CreateSpaceWorkflow::Username
+        <CardSpace::CreateSpaceWorkflow::DisplayName
           @workflowSession={{this.session}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -149,24 +149,24 @@ module(
 
       assert.dom(SAVE_BUTTON).isDisabled();
 
-      await fillIn(USERNAME_INPUT, 'Hello there');
-      assert.dom(USERNAME_INPUT).hasValue('Hello there');
+      await fillIn(DISPLAY_NAME_INPUT, 'Hello there');
+      assert.dom(DISPLAY_NAME_INPUT).hasValue('Hello there');
 
       await waitFor(
-        `${USERNAME_INPUT}[data-test-boxel-input-validation-state="valid"]`
+        `${DISPLAY_NAME_INPUT}[data-test-boxel-input-validation-state="valid"]`
       );
 
       assert.dom(SAVE_BUTTON).isEnabled();
 
-      await fillIn(USERNAME_INPUT, 'Errored');
-      assert.dom(USERNAME_INPUT).hasValue('Errored');
+      await fillIn(DISPLAY_NAME_INPUT, 'Errored');
+      assert.dom(DISPLAY_NAME_INPUT).hasValue('Errored');
 
       await waitFor(
-        `${USERNAME_INPUT}[data-test-boxel-input-validation-state="invalid"]`
+        `${DISPLAY_NAME_INPUT}[data-test-boxel-input-validation-state="invalid"]`
       );
 
       assert.dom(SAVE_BUTTON).isDisabled();
-      assert.dom(USERNAME_FIELD).containsText('Test invalid username');
+      assert.dom(DISPLAY_NAME_FIELD).containsText('Test invalid display name');
     });
 
     test('it can upload an image', async function (this: MirageTestContext, assert) {
@@ -183,7 +183,7 @@ module(
       });
 
       await render(hbs`
-        <CardSpace::CreateSpaceWorkflow::Username
+        <CardSpace::CreateSpaceWorkflow::DisplayName
           @workflowSession={{this.session}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -221,7 +221,7 @@ module(
       });
 
       await render(hbs`
-        <CardSpace::CreateSpaceWorkflow::Username
+        <CardSpace::CreateSpaceWorkflow::DisplayName
           @workflowSession={{this.session}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
