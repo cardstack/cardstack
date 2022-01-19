@@ -7,7 +7,7 @@
     {{#if @isComplete}}
       <CardPay::LabeledValue
         @fieldMode="view"
-        @label="User name"
+        @label="Username"
         @value={{this.username}}
         data-test-card-space-username
       />
@@ -29,7 +29,7 @@
     {{else}}
       <CardPay::LabeledValue
         @fieldMode="edit"
-        @label="User name"
+        @label="Username"
         data-test-card-space-username-field
       >
         <Boxel::Input::ValidationState
