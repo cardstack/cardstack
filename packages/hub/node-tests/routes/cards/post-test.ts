@@ -85,7 +85,7 @@ if (process.env.COMPILER) {
       await getCard(body.data.id).expect(200);
     });
 
-    it('Errors when you provide an ID that alreay exists', async function () {
+    it('Errors when you provide an ID that already exists', async function () {
       await cards.create({
         realm: realmURL,
         id: 'post-is-the-most',

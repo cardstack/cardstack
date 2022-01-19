@@ -116,35 +116,6 @@ export class CardService {
     await this.searchIndex.deleteCard(raw);
   }
 
-  // Question for Ed: as we are refactoring to use CardModel as primary
-  // interface, do we still need these card service data mutators?
-  async createData(
-    rawData: Pick<RawCard<Unsaved>, 'id' | 'realm' | 'adoptsFrom' | 'data'>,
-    format: Format
-  ): Promise<CardModel> {
-    let {
-      compiled: { url },
-    } = await this.create(rawData);
-    // TODO don't make an extra query here--create a mechanism to build a
-    // CardModel from a RawCard/CompiledCard. currently an example of this is in
-    // the CardModelForHub.save()
-    let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], url);
-
-    return this.makeCardModelFromDatabase(format, result);
-  }
-
-  // Same question for Ed as above: do we really even want this here? probably
-  // for updating data consumers should be using the card model.
-
-  // async updateData(patchedData: Pick<RawCard, 'id' | 'realm' | 'data'>, format: Format): Promise<CardModel> {
-  //   let original = await this.loadData(cardURL(patchedData), format);
-  //   let updatedData = merge({}, { data: original.data }, patchedData);
-  //   let raw = await this.realmManager.update(updatedData);
-  //   let compiled = await this.searchIndex.indexData(raw);
-
-  //   return this.makeCardModelFromCard(format, { raw, compiled });
-  // }
-
   async query(format: Format, query: Query): Promise<CardModel[]> {
     let client = await this.db.getPool();
     try {

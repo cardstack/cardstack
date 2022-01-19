@@ -64,6 +64,10 @@ export class Conflict extends CardstackError {
   status = 409;
   title = 'Conflict';
 }
+export class UnprocessableEntity extends CardstackError {
+  status = 422;
+  title = 'Unprocessable Entity';
+}
 
 export function augmentBadRequest(error: any) {
   error.status = 400;

@@ -5,10 +5,9 @@ import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
-import { NotFound, CardstackError } from '@cardstack/core/src/utils/errors';
+import { NotFound, CardstackError, isCardstackError, UnprocessableEntity } from '@cardstack/core/src/utils/errors';
 import { parseQueryString } from '@cardstack/core/src/query';
 import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
-import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 
 declare global {
   const __non_webpack_require__: any;
@@ -60,20 +59,25 @@ export default class CardRoutes {
       params: { parentCardURL, realmURL },
     } = ctx;
 
+    let cardId = data.id ? data.id.slice(realmURL.length) : undefined;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let card: RawCard<Unsaved> = {
-      id: undefined,
-      realm: realmURL,
-      adoptsFrom: parentCardURL,
-      data: data.attributes,
-    };
-    if (data.id) {
-      card.id = data.id.slice(realmURL.length);
+    let parentCard;
+    try {
+      parentCard = await this.cards.as(INSECURE_CONTEXT).loadData(parentCardURL, format);
+    } catch (e) {
+      if (!isCardstackError(e) || e.status !== 404) {
+        throw e;
+      }
+      let noParentError = new UnprocessableEntity(`tried to adopt from card ${parentCardURL} but it failed to load`);
+      noParentError.additionalErrors = [e, ...(e.additionalErrors || [])];
+      throw noParentError;
     }
 
-    let createdCard = await this.cards.as(INSECURE_CONTEXT).createData(card, format);
-    ctx.body = serializeCardPayloadForFormat(createdCard.cardContent);
+    let card = await parentCard.adoptIntoRealm(realmURL, cardId);
+    card.setData(data.attributes);
+    await card.save();
+    ctx.body = { data: card.serialize() };
     ctx.status = 201;
   }
 

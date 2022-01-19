@@ -20,6 +20,8 @@ import {
   serializeAttributes,
   serializeResource,
 } from '@cardstack/core/src/serializers';
+import { cardURL } from '@cardstack/core/src/utils';
+import { Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
 
 export interface NewCardParams {
   realm: string;
@@ -75,10 +77,22 @@ export default class CardModelForBrowser implements CardModel {
     }
   }
 
-  adoptIntoRealm(realm: string): CardModel {
+  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
+    if (id) {
+      try {
+        await this.cards.load(cardURL({ realm, id }), 'isolated');
+        throw new Conflict(`Card ${id} already exists in realm ${realm}`);
+      } catch (e: any) {
+        if (!isCardstackError(e) || e.status !== 404) {
+          throw e;
+        }
+        // we expect a 404 here, so we can continue
+      }
+    }
+
     return new (this.constructor as typeof CardModelForBrowser)(this.cards, {
       type: 'created',
       realm,

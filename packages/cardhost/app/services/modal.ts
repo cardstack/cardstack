@@ -65,7 +65,7 @@ export default class Modal extends Service {
   @task async newCardTask(parentCard: CardModel, realm: string) {
     this.state = { name: 'loading' };
     let editableParent = await parentCard.editable();
-    let loadedCard = editableParent.adoptIntoRealm(realm);
+    let loadedCard = await editableParent.adoptIntoRealm(realm);
     this.state = {
       name: 'loaded',
       loadedCard,

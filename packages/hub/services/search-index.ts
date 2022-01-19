@@ -11,7 +11,7 @@ import {
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { serializableError } from '@cardstack/core/src/utils/errors';
+import { isCardstackError, serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
@@ -326,20 +326,61 @@ class IndexerRun implements IndexerHandle {
   private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
-    let compiled = await this.builder.getCompiledCard(url);
-    let sql = expressionToSql([
-      'UPDATE cards SET generation =',
-      param(this.generation || null),
-      ', data =',
-      param(rawCard.data ?? null),
-      ', raw =',
-      param(new RawCardSerializer().serialize(rawCard)),
-      ', "searchData" =',
-      param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
-      'WHERE url =',
-      param(url),
-    ]);
-    await this.db.query(sql);
+    let compiled;
+    let isNew = false;
+    let deps: string[] | undefined;
+    try {
+      compiled = await this.builder.getCompiledCard(url);
+    } catch (e: any) {
+      if (!rawCard.adoptsFrom || !isCardstackError(e) || e.status !== 404) {
+        throw e;
+      }
+      // this is a new card, in which case we get the compiled card from the
+      // parent. the only remnant of the parent that we need to adjust for our
+      // own compiled is the URL
+      isNew = true;
+      compiled = await this.builder.getCompiledCard(rawCard.adoptsFrom);
+      compiled.url = url;
+      let {
+        rows: [{ deps: result }],
+      } = await this.db.query(expressionToSql(['select deps from cards where url =', param(rawCard.adoptsFrom)]));
+      deps = [...(result as string[]), rawCard.adoptsFrom];
+    }
+
+    let expression: Expression;
+    if (isNew) {
+      if (!deps) {
+        throw new Error('This should never happen');
+      }
+      expression = upsert('cards', 'cards_pkey', {
+        url: param(url),
+        realm: param(this.realmURL),
+        generation: param(this.generation || null),
+        ancestors: param(ancestorsOf(compiled)),
+        data: param(rawCard.data ?? null),
+        raw: param(new RawCardSerializer().serialize(rawCard)),
+        compiled: param(new RawCardSerializer().serialize(rawCard, compiled)),
+        searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        compileErrors: param(null),
+        deps: param([deps]),
+        schemaModule: param(compiled.schemaModule.global),
+        componentInfos: param(getComponentModules(compiled)),
+      });
+    } else {
+      expression = [
+        'UPDATE cards SET generation =',
+        param(this.generation || null),
+        ', data =',
+        param(rawCard.data ?? null),
+        ', raw =',
+        param(new RawCardSerializer().serialize(rawCard)),
+        ', "searchData" =',
+        param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        'WHERE url =',
+        param(url),
+      ];
+    }
+    await this.db.query(expressionToSql(expression));
 
     this.touched.set(url, this.touchCounter++);
     return compiled;

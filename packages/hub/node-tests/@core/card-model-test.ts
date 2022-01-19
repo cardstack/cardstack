@@ -25,7 +25,7 @@ let attributes: Record<string, any> = {
 };
 
 if (process.env.COMPILER) {
-  describe.only('CardModelForHub', function () {
+  describe('CardModelForHub', function () {
     let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
     let cardDBResult: Record<string, any>;
 
@@ -75,7 +75,7 @@ if (process.env.COMPILER) {
 
     it('.url on new card throws error', async function () {
       let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = parentCard.adoptIntoRealm(realmURL);
+      let model = await parentCard.adoptIntoRealm(realmURL);
       try {
         model.url;
         throw new Error('did not throw expected error');
@@ -86,7 +86,7 @@ if (process.env.COMPILER) {
 
     it('.save() created card', async function () {
       let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = parentCard.adoptIntoRealm(realmURL);
+      let model = await parentCard.adoptIntoRealm(realmURL);
       model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
       expect(model.data.address.settlementDate instanceof Date).to.be.true;
       expect(isSameDay(model.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
@@ -98,7 +98,7 @@ if (process.env.COMPILER) {
       expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
     });
 
-    it.only('.save() loaded card - isolated', async function () {
+    it('.save() loaded card - isolated', async function () {
       let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
       model.setData({ name: 'Robert Barker' });
       await model.save();
@@ -139,10 +139,22 @@ if (process.env.COMPILER) {
       expect(isolated.data.name).to.equal('Robert Barker');
     });
 
-    it.skip('setData of unused field', async function () {
-      // Should we throw? the expectation is that we are only invalidating used
-      // fields, and things that depend on used fields. Setting data on a unused
-      // field may break the assumptions of the whoever is using this.
+    // note that we have route tests that also assert that setting values on
+    // non-existent fields should error
+    it('setData of unused field', async function () {
+      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      try {
+        model.setData({
+          name: 'Robert Barker',
+          pizza: 'pepperoni', // non-existent field
+          address: { city: 'New York' }, // unused field
+        });
+        throw new Error('did not throw expected error');
+      } catch (e: any) {
+        expect(e.message).to.equal(
+          `the field(s) 'pizza', 'address.city' are not allowed to be set for the card ${realmURL}bob-barker in format 'embedded'`
+        );
+      }
     });
 
     it('.serialize isolated card', async function () {
@@ -181,7 +193,7 @@ if (process.env.COMPILER) {
 
     it('.serialize card model in created state', async function () {
       let parent = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = parent.adoptIntoRealm(realmURL);
+      let model = await parent.adoptIntoRealm(realmURL);
       model.setData(attributes);
       let result = model.serialize();
 

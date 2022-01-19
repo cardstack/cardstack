@@ -15,9 +15,11 @@ import {
 import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
+import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
 import RealmManager from '../services/realm-manager';
 import { SearchIndex } from '../services/search-index';
+import { BadRequest, Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
 // import { tracked } from '@glimmer/tracking';
 
 export interface NewCardParams {
@@ -73,12 +75,23 @@ export default class CardModelForHub implements CardModel {
     }
   }
 
-  adoptIntoRealm(realm: string, id?: string): CardModel {
+  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
+    }
+    if (id) {
+      try {
+        await this.env.loadData(cardURL({ realm, id }), 'isolated');
+        throw new Conflict(`Card ${id} already exists in realm ${realm}`);
+      } catch (e: any) {
+        if (!isCardstackError(e) || e.status !== 404) {
+          throw e;
+        }
+        // we expect a 404 here, so we can continue
+      }
     }
     return new (this.constructor as typeof CardModelForHub)(this.env, {
       type: 'created',
@@ -122,8 +135,29 @@ export default class CardModelForHub implements CardModel {
   }
 
   setData(data: RawCardData, deserialized = true): void {
+    let nonExistentFields = this.assertFieldsExists(data);
+    if (nonExistentFields.length) {
+      throw new BadRequest(
+        `the field(s) ${nonExistentFields.map((f) => `'${f}'`).join(', ')} are not allowed to be set for the card ${
+          this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
+        } in format '${this.format}'`
+      );
+    }
     this._data = data;
     this.state.deserialized = deserialized;
+  }
+
+  private assertFieldsExists(data: RawCardData, path = ''): string[] {
+    let nonExistentFields: string[] = [];
+    for (let [field, value] of Object.entries(data)) {
+      let fieldPath = path ? `${path}.${field}` : field;
+      if (isPlainObject(value)) {
+        nonExistentFields = [...nonExistentFields, ...this.assertFieldsExists(value, fieldPath)];
+      } else if (!this.usedFields.includes(fieldPath)) {
+        nonExistentFields.push(fieldPath);
+      }
+    }
+    return nonExistentFields;
   }
 
   get data(): any {
@@ -186,16 +220,13 @@ export default class CardModelForHub implements CardModel {
     let raw: RawCard, compiled: CompiledCard;
     switch (this.state.type) {
       case 'created':
-        // TODO: I think we can refactor this so that we use the same logic as
-        // the update case--since we are only changing data we can rely upon our
-        // paren't compiled card instead of having to do a new compile for this
-        // card.
-        ({ raw, compiled } = await this.env.create({
+        raw = await this.env.realmManager.create({
           id: this.state.id,
           realm: this.state.realm,
           adoptsFrom: this.state.parentCardURL,
           data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
-        }));
+        });
+        compiled = await this.env.searchIndex.indexData(raw);
         break;
       case 'loaded':
         {

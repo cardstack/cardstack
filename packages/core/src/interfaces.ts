@@ -192,7 +192,7 @@ export interface Builder {
 
 export interface CardModel {
   setters: Setter | undefined;
-  adoptIntoRealm: (realm: string) => CardModel;
+  adoptIntoRealm: (realm: string, id?: string) => Promise<CardModel>;
   editable: () => Promise<CardModel>;
   innerComponent: unknown;
   serializerMap: SerializerMap;
