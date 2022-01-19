@@ -12,7 +12,6 @@ import { serializeErrors } from './utils/error';
 
 export interface CardSpace {
   id: string;
-  url?: string;
   profileName?: string;
   profileDescription?: string;
   profileCategory?: string;
@@ -56,7 +55,6 @@ export default class CardSpacesRoute {
 
     const cardSpace: CardSpace = {
       id: shortUuid.uuid(),
-      url: this.sanitizeText(ctx.request.body.data.attributes['url']),
       profileName: this.sanitizeText(ctx.request.body.data.attributes['profile-name']),
       profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
       profileCategory: this.sanitizeText(ctx.request.body.data.attributes['profile-category']),
@@ -173,21 +171,6 @@ export default class CardSpacesRoute {
     ctx.status = 200;
     ctx.body = {
       errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/profile-name'),
-    };
-    ctx.type = 'application/vnd.api+json';
-  }
-
-  async postUrlValidation(ctx: Koa.Context) {
-    if (!ensureLoggedIn(ctx)) {
-      return;
-    }
-
-    let url: string = ctx.request.body.data.attributes.url;
-    let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
-
-    ctx.status = 200;
-    ctx.body = {
-      errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/url'),
     };
     ctx.type = 'application/vnd.api+json';
   }

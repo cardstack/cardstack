@@ -2,11 +2,9 @@ import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
-import isValidDomain from 'is-valid-domain';
 import { NestedAttributeError } from '../../routes/utils/error';
 
 export type CardSpaceAttribute =
-  | 'url'
   | 'profileName'
   | 'profileDescription'
   | 'profileButtonText'
@@ -49,7 +47,6 @@ export default class CardSpaceValidator {
 
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
-      url: [],
       profileName: [],
       profileDescription: [],
       profileButtonText: [],
@@ -68,7 +65,6 @@ export default class CardSpaceValidator {
     };
 
     let mandatoryAttributes: CardSpaceAttribute[] = [
-      'url',
       'profileName',
       'profileDescription',
       'profileButtonText',
@@ -107,37 +103,6 @@ export default class CardSpaceValidator {
       if (this.reservedWords.isProfane(cardSpace.profileCategory)) {
         errors.profileCategory.push('Category is not allowed');
       }
-    }
-
-    if (cardSpace.url) {
-      let urlParts = cardSpace.url.split('.');
-      let subdomain = urlParts[0];
-
-      // do basic string and length checks first before falling back to validity test
-      // to catch other vaguer invalid things
-      if (cardSpace.url === '.card.space') {
-        errors.url.push('Please provide a subdomain');
-      } else if (urlParts.length > 3) {
-        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
-      } else if (/[^a-zA-Z0-9-_]/.test(subdomain)) {
-        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
-      } else if (cardSpace.url.startsWith('xn--')) {
-        errors.url.push(`Internationalised domain names are not supported`);
-      } else if (subdomain.length > MAX_SHORT_FIELD_LENGTH) {
-        errors.url.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
-      } else if (!isValidUrl(`https://${cardSpace.url}`) || !isValidDomain(cardSpace.url)) {
-        errors.url.push('URL is not valid');
-      } else if (!new URL(`https://${cardSpace.url}`).hostname.endsWith('card.space')) {
-        errors.url.push('Only valid card.space subdomains are allowed');
-      } else if (this.reservedWords.isReserved(subdomain, this.reservedWords.lowerCaseAlphaNumericTransform)) {
-        errors.url.push('URL unavailable');
-      }
-    }
-
-    let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
-
-    if (cardSpace.id !== cardSpaceWithExistingUrl?.id && cardSpaceWithExistingUrl) {
-      errors.url.push('Already exists');
     }
 
     if (cardSpace.profileImageUrl && !isValidUrl(cardSpace.profileImageUrl!)) {

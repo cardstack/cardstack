@@ -5,7 +5,6 @@ import { buildConditions } from '../../utils/queries';
 
 interface CardSpaceQueriesFilter {
   id?: string;
-  url?: string;
 }
 
 export default class CardSpaceQueries {
@@ -15,10 +14,9 @@ export default class CardSpaceQueries {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO card_spaces (id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      'INSERT INTO card_spaces (id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
       [
         model.id,
-        model.url,
         model.profileName,
         model.profileImageUrl,
         model.profileCoverImageUrl,
@@ -35,7 +33,6 @@ export default class CardSpaceQueries {
 
     await db.query(
       `UPDATE card_spaces SET
-        url = $2,
         profile_name = $3,
         profile_image_url = $4,
         profile_cover_image_url = $5,
@@ -55,7 +52,6 @@ export default class CardSpaceQueries {
       WHERE ID = $1`,
       [
         model.id,
-        model.url,
         model.profileName,
         model.profileImageUrl,
         model.profileCoverImageUrl,
@@ -81,13 +77,12 @@ export default class CardSpaceQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, owner_address FROM card_spaces WHERE ${conditions.where}`;
+    const query = `SELECT id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, owner_address FROM card_spaces WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
       return {
         id: row['id'],
-        url: row['url'],
         profileName: row['profile_name'],
         profileImageUrl: row['profile_profile_image_url'],
         profileCoverImageUrl: row['profile_cover_image_url'],
