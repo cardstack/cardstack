@@ -30,7 +30,7 @@ const FAILURE_REASONS = {
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.conversationalName} wallet`,
-  `Pick username`,
+  `Pick display name`,
   `Save Card Space details`,
   `Create Card Space`,
 ];
@@ -104,14 +104,14 @@ class CreateSpaceWorkflow extends Workflow {
           },
         }),
         new WorkflowMessage({
-          message: `Please pick a username for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
+          message: `Please pick a display name for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
         }),
         new WorkflowCard({
-          cardName: 'CARD_SPACE_USERNAME',
-          componentName: 'card-space/create-space-workflow/username',
+          cardName: 'CARD_SPACE_DISPLAY_NAME',
+          componentName: 'card-space/create-space-workflow/display-name',
         }),
       ],
-      completedDetail: `Username picked`,
+      completedDetail: `Display name picked`,
     }),
     new Milestone({
       title: MILESTONE_TITLES[2],

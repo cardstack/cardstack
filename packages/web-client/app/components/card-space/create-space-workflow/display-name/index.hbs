@@ -1,15 +1,15 @@
 <ActionCardContainer
   @header="User Profile"
   @isComplete={{@isComplete}}
-  data-test-card-space-username-is-complete={{@isComplete}}
+  data-test-card-space-display-name-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Pick a username">
+  <ActionCardContainer::Section @title="Pick a display name">
     {{#if @isComplete}}
       <CardPay::LabeledValue
         @fieldMode="view"
-        @label="Username"
-        @value={{this.username}}
-        data-test-card-space-username
+        @label="Display name"
+        @value={{this.displayName}}
+        data-test-card-space-display-name
       />
       <CardPay::LabeledValue
         @fieldMode="view"
@@ -29,15 +29,15 @@
     {{else}}
       <CardPay::LabeledValue
         @fieldMode="edit"
-        @label="Username"
-        data-test-card-space-username-field
+        @label="Display name"
+        data-test-card-space-display-name-field
       >
         <Boxel::Input::ValidationState
-          @state={{this.usernameInputState}}
-          @errorMessage={{this.usernameInputErrorMessage}}
-          @value={{this.username}}
-          @onInput={{this.updateUsername}}
-          data-test-card-space-username-input
+          @state={{this.displayNameInputState}}
+          @errorMessage={{this.displayNameInputErrorMessage}}
+          @value={{this.displayName}}
+          @onInput={{this.updateDisplayName}}
+          data-test-card-space-display-name-input
         />
       </CardPay::LabeledValue>
       <CardPay::LabeledValue
@@ -72,7 +72,7 @@
   >
     <:default as |d|>
       <d.ActionButton
-        data-test-card-space-username-save-button
+        data-test-card-space-display-name-save-button
         {{on 'click' this.save}}
       >
         Continue
@@ -80,7 +80,7 @@
     </:default>
     <:memorialized as |m|>
       <m.ActionButton
-        data-test-card-space-username-edit-button
+        data-test-card-space-display-name-edit-button
         {{on "click" this.edit}}
       >
         Edit

@@ -18,16 +18,16 @@ import {
 import { taskFor } from 'ember-concurrency-ts';
 
 export const IMAGE_EDITOR_ELEMENT_ID = 'card-space-image-editor';
-export default class UsernameComponent extends Component<WorkflowCardComponentArgs> {
+export default class DisplayNameComponent extends Component<WorkflowCardComponentArgs> {
   @service('hub-authentication') declare hubAuthentication: HubAuthentication;
 
   imageEditorElement = document.getElementById(IMAGE_EDITOR_ELEMENT_ID);
   desiredWidth = 400;
   desiredHeight = 400;
   acceptedFileTypes = ['image/jpeg', 'image/png'];
-  @tracked username = '';
-  @tracked usernameInputState: InputValidationState = 'initial';
-  @tracked usernameInputErrorMessage = '';
+  @tracked displayName = '';
+  @tracked displayNameInputState: InputValidationState = 'initial';
+  @tracked displayNameInputErrorMessage = '';
   @tracked profileImage = '';
   @tracked processedImage = {
     type: '',
@@ -42,15 +42,15 @@ export default class UsernameComponent extends Component<WorkflowCardComponentAr
     super(owner, args);
     this.profileImage =
       this.args.workflowSession.getValue<string>('profileImageUrl') ?? '';
-    let username = this.args.workflowSession.getValue<string>('username');
-    this.username = username ?? '';
-    if (!this.args.isComplete && username) {
-      taskFor(this.updateUsernameTask).perform(username);
+    let displayName = this.args.workflowSession.getValue<string>('displayName');
+    this.displayName = displayName ?? '';
+    if (!this.args.isComplete && displayName) {
+      taskFor(this.updateDisplayNameTask).perform(displayName);
     }
   }
 
   get disableCompletion() {
-    return !this.args.isComplete && this.usernameInputState !== 'valid';
+    return !this.args.isComplete && this.displayNameInputState !== 'valid';
   }
 
   get imageValidation() {
@@ -60,8 +60,8 @@ export default class UsernameComponent extends Component<WorkflowCardComponentAr
     });
   }
 
-  @restartableTask *updateUsernameTask(username: string): any {
-    this.usernameInputState = 'loading';
+  @restartableTask *updateDisplayNameTask(displayName: string): any {
+    this.displayNameInputState = 'loading';
 
     yield timeout(config.environment === 'test' ? 10 : 500); // debounce
 
@@ -76,34 +76,34 @@ export default class UsernameComponent extends Component<WorkflowCardComponentAr
             'Content-Type': 'application/vnd.api+json',
           },
           body: JSON.stringify({
-            data: { attributes: { 'profile-name': username } },
+            data: { attributes: { 'profile-name': displayName } },
           }),
         }
       );
       let { errors } = yield response.json();
 
       if (errors.length === 0) {
-        this.username = username;
-        this.args.workflowSession.setValue('username', username);
-        this.usernameInputState = 'valid';
-        this.usernameInputErrorMessage = '';
+        this.displayName = displayName;
+        this.args.workflowSession.setValue('displayName', displayName);
+        this.displayNameInputState = 'valid';
+        this.displayNameInputErrorMessage = '';
       } else {
-        this.usernameInputState = 'invalid';
-        this.usernameInputErrorMessage = errors[0].detail;
-        this.args.workflowSession.delete('username');
+        this.displayNameInputState = 'invalid';
+        this.displayNameInputErrorMessage = errors[0].detail;
+        this.args.workflowSession.delete('displayName');
       }
     } catch (e) {
-      console.error('Error validating card space username', e);
+      console.error('Error validating card space displayName', e);
       Sentry.captureException(e);
-      this.args.workflowSession.delete('username');
-      this.usernameInputState = 'invalid';
-      this.usernameInputErrorMessage =
-        'There was an error validating your Card Space username. Please try again or contact support';
+      this.args.workflowSession.delete('displayName');
+      this.displayNameInputState = 'invalid';
+      this.displayNameInputErrorMessage =
+        'There was an error validating your Card Space display name. Please try again or contact support';
     }
   }
 
-  @action async updateUsername(username: string) {
-    taskFor(this.updateUsernameTask).perform(username);
+  @action async updateDisplayName(displayName: string) {
+    taskFor(this.updateDisplayNameTask).perform(displayName);
   }
 
   @action async onUpload(image: ImageUploadSuccessResult): Promise<void> {
@@ -129,7 +129,7 @@ export default class UsernameComponent extends Component<WorkflowCardComponentAr
   }
 
   @action edit() {
-    this.updateUsername(this.username);
+    this.updateDisplayName(this.displayName);
     this.args.onIncomplete?.();
   }
 

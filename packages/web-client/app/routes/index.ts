@@ -127,12 +127,12 @@ export default class CardstackRoute extends Route {
 
   renderTemplate(controller: Controller) {
     if (this.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
-      let username = this.location.hostname.replace(
+      let displayName = this.location.hostname.replace(
         `.${config.cardSpaceHostnameSuffix}`,
         ''
       );
 
-      this.render('view-card-space', { model: { username } });
+      this.render('view-card-space', { model: { displayName } });
     } else {
       super.renderTemplate(controller, null);
     }
