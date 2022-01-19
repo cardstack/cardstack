@@ -635,6 +635,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - RewardeeClaim
+        - RewardTokensAdd
       abis:
         - name: RewardPool
           file: ./abis/generated/RewardPool.json
