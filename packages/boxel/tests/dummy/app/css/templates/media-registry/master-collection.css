@@ -16,7 +16,7 @@
   right: 5px;
   width: 30px;
   height: 30px;
-  background: url('../../../../../public/@cardstack/boxel/images/icons/expand.svg') center/16px 16px no-repeat;
+  background: url('data:');
   z-index: 5;
   pointer-events: none;
 }

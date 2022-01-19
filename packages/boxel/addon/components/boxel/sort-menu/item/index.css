@@ -26,7 +26,7 @@
 }
 
 .sort-menu-item__active::before {
-  content: url('/@cardstack/boxel/images/icons/checkmark-highlighted.svg');
+  content: url('data:');
   position: absolute;
   left: -10px;
 }

@@ -1,14 +1,12 @@
 import BaseRoute from './base';
 import '../../css/card-pay/wallet.css';
-import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
-import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const WALLET_PANEL = {
   title: 'Simple Wallet',
   description: 'DeFi payments that are fast, easy and cheap for everyone',
-  heroImageUrl,
-  summaryHeroImageUrl,
+  heroImageUrl: 'xyz',
+  summaryHeroImageUrl: 'xyz',
   sections: [
     {
       workflow: 'issue-prepaid-card',

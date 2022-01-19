@@ -44,6 +44,13 @@ module.exports = function (defaults) {
     sourceMapConfig: { enabled: true },
   });
 
+  // @ts-ignore
+  if (typeof FastBoot !== 'undefined') {
+    console.log('quee?');
+    // @ts-ignore
+    global.btoa = () => {};
+  }
+
   return require('@embroider/compat').compatBuild(app, Webpack, {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {

@@ -101,7 +101,7 @@
   right: 0;
   width: 40px;
   height: 40px;
-  background: url('../../../../public/@cardstack/boxel/images/icons/dropdown-arrows-highlighted.svg') center/15px 15px no-repeat;
+  background: url('data:');
 }
 
 .queue__filter-dropdown .ember-power-select-trigger:focus {
@@ -114,7 +114,7 @@
 }
 
 .queue__filter-dropdown .ember-power-select-option[aria-selected="true"] {
-  background: url('../../../../public/@cardstack/boxel/images/icons/checkmark-highlighted.svg') right 12px center/10px 10px no-repeat;
+  background: url('data:');
   color: var(--boxel-light);
 }
 

@@ -30,7 +30,7 @@
 }
 
 .boxel-card__expand-overlay:hover {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/expand.svg');
+  background-image: url('data:');
   background-position: top var(--boxel-sp-xxxs) right var(--boxel-sp-xxxs);
   background-size: 1rem 1rem;
   background-repeat: no-repeat;
@@ -128,7 +128,7 @@
   width: 26px;
   height: 26px;
   background:
-    url('../../images/media-registry/verifi-logo.svg') center/26px
+    url('data:')) center/26px
     26px no-repeat;
   position: absolute;
   top: 10px;
@@ -137,7 +137,7 @@
 
 .boxel-card--profile .boxel-card__bg-img {
   border-radius: 100px;
-  background-image: url('../../../../public/@cardstack/boxel/images/placeholders/profile.svg');
+  background-image: url('data:');
 }
 
 .boxel-card--audio .boxel-card__inner {
@@ -145,7 +145,7 @@
 }
 
 .file-card__icon .boxel-card__inner {
-  background-image: url('../../images/media-registry/file.svg');
+  background-image: url('data:');
   background-position: center left 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
@@ -310,7 +310,7 @@
 }
 
 .territory-card--worldwide .boxel-card__inner {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/world.svg');
+  background-image: url('data:');
   background-position: left 18px center;
   background-size: 15px 15px;
   background-repeat: no-repeat;

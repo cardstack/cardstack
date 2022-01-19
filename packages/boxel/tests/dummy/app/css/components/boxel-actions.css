@@ -40,7 +40,7 @@
 }
 
 .boxel-actions__btn--expand {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/expand.svg');
+  background-image: url('data:');
 }
 
 .boxel-actions--offset {
@@ -64,27 +64,27 @@
 
 .boxel-actions__label--added {
   background-color: var(--boxel-success-100);
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/plus.svg');
+  background-image: url('data:');
 }
 
 .boxel-actions__label--removed {
   background-color: var(--boxel-error-100);
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/minus.svg');
+  background-image: url('data:');
 }
 
 .boxel-actions__label--changed {
   background-color: var(--boxel-success-100);
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/checkmark-lg.svg');
+  background-image: url('data:');
 }
 
 .boxel-actions__label--deleted {
   background-color: var(--boxel-light-400);
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/close.svg');
+  background-image: url('data:');
 }
 
 .boxel-actions__label--modified {
   background-color: var(--boxel-warning-100);
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/triangle.svg');
+  background-image: url('data:');
   background-position: center right 10px;
   width: auto;
   min-width: 30px;
@@ -133,5 +133,5 @@
 
 .boxel-actions--comparison-mode > .boxel-actions__label--no-change {
   background-color: #dbdbdb;
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/check-mark.svg');
+  background-image: url('data:');
 }

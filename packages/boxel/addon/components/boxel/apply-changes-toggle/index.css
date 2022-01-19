@@ -11,9 +11,7 @@
 }
 
 .boxel-apply-changes-toggle--active {
-  background-image:
-    url('/@cardstack/boxel/images/icons/arrows.svg'),
-    url('/@cardstack/boxel/images/icons/arrows.svg');
+  background-image: url('data:');
   background-position: left center, right center;
   background-size: 70px 20px, 70px 20px;
   background-repeat: no-repeat, no-repeat;

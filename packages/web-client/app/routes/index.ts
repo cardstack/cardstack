@@ -2,19 +2,30 @@ import Route from '@ember/routing/route';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
-import CardSpaceLogo from '@cardstack/web-client/images/icons/card-space-logo-clear-background.svg';
-import CardPayLogo from '@cardstack/web-client/images/icons/card-pay-logo.svg';
-import CardMembershipLogo from '@cardstack/web-client/images/icons/card-membership-logo.svg';
-import CardCatalogLogo from '@cardstack/web-client/images/icons/card-catalog-logo.svg';
+const CardSpaceLogo =
+  '@cardstack/web-client/images/icons/card-space-logo-clear-background.svg';
+const CardPayLogo = '@cardstack/web-client/images/icons/card-pay-logo.svg';
+const CardMembershipLogo =
+  '@cardstack/web-client/images/icons/card-membership-logo.svg';
+const CardCatalogLogo =
+  '@cardstack/web-client/images/icons/card-catalog-logo.svg';
 
-import CardSpaceImage from '@cardstack/web-client/images/illustrations/card-space-illustration.svg';
-import CardPayImage from '@cardstack/web-client/images/illustrations/card-pay-illustration.svg';
-import CardCatalogImage from '@cardstack/web-client/images/illustrations/card-catalog-illustration.svg';
-import CardMembershipImage from '@cardstack/web-client/images/illustrations/card-membership-illustration.svg';
-import CardSpaceHor from '@cardstack/web-client/images/illustrations/card-space-illustration-horizontal.svg';
-import CardPayHor from '@cardstack/web-client/images/illustrations/card-pay-illustration-horizontal.svg';
-import CardCatalogHor from '@cardstack/web-client/images/illustrations/card-catalog-illustration-horizontal.svg';
-import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-membership-illustration-horizontal.svg';
+const CardSpaceImage =
+  '@cardstack/web-client/images/illustrations/card-space-illustration.svg';
+const CardPayImage =
+  '@cardstack/web-client/images/illustrations/card-pay-illustration.svg';
+const CardCatalogImage =
+  '@cardstack/web-client/images/illustrations/card-catalog-illustration.svg';
+const CardMembershipImage =
+  '@cardstack/web-client/images/illustrations/card-membership-illustration.svg';
+const CardSpaceHor =
+  '@cardstack/web-client/images/illustrations/card-space-illustration-horizontal.svg';
+const CardPayHor =
+  '@cardstack/web-client/images/illustrations/card-pay-illustration-horizontal.svg';
+const CardCatalogHor =
+  '@cardstack/web-client/images/illustrations/card-catalog-illustration-horizontal.svg';
+const CardMembershipHor =
+  '@cardstack/web-client/images/illustrations/card-membership-illustration-horizontal.svg';
 
 import '../css/cardstack-landing-page.css';
 

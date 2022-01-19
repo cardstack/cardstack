@@ -35,11 +35,13 @@ import { UsdConvertibleSymbol } from './token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import { Safes } from '../resources/safes';
 import { TransactionReceipt } from 'web3-core';
+import Fastboot from 'ember-cli-fastboot/services/fastboot';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
 {
   @service declare hubAuthentication: HubAuthentication;
+  @service declare fastboot: Fastboot;
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isInitializing') declare isInitializing: boolean;
@@ -72,16 +74,21 @@ export default class Layer2Network
 
   constructor(props: object | undefined) {
     super(props);
-    switch (config.chains.layer2) {
-      case 'xdai':
-        this.strategy = new XDaiWeb3Strategy();
-        break;
-      case 'sokol':
-        this.strategy = new SokolWeb3Strategy();
-        break;
-      case 'test':
-        this.strategy = new Layer2TestWeb3Strategy();
-        break;
+
+    if (this.fastboot.isFastBoot) {
+      this.strategy = new Layer2TestWeb3Strategy();
+    } else {
+      switch (config.chains.layer2) {
+        case 'xdai':
+          this.strategy = new XDaiWeb3Strategy();
+          break;
+        case 'sokol':
+          this.strategy = new SokolWeb3Strategy();
+          break;
+        case 'test':
+          this.strategy = new Layer2TestWeb3Strategy();
+          break;
+      }
     }
 
     this.strategy.on('disconnect', this.onDisconnect);

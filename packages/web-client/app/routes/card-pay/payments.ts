@@ -1,15 +1,13 @@
 import BaseRoute from './base';
 import '../../css/card-pay/payments.css';
-import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
-import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
 import config from '@cardstack/web-client/config/environment';
 
 const MERCHANTS_PANEL = {
   title: 'Quick Payments',
   description:
     'Accept payments and tips backed by stablecoins with automatically managed currency conversions',
-  heroImageUrl,
-  summaryHeroImageUrl,
+  heroImageUrl: 'xyz',
+  summaryHeroImageUrl: 'xyz',
   sections: [
     {
       workflow: 'create-business',

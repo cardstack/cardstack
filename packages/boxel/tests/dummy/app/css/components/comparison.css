@@ -29,7 +29,7 @@
   padding-left: 35px;
   padding-right: 20px;
   color: var(--boxel-light);
-  background: url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
+  background: url('data:');
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -82,7 +82,7 @@
 .discrepancy__nested-level-back-btn {
   padding: 10px 20px;
   border: none;
-  background: url('../../../../public/@cardstack/boxel/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
+  background: url('data:');
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -211,7 +211,7 @@ button.discrepancy-card__header-btn {
   height: 40px;
   padding: 10px 40px;
   font-weight: 400;
-  background: url('../../../../public/@cardstack/boxel/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
+  background: url('data:');
   background-color: transparent;
   border-color: var(--boxel-purple-400);
   color: inherit;
@@ -225,7 +225,7 @@ button.discrepancy-card__header-btn:hover {
 }
 
 button.discrepancy-card__header-btn.checked {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/select-checked.svg');
+  background-image: url('data:');
   border-color: var(--boxel-dark);
   font-weight: 600;
   cursor: initial;
@@ -278,7 +278,7 @@ button.discrepancy-card__header-btn--toggle.checked:hover {
 .discrepancy__count-btn__link-copy {
   display: inline-block;
   color: var(--boxel-light);
-  background: url('../../../../public/@cardstack/boxel/images/icons/warning.svg') bottom left/25px 20px no-repeat;
+  background: url('data:');
   font: var(--boxel-font-sm);
   padding-top: 25px;
   padding-left: 35px;

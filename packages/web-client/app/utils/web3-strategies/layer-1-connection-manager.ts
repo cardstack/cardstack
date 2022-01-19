@@ -1,14 +1,11 @@
 import detectEthereumProvider from '@metamask/detect-provider';
-import WalletConnectProvider from '../wc-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import config from '../../config/environment';
-import CustomStorageWalletConnect, {
-  clearWalletConnectStorage,
-} from '../wc-connector';
+import { clearWalletConnectStorage } from '../wc-connector';
 import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
-import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
+import { networkIds } from '@cardstack/cardpay-sdk';
 import { Layer1NetworkSymbol } from './types';
 import Web3 from 'web3';
 import { TypedChannel } from '../typed-channel';
@@ -439,50 +436,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
         qrcodeModal: WalletConnectQRCodeModal,
       };
     }
-    let provider = new WalletConnectProvider({
-      chainId,
-      infuraId: config.infuraId,
-      rpc: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcNode',
-          this.networkSymbol
-        ),
-      },
-      rpcWss: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcWssNode',
-          this.networkSymbol
-        ),
-      },
-      // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
-      connector: new CustomStorageWalletConnect(connectorOptions, chainId),
-    });
-
-    // Subscribe to accounts change
-    provider.on('accountsChanged', (accounts: string[]) => {
-      if (accounts.length) this.onConnect(accounts);
-    });
-
-    // Subscribe to chainId change
-    provider.on('chainChanged', (changedChainId: number) => {
-      this.onChainChanged(changedChainId);
-    });
-
-    // Subscribe to session disconnection
-    // This is how WalletConnect informs us if we disconnect the Dapp
-    // from the wallet side. Unlike MetaMask, listening to 'accountsChanged'
-    // does not work.
-    provider.on('disconnect', (code: number, reason: string) => {
-      console.log('disconnect from wallet connect', code, reason);
-      this.onDisconnect(false);
-    });
-
-    provider.on('websocket-disconnected', () => {
-      this.emit('websocket-disconnected');
-      this.disconnect();
-    });
-
-    this.provider = provider;
+    console.log('options to use', connectorOptions);
     return;
   }
 

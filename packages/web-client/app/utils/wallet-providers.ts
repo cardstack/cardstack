@@ -1,5 +1,5 @@
-import metamaskLogo from '@cardstack/web-client/images/logos/metamask-logo.svg';
-import walletConnectLogo from '@cardstack/web-client/images/logos/wallet-connect-logo.svg';
+const metamaskLogo = '@cardstack/web-client/images/logos/metamask-logo.svg';
+const walletConnectLogo = '@cardstack/web-client/images/logos/wallet-connect-logo.svg';
 
 export type WalletProviderId = 'metamask' | 'wallet-connect';
 export interface WalletProvider {

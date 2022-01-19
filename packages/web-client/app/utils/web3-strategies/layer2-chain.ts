@@ -5,7 +5,6 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { IConnector } from '@walletconnect/types';
-import WalletConnectProvider from '../wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
@@ -17,7 +16,6 @@ import {
   TokenSymbol,
 } from '../token';
 import WalletInfo from '../wallet-info';
-import CustomStorageWalletConnect from '../wc-connector';
 import {
   ChainAddress,
   Layer2Web3Strategy,
@@ -43,7 +41,6 @@ import {
   waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
-import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
@@ -54,7 +51,6 @@ import { IAssets } from '@cardstack/cardpay-sdk';
 import { PrepaidCard } from '@cardstack/cardpay-sdk';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
-import { getLayer2RpcWssNodeUrl } from '../features';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -65,14 +61,12 @@ interface Layer2ConnectEvent {
   session?: any;
 }
 
-const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-
 export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy, Emitter<Layer2ChainEvent>
 {
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
-  provider: WalletConnectProvider | undefined;
+  provider = undefined;
   simpleEmitter = new SimpleEmitter();
 
   defaultTokenSymbol: BridgedTokenSymbol;
@@ -142,99 +136,11 @@ export default abstract class Layer2ChainWeb3Strategy
       event.data.type === BROADCAST_CHANNEL_MESSAGES.CONNECTED &&
       !this.isConnected
     ) {
-      taskFor(this.initializeTask).perform(event.data.session);
+      taskFor(this.initializeTask).perform();
     }
   }
 
-  @task *initializeTask(session?: any): TaskGenerator<void> {
-    let connectorOptions;
-    if (session) {
-      connectorOptions = { session };
-    } else {
-      connectorOptions = {
-        bridge: BRIDGE,
-      };
-    }
-    this.web3 = new Web3();
-
-    let rpcWss = getLayer2RpcWssNodeUrl(this.networkSymbol);
-    this.provider = new WalletConnectProvider({
-      chainId: this.chainId,
-      rpc: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcNode',
-          this.networkSymbol
-        ),
-      },
-      rpcWss: {
-        [networkIds[this.networkSymbol]]: rpcWss,
-      },
-      connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
-    });
-
-    this.provider.on('websocket-disconnected', () => {
-      this.simpleEmitter.emit('websocket-disconnected');
-      this.disconnect();
-    });
-
-    this.web3.setProvider(this.provider as any);
-
-    this.connector.on('display_uri', (err, payload) => {
-      if (err) {
-        console.error('Error in display_uri callback', err);
-        return;
-      }
-      // if we get here when a user loads a page, then it means that the user did not have
-      // a connection from local storage. We can safely say they are initialized
-      this.isInitializing = false;
-      this.walletConnectUri = payload.params[0];
-    });
-
-    this.provider.on('accountsChanged', async (accounts: string[]) => {
-      try {
-        // try to initialize things safely
-        // one expected failure is if we connect to a chain which we don't have an rpc url for
-        this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
-        this.#safesApi = await getSDK('Safes', this.web3);
-        this.#assetsApi = await getSDK('Assets', this.web3);
-        this.#prepaidCardApi = await getSDK('PrepaidCard', this.web3);
-        this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
-        await this.fetchIssuePrepaidCardMinValues();
-        await this.updateWalletInfo(accounts);
-        this.#broadcastChannel.postMessage({
-          type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
-          session: this.connector?.session,
-        });
-      } catch (e) {
-        console.error(
-          'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
-        );
-        console.error(e);
-        this.disconnect();
-      } finally {
-        this.isInitializing = false;
-      }
-    });
-
-    this.provider.on('chainChanged', async (connectedChainId: number) => {
-      if (connectedChainId !== this.chainId) {
-        this.simpleEmitter.emit('incorrect-chain');
-        this.disconnect();
-      } else {
-        this.simpleEmitter.emit('correct-chain');
-      }
-    });
-
-    this.connector.on('disconnect', (error) => {
-      if (error) {
-        console.error('error disconnecting', error);
-        throw error;
-      }
-      this.onDisconnect();
-    });
-
-    yield this.provider.enable();
-  }
+  @task *initializeTask(): TaskGenerator<void> {}
 
   private getTokenContractInfo(
     symbol: TokenSymbol,
@@ -571,9 +477,7 @@ export default abstract class Layer2ChainWeb3Strategy
     return this.#hubAuthApi.checkValidAuth(authToken);
   }
 
-  async disconnect(): Promise<void> {
-    await this.provider?.disconnect();
-  }
+  async disconnect(): Promise<void> {}
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);

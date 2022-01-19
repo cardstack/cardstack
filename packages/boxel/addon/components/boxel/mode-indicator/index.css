@@ -33,23 +33,18 @@
 }
 
 .boxel-mode-indicator--edit {
-  background-image: url('/@cardstack/boxel/images/icons/edit-box.svg');
 }
 
 .boxel-mode-indicator--configure {
-  background-image: url('/@cardstack/boxel/images/icons/gear.svg');
 }
 
 .boxel-mode-indicator--themer {
-  background-image: url('/@cardstack/boxel/images/icons/themer.svg');
 }
 
 .boxel-mode-indicator--preview {
-  background-image: url('/@cardstack/boxel/images/icons/eye.svg');
 }
 
 .boxel-mode-indicator--revision,
 .boxel-mode-indicator--comparison {
   min-width: 285px;
-  background-image: url('/@cardstack/boxel/images/icons/clock.svg');
 }

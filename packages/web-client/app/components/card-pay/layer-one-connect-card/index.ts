@@ -10,8 +10,10 @@ import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
 import walletProviders from '@cardstack/web-client/utils/wallet-providers';
 
-import cardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
-import connectionSymbol from '@cardstack/web-client/images/icons/connection-symbol.svg';
+const cardstackLogo =
+  '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
+const connectionSymbol =
+  '@cardstack/web-client/images/icons/connection-symbol.svg';
 import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 

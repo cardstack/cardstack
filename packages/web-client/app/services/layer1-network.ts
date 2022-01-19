@@ -28,6 +28,8 @@ import walletProviders, {
 } from '@cardstack/web-client/utils/wallet-providers';
 import { BridgeableSymbol, ConversionFunction } from '../utils/token';
 import { UsdConvertibleSymbol } from './token-to-usd';
+import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import { inject as service } from '@ember/service';
 
 export default class Layer1Network
   extends Service
@@ -36,6 +38,9 @@ export default class Layer1Network
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   walletProviders = walletProviders;
+
+  @service declare fastboot: Fastboot;
+
   @reads('strategy.isInitializing') declare isInitializing: boolean;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
@@ -52,16 +57,21 @@ export default class Layer1Network
 
   constructor(props: object | undefined) {
     super(props);
-    switch (config.chains.layer1) {
-      case 'keth':
-        this.strategy = new KovanWeb3Strategy();
-        break;
-      case 'eth':
-        this.strategy = new EthWeb3Strategy();
-        break;
-      case 'test':
-        this.strategy = new Layer1TestWeb3Strategy();
-        break;
+
+    if (this.fastboot.isFastBoot) {
+      this.strategy = new Layer1TestWeb3Strategy();
+    } else {
+      switch (config.chains.layer1) {
+        case 'keth':
+          this.strategy = new KovanWeb3Strategy();
+          break;
+        case 'eth':
+          this.strategy = new EthWeb3Strategy();
+          break;
+        case 'test':
+          this.strategy = new Layer1TestWeb3Strategy();
+          break;
+      }
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
