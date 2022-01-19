@@ -1,5 +1,9 @@
-import { RewardeeClaim as RewardeeClaimEvent, RewardTokensAdded } from '../../generated/RewardPool/RewardPool';
-import { RewardeeClaim, RewardSafe, RewardTokensAdd, RewardProgram } from '../../generated/schema';
+import {
+  RewardeeClaim as RewardeeClaimEvent,
+  RewardTokensAdded,
+  MerkleRootSubmission,
+} from '../../generated/RewardPool/RewardPool';
+import { RewardeeClaim, RewardSafe, RewardTokensAdd, RewardProgram, MerkleRoot } from '../../generated/schema';
 import { toChecksumAddress, makeEOATransactionForSafe, makeAccount, makeToken } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -70,5 +74,25 @@ export function handleRewardTokensAdded(event: RewardTokensAdded): void {
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
   entity.blockNumber = event.block.number;
+  entity.save();
+}
+
+export function handleMerkleRootSubmission(event: MerkleRootSubmission): void {
+  let txnHash = event.transaction.hash.toHex();
+  let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
+  let paymentCycle = event.params.paymentCycle;
+
+  let rewardProgramEntity = RewardProgram.load(rewardProgramID);
+  if (rewardProgramEntity == null) {
+    log.warning(
+      'Cannot process tokens added txn {}: Reward program entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
+      [txnHash, rewardProgramID]
+    );
+    return;
+  }
+
+  let entity = new MerkleRoot(txnHash);
+  entity.rewardProgram = rewardProgramID;
+  entity.paymentCycle = paymentCycle;
   entity.save();
 }
