@@ -23,7 +23,7 @@ const log = logger('hub/search-index');
 function assertNever(value: never) {
   throw new Error(`unsupported operation ${value}`);
 }
-export class SearchIndex {
+export default class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private builder = inject('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });

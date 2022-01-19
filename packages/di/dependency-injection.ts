@@ -13,18 +13,18 @@ export class Container implements ContainerInterface {
   async lookup<K extends keyof KnownServices>(name: K): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
-    let { promise, instance } = this._lookup(name);
+    let { promise, instance } = await this._lookup(name);
     await promise;
     return instance;
   }
 
-  private _lookup(name: string): CacheEntry {
+  private async _lookup(name: string): Promise<CacheEntry> {
     let cached = this.cache.get(name);
     if (cached) {
       return cached;
     }
 
-    let factory = this.lookupFactory(name);
+    let factory = await this.lookupFactory(name);
     return this.provideInjections(() => {
       let instance: any;
       if (isFactoryByCreateMethod(factory)) {
@@ -36,12 +36,23 @@ export class Container implements ContainerInterface {
     }, name);
   }
 
-  private lookupFactory(name: string): Factory<any> {
+  private async lookupFactory(name: string): Promise<Factory<any>> {
     let factory = mappings.get(this.registry)!.get(name);
+
     if (!factory) {
-      throw new Error(`no such service "${name}"`);
+      if (!this.registry.findFactory) {
+        throw new Error(`no such service "${name}"`);
+      }
+
+      let klass = await this.registry.findFactory(name);
+      if (!klass && !klass.default) {
+        throw new Error(`no such service "${name}"`);
+      }
+      this.registry.register(name, klass.default);
+      factory = klass.default;
     }
-    return factory;
+
+    return factory!;
   }
 
   // When this is called we'll always instantiate a new instance for each
@@ -54,7 +65,7 @@ export class Container implements ContainerInterface {
   // When you use instantiate, you are responsible for calling teardown on the
   // returned object.
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
-    let { instance, promise } = this.provideInjections(() => {
+    let { instance, promise } = await this.provideInjections(() => {
       if (isFactoryByCreateMethod(factory)) {
         return factory.create(...args);
       } else {
@@ -66,7 +77,7 @@ export class Container implements ContainerInterface {
     return instance;
   }
 
-  private provideInjections<T>(create: () => T, cacheKey?: CacheKey): CacheEntry {
+  private async provideInjections<T>(create: () => T, cacheKey?: CacheKey): Promise<CacheEntry> {
     let pending = new Map() as PendingInjections;
     pendingInstantiationStack.unshift(pending);
     let result: CacheEntry;
@@ -78,7 +89,7 @@ export class Container implements ContainerInterface {
         this.cache.set(cacheKey, result);
       }
       for (let [name, entry] of pending.entries()) {
-        entry.cacheEntry = this._lookup(name);
+        entry.cacheEntry = await this._lookup(name);
       }
     } finally {
       pendingInstantiationStack.shift();
@@ -233,7 +244,7 @@ let pendingInstantiationStack = [] as PendingInjections[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
 export class Registry {
-  constructor() {
+  constructor(public findFactory?: (name: string) => any) {
     mappings.set(this, new Map());
   }
   register<T>(name: string, factory: Factory<T>) {
