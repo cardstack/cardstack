@@ -834,19 +834,17 @@ CREATE TABLE public.card_spaces (
     profile_description text NOT NULL,
     profile_button_text text NOT NULL,
     profile_category text NOT NULL,
-    owner_address text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     bio_title text,
     bio_description text,
     links json[] DEFAULT '{}'::json[] NOT NULL,
     donation_title text,
     donation_description text,
-    merchant_id uuid,
+    merchant_id uuid NOT NULL,
     donation_suggestion_amount_1 integer,
     donation_suggestion_amount_2 integer,
     donation_suggestion_amount_3 integer,
-    donation_suggestion_amount_4 integer,
-    url text NOT NULL
+    donation_suggestion_amount_4 integer
 );
 
 
@@ -1635,6 +1633,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 22	20211214163123421_card-index-errors	2022-01-12 15:29:55.727589
 23	20220103201128435_invalidation-ordering	2022-01-12 15:29:55.727589
 24	20220107151914576_rename-beta-testers-table	2022-01-12 15:29:55.727589
+28	20220119232151260_space-belongs-to-merchant	2022-01-19 17:32:46.842632
 \.
 
 
@@ -1642,7 +1641,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 26, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 28, true);
 
 
 --
