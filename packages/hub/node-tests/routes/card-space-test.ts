@@ -431,7 +431,7 @@ describe('POST /api/card-spaces/validate-profile-name', async function () {
             source: {
               pointer: `/data/attributes/profile-name`,
             },
-            detail: 'Username is not allowed',
+            detail: 'Display name is not allowed',
           },
         ],
       })
