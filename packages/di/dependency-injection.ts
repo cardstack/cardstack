@@ -1,9 +1,10 @@
 import { Memoize } from 'typescript-memoize';
 import { Deferred } from './deferred';
 import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } from './container';
-import kebabCase from 'lodash/kebabCase';
 import walkSync from 'walk-sync';
-import { find } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
+import filter from 'lodash/filter';
+import pluralize from 'pluralize';
 
 let nonce = 0;
 
@@ -241,26 +242,34 @@ let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
 let pendingInstantiationStack = [] as PendingInjections[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
+interface ImportConfigOption {
+  type: string;
+  prefixOptional?: boolean;
+  dir?: string;
+  glob?: string;
+}
+
 interface RegistryOptions {
-  findFactory: Registry['findFactory'];
+  importFactory: Registry['importFactory'];
   rootDir?: Registry['rootDir'];
-  factoryGlobs?: Registry['factoryGlobs'];
+  importConfig?: ImportConfigOption[];
 }
 
 export class Registry {
-  private findFactory: (importPath: string) => Promise<any> | void;
+  // TODO: Can we make the type dynamic to the importConfigs passed into the constructor?
+  private importFactory?: (type: string, importPath: string) => Promise<any> | void;
   private rootDir: string;
-  private factoryGlobs: string[];
-  private importPossibilities: string[] = [];
+  private importConfigs: ImportConfig[];
 
-  constructor(options: RegistryOptions) {
-    this.findFactory = options.findFactory;
-    this.rootDir = options.rootDir ?? process.cwd();
-    this.factoryGlobs = options.factoryGlobs ?? [];
+  constructor(options?: RegistryOptions) {
+    this.importFactory = options?.importFactory;
+    this.rootDir = options?.rootDir ?? process.cwd();
+
+    this.importConfigs = (options?.importConfig ?? []).map((o) => {
+      return new ImportConfig(this.rootDir, o);
+    });
 
     mappings.set(this, new Map());
-
-    this.importPossibilities = this.findImportPossibilities();
   }
 
   register<T>(name: string, factory: Factory<T>) {
@@ -268,42 +277,97 @@ export class Registry {
     mappings.get(this)!.set(name, factory);
   }
 
-  findInImportPosibilities(name: string) {
-    // kebabCase converts web3 to web-3 which is bad
-    let fileName = kebabCase(name).replace('-3-', '3-');
-
-    let possibility = find(this.importPossibilities, (e) => {
-      return e.endsWith(fileName + '.ts');
-    });
-    if (!possibility) {
-      return;
+  private getImportConfigFor(injectString: string): ImportConfig[] {
+    let configs = filter(this.importConfigs, (ic) => ic.isPossiblyMine(injectString));
+    if (configs.length === 0) {
+      throw Error(`No dynamic injection configured for key: ${injectString}`);
     }
-    return possibility.replace(/\.ts&/, '');
+    return configs;
+  }
+
+  private findImportableFile(injectString: string): { type: string; path: string } {
+    // kebabCase converts web3 to web-3 which is bad
+    let fileName = kebabCase(injectString).replace('-3-', '3-');
+
+    let configs = this.getImportConfigFor(fileName);
+    let result = configs.map((c) => {
+      return {
+        type: c.type,
+        path: c.findFile(fileName),
+      };
+    });
+
+    if (result.length > 1 || result[0].path.length > 1) {
+      throw Error(`Tried to inject ${injectString}, but found multple possibilities: ${JSON.stringify(result)}`);
+    }
+    let {
+      type,
+      path: [path],
+    } = result[0];
+    if (!path) {
+      throw Error(`Tried to inject ${injectString}, but found ZERO possigilities`);
+    }
+
+    return {
+      type,
+      path: path.replace(/\.ts&/, ''),
+    };
   }
 
   async tryToFindFactory(name: string): Promise<any | void> {
-    let path = this.findInImportPosibilities(name);
-    if (!path) {
+    let result = this.findImportableFile(name);
+    if (!result || !this.importFactory) {
       return;
     }
-    let factory = await this.findFactory(path);
+    let factory = await this.importFactory(result.type, result.path);
     if (!factory || !factory.default) {
       return;
     }
     return factory.default;
   }
+}
 
-  private findImportPossibilities() {
+class ImportConfig {
+  type: string;
+  dir: string;
+  glob: string;
+  knownFilePaths: string[];
+
+  private prefixOptional = false;
+
+  constructor(private rootDir: string, config: ImportConfigOption) {
+    this.type = config.type;
+    this.prefixOptional = config.prefixOptional ?? false;
+    this.dir = config.dir ?? `${pluralize(config.type)}`;
+    this.glob = config.glob ?? `${this.dir}/**/*.ts`;
+    this.knownFilePaths = this.buildFilePaths();
+  }
+
+  isPossiblyMine(injectString: string): boolean {
+    let [type, name] = injectString.split(':');
+    if (type && !name) {
+      return this.prefixOptional;
+    } else {
+      return this.type === type;
+    }
+  }
+
+  findFile(fileName: string): (string | undefined)[] {
+    return filter(this.knownFilePaths, (e) => {
+      return e.endsWith(fileName + '.ts');
+    });
+  }
+
+  private buildFilePaths() {
     return walkSync
       .entries(this.rootDir, {
-        globs: this.factoryGlobs,
+        globs: [this.glob],
         ignore: ['**/*.d.ts'],
         fs: undefined as any,
       })
       .map((entry) => './' + entry.relativePath);
   }
 }
-
 // This exists to be extended by authors of services
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface KnownServices {}

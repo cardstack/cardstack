@@ -79,25 +79,19 @@ global.fetch = fetch;
 
 const serverLog = logger('hub/server');
 
-// const factoryOptions = {
-//   service: {
-//     default: true,
-//     dir: 'services',
-//   },
-//   route: {
-//     dir: 'routes',
-//   },
-// };
 export function createRegistry(): Registry {
   let registry = new Registry({
     rootDir: process.cwd(),
-    factoryGlobs: ['services/**/*.ts', 'routes/**/*.ts'],
-    findFactory: async (importPath: string) => {
-      if (importPath.startsWith('./services/')) {
-        return await import(
-          /* webpackExclude: /assets/ */
-          `./services/${importPath.replace('./services/', '')}`
-        );
+    importConfig: [{ type: 'service', prefixOptional: true }],
+    importFactory: async (type, importPath) => {
+      switch (type) {
+        case 'service':
+          return await import(
+            /* webpackExclude: /assets/ */
+            `./services/${importPath.replace('./services/', '')}`
+          );
+        default:
+          return;
       }
       // if (importPath.startsWith('./routes/')) {
       //   return await import(`./routes/${importPath.replace('./routes/', '')}`);

@@ -5,9 +5,7 @@ describe('hub/di/dependency-injection', function () {
   let container: Container;
 
   before(function () {
-    registry = new Registry({
-      findFactory: () => {},
-    });
+    registry = new Registry();
     registry.register('testExample', ExampleService);
     registry.register('testConsumer', ConsumingService);
     registry.register('test-has-async', HasAsyncReady);
@@ -37,7 +35,7 @@ describe('hub/di/dependency-injection', function () {
     try {
       await container.lookup('testBadService');
       throw new Error('should not get here');
-    } catch (err) {
+    } catch (err: any) {
       expect(err.message).to.match(/you must pass the 'as' argument/);
     }
   });
@@ -91,7 +89,7 @@ describe('hub/di/dependency-injection', function () {
     try {
       await container.lookup('testCircleThree');
       throw new Error(`shouldn't get here`);
-    } catch (err) {
+    } catch (err: any) {
       expect(err.message).to.match(
         /circular dependency: testCircleThree tries to eagerly inject testCircleFour, which depends on testCircleThree/
       );
