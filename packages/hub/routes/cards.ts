@@ -10,10 +10,6 @@ import { parseQueryString } from '@cardstack/core/src/query';
 import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 
-declare global {
-  const __non_webpack_require__: any;
-}
-
 const requireCard = function (path: string, root: string): any {
   const module = __non_webpack_require__.resolve(path, {
     paths: [root],
@@ -209,7 +205,7 @@ const defaultRouterInstance = {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'card-routes': CardRoutes;
+    // 'route:cards': CardRoutes;
     'card-routes-config': CardRoutesConfig;
   }
 }

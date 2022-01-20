@@ -101,6 +101,6 @@ export default class NotificationPreferencesRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'notification-preferences-route': NotificationPreferencesRoute;
+    'route:notification-preferences': NotificationPreferencesRoute;
   }
 }

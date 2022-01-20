@@ -203,6 +203,6 @@ export default class CardSpacesRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'card-spaces-route': CardSpacesRoute;
+    'route:card-spaces': CardSpacesRoute;
   }
 }

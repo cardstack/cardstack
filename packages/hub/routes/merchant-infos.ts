@@ -123,6 +123,6 @@ export default class MerchantInfosRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'merchant-infos-route': MerchantInfosRoute;
+    'route:merchant-infos': MerchantInfosRoute;
   }
 }

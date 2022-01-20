@@ -69,6 +69,6 @@ export default class ExchangeRatesRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'exchange-rates-route': ExchangeRatesRoute;
+    'route:exchange-rates': ExchangeRatesRoute;
   }
 }

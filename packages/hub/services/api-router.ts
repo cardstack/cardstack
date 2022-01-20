@@ -8,36 +8,36 @@ import { inject } from '@cardstack/di';
 import { parseBody } from '../middleware';
 
 export default class APIRouter {
-  boomRoute = inject('boom-route', { as: 'boomRoute' });
-  exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
-  sessionRoute = inject('session-route', { as: 'sessionRoute' });
-  statusRoute = inject('status-route', { as: 'statusRoute' });
-  prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
+  boomRoute = inject('route:boom', { as: 'boomRoute' });
+  exchangeRatesRoute = inject('route:exchange-rates', { as: 'exchangeRatesRoute' });
+  sessionRoute = inject('route:session', { as: 'sessionRoute' });
+  statusRoute = inject('route:status', { as: 'statusRoute' });
+  prepaidCardColorSchemesRoute = inject('route:prepaid-card-color-schemes', {
     as: 'prepaidCardColorSchemesRoute',
   });
-  prepaidCardPatternsRoute = inject('prepaid-card-patterns-route', {
+  prepaidCardPatternsRoute = inject('route:prepaid-card-patterns', {
     as: 'prepaidCardPatternsRoute',
   });
-  prepaidCardCustomizationsRoute = inject('prepaid-card-customizations-route', {
+  prepaidCardCustomizationsRoute = inject('route:prepaid-card-customizations', {
     as: 'prepaidCardCustomizationsRoute',
   });
-  merchantInfosRoute = inject('merchant-infos-route', {
+  merchantInfosRoute = inject('route:merchant-infos', {
     as: 'merchantInfosRoute',
   });
-  cardSpacesRoute = inject('card-spaces-route', {
+  cardSpacesRoute = inject('route:card-spaces', {
     as: 'cardSpacesRoute',
   });
-  pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
+  pushNotificationRegistrationsRoute = inject('route:push-notification-registrations', {
     as: 'pushNotificationRegistrationsRoute',
   });
-  notificationPreferencesRoute = inject('notification-preferences-route', {
+  notificationPreferencesRoute = inject('route:notification-preferences', {
     as: 'notificationPreferencesRoute',
   });
-  custodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
-  ordersRoute = inject('orders-route', { as: 'ordersRoute' });
-  reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
-  inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
-  wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
+  custodialWalletRoute = inject('route:custodial-wallet', { as: 'custodialWalletRoute' });
+  ordersRoute = inject('route:orders', { as: 'ordersRoute' });
+  reservationsRoute = inject('route:reservations', { as: 'reservationsRoute' });
+  inventoryRoute = inject('route:inventory', { as: 'inventoryRoute' });
+  wyrePricesRoute = inject('route:wyre-prices', { as: 'wyrePricesRoute' });
 
   routes() {
     let {

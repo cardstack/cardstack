@@ -43,6 +43,6 @@ export default class WyrePricesRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'wyre-prices-route': WyrePricesRoute;
+    'route:wyre-prices': WyrePricesRoute;
   }
 }

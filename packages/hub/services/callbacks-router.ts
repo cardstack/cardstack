@@ -9,8 +9,8 @@ import WyreCallbackRoute from '../routes/wyre-callback';
 import { parseBody } from '../middleware';
 
 export default class CallbacksRouter {
-  wyreCallbackRoute: WyreCallbackRoute = inject('wyre-callback-route', { as: 'wyreCallbackRoute' });
-  checklyWebhookRoute = inject('checkly-webhook-route', { as: 'checklyWebhookRoute' });
+  wyreCallbackRoute: WyreCallbackRoute = inject('route:wyre-callback', { as: 'wyreCallbackRoute' });
+  checklyWebhookRoute = inject('route:checkly-webhook', { as: 'checklyWebhookRoute' });
 
   routes() {
     let { wyreCallbackRoute, checklyWebhookRoute } = this;

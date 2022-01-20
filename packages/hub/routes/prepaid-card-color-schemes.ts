@@ -42,6 +42,6 @@ export default class PrepaidCardColorSchemesRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'prepaid-card-color-schemes-route': PrepaidCardColorSchemesRoute;
+    'route:prepaid-card-color-schemes': PrepaidCardColorSchemesRoute;
   }
 }

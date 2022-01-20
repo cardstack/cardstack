@@ -101,6 +101,6 @@ export default class SessionRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'session-route': SessionRoute;
+    'route:session': SessionRoute;
   }
 }

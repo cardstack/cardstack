@@ -39,6 +39,6 @@ export default class BoomRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'boom-route': BoomRoute;
+    'route:boom': BoomRoute;
   }
 }

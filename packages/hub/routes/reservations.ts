@@ -153,6 +153,6 @@ function handleNotFound(ctx: Koa.Context) {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'reservations-route': ReservationsRoute;
+    'route:reservations': ReservationsRoute;
   }
 }

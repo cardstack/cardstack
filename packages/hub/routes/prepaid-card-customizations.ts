@@ -106,6 +106,6 @@ function foreignKeyConstraintError(ctx: Koa.Context, constraintName: string) {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'prepaid-card-customizations-route': PrepaidCardCustomizationsRoute;
+    'route:prepaid-card-customizations': PrepaidCardCustomizationsRoute;
   }
 }

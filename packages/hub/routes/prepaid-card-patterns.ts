@@ -38,6 +38,6 @@ export default class PrepaidCardPatternsRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'prepaid-card-patterns-route': PrepaidCardPatternsRoute;
+    'route:prepaid-card-patterns': PrepaidCardPatternsRoute;
   }
 }

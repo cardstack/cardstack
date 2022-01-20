@@ -378,6 +378,6 @@ function assertWyreCallbackRequest(request: any): asserts request is WyreCallbac
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'wyre-callback-route': WyreCallbackRoute;
+    'route:wyre-callback': WyreCallbackRoute;
   }
 }

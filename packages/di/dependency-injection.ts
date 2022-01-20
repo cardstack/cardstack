@@ -297,7 +297,7 @@ export class Registry {
     let results = config.findFile(fileName);
 
     if (results.length > 1) {
-      throw Error(`Tried to inject ${injectString}, but found multple possibilities: ${path}`);
+      throw Error(`Tried to inject ${injectString}, but found multple possibilities: ${results}`);
     }
     let [path] = results;
     if (!path) {

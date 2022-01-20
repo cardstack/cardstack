@@ -35,6 +35,6 @@ export default class InventoryRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'inventory-route': InventoryRoute;
+    'route:inventory': InventoryRoute;
   }
 }

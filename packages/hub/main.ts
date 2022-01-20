@@ -25,37 +25,20 @@ import { AuthenticationUtils } from './utils/authentication';
 import CardpaySDKService from './services/cardpay-sdk';
 import { Clock } from './services/clock';
 
-import BoomRoute from './routes/boom-route';
 import CardSpaceQueries from './services/queries/card-space';
-import CardSpacesRoute from './routes/card-spaces';
 import CardSpaceValidator from './services/validators/card-space';
-import ChecklyWebhookRoute from './routes/checkly-webhook';
-import CustodialWalletRoute from './routes/custodial-wallet';
-import ExchangeRatesService from './services/exchange-rates';
-import ExchangeRatesRoute from './routes/exchange-rates';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
 import LatestEventBlockQueries from './services/queries/latest-event-block';
 import MerchantInfoQueries from './services/queries/merchant-info';
-import MerchantInfosRoute from './routes/merchant-infos';
 import NotificationPreferenceQueries from './services/queries/notification-preference';
 import NotificationPreferenceService from './services/push-notifications/preferences';
-import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationTypeQueries from './services/queries/notification-type';
-import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
-import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
-import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
-import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
-import ReservationsRoute from './routes/reservations';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
-import SessionRoute from './routes/session';
-import StatusRoute from './routes/status';
 import Upload from './routes/upload';
 import UploadQueries from './services/queries/upload';
 import UploadRouter from './routes/upload';
-import WyreCallbackRoute from './routes/wyre-callback';
-import WyrePricesRoute from './routes/wyre-prices';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
@@ -69,10 +52,8 @@ import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notification
 import SendNotificationsTask from './tasks/send-notifications';
 
 import OrderService from './services/order';
-import OrdersRoute from './routes/orders';
 
 import InventoryService from './services/inventory';
-import InventoryRoute from './routes/inventory';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -82,7 +63,7 @@ const serverLog = logger('hub/server');
 export function createRegistry(): Registry {
   let registry = new Registry({
     rootDir: process.cwd(),
-    importConfig: [{ type: 'service', prefixOptional: true }],
+    importConfig: [{ type: 'service', prefixOptional: true }, { type: 'route' }],
     importFactory: async (type, importPath) => {
       switch (type) {
         case 'service':
@@ -90,8 +71,11 @@ export function createRegistry(): Registry {
             /* webpackExclude: /assets/ */
             `./services/${importPath.replace('./services/', '')}`
           );
+        case 'route':
+          return await import(`./routes/${importPath.replace('./routes/', '')}`);
+
         default:
-          return;
+          throw new Error(`Received an import type of ${type} that didnt receive an import config`);
       }
       // if (importPath.startsWith('./routes/')) {
       //   return await import(`./routes/${importPath.replace('./routes/', '')}`);
@@ -104,52 +88,33 @@ export function createRegistry(): Registry {
   registry.register('hubBot', HubBot);
 
   registry.register('authentication-utils', AuthenticationUtils);
-  registry.register('boom-route', BoomRoute);
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
-  registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
-  registry.register('exchange-rates', ExchangeRatesService);
-  registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
   registry.register('upload-queries', UploadQueries);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
-  registry.register('inventory-route', InventoryRoute);
   registry.register('latest-event-block-queries', LatestEventBlockQueries);
-  registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('order', OrderService);
-  registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
   registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
-  registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
-  registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
-  registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-space-queries', CardSpaceQueries);
-  registry.register('card-spaces-route', CardSpacesRoute);
-  registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('notification-type-queries', NotificationTypeQueries);
-  registry.register('notification-preferences-route', NotificationPreferencesRoute);
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
-  registry.register('reservations-route', ReservationsRoute);
-  registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
-  registry.register('status-route', StatusRoute);
-  registry.register('wyre-callback-route', WyreCallbackRoute);
-  registry.register('wyre-prices-route', WyrePricesRoute);
-  registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
     registry.register(
@@ -173,7 +138,7 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private cardRoutes: KnownServices['card-routes'] | undefined;
+  private cardRoutes: KnownServices['route:cards'] | undefined;
   private healthCheck = inject('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
 
@@ -183,7 +148,7 @@ export class HubServer {
 
   async ready() {
     if (process.env.COMPILER) {
-      this.cardRoutes = await getOwner(this).lookup('card-routes');
+      this.cardRoutes = await getOwner(this).lookup('route:cards');
     }
   }
 

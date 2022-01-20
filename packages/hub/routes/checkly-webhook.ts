@@ -70,6 +70,6 @@ export default class ChecklyWebhookRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'checkly-webhook-route': ChecklyWebhookRoute;
+    'route:checkly-webhook': ChecklyWebhookRoute;
   }
 }

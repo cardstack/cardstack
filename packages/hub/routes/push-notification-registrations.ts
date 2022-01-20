@@ -88,6 +88,6 @@ export default class PushNotificationRegistrationsRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'push-notification-registrations-route': PushNotificationRegistrationsRoute;
+    'route:push-notification-registrations': PushNotificationRegistrationsRoute;
   }
 }

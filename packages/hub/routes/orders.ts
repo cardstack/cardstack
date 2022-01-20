@@ -219,6 +219,6 @@ function handleNotFound(ctx: Koa.Context) {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'orders-route': OrdersRoute;
+    'route:orders': OrdersRoute;
   }
 }

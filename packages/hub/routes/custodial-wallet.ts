@@ -56,6 +56,6 @@ export default class CustodialWalletRoute {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'custodial-wallet-route': CustodialWalletRoute;
+    'route:custodial-wallet': CustodialWalletRoute;
   }
 }
