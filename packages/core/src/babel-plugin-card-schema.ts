@@ -9,7 +9,6 @@ import {
   callExpression,
   isDecorator,
   stringLiteral,
-  isClassProperty,
   ImportSpecifier,
   isStringLiteral,
   isIdentifier,
@@ -136,22 +135,32 @@ function validateUsageAndGetFieldMeta(
       throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator must be used as a decorator`);
     }
 
-    if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
-      throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator can only go on class properties`);
+    let fieldPath = fieldIdentifier.parentPath.parentPath.parentPath;
+    if (!fieldPath.isClassProperty() && !fieldPath.isClassMethod()) {
+      throw error(
+        fieldIdentifier,
+        `the @${fieldTypeDecorator} decorator can only go on class properties or class methods`
+      );
     }
 
-    if (fieldIdentifier.parentPath.parentPath.parent.computed) {
-      throw error(fieldIdentifier, 'field names must not be dynamically computed');
+    if (fieldPath.node.computed) {
+      throw error(fieldPath, 'field names must not be dynamically computed');
     }
 
-    if (
-      !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
-      !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
-    ) {
+    if (!isIdentifier(fieldPath.node.key) && !isStringLiteral(fieldPath.node.key)) {
       throw error(fieldIdentifier, 'field names must be identifiers or string literals');
     }
 
-    let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
+    if (fieldPath.isClassMethod()) {
+      if (fieldPath.node.params.length !== 0) {
+        throw error(fieldPath.get('params')[0], 'computed fields take no arguments');
+      }
+      if (fieldPath.node.static) {
+        throw error(fieldPath, 'computed fields should not be static');
+      }
+    }
+
+    let fieldName = name(fieldPath.node.key);
     fields[fieldName] = {
       ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<CallExpression>, fieldTypeDecorator),
       type: actualName,

@@ -135,8 +135,12 @@ export default class FileCache {
     return this.moduleURL(cardURL, localFile);
   }
 
+  resolveModule(moduleURL: string, env: Environment = 'node'): string {
+    return join(this.dir, env, moduleURL.replace(this.pkgName + '', ''));
+  }
+
   getModule(moduleURL: string, env: Environment = 'node'): string | undefined {
-    return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
+    return this.readFile(this.resolveModule(moduleURL, env));
   }
 
   deleteCardModules(cardURL: string): void {
