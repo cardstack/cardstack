@@ -4,9 +4,12 @@ import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } fro
 import walkSync from 'walk-sync';
 import kebabCase from 'lodash/kebabCase';
 import filter from 'lodash/filter';
+import find from 'lodash/find';
 import pluralize from 'pluralize';
+import logger from '@cardstack/logger';
 
 let nonce = 0;
+const log = logger('di');
 
 export class Container implements ContainerInterface {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
@@ -277,48 +280,43 @@ export class Registry {
     mappings.get(this)!.set(name, factory);
   }
 
-  private getImportConfigFor(injectString: string): ImportConfig[] {
-    let configs = filter(this.importConfigs, (ic) => ic.isPossiblyMine(injectString));
-    if (configs.length === 0) {
-      throw Error(`No dynamic injection configured for key: ${injectString}`);
-    }
-    return configs;
+  private findImportConfigForFile(type: string | undefined): ImportConfig | undefined {
+    return find(this.importConfigs, (ic) => ic.isPossiblyMine(type));
   }
 
   private findImportableFile(injectString: string): { type: string; path: string } {
-    // kebabCase converts web3 to web-3 which is bad
-    let fileName = kebabCase(injectString).replace('-3-', '3-');
-
-    let configs = this.getImportConfigFor(fileName);
-    let result = configs.map((c) => {
-      return {
-        type: c.type,
-        path: c.findFile(fileName),
-      };
-    });
-
-    if (result.length > 1 || result[0].path.length > 1) {
-      throw Error(`Tried to inject ${injectString}, but found multple possibilities: ${JSON.stringify(result)}`);
+    let injection = injectString.split(':');
+    let name = injection[1] ?? injection[0];
+    let config = this.findImportConfigForFile(!injection[1] ? undefined : injection[0]);
+    if (!config) {
+      throw Error(`No dynamic injection configured for key: ${injectString}`);
     }
-    let {
-      type,
-      path: [path],
-    } = result[0];
+
+    // kebabCase converts web3 to web-3 which is bad
+    let fileName = kebabCase(name).replace('-3-', '3-');
+    let results = config.findFile(fileName);
+
+    if (results.length > 1) {
+      throw Error(`Tried to inject ${injectString}, but found multple possibilities: ${path}`);
+    }
+    let [path] = results;
     if (!path) {
-      throw Error(`Tried to inject ${injectString}, but found ZERO possigilities`);
+      throw Error(`Tried to inject ${injectString}, but found ZERO possibilities`);
     }
 
     return {
-      type,
-      path: path.replace(/\.ts&/, ''),
+      type: config.type,
+      path: path.replace(/\.ts$/, ''),
     };
   }
 
+  // TODO: Is there a better type than any for the loaded classes?
   async tryToFindFactory(name: string): Promise<any | void> {
     let result = this.findImportableFile(name);
     if (!result || !this.importFactory) {
       return;
     }
+    log.trace('Trying to import %s', result.path);
     let factory = await this.importFactory(result.type, result.path);
     if (!factory || !factory.default) {
       return;
@@ -343,12 +341,11 @@ class ImportConfig {
     this.knownFilePaths = this.buildFilePaths();
   }
 
-  isPossiblyMine(injectString: string): boolean {
-    let [type, name] = injectString.split(':');
-    if (type && !name) {
-      return this.prefixOptional;
-    } else {
+  isPossiblyMine(type: string | undefined): boolean {
+    if (type) {
       return this.type === type;
+    } else {
+      return this.prefixOptional;
     }
   }
 
