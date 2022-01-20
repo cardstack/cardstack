@@ -11,10 +11,19 @@ module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
     svgJar: {
+      strategy: 'inline',
+      sourceDirs: ['public'],
       optimizer: {
+        svgoModule: require('svgo'),
         plugins: [
           {
-            cleanupIDs: false,
+            cleanupIDs: { minify: false },
+          },
+          {
+            prefixIds: false,
+          },
+          {
+            uniqueID: require('svgo-unique-id'),
           },
         ],
       },
