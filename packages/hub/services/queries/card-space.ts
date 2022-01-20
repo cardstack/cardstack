@@ -14,16 +14,16 @@ export default class CardSpaceQueries {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO card_spaces (id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+      'INSERT INTO card_spaces (id, merchant_id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
       [
         model.id,
+        model.merchantId,
         model.profileName,
         model.profileImageUrl,
         model.profileCoverImageUrl,
         model.profileDescription,
         model.profileButtonText,
         model.profileCategory,
-        model.ownerAddress,
       ]
     );
   }
@@ -77,7 +77,7 @@ export default class CardSpaceQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, owner_address FROM card_spaces WHERE ${conditions.where}`;
+    const query = `SELECT id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4 FROM card_spaces WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
@@ -98,7 +98,6 @@ export default class CardSpaceQueries {
         donationSuggestionAmount2: row['donation_suggestion_amount_2'],
         donationSuggestionAmount3: row['donation_suggestion_amount_3'],
         donationSuggestionAmount4: row['donation_suggestion_amount_4'],
-        ownerAddress: row['owner_address'],
       };
     });
   }

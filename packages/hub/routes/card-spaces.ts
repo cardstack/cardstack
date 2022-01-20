@@ -12,6 +12,7 @@ import { serializeErrors } from './utils/error';
 
 export interface CardSpace {
   id: string;
+  merchantId?: string;
   profileName?: string;
   profileDescription?: string;
   profileCategory?: string;
@@ -27,8 +28,6 @@ export interface CardSpace {
   donationSuggestionAmount2?: number;
   donationSuggestionAmount3?: number;
   donationSuggestionAmount4?: number;
-  ownerAddress?: string;
-  merchantId?: string;
 }
 
 export default class CardSpacesRoute {
@@ -55,14 +54,16 @@ export default class CardSpacesRoute {
 
     const cardSpace: CardSpace = {
       id: shortUuid.uuid(),
+      merchantId: this.sanitizeText(ctx.request.body.data.attributes['merchant-id']),
       profileName: this.sanitizeText(ctx.request.body.data.attributes['profile-name']),
       profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
       profileCategory: this.sanitizeText(ctx.request.body.data.attributes['profile-category']),
       profileButtonText: this.sanitizeText(ctx.request.body.data.attributes['profile-button-text']),
       profileImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']),
       profileCoverImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-cover-image-url']),
-      ownerAddress: ctx.state.userAddress,
     };
+
+    // FIXME restore handling of ctx.state.userAddress
 
     let errors = await this.cardSpaceValidator.validate(cardSpace);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
@@ -94,12 +95,12 @@ export default class CardSpacesRoute {
     let cardSpaceId = ctx.params.id;
     let cardSpace = (await this.cardSpaceQueries.query({ id: cardSpaceId }))[0] as CardSpace;
 
-    if (cardSpace) {
-      if (ctx.state.userAddress !== cardSpace.ownerAddress) {
-        ctx.status = 403;
-        return;
-      }
-    }
+    // if (cardSpace) {
+    //   if (ctx.state.userAddress !== cardSpace.ownerAddress) {
+    //     ctx.status = 403;
+    //     return;
+    //   }
+    // }
 
     if (!cardSpace) {
       ctx.status = 404;

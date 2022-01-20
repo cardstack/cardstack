@@ -52,10 +52,11 @@ describe('POST /api/card-spaces', function () {
   });
 
   it('persists card space', async function () {
+    let merchantId = uuidv4();
     await (
       await getContainer().lookup('merchant-info-queries')
     ).insert({
-      id: uuidv4(), // Can’t insert without an id?
+      id: merchantId, // Can’t insert without an id?
       ownerAddress: stubUserAddress,
       name: 'Satoshi?',
       slug: 'satoshi',
@@ -67,13 +68,13 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
+          'merchant-id': merchantId,
           'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
           'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
           'profile-cover-image-url': 'https://test.com/test2.png',
           'profile-button-text': 'Visit this Space',
-          'owner-address': stubUserAddress,
         },
       },
     };
@@ -101,13 +102,13 @@ describe('POST /api/card-spaces', function () {
           id: 'the-id',
           attributes: {
             did: 'the-did',
+            'merchant-id': merchantId,
             'profile-name': 'Satoshi Nakamoto',
             'profile-description': "Satoshi's place",
             'profile-category': 'entertainment',
             'profile-image-url': 'https://test.com/test1.png',
             'profile-cover-image-url': 'https://test.com/test2.png',
             'profile-button-text': 'Visit this Space',
-            'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
           },
         },
       })
