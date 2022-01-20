@@ -18,7 +18,7 @@ import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
 import RealmManager from '../services/realm-manager';
 import { SearchIndex } from '../services/search-index';
-import { BadRequest, Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
+import { BadRequest } from '@cardstack/core/src/utils/errors';
 // import { tracked } from '@glimmer/tracking';
 
 export interface NewCardParams {
@@ -80,19 +80,6 @@ export default class CardModelForHub implements CardModel {
     }
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
-    }
-    // TODO remove this. it's up to the realm manager to make this
-    // decision--and it's the one that needs to raise the errors
-    if (id) {
-      try {
-        await this.env.loadData(cardURL({ realm, id }), 'isolated');
-        throw new Conflict(`Card ${id} already exists in realm ${realm}`);
-      } catch (e: any) {
-        if (!isCardstackError(e) || e.status !== 404) {
-          throw e;
-        }
-        // we expect a 404 here, so we can continue
-      }
     }
     return new (this.constructor as typeof CardModelForHub)(this.env, {
       type: 'created',
