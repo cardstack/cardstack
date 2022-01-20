@@ -36,3 +36,7 @@
   font-weight: 300;
   color: var(--boxel-dark);
 }
+
+.workflow-thread__degraded-service-banner:first-child {
+  border-radius: inherit;
+}

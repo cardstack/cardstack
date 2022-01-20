@@ -10,9 +10,44 @@ import {
   WorkflowCard,
 } from '@cardstack/web-client/models/workflow';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
+import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+import config from '@cardstack/web-client/config/environment';
 
 module('Integration | Component | workflow-thread', function (hooks) {
   setupRenderingTest(hooks);
+  setupMirage(hooks);
+
+  test('it displays a degraded service banner if required', async function (this: MirageTestContext, assert) {
+    this.set('workflow', new WorkflowStub(this.owner));
+    let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`;
+    this.server.get(statusPageUrl, function () {
+      return new MirageResponse(
+        200,
+        {},
+        {
+          incidents: [
+            {
+              name: 'This should be visible in a workflow.',
+              impact: 'critical',
+            },
+          ],
+        }
+      );
+    });
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}}>
+        <:before-content>
+          <div data-test-hello-world>Hello world</div>
+        </:before-content>
+      </WorkflowThread>
+    `);
+
+    assert
+      .dom('[data-test-degraded-service-banner]')
+      .isVisible()
+      .containsText('This should be visible in a workflow.');
+  });
 
   test('it renders before-content named block', async function (assert) {
     this.set('workflow', new WorkflowStub(this.owner));
