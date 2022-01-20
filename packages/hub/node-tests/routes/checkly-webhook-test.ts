@@ -40,12 +40,13 @@ describe('POST /api/checkly-webhook', async function () {
 
     expect(createdIncident).to.deep.equal({
       componentName: 'Subgraph',
+      name: 'Experiencing degraded service',
       message:
         'We are experiencing blockchain indexing delays. The blockchain index is delayed by at least 10 blocks. This will result increased transaction processing times.',
     });
   });
 
-  it('creates a new alert when the check recovered', async function () {
+  it('resolves an incident when the check recovered', async function () {
     await request()
       .post('/callbacks/checkly')
       .set('Accept', 'application/json')
