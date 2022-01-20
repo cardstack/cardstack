@@ -19,7 +19,6 @@ module.exports = {
   options: {
     svgJar: {
       strategy: 'inline',
-      sourceDirs: ['public'],
       optimizer: {
         svgoModule: require('svgo'),
         plugins: [
