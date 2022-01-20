@@ -81,6 +81,8 @@ export default class CardModelForHub implements CardModel {
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
     }
+    // TODO remove this. it's up to the realm manager to make this
+    // decision--and it's the one that needs to raise the errors
     if (id) {
       try {
         await this.env.loadData(cardURL({ realm, id }), 'isolated');
@@ -146,6 +148,8 @@ export default class CardModelForHub implements CardModel {
     this.state.deserialized = deserialized;
   }
 
+  // TODO: we need to really use a validation mechanism which will use code from
+  // the schema.js module to validate the fields
   private assertFieldsExists(data: RawCardData, path = ''): string[] {
     let nonExistentFields: string[] = [];
     for (let [field, value] of Object.entries(data)) {
@@ -159,6 +163,8 @@ export default class CardModelForHub implements CardModel {
     return nonExistentFields;
   }
 
+  // TODO: This will likely need to go to a field level deserialization so that
+  // you know from a field-by-field perspective if a field has been deserialized
   get data(): any {
     if (!this.state.deserialized && this.state.type === 'loaded') {
       this._data = deserializeAttributes(this.state.rawData, this.serializerMap);
@@ -176,6 +182,7 @@ export default class CardModelForHub implements CardModel {
       return serializeResource(
         'card',
         undefined,
+        // TODO can we use structuredClone here instead of cloneDeep?
         serializeAttributes(cloneDeep(this.data), this.serializerMap),
         this.usedFields
       );
@@ -210,6 +217,8 @@ export default class CardModelForHub implements CardModel {
         break;
       case 'loaded':
         {
+          // TODO we started out with the old data--so just hang on to it (this
+          // is this.rawData)
           let original = await this.env.loadData(this.url, this.format);
           let updatedRawCard = merge(
             {

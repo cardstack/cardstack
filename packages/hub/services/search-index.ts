@@ -340,6 +340,13 @@ class IndexerRun implements IndexerHandle {
       // own compiled is the URL
       isNew = true;
       compiled = await this.builder.getCompiledCard(rawCard.adoptsFrom);
+      // TODO The outer parts of this compiled card are still not correct for
+      // us--like adoptsFrom.
+      // TODO instead of mutating we should create a new
+      // object. this will help us with constructing our own fields. we can just
+      // splat in the parent's compiled and then add our own stuff. also need to
+      // make sure to fill in the componentInfos' parent if unset. consider
+      // moving this as a function into the compiler: `compileDerive`
       compiled.url = url;
       let {
         rows: [{ deps: result }],
@@ -352,6 +359,7 @@ class IndexerRun implements IndexerHandle {
       if (!deps) {
         throw new Error('This should never happen');
       }
+      // TODO make into an insert--don't use upsert
       expression = upsert('cards', 'cards_pkey', {
         url: param(url),
         realm: param(this.realmURL),
@@ -431,6 +439,8 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
   return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
 }
 
+// TODO consider using the compiler to return a function that can be used to
+// generate these values for a card
 function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
   let result: Record<string, any> = {};
 
