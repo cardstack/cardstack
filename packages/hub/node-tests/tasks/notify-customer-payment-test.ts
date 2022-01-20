@@ -148,7 +148,7 @@ describe('NotifyCustomerPaymentTask', function () {
       }),
     };
 
-    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+    let task = (await getContainer().lookup('task:notify-customer-payment')) as NotifyCustomerPayment;
 
     await task.perform('a');
 
@@ -247,7 +247,7 @@ describe('NotifyCustomerPaymentTask', function () {
       }),
     };
 
-    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+    let task = (await getContainer().lookup('task:notify-customer-payment')) as NotifyCustomerPayment;
 
     await task.perform('a');
 
@@ -342,7 +342,7 @@ describe('NotifyCustomerPaymentTask', function () {
       }),
     };
 
-    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+    let task = (await getContainer().lookup('task:notify-customer-payment')) as NotifyCustomerPayment;
 
     await task.perform('a');
 
@@ -366,7 +366,7 @@ describe('NotifyCustomerPaymentTask', function () {
   });
 
   it('throws when the transaction is not found on the subgraph', async function () {
-    let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
+    let task = (await getContainer().lookup('task:notify-customer-payment')) as NotifyCustomerPayment;
 
     return expect(task.perform('a'))
       .to.be.rejectedWith(`Subgraph did not return information for prepaid card payment with transaction hash: "a"`)

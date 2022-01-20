@@ -93,7 +93,7 @@ describe('SendNotificationsTask', function () {
     lastSentData = undefined;
     notificationSent = false;
 
-    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    subject = (await getContainer().lookup('task:send-notifications')) as SendNotifications;
   });
 
   it('will not send a notification if it already exists in the db', async function () {
@@ -154,7 +154,7 @@ describe('SendNotificationsTask deduplication errors', async function () {
   });
 
   it('handles deduplication write failure by catching the error, and sends the notification', async function () {
-    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    let subject = (await getContainer().lookup('task:send-notifications')) as SendNotifications;
 
     await subject.perform(newlyAddedNotification, helpers);
 
@@ -195,7 +195,7 @@ describe('SendNotificationsTask firebase errors', function () {
 
   it('should throw if sending a notification fails, and still log to sentry', async function () {
     registry(this).register('firebase-push-notifications', ErroredFirebasePushNotifications);
-    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    let subject = (await getContainer().lookup('task:send-notifications')) as SendNotifications;
 
     await expect(subject.perform(newlyAddedNotification, helpers)).to.be.rejectedWith(
       ErroredFirebasePushNotifications.message
@@ -229,7 +229,7 @@ describe('SendNotificationsTask expired notifications', function () {
     notificationSent = false;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
 
-    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    subject = (await getContainer().lookup('task:send-notifications')) as SendNotifications;
   });
 
   it('should not send an expired notification', async function () {

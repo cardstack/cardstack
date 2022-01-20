@@ -61,7 +61,7 @@ describe('RemoveOldSentNotificationsTask', function () {
       ]);
     }
 
-    subject = (await getContainer().lookup('remove-old-sent-notifications')) as RemoveOldSentNotificationsTask;
+    subject = (await getContainer().lookup('task:remove-old-sent-notifications')) as RemoveOldSentNotificationsTask;
   });
 
   it('deletes old items and keeps recent', async function () {

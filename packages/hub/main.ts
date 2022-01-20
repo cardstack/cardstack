@@ -43,14 +43,6 @@ import { ContractSubscriptionEventHandler } from './services/contract-subscripti
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 
-import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
-import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
-import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
-import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
-import SendNotificationsTask from './tasks/send-notifications';
-
 import OrderService from './services/order';
 
 import InventoryService from './services/inventory';
@@ -63,7 +55,7 @@ const serverLog = logger('hub/server');
 export function createRegistry(): Registry {
   let registry = new Registry({
     rootDir: process.cwd(),
-    importConfig: [{ type: 'service', prefixOptional: true }, { type: 'route' }],
+    importConfig: [{ type: 'service', prefixOptional: true }, { type: 'route' }, { type: 'task' }],
     importFactory: async (type, importPath) => {
       switch (type) {
         case 'service':
@@ -73,6 +65,8 @@ export function createRegistry(): Registry {
           );
         case 'route':
           return await import(`./routes/${importPath.replace('./routes/', '')}`);
+        case 'task':
+          return await import(`./tasks/${importPath.replace('./tasks/', '')}`);
 
         default:
           throw new Error(`Received an import type of ${type} that didnt receive an import config`);
@@ -99,13 +93,7 @@ export function createRegistry(): Registry {
   registry.register('inventory', InventoryService);
   registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-info-queries', MerchantInfoQueries);
-  registry.register('send-notifications', SendNotificationsTask);
-  registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
-  registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('order', OrderService);
-  registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
-  registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
-  registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
@@ -113,7 +101,6 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
-  registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
 
   if (process.env.COMPILER) {
