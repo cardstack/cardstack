@@ -11,6 +11,7 @@ type CheckName = 'hub-prod subgraph / RPC node block number diff within threshol
 type Checks = {
   [key in CheckName]: {
     componentName: 'Subgraph'; // Component name in Checkly
+    incidentName: string; // Incident name in Checkly
     incidentMessage: string; // Will be shown in Statuspage
   };
 };
@@ -21,6 +22,7 @@ export default class ChecklyWebhookRoute {
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {
       componentName: 'Subgraph',
+      incidentName: 'Experiencing degraded service',
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
     },
   };
@@ -46,7 +48,7 @@ export default class ChecklyWebhookRoute {
       let alertType = ctx.request.body.alert_type;
 
       if (alertType === 'ALERT_FAILURE') {
-        await this.statuspageApi.createIncident(check.componentName, check.incidentMessage);
+        await this.statuspageApi.createIncident(check.componentName, check.incidentName, check.incidentMessage);
       } else if (alertType == 'ALERT_RECOVERY') {
         await this.statuspageApi.resolveIncident(check.componentName);
       }
