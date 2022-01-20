@@ -43,8 +43,6 @@ import { ContractSubscriptionEventHandler } from './services/contract-subscripti
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 
-import OrderService from './services/order';
-
 import InventoryService from './services/inventory';
 
 //@ts-ignore polyfilling fetch
@@ -71,9 +69,6 @@ export function createRegistry(): Registry {
         default:
           throw new Error(`Received an import type of ${type} that didnt receive an import config`);
       }
-      // if (importPath.startsWith('./routes/')) {
-      //   return await import(`./routes/${importPath.replace('./routes/', '')}`);
-      // }
     },
   });
 
@@ -93,7 +88,6 @@ export function createRegistry(): Registry {
   registry.register('inventory', InventoryService);
   registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-info-queries', MerchantInfoQueries);
-  registry.register('order', OrderService);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
