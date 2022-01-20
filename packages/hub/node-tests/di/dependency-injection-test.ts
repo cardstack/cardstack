@@ -5,7 +5,9 @@ describe('hub/di/dependency-injection', function () {
   let container: Container;
 
   before(function () {
-    registry = new Registry();
+    registry = new Registry({
+      findFactory: () => {},
+    });
     registry.register('testExample', ExampleService);
     registry.register('testConsumer', ConsumingService);
     registry.register('test-has-async', HasAsyncReady);

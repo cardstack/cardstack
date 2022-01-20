@@ -20,85 +20,89 @@ import initSentry from './initializers/sentry';
 import initFirebase from './initializers/firebase';
 
 import DatabaseManager from '@cardstack/db';
-import WalletConnectService from './services/discord-bots/hub-bot/services/wallet-connect';
 
-import BoomRoute from './routes/boom';
-import ExchangeRatesRoute from './routes/exchange-rates';
-import SessionRoute from './routes/session';
-import StatusRoute from './routes/status';
-import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
-import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
-import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
-import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
-import PrepaidCardCustomizationSerializer from './services/serializers/prepaid-card-customization-serializer';
-import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
-import OrdersRoute from './routes/orders';
-import ReservationsRoute from './routes/reservations';
-import InventoryRoute from './routes/inventory';
-import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
-import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
-import MerchantInfosRoute from './routes/merchant-infos';
-import CustodialWalletRoute from './routes/custodial-wallet';
-import WyreCallbackRoute from './routes/wyre-callback';
-import WyrePricesRoute from './routes/wyre-prices';
-import CardSpacesRoute from './routes/card-spaces';
-import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
-import MerchantInfoQueries from './services/queries/merchant-info';
-import CardSpaceQueries from './services/queries/card-space';
-import CardSpaceSerializer from './services/serializers/card-space-serializer';
-import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
-import Upload from './routes/upload';
-import UploadQueries from './services/queries/upload';
 import CardpaySDKService from './services/cardpay-sdk';
 import { Clock } from './services/clock';
-import Web3HttpService from './services/web3-http';
-import Web3SocketService from './services/web3-socket';
 
-import CardRoutes from './routes/card-routes';
-import { FileCacheConfig } from './services/file-cache-config';
+import BoomRoute from './routes/boom-route';
+import CardSpaceQueries from './services/queries/card-space';
+import CardSpacesRoute from './routes/card-spaces';
+import CardSpaceValidator from './services/validators/card-space';
+import ChecklyWebhookRoute from './routes/checkly-webhook';
+import CustodialWalletRoute from './routes/custodial-wallet';
+import ExchangeRatesService from './services/exchange-rates';
+import ExchangeRatesRoute from './routes/exchange-rates';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
-import Web3Storage from './services/web3-storage';
-import UploadRouter from './routes/upload';
-import RealmsConfig from './services/realms-config';
-import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
-import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
-import SendNotificationsTask from './tasks/send-notifications';
-import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
+import LatestEventBlockQueries from './services/queries/latest-event-block';
+import MerchantInfoQueries from './services/queries/merchant-info';
+import MerchantInfosRoute from './routes/merchant-infos';
+import NotificationPreferenceQueries from './services/queries/notification-preference';
+import NotificationPreferenceService from './services/push-notifications/preferences';
+import NotificationPreferencesRoute from './routes/notification-preferences';
+import NotificationTypeQueries from './services/queries/notification-type';
+import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
+import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
+import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
-import FirebasePushNotifications from './services/push-notifications/firebase';
-import LatestEventBlockQueries from './services/queries/latest-event-block';
-import NotificationTypeQueries from './services/queries/notification-type';
-import NotificationPreferenceQueries from './services/queries/notification-preference';
-import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
-import NotificationPreferencesRoute from './routes/notification-preferences';
-import NotificationPreferenceService from './services/push-notifications/preferences';
+import ReservationsRoute from './routes/reservations';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
-import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import SessionRoute from './routes/session';
+import StatusRoute from './routes/status';
+import Upload from './routes/upload';
+import UploadQueries from './services/queries/upload';
+import UploadRouter from './routes/upload';
+import WyreCallbackRoute from './routes/wyre-callback';
+import WyrePricesRoute from './routes/wyre-prices';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
-import StatuspageApi from './services/statuspage-api';
-import ChecklyWebhookRoute from './routes/checkly-webhook';
-import kebabCase from 'lodash/kebabCase';
+
+import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
+import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
+import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
+import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
+import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import SendNotificationsTask from './tasks/send-notifications';
+
+import OrderService from './services/order';
+import OrdersRoute from './routes/orders';
+
+import InventoryService from './services/inventory';
+import InventoryRoute from './routes/inventory';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
 const serverLog = logger('hub/server');
 
+// const factoryOptions = {
+//   service: {
+//     default: true,
+//     dir: 'services',
+//   },
+//   route: {
+//     dir: 'routes',
+//   },
+// };
 export function createRegistry(): Registry {
-  let registry = new Registry(async (name: string) => {
-    // TODO:
-    // - [ ] Check if the file exists first and then exit early
-    // - [ ] Configure for routes
-    return await import(
-      /* webpackExclude: /assets/ */
-      `./services/${kebabCase(name)}`
-    );
+  let registry = new Registry({
+    rootDir: process.cwd(),
+    factoryGlobs: ['services/**/*.ts', 'routes/**/*.ts'],
+    findFactory: async (importPath: string) => {
+      if (importPath.startsWith('./services/')) {
+        return await import(
+          /* webpackExclude: /assets/ */
+          `./services/${importPath.replace('./services/', '')}`
+        );
+      }
+      // if (importPath.startsWith('./routes/')) {
+      //   return await import(`./routes/${importPath.replace('./routes/', '')}`);
+      // }
+    },
   });
 
   registry.register('hubServer', HubServer);
@@ -111,42 +115,37 @@ export function createRegistry(): Registry {
   registry.register('clock', Clock);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
+  registry.register('exchange-rates', ExchangeRatesService);
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
   registry.register('upload-queries', UploadQueries);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
+  registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-infos-route', MerchantInfosRoute);
-  registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
+  registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
   registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
-  registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
-  registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
-  registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
-  registry.register('card-space-serializer', CardSpaceSerializer);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
-  registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
-  registry.register('firebase-push-notifications', FirebasePushNotifications);
   registry.register('notification-type-queries', NotificationTypeQueries);
   registry.register('notification-preferences-route', NotificationPreferencesRoute);
   registry.register('notification-preference-queries', NotificationPreferenceQueries);
-  registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
@@ -154,19 +153,11 @@ export function createRegistry(): Registry {
   registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
   registry.register('status-route', StatusRoute);
-  registry.register('wallet-connect', WalletConnectService);
-  registry.register('web3-http', Web3HttpService);
-  registry.register('web3-socket', Web3SocketService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
-  registry.register('web3-storage', Web3Storage);
-  registry.register('statuspage-api', StatuspageApi);
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
-    registry.register('realmsConfig', RealmsConfig);
-    registry.register('file-cache-config', FileCacheConfig);
-    registry.register('card-routes', CardRoutes);
     registry.register(
       'card-routes-config',
       class {

@@ -1,6 +1,9 @@
 import { Memoize } from 'typescript-memoize';
 import { Deferred } from './deferred';
 import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } from './container';
+import kebabCase from 'lodash/kebabCase';
+import walkSync from 'walk-sync';
+import { find } from 'lodash';
 
 let nonce = 0;
 
@@ -40,19 +43,14 @@ export class Container implements ContainerInterface {
     let factory = mappings.get(this.registry)!.get(name);
 
     if (!factory) {
-      if (!this.registry.findFactory) {
+      factory = await this.registry.tryToFindFactory(name);
+      if (!factory) {
         throw new Error(`no such service "${name}"`);
       }
-
-      let klass = await this.registry.findFactory(name);
-      if (!klass && !klass.default) {
-        throw new Error(`no such service "${name}"`);
-      }
-      this.registry.register(name, klass.default);
-      factory = klass.default;
+      this.registry.register(name, factory);
     }
 
-    return factory!;
+    return factory;
   }
 
   // When this is called we'll always instantiate a new instance for each
@@ -243,13 +241,66 @@ let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
 let pendingInstantiationStack = [] as PendingInjections[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
+interface RegistryOptions {
+  findFactory: Registry['findFactory'];
+  rootDir?: Registry['rootDir'];
+  factoryGlobs?: Registry['factoryGlobs'];
+}
+
 export class Registry {
-  constructor(public findFactory?: (name: string) => any) {
+  private findFactory: (importPath: string) => Promise<any> | void;
+  private rootDir: string;
+  private factoryGlobs: string[];
+  private importPossibilities: string[] = [];
+
+  constructor(options: RegistryOptions) {
+    this.findFactory = options.findFactory;
+    this.rootDir = options.rootDir ?? process.cwd();
+    this.factoryGlobs = options.factoryGlobs ?? [];
+
     mappings.set(this, new Map());
+
+    this.importPossibilities = this.findImportPossibilities();
   }
+
   register<T>(name: string, factory: Factory<T>) {
     // non-null because our constructor initializes weakmap.
     mappings.get(this)!.set(name, factory);
+  }
+
+  findInImportPosibilities(name: string) {
+    // kebabCase converts web3 to web-3 which is bad
+    let fileName = kebabCase(name).replace('-3-', '3-');
+
+    let possibility = find(this.importPossibilities, (e) => {
+      return e.endsWith(fileName + '.ts');
+    });
+    if (!possibility) {
+      return;
+    }
+    return possibility.replace(/\.ts&/, '');
+  }
+
+  async tryToFindFactory(name: string): Promise<any | void> {
+    let path = this.findInImportPosibilities(name);
+    if (!path) {
+      return;
+    }
+    let factory = await this.findFactory(path);
+    if (!factory || !factory.default) {
+      return;
+    }
+    return factory.default;
+  }
+
+  private findImportPossibilities() {
+    return walkSync
+      .entries(this.rootDir, {
+        globs: this.factoryGlobs,
+        ignore: ['**/*.d.ts'],
+        fs: undefined as any,
+      })
+      .map((entry) => './' + entry.relativePath);
   }
 }
 
