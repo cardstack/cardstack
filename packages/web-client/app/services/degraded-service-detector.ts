@@ -43,10 +43,10 @@ export default class DegradedServiceDetector extends Service {
     }
   }
 
-  async getDegradationStatusData(): Promise<any> {
+  async getDegradationStatusData(): Promise<Incident | null> {
     let statusPageUrl = `${this.statusPageUrl}/api/v2/incidents/unresolved.json`;
 
-    let data = {} as any;
+    let data = {} as StatuspageStatusAPIUnresolvedResponse;
 
     try {
       let response = await fetch(statusPageUrl);
@@ -81,9 +81,12 @@ export default class DegradedServiceDetector extends Service {
         return +new Date(b.started_at) - +new Date(a.started_at);
       })[0];
 
+    let lastUpdate =
+      incident.incident_updates[incident.incident_updates.length - 1];
+
     return {
       status: incident.status,
-      name: this.addPunctuation(incident.name),
+      name: this.addPunctuation(lastUpdate.body),
       impact: incident.impact,
     };
   }
@@ -96,3 +99,25 @@ export default class DegradedServiceDetector extends Service {
     return `${text}.`;
   }
 }
+
+// https://metastatuspage.com/api#incidents-unresolved
+type StatuspageStatusAPIUnresolvedResponse = {
+  incidents: Array<StatuspageIncident>;
+};
+
+type StatuspageIncident = {
+  impact: string;
+  incident_updates: [
+    {
+      body: string;
+    }
+  ];
+  name: string;
+  status: string;
+};
+
+type Incident = {
+  name: string;
+  impact: string;
+  status: string;
+};

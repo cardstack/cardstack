@@ -39,8 +39,12 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
         {
           incidents: [
             {
-              name: 'All systems down.',
+              name: 'Ignored',
               impact: 'critical',
+              incident_updates: [
+                { body: 'An old error' },
+                { body: 'All systems down.' },
+              ],
             },
           ],
         }
@@ -69,6 +73,7 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
             {
               name: 'All systems down.',
               impact: 'major',
+              incident_updates: [{ body: 'All systems down.' }],
             },
           ],
         }
@@ -90,8 +95,9 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
         {
           incidents: [
             {
-              name: 'One small system down.',
+              name: 'Ignored',
               impact: 'minor',
+              incident_updates: [{ body: 'One small system down.' }],
             },
           ],
         }
@@ -118,23 +124,27 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
         {
           incidents: [
             {
-              name: 'All systems down.',
+              name: 'Ignored',
               impact: 'major',
+              incident_updates: [{ body: 'All systems down.' }],
               started_at: '2021-10-10T10:10:00.000Z',
             },
             {
-              name: 'One small system down.',
+              name: 'Ignored',
               impact: 'minor',
+              incident_updates: [{ body: 'One small system down.' }],
               started_at: '2021-10-10T10:10:00.003Z',
             },
             {
-              name: 'World down.',
+              name: 'Ignored',
               impact: 'critical',
+              incident_updates: [{ body: 'World down.' }],
               started_at: '2021-10-10T10:10:00.002Z',
             },
             {
-              name: 'Internet down.',
+              name: 'Ignored',
               impact: 'critical',
+              incident_updates: [{ body: 'Internet down.' }],
               started_at: '2021-10-10T10:10:00.001Z',
             },
           ],
@@ -160,8 +170,9 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
         {
           incidents: [
             {
-              name: 'We are experiencing issues',
+              name: 'Ignored',
               impact: 'major',
+              incident_updates: [{ body: 'We are experiencing issues' }],
             },
           ],
         }

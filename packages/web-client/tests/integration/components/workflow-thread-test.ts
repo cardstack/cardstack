@@ -28,8 +28,11 @@ module('Integration | Component | workflow-thread', function (hooks) {
         {
           incidents: [
             {
-              name: 'This should be visible in a workflow.',
+              name: 'Ignored',
               impact: 'critical',
+              incident_updates: [
+                { body: 'This should be visible in a workflow.' },
+              ],
             },
           ],
         }
