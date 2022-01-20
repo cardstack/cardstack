@@ -1,6 +1,6 @@
 import { registry, setupHub } from '../helpers/server';
 
-let createdIncident: { componentName: string; name: string, message: string } | null,
+let createdIncident: { componentName: string; name: string; message: string } | null,
   resolvedIncident: { componentName: string } | null;
 
 class StubStatuspageApi {
