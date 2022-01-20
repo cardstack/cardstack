@@ -103,7 +103,7 @@ module('Acceptance | create card space persistence', function (hooks) {
       assert.dom(milestoneCompletedSel(2)).exists(); // Details
       assert.dom(milestoneCompletedSel(3)).exists(); // Confirm
       assert
-        .dom('[data-test-epilogue][data-test-postable="1"]')
+        .dom('[data-test-epilogue][data-test-postable="0"]')
         .includesText(`Congrats, you have created your Card Space!`);
     });
 

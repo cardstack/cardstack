@@ -163,16 +163,13 @@ module('Acceptance | create card space', function (hooks) {
 
     // // Epilogue
     await waitFor(epiloguePostableSel(0));
+
+    await waitFor(epiloguePostableSel(0));
     assert
       .dom(epiloguePostableSel(0))
-      .containsText(`This is the remaining balance on your prepaid card`);
-
-    await waitFor(epiloguePostableSel(1));
-    assert
-      .dom(epiloguePostableSel(1))
       .containsText(`Congrats, you have created your Card Space!`);
 
-    await waitFor(epiloguePostableSel(2));
+    await waitFor(epiloguePostableSel(1));
 
     await percySnapshot(assert);
 
