@@ -139,6 +139,18 @@ if (process.env.COMPILER) {
       expect(isolated.data.name).to.equal('Robert Barker');
     });
 
+    it('.save() on adopted card using pre-existing id', async function () {
+      let id = 'bob-barker';
+      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
+      let model = await parentCard.adoptIntoRealm(realmURL, id);
+      try {
+        await model.save();
+        throw new Error('did not throw expected error');
+      } catch (e: any) {
+        expect(e.message).to.equal(`card ${realmURL}${id} already exists`);
+      }
+    });
+
     // note that we have route tests that also assert that setting values on
     // non-existent fields should error
     it('setData of unused field', async function () {
