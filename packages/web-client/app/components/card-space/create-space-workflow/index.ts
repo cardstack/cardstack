@@ -81,14 +81,6 @@ class CreateSpaceWorkflow extends Workflow {
     new Milestone({
       title: MILESTONE_TITLES[1],
       postables: [
-        // TODO
-        // new WorkflowMessage({
-        //   message: `It looks like you don’t have a prepaid card in your account. You will need one to pay the **100 SPEND ($1 USD)** Card Space creation fee. Please buy a prepaid card before you continue with this workflow.`,
-        // }),
-        // new WorkflowCard({
-        //   cardName: 'PREPAID_CARD_PURCHASE_INSTRUCTIONS',
-        //   componentName: 'card-pay/prepaid-card-purchase-instructions',
-        // }),
         new NetworkAwareWorkflowMessage({
           message: `To store data in the Cardstack Hub, you need to authenticate using your Card Wallet.
           You only need to do this once per browser/device.`,
@@ -154,14 +146,6 @@ class CreateSpaceWorkflow extends Workflow {
     }),
   ];
   epilogue = new PostableCollection([
-    new WorkflowMessage({
-      message: `This is the remaining balance on your prepaid card:`,
-    }),
-    // TODO
-    // new WorkflowCard({
-    //   cardName: 'EPILOGUE_PREPAID_CARD_BALANCE',
-    //   componentName: 'card-pay/prepaid-card-balance',
-    // }),
     new WorkflowMessage({
       message: `Congrats, you have created your Card Space!`,
     }),
