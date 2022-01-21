@@ -72,25 +72,19 @@ module.exports = function (defaults) {
             vm: false,
           },
         },
+        output: {
+          assetModuleFilename: '[path][name]-[contenthash].[ext]',
+        },
         module: {
           rules: [
             {
               test: /\.(png|jpg|gif|woff|woff2|eot|ttf|otf|flac)$/i,
-              loader: 'file-loader',
-              options: {
-                name: '[path][name]-[contenthash].[ext]',
-              },
+              type: 'asset/resource',
             },
             {
               test: /\.svg$/i,
-              type: 'javascript/auto',
+              type: 'asset/resource',
               use: [
-                {
-                  loader: 'file-loader',
-                  options: {
-                    name: '[path][name]-[contenthash].[ext]',
-                  },
-                },
                 {
                   loader: '@hyperbola/svgo-loader',
                   options: {
