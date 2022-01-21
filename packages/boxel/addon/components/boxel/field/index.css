@@ -1,2 +1,17 @@
 @import './edit/index.css';
 @import './view/index.css';
+
+.boxel-field {
+  display: grid;
+  gap: var(--boxel-sp-xs) var(--boxel-sp-lg);
+}
+
+.boxel-field--horizontal {
+  --boxel-field-label-size: minmax(4rem, 15%);
+
+  grid-template-columns: var(--boxel-field-label-size) 1fr;
+}
+
+.boxel-field--label-md {
+  --boxel-field-label-size: 25%;
+}

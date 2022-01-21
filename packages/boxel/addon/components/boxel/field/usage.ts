@@ -8,4 +8,5 @@ export default class extends Component {
   @tracked id = 'sample-field';
   @tracked labelClass = 'custom-classname';
   @tracked labelWidth = '7.5rem';
+  @tracked isVertical = false;
 }

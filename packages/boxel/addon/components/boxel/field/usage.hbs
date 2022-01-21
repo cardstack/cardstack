@@ -5,7 +5,8 @@
       @labelClass={{this.labelClass}}
       @fieldMode={{this.mode}}
       @fieldId={{this.id}}
-      style={{css-var boxel-field-label-width=this.labelWidth}}
+      @vertical={{this.isVertical}}
+      {{!-- style={{css-var boxel-field-label-width=this.labelWidth}} --}}
     >
       {{#if (eq this.mode "edit")}}
         <Boxel::Input
@@ -44,6 +45,13 @@
       @description="optional css class name for the field label"
       @value={{this.labelClass}}
       @onInput={{fn (mut this.labelClass)}}
+    />
+    <Args.Bool
+      @name="vertical"
+      @description="Whether the field should be displayed vertically"
+      @defaultValue="false"
+      @onInput={{fn (mut this.isVertical)}}
+      @value={{this.isVertical}}
     />
     <Args.String
       @name="--boxel-field-label-width"

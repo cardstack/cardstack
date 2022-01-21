@@ -1,15 +1,17 @@
-<div
-  class="boxel-field"
-  data-test-boxel-field
-  data-test-boxel-field-id={{@fieldId}}
-  ...attributes
->
-  <span
-    class={{cn "boxel-field__label" (if @labelClass @labelClass)}}
-    data-test-boxel-field-label
+{{#let (element (or @tag "div")) as |Tag|}}
+  <Tag
+    class="boxel-field"
+    data-test-boxel-field
+    data-test-boxel-field-id={{@fieldId}}
+    ...attributes
   >
-    {{@label}}
-  </span>
+    <span
+      class={{cn "boxel-field__label" (if @labelClass @labelClass)}}
+      data-test-boxel-field-label
+    >
+      {{@label}}
+    </span>
 
-  {{yield}}
-</div>
+    {{yield}}
+  </Tag>
+{{/let}}
