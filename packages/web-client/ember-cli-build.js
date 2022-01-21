@@ -92,7 +92,7 @@ module.exports = function (defaults) {
                   },
                 },
                 {
-                  loader: path.resolve(__dirname, './svgo-1-loader.js'),
+                  loader: '@hyperbola/svgo-loader',
                   options: {
                     plugins: [
                       { removeTitle: false },
