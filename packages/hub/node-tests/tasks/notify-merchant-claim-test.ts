@@ -110,6 +110,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -120,6 +123,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
@@ -164,6 +170,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -174,6 +183,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
@@ -216,6 +228,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -226,6 +241,9 @@ describe('NotifyMerchantClaimTask', function () {
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
+          transactionInformation: JSON.stringify({
+            merchantId: 'merchant-safe-address',
+          }),
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
