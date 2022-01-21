@@ -31,7 +31,7 @@
             @isAddress={{true}}
             data-test-address-field
           />
-          <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
+          <Boxel::Field @label="Depot balance" data-test-balance-container>
             {{#if this.layer2Network.isFetchingDepot}}
               <Boxel::LoadingIndicator data-test-balance-container-loading/>
             {{else if this.balancesToShow.length}}
@@ -43,7 +43,7 @@
             {{else}}
               None
             {{/if}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
 
         {{!-- future: show Prepaid Cards, Badges --}}

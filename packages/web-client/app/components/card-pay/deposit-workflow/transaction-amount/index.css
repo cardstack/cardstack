@@ -2,10 +2,6 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.transaction-amount__label {
-  --field-label-width: 15%;
-}
-
 .transaction-amount__token {
   display: flex;
   align-items: center;

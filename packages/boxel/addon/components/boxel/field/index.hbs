@@ -3,7 +3,7 @@
     class={{cn "boxel-field"
       boxel-field--edit=(eq @fieldMode "edit")
       boxel-field--horizontal=(not @vertical)
-      boxel-field--label-md=(eq @labelSize "md")
+      boxel-field--small-label=@smallLabel
     }}
     data-test-boxel-field
     data-test-boxel-field-id={{@fieldId}}
@@ -17,24 +17,3 @@
     </div>
   </Tag>
 {{/let}}
-
-
-{{!-- {{#if (eq @fieldMode "edit")}}
-  <Boxel::Field::Edit
-    @fieldId={{@fieldId}}
-    @label={{@label}}
-    @labelClass={{@labelClass}}
-    ...attributes
-  >
-    {{yield}}
-  </Boxel::Field::Edit>
-{{else}}
-  <Boxel::Field::View
-    @fieldId={{@fieldId}}
-    @label={{@label}}
-    @labelClass={{@labelClass}}
-    ...attributes
-  >
-    {{yield}}
-  </Boxel::Field::View>
-{{/if}} --}}

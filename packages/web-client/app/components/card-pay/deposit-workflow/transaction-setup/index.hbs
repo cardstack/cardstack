@@ -6,7 +6,7 @@
 >
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Deposit tokens">
-      <CardPay::LabeledValue @label="From:" @isCompact={{true}}>
+      <Boxel::Field @label="From:" @smallLabel={{true}}>
         {{#if @isComplete}}
           <CardPay::NestedItems>
             <:outer>
@@ -61,10 +61,10 @@
             </Boxel::RadioInput>
           </div>
         {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
-      <CardPay::LabeledValue @label="In:" @isCompact={{true}}>
+      <Boxel::Field @label="In:" @smallLabel={{true}}>
         <div>
           <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-deposit-transaction-setup-to-wallet />
           <CardPay::NestedItems>
@@ -87,7 +87,7 @@
             </:inner>
           </CardPay::NestedItems>
         </div>
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     </ActionCardContainer::Section>
     {{#if this.noTokenBalance}}
       <CardPay::ErrorMessage data-test-deposit-transaction-setup-validation>

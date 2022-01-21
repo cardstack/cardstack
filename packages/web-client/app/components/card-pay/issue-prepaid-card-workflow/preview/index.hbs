@@ -12,7 +12,6 @@
       {{#unless @isComplete}}
         <Boxel::Field
           @label="Card Preview"
-          @fieldMode="view"
           class="preview__card-preview-field"
         >
           <div class="preview__card">
@@ -36,25 +35,26 @@
         class={{cn "preview__data" preview__data--is-complete=@isComplete}}
         @horizontal={{@isComplete}}
       >
-        <CardPay::LabeledValue
+        <Boxel::Field
           @vertical={{true}}
           @label="Issued by"
-          @value={{@workflowSession.state.issuerName}}
           data-test-prepaid-card-issuer-name-labeled-value
-        />
+        >
+          {{@workflowSession.state.issuerName}}
+        </Boxel::Field>
 
         {{#if @isComplete}}
-          <CardPay::LabeledValue
+          <Boxel::Field
             @vertical={{true}}
             @label="Card address"
             data-test-prepaid-card-address-labeled-value
           >
             {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
             on {{network-display-info "layer2" "fullName"}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
 
-        <CardPay::LabeledValue
+        <Boxel::Field
           @vertical={{true}}
           @label="Face value"
           data-test-prepaid-card-face-value-labeled-value
@@ -67,7 +67,7 @@
             @balance={{format-amount this.faceValue}}
             @usdBalance={{spend-to-usd this.faceValue}}
           />
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       </CardPay::FieldStack>
     </div>
     {{#if this.error}}

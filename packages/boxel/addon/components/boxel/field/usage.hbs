@@ -5,7 +5,8 @@
       @labelClass={{this.labelClass}}
       @fieldMode={{this.mode}}
       @fieldId={{this.id}}
-      @vertical={{this.isVertical}}
+      @vertical={{this.vertical}}
+      @smallLabel={{this.smallLabel}}
       {{!-- style={{css-var boxel-field-label-width=this.labelWidth}} --}}
     >
       {{#if (eq this.mode "edit")}}
@@ -50,14 +51,15 @@
       @name="vertical"
       @description="Whether the field should be displayed vertically"
       @defaultValue="false"
-      @onInput={{fn (mut this.isVertical)}}
-      @value={{this.isVertical}}
+      @onInput={{fn (mut this.vertical)}}
+      @value={{this.vertical}}
     />
-    <Args.String
-      @name="--boxel-field-label-width"
-      @description="css variable for the width of the label column"
-      @value={{this.labelWidth}}
-      @onInput={{fn (mut this.labelWidth)}}
+    <Args.Bool
+      @name="smallLabel"
+      @description="Whether the label column should have a smaller width"
+      @defaultValue="false"
+      @onInput={{fn (mut this.smallLabel)}}
+      @value={{this.smallLabel}}
     />
     <Args.Yield
       @description="Yield value or form field"

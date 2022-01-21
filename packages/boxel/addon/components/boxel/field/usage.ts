@@ -7,6 +7,6 @@ export default class extends Component {
   @tracked mode = 'edit';
   @tracked id = 'sample-field';
   @tracked labelClass = 'custom-classname';
-  @tracked labelWidth = '7.5rem';
-  @tracked isVertical = false;
+  @tracked vertical = false;
+  @tracked smallLabel = false;
 }

@@ -6,7 +6,7 @@
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a source and balance to fund your prepaid card">
       {{#if this.sufficientBalanceSafes}}
-        <CardPay::LabeledValue @label="Source:" @isCompact={{true}}>
+        <Boxel::Field @label="Source:" @smallLabel={{true}}>
           <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
           <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="funding-source__nested-items">
             <:outer>
@@ -55,7 +55,7 @@
               {{/if}}
             </:innermost>
           </CardPay::NestedItems>
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       {{else}}
         <p data-test-insufficient-balance-message>
           You don’t have a business account or depot with enough balance to fund a prepaid card.

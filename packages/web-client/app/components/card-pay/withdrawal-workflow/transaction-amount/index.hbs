@@ -5,13 +5,13 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
     <div class="withdrawal-transaction-amount__fields">
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Withdrawal source" class="withdrawal-transaction-amount__label">
+      <Boxel::Field @vertical={{this.isConfirmed}} @label="Withdrawal source" @smallLabel={{true}}>
         <CardPay::SafeChooserDropdown::SafeOption
           @safe={{this.currentSafe}}
           data-test-withdrawal-source
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Source balance" class="withdrawal-transaction-amount__label">
+      </Boxel::Field>
+      <Boxel::Field @vertical={{this.isConfirmed}} @label="Source balance" @smallLabel={{true}}>
         <CardPay::BalanceDisplay
           class="withdrawal-transaction-amount__balance"
           @size="small"
@@ -21,12 +21,12 @@
           @symbol={{this.currentTokenDetails.symbol}}
           data-test-withdrawal-balance
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        class="withdrawal-transaction-amount__label"
-        @fieldMode={{if this.isConfirmed "view" "edit"}}
+      </Boxel::Field>
+      <Boxel::Field
+        @tag={{unless this.isConfirmed "label"}}
         @vertical={{this.isConfirmed}}
         @label="Amount to withdraw"
+        @smallLabel={{true}}
         data-test-amount-label
       >
         {{#if this.isConfirmed}}
@@ -50,15 +50,15 @@
             @disabled={{or @frozen (eq this.amountCtaState 'memorialized')}}
           />
         {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
       {{#unless this.isConfirmed}}
-        <CardPay::LabeledValue
-          class="withdrawal-transaction-amount__label"
+        <Boxel::Field
           @label="Approximate value*"
+          @smallLabel={{true}}
           data-test-approximate-value-label
         >
           {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       {{/unless}}
     </div>
     {{#if this.error}}

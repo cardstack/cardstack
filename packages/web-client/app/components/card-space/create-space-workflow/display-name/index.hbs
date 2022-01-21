@@ -5,13 +5,13 @@
 >
   <ActionCardContainer::Section @title="Pick a display name">
     {{#if @isComplete}}
-      <CardPay::LabeledValue
-        @fieldMode="view"
+      <Boxel::Field
         @label="Display name"
-        @value={{this.displayName}}
         data-test-card-space-display-name
-      />
-      <CardPay::LabeledValue
+      >
+        {{this.displayName}}
+      </Boxel::Field>
+      <Boxel::Field
         @fieldMode="view"
         @label="Profile Picture (Optional)"
       >
@@ -25,10 +25,10 @@
       {{else}}
         No profile picture
       {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     {{else}}
-      <CardPay::LabeledValue
-        @fieldMode="edit"
+      <Boxel::Field
+        @tag="label"
         @label="Display name"
         data-test-card-space-display-name-field
       >
@@ -39,9 +39,8 @@
           @onInput={{this.updateDisplayName}}
           data-test-card-space-display-name-input
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        @fieldMode="view"
+      </Boxel::Field>
+      <Boxel::Field
         @label="Profile Picture (Optional)"
       >
         <ImageUploader
@@ -62,7 +61,7 @@
             data-test-card-space-image-uploader-avatar
           />
         </ImageUploader>
-      </CardPay::LabeledValue>
+      </Boxel::Field>
       {{/if}}
   </ActionCardContainer::Section>
 

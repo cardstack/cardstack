@@ -32,7 +32,7 @@
             @value={{this.layer1Network.walletInfo.firstAddress}}
             @isAddress={{true}}
           />
-          <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
+          <Boxel::Field @label="Balance*" data-test-balance-container>
             {{#if this.balancesToShow.length}}
               <CardPay::BalancesList as |Balance|>
                 {{#each this.balancesToShow as |b|}}
@@ -42,7 +42,7 @@
             {{else}}
               None
             {{/if}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
       </CardPay::FieldStack>
 
