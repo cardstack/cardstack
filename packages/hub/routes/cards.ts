@@ -205,7 +205,7 @@ const defaultRouterInstance = {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    // 'route:cards': CardRoutes;
+    'route:cards': CardRoutes;
     'card-routes-config': CardRoutesConfig;
   }
 }
