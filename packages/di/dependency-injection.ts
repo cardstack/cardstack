@@ -10,21 +10,24 @@ export class Container implements ContainerInterface {
 
   constructor(private registry: Registry) {}
 
-  async lookup<K extends keyof KnownServices>(name: K): Promise<KnownServices[K]>;
+  async lookup<Name extends keyof KnownServices[Type], Type extends keyof KnownServices = 'default'>(
+    name: Name,
+    opts?: { type: Type }
+  ): Promise<KnownServices[Type][Name]>;
   async lookup(name: string): Promise<unknown>;
-  async lookup(name: string): Promise<any> {
-    let { promise, instance } = this._lookup(name);
+  async lookup(name: string, opts?: { type?: string }): Promise<any> {
+    let { promise, instance } = this._lookup(name, opts?.type ?? 'default');
     await promise;
     return instance;
   }
 
-  private _lookup(name: string): CacheEntry {
+  private _lookup(name: string, type: string): CacheEntry {
     let cached = this.cache.get(name);
     if (cached) {
       return cached;
     }
 
-    let factory = this.lookupFactory(name);
+    let factory = this.lookupFactory(name, type);
     return this.provideInjections(() => {
       let instance: any;
       if (isFactoryByCreateMethod(factory)) {
@@ -36,10 +39,10 @@ export class Container implements ContainerInterface {
     }, name);
   }
 
-  private lookupFactory(name: string): Factory<any> {
-    let factory = mappings.get(this.registry)!.get(name);
+  private lookupFactory(name: string, type: string): Factory<any> {
+    let factory = mappings.get(this.registry)!.get(type)?.get(name);
     if (!factory) {
-      throw new Error(`no such service "${name}"`);
+      throw new Error(`can't find name="${name}" type="${type}"`);
     }
     return factory;
   }
@@ -78,7 +81,7 @@ export class Container implements ContainerInterface {
         this.cache.set(cacheKey, result);
       }
       for (let [name, entry] of pending.entries()) {
-        entry.cacheEntry = this._lookup(name);
+        entry.cacheEntry = this._lookup(name, entry.opts.type);
       }
     } finally {
       pendingInstantiationStack.shift();
@@ -228,7 +231,13 @@ class CacheEntry {
 
 type CacheKey = string;
 
-let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
+// from name to implementation within a given type
+type TypeMap = Map<string, Factory<any>>;
+
+// keys are type names
+type PerRegistryMap = Map<string, TypeMap>;
+
+let mappings = new WeakMap() as WeakMap<Registry, PerRegistryMap>;
 let pendingInstantiationStack = [] as PendingInjections[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
@@ -236,24 +245,47 @@ export class Registry {
   constructor() {
     mappings.set(this, new Map());
   }
-  register<T>(name: string, factory: Factory<T>) {
+  register<Implementation, Type extends keyof KnownServices = 'default'>(
+    name: string,
+    factory: Factory<Implementation>,
+    opts?: { type?: Type }
+  ) {
     // non-null because our constructor initializes weakmap.
-    mappings.get(this)!.set(name, factory);
+    let myMapping = mappings.get(this)!;
+
+    let type = (opts?.type ?? 'default') as string;
+    let typeMap = myMapping.get(type);
+    if (!typeMap) {
+      typeMap = new Map();
+      myMapping.set(type, typeMap);
+    }
+    typeMap.set(name, factory);
   }
+
+  registerType<Name extends keyof KnownServices[Type], Type extends keyof KnownServices = 'default'>(
+    _type: Type,
+    _lookup: (name: Name) => Promise<KnownServices[Type][Name]>
+  ) {}
 }
 
 // This exists to be extended by authors of services
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface KnownServices {}
+export interface KnownServices {
+  [typeName: string]: unknown;
+  default: DefaultKnownServices;
+}
 
-interface InjectOptions {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DefaultKnownServices {}
+
+export interface InjectOptions<Type extends keyof KnownServices = 'default'> {
   // if you are storing your injection in a property whose name doesn't match
   // the key it was registered under, you need to pass the property name here.
-  as: string;
+  as?: string;
+  type?: Type;
 }
 
 interface PendingInjection {
-  opts: InjectOptions;
+  opts: Required<InjectOptions>;
   cacheEntry: CacheEntry | null;
   isReady: boolean;
 }
@@ -314,15 +346,20 @@ type PendingInjections = Map<string, PendingInjection>;
     }
   }
 */
-export function inject<K extends keyof KnownServices>(name: K, opts?: InjectOptions): KnownServices[K];
+
+export function inject<Name extends keyof KnownServices[Type], Type extends keyof KnownServices = 'default'>(
+  name: Name,
+  opts?: InjectOptions<Type>
+): KnownServices[Type][Name];
 export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
   let pending = pendingInstantiationStack[0];
   if (!pending) {
     throw new Error(`Tried to directly instantiate an object with injections. Look it up in the container instead.`);
   }
-  let completeOpts = Object.assign(
+  let completeOpts: Required<InjectOptions> = Object.assign(
     {
       as: name,
+      type: 'default',
     },
     opts
   );

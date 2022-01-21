@@ -1,4 +1,12 @@
-import { Registry, Container, inject, getOwner, injectionReady } from '@cardstack/di';
+import {
+  Registry,
+  Container,
+  inject,
+  getOwner,
+  injectionReady,
+  TypedKnownServices,
+  InjectOptions,
+} from '@cardstack/di';
 
 describe('hub/di/dependency-injection', function () {
   let registry: Registry;
@@ -15,6 +23,14 @@ describe('hub/di/dependency-injection', function () {
     registry.register('testCircleThree', CircleThreeService);
     registry.register('testCircleFour', CircleFourService);
     registry.register('testCircleFive', new CircleFiveServiceFactory());
+    registry.register('testSpecificType', UsesSpecificType, { type: 'test-things' });
+    registry.register('injectsSpecificType', InjectsSpecificType, { type: 'test-things' });
+    registry.register('usesCustomInjector', UsesCustomInjector, { type: 'test-things' });
+    registry.registerType('test-things', async (_name: string) => {
+      // NEXT: make this work, we can use real modules in this subdir
+      // return (await import(`./test-things/${_name}`)).default;
+      throw new Error('unimplemented');
+    });
   });
 
   beforeEach(function () {
@@ -101,6 +117,21 @@ describe('hub/di/dependency-injection', function () {
     expect(five.iAmFive).equals(true);
     expect(five.testCircleTwo?.iAmTwo).equals(true);
   });
+
+  it('can lookup something that was registered explicitly under a non-default type', async function () {
+    let example = await container.lookup('testSpecificType', { type: 'test-things' });
+    expect(example.isUseANonDefaultType).equals(true);
+  });
+
+  it('can inject something that was registered explicitly under a non-default type', async function () {
+    let example = await container.lookup('injectsSpecificType', { type: 'test-things' });
+    expect(example.u.isUseANonDefaultType).equals(true);
+  });
+
+  it('can make a custom type-specific injector', async function () {
+    let example = await container.lookup('usesCustomInjector', { type: 'test-things' });
+    expect(example.viaCustomInjector.isUseANonDefaultType).equals(true);
+  });
 });
 
 let exampleServiceTornDown = false;
@@ -174,6 +205,25 @@ class CircleFiveServiceFactory {
   }
 }
 
+class UsesSpecificType {
+  isUseANonDefaultType = true;
+}
+
+class InjectsSpecificType {
+  u = inject('testSpecificType', { type: 'test-things', as: 'u' });
+}
+
+class UsesCustomInjector {
+  viaCustomInjector = testThing('testSpecificType', { as: 'viaCustomInjector' });
+}
+
+function testThing<Name extends keyof TypedKnownServices['test-things']>(
+  name: Name,
+  opts?: Omit<InjectOptions, 'type'>
+): TypedKnownServices['test-things'][Name] {
+  return inject(name, { type: 'test-things', ...opts });
+}
+
 declare module '@cardstack/di' {
   interface KnownServices {
     testExample: ExampleService;
@@ -185,5 +235,13 @@ declare module '@cardstack/di' {
     testCircleThree: CircleThreeService;
     testCircleFour: CircleFourService;
     testCircleFive: CircleFiveService;
+  }
+  interface TypedKnownServices {
+    'test-things': {
+      testSpecificType: UsesSpecificType;
+      injectsSpecificType: InjectsSpecificType;
+      usesCustomInjector: UsesCustomInjector;
+      foundViaPattern: { yesIWasFound: true };
+    };
   }
 }
