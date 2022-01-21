@@ -44,6 +44,7 @@ module.exports = {
         '.percy.js',
         '.prettierrc.js',
         '.template-lintrc.js',
+        'svgo-1-loader.js',
         'ember-cli-build.js',
         'testem.js',
         'blueprints/*/index.js',

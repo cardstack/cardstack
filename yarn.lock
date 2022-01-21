@@ -4294,11 +4294,6 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.0.tgz#87de7af9c231826fdd68ac7258f77c429e0e5fcf"
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
-"@hyperbola/svgo-loader@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@hyperbola/svgo-loader/-/svgo-loader-0.2.3.tgz#044346f555478da045e4d66e390527e77bb0f05e"
-  integrity sha512-7pJ8SfnGv7O+CE6PSpFtXGnUa7iCegbv5saw0uQTF9xK4b8OpPLUDwRxZ1fmGs5c+AT0C9WsdaqIedBQ9khmdQ==
-
 "@ipld/car@^3.0.1", "@ipld/car@^3.1.4":
   version "3.1.21"
   resolved "https://registry.yarnpkg.com/@ipld/car/-/car-3.1.21.tgz#c8f81c8b0ac1b24c7758c33799192ca0302714cd"
@@ -20791,6 +20786,11 @@ loader-utils@^2.0.0:
     big.js "^5.2.2"
     emojis-list "^3.0.0"
     json5 "^2.1.2"
+
+loader-utils@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-3.2.0.tgz#bcecc51a7898bee7473d4bc6b845b23af8304d4f"
+  integrity sha512-HVl9ZqccQihZ7JM85dco1MvO9G+ONvxoGa9rkhzFsneGLKSUg1gJf9bWzhRhcvm2qChhWpebQhP44qxjKIUCaQ==
 
 loader.js@^4.7.0:
   version "4.7.0"
