@@ -117,7 +117,7 @@ export default class NotifyMerchantClaim {
         notificationData: {
           notificationType: 'merchant_claim',
           transactionInformation: JSON.stringify({
-            merchantId: ownerAddress,
+            merchantId: result.merchantSafe.id,
           }),
         },
         notificationType: 'merchant_claim',
