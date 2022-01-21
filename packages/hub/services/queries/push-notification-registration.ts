@@ -1,6 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { PushNotificationRegistration } from '../../routes/push_notification_registrations';
+import type { PushNotificationRegistration } from '../../routes/push-notification-registrations';
 import { buildConditions } from '../../utils/queries';
 
 interface PushNotificationRegistrationQueriesFilter {
