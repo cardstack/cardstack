@@ -1,5 +1,6 @@
-import { transformSync } from '@babel/core';
+import { transformFromAstSync, transformSync } from '@babel/core';
 import type { TransformOptions } from '@babel/core';
+import type { File } from '@babel/types';
 import { ColocatedBabelPlugin } from '@cardstack/core/src/utils/babel';
 
 import { precompile } from '@glimmer/compiler';
@@ -20,11 +21,18 @@ import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
  */
 export default function dynamicCardTransform(
   moduleURL: string,
-  source: string
+  source: string,
+  ast?: File
 ): string {
-  let out = transformSync(source, babelConfig(moduleURL));
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return out!.code!;
+  let code: string;
+  if (ast) {
+    let out = transformFromAstSync(ast, source, babelConfig(moduleURL));
+    code = out!.code!;
+  } else {
+    let out = transformSync(source, babelConfig(moduleURL));
+    code = out!.code!;
+  }
+  return code;
 }
 
 function babelConfig(moduleURL: string): TransformOptions {

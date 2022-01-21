@@ -18,7 +18,8 @@ import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../utils/expressions';
 import CardBuilder from './card-builder';
-import { transformSync } from '@babel/core';
+import { transformFromAstSync, transformSync } from '@babel/core';
+import type { File } from '@babel/types';
 import logger from '@cardstack/logger';
 
 // @ts-ignore
@@ -264,8 +265,8 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src) =>
-      this.define(cardURL(rawCard), local, type, src)
+    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
+      this.define(cardURL(rawCard), local, type, src, ast)
     );
     return await this.writeToIndex(rawCard, definedCard, compiler);
   }
@@ -275,24 +276,36 @@ class IndexerRun implements IndexerHandle {
     return await this.writeDataToIndex(rawCard);
   }
 
-  private define(cardURL: string, localPath: string, type: string, source: string): string {
+  private define(cardURL: string, localPath: string, type: string, source: string, ast: File | undefined): string {
     switch (type) {
       case JS_TYPE:
         this.fileCache.setModule(BROWSER, cardURL, localPath, source);
-        return this.fileCache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source));
+        return this.fileCache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source, ast));
       default:
         return this.fileCache.writeAsset(cardURL, localPath, source);
     }
   }
 
-  private transformToCommonJS(moduleURL: string, source: string): string {
-    let out = transformSync(source, {
-      configFile: false,
-      babelrc: false,
-      filenameRelative: moduleURL,
-      plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
-    });
-    return out!.code!;
+  private transformToCommonJS(moduleURL: string, source: string, ast: File | undefined): string {
+    let code: string;
+    if (ast) {
+      let out = transformFromAstSync(ast, source, {
+        configFile: false,
+        babelrc: false,
+        filenameRelative: moduleURL,
+        plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
+      });
+      code = out!.code!;
+    } else {
+      let out = transformSync(source, {
+        configFile: false,
+        babelrc: false,
+        filenameRelative: moduleURL,
+        plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
+      });
+      code = out!.code!;
+    }
+    return code;
   }
 
   private async writeToIndex(

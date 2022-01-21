@@ -4,6 +4,7 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
 import { NodePath, transformSync } from '@babel/core';
+import { File } from '@babel/types';
 import * as t from '@babel/types';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
@@ -30,15 +31,16 @@ interface State {
   neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
 }
 
-export default function (templateSource: string, options: CardComponentPluginOptions): string {
+export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: File } {
   try {
     let out = transformSync(templateSource, {
+      ast: true,
       plugins: [[babelPluginCardTemplate, options]],
       // HACK: The / resets the relative path setup, removing the cwd of the hub.
       // This allows the error module to look a lot more like the card URL.
       filename: '/' + options.debugPath.replace(/^\//, ''),
     });
-    return out!.code!;
+    return { source: out!.code!, ast: out!.ast! };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }

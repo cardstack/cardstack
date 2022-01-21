@@ -30,7 +30,7 @@ if (process.env.COMPILER) {
         '<div><h1><@fields.name /></h1><@fields.birthdate /> <@fields.address /></div>'
       );
 
-      code = transformCardComponent(src, options);
+      code = transformCardComponent(src, options).source;
     });
 
     it('updates usedFields on options', async function () {

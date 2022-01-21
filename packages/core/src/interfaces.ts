@@ -1,6 +1,7 @@
 import * as JSON from 'json-typescript';
 import difference from 'lodash/difference';
 import { CardstackError } from './utils/errors';
+import type { File } from '@babel/types';
 
 export { Query } from './query';
 
@@ -146,6 +147,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
     {
       type: string;
       source: string;
+      ast?: File;
     }
   >;
 

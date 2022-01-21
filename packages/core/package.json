@@ -13,8 +13,8 @@
   "description": "Core library for Cardstack, portable to both browser and server environments",
   "dependencies": {
     "@babel/core": "^7.12.13",
-    "@babel/plugin-proposal-class-properties": "^7.12.13",
-    "@babel/plugin-proposal-decorators": "^7.12.13",
+    "@babel/plugin-syntax-class-properties": "^7.12.13",
+    "@babel/plugin-syntax-decorators": "^7.16.7",
     "@babel/traverse": "^7.12.13",
     "@babel/types": "^7.12.13",
     "@glimmer/syntax": "0.75.0",
@@ -35,9 +35,9 @@
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.7",
     "@types/mime-types": "^2.1.0",
+    "@types/qs": "^6.9.1",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
-    "@types/qs": "^6.9.1",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.0.1",
     "ember-source": "~3.24.0",
