@@ -26,10 +26,13 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  NO_BUSINESS_ACCOUNT: 'NO_BUSINESS_ACCOUNT',
+  RESTORATION_NO_BUSINESS_ACCOUNT: 'RESTORATION_NO_BUSINESS_ACCOUNT',
 } as const;
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.conversationalName} wallet`,
+  `Select business account`,
   `Pick display name`,
   `Save Card Space details`,
   `Create Card Space`,
@@ -74,6 +77,25 @@ class CreateSpaceWorkflow extends Workflow {
         new WorkflowCard({
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
+          async check() {
+            let { layer2Network } = this.workflow as CreateSpaceWorkflow;
+
+            await layer2Network.waitForAccount;
+
+            let hasMerchantSafe =
+              layer2Network.safes.value.filterBy('type', 'merchant').length > 0;
+
+            if (hasMerchantSafe) {
+              return {
+                success: true,
+              };
+            } else {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
+              };
+            }
+          },
         }),
       ],
       completedDetail: `${c.layer2.fullName} wallet connected`,
@@ -96,6 +118,20 @@ class CreateSpaceWorkflow extends Workflow {
           },
         }),
         new WorkflowMessage({
+          message: `Please select a business account you would like to associate with your Card Space. The business ID will be used in the URL to access your Card Space.`,
+        }),
+        new WorkflowCard({
+          cardName: 'SELECT_BUSINESS_ACCOUNT',
+          componentName:
+            'card-space/create-space-workflow/select-business-account',
+        }),
+      ],
+      completedDetail: `Business selected`,
+    }),
+    new Milestone({
+      title: MILESTONE_TITLES[2],
+      postables: [
+        new WorkflowMessage({
           message: `Please pick a display name for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
         }),
         new WorkflowCard({
@@ -106,7 +142,7 @@ class CreateSpaceWorkflow extends Workflow {
       completedDetail: `Display name picked`,
     }),
     new Milestone({
-      title: MILESTONE_TITLES[2],
+      title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
           message: `Nice choice!`,
@@ -122,7 +158,7 @@ class CreateSpaceWorkflow extends Workflow {
       completedDetail: `Card Space details saved`,
     }),
     new Milestone({
-      title: MILESTONE_TITLES[3],
+      title: MILESTONE_TITLES[4],
       postables: [
         new WorkflowMessage({
           message: `We have sent your URL reservation badge to your connected account (just check your Card Wallet mobile app).`,
@@ -184,6 +220,30 @@ class CreateSpaceWorkflow extends Workflow {
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+    }),
+    new WorkflowMessage({
+      message: `It looks like you haven't created a business account yet. In order to create your Card Space, you must first create your first business account. This is required
+          because your Card Space URL will depend on your business account ID.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT
+        );
+      },
+    }),
+    new WorkflowCard({
+      componentName:
+        'card-space/create-space-workflow/create-business-account-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT
+        );
+      },
     }),
     ...standardCancelationPostables(),
   ]);
