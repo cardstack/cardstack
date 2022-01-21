@@ -15,6 +15,7 @@ import { setupHubAuthenticationToken } from '../helpers/setup';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import {
   createDepotSafe,
+  createMerchantSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -78,11 +79,11 @@ module('Acceptance | create card space', function (hooks) {
       )
       .containsText('Button Text');
 
-    // // Milestone 1
+    // Milestone 1
     assert.dom(`${postableSel(0, 0)} img`).exists();
     assert.dom(postableSel(0, 0)).containsText(`Hello, welcome to Card Space`);
 
-    // // L2 wallet connection
+    // L2 wallet connection
     assert
       .dom(postableSel(0, 1))
       .containsText(`connect your ${c.layer2.fullName} wallet`);
@@ -92,6 +93,21 @@ module('Acceptance | create card space', function (hooks) {
 
     layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
+
+    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createMerchantSafe({
+        address: merchantAddress,
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        accumulatedSpendValue: 100,
+        tokens: [
+          createSafeToken('DAI.CPXD', '125000000000000000000'),
+          createSafeToken('CARD.CPXD', '450000000000000000000'),
+        ],
+      }),
+    ]);
+
     layer2Service.test__simulateWalletConnectUri();
 
     await waitFor('[data-test-wallet-connect-qr-code]');
@@ -115,17 +131,22 @@ module('Acceptance | create card space', function (hooks) {
       .dom(milestoneCompletedSel(0))
       .containsText(`${c.layer2.fullName} wallet connected`);
 
-    // // Milestone 2
-    // // Hub auth
+    // Hub auth
     assert.dom(postableSel(1, 0)).containsText(`you need to authenticate`);
 
     await click(`[data-test-authentication-button]`);
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
-    // // Display name step
-    await waitFor(postableSel(1, 3));
-    assert.dom(postableSel(1, 2)).containsText(`Please pick a display name`);
-    assert.dom(postableSel(1, 3)).containsText(`Pick a display name`);
+    // Select a business account
+    await waitFor(postableSel(1, 3)); // First merchant will be automatically selected
+    await click('[data-test-card-space-select-business-account-save-button]');
+    assert
+      .dom('[data-test-card-space-select-business-account-is-complete]')
+      .exists();
+
+    // Display name
+    await waitFor(postableSel(2, 1));
+    assert.dom(postableSel(2, 1)).containsText(`Pick a display name`);
 
     await fillIn(
       '[data-test-card-space-display-name-input] input',
@@ -139,17 +160,17 @@ module('Acceptance | create card space', function (hooks) {
     await click('[data-test-card-space-display-name-save-button]');
     assert.dom('[data-test-card-space-display-name-is-complete]').exists();
 
-    await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText(`Display name picked`);
+    await waitFor(milestoneCompletedSel(2));
+    assert.dom(milestoneCompletedSel(2)).containsText(`Display name picked`);
 
-    // // Milestone 3
-    // // Details step
-    await waitFor(postableSel(2, 2));
+    // Details
+
+    await waitFor(postableSel(3, 2));
     assert
-      .dom(postableSel(2, 1))
+      .dom(postableSel(3, 1))
       .containsText(`Now it’s time to set up your space.`);
     assert
-      .dom(postableSel(2, 2))
+      .dom(postableSel(3, 2))
       .containsText(`Fill out the Card Space details`);
 
     await click('[data-test-card-space-details-start-button]');
@@ -157,35 +178,29 @@ module('Acceptance | create card space', function (hooks) {
 
     assert.dom('[data-test-card-space-details-is-complete]').exists();
 
-    await waitFor(milestoneCompletedSel(2));
+    await waitFor(milestoneCompletedSel(3));
     assert
-      .dom(milestoneCompletedSel(2))
+      .dom(milestoneCompletedSel(3))
       .containsText(`Card Space details saved`);
 
-    // // Milestone 4
-    await waitFor(postableSel(3, 1));
+    // Reservation badge
+    await waitFor(postableSel(4, 1));
     assert
-      .dom(postableSel(3, 0))
+      .dom(postableSel(4, 0))
       .containsText(`We have sent your URL reservation badge`);
-    // // Badge
-    assert.dom(postableSel(3, 1)).containsText(`URL reservation`);
+    assert.dom(postableSel(4, 1)).containsText(`URL reservation`);
     assert
-      .dom(`${postableSel(3, 1)} [data-test-full-card-space-domain]`)
+      .dom(`${postableSel(4, 1)} [data-test-full-card-space-domain]`)
       .containsText(`${subdomain}.card.space`);
 
-    // // Confirm step
-    await waitFor(postableSel(3, 3));
-    assert
-      .dom(postableSel(3, 2))
-      .containsText(`You need to pay a small protocol fee`);
-    assert.dom(postableSel(3, 3)).containsText(`Select a payment method`);
+    // Confirm
+    await waitFor(postableSel(4, 3));
 
     await click('[data-test-card-space-creation-button]');
     assert.dom('[data-test-card-space-creation-is-complete]').exists();
 
-    await waitFor(milestoneCompletedSel(3));
-    assert.dom(postableSel(3, 4)).containsText(`Thank you for your payment`);
-    assert.dom(milestoneCompletedSel(3)).containsText(`Card Space created`);
+    await waitFor(milestoneCompletedSel(4));
+    assert.dom(milestoneCompletedSel(4)).containsText(`Card Space created`);
 
     assert
       .dom(
@@ -193,10 +208,9 @@ module('Acceptance | create card space', function (hooks) {
       )
       .doesNotExist();
 
-    // // Epilogue
+    // Epilogue
     await waitFor(epiloguePostableSel(0));
 
-    await waitFor(epiloguePostableSel(0));
     assert
       .dom(epiloguePostableSel(0))
       .containsText(`Congrats, you have created your Card Space!`);
@@ -250,6 +264,18 @@ module('Acceptance | create card space', function (hooks) {
           tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
       ]);
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createMerchantSafe({
+          address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          accumulatedSpendValue: 100,
+          tokens: [
+            createSafeToken('DAI.CPXD', '125000000000000000000'),
+            createSafeToken('CARD.CPXD', '450000000000000000000'),
+          ],
+        }),
+      ]);
+
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
@@ -279,13 +305,15 @@ module('Acceptance | create card space', function (hooks) {
           '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
         )
         .doesNotExist();
+
       assert
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       await waitFor(postableSel(1, 1));
-      assert.dom(postableSel(1, 0)).containsText(`Please pick a display name`);
-      assert.dom(postableSel(1, 1)).containsText(`Pick a display name`);
+      assert
+        .dom(postableSel(1, 0))
+        .containsText(`Please select a business account`);
 
       let workflowPersistenceService = this.owner.lookup(
         'service:workflow-persistence'
@@ -359,6 +387,7 @@ module('Acceptance | create card space', function (hooks) {
         .dom('[data-test-layer-2-wallet-card] [data-test-address-field]')
         .containsText(layer2AccountAddress)
         .isVisible();
+
       assert
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
@@ -395,5 +424,33 @@ module('Acceptance | create card space', function (hooks) {
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .doesNotExist();
     });
+  });
+
+  test('cancels the workflow when there are no merchant safes (business accounts)', async function (assert) {
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
+      }),
+    ]);
+
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+    await visit('/card-space');
+    await click('[data-test-workflow-button="create-space"]');
+
+    assert
+      .dom('[data-test-cancelation]')
+      .containsText('It looks like you haven’t created a business account yet');
+
+    await click(
+      '[data-test-create-card-space-workflow-create-business-account-cta] button'
+    );
+
+    assert
+      .dom('[data-test-boxel-thread-header]')
+      .containsText('Business Account Creation');
   });
 });

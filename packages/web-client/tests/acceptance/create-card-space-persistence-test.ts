@@ -10,6 +10,10 @@ import {
   MILESTONE_TITLES,
   WORKFLOW_VERSION,
 } from '@cardstack/web-client/components/card-space/create-space-workflow';
+import {
+  createMerchantSafe,
+  createSafeToken,
+} from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
 
@@ -37,6 +41,18 @@ module('Acceptance | create card space persistence', function (hooks) {
       'service:workflow-persistence'
     );
 
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createMerchantSafe({
+        address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        accumulatedSpendValue: 100,
+        tokens: [
+          createSafeToken('DAI.CPXD', '125000000000000000000'),
+          createSafeToken('CARD.CPXD', '450000000000000000000'),
+        ],
+      }),
+    ]);
+
     workflowPersistenceService.clear();
   });
 
@@ -60,7 +76,11 @@ module('Acceptance | create card space persistence', function (hooks) {
       let state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_DISPLAY_NAME'],
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'SELECT_BUSINESS_ACCOUNT',
+            'CARD_SPACE_DISPLAY_NAME',
+          ],
         },
       });
 
@@ -72,9 +92,10 @@ module('Acceptance | create card space persistence', function (hooks) {
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
-      assert.dom(milestoneCompletedSel(1)).exists(); // Display name
-      assert.dom(milestoneCompletedSel(2)).doesNotExist();
-      assert.dom('[data-test-milestone="2"][data-test-postable="2"]').exists();
+      assert.dom(milestoneCompletedSel(1)).exists(); // Business account
+      assert.dom(milestoneCompletedSel(2)).exists(); // Display name
+      assert.dom(milestoneCompletedSel(3)).doesNotExist();
+      assert.dom('[data-test-milestone="3"][data-test-postable="2"]').exists();
       assert.dom('[data-test-card-space-details-start-button]').isNotDisabled();
     });
 
@@ -84,6 +105,7 @@ module('Acceptance | create card space persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER2_CONNECT',
+            'SELECT_BUSINESS_ACCOUNT',
             'CARD_SPACE_DISPLAY_NAME',
             'CARD_SPACE_DETAILS',
             'CARD_SPACE_CONFIRM',
@@ -99,9 +121,11 @@ module('Acceptance | create card space persistence', function (hooks) {
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
-      assert.dom(milestoneCompletedSel(1)).exists(); // Display name
-      assert.dom(milestoneCompletedSel(2)).exists(); // Details
-      assert.dom(milestoneCompletedSel(3)).exists(); // Confirm
+      assert.dom(milestoneCompletedSel(1)).exists(); // Business account
+      assert.dom(milestoneCompletedSel(2)).exists(); // Display name
+      assert.dom(milestoneCompletedSel(3)).exists(); // Details
+      assert.dom(milestoneCompletedSel(4)).exists(); // Confirm
+
       assert
         .dom('[data-test-epilogue][data-test-postable="0"]')
         .includesText(`Congrats, you have created your Card Space!`);
@@ -111,7 +135,11 @@ module('Acceptance | create card space persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_DISPLAY_NAME'],
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'SELECT_BUSINESS_ACCOUNT',
+            'CARD_SPACE_DISPLAY_NAME',
+          ],
           isCanceled: true,
           cancelationReason: 'L2_DISCONNECTED',
         },
@@ -125,8 +153,9 @@ module('Acceptance | create card space persistence', function (hooks) {
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
-      assert.dom(milestoneCompletedSel(1)).exists(); // Display name
-      assert.dom(milestoneCompletedSel(2)).doesNotExist();
+      assert.dom(milestoneCompletedSel(1)).exists(); // Select Business Account
+      assert.dom(milestoneCompletedSel(2)).exists(); // Display name
+      assert.dom(milestoneCompletedSel(3)).doesNotExist();
       assert
         .dom('[data-test-cancelation]')
         .includesText(
@@ -145,7 +174,11 @@ module('Acceptance | create card space persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_DISPLAY_NAME'],
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'SELECT_BUSINESS_ACCOUNT',
+            'CARD_SPACE_DISPLAY_NAME',
+          ],
         },
       });
 
@@ -159,7 +192,7 @@ module('Acceptance | create card space persistence', function (hooks) {
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
       assert.dom(milestoneCompletedSel(0)).doesNotExist(); // L2 connect
-      assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Display name
+      assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Business account
       assert
         .dom('[data-test-cancelation]')
         .includesText(
@@ -169,7 +202,7 @@ module('Acceptance | create card space persistence', function (hooks) {
       await click('[data-test-workflow-default-cancelation-restart]');
 
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
-      assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Display name
+      assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Business account
       assert.dom(`[data-test-authentication-button]`).exists();
 
       const workflowPersistenceId = new URL(
@@ -236,7 +269,6 @@ module('Acceptance | create card space persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT'],
         },
-        displayName: 'Display name',
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -250,9 +282,11 @@ module('Acceptance | create card space persistence', function (hooks) {
       assert.dom(milestoneCompletedSel(1)).doesNotExist();
 
       await waitFor('[data-test-postable="1"][data-test-milestone="1"]');
-      assert.dom('[data-test-card-space-display-name-save-button]').isEnabled();
+      assert
+        .dom('[data-test-card-space-select-business-account-save-button]')
+        .isEnabled();
 
-      await click('[data-test-card-space-display-name-save-button]');
+      await click('[data-test-card-space-select-business-account-save-button]');
       assert.dom(milestoneCompletedSel(1)).exists();
     });
 
