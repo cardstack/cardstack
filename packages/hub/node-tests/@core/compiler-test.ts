@@ -335,6 +335,88 @@ if (process.env.COMPILER) {
       });
     });
 
+    describe.only('computed fields', function () {
+      let bioCard: RawCard = {
+        realm,
+        id: 'bio',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import date from "https://cardstack.com/base/date";
+
+            export default class Bio {
+              @contains(date) birthdate;
+            }
+          `,
+        },
+      };
+      let personCard: RawCard = {
+        realm,
+        id: 'person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import bio from "${realm}bio";
+
+            export default class Person {
+              @contains(string) lastName;
+              @contains(bio) aboutMe;
+
+              @contains(string)
+              async fullName() {
+                return "Mr or Mrs " + (await this.lastName());
+              }
+            }
+          `,
+        },
+      };
+
+      this.beforeEach(async function () {
+        await cards.create(bioCard);
+        await cards.create(personCard);
+      });
+
+      it('can compile primitive field implementation in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}bio`);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.not.containsSource(`@contains`);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.not.containsSource(
+          `https://cardstack.com/base/string`
+        );
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.containsSource(
+          `async birthdate() {
+            return await _classPrivateFieldGet(this, _getRawField).call(this, "birthdate");
+          }`
+        );
+      });
+
+      it.skip('can compile composite field implementation in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.not.containsSource(`@contains`);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.not.containsSource(`${realm}bio`);
+        // TODO assert the compiled Bio module is imported
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.containsSource(
+          // babel renames our "BioClass" declaration to "_bio"
+          `async aboutMe() {
+            return new _bio.default(innerField => _classPrivateFieldGet(this, _getRawField).call(this, "aboutMe." + innerField));
+          }`
+        );
+      });
+
+      it('can compile computed field in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.not.containsSource(`@contains`);
+        expect(getFileCache().getModule(compiled.schemaModule.global)).to.containsSource(
+          `async fullName() {
+            return "Mr or Mrs " + (await this.lastName());
+          }`
+        );
+      });
+    });
+
     describe('linksTo', function () {
       let postCard: RawCard = {
         realm,

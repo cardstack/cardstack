@@ -202,7 +202,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         plugins: [
           [cardSchemaPlugin, options],
           [decoratorsPlugin, { decoratorsBeforeExport: false }],
-          classPropertiesPlugin,
+          [classPropertiesPlugin, { loose: true }],
         ],
       })!;
     } catch (error: any) {
