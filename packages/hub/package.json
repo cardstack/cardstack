@@ -82,7 +82,7 @@
     "mime-match": "^1.0.2",
     "nanoid": "^3.1.23",
     "node-cleanup": "^2.1.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "node-pg-migrate": "^5.9.0",
     "pg": "^8.6.0",
     "pg-cursor": "^2.7.1",

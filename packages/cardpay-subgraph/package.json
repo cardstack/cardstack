@@ -38,7 +38,7 @@
     "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
     "@protofire/subgraph-toolkit": "0.1.2",
     "fs-extra": "^10.0.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "ts-node": "^10.3.0"
   },
   "private": true,
