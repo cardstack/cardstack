@@ -22,7 +22,7 @@ export default class ChecklyWebhookRoute {
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {
       componentName: 'Subgraph',
-      incidentName: 'Experiencing degraded service',
+      incidentName: 'Transactions delayed',
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
     },
   };
