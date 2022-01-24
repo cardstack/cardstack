@@ -60,12 +60,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let options = {};
     let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let { cardSource } = this;
-    let schemaModule: ModuleRef | undefined = this.prepareSchema(cardSource, options, modules);
+    let schemaModule: ModuleRef | undefined = this.analyzeSchema(cardSource, options, modules);
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
     if (schemaModule) {
-      this.transformSchema(schemaModule, meta, fields, modules);
+      this.prepareSchema(schemaModule, meta, fields, modules);
     }
 
     this.defineAssets(cardSource, modules);
@@ -187,7 +187,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private prepareSchema(
+  private analyzeSchema(
     cardSource: RawCard<Unsaved>,
     options: any,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
@@ -223,7 +223,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return { local: schemaLocalFilePath };
   }
 
-  private transformSchema(
+  private prepareSchema(
     schemaModule: LocalRef,
     meta: PluginMeta,
     fields: CompiledCard['fields'],
