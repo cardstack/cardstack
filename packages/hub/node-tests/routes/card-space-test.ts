@@ -136,7 +136,88 @@ describe('POST /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  // FIXME: test for POST when corresponding merchant doesn’t exist
+  it('returns 422 when the merchant id is not specified', async function () {
+    let payload = {
+      data: {
+        type: 'card-spaces',
+        attributes: {
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
+          'profile-image-url': 'https://test.com/test1.png',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/card-spaces')
+      .send(payload)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: 'Must be present',
+            source: { pointer: '/data/attributes/merchant-id' },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
+  });
+
+  it('returns 422 when the merchant doesn’t exist', async function () {
+    let merchantId = uuidv4();
+    await (
+      await getContainer().lookup('merchant-info-queries')
+    ).insert({
+      id: merchantId, // Can’t insert without an id?
+      ownerAddress: stubUserAddress,
+      name: 'Satoshi?',
+      slug: 'satoshi',
+      color: 'black',
+      textColor: 'red',
+    });
+
+    let payloadMerchantId = uuidv4();
+
+    let payload = {
+      data: {
+        type: 'card-spaces',
+        attributes: {
+          'merchant-id': payloadMerchantId,
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
+          'profile-image-url': 'https://test.com/test1.png',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/card-spaces')
+      .send(payload)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: `Given merchant-id ${payloadMerchantId} was not found`,
+            source: { pointer: '/data/attributes/merchant-id' },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
+  });
 });
 
 describe('POST /api/card-spaces/validate-profile-category', async function () {

@@ -3,8 +3,10 @@ import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
 import { NestedAttributeError } from '../../routes/utils/error';
+import MerchantInfoQueries from '../queries/merchant-info';
 
 export type CardSpaceAttribute =
+  | 'merchantId'
   | 'profileName'
   | 'profileDescription'
   | 'profileButtonText'
@@ -41,12 +43,17 @@ export default class CardSpaceValidator {
     as: 'cardSpaceQueries',
   });
 
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
+
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
   });
 
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
+      merchantId: [],
       profileName: [],
       profileDescription: [],
       profileButtonText: [],
@@ -65,6 +72,7 @@ export default class CardSpaceValidator {
     };
 
     let mandatoryAttributes: CardSpaceAttribute[] = [
+      'merchantId',
       'profileName',
       'profileDescription',
       'profileButtonText',
@@ -76,6 +84,16 @@ export default class CardSpaceValidator {
         errors[attribute].push('Must be present');
       }
     });
+
+    if (cardSpace.merchantId) {
+      let merchantId = cardSpace.merchantId;
+      let merchant = await this.merchantInfoQueries.fetch({ id: merchantId });
+
+      if (!merchant || !merchant.length) {
+        // FIXME this should be a relationship vs an attribute, right?
+        errors.merchantId.push(`Given merchant-id ${merchantId} was not found`);
+      }
+    }
 
     if (!ALLOWED_BUTTON_TEXTS.includes(cardSpace.profileButtonText!)) {
       errors.profileButtonText.push(`Needs to be one of the: ${ALLOWED_BUTTON_TEXTS.join(', ')}`);
