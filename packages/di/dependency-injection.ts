@@ -69,10 +69,10 @@ export class Container implements ContainerInterface {
     return instance;
   }
 
-  private provideInjections<T>(create: () => T, cacheKey?: CacheKey): CacheEntry {
+  private provideInjections<T>(create: () => T, cacheKey?: CacheKey): CacheEntry<T> {
     let pending = new Map() as PendingInjections;
     pendingInstantiationStack.unshift(pending);
-    let result: CacheEntry;
+    let result: CacheEntry<T>;
     try {
       let instance = create();
       ownership.set(instance, this);
@@ -105,8 +105,8 @@ export class Container implements ContainerInterface {
               } catch (e) {
                 // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
               }
-              if (typeof instance?.willTeardown === 'function') {
-                await instance.willTeardown();
+              if (typeof (instance as any).willTeardown === 'function') {
+                await (instance as any).willTeardown();
               }
             })
           );
@@ -116,8 +116,8 @@ export class Container implements ContainerInterface {
           // everything.
           await Promise.all(
             [...this.cache.values()].map(async ({ instance }) => {
-              if (typeof instance?.teardown === 'function') {
-                await instance.teardown();
+              if (typeof (instance as any).teardown === 'function') {
+                await (instance as any).teardown();
               }
             })
           );
@@ -129,12 +129,12 @@ export class Container implements ContainerInterface {
   }
 }
 
-class CacheEntry {
+class CacheEntry<Instance = unknown> {
   private deferredPartial: Deferred<void> | undefined;
   private deferredPromise: Deferred<void> | undefined;
   private deferredInjections: Map<string, Deferred<void>> = new Map();
 
-  constructor(private identityKey: CacheKey, readonly instance: any, private injections: PendingInjections) {}
+  constructor(private identityKey: CacheKey, readonly instance: Instance, private injections: PendingInjections) {}
 
   // resolves when this CacheEntry is fully ready to be used
   get promise(): Promise<void> {
@@ -160,12 +160,13 @@ class CacheEntry {
       return;
     }
     let { opts, cacheEntry } = pending;
-    if (!this.instance[opts.as] || this.instance[opts.as].injectionNotReadyYet !== name) {
+    let instance = this.instance as any;
+    if (!instance[opts.as] || instance[opts.as].injectionNotReadyYet !== name) {
       throw new Error(
         `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
       );
     }
-    this.instance[opts.as] = cacheEntry!.instance;
+    instance[opts.as] = cacheEntry!.instance;
     pending.isReady = true;
   }
 
@@ -223,8 +224,8 @@ class CacheEntry {
   }
 
   private async runReady(): Promise<void> {
-    if (typeof this.instance.ready === 'function') {
-      await this.instance.ready();
+    if (typeof (this.instance as any).ready === 'function') {
+      await (this.instance as any).ready();
     }
   }
 }
