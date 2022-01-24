@@ -10,6 +10,7 @@ import CardSpaceQueries from '../services/queries/card-space';
 import CardSpaceValidator from '../services/validators/card-space';
 import { serializeErrors } from './utils/error';
 import { validateRequiredFields } from './utils/validation';
+import MerchantInfoQueries from '../services/queries/merchant-info';
 
 export interface CardSpace {
   id: string;
@@ -42,6 +43,9 @@ export default class CardSpacesRoute {
   cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
     as: 'cardSpaceValidator',
   });
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -68,26 +72,58 @@ export default class CardSpacesRoute {
       profileCoverImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-cover-image-url']),
     };
 
-    // FIXME restore handling of ctx.state.userAddress
+    let merchantInfoError;
 
-    let errors = await this.cardSpaceValidator.validate(cardSpace);
-    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
+    if (cardSpace.merchantId) {
+      let merchantId = cardSpace.merchantId;
+      let merchant = await this.merchantInfoQueries.fetch({ id: merchantId });
 
-    if (hasErrors) {
-      ctx.status = 422;
+      if (!merchant || !merchant.length) {
+        merchantInfoError = [
+          {
+            relationship: 'merchant-info',
+            detail: `Given merchant-id ${merchantId} was not found`,
+          },
+        ];
+      } else {
+        let merchantInfo = merchant[0];
+
+        if (merchantInfo.ownerAddress !== ctx.state.userAddress) {
+          merchantInfoError = [
+            {
+              relationship: 'merchant-info',
+              detail: `Given merchant-id ${merchantId} is not owned by the user`,
+            },
+          ];
+        }
+      }
+    }
+
+    if (merchantInfoError) {
+      ctx.status = 403;
       ctx.body = {
-        errors: serializeErrors(errors),
+        errors: serializeErrors({ merchantInfo: merchantInfoError }),
       };
     } else {
-      await this.cardSpaceQueries.insert(cardSpace);
+      let errors = await this.cardSpaceValidator.validate(cardSpace);
+      let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
 
-      await this.workerClient.addJob('persist-off-chain-card-space', {
-        id: cardSpace.id,
-      });
+      if (hasErrors) {
+        ctx.status = 422;
+        ctx.body = {
+          errors: serializeErrors(errors),
+        };
+      } else {
+        await this.cardSpaceQueries.insert(cardSpace);
 
-      let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
-      ctx.status = 201;
-      ctx.body = serialized;
+        await this.workerClient.addJob('persist-off-chain-card-space', {
+          id: cardSpace.id,
+        });
+
+        let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
+        ctx.status = 201;
+        ctx.body = serialized;
+      }
     }
     ctx.type = 'application/vnd.api+json';
   }

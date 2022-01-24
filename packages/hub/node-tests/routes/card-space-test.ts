@@ -150,6 +150,61 @@ describe('POST /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('returns 403 when the related merchant has a different owner', async function () {
+    let merchantId = uuidv4();
+    await (
+      await getContainer().lookup('merchant-info-queries')
+    ).insert({
+      id: merchantId,
+      ownerAddress: '0xmystery',
+      name: 'Satoshi?',
+      slug: 'satoshi',
+      color: 'black',
+      textColor: 'red',
+    });
+
+    let payload = {
+      data: {
+        type: 'card-spaces',
+        attributes: {
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
+          'profile-image-url': 'https://test.com/test1.png',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              id: merchantId,
+            },
+          },
+        },
+      },
+    };
+
+    await request()
+      .post('/api/card-spaces')
+      .send(payload)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(403)
+      .expect({
+        errors: [
+          {
+            detail: `Given merchant-id ${merchantId} is not owned by the user`,
+            source: { pointer: '/data/relationships/merchant-info' },
+            status: '422', // FIXME ugh
+            title: 'Invalid relationship',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('returns 422 when the merchant id is not specified', async function () {
     let payload = {
       data: {
@@ -226,7 +281,7 @@ describe('POST /api/card-spaces', function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(403) // 😭
       .expect({
         errors: [
           {
