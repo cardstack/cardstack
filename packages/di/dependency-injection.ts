@@ -40,7 +40,7 @@ export class Container implements ContainerInterface {
   }
 
   private lookupFactory(name: string, type: string): Factory<any> {
-    let factory = mappings.get(this.registry)!.get(type)?.get(name);
+    let factory = mappings.get(this.registry)!.get(type)?.explicit.get(name);
     if (!factory) {
       throw new Error(`can't find name="${name}" type="${type}"`);
     }
@@ -235,7 +235,7 @@ type CacheKey = string;
 type TypeMap = Map<string, Factory<any>>;
 
 // keys are type names
-type PerRegistryMap = Map<string, TypeMap>;
+type PerRegistryMap = Map<string, { explicit: TypeMap; lookup: undefined | ((name: string) => Promise<unknown>) }>;
 
 let mappings = new WeakMap() as WeakMap<Registry, PerRegistryMap>;
 let pendingInstantiationStack = [] as PendingInjections[];
@@ -256,16 +256,23 @@ export class Registry {
     let type = (opts?.type ?? 'default') as string;
     let typeMap = myMapping.get(type);
     if (!typeMap) {
-      typeMap = new Map();
+      typeMap = { explicit: new Map(), lookup: undefined };
       myMapping.set(type, typeMap);
     }
-    typeMap.set(name, factory);
+    typeMap.explicit.set(name, factory);
   }
 
-  registerType<Name extends keyof KnownServices[Type], Type extends keyof KnownServices = 'default'>(
-    _type: Type,
-    _lookup: (name: Name) => Promise<KnownServices[Type][Name]>
-  ) {}
+  registerType(type: string, lookup: (name: string) => Promise<unknown>) {
+    // non-null because our constructor initializes weakmap.
+    let myMapping = mappings.get(this)!;
+
+    let typeMap = myMapping.get(type);
+    if (!typeMap) {
+      typeMap = { explicit: new Map(), lookup: undefined };
+      myMapping.set(type, typeMap);
+    }
+    typeMap.lookup = lookup;
+  }
 }
 
 // This exists to be extended by authors of services

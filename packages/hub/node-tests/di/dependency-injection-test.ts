@@ -26,10 +26,8 @@ describe('hub/di/dependency-injection', function () {
     registry.register('testSpecificType', UsesSpecificType, { type: 'test-things' });
     registry.register('injectsSpecificType', InjectsSpecificType, { type: 'test-things' });
     registry.register('usesCustomInjector', UsesCustomInjector, { type: 'test-things' });
-    registry.registerType('test-things', async (_name: string) => {
-      // NEXT: make this work, we can use real modules in this subdir
-      // return (await import(`./test-things/${_name}`)).default;
-      throw new Error('unimplemented');
+    registry.registerType('test-things', async (name: string) => {
+      return (await import(`./test-things/${name}`)).default;
     });
   });
 
@@ -132,6 +130,11 @@ describe('hub/di/dependency-injection', function () {
     let example = await container.lookup('usesCustomInjector', { type: 'test-things' });
     expect(example.viaCustomInjector.isUseANonDefaultType).equals(true);
   });
+
+  it.skip('can discover modules registered via type patterns', async function () {
+    let example = await container.lookup('discovered', { type: 'test-things' });
+    expect(example.iWasDiscovered).equals(true);
+  });
 });
 
 let exampleServiceTornDown = false;
@@ -224,6 +227,13 @@ function testThing<Name extends keyof TypedKnownServices['test-things']>(
   return inject(name, { type: 'test-things', ...opts });
 }
 
+export interface KnownTestThings {
+  testSpecificType: UsesSpecificType;
+  injectsSpecificType: InjectsSpecificType;
+  usesCustomInjector: UsesCustomInjector;
+  foundViaPattern: { yesIWasFound: true };
+}
+
 declare module '@cardstack/di' {
   interface KnownServices {
     testExample: ExampleService;
@@ -237,11 +247,6 @@ declare module '@cardstack/di' {
     testCircleFive: CircleFiveService;
   }
   interface TypedKnownServices {
-    'test-things': {
-      testSpecificType: UsesSpecificType;
-      injectsSpecificType: InjectsSpecificType;
-      usesCustomInjector: UsesCustomInjector;
-      foundViaPattern: { yesIWasFound: true };
-    };
+    'test-things': KnownTestThings;
   }
 }
