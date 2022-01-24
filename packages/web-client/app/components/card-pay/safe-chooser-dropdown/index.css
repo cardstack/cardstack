@@ -54,7 +54,6 @@
 }
 
 .safe-chooser-dropdown__option:hover {
-  background-color: var(--boxel-light-300);
   cursor: pointer;
 }
 
