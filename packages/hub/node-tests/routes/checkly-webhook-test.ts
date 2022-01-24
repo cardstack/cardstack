@@ -1,12 +1,13 @@
 import { registry, setupHub } from '../helpers/server';
 
-let createdIncident: { componentName: string; message: string } | null,
+let createdIncident: { componentName: string; name: string; message: string } | null,
   resolvedIncident: { componentName: string } | null;
 
 class StubStatuspageApi {
-  async createIncident(componentName: string, message: string): Promise<void> {
+  async createIncident(componentName: string, name: string, message: string): Promise<void> {
     createdIncident = {
       componentName,
+      name,
       message,
     };
   }
@@ -40,12 +41,13 @@ describe('POST /api/checkly-webhook', async function () {
 
     expect(createdIncident).to.deep.equal({
       componentName: 'Subgraph',
+      name: 'Transactions delayed',
       message:
         'We are experiencing blockchain indexing delays. The blockchain index is delayed by at least 10 blocks. This will result increased transaction processing times.',
     });
   });
 
-  it('creates a new alert when the check recovered', async function () {
+  it('resolves an incident when the check recovered', async function () {
     await request()
       .post('/callbacks/checkly')
       .set('Accept', 'application/json')
