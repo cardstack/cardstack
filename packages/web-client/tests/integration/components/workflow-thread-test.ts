@@ -28,7 +28,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
         {
           incidents: [
             {
-              name: 'Ignored',
+              name: 'Name',
               impact: 'critical',
               incident_updates: [
                 { body: 'This should be visible in a workflow.' },
@@ -49,7 +49,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert
       .dom('[data-test-degraded-service-banner]')
       .isVisible()
-      .containsText('This should be visible in a workflow.');
+      .containsText('Name: This should be visible in a workflow.');
   });
 
   test('it renders before-content named block', async function (assert) {

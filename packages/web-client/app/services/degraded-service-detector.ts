@@ -86,7 +86,7 @@ export default class DegradedServiceDetector extends Service {
 
     return {
       status: incident.status,
-      name: this.addPunctuation(lastUpdate.body),
+      name: `${incident.name}: ${this.addPunctuation(lastUpdate.body)}`,
       impact: incident.impact,
     };
   }
