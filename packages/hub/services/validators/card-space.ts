@@ -2,11 +2,10 @@ import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
-import { NestedAttributeError } from '../../routes/utils/error';
+import { NestedAttributeError, RelationshipError } from '../../routes/utils/error';
 import MerchantInfoQueries from '../queries/merchant-info';
 
 export type CardSpaceAttribute =
-  | 'merchantId'
   | 'profileName'
   | 'profileDescription'
   | 'profileButtonText'
@@ -23,7 +22,12 @@ export type CardSpaceAttribute =
   | 'donationSuggestionAmount3'
   | 'donationSuggestionAmount4';
 
-export type CardSpaceErrors = Record<CardSpaceAttribute, (string | NestedAttributeError)[]>;
+export type CardSpaceRelationship = 'merchantInfo';
+
+export type CardSpaceErrors = Record<
+  CardSpaceAttribute | CardSpaceRelationship,
+  (string | NestedAttributeError | RelationshipError)[]
+>;
 
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
@@ -53,7 +57,7 @@ export default class CardSpaceValidator {
 
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
-      merchantId: [],
+      merchantInfo: [],
       profileName: [],
       profileDescription: [],
       profileButtonText: [],
@@ -72,7 +76,6 @@ export default class CardSpaceValidator {
     };
 
     let mandatoryAttributes: CardSpaceAttribute[] = [
-      'merchantId',
       'profileName',
       'profileDescription',
       'profileButtonText',
@@ -91,7 +94,10 @@ export default class CardSpaceValidator {
 
       if (!merchant || !merchant.length) {
         // FIXME this should be a relationship vs an attribute, right?
-        errors.merchantId.push(`Given merchant-id ${merchantId} was not found`);
+        errors.merchantInfo.push({
+          relationship: 'merchant-info',
+          detail: `Given merchant-id ${merchantId} was not found`,
+        });
       }
     }
 

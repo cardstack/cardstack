@@ -68,13 +68,20 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'merchant-id': merchantId,
           'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
           'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
           'profile-cover-image-url': 'https://test.com/test2.png',
           'profile-button-text': 'Visit this Space',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              id: merchantId,
+            },
+          },
         },
       },
     };
@@ -102,13 +109,20 @@ describe('POST /api/card-spaces', function () {
           id: 'the-id',
           attributes: {
             did: 'the-did',
-            'merchant-id': merchantId,
             'profile-name': 'Satoshi Nakamoto',
             'profile-description': "Satoshi's place",
             'profile-category': 'entertainment',
             'profile-image-url': 'https://test.com/test1.png',
             'profile-cover-image-url': 'https://test.com/test2.png',
             'profile-button-text': 'Visit this Space',
+          },
+          relationships: {
+            'merchant-info': {
+              data: {
+                type: 'merchant-infos',
+                id: merchantId,
+              },
+            },
           },
         },
       })
@@ -161,10 +175,9 @@ describe('POST /api/card-spaces', function () {
       .expect({
         errors: [
           {
-            detail: 'Must be present',
-            source: { pointer: '/data/attributes/merchant-id' },
+            detail: 'Required relationship merchant-info was not provided',
             status: '422',
-            title: 'Invalid attribute',
+            title: 'Missing required relationship: merchant-info',
           },
         ],
       });
@@ -189,13 +202,20 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'merchant-id': payloadMerchantId,
           'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
           'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
           'profile-cover-image-url': 'https://test.com/test2.png',
           'profile-button-text': 'Visit this Space',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              id: payloadMerchantId,
+            },
+          },
         },
       },
     };
@@ -211,9 +231,9 @@ describe('POST /api/card-spaces', function () {
         errors: [
           {
             detail: `Given merchant-id ${payloadMerchantId} was not found`,
-            source: { pointer: '/data/attributes/merchant-id' },
+            source: { pointer: '/data/relationships/merchant-info' },
             status: '422',
-            title: 'Invalid attribute',
+            title: 'Invalid relationship',
           },
         ],
       });

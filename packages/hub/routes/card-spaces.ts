@@ -9,6 +9,7 @@ import WorkerClient from '../services/worker-client';
 import CardSpaceQueries from '../services/queries/card-space';
 import CardSpaceValidator from '../services/validators/card-space';
 import { serializeErrors } from './utils/error';
+import { validateRequiredFields } from './utils/validation';
 
 export interface CardSpace {
   id: string;
@@ -52,9 +53,13 @@ export default class CardSpacesRoute {
       return;
     }
 
+    if (!validateRequiredFields(ctx, { requiredRelationships: ['merchant-info'] })) {
+      return;
+    }
+
     const cardSpace: CardSpace = {
       id: shortUuid.uuid(),
-      merchantId: this.sanitizeText(ctx.request.body.data.attributes['merchant-id']),
+      merchantId: this.sanitizeText(ctx.request.body.data.relationships['merchant-info'].data.id),
       profileName: this.sanitizeText(ctx.request.body.data.attributes['profile-name']),
       profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
       profileCategory: this.sanitizeText(ctx.request.body.data.attributes['profile-category']),
