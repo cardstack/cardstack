@@ -70,7 +70,7 @@
 }
 
 .card-picker-dropdown__option--selected {
-  background-image: url('/images/icons/success-bordered.svg');
+  background-image: url('/@cardstack/boxel/images/icons/success-bordered.svg');
 }
 
 .ember-power-select-selected-item .card-picker-dropdown__option--selected {
