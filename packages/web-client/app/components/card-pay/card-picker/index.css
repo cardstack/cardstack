@@ -43,7 +43,7 @@
 
 .card-picker-dropdown .ember-basic-dropdown-content {
   max-width: 100%;
-  height: 100%;
+  height: 500px;
   width: var(--default-field-width);
   max-height: var(--options-menu-height);
   background-color: var(--boxel-light);
@@ -82,7 +82,6 @@
 }
 
 .card-picker-dropdown__option:hover:not(.card-picker-dropdown__option--disabled) {
-  background-color: var(--boxel-purple-100);
   cursor: pointer;
 }
 
