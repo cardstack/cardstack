@@ -27,6 +27,7 @@ import {
   importDeclaration,
   isImportDefaultSpecifier,
   importDefaultSpecifier,
+  ClassDeclaration,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { error } from './utils/babel';
@@ -34,12 +35,15 @@ import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-ca
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
+import { baseCardURL } from './compiler';
 
 const processedImports = new WeakSet<NodePath<ImportDeclaration>>();
 interface State {
   opts: {
     fields: CompiledCard['fields'];
     meta: PluginMeta;
+    parent: CompiledCard;
+    parentLocalName: string | undefined;
   };
 }
 
@@ -59,12 +63,19 @@ export default function main() {
           if (path.node.specifiers.length !== 1 || !isImportDefaultSpecifier(path.node.specifiers[0])) {
             throw error(path, `expecting a default import for card`);
           }
-          let fieldMetas = fieldMetasForCardURL(path.node.source.value, state);
-          if (fieldMetas.length === 0) {
-            throw new Error(`should never get here`);
+          let cardURL = path.node.source.value;
+          let resolvedModule: string;
+          if (cardURL === state.opts.meta.parent?.cardURL) {
+            resolvedModule = state.opts.parent.schemaModule.global;
+            state.opts.parentLocalName = path.node.specifiers[0].local.name;
+          } else {
+            let fieldMetas = fieldMetasForCardURL(cardURL, state);
+            if (fieldMetas.length === 0) {
+              throw error(path, `could not find fieldMeta for ${cardURL}`);
+            }
+            let [fieldName] = fieldMetas[0]; // all these fields share the same field card--so just use the first one
+            resolvedModule = state.opts.fields[fieldName].card.schemaModule.global;
           }
-          let [fieldName] = fieldMetas[0]; // all these fields share the same field card--so just use the first one
-          let resolvedModule = state.opts.fields[fieldName].card.schemaModule.global;
           path.replaceWith(
             importDeclaration(
               [importDefaultSpecifier(identifier(asClassName(path.node.specifiers[0].local.name)))],
@@ -74,35 +85,60 @@ export default function main() {
         }
         processedImports.add(path);
       },
-      Class(path: NodePath<Class>, state: State) {
-        path.get('body').node.body.unshift(
-          // creates a private property that looks like:
-          //   #getRawField;
-          classPrivateProperty(privateName(identifier('getRawField')), null, null, false),
 
-          // creates a constructor that looks like:
-          //   constructor(get) {
-          //     this.#getRawField = get;
-          //   }
-          classMethod(
-            'constructor',
-            identifier('constructor'),
-            [identifier('get')],
-            blockStatement([
-              expressionStatement(
-                assignmentExpression(
-                  '=',
-                  memberExpression(thisExpression(), privateName(identifier('getRawField'))),
-                  identifier('get')
-                )
-              ),
-            ]),
-            false,
-            false,
-            false,
-            false
-          )
-        );
+      ClassDeclaration(path: NodePath<ClassDeclaration>, state: State) {
+        if (state.opts.meta.parent?.cardURL && state.opts.parentLocalName) {
+          path.node.superClass = identifier(asClassName(state.opts.parentLocalName));
+        }
+      },
+
+      Decorator(path: NodePath<Decorator>) {
+        // we don't want any decorators bleeding thru into our resulting classes
+        path.remove();
+      },
+
+      Class(path: NodePath<Class>, state: State) {
+        let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
+        // you can't upgrade a primitive card to a composite card--you are
+        // either a primitive card or a composite card. so if we adopt from a
+        // card that is primitive, then we ourselves must be primitive as well.
+        if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
+          path.get('body').node.body.unshift(
+            // creates a private property that looks like:
+            //   #getRawField;
+            classPrivateProperty(privateName(identifier('getRawField')), null, null, false),
+
+            // creates a constructor that looks like:
+            //   constructor(get) {
+            //     super(get); // when we adopt from a non-base card
+            //     this.#getRawField = get;
+            //   }
+            classMethod(
+              'constructor',
+              identifier('constructor'),
+              [identifier('get')],
+              blockStatement([
+                ...(state.opts.meta.parent?.cardURL
+                  ? [
+                      // if we extend a non base card, then add a super()
+                      expressionStatement(callExpression(identifier('super'), [identifier('get')])),
+                    ]
+                  : []),
+                expressionStatement(
+                  assignmentExpression(
+                    '=',
+                    memberExpression(thisExpression(), privateName(identifier('getRawField'))),
+                    identifier('get')
+                  )
+                ),
+              ]),
+              false,
+              false,
+              false,
+              false
+            )
+          );
+        }
 
         // The ClassProperty visitor doesn't seem to work. It looks like
         // @babel/plugin-proposal-class-properties creates a "Class" visitor
@@ -123,7 +159,12 @@ function handleClassMethod(path: NodePath<ClassMethod>, _state: State) {
   if (path.node.kind === 'constructor') {
     return;
   }
-  let decorators = path.get('decorators') as NodePath<Decorator>[];
+  // the types for the "decorators" path leaves much to be desired....
+  let maybeDecorators = path.get('decorators') as NodePath<Node>;
+  if (!maybeDecorators.type) {
+    return;
+  }
+  let decorators = maybeDecorators as unknown as NodePath<Decorator>[];
   for (let decorator of decorators) {
     if (
       isCallExpression(decorator.node.expression) &&
@@ -177,13 +218,20 @@ function handleClassProperty(path: NodePath<ClassProperty>, state: State) {
 
 // we consider a primitive card any card that has no fields
 function cardTypeByURL(url: string, state: State): 'primitive' | 'composite' | undefined {
-  let metas = fieldMetasForCardURL(url, state);
-  if (metas.length === 0) {
+  let isParentMeta = (state.opts.meta.parent?.cardURL ?? baseCardURL) === url;
+  if (isParentMeta && baseCardURL === url) {
+    return 'composite'; // a base card, while having no fields is actually the stem for all composite cards
+  } else if (isParentMeta) {
+    return Object.keys(state.opts.parent.fields).length === 0 ? 'primitive' : 'composite';
+  }
+
+  let fieldMetas = fieldMetasForCardURL(url, state);
+  if (fieldMetas.length === 0 && !isParentMeta) {
     return;
   }
 
   // all these fields share the same field card--so just use the first one
-  let [fieldName] = metas[0];
+  let [fieldName] = fieldMetas[0];
   let fieldCard = state.opts.fields[fieldName].card;
   return Object.keys(fieldCard.fields).length === 0 ? 'primitive' : 'composite';
 }

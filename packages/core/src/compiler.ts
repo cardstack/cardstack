@@ -64,9 +64,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
-    if (schemaModule) {
-      this.prepareSchema(schemaModule, meta, fields, modules);
-    }
 
     this.defineAssets(cardSource, modules);
 
@@ -82,7 +79,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
       }
 
-      if (!schemaModule) {
+      if (schemaModule) {
+        this.prepareSchema(schemaModule, meta, fields, parentCard, modules);
+      } else {
         schemaModule = parentCard.schemaModule;
       }
 
@@ -227,6 +226,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     schemaModule: LocalRef,
     meta: PluginMeta,
     fields: CompiledCard['fields'],
+    parent: CompiledCard,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
   ) {
     let { source, ast } = modules[schemaModule.local];
@@ -238,7 +238,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     try {
       out = transformFromAstSync(ast, source, {
         ast: true,
-        plugins: [[cardSchemaTransformPlugin, { meta, fields }]],
+        plugins: [[cardSchemaTransformPlugin, { meta, fields, parent }]],
       })!;
     } catch (error: any) {
       throw augmentBadRequest(error);

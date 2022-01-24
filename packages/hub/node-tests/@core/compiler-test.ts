@@ -335,7 +335,18 @@ if (process.env.COMPILER) {
       });
     });
 
-    describe.only('computed fields', function () {
+    describe('computed fields', function () {
+      let fancyDateCard: RawCard = {
+        realm,
+        id: 'fancy-date',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts } from "@cardstack/types";
+            import date from "https://cardstack.com/base/date";
+            export default @adopts(date) class FancyDate { }`,
+        },
+      };
       let bioCard: RawCard = {
         realm,
         id: 'bio',
@@ -359,8 +370,7 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import bio from "${realm}bio";
-
+            import bio from "../bio";
             export default class Person {
               @contains(string) lastName;
               @contains(bio) aboutMe;
@@ -373,13 +383,45 @@ if (process.env.COMPILER) {
           `,
         },
       };
+      let fancyPersonCard: RawCard = {
+        realm,
+        id: 'fancy-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts } from "@cardstack/types";
+            import person from "../person";
+            export default @adopts(person) class FancyPerson {
+
+            }
+          `,
+        },
+      };
+      let reallyFancyPersonCard: RawCard = {
+        realm,
+        id: 'really-fancy-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts, contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import fancyPerson from "../fancy-person";
+            export default @adopts(fancyPerson) class ReallyFancyPerson {
+              @contains(string) middleName;
+            }
+          `,
+        },
+      };
 
       this.beforeEach(async function () {
+        await cards.create(fancyDateCard);
         await cards.create(bioCard);
         await cards.create(personCard);
+        await cards.create(fancyPersonCard);
+        await cards.create(reallyFancyPersonCard);
       });
 
-      it('can compile schema class constructor', async function () {
+      it('can compile schema class constructor for composite card', async function () {
         let { compiled } = await cards.load(`${realm}bio`);
         // the browser source has a lot less babel shenanigans
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
@@ -426,6 +468,37 @@ if (process.env.COMPILER) {
         expect(source).to.containsSource(`
           async fullName() {
             return "Mr or Mrs " + (await this.lastName());
+          }
+        `);
+      });
+
+      it('can compile a schema.js that adopts from a primitive card that is itself primitive', async function () {
+        let { compiled } = await cards.load(`${realm}fancy-date`);
+        // the browser source has a lot less babel shenanigans
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          export default class FancyDate {}
+        `);
+      });
+
+      it('can compile a schema.js that adopts from a composite card has no additional fields', async function () {
+        let { compiled } = await cards.load(`${realm}fancy-person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          import PersonClass from "@cardstack/compiled/https-cardstack.local-person/schema.js";
+          export default class FancyPerson extends PersonClass {}
+        `);
+      });
+
+      it('can make a constructor for a schema.js that adopts from a composite card has additional fields', async function () {
+        let { compiled } = await cards.load(`${realm}really-fancy-person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          #getRawField;
+
+          constructor(get) {
+            super(get);
+            this.#getRawField = get;
           }
         `);
       });
