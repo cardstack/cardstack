@@ -328,12 +328,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
 
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       layer2Service.test__simulateWalletConnectUri();
       await waitFor('[data-test-wallet-connect-qr-code]');
 
@@ -372,11 +374,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
+
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       assert
         .dom(postableSel(0, 1))
         .containsText(

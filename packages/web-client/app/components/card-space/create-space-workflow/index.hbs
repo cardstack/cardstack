@@ -23,21 +23,22 @@
 />
 
 
-
-<ToElsewhere
-  @named="sidebar-preview-content"
-  @send={{component
-    "card-space/profile-card"
-    profilePhoto=this.currentCardSpaceDetails.profilePhoto
-    coverPhoto=this.currentCardSpaceDetails.coverPhoto
-    name=this.currentCardSpaceDetails.name
-    host=this.currentCardSpaceDetails.host
-    category=this.currentCardSpaceDetails.category
-    description=this.currentCardSpaceDetails.description
-    buttonText=this.currentCardSpaceDetails.buttonText
-  }}
-  @outsideParams={{hash
-    title="Live Preview"
-    description="How others will preview your space in the Card Space org"
-  }}
-/>
+{{#unless this.workflow.isCanceled}}
+  <ToElsewhere
+    @named="sidebar-preview-content"
+    @send={{component
+      "card-space/profile-card"
+      profilePhoto=this.currentCardSpaceDetails.profilePhoto
+      coverPhoto=this.currentCardSpaceDetails.coverPhoto
+      name=this.currentCardSpaceDetails.name
+      host=this.currentCardSpaceDetails.host
+      category=this.currentCardSpaceDetails.category
+      description=this.currentCardSpaceDetails.description
+      buttonText=this.currentCardSpaceDetails.buttonText
+    }}
+    @outsideParams={{hash
+      title="Live Preview"
+      description="How others will preview your space in the Card Space org"
+    }}
+  />
+{{/unless}}
