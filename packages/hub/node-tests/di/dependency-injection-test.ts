@@ -8,7 +8,7 @@ import {
   InjectOptions,
 } from '@cardstack/di';
 
-describe('hub/di/dependency-injection', function () {
+describe.only('hub/di/dependency-injection', function () {
   let registry: Registry;
   let container: Container;
 
@@ -39,7 +39,7 @@ describe('hub/di/dependency-injection', function () {
     await container.teardown();
   });
 
-  it('it can inject a service', async function () {
+  it('can inject a service', async function () {
     let consumer = await container.lookup('testConsumer');
     expect(consumer.useIt()).equals('Quint');
     expect(consumer.theAnswer()).equals('Quint');
@@ -131,7 +131,7 @@ describe('hub/di/dependency-injection', function () {
     expect(example.viaCustomInjector.isUseANonDefaultType).equals(true);
   });
 
-  it.skip('can discover modules registered via type patterns', async function () {
+  it('can discover modules registered via type patterns', async function () {
     let example = await container.lookup('discovered', { type: 'test-things' });
     expect(example.iWasDiscovered).equals(true);
   });
