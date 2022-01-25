@@ -70,6 +70,7 @@ export default class APIRouter {
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
+    apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);
     apiSubrouter.post('/orders', parseBody, ordersRoute.post);
