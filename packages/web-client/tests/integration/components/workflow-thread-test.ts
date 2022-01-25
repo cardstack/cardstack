@@ -290,4 +290,43 @@ module('Integration | Component | workflow-thread', function (hooks) {
       .dom('[data-test-milestone="0"][data-test-milestone-completed]')
       .doesNotExist();
   });
+
+  test('it can render the `sidebar-preview-content`', async function (assert) {
+    this.set('workflow', new WorkflowStub(this.owner));
+    this.owner.register(
+      'template:components/dummy-test',
+      hbs`
+          <div>Just a dummy component so we don't have to depend on existing components for this test</div>
+          `
+    );
+
+    await render(hbs`
+      <ToElsewhere @named="sidebar-preview-content" @send={{component "dummy-test"}} @outsideParams={{hash title="Test title" description="Test description"}}/>
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+
+    assert.dom('[data-test-sidebar-preview-title]').containsText('Test title');
+    assert
+      .dom('[data-test-sidebar-preview-body]')
+      .containsText(
+        "Just a dummy component so we don't have to depend on existing components for this test"
+      );
+    assert
+      .dom('[data-test-sidebar-preview-description]')
+      .containsText('Test description');
+    assert.dom('[data-test-sidebar-preview-separator]').exists();
+  });
+
+  test('it will not render the `sidebar-preview-content` if there is no ToElsewhere that sends a component', async function (assert) {
+    this.set('workflow', new WorkflowStub(this.owner));
+
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+
+    assert.dom('[data-test-sidebar-preview-title]').doesNotExist();
+    assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
+    assert.dom('[data-test-sidebar-preview-description]').doesNotExist();
+    assert.dom('[data-test-sidebar-preview-separator]').doesNotExist();
+  });
 });
