@@ -270,7 +270,7 @@ describe('POST /api/wyre-callback', function () {
 
   this.beforeEach(function () {
     registry(this).register('wyre', StubWyreService);
-    registry(this).register('relay', StubRelayService);
+    registry(this).register('relay', StubRelayService, { type: 'service' });
     registry(this).register('subgraph', StubSubgraphService);
   });
 

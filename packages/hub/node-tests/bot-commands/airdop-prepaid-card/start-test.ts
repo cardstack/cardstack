@@ -77,7 +77,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
   this.beforeAll(async function () {
     registry(this).register('inventory', StubInventoryService);
     registry(this).register('wallet-connect', StubWalletConnectService);
-    registry(this).register('relay', StubRelayService);
+    registry(this).register('relay', StubRelayService, { type: 'service' });
     registry(this).register('cardpay', StubCardpaySDK);
   });
 

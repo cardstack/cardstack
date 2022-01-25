@@ -38,7 +38,6 @@ import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations
 import OrdersRoute from './routes/orders';
 import ReservationsRoute from './routes/reservations';
 import InventoryRoute from './routes/inventory';
-import RelayService from './services/relay';
 import SubgraphService from './services/subgraph';
 import OrderService from './services/order';
 import InventoryService from './services/inventory';
@@ -105,6 +104,7 @@ import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
 import { registerRoutes } from '@cardstack/hub/routes';
+import { registerServices } from '@cardstack/hub/services';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -173,7 +173,6 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
-  registry.register('relay', RelayService);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
@@ -208,6 +207,7 @@ export function createRegistry(): Registry {
     registry.register('searchIndex', SearchIndex);
   }
 
+  registerServices(registry);
   registerRoutes(registry);
 
   return registry;
