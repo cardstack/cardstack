@@ -113,6 +113,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -126,6 +128,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
@@ -173,6 +177,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -186,6 +192,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
@@ -231,6 +239,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '123',
@@ -244,6 +254,8 @@ describe('NotifyMerchantClaimTask', function () {
           transactionInformation: JSON.stringify({
             merchantId: 'merchant-safe-address',
           }),
+          ownerAddress: 'eoa-address',
+          network: 'sokol',
         },
         notificationType: 'merchant_claim',
         pushClientId: '456',
