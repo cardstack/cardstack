@@ -95,7 +95,9 @@ module.exports = function (environment) {
       testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
       discordSupportChannelUrl:
         'https://discord.com/channels/584043165066199050/899645340746141806',
-      statusPageUrl: 'https://status.cardstack.com',
+      statusPageBase: 'https://status.cardstack.com',
+      statusPageUrl:
+        'https://status.cardstack.com/api/v2/incidents/summary.json',
     },
     // basically our favicons for now
     walletConnectIcons: [

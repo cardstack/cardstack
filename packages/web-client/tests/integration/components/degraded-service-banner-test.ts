@@ -9,7 +9,7 @@ import config from '@cardstack/web-client/config/environment';
 
 interface Context extends MirageTestContext {}
 
-let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/summary.json`;
+let statusPageUrl = config.urls.statusPageUrl;
 
 module('Integration | Component | degraded-service-banner', function (hooks) {
   setupRenderingTest(hooks);

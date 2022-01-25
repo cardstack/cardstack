@@ -44,12 +44,10 @@ export default class DegradedServiceDetector extends Service {
   }
 
   async getDegradationStatusData(): Promise<Incident | null> {
-    let statusPageUrl = `${this.statusPageUrl}/api/v2/incidents/summary.json`;
-
     let data = {} as StatuspageStatusAPISummaryResponse;
 
     try {
-      let response = await fetch(statusPageUrl);
+      let response = await fetch(this.statusPageUrl);
       data = await response.json();
     } catch (e) {
       console.error('Failed to fetch Statuspage summary', e);
