@@ -4,8 +4,6 @@ import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } fro
 
 let nonce = 0;
 
-let reverseCache = new WeakMap<object, CacheEntry>();
-
 export class Container implements ContainerInterface {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
   private tearingDown: Deferred<void> | undefined;
@@ -19,9 +17,8 @@ export class Container implements ContainerInterface {
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string, opts?: { type?: string }): Promise<any> {
     let entry = this._lookup(name, opts?.type ?? 'default');
-    let instance = await entry.instance();
     await entry.promise;
-    return instance;
+    return entry.instance;
   }
 
   private _lookup(name: string, type: string): CacheEntry {
@@ -84,9 +81,8 @@ export class Container implements ContainerInterface {
         }
       },
     });
-    let instance = await entry.instance();
     await entry.promise;
-    return instance;
+    return entry.instance;
   }
 
   private provideInjections<FindResult, Instance>(
@@ -100,7 +96,6 @@ export class Container implements ContainerInterface {
     result.bootUp((instance, pendingInjections) => {
       let injections: Injections = new Map();
       ownership.set(instance, this);
-      reverseCache.set(instance as any, result as CacheEntry);
       for (let [name, opts] of pendingInjections.entries()) {
         injections.set(name, {
           isReady: false,
@@ -124,9 +119,16 @@ export class Container implements ContainerInterface {
             await Promise.all(
               [...this.cache.values()].map(async (entry) => {
                 try {
-                  return { instance: await entry.instance(), entry };
+                  await entry.promise;
                 } catch (err) {
                   // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
+                }
+                try {
+                  // if they got far enough to have an instance, we will run its
+                  // teardown regardless of whether something caused
+                  // `entry.promise` to reject above
+                  return { instance: entry.instance, entry };
+                } catch (err) {
                   return undefined;
                 }
               })
@@ -186,6 +188,9 @@ class CacheEntry<Instance = unknown> {
   private deferredInstance: Deferred<{ instance: Instance; injections: Injections }>;
   private identityKey: CacheKey;
 
+  #instance: Instance | undefined;
+  #injections: Injections | undefined;
+
   constructor(private instantiator: Instantiator<unknown, Instance>, cacheKey: CacheKey | undefined) {
     this.identityKey = cacheKey ?? `anonymous_${nonce++}`;
     this.deferredInstance = new Deferred();
@@ -204,6 +209,8 @@ class CacheEntry<Instance = unknown> {
     }
     let { instance, injections: pending } = this.instantiate(factory);
     let injections = connect(instance, pending);
+    this.#instance = instance;
+    this.#injections = injections;
     return { instance, injections };
   }
 
@@ -226,17 +233,29 @@ class CacheEntry<Instance = unknown> {
     return this.deferredPromise.promise;
   }
 
-  async instance(): Promise<any> {
-    let { instance } = await this.deferredInstance.promise;
-    return instance;
+  get hasInstance(): boolean {
+    return Boolean(this.#instance);
+  }
+
+  get instance(): Instance {
+    if (!this.#instance) {
+      throw new Error(`bug: CacheEntry is not in the right state to have an instance yet`);
+    }
+    return this.#instance;
+  }
+
+  private get injections(): Injections {
+    if (!this.#injections) {
+      throw new Error(`bug: CacheEntry is not in the right state to have injections yet`);
+    }
+    return this.#injections;
   }
 
   private async prepareSubgraph(): Promise<void> {
     let subgraph = await this.subgraph();
     await Promise.all([...subgraph].map((entry) => entry.partial));
     for (let entry of subgraph) {
-      let { injections } = await entry.deferredInstance.promise;
-      for (let [name, pending] of injections) {
+      for (let [name, pending] of entry.injections) {
         await entry.installInjection(name, pending);
       }
     }
@@ -247,14 +266,12 @@ class CacheEntry<Instance = unknown> {
       return;
     }
     let { opts, cacheEntry } = injection;
-    let { instance: myInstance } = await this.deferredInstance.promise;
-    let { instance: theirInstance } = await cacheEntry.deferredInstance.promise;
-    if ((myInstance as any)[opts.as]?.injectionNotReadyYet !== name) {
+    if ((this.instance as any)[opts.as]?.injectionNotReadyYet !== name) {
       throw new Error(
         `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
       );
     }
-    (myInstance as any)[opts.as] = theirInstance;
+    (this.instance as any)[opts.as] = cacheEntry.instance;
     injection.isReady = true;
   }
 
@@ -299,14 +316,13 @@ class CacheEntry<Instance = unknown> {
     this.deferredInjections.set(name, cached);
     cached.fulfill(
       (async () => {
-        let { injections } = await this.deferredInstance.promise;
-        let pending = injections.get(name)!;
+        let pending = this.injections.get(name)!;
         if ((await pending.cacheEntry.subgraph()).has(this as CacheEntry)) {
           throw new Error(
             `circular dependency: ${this.identityKey} tries to eagerly inject ${name}, which depends on ${this.identityKey}`
           );
         }
-        await pending.cacheEntry!.promise;
+        await pending.cacheEntry.promise;
         await this.installInjection(name, pending);
       })()
     );
@@ -314,9 +330,8 @@ class CacheEntry<Instance = unknown> {
   }
 
   private async runReady(): Promise<void> {
-    let { instance } = await this.deferredInstance.promise;
-    if (typeof (instance as any).ready === 'function') {
-      await (instance as any).ready();
+    if (typeof (this.instance as any).ready === 'function') {
+      await (this.instance as any).ready();
     }
   }
 }
@@ -477,9 +492,16 @@ export function getOwner(obj: any): Container {
 }
 
 export async function injectionReady(instance: any, name: string): Promise<void> {
-  let entry = reverseCache.get(instance);
-  if (!entry) {
-    throw new Error(`tried to await injectionReady from an object that was not found in our container`);
+  let container = getOwner(instance);
+
+  // accessing a private member variable
+  let cache: Container['cache'] = (container as any).cache;
+
+  for (let entry of cache.values()) {
+    if (entry.hasInstance && entry.instance === instance) {
+      await entry.prepareInjectionEagerly(name);
+      return;
+    }
   }
-  await entry.prepareInjectionEagerly(name);
+  throw new Error(`injectionReady(..., "${name}") was called for an object that was not found in the DI system`);
 }
