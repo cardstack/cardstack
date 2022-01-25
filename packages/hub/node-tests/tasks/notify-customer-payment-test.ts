@@ -146,6 +146,8 @@ describe('NotifyCustomerPaymentTask', function () {
           symbol: 'DAI.CPXD',
         },
       }),
+      ownerAddress: 'eoa-address',
+      network: 'sokol',
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
@@ -245,6 +247,8 @@ describe('NotifyCustomerPaymentTask', function () {
           symbol: 'DAI.CPXD',
         },
       }),
+      ownerAddress: 'eoa-address',
+      network: 'sokol',
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
@@ -340,6 +344,8 @@ describe('NotifyCustomerPaymentTask', function () {
           symbol: 'DAI.CPXD',
         },
       }),
+      ownerAddress: 'eoa-address',
+      network: 'sokol',
     };
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
