@@ -6,7 +6,7 @@ import { modifier } from 'ember-modifier';
  * @param element The container element
  * @param params Array of length 1 that contains a single string for the width of the element
  */
-function scaleToFit(element: HTMLElement, params: string[]) {
+function scaleDownToWidth(element: HTMLElement, params: string[]) {
   element.style.width = params[0];
   element.style.overflow = 'visible';
 
@@ -37,4 +37,4 @@ function scaleToFit(element: HTMLElement, params: string[]) {
   (child as HTMLElement).style.transformOrigin = 'top left';
 }
 
-export default modifier(scaleToFit);
+export default modifier(scaleDownToWidth);

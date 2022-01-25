@@ -83,7 +83,7 @@
             {{outsideParams.title}}
           </div>
         {{/if}}
-        <div {{scale-to-fit "var(--boxel-sidebar-max-width)"}} data-test-sidebar-preview-body>
+        <div {{scale-down-to-width "var(--boxel-sidebar-max-width)"}} data-test-sidebar-preview-body>
           {{component preview}}
         </div>
         {{#if outsideParams.description}}
