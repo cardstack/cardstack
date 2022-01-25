@@ -29,7 +29,6 @@ import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
-import StatusRoute from './routes/status';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
@@ -105,6 +104,7 @@ import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
+import { registerRoutes } from '@cardstack/hub/routes';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -179,7 +179,6 @@ export function createRegistry(): Registry {
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
-  registry.register('status-route', StatusRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
@@ -208,6 +207,8 @@ export function createRegistry(): Registry {
     registry.register('card-builder', CardBuilder);
     registry.register('searchIndex', SearchIndex);
   }
+
+  registerRoutes(registry);
 
   return registry;
 }

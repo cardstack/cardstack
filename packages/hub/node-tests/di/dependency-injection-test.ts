@@ -8,7 +8,7 @@ import {
   InjectOptions,
 } from '@cardstack/di';
 
-describe.only('hub/di/dependency-injection', function () {
+describe('hub/di/dependency-injection', function () {
   let registry: Registry;
   let container: Container;
 
