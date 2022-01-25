@@ -20,7 +20,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
 
   test('it displays a degraded service banner if required', async function (this: MirageTestContext, assert) {
     this.set('workflow', new WorkflowStub(this.owner));
-    let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`;
+    let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/summary.json`;
     this.server.get(statusPageUrl, function () {
       return new MirageResponse(
         200,

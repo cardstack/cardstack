@@ -94,7 +94,7 @@ export default function () {
 
   // prevent sporadic test failure because of degradation banner
   this.get(
-    `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`,
+    `${config.urls.statusPageUrl}/api/v2/incidents/summary.json`,
     function () {
       return {
         incidents: [],

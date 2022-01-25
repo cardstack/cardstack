@@ -9,19 +9,20 @@ import config from '@cardstack/web-client/config/environment';
 
 interface Context extends MirageTestContext {}
 
-let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`;
+let statusPageUrl = `${config.urls.statusPageUrl}/api/v2/incidents/summary.json`;
 
 module('Integration | Component | degraded-service-banner', function (hooks) {
   setupRenderingTest(hooks);
   setupMirage(hooks);
 
-  test('It doesn not display a banner when there are no incidents', async function (this: Context, assert) {
+  test('It does not display a banner when there are no incidents or maintenances', async function (this: Context, assert) {
     this.server.get(statusPageUrl, function () {
       return new MirageResponse(
         200,
         {},
         {
           incidents: [],
+          scheduled_maintenances: [],
         }
       );
     });
@@ -116,7 +117,36 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
       .doesNotHaveClass('degraded-service-banner--severe');
   });
 
-  test('It shows only the most recent and most impactful incident', async function (this: Context, assert) {
+  test('It shows an in-progress maintenance as default', async function (this: Context, assert) {
+    this.server.get(statusPageUrl, function () {
+      return new MirageResponse(
+        200,
+        {},
+        {
+          scheduled_maintenances: [
+            {
+              name: 'Name',
+              impact: 'minor',
+              incident_updates: [{ body: 'One small system down.' }],
+            },
+          ],
+        }
+      );
+    });
+
+    await render(hbs`<Common::DegradedServiceBanner />`);
+    await waitFor('[data-test-degraded-service-banner]');
+    assert
+      .dom('[data-test-degraded-service-banner]')
+      .containsText(
+        'Name: One small system down. For more details, check our status page'
+      );
+    assert
+      .dom('[data-test-degraded-service-banner]')
+      .doesNotHaveClass('degraded-service-banner--severe');
+  });
+
+  test('It shows only the most recent and most impactful incident or maintenance', async function (this: Context, assert) {
     this.server.get(statusPageUrl, function () {
       return new MirageResponse(
         200,
@@ -145,6 +175,14 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
               name: 'Ignored',
               impact: 'critical',
               incident_updates: [{ body: 'Internet down.' }],
+              started_at: '2021-10-10T10:10:00.001Z',
+            },
+          ],
+          scheduled_maintenances: [
+            {
+              name: 'Ignored',
+              impact: 'major',
+              incident_updates: [{ body: 'Maintenance also?!' }],
               started_at: '2021-10-10T10:10:00.001Z',
             },
           ],
