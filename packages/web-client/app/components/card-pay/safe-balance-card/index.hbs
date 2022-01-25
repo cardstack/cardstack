@@ -16,10 +16,9 @@
           {{did-insert this.layer2Network.refreshSafesAndBalances}}
         >
           <CardPay::FieldStack>
-            <CardPay::LabeledValue
+            <Boxel::Field
               @label={{this.safeAddressLabel}}
-              @value={{this.safe.address}}
-              @isAddress={{true}}
+              @address={{this.safe.address}}
               data-test-safe-address
             />
             <Boxel::Field @label={{this.safeBalanceLabel}} data-test-balance-label>

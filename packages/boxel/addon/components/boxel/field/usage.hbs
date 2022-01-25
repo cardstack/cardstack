@@ -2,33 +2,15 @@
   <:example>
     <Boxel::Field
       @label={{this.label}}
-      @labelClass={{this.labelClass}}
-      @fieldMode={{this.mode}}
       @fieldId={{this.id}}
       @vertical={{this.vertical}}
       @smallLabel={{this.smallLabel}}
-      {{!-- style={{css-var boxel-field-label-width=this.labelWidth}} --}}
     >
-      {{#if (eq this.mode "edit")}}
-        <Boxel::Input
-          @value={{this.value}}
-          @required={{true}}
-        />
-      {{else}}
-        {{this.value}}
-      {{/if}}
+      {{this.value}}
     </Boxel::Field>
   </:example>
 
   <:api as |Args|>
-    <Args.String
-      @name="fieldMode"
-      @description="field mode"
-      @value={{this.mode}}
-      @options={{w "view edit"}}
-      @defaultValue="view"
-      @onInput={{fn (mut this.mode)}}
-    />
     <Args.String
       @name="fieldId"
       @description="optional field id"
@@ -42,10 +24,20 @@
       @onInput={{fn (mut this.label)}}
     />
     <Args.String
-      @name="labelClass"
-      @description="optional css class name for the field label"
-      @value={{this.labelClass}}
-      @onInput={{fn (mut this.labelClass)}}
+      @name="value"
+      @description="text value"
+      @value={{this.value}}
+      @onInput={{fn (mut this.value)}}
+    />
+    {{!-- TODO: @address, @icon --}}
+
+    {{!-- TODO: better name --}}
+    <Args.Bool
+      @name="smallLabel"
+      @description="Whether the label column should have a smaller width"
+      @defaultValue="false"
+      @onInput={{fn (mut this.smallLabel)}}
+      @value={{this.smallLabel}}
     />
     <Args.Bool
       @name="vertical"
@@ -53,13 +45,6 @@
       @defaultValue="false"
       @onInput={{fn (mut this.vertical)}}
       @value={{this.vertical}}
-    />
-    <Args.Bool
-      @name="smallLabel"
-      @description="Whether the label column should have a smaller width"
-      @defaultValue="false"
-      @onInput={{fn (mut this.smallLabel)}}
-      @value={{this.smallLabel}}
     />
     <Args.Yield
       @description="Yield value or form field"

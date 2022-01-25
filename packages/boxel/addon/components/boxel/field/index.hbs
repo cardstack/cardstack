@@ -12,8 +12,24 @@
     <div class="boxel-field__label" data-test-boxel-field-label>
       {{@label}}
     </div>
-    <div>
-      {{yield}}
+    <div class="boxel-field__contents">
+      {{#if @icon}}
+        {{svg-jar @icon class="boxel-field__icon" role="presentation"}}
+      {{/if}}
+
+      {{#if @address}}
+        <div class="boxel-field__address">{{@address}}</div>
+      {{/if}}
+
+      {{#if @value}}
+        <div class="boxel-field__value">{{@value}}</div>
+      {{/if}}
+
+      {{#if (has-block)}}
+        <div>
+          {{yield}}
+        </div>
+      {{/if}}
     </div>
   </Tag>
 {{/let}}

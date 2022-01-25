@@ -19,3 +19,19 @@
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
+
+.boxel-field__contents {
+  display: flex;
+}
+
+.boxel-field__icon {
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.boxel-field__address {
+  font-family: var(--boxel-monospace-font-family);
+  max-width: 22ch;
+  word-break: break-all;
+}

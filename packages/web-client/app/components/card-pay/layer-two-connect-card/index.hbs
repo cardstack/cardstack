@@ -19,16 +19,15 @@
       data-test-layer-2-wallet-summary
     >
       <CardPay::FieldStack>
-        <CardPay::LabeledValue
+        <Boxel::Field
           @label="Network"
           @value={{network-display-info "layer2" "fullName"}}
         />
 
         {{#if this.isConnected}}
-          <CardPay::LabeledValue
+          <Boxel::Field
             @label="Account"
-            @value={{this.layer2Network.walletInfo.firstAddress}}
-            @isAddress={{true}}
+            @address={{this.layer2Network.walletInfo.firstAddress}}
             data-test-address-field
           />
           <Boxel::Field @label="Depot balance" data-test-balance-container>
@@ -47,7 +46,7 @@
         {{/if}}
 
         {{!-- future: show Prepaid Cards, Badges --}}
-        <CardPay::LabeledValue
+        <Boxel::Field
           @label="Status"
           @value={{if this.isConnected "Connected" "Disconnected"}}
           @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
