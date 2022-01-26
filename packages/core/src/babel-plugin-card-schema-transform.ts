@@ -19,8 +19,6 @@ import {
   classPrivateProperty,
   isClassProperty,
   Class,
-  isClassMethod,
-  ClassMethod,
   newExpression,
   arrowFunctionExpression,
   binaryExpression,
