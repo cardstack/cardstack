@@ -18,8 +18,8 @@ export default class HealthCheck {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'health-check': HealthCheck;
   }
 }
