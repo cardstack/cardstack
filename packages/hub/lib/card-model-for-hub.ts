@@ -9,18 +9,16 @@ import {
   Saved,
   Unsaved,
   RawCardData,
-  Card,
 } from '@cardstack/core/src/interfaces';
 import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
+import { inject, getOwner } from '@cardstack/di';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
-import RealmManager from '../services/realm-manager';
-import { SearchIndex } from '../services/search-index';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
-import FileCache from '../services/file-cache';
+import { INSECURE_CONTEXT } from '../services/card-service';
 
 export interface NewCardParams {
   realm: string;
@@ -52,21 +50,17 @@ interface LoadedState {
   original: CardModel | undefined;
 }
 
-// TODO: move to real injections intead, and instantiate CardModel via container.instantiate()
-export interface CardServiceEnv {
-  create: (raw: RawCard<Unsaved>) => Promise<Card>;
-  loadData: (cardURL: string, format: Format) => Promise<CardModel>;
-  realmManager: RealmManager;
-  searchIndex: SearchIndex;
-  fileCache: FileCache;
-}
-
 export default class CardModelForHub implements CardModel {
+  private cardService = inject('card-service', { as: 'cardService' });
+  private fileCache = inject('file-cache', { as: 'fileCache' });
+  private realmManager = inject('realm-manager', { as: 'realmManager' });
+  private searchIndex = inject('searchIndex');
+
   setters: undefined;
   private _data: any;
   private state: CreatedState | LoadedState;
 
-  constructor(private env: CardServiceEnv, state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
+  constructor(state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>) {
     if (state.type == 'created') {
       this.state = state;
     } else {
@@ -86,7 +80,7 @@ export default class CardModelForHub implements CardModel {
 
     // TODO we probably want to cache the schemaInstance. It should only be
     // created the first time it's needed
-    let SchemaClass = this.env.fileCache.loadModule(this.state.schemaModule).default;
+    let SchemaClass = this.fileCache.loadModule(this.state.schemaModule).default;
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
     let value = await schemaInstance[name]();
     return value;
@@ -99,8 +93,7 @@ export default class CardModelForHub implements CardModel {
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
     }
-    // TODO: this becomes getOwner(this).instantiate(this.constructor, {})
-    return new (this.constructor as typeof CardModelForHub)(this.env, {
+    return await getOwner(this).instantiate(this.constructor as typeof CardModelForHub, {
       type: 'created',
       realm,
       id,
@@ -214,19 +207,19 @@ export default class CardModelForHub implements CardModel {
     let raw: RawCard, compiled: CompiledCard;
     switch (this.state.type) {
       case 'created':
-        raw = await this.env.realmManager.create({
+        raw = await this.realmManager.create({
           id: this.state.id,
           realm: this.state.realm,
           adoptsFrom: this.state.parentCardURL,
           data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
         });
-        compiled = await this.env.searchIndex.indexData(raw);
+        compiled = await this.searchIndex.indexData(raw);
         break;
       case 'loaded':
         {
           // TODO we started out with the old data--so just hang on to it (this
           // is this.rawData)
-          let original = await this.env.loadData(this.url, this.format);
+          let original = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(this.url, this.format);
           let updatedRawCard = merge(
             {
               id: this.state.id,
@@ -237,8 +230,8 @@ export default class CardModelForHub implements CardModel {
           );
 
           serializeAttributes(updatedRawCard.data, this.serializerMap);
-          raw = await this.env.realmManager.update(updatedRawCard);
-          compiled = await this.env.searchIndex.indexData(raw);
+          raw = await this.realmManager.update(updatedRawCard);
+          compiled = await this.searchIndex.indexData(raw);
         }
         break;
       default:

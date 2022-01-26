@@ -1,7 +1,7 @@
 import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
-import { inject } from '@cardstack/di';
+import { getOwner, inject } from '@cardstack/di';
 import {
   field,
   addExplicitParens,
@@ -27,28 +27,18 @@ export const INSECURE_CONTEXT = {};
 const log = logger('hub/card-service');
 
 export default class CardServiceFactory {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
-  private searchIndex = inject('searchIndex');
-  private db = inject('database-manager', { as: 'db' });
-  private fileCache = inject('file-cache', { as: 'fileCache' });
-
-  as(requestContext: unknown): CardService {
-    // TODO: this can probably become getOwner(this).instantiate(CardService,
-    // requestContext), and then CardService can get its own injections
-    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db, this.fileCache);
+  async as(requestContext: unknown): Promise<CardService> {
+    return await getOwner(this).instantiate(CardService, requestContext);
   }
 }
 
 export class CardService {
-  constructor(
-    _requestContext: unknown,
-    private realmManager: CardServiceFactory['realmManager'],
-    private builder: CardServiceFactory['builder'],
-    private searchIndex: CardServiceFactory['searchIndex'],
-    private db: CardServiceFactory['db'],
-    private fileCache: CardServiceFactory['fileCache']
-  ) {}
+  private realmManager = inject('realm-manager', { as: 'realmManager' });
+  private builder = inject('card-builder', { as: 'builder' });
+  private searchIndex = inject('searchIndex');
+  private db = inject('database-manager', { as: 'db' });
+
+  constructor(_requestContext: unknown) {}
 
   async load(cardURL: string): Promise<Card> {
     log.trace('load', cardURL);
@@ -68,7 +58,7 @@ export class CardService {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return this.makeCardModelFromDatabase(format, result);
+    return await this.makeCardModelFromDatabase(format, result);
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -128,36 +118,25 @@ export class CardService {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return result.rows.map((row) => {
-        return this.makeCardModelFromDatabase(format, row);
-      });
+      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
     } finally {
       client.release();
     }
   }
 
-  makeCardModelFromDatabase(format: Format, result: Record<string, any>): CardModel {
+  async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
-    return new CardModelForHub(
-      {
-        create: this.create.bind(this),
-        loadData: this.loadData.bind(this),
-        realmManager: this.realmManager,
-        searchIndex: this.searchIndex,
-        fileCache: this.fileCache,
-      },
-      {
-        type: 'loaded',
-        id: cardId.id,
-        realm: cardId.realm,
-        format,
-        rawData: result.data ?? {},
-        schemaModule: result.schemaModule,
-        usedFields: result.componentInfos[format].usedFields,
-        componentModule: result.componentInfos[format].moduleName.global,
-        serializerMap: result.componentInfos[format].serializerMap,
-      }
-    );
+    return await getOwner(this).instantiate(CardModelForHub, {
+      type: 'loaded',
+      id: cardId.id,
+      realm: cardId.realm,
+      format,
+      rawData: result.data ?? {},
+      schemaModule: result.schemaModule,
+      usedFields: result.componentInfos[format].usedFields,
+      componentModule: result.componentInfos[format].moduleName.global,
+      serializerMap: result.componentInfos[format].serializerMap,
+    });
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
@@ -253,6 +232,8 @@ function unimpl(which: string) {
 
 declare module '@cardstack/di' {
   interface KnownServices {
+    // Note that we are only registering CardServiceFactory and not CardService
+    // so that consumers will be force to provide a request context via .as()
     'card-service': CardServiceFactory;
   }
 }

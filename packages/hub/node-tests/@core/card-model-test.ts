@@ -66,7 +66,7 @@ if (process.env.COMPILER) {
     });
 
     it('.data', async function () {
-      let model = cards.makeCardModelFromDatabase('isolated', cardDBResult);
+      let model = await cards.makeCardModelFromDatabase('isolated', cardDBResult);
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);
