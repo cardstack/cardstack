@@ -40,3 +40,26 @@
 .workflow-thread__degraded-service-banner:first-child {
   border-radius: inherit;
 }
+
+.workflow-thread__sidebar-preview-title {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--boxel-purple-500);
+}
+
+.workflow-thread__sidebar-preview-description {
+  font-size: 12px;
+  text-align: center;
+  max-width: var(--boxel-sidebar-max-width);
+  color: var(--boxel-purple-500);
+}
+
+.workflow-thread__sidebar-preview-separator {
+  grid-row: 1;
+  grid-column: 1;
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--boxel-light-600);
+  margin: var(--boxel-sp) 0;
+}

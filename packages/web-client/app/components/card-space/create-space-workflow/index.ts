@@ -234,6 +234,18 @@ export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComp
     return CreateSpaceWorkflow;
   }
 
+  get currentCardSpaceDetails() {
+    return {
+      profilePhoto: this.workflow.session.getValue('profileImageUrl'),
+      coverPhoto: this.workflow.session.getValue('coverPhotoUrl'),
+      name: this.workflow.session.getValue('displayName'),
+      host: this.workflow.session.getValue('url'),
+      category: this.workflow.session.getValue('profileCategory'),
+      description: this.workflow.session.getValue('profileDescription'),
+      buttonText: this.workflow.session.getValue('buttonText'),
+    };
+  }
+
   @action onDisconnect() {
     this.workflow?.cancel(FAILURE_REASONS.L2_DISCONNECTED);
   }
