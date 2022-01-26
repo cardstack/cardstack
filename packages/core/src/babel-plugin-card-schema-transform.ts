@@ -51,6 +51,7 @@ export default function main() {
   return {
     visitor: {
       ImportDeclaration(path: NodePath<ImportDeclaration>, state: State) {
+        // TODO use ed's babel import util reduce the amount of work here
         // don't re-process the imports we replaced
         if (processedImports.has(path)) {
           return;
@@ -86,6 +87,7 @@ export default function main() {
         processedImports.add(path);
       },
 
+      // TODO do we want @adopts to be transpiled into ES class extension?
       ClassDeclaration(path: NodePath<ClassDeclaration>, state: State) {
         if (state.opts.meta.parent?.cardURL && state.opts.parentLocalName) {
           path.node.superClass = identifier(asClassName(state.opts.parentLocalName));
@@ -146,34 +148,11 @@ export default function main() {
         for (let bodyItem of path.get('body').get('body')) {
           if (isClassProperty(bodyItem.node)) {
             handleClassProperty(bodyItem as NodePath<ClassProperty>, state);
-          } else if (isClassMethod(bodyItem.node)) {
-            handleClassMethod(bodyItem as NodePath<ClassMethod>, state);
           }
         }
       },
     },
   };
-}
-
-function handleClassMethod(path: NodePath<ClassMethod>, _state: State) {
-  if (path.node.kind === 'constructor') {
-    return;
-  }
-  // the types for the "decorators" path leaves much to be desired....
-  let maybeDecorators = path.get('decorators') as NodePath<Node>;
-  if (!maybeDecorators.type) {
-    return;
-  }
-  let decorators = maybeDecorators as unknown as NodePath<Decorator>[];
-  for (let decorator of decorators) {
-    if (
-      isCallExpression(decorator.node.expression) &&
-      isIdentifier(decorator.node.expression.callee) &&
-      Object.keys(VALID_FIELD_DECORATORS).includes(decorator.node.expression.callee.name)
-    ) {
-      decorator.remove();
-    }
-  }
 }
 
 function handleClassProperty(path: NodePath<ClassProperty>, state: State) {
@@ -316,6 +295,8 @@ function transformPrimitiveField(path: NodePath<ClassProperty>) {
   );
 }
 
+// TODO There could be collisions here--take a look at Ed's util for a better
+// solution
 function asClassName(name: string): string {
   if (name.toLowerCase().endsWith('class')) {
     name = name.slice(0, -5);

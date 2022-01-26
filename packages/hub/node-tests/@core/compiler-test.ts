@@ -474,7 +474,6 @@ if (process.env.COMPILER) {
 
       it('can compile a schema.js that adopts from a primitive card that is itself primitive', async function () {
         let { compiled } = await cards.load(`${realm}fancy-date`);
-        // the browser source has a lot less babel shenanigans
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
           export default class FancyDate {}
