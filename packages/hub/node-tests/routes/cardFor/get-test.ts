@@ -14,7 +14,8 @@ if (process.env.COMPILER) {
         'card-routes-config',
         class {
           routeCard = `${TEST_REALM}routes`;
-        }
+        },
+        { type: 'service' }
       );
     });
 

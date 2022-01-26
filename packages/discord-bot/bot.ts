@@ -71,7 +71,9 @@ export class Bot extends Client {
       log.info('No bot token found. Bot will not login to discord.');
       return;
     }
-    await this.login(this.config.botToken);
+    if (process.env.NODE_ENV !== 'test') {
+      await this.login(this.config.botToken);
+    }
     await this.listenForDatabaseNotifications();
     await this.updateStatus('connected');
     await this.wireDiscordEventHandling();

@@ -61,10 +61,11 @@ function setupCacheDir(cardCacheDir: string): void {
 }
 
 import logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 const log = logger('hub/file-cache');
 
 export default class FileCache {
-  config = inject('file-cache-config', { as: 'config' });
+  config = service('file-cache-config', { as: 'config' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   client!: Client;
 
@@ -160,8 +161,8 @@ export default class FileCache {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'file-cache': FileCache;
   }
 }

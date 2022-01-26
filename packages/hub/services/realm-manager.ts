@@ -3,13 +3,14 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 import { CardId, RawCard, RealmConfig, Unsaved } from '@cardstack/core/src/interfaces';
 import { ensureTrailingSlash, removeTrailingSlash } from '@cardstack/core/src/utils';
 import { RealmInterface } from '../interfaces';
-import { getOwner, inject, injectionReady } from '@cardstack/di';
+import { getOwner, injectionReady } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 
 export default class RealmManager {
   realms: RealmInterface<any>[] = [];
 
-  private realmsConfig = inject('realmsConfig');
-  private searchIndex = inject('searchIndex');
+  private realmsConfig = service('realmsConfig');
+  private searchIndex = service('searchIndex');
 
   async ready() {
     await injectionReady(this, 'realmsConfig');
@@ -80,8 +81,8 @@ export default class RealmManager {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'realm-manager': RealmManager;
   }
 }
