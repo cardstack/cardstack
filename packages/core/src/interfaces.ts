@@ -111,6 +111,7 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
 
 export interface Field {
   type: 'contains' | 'containsMany' | 'linksTo';
+  computed: boolean;
   card: CompiledCard;
   name: string;
 }

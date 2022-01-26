@@ -259,6 +259,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
           card: await this.builder.getCompiledCard(fieldURL),
           type,
           name,
+          computed: false,
         };
       } catch (err: any) {
         if (!err.isCardstackError || err.status !== 404) {

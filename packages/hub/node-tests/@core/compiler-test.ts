@@ -66,6 +66,10 @@ if (process.env.COMPILER) {
       await cards.create(PERSON_CARD);
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
+      let nameFieldMeta = compiled.fields['name'];
+      expect(nameFieldMeta).to.have.property('name', 'name');
+      expect(nameFieldMeta).to.have.property('type', 'contains');
+      expect(nameFieldMeta).to.have.property('computed', false);
     });
 
     it('CompiledCard embedded view', async function () {
