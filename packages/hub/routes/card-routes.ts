@@ -1,19 +1,19 @@
 import { RouterContext } from '@koa/router';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
-import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
 import { NotFound, CardstackError, isCardstackError, UnprocessableEntity } from '@cardstack/core/src/utils/errors';
 import { parseQueryString } from '@cardstack/core/src/query';
 import { RawCardSerializer } from '@cardstack/core/src/serializers';
+import { service } from '@cardstack/hub/services';
 
 export default class CardRoutes {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private cache = inject('file-cache', { as: 'cache' });
-  private cards = inject('card-service', { as: 'cards' });
-  private config = inject('card-routes-config', { as: 'config' });
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private cache = service('file-cache', { as: 'cache' });
+  private cardService = service('card-service', { as: 'cardService' });
+  private config = service('card-routes-config', { as: 'config' });
 
   private routerInstance: undefined | RouterInstance;
 
@@ -27,14 +27,14 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await (await this.cards.as(INSECURE_CONTEXT)).loadData(url, format);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format);
     ctx.body = { data: card.serialize() };
     ctx.status = 200;
   }
 
   private async queryCards(ctx: RouterContext) {
     let query = parseQueryString(ctx.querystring);
-    let cards = await (await this.cards.as(INSECURE_CONTEXT)).query('embedded', query);
+    let cards = await (await this.cardService.as(INSECURE_CONTEXT)).query('embedded', query);
     let collection = cards.map((card) => card.serialize());
     ctx.body = { data: collection };
     ctx.status = 200;
@@ -53,7 +53,7 @@ export default class CardRoutes {
 
     let parentCard;
     try {
-      parentCard = await (await this.cards.as(INSECURE_CONTEXT)).loadData(parentCardURL, format);
+      parentCard = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(parentCardURL, format);
     } catch (e) {
       if (!isCardstackError(e) || e.status !== 404) {
         throw e;
@@ -79,7 +79,7 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await (await this.cards.as(INSECURE_CONTEXT)).loadData(url, format);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format);
     card.setData(data.attributes);
     await card.save();
     ctx.body = { data: card.serialize() };
@@ -92,7 +92,7 @@ export default class CardRoutes {
     } = ctx;
 
     let cardId = this.realmManager.parseCardURL(url);
-    await (await this.cards.as(INSECURE_CONTEXT)).delete(cardId);
+    await (await this.cardService.as(INSECURE_CONTEXT)).delete(cardId);
 
     ctx.status = 204;
     ctx.body = null;
@@ -111,7 +111,7 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let card = await (await this.cards.as(INSECURE_CONTEXT)).loadData(url, 'isolated');
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, 'isolated');
     ctx.body = { data: card.serialize() };
   }
 
@@ -121,7 +121,7 @@ export default class CardRoutes {
       query,
     } = ctx;
 
-    let card = await (await this.cards.as(INSECURE_CONTEXT)).load(url);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).load(url);
     let compiledCard;
 
     if (query.include === 'compiledMeta') {
@@ -136,7 +136,7 @@ export default class CardRoutes {
       if (!this.config.routeCard) {
         this.routerInstance = defaultRouterInstance;
       } else {
-        let { compiled } = await (await this.cards.as(INSECURE_CONTEXT)).load(this.config.routeCard);
+        let { compiled } = await (await this.cardService.as(INSECURE_CONTEXT)).load(this.config.routeCard);
         if (!compiled) {
           throw new CardstackError('Routing card is not compiled!');
         }
@@ -201,9 +201,14 @@ const defaultRouterInstance = {
   },
 };
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/routes' {
+  interface KnownRoutes {
     'card-routes': CardRoutes;
+  }
+}
+
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'card-routes-config': CardRoutesConfig;
   }
 }

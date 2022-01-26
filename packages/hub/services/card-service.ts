@@ -19,6 +19,7 @@ import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import CardModelForHub from '../lib/card-model-for-hub';
+import { service } from '@cardstack/hub/services';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -33,9 +34,9 @@ export default class CardServiceFactory {
 }
 
 export class CardService {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
-  private searchIndex = inject('searchIndex');
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private builder = service('card-builder', { as: 'builder' });
+  private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
 
   constructor(_requestContext: unknown) {}
@@ -230,8 +231,8 @@ function unimpl(which: string) {
   return new Error(`unimpl ${which}`);
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     // Note that we are only registering CardServiceFactory and not CardService
     // so that consumers will be force to provide a request context via .as()
     'card-service': CardServiceFactory;
