@@ -44,15 +44,13 @@ export default class DegradedServiceDetector extends Service {
   }
 
   async getDegradationStatusData(): Promise<Incident | null> {
-    let statusPageUrl = `${this.statusPageUrl}/api/v2/incidents/unresolved.json`;
-
-    let data = {} as StatuspageStatusAPIUnresolvedResponse;
+    let data = {} as StatuspageStatusAPISummaryResponse;
 
     try {
-      let response = await fetch(statusPageUrl);
+      let response = await fetch(this.statusPageUrl);
       data = await response.json();
     } catch (e) {
-      console.error('Failed to fetch unresolved status page incidents');
+      console.error('Failed to fetch Statuspage summary', e);
       Sentry.captureException(e);
 
       return null;
@@ -60,11 +58,15 @@ export default class DegradedServiceDetector extends Service {
 
     let order = ['none', 'minor', 'major', 'critical'];
 
-    if (data.incidents.length === 0) {
+    let incidentsAndMaintenances = (data.incidents || []).concat(
+      data.scheduled_maintenances || []
+    );
+
+    if (incidentsAndMaintenances.length === 0) {
       return null;
     }
 
-    let highestImpact = data.incidents.sort((a: any, b: any) => {
+    let highestImpact = incidentsAndMaintenances.sort((a: any, b: any) => {
       if (order.indexOf(a.impact) > order.indexOf(b.impact)) {
         return -1;
       }
@@ -75,7 +77,7 @@ export default class DegradedServiceDetector extends Service {
       return 0;
     })[0].impact;
 
-    let incident = data.incidents
+    let incident = incidentsAndMaintenances
       .filterBy('impact', highestImpact)
       .sort((a: any, b: any) => {
         return +new Date(b.started_at) - +new Date(a.started_at);
@@ -101,11 +103,12 @@ export default class DegradedServiceDetector extends Service {
 }
 
 // https://metastatuspage.com/api#incidents-unresolved
-type StatuspageStatusAPIUnresolvedResponse = {
-  incidents: Array<StatuspageIncident>;
+type StatuspageStatusAPISummaryResponse = {
+  incidents: Array<StatuspageIncidentOrMaintenance>;
+  scheduled_maintenances: Array<StatuspageIncidentOrMaintenance>;
 };
 
-type StatuspageIncident = {
+type StatuspageIncidentOrMaintenance = {
   impact: string;
   incident_updates: [
     {
