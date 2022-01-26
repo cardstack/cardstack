@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit } from '@ember/test-helpers';
+import { currentURL, visit } from '@ember/test-helpers';
 import config from '@cardstack/web-client/config/environment';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { LocationService } from '@cardstack/web-client/services/location';
@@ -27,5 +27,14 @@ module('Acceptance | visit card space', function (hooks) {
       .hasText('displayNametodo');
 
     await percySnapshot(assert);
+  });
+
+  test('redirects from other links', async function (assert) {
+    await visit('/card-pay/wallet');
+
+    assert.equal(currentURL(), '/');
+    assert
+      .dom('[data-test-card-space-display-name]')
+      .hasText('displayNametodo');
   });
 });
