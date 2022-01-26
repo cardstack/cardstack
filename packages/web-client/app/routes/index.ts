@@ -132,7 +132,13 @@ export default class CardstackRoute extends Route {
         ''
       );
 
-      this.render('view-card-space', { model: { displayName } });
+      this.render('card-space', {
+        into: 'application',
+      });
+      this.render('view-card-space', {
+        into: 'card-space',
+        model: { displayName },
+      });
     } else {
       super.renderTemplate(controller, null);
     }
