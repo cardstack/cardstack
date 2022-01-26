@@ -1,16 +1,12 @@
 import { JS_TYPE } from './utils/content';
-import { BabelFileResult, transformFromAstSync, transformSync } from '@babel/core';
+import { BabelFileResult, transformFromAstSync } from '@babel/core';
 import type { File } from '@babel/types';
-// @ts-ignore
-import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
-// @ts-ignore
-import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
 import md5 from 'md5';
 
-import cardSchemaAnalyzePlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
+import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
 import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
@@ -200,24 +196,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       return undefined;
     }
     let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
-    let out: BabelFileResult;
-    try {
-      out = transformSync(schemaSrc, {
-        ast: true,
-        plugins: [
-          [cardSchemaAnalyzePlugin, options],
-          [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
-          classPropertiesSyntaxPlugin,
-        ],
-      })!;
-    } catch (error: any) {
-      throw augmentBadRequest(error);
-    }
+    let { code, ast } = analyzeSchemaBabelPlugin(schemaSrc, options);
 
     modules[schemaLocalFilePath] = {
       type: JS_TYPE,
-      source: out!.code!,
-      ast: out!.ast!,
+      source: code!,
+      ast: ast!,
     };
     return { local: schemaLocalFilePath };
   }

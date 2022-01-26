@@ -8,8 +8,15 @@ import {
   isCallExpression,
   isClassDeclaration,
 } from '@babel/types';
+import { BabelFileResult, transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { name, error } from './utils/babel';
+import { augmentBadRequest } from './utils/errors';
+
+// @ts-ignore
+import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
+// @ts-ignore
+import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
 
 export const VALID_FIELD_DECORATORS = {
   linksTo: true,
@@ -59,7 +66,31 @@ const metas = new WeakMap<
   }
 >();
 
-export default function main() {
+export default function (
+  schemaSrc: string,
+  options: any
+): { code: BabelFileResult['code']; ast: BabelFileResult['ast'] } {
+  let out: BabelFileResult;
+  try {
+    out = transformSync(schemaSrc, {
+      ast: true,
+      plugins: [
+        [babelPluginCardSchemaAnalyze, options],
+        [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
+        classPropertiesSyntaxPlugin,
+      ],
+    })!;
+  } catch (error: any) {
+    throw augmentBadRequest(error);
+  }
+
+  return {
+    code: out!.code,
+    ast: out!.ast,
+  };
+}
+
+export function babelPluginCardSchemaAnalyze() {
   return {
     visitor: {
       ImportDeclaration(path: NodePath<ImportDeclaration>, state: State) {
