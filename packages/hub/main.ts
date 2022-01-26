@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
 import logger from '@cardstack/logger';
-import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
+import { Registry, Container, inject, getOwner } from '@cardstack/di';
 
 import initSentry from './initializers/sentry';
 import initFirebase from './initializers/firebase';
@@ -68,14 +68,7 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
-import RealmManager from './services/realm-manager';
-
-import CardBuilder from './services/card-builder';
-import CardRoutes from './routes/card-routes';
-import { FileCacheConfig } from './services/file-cache-config';
-import FileCache from './services/file-cache';
 import ExchangeRatesService from './services/exchange-rates';
-import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
 import { SearchIndex } from './services/search-index';
@@ -191,19 +184,14 @@ export function createRegistry(): Registry {
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
-    registry.register('card-service', CardService);
     registry.register('realmsConfig', RealmsConfig);
-    registry.register('realm-manager', RealmManager);
-    registry.register('file-cache-config', FileCacheConfig);
-    registry.register('file-cache', FileCache);
-    registry.register('card-routes', CardRoutes);
     registry.register(
       'card-routes-config',
       class {
         routeCard = config.has('compiler.routeCard') ? config.get('compiler.routeCard') : undefined;
-      }
+      },
+      { type: 'service' }
     );
-    registry.register('card-builder', CardBuilder);
     registry.register('searchIndex', SearchIndex);
   }
 
@@ -223,18 +211,12 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private cardRoutes: KnownServices['card-routes'] | undefined;
   private healthCheck = inject('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
+  private cardRoutes = inject('card-routes', { as: 'cardRoutes', type: 'route' });
 
   constructor() {
     runInitializers();
-  }
-
-  async ready() {
-    if (process.env.COMPILER) {
-      this.cardRoutes = await getOwner(this).lookup('card-routes');
-    }
   }
 
   @Memoize()
@@ -251,7 +233,7 @@ export class HubServer {
     app.use(this.callbacksRouter.routes());
     app.use(this.uploadRouter.routes());
 
-    if (this.cardRoutes) {
+    if (process.env.COMPILER) {
       app.use(this.cardRoutes.routes());
     }
 

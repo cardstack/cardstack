@@ -1,6 +1,6 @@
 import { dirname } from 'path';
 
-export class FileCacheConfig {
+export default class FileCacheConfig {
   packageName = '@cardstack/compiled';
 
   get root() {
@@ -12,8 +12,8 @@ export class FileCacheConfig {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'file-cache-config': FileCacheConfig;
   }
 }

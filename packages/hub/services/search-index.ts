@@ -12,6 +12,7 @@ import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../util
 import CardBuilder from './card-builder';
 import { transformSync } from '@babel/core';
 import logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 
 // @ts-ignore
 import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
@@ -24,10 +25,10 @@ function assertNever(value: never) {
   throw new Error(`unsupported operation ${value}`);
 }
 export class SearchIndex {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private builder = service('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
-  private fileCache = inject('file-cache', { as: 'fileCache' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
   private notifyQueuePromise: Promise<void> = Promise.resolve();
 
