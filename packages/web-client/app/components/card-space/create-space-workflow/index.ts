@@ -18,6 +18,8 @@ import {
 } from '@cardstack/web-client/models/workflow';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 import RestorableWorkflowComponent from '../../card-pay/restorable-workflow-component';
+import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
+import { taskFor } from 'ember-concurrency-ts';
 
 const FAILURE_REASONS = {
   L2_DISCONNECTED: 'L2_DISCONNECTED',
@@ -28,6 +30,9 @@ const FAILURE_REASONS = {
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   NO_BUSINESS_ACCOUNT: 'NO_BUSINESS_ACCOUNT',
   RESTORATION_NO_BUSINESS_ACCOUNT: 'RESTORATION_NO_BUSINESS_ACCOUNT',
+  ALL_BUSINESS_ACCOUNTS_TAKEN: 'ALL_BUSINESS_ACCOUNTS_TAKEN',
+  RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN:
+    'RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN',
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -44,6 +49,7 @@ class CreateSpaceWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
+  @service declare merchantInfo: MerchantInfoService;
 
   name: WorkflowName = 'CARD_SPACE_CREATION';
   version = WORKFLOW_VERSION;
@@ -55,6 +61,7 @@ class CreateSpaceWorkflow extends Workflow {
         new WorkflowMessage({
           message: `Hello, welcome to Card Space, we're happy to see you!`,
         }),
+
         new NetworkAwareWorkflowMessage({
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
@@ -77,27 +84,9 @@ class CreateSpaceWorkflow extends Workflow {
         new WorkflowCard({
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
-          async check() {
-            let { layer2Network } = this.workflow as CreateSpaceWorkflow;
-
-            await layer2Network.waitForAccount;
-
-            let hasMerchantSafe =
-              layer2Network.safes.value.filterBy('type', 'merchant').length > 0;
-
-            if (hasMerchantSafe) {
-              return {
-                success: true,
-              };
-            } else {
-              return {
-                success: false,
-                reason: FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
-              };
-            }
-          },
         }),
       ],
+
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
@@ -110,11 +99,45 @@ class CreateSpaceWorkflow extends Workflow {
             return !this.isHubAuthenticated;
           },
         }),
+        new NetworkAwareWorkflowMessage({
+          message: `Looks like you already authenticated with the Cardstack Hub. Please continue with the next step of this workflow.`,
+          includeIf() {
+            return this.isHubAuthenticated;
+          },
+        }),
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
           componentName: 'card-pay/hub-authentication',
-          includeIf(this: NetworkAwareWorkflowCard) {
-            return !this.isHubAuthenticated;
+          async check() {
+            let { layer2Network, merchantInfo } = this
+              .workflow as CreateSpaceWorkflow;
+
+            let hasMerchantSafes =
+              layer2Network.safes.value.filterBy('type', 'merchant').length > 0;
+
+            if (!hasMerchantSafes) {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
+              };
+            } else {
+              let availableMerchantInfos = await taskFor(
+                merchantInfo.fetchMerchantInfosAvailableForCardSpace
+              ).perform();
+
+              let hasAvailableMerchants = availableMerchantInfos.length > 0;
+
+              if (!hasAvailableMerchants) {
+                return {
+                  success: false,
+                  reason: FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN,
+                };
+              } else {
+                return {
+                  success: true,
+                };
+              }
+            }
           },
         }),
         new WorkflowMessage({
@@ -233,16 +256,29 @@ class CreateSpaceWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      message: `It looks like you all your business accounts have already been used to create a Card Space. In order to create your Card Space, you must first create a new business account.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN
+        );
+      },
+    }),
     new WorkflowCard({
       componentName:
         'card-space/create-space-workflow/create-business-account-cta',
       includeIf() {
         return (
-          this.workflow?.cancelationReason ===
-            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
-          this.workflow?.cancelationReason ===
-            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT
-        );
+          [
+            FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
+            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT,
+            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN,
+            FAILURE_REASONS.RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN,
+          ] as any[]
+        ).includes(this.workflow?.cancelationReason);
       },
     }),
     ...standardCancelationPostables(),
