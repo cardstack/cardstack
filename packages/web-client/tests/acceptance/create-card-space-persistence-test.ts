@@ -267,7 +267,7 @@ module('Acceptance | create card space persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT'],
+          completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
         },
       });
 
