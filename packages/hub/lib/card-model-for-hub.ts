@@ -19,7 +19,8 @@ import { cardURL } from '@cardstack/core/src/utils';
 import RealmManager from '../services/realm-manager';
 import { SearchIndex } from '../services/search-index';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
-// import { tracked } from '@glimmer/tracking';
+import get from 'lodash/get';
+import FileCache from '../services/file-cache';
 
 export interface NewCardParams {
   realm: string;
@@ -34,6 +35,7 @@ export interface CreatedState {
   serializerMap: SerializerMap;
   usedFields: ComponentInfo['usedFields'];
   deserialized: boolean;
+  schemaModule: CompiledCard['schemaModule']['global'];
 }
 
 interface LoadedState {
@@ -50,11 +52,13 @@ interface LoadedState {
   original: CardModel | undefined;
 }
 
+// TODO: move to real injections intead, and instantiate CardModel via container.instantiate()
 export interface CardServiceEnv {
   create: (raw: RawCard<Unsaved>) => Promise<Card>;
   loadData: (cardURL: string, format: Format) => Promise<CardModel>;
   realmManager: RealmManager;
   searchIndex: SearchIndex;
+  fileCache: FileCache;
 }
 
 export default class CardModelForHub implements CardModel {
@@ -74,6 +78,20 @@ export default class CardModelForHub implements CardModel {
     }
   }
 
+  async getField(name: string): Promise<any> {
+    // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
+    // if (this.isComputedField(name)) {
+    //   return get(this.data, name);
+    // }
+
+    // TODO we probably want to cache the schemaInstance. It should only be
+    // created the first time it's needed
+    let SchemaClass = this.env.fileCache.loadModule(this.state.schemaModule).default;
+    let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
+    let value = await schemaInstance[name]();
+    return value;
+  }
+
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
@@ -81,6 +99,7 @@ export default class CardModelForHub implements CardModel {
     if (this.format !== 'isolated') {
       throw new Error(`Can only adoptIntoRealm from an isolated card. This card is ${this.format}`);
     }
+    // TODO: this becomes getOwner(this).instantiate(this.constructor, {})
     return new (this.constructor as typeof CardModelForHub)(this.env, {
       type: 'created',
       realm,
@@ -89,6 +108,7 @@ export default class CardModelForHub implements CardModel {
       parentCardURL: this.url,
       serializerMap: this.serializerMap,
       deserialized: true,
+      schemaModule: this.state.schemaModule,
     });
   }
 

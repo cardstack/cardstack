@@ -9,17 +9,6 @@ import { NotFound, CardstackError, isCardstackError, UnprocessableEntity } from 
 import { parseQueryString } from '@cardstack/core/src/query';
 import { RawCardSerializer } from '@cardstack/core/src/serializers';
 
-declare global {
-  const __non_webpack_require__: any;
-}
-
-const requireCard = function (path: string, root: string): any {
-  const module = __non_webpack_require__.resolve(path, {
-    paths: [root],
-  });
-  return __non_webpack_require__(module);
-};
-
 export default class CardRoutes {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private cache = inject('file-cache', { as: 'cache' });
@@ -152,7 +141,7 @@ export default class CardRoutes {
           throw new CardstackError('Routing card is not compiled!');
         }
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const CardRouterClass = requireCard(compiled.schemaModule.global, this.cache.dir).default;
+        const CardRouterClass = this.cache.loadModule(compiled.schemaModule.global).default;
         const cardRouterInstance = new CardRouterClass();
         assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
         this.routerInstance = cardRouterInstance;

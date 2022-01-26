@@ -31,9 +31,12 @@ export default class CardServiceFactory {
   private builder = inject('card-builder', { as: 'builder' });
   private searchIndex = inject('searchIndex');
   private db = inject('database-manager', { as: 'db' });
+  private fileCache = inject('file-cache', { as: 'fileCache' });
 
   as(requestContext: unknown): CardService {
-    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db);
+    // TODO: this can probably become getOwner(this).instantiate(CardService,
+    // requestContext), and then CardService can get its own injections
+    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db, this.fileCache);
   }
 }
 
@@ -43,7 +46,8 @@ export class CardService {
     private realmManager: CardServiceFactory['realmManager'],
     private builder: CardServiceFactory['builder'],
     private searchIndex: CardServiceFactory['searchIndex'],
-    private db: CardServiceFactory['db']
+    private db: CardServiceFactory['db'],
+    private fileCache: CardServiceFactory['fileCache']
   ) {}
 
   async load(cardURL: string): Promise<Card> {
@@ -140,6 +144,7 @@ export class CardService {
         loadData: this.loadData.bind(this),
         realmManager: this.realmManager,
         searchIndex: this.searchIndex,
+        fileCache: this.fileCache,
       },
       {
         type: 'loaded',

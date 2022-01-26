@@ -195,17 +195,18 @@ export interface Builder {
 export interface CardModel {
   setters: Setter | undefined;
   adoptIntoRealm: (realm: string, id?: string) => Promise<CardModel>;
-  editable: () => Promise<CardModel>;
+  editable(): Promise<CardModel>;
   innerComponent: unknown;
   serializerMap: SerializerMap;
   url: string;
-  data: any;
+  data: Record<string, any>;
+  getField(name: string): Promise<any>;
   format: Format;
-  setData: (data: RawCardData) => void;
-  serialize: () => ResourceObject<Saved | Unsaved>;
+  setData(data: RawCardData): void;
+  serialize(): ResourceObject<Saved | Unsaved>;
   component: unknown;
   usedFields: ComponentInfo['usedFields'];
-  save: () => Promise<void>;
+  save(): Promise<void>;
 }
 
 export interface RealmConfig {

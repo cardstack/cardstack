@@ -16,6 +16,10 @@ import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { Client } from 'pg';
 
+declare global {
+  const __non_webpack_require__: any;
+}
+
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
   exports: {
@@ -141,6 +145,10 @@ export default class FileCache {
 
   getModule(moduleURL: string, env: Environment = 'node'): string | undefined {
     return this.readFile(this.resolveModule(moduleURL, env));
+  }
+
+  loadModule(moduleURL: string): any {
+    return __non_webpack_require__(this.resolveModule(moduleURL));
   }
 
   deleteCardModules(cardURL: string): void {
