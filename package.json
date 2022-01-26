@@ -33,6 +33,7 @@
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
     "postinstall": "cd ./packages/cardpay-sdk && yarn codegen; cd -",
+    "cardpay": "cd ./packages/cardpay-cli && yarn cardpay",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:hub": "cd ./packages/hub && yarn build",
