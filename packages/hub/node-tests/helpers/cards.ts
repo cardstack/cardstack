@@ -56,14 +56,15 @@ export function configureCompiler(mochaContext: Mocha.Suite) {
     let reg = registry(this);
 
     if (process.env.COMPILER) {
-      reg.register('file-cache-config', TestFileCacheConfig);
+      reg.register('file-cache-config', TestFileCacheConfig, { type: 'service' });
 
       testRealmDir = tmp.dirSync().name;
       reg.register(
         'realmsConfig',
         class TestRealmsConfig {
           realms: RealmConfig[] = [BASE_REALM_CONFIG, DEMO_REALM_CONFIG, { url: TEST_REALM, directory: testRealmDir }];
-        }
+        },
+        { type: 'service' }
       );
     }
   });
@@ -109,7 +110,7 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
     fileCacheConfig = (await container.lookup('file-cache-config', { type: 'service' })) as TestFileCacheConfig;
     fileCache = await container.lookup('file-cache', { type: 'service' });
 
-    let si = await container.lookup('searchIndex');
+    let si = await container.lookup('searchIndex', { type: 'service' });
     await si.indexAllRealms();
   });
 

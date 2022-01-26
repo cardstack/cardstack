@@ -30,7 +30,7 @@ const log = logger('hub/card-service');
 export default class CardServiceFactory {
   private realmManager = service('realm-manager', { as: 'realmManager' });
   private builder = service('card-builder', { as: 'builder' });
-  private searchIndex = inject('searchIndex');
+  private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
 
   as(requestContext: unknown): CardService {

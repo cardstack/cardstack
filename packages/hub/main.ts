@@ -71,10 +71,8 @@ import Web3SocketService from './services/web3-socket';
 import ExchangeRatesService from './services/exchange-rates';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
-import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
-import RealmsConfig from './services/realms-config';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -184,7 +182,6 @@ export function createRegistry(): Registry {
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
-    registry.register('realmsConfig', RealmsConfig);
     registry.register(
       'card-routes-config',
       class {
@@ -192,7 +189,6 @@ export function createRegistry(): Registry {
       },
       { type: 'service' }
     );
-    registry.register('searchIndex', SearchIndex);
   }
 
   registerServices(registry);
@@ -274,7 +270,7 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-    let searchIndex = await getOwner(this).lookup('searchIndex');
+    let searchIndex = await getOwner(this).lookup('searchIndex', { type: 'service' });
     await searchIndex.indexAllRealms();
   }
 }

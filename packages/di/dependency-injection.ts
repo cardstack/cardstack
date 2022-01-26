@@ -56,10 +56,14 @@ export class Container implements ContainerInterface {
 
     let lookup = mappingsForType.lookup;
     if (!lookup) {
-      throw new Error(`can't find name="${name}" type="${type}"`);
+      throw new Error(`can't find lookup method for type="${type}" when trying to lookup the factory for "${name}"`);
     }
 
-    return (await lookup(name)) as Factory<any>;
+    let module = (await lookup(name)) as Factory<any>;
+    if (!module) {
+      throw new Error(`lookupFactory could not find a factory for "${name}"`);
+    }
+    return module;
   }
 
   // When this is called we'll always instantiate a new instance for each

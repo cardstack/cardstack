@@ -1,16 +1,16 @@
 import { inject, InjectOptions, Registry } from '@cardstack/di';
+import { kebabCase } from 'lodash';
 
 export function registerServices(registry: Registry) {
-  registry.registerType(
-    'service',
-    async (name) =>
-      (
-        await import(
-          /* webpackExclude: /assets/ */
-          `./${name}`
-        )
-      ).default
-  );
+  registry.registerType('service', async (name) => {
+    let filename = kebabCase(name);
+    return (
+      await import(
+        /* webpackExclude: /assets/ */
+        `./${filename}`
+      )
+    ).default;
+  });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
