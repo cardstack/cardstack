@@ -11,7 +11,7 @@ import {
   RawCardData,
 } from '@cardstack/core/src/interfaces';
 import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
-import { inject, getOwner } from '@cardstack/di';
+import { getOwner } from '@cardstack/di';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
@@ -19,6 +19,7 @@ import { cardURL } from '@cardstack/core/src/utils';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
 import { INSECURE_CONTEXT } from '../services/card-service';
+import { service } from '@cardstack/hub/services';
 
 export interface NewCardParams {
   realm: string;
@@ -51,10 +52,10 @@ interface LoadedState {
 }
 
 export default class CardModelForHub implements CardModel {
-  private cardService = inject('card-service', { as: 'cardService' });
-  private fileCache = inject('file-cache', { as: 'fileCache' });
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private searchIndex = inject('searchIndex');
+  private cardService = service('card-service', { as: 'cardService' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private searchIndex = service('searchIndex');
 
   setters: undefined;
   private _data: any;
