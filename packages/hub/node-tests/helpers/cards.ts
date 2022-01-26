@@ -1,7 +1,7 @@
 import Mocha from 'mocha';
 import tmp from 'tmp';
 import { join } from 'path';
-import { FileCacheConfig } from '../../services/file-cache-config';
+import FileCacheConfig from '../../services/file-cache-config';
 import { contextFor, registry, setupHub } from './server';
 import CardServiceFactory, { CardService, INSECURE_CONTEXT } from '../../services/card-service';
 import FileCache from '../../services/file-cache';
@@ -105,9 +105,9 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
     if (!container) {
       throw new Error('Make sure cardHelpers are run after setupHub. It needs a configured container');
     }
-    currentCardService = await container.lookup('card-service');
-    fileCacheConfig = (await container.lookup('file-cache-config')) as TestFileCacheConfig;
-    fileCache = await container.lookup('file-cache');
+    currentCardService = await container.lookup('card-service', { type: 'service' });
+    fileCacheConfig = (await container.lookup('file-cache-config', { type: 'service' })) as TestFileCacheConfig;
+    fileCache = await container.lookup('file-cache', { type: 'service' });
 
     let si = await container.lookup('searchIndex');
     await si.indexAllRealms();
