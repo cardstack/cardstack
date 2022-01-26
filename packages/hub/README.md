@@ -87,22 +87,22 @@ The following command will create a hub_development database on your locally run
 ```sh
     createdb hub_development
     yarn db:migrate up
-    dist/hub.js db seed
-    dist/hub.js db dump
-    NODE_ENV=test dist/hub.js db init
+    node dist/hub.js db seed
+    node dist/hub.js db dump
+    NODE_ENV=test node dist/hub.js db init
 ```
 
 ### Running the hub
 
 ```sh
 # Starts the server on port 3000
-dist/hub.js server
+node dist/hub.js server
 
 # Starts the worker process
-dist/hub.js worker
+node dist/hub.js worker
 
 # Starts the discord bot
-dist/hub.js bot
+node dist/hub.js bot
 
 # If you want to run both in the same terminal you can run
 yarn start
@@ -128,7 +128,7 @@ Documentation on how to create migration scripts is available at https://salsita
 
 After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
 
-    dist/hub.js db dump
+    node dist/hub.js db dump
 
 ## Application console
 
@@ -153,6 +153,15 @@ Hub > await client.query('SELECT * FROM merchant_infos');
 ```js
 Hub > const workerClient = await container.lookup('worker-client');
 Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
+```
+
+To connect to a console in a remote environment (staging/production), use waypoint:
+
+```sh
+waypoint exec -app=hub sh
+node --no-deprecation --experimental-repl-await ./dist/hub.js console
+
+Hub >
 ```
 
 ## Connecting to the database staging|production database on AWS
@@ -199,9 +208,7 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 
 The hub CLI can be invoked from within the hub package
 
-    dist/hub.js
-
-_💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)_
+    node dist/hub.js
 
 The files that support the CLI are in the `cli/` directory. You can add your own by [following these instructions](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts). The full `yargs` api [can be found here](https://github.com/yargs/yargs/blob/master/docs/api.md).
 
@@ -210,7 +217,7 @@ The files that support the CLI are in the `cli/` directory. You can add your own
 All compiler functionality is currently hidden behind the COMPILER feature flag. So to start the server with card compiling and related routes, use that flag.
 
 ```
-COMPILER=true dist/hub.js server
+COMPILER=true node dist/hub.js server
 ```
 
 ## Contributing

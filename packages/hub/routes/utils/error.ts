@@ -1,6 +1,20 @@
 import Koa from 'koa';
 import { kebabCase } from 'lodash';
 
+/**
+ * Sets the Koa Context's response to a JSON-API compliant error
+ * ```
+ * {
+ *   status: statusCode,
+ *   body: {
+ *     errors: [
+ *       { status: statusCode, title, detail }
+ *     ]
+ *   },
+ *   type: 'application/vnd.api+json'
+ * }
+ * ```
+ */
 export function handleError(ctx: Koa.Context, statusCode: number, title: string, detail?: string) {
   let error: { status: string; title: string; detail?: string } = {
     status: `${statusCode}`,

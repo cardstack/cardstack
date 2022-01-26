@@ -63,13 +63,13 @@ module(
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
         @onComplete={{this.onComplete}}
-        @onIncomplete={{(noop)}}
+        @onIncomplete={{noop}}
       />
     `);
 
       const daiToSend = '5';
 
-      await fillIn('[data-test-token-amount-input]', daiToSend);
+      await fillIn('[data-test-boxel-input-token-amount]', daiToSend);
       assert.dom('[data-test-deposit-button]').isDisabled();
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
@@ -118,8 +118,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 
@@ -156,8 +156,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 
@@ -178,19 +178,19 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 
       assert.dom('[data-test-unlock-button]').isDisabled();
-      await fillIn('[data-test-token-amount-input]', moreDaiThanBalance);
+      await fillIn('[data-test-boxel-input-token-amount]', moreDaiThanBalance);
       assert.dom('[data-test-unlock-button]').isDisabled();
       assert
         .dom('[data-test-boxel-input-error-message]')
         .containsText('Insufficient balance in your account');
 
-      await fillIn('[data-test-token-amount-input]', daiInBalance);
+      await fillIn('[data-test-boxel-input-token-amount]', daiInBalance);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
     });
 
@@ -201,14 +201,14 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 
       let approveSpy = sinon.spy(layer1Service, 'approve');
 
-      await fillIn('[data-test-token-amount-input]', daiToSend);
+      await fillIn('[data-test-boxel-input-token-amount]', daiToSend);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
       await click('[data-test-unlock-button]');
@@ -232,8 +232,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 
@@ -245,41 +245,43 @@ module(
 
       await settled();
 
-      assert.dom('[data-test-token-amount-input]').hasValue('');
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('');
       assert.dom('[data-test-unlock-button]').isDisabled();
 
-      await fillIn('[data-test-token-amount-input]', invalidDai1);
-      assert.dom('[data-test-token-amount-input]').hasValue(invalidDai1);
+      await fillIn('[data-test-boxel-input-token-amount]', invalidDai1);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue(invalidDai1);
       assert.dom('[data-test-unlock-button]').isDisabled();
 
-      await fillIn('[data-test-token-amount-input]', validAmount);
-      assert.dom('[data-test-token-amount-input]').hasValue(validAmount);
+      await fillIn('[data-test-boxel-input-token-amount]', validAmount);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue(validAmount);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-      await fillIn('[data-test-token-amount-input]', invalidDai2);
-      assert.dom('[data-test-token-amount-input]').hasValue(validAmount);
+      await fillIn('[data-test-boxel-input-token-amount]', invalidDai2);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue(validAmount);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-      await fillIn('[data-test-token-amount-input]', '');
-      assert.dom('[data-test-token-amount-input]').hasValue('');
+      await fillIn('[data-test-boxel-input-token-amount]', '');
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('');
       assert.dom('[data-test-unlock-button]').isDisabled();
 
-      await typeIn('[data-test-token-amount-input]', invalidDai2);
-      assert.dom('[data-test-token-amount-input]').hasValue('11');
+      await typeIn('[data-test-boxel-input-token-amount]', invalidDai2);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('11');
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-      await fillIn('[data-test-token-amount-input]', '');
-      await typeIn('[data-test-token-amount-input]', invalidDai3);
-      assert.dom('[data-test-token-amount-input]').hasValue('1');
+      await fillIn('[data-test-boxel-input-token-amount]', '');
+      await typeIn('[data-test-boxel-input-token-amount]', invalidDai3);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('1');
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-      await fillIn('[data-test-token-amount-input]', '');
-      await typeIn('[data-test-token-amount-input]', invalidDai4);
-      assert.dom('[data-test-token-amount-input]').hasValue('12');
+      await fillIn('[data-test-boxel-input-token-amount]', '');
+      await typeIn('[data-test-boxel-input-token-amount]', invalidDai4);
+      assert.dom('[data-test-boxel-input-token-amount]').hasValue('12');
       assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-      await fillIn('[data-test-token-amount-input]', startDaiString);
-      assert.dom('[data-test-token-amount-input]').hasValue(startDaiString);
+      await fillIn('[data-test-boxel-input-token-amount]', startDaiString);
+      assert
+        .dom('[data-test-boxel-input-token-amount]')
+        .hasValue(startDaiString);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
     });
 
@@ -287,8 +289,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{(noop)}}
-        @onIncomplete={{(noop)}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
       />
     `);
 

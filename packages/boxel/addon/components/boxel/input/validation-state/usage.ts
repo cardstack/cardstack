@@ -2,12 +2,13 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-export default class ValidationStateInputUsageComponent extends Component {
+export default class BoxelInputValidationStateUsage extends Component {
   @tracked id = 'validation-input-usage-id';
   @tracked value = '';
   @tracked state = 'default';
   @tracked helperText = 'Please enter a value';
   @tracked errorMessage = '';
+  @tracked disabled = false;
 
   @action set(val: string): void {
     this.value = val;

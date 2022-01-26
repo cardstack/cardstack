@@ -114,7 +114,7 @@ describe('GET /api/inventory', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('subgraph', StubSubgraph);
     registry(this).register('web3-http', StubWeb3);
-    registry(this).register('relay', StubRelay);
+    registry(this).register('relay', StubRelay, { type: 'service' });
   });
 
   let { getContainer, request } = setupHub(this);

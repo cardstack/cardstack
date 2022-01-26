@@ -64,3 +64,8 @@
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
+
+.boxel-input:disabled ~ .boxel-input__error-message,
+.boxel-input:disabled ~ .boxel-input__helper-text {
+  display: none;
+}

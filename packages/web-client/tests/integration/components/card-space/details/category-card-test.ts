@@ -72,7 +72,7 @@ module(
         .exists();
 
       await fillIn('[data-test-category-option-other] input', 'Something');
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert
         .dom(`[data-test-category-option]:nth-child(${OPTIONS.length}) input`)
@@ -97,7 +97,7 @@ module(
         .dom('[data-test-category-option-other] input')
         .hasValue('Something');
 
-      await waitFor('[data-test-boxel-validation-state-input="valid"]');
+      await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert.equal(
         workflowSession.getValue<string>('profileCategory'),
@@ -186,11 +186,11 @@ module(
       await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
 
       assert
-        .dom('[data-test-boxel-validation-state-input]')
-        .hasAttribute('data-test-boxel-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'invalid');
 
       assert
         .dom(
@@ -216,11 +216,11 @@ module(
       await click('[data-test-category-option-other-container]');
       await fillIn('[data-test-category-option-other] input', 'Something');
 
-      await waitFor('[data-test-boxel-validation-state-input="invalid"]');
+      await waitFor('[data-test-boxel-input-validation-state="invalid"]');
 
       assert
-        .dom('[data-test-boxel-validation-state-input]')
-        .hasAttribute('data-test-boxel-validation-state-input', 'invalid');
+        .dom('[data-test-boxel-input-validation-state]')
+        .hasAttribute('data-test-boxel-input-validation-state', 'invalid');
 
       assert
         .dom(

@@ -3,17 +3,18 @@
     class="boxel-validation-state-input-group__input"
     @id={{@id}}
     @value={{@value}}
-    @required={{true}}
+    @required={{unless @disabled true}}
     @onInput={{@onInput}}
     @onBlur={{@onBlur}}
-    @invalid={{this.isInvalid}}
+    @invalid={{unless @disabled this.isInvalid}}
+    @disabled={{@disabled}}
     @errorMessage={{@errorMessage}}
     @helperText={{@helperText}}
     autocomplete="off"
     autocorrect="off"
     autocapitalize="off"
     spellcheck="false"
-    data-test-boxel-validation-state-input={{@state}}
+    data-test-boxel-input-validation-state={{if @disabled true @state}}
   />
   {{#if this.icon}}
     {{svg-jar this.icon class="boxel-validation-state-input-group__icon" role="presentation"}}

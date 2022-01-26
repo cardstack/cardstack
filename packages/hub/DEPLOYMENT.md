@@ -67,8 +67,11 @@ Usage:
 !deploy web-client                         (checkout to main branch, deploy web-client to production)
 ```
 
-## Step 4: Run migrations (if any)
+## Step 4: Run migrations (if necessary)
 
+At boot, the hub will check for new migrations, and execute them. If for any reason you need to
+run migrations manually, do the following:
+  
 Connect to the instance where the app is deployed:
 
 ```sh

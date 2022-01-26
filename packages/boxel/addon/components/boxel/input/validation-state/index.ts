@@ -1,15 +1,17 @@
 import Component from '@glimmer/component';
-import '@cardstack/boxel/styles/global.css';
-import './index.css';
 
 export type InputValidationState = 'valid' | 'invalid' | 'loading' | 'initial';
 
 interface ValidationStateInputArgs {
   state: InputValidationState;
+  disabled: boolean;
 }
 
-export default class BoxelValidationStateInput extends Component<ValidationStateInputArgs> {
+export default class BoxelInputValidationState extends Component<ValidationStateInputArgs> {
   get icon(): string {
+    if (this.args.disabled) {
+      return '';
+    }
     switch (this.args.state) {
       case 'valid':
         return 'success-bordered';

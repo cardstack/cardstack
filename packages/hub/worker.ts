@@ -4,7 +4,6 @@ import { JobHelpers, LogFunctionFactory, Logger, run as runWorkers } from 'graph
 import { LogLevel, LogMeta } from '@graphile/logger';
 import { Factory, getOwner } from '@cardstack/di';
 import logger from '@cardstack/logger';
-
 import { runInitializers } from './main';
 
 // Tasks

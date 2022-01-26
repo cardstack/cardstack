@@ -16,6 +16,7 @@ interface UrlsOptions {
   googlePlayLink: string | undefined;
   testFlightLink: string;
   discordSupportChannelUrl: string;
+  statusPageBase: string;
   statusPageUrl: string;
 }
 

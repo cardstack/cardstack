@@ -70,6 +70,12 @@ export default function () {
     return customization;
   });
 
+  this.post('/card-spaces/validate-profile-name', function () {
+    return {
+      errors: [],
+    };
+  });
+
   this.get(
     'https://storage.cardstack.com/prepaid-card-customization/:idWithExtension',
     function (schema, { params: { idWithExtension } }) {
@@ -87,17 +93,15 @@ export default function () {
   );
 
   // prevent sporadic test failure because of degradation banner
-  this.get(
-    `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`,
-    function () {
-      return {
-        incidents: [],
-      };
-    }
-  );
+  this.get(config.urls.statusPageUrl, function () {
+    return {
+      incidents: [],
+    };
+  });
 
   this.passthrough((request) => {
     return (
+      !request.url.startsWith('/upload') &&
       !request.url.includes('/api/') &&
       !request.url.includes('storage.cardstack.com')
     );

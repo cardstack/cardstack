@@ -1,8 +1,9 @@
-<Freestyle::Usage @name="ValidationStateInput">
+<Freestyle::Usage @name="Input::ValidationState">
   <:example>
     <label for={{this.id}} class="boxel-sr-only">Label</label>
-    <Boxel::ValidationStateInput
+    <Boxel::Input::ValidationState
       @id={{this.id}}
+      @disabled={{this.disabled}}
       @state={{this.state}}
       @value={{this.value}}
       @onInput={{this.set}}
@@ -17,6 +18,13 @@
       @description="The id of the input"
       @onInput={{fn (mut this.id)}}
       @value={{this.id}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @description="Whether the input is disabled"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.disabled)}}
+      @value={{this.disabled}}
     />
     <Args.String
       @name="state"

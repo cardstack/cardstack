@@ -1,4 +1,4 @@
-.token-amount-input-group {
+.boxel-token-amount-input-group {
   --input-height: 3.75rem; /* 60px */
   --input-icon-size: var(--boxel-icon-lg);
   --input-symbol-width: 7rem;
@@ -12,7 +12,7 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.token-amount-input-group .token-amount-input-group__input {
+.boxel-token-amount-input-group__input {
   height: var(--input-height);
   padding-left: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
   padding-right: calc(var(--input-symbol-width) + var(--input-symbol-space) * 2);
@@ -20,7 +20,7 @@
   letter-spacing: inherit;
 }
 
-.token-amount-input-group__icon {
+.boxel-token-amount-input-group__icon {
   position: absolute;
   width: var(--input-icon-size);
   height: var(--input-height);
@@ -29,7 +29,7 @@
   user-select: none;
 }
 
-.token-amount-input-group__symbol {
+.boxel-token-amount-input-group__symbol {
   position: absolute;
   max-width: var(--input-symbol-width);
   height: var(--input-height);
@@ -38,4 +38,8 @@
   top: 0;
   right: var(--input-symbol-space);
   user-select: none;
+}
+
+.boxel-token-amount-input-group__input:disabled ~ .boxel-token-amount-input-group__symbol {
+  opacity: 0.5;
 }

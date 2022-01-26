@@ -3,12 +3,12 @@ import { setupApplicationTest } from 'ember-qunit';
 import {
   click,
   currentURL,
+  fillIn,
   settled,
   visit,
   waitFor,
 } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
-import config from '@cardstack/web-client/config/environment';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { setupHubAuthenticationToken } from '../helpers/setup';
@@ -18,8 +18,6 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { LocationService } from '@cardstack/web-client/services/location';
-import Service from '@ember/service';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -31,20 +29,12 @@ function epiloguePostableSel(postableIndex: number): string {
   return `[data-test-epilogue][data-test-postable="${postableIndex}"]`;
 }
 
-class MockLocation extends Service implements LocationService {
-  hostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
-}
-
 module('Acceptance | create card space', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-
-  hooks.beforeEach(function () {
-    this.owner.register('service:location', MockLocation);
-  });
 
   test('initiating workflow without wallet connections', async function (assert) {
     let subdomain = ''; // TODO: replace this when other parts of the form are filled out
@@ -55,6 +45,38 @@ module('Acceptance | create card space', function (hooks) {
     assert
       .dom('[data-test-boxel-thread-header]')
       .containsText('Card Space Creation');
+
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-placeholder-cover-photo]'
+      )
+      .exists();
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-placeholder-profile-photo]'
+      )
+      .exists();
+
+    // test that the preview shows a blank state
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-name]')
+      .containsText('Name');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
+      .containsText('blank.card.space');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-category]')
+      .containsText('Category');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-description]'
+      )
+      .containsText('Description');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-button-text]'
+      )
+      .containsText('Button Text');
 
     // // Milestone 1
     assert.dom(`${postableSel(0, 0)} img`).exists();
@@ -100,16 +122,25 @@ module('Acceptance | create card space', function (hooks) {
     await click(`[data-test-authentication-button]`);
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
-    // // Username step
+    // // Display name step
     await waitFor(postableSel(1, 3));
-    assert.dom(postableSel(1, 2)).containsText(`Please pick a username`);
-    assert.dom(postableSel(1, 3)).containsText(`Pick a username`);
+    assert.dom(postableSel(1, 2)).containsText(`Please pick a display name`);
+    assert.dom(postableSel(1, 3)).containsText(`Pick a display name`);
 
-    await click('[data-test-card-space-username-save-button]');
-    assert.dom('[data-test-card-space-username-is-complete]').exists();
+    await fillIn(
+      '[data-test-card-space-display-name-input] input',
+      'Hello there'
+    );
+
+    await waitFor(
+      '[data-test-card-space-display-name-save-button]:not(:disabled)'
+    );
+
+    await click('[data-test-card-space-display-name-save-button]');
+    assert.dom('[data-test-card-space-display-name-is-complete]').exists();
 
     await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText(`Username picked`);
+    assert.dom(milestoneCompletedSel(1)).containsText(`Display name picked`);
 
     // // Milestone 3
     // // Details step
@@ -164,23 +195,47 @@ module('Acceptance | create card space', function (hooks) {
 
     // // Epilogue
     await waitFor(epiloguePostableSel(0));
+
+    await waitFor(epiloguePostableSel(0));
     assert
       .dom(epiloguePostableSel(0))
-      .containsText(`This is the remaining balance on your prepaid card`);
-
-    await waitFor(epiloguePostableSel(1));
-    assert
-      .dom(epiloguePostableSel(1))
       .containsText(`Congrats, you have created your Card Space!`);
 
-    await waitFor(epiloguePostableSel(2));
+    // test that the preview is filled in
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-name]')
+      .containsText('Hello there');
+    // TODO: fill these in as we update the workflow (these are the required fields.
+    // I haven't added assertions on images. they are not required fields.)
+    // These should fail as the workflow is filled out and starts modifying the correct values in the
+    // workflow session
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
+      .containsText('blank.card.space');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-category]')
+      .containsText('Category');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-description]'
+      )
+      .containsText('Description');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-button-text]'
+      )
+      .containsText('Button Text');
+
+    await waitFor(epiloguePostableSel(1));
 
     await percySnapshot(assert);
 
-    let spaceHostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
-    assert
-      .dom('[data-test-card-space-next-step="visit-space"]')
-      .hasAttribute('href', new RegExp(spaceHostname.replace(/\./g, '\\.')));
+    // TODO: fix this assertion after we have fixed the subdomain/business ID
+    // things
+    // let spaceHostname = `displayNametodo.${config.cardSpaceHostnameSuffix}`;
+    // assert
+    //   .dom('[data-test-card-space-next-step="visit-space"]')
+    //   .hasAttribute('href', new RegExp(spaceHostname.replace(/\./g, '\\.')));
   });
 
   module('tests with layer 2 already connected', function (hooks) {
@@ -229,8 +284,8 @@ module('Acceptance | create card space', function (hooks) {
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       await waitFor(postableSel(1, 1));
-      assert.dom(postableSel(1, 0)).containsText(`Please pick a username`);
-      assert.dom(postableSel(1, 1)).containsText(`Pick a username`);
+      assert.dom(postableSel(1, 0)).containsText(`Please pick a display name`);
+      assert.dom(postableSel(1, 1)).containsText(`Pick a display name`);
 
       let workflowPersistenceService = this.owner.lookup(
         'service:workflow-persistence'
@@ -273,12 +328,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
 
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       layer2Service.test__simulateWalletConnectUri();
       await waitFor('[data-test-wallet-connect-qr-code]');
 
@@ -317,11 +374,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
+
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       assert
         .dom(postableSel(0, 1))
         .containsText(

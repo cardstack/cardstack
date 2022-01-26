@@ -12,16 +12,18 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
     "build": "webpack --progress",
+    "build_if_missing": "[ -d dist ] || yarn build",
+    "clean": "rm -rf dist",
     "rebuild": "webpack --watch --progress",
-    "start": "run-p -c start:*",
+    "start": "yarn build_if_missing && run-p -c start:*",
     "start:server": "node --no-deprecation -r source-map-support/register dist/hub.js server",
     "start:worker": "node --no-deprecation -r source-map-support/register dist/hub.js worker",
     "start:bot": "node --no-deprecation -r source-map-support/register dist/hub.js bot",
     "start:event-listener": "node --no-deprecation -r source-map-support/register dist/hub.js event-listener",
-    "console": "node --no-deprecation --experimental-repl-await ./dist/hub.js console",
+    "console": "yarn build_if_missing && node --no-deprecation --experimental-repl-await ./dist/hub.js console",
     "db:test-init": "yarn build && NODE_ENV=test node --no-deprecation -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
-    "test": "npm-run-all test:*",
+    "test": "yarn build_if_missing && npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha --no-deprecation -r source-map-support/register dist/tests.js --timeout 60000",
     "test:bot": "bin/corde",
     "autotest": "NODE_ENV=test mocha --no-deprecation -w --reporter=min -r source-map-support/register dist/tests.js --timeout 60000"
@@ -115,6 +117,7 @@
     "@types/pg-format": "^1.0.1",
     "@types/sane": "^2.0.1",
     "@types/supertest": "^2.0.11",
+    "@types/websocket": "^1.0.4",
     "@types/yargs": "^17.0.2",
     "chai": "^4.3.4",
     "copy-webpack-plugin": "^10.0.0",
@@ -131,7 +134,8 @@
     "tslog": "^3.2.2",
     "web3-utils": "1.5.2",
     "webpack": "^5.64.4",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.1",
+    "websocket": "^1.0.34"
   },
   "engines": {
     "node": "^14.0",
