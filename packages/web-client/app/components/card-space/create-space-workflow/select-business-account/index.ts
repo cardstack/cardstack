@@ -7,11 +7,14 @@ import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
 import { useResource } from 'ember-resources';
+import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
+import { taskFor } from 'ember-concurrency-ts';
 
 class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   @tracked merchantSafes: MerchantSafe[] | null = null;
   @tracked selectedSafe: MerchantSafe | null = null;
+  @service declare merchantInfo: MerchantInfoService;
 
   get merchantData() {
     if (this.selectedSafe) {
@@ -26,10 +29,20 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
   @action async setupBusinessAccountSelection() {
     await this.layer2Network.waitForAccount;
 
-    let merchantSafes = this.layer2Network.safes.value.filterBy(
-      'type',
-      'merchant'
-    ) as MerchantSafe[];
+    let safes = this.layer2Network.safes.value;
+
+    let availableMerchantInfosDIDs = (
+      await taskFor(
+        this.merchantInfo.fetchMerchantInfosAvailableForCardSpace
+      ).perform()
+    ).mapBy('did');
+
+    let merchantSafes = safes.filter((safe) => {
+      return (
+        safe.type == 'merchant' &&
+        availableMerchantInfosDIDs.includes(safe.infoDID)
+      );
+    }) as MerchantSafe[];
 
     this.merchantSafes = merchantSafes;
 
