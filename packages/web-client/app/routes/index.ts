@@ -20,7 +20,7 @@ import CardPayHor from '@cardstack/web-client/images/illustrations/card-pay-illu
 import CardCatalogHor from '@cardstack/web-client/images/illustrations/card-catalog-illustration-horizontal.svg';
 import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-membership-illustration-horizontal.svg';
 
-import '../css/cardstack-landing-page.css';
+import '@cardstack/web-client/css/cardstack-landing-page.css';
 
 import ENV from '../config/environment';
 const { enableCardSpace, enableCardPay } = ENV.features;
