@@ -42,7 +42,7 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
     super(owner, args);
     this.profileImage =
       this.args.workflowSession.getValue<string>('profileImageUrl') ?? '';
-    let displayName = this.args.workflowSession.getValue<string>('displayName');
+    let displayName = this.args.workflowSession.getValue<string>('profileName');
     this.displayName = displayName ?? '';
     if (!this.args.isComplete && displayName) {
       taskFor(this.updateDisplayNameTask).perform(displayName);
@@ -84,18 +84,18 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
 
       if (errors.length === 0) {
         this.displayName = displayName;
-        this.args.workflowSession.setValue('displayName', displayName);
+        this.args.workflowSession.setValue('profileName', displayName);
         this.displayNameInputState = 'valid';
         this.displayNameInputErrorMessage = '';
       } else {
         this.displayNameInputState = 'invalid';
         this.displayNameInputErrorMessage = errors[0].detail;
-        this.args.workflowSession.delete('displayName');
+        this.args.workflowSession.delete('profileName');
       }
     } catch (e) {
       console.error('Error validating card space displayName', e);
       Sentry.captureException(e);
-      this.args.workflowSession.delete('displayName');
+      this.args.workflowSession.delete('profileName');
       this.displayNameInputState = 'invalid';
       this.displayNameInputErrorMessage =
         'There was an error validating your Card Space display name. Please try again or contact support';

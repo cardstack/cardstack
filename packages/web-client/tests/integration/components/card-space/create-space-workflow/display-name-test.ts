@@ -88,7 +88,7 @@ module(
 
     test('it renders the card in a filled in, memorialized state', async function (assert) {
       session.setValue({
-        displayName: 'monchi',
+        profileName: 'monchi',
         profileImageUrl: sampleImage,
       });
       this.set('isComplete', true);
