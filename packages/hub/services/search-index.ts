@@ -24,7 +24,7 @@ const log = logger('hub/search-index');
 function assertNever(value: never) {
   throw new Error(`unsupported operation ${value}`);
 }
-export class SearchIndex {
+export default class SearchIndex {
   private realmManager = service('realm-manager', { as: 'realmManager' });
   private builder = service('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
@@ -352,8 +352,8 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
   return result;
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     searchIndex: SearchIndex;
   }
 }

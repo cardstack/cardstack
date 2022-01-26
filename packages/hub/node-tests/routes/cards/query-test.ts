@@ -62,7 +62,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let searchIndex = await getContainer().lookup('searchIndex');
+      let searchIndex = await getContainer().lookup('searchIndex', { type: 'service' });
       await searchIndex.indexAllRealms();
     });
 
