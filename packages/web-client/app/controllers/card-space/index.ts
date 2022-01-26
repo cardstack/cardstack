@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import '@cardstack/web-client/css/card-space.css';
 
 export default class CardSpaceIndexController extends Controller {
   queryParams = ['flow', { workflowPersistenceId: 'flow-id' }];

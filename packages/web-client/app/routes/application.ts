@@ -2,8 +2,9 @@ import Route from '@ember/routing/route';
 import RouterService from '@ember/routing/router-service';
 import { LocationService } from '../services/location';
 import { inject as service } from '@ember/service';
-import '@cardstack/web-client/css/variables.css';
 import config from '@cardstack/web-client/config/environment';
+import '@cardstack/web-client/css/variables.css';
+import '@cardstack/web-client/css/card-space.css';
 
 export default class ApplicationRoute extends Route {
   @service declare router: RouterService;
