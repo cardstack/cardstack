@@ -11,7 +11,17 @@ export default class HealthCheck {
       let db = await this.databaseManager.getClient();
       await db.query('SELECT 1');
       ctx.status = 200;
-      ctx.body = `Cardstack Hub is up and running at ${new Date().toISOString()}`;
+      let body = `
+Cardstack Hub
+-------------
+Up and running at ${new Date().toISOString()}
+${
+  process.env.WAYPOINT_DEPLOYMENT_ID
+    ? `Deployment ID: ${process.env.WAYPOINT_DEPLOYMENT_ID}`
+    : 'Running outside of Waypoint'
+}
+`;
+      ctx.body = body;
     });
 
     return healthCheckRouter.routes();
