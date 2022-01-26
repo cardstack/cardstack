@@ -96,8 +96,7 @@ module.exports = function (environment) {
       discordSupportChannelUrl:
         'https://discord.com/channels/584043165066199050/899645340746141806',
       statusPageBase: 'https://status.cardstack.com',
-      statusPageUrl:
-        'https://status.cardstack.com/api/v2/incidents/summary.json',
+      statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
     },
     // basically our favicons for now
     walletConnectIcons: [
