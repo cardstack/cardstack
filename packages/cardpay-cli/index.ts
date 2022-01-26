@@ -58,6 +58,7 @@ import {
   addToInventory as addPrepaidCardInventory,
 } from './prepaid-card-market';
 import { Safe } from '@cardstack/cardpay-sdk';
+import { hideBin } from 'yargs/helpers';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -202,7 +203,7 @@ let {
   safeType,
   leaf,
   acceptPartialClaim,
-} = yargs(process.argv.slice(2))
+} = yargs(hideBin(process.argv))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
   .command('bridge-to-l2 <amount> <tokenAddress> [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
