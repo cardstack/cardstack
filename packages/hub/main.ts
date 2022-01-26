@@ -94,7 +94,7 @@ import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
-import { registerRoutes } from '@cardstack/hub/routes';
+import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
 
 //@ts-ignore polyfilling fetch
@@ -209,10 +209,16 @@ export class HubServer {
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
   private healthCheck = inject('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
-  private cardRoutes = inject('card-routes', { as: 'cardRoutes', type: 'route' });
+  private cardRoutes: KnownRoutes['card-routes'] | undefined;
 
   constructor() {
     runInitializers();
+  }
+
+  async ready() {
+    if (process.env.COMPILER) {
+      this.cardRoutes = await getOwner(this).lookup('card-routes', { type: 'route' });
+    }
   }
 
   @Memoize()
@@ -229,7 +235,7 @@ export class HubServer {
     app.use(this.callbacksRouter.routes());
     app.use(this.uploadRouter.routes());
 
-    if (process.env.COMPILER) {
+    if (this.cardRoutes) {
       app.use(this.cardRoutes.routes());
     }
 

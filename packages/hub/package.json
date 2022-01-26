@@ -25,7 +25,7 @@
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "yarn build_if_missing && npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha --no-deprecation -r source-map-support/register dist/tests.js --timeout 60000",
-    "test:bot": "bin/corde",
+    "disabled-test:bot": "bin/corde",
     "autotest": "NODE_ENV=test mocha --no-deprecation -w --reporter=min -r source-map-support/register dist/tests.js --timeout 60000"
   },
   "dependencies": {
