@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import Web3 from 'web3';
 
 const { toChecksumAddress } = Web3.utils;
@@ -21,7 +22,7 @@ export interface OrderState {
 }
 
 export default class OrderService {
-  relay = inject('relay');
+  relay = service('relay');
   subgraph = inject('subgraph');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 

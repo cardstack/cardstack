@@ -79,9 +79,9 @@ describe('/api/orders', function () {
   let reservationId: string;
 
   this.beforeEach(function () {
+    registry(this).register('relay', StubRelayService, { type: 'service' });
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('subgraph', StubSubgraph);
-    registry(this).register('relay', StubRelayService);
     registry(this).register('wyre', StubWyreService);
   });
 
