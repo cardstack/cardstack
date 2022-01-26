@@ -1,6 +1,10 @@
 @import './card-container/index.css';
 @import './section/index.css';
 
+.boxel-sidebar {
+  --boxel-sidebar-max-width: 15rem;
+}
+
 .boxel-sidebar > * + * {
   margin-top: var(--boxel-sp);
 }

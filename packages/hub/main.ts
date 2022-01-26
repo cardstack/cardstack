@@ -29,7 +29,6 @@ import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
-import StatusRoute from './routes/status';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
@@ -39,7 +38,6 @@ import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations
 import OrdersRoute from './routes/orders';
 import ReservationsRoute from './routes/reservations';
 import InventoryRoute from './routes/inventory';
-import RelayService from './services/relay';
 import SubgraphService from './services/subgraph';
 import OrderService from './services/order';
 import InventoryService from './services/inventory';
@@ -105,6 +103,8 @@ import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
+import { registerRoutes } from '@cardstack/hub/routes';
+import { registerServices } from '@cardstack/hub/services';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -173,13 +173,11 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
-  registry.register('relay', RelayService);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
-  registry.register('status-route', StatusRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
@@ -208,6 +206,9 @@ export function createRegistry(): Registry {
     registry.register('card-builder', CardBuilder);
     registry.register('searchIndex', SearchIndex);
   }
+
+  registerServices(registry);
+  registerRoutes(registry);
 
   return registry;
 }

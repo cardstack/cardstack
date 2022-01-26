@@ -9,13 +9,14 @@ import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import Logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 
 let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
   authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   web3 = inject('web3-http', { as: 'web3' });
-  relay = inject('relay');
+  relay = service('relay');
   inventory = inject('inventory');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 

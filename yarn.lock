@@ -4199,6 +4199,11 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.0.tgz#87de7af9c231826fdd68ac7258f77c429e0e5fcf"
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
+"@hyperbola/svgo-loader@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@hyperbola/svgo-loader/-/svgo-loader-0.1.2.tgz#9e2d2332fb2f89b30ba52e29c802582ad730166e"
+  integrity sha512-ALDIIe/+eXZJqMXnqGDottpra+yPV+i8Hu0WCYh7qT0LyEopi0uTZRQBI1mFNptikdnvay6ED/jp3ybaqTHSSQ==
+
 "@ipld/car@^3.0.1", "@ipld/car@^3.1.4":
   version "3.1.21"
   resolved "https://registry.yarnpkg.com/@ipld/car/-/car-3.1.21.tgz#c8f81c8b0ac1b24c7758c33799192ca0302714cd"
@@ -13971,7 +13976,7 @@ ember-style-modifier@^0.6.0:
     ember-cli-babel "^7.21.0"
     ember-modifier "^2.1.0"
 
-ember-svg-jar@^2.2.3, ember-svg-jar@^2.3.3:
+ember-svg-jar@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/ember-svg-jar/-/ember-svg-jar-2.3.3.tgz#aede3f23e58bdcacc0e59a297c1ebad71a472e31"
   integrity sha512-Obs8vEMKPfS2R48bKBAfNSLphFsDwUMRqi8TVKtlLE6okTXC8NebGg7pA/IutIGnakqJRAz4/dWAZyI74duDuQ==
@@ -16349,6 +16354,11 @@ gcs-resumable-upload@^3.5.1:
     google-auth-library "^7.0.0"
     pumpify "^2.0.0"
     stream-events "^1.0.4"
+
+generate-alphabetic-name@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/generate-alphabetic-name/-/generate-alphabetic-name-1.0.0.tgz#20390ac8dc8325caf9edb4b5643beb5385210e5a"
+  integrity sha512-/0o6Y1wZ2NgvF9Ev8mYEqi2TGQjyQM0Z9BuyQ8ulZ8ObkDV9inRDrLFTH9nFmMIRswDTavyWz60L4tRndgFyFA==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -26190,6 +26200,13 @@ svg-tags@^1.0.0:
   resolved "https://registry.yarnpkg.com/svg-tags/-/svg-tags-1.0.0.tgz#58f71cee3bd519b59d4b2a843b6c7de64ac04764"
   integrity sha1-WPcc7jvVGbWdSyqEO2x95krAR2Q=
 
+svgo-unique-id@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/svgo-unique-id/-/svgo-unique-id-1.0.0.tgz#7f66f6e238ea01f5fbd4f23c381b4959041635b0"
+  integrity sha512-CcuAmVU8PuPGYYa3f6z5EasO5i2e+1JEz3Ddk5wN653Ljev5ksjSL5P+w8F2n3JCHCPrzrwFc76rZszB1fL3kA==
+  dependencies:
+    generate-alphabetic-name "^1.0.0"
+
 svgo@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/svgo/-/svgo-1.3.0.tgz#bae51ba95ded9a33a36b7c46ce9c359ae9154313"
@@ -26779,8 +26796,9 @@ trim-newlines@^3.0.0:
   integrity sha512-C4+gOpvmxaSMKuEf9Qc134F1ZuOHVXKRbtEflf4NTtuuJDEIJ9p5PXsalL8SkeRw+qit1Mo+yuvMPAKwWg/1hA==
 
 trim-off-newlines@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.3.tgz#8df24847fcb821b0ab27d58ab6efec9f2fe961a1"
+  integrity sha512-kh6Tu6GbeSNMGfrrZh6Bb/4ZEHV1QlB4xNDBeog8Y9/QwFlKTRyWvY3Fs9tRDAMZliVUwieMgEdIeL/FtqjkJg==
 
 trim-right@^1.0.1:
   version "1.0.1"

@@ -46,6 +46,38 @@ module('Acceptance | create card space', function (hooks) {
       .dom('[data-test-boxel-thread-header]')
       .containsText('Card Space Creation');
 
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-placeholder-cover-photo]'
+      )
+      .exists();
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-placeholder-profile-photo]'
+      )
+      .exists();
+
+    // test that the preview shows a blank state
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-name]')
+      .containsText('Name');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
+      .containsText('blank.card.space');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-category]')
+      .containsText('Category');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-description]'
+      )
+      .containsText('Description');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-button-text]'
+      )
+      .containsText('Button Text');
+
     // // Milestone 1
     assert.dom(`${postableSel(0, 0)} img`).exists();
     assert.dom(postableSel(0, 0)).containsText(`Hello, welcome to Card Space`);
@@ -169,6 +201,31 @@ module('Acceptance | create card space', function (hooks) {
       .dom(epiloguePostableSel(0))
       .containsText(`Congrats, you have created your Card Space!`);
 
+    // test that the preview is filled in
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-name]')
+      .containsText('Hello there');
+    // TODO: fill these in as we update the workflow (these are the required fields.
+    // I haven't added assertions on images. they are not required fields.)
+    // These should fail as the workflow is filled out and starts modifying the correct values in the
+    // workflow session
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
+      .containsText('blank.card.space');
+    assert
+      .dom('[data-test-sidebar-preview-body] [data-test-profile-card-category]')
+      .containsText('Category');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-description]'
+      )
+      .containsText('Description');
+    assert
+      .dom(
+        '[data-test-sidebar-preview-body] [data-test-profile-card-button-text]'
+      )
+      .containsText('Button Text');
+
     await waitFor(epiloguePostableSel(1));
 
     await percySnapshot(assert);
@@ -271,12 +328,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
 
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       layer2Service.test__simulateWalletConnectUri();
       await waitFor('[data-test-wallet-connect-qr-code]');
 
@@ -315,11 +374,14 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
         .containsText('Workflow canceled');
+      assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
 
       // restart workflow
       await click(
         '[data-test-workflow-default-cancelation-restart="create-space"]'
       );
+
+      assert.dom('[data-test-sidebar-preview-body]').exists();
       assert
         .dom(postableSel(0, 1))
         .containsText(
