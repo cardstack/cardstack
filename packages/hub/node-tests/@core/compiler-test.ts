@@ -261,6 +261,64 @@ if (process.env.COMPILER) {
       }
     });
 
+    it(`gives a good error when a card can't compile because computed field has args`, async function () {
+      let badCard: RawCard = {
+        realm,
+        id: 'bad-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+          import string from "https://cardstack.com/base/string";
+          import { contains } from "@cardstack/types";
+          import person from "../person";
+          export default class BadPerson {
+            @contains(string) lastName;
+            @contains(string)
+            async fullName(arg) {
+              return "Mr or Mrs " + (await this.lastName());
+            }
+          }
+        `,
+        },
+      };
+      try {
+        await cards.create(badCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.include(`computed fields take no arguments`);
+        expect(err.status).to.eq(400);
+      }
+    });
+
+    it(`gives a good error when a card can't compile because computed field has static name`, async function () {
+      let badCard: RawCard = {
+        realm,
+        id: 'bad-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+          import string from "https://cardstack.com/base/string";
+          import { contains } from "@cardstack/types";
+          import person from "../person";
+          export default class BadPerson {
+            @contains(string) lastName;
+            @contains(string)
+            static async fullName() {
+              return "Mr or Mrs " + (await this.lastName());
+            }
+          }
+        `,
+        },
+      };
+      try {
+        await cards.create(badCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.include(`computed fields should not be static`);
+        expect(err.status).to.eq(400);
+      }
+    });
+
     describe('@fields iterating', function () {
       let postCard: RawCard = {
         realm,
