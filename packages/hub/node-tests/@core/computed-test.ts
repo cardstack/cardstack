@@ -67,12 +67,12 @@ if (process.env.COMPILER) {
       });
     });
 
-    it(`can access a one-level-deep computed field`, async function () {
+    it.skip(`can access a one-level-deep computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Arthur Faulkner');
     });
 
-    it(`can access a two-level-deep computed field`, async function () {
+    it.skip(`can access a two-level-deep computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
