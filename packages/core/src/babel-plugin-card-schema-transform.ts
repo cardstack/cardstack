@@ -1,4 +1,5 @@
-import * as t from '@babel/types';
+import type * as Babel from '@babel/core';
+import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { addImports, error, ImportDetails } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
@@ -17,7 +18,8 @@ interface State {
   };
 }
 
-export default function main() {
+export default function main(babel: typeof Babel) {
+  let t = babel.types;
   return {
     visitor: {
       Program: {
@@ -132,7 +134,7 @@ export default function main() {
         // that you need to hook into.
         for (let bodyItem of path.get('body').get('body')) {
           if (t.isClassProperty(bodyItem.node)) {
-            handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state);
+            handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
           }
         }
       },
@@ -140,7 +142,7 @@ export default function main() {
   };
 }
 
-function handleClassProperty(path: NodePath<t.ClassProperty>, state: State) {
+function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
@@ -173,9 +175,9 @@ function handleClassProperty(path: NodePath<t.ClassProperty>, state: State) {
       throw error(path.get('key'), `cannot find field in card`);
     }
     if (type === 'primitive') {
-      transformPrimitiveField(path);
+      transformPrimitiveField(path, t);
     } else {
-      transformCompositeField(path, state);
+      transformCompositeField(path, state, t);
     }
   }
 }
@@ -217,7 +219,7 @@ function fieldMetasForCardURL(url: string, state: State): [string, FieldMeta][] 
 //   async aboutMe() {
 //     return new BioClass((innerField) => this.#getRawField("aboutMe." + innerField) )
 //   }
-function transformCompositeField(path: NodePath<t.ClassProperty>, state: State) {
+function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
@@ -252,7 +254,7 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State) 
 //   async birthdate() {
 //     return new FieldGetter(this.#getRawField, "birthdate");
 //   }
-function transformPrimitiveField(path: NodePath<t.ClassProperty>) {
+function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
