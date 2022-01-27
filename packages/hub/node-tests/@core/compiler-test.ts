@@ -439,7 +439,7 @@ if (process.env.COMPILER) {
 
               @contains(string)
               async fullName() {
-                return "Mr or Mrs " + (await this.lastName());
+                return "Mr or Mrs " + await this.lastName;
               }
             }
           `,
@@ -502,8 +502,11 @@ if (process.env.COMPILER) {
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
         expect(source).to.containsSource(`
+          import FieldGetter from "@cardstack/core/field-getter";
+        `);
+        expect(source).to.containsSource(`
           async birthdate() {
-            return await this.#getRawField("birthdate");
+            return new FieldGetter(this.#getRawField, "birthdate");
           }
         `);
       });
@@ -529,7 +532,7 @@ if (process.env.COMPILER) {
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.containsSource(`
           async fullName() {
-            return "Mr or Mrs " + (await this.lastName());
+            return "Mr or Mrs " + (await this.lastName);
           }
         `);
       });

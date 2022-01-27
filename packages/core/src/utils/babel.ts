@@ -25,6 +25,23 @@ export function error(path: NodePath<any>, message: string) {
   return path.buildCodeFrameError(message, CompilerError);
 }
 
+export type ImportDetails = Map<string, { moduleSpecifier: string; exportedName: string }>;
+
+export function addImports(neededImports: ImportDetails, path: NodePath<t.Program>) {
+  for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
+    path.node.body.push(
+      t.importDeclaration(
+        [
+          exportedName === 'default'
+            ? t.importDefaultSpecifier(t.identifier(localName))
+            : t.importSpecifier(t.identifier(localName), t.identifier(exportedName)),
+        ],
+        t.stringLiteral(moduleSpecifier)
+      )
+    );
+  }
+}
+
 class CompilerError extends Error {
   constructor(message: string) {
     super(message);

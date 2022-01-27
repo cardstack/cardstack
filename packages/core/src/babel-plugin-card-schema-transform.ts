@@ -1,41 +1,13 @@
-import {
-  ImportDeclaration,
-  identifier,
-  callExpression,
-  stringLiteral,
-  isIdentifier,
-  isCallExpression,
-  ClassProperty,
-  Decorator,
-  classMethod,
-  blockStatement,
-  returnStatement,
-  awaitExpression,
-  memberExpression,
-  thisExpression,
-  privateName,
-  expressionStatement,
-  assignmentExpression,
-  classPrivateProperty,
-  isClassProperty,
-  Class,
-  newExpression,
-  arrowFunctionExpression,
-  binaryExpression,
-  importDeclaration,
-  isImportDefaultSpecifier,
-  importDefaultSpecifier,
-  ClassDeclaration,
-} from '@babel/types';
+import * as t from '@babel/types';
 import { NodePath } from '@babel/traverse';
-import { error } from './utils/babel';
+import { addImports, error, ImportDetails } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
 import { baseCardURL } from './compiler';
 
-const processedImports = new WeakSet<NodePath<ImportDeclaration>>();
+const processedImports = new WeakSet<NodePath<t.ImportDeclaration>>();
 interface State {
   opts: {
     fields: CompiledCard['fields'];
@@ -48,7 +20,23 @@ interface State {
 export default function main() {
   return {
     visitor: {
-      ImportDeclaration(path: NodePath<ImportDeclaration>, state: State) {
+      Program: {
+        exit(path: NodePath<t.Program>, state: State) {
+          let neededImports: ImportDetails = new Map();
+          if (Object.keys(state.opts.fields).length > 0) {
+            neededImports.set('FieldGetter', {
+              moduleSpecifier: '@cardstack/core/field-getter',
+              exportedName: 'default',
+            });
+          }
+
+          if (neededImports.size > 0) {
+            addImports(neededImports, path);
+          }
+        },
+      },
+
+      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         // TODO use ed's babel import util reduce the amount of work here
         // don't re-process the imports we replaced
         if (processedImports.has(path)) {
@@ -59,7 +47,7 @@ export default function main() {
         if (type === 'primitive') {
           path.remove();
         } else if (type === 'composite') {
-          if (path.node.specifiers.length !== 1 || !isImportDefaultSpecifier(path.node.specifiers[0])) {
+          if (path.node.specifiers.length !== 1 || !t.isImportDefaultSpecifier(path.node.specifiers[0])) {
             throw error(path, `expecting a default import for card`);
           }
           let cardURL = path.node.source.value;
@@ -76,28 +64,27 @@ export default function main() {
             resolvedModule = state.opts.fields[fieldName].card.schemaModule.global;
           }
           path.replaceWith(
-            importDeclaration(
-              [importDefaultSpecifier(identifier(asClassName(path.node.specifiers[0].local.name)))],
-              stringLiteral(resolvedModule)
+            t.importDeclaration(
+              [t.importDefaultSpecifier(t.identifier(asClassName(path.node.specifiers[0].local.name)))],
+              t.stringLiteral(resolvedModule)
             )
           );
         }
-        processedImports.add(path);
       },
 
       // TODO do we want @adopts to be transpiled into ES class extension?
-      ClassDeclaration(path: NodePath<ClassDeclaration>, state: State) {
+      ClassDeclaration(path: NodePath<t.ClassDeclaration>, state: State) {
         if (state.opts.meta.parent?.cardURL && state.opts.parentLocalName) {
-          path.node.superClass = identifier(asClassName(state.opts.parentLocalName));
+          path.node.superClass = t.identifier(asClassName(state.opts.parentLocalName));
         }
       },
 
-      Decorator(path: NodePath<Decorator>) {
+      Decorator(path: NodePath<t.Decorator>) {
         // we don't want any decorators bleeding thru into our resulting classes
         path.remove();
       },
 
-      Class(path: NodePath<Class>, state: State) {
+      Class(path: NodePath<t.Class>, state: State) {
         let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
         // you can't upgrade a primitive card to a composite card--you are
         // either a primitive card or a composite card. so if we adopt from a
@@ -106,29 +93,29 @@ export default function main() {
           path.get('body').node.body.unshift(
             // creates a private property that looks like:
             //   #getRawField;
-            classPrivateProperty(privateName(identifier('getRawField')), null, null, false),
+            t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
 
             // creates a constructor that looks like:
             //   constructor(get) {
             //     super(get); // when we adopt from a non-base card
             //     this.#getRawField = get;
             //   }
-            classMethod(
+            t.classMethod(
               'constructor',
-              identifier('constructor'),
-              [identifier('get')],
-              blockStatement([
+              t.identifier('constructor'),
+              [t.identifier('get')],
+              t.blockStatement([
                 ...(state.opts.meta.parent?.cardURL
                   ? [
                       // if we extend a non base card, then add a super()
-                      expressionStatement(callExpression(identifier('super'), [identifier('get')])),
+                      t.expressionStatement(t.callExpression(t.identifier('super'), [t.identifier('get')])),
                     ]
                   : []),
-                expressionStatement(
-                  assignmentExpression(
+                t.expressionStatement(
+                  t.assignmentExpression(
                     '=',
-                    memberExpression(thisExpression(), privateName(identifier('getRawField'))),
-                    identifier('get')
+                    t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+                    t.identifier('get')
                   )
                 ),
               ]),
@@ -144,8 +131,8 @@ export default function main() {
         // @babel/plugin-proposal-class-properties creates a "Class" visitor
         // that you need to hook into.
         for (let bodyItem of path.get('body').get('body')) {
-          if (isClassProperty(bodyItem.node)) {
-            handleClassProperty(bodyItem as NodePath<ClassProperty>, state);
+          if (t.isClassProperty(bodyItem.node)) {
+            handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state);
           }
         }
       },
@@ -153,8 +140,8 @@ export default function main() {
   };
 }
 
-function handleClassProperty(path: NodePath<ClassProperty>, state: State) {
-  if (!isIdentifier(path.node.key)) {
+function handleClassProperty(path: NodePath<t.ClassProperty>, state: State) {
+  if (!t.isIdentifier(path.node.key)) {
     return;
   }
 
@@ -163,19 +150,19 @@ function handleClassProperty(path: NodePath<ClassProperty>, state: State) {
     decorators?.length === 0 ||
     !decorators?.find(
       (d) =>
-        isCallExpression(d.expression) &&
-        isIdentifier(d.expression.callee) &&
+        t.isCallExpression(d.expression) &&
+        t.isIdentifier(d.expression.callee) &&
         Object.keys(VALID_FIELD_DECORATORS).includes(d.expression.callee.name)
     )
   ) {
     return;
   }
 
-  for (let decoratorPath of path.get('decorators') as NodePath<Decorator>[]) {
+  for (let decoratorPath of path.get('decorators') as NodePath<t.Decorator>[]) {
     let decorator = decoratorPath.node;
     if (
-      !isCallExpression(decorator.expression) ||
-      !isIdentifier(decorator.expression.callee) ||
+      !t.isCallExpression(decorator.expression) ||
+      !t.isIdentifier(decorator.expression.callee) ||
       !Object.keys(VALID_FIELD_DECORATORS).includes(decorator.expression.callee.name)
     ) {
       continue;
@@ -230,24 +217,24 @@ function fieldMetasForCardURL(url: string, state: State): [string, FieldMeta][] 
 //   async aboutMe() {
 //     return new BioClass((innerField) => this.#getRawField("aboutMe." + innerField) )
 //   }
-function transformCompositeField(path: NodePath<ClassProperty>, state: State) {
-  if (!isIdentifier(path.node.key)) {
+function transformCompositeField(path: NodePath<t.ClassProperty>, state: State) {
+  if (!t.isIdentifier(path.node.key)) {
     return;
   }
   let fieldName = path.node.key.name;
   let fieldMeta = state.opts.meta.fields[fieldName];
   path.replaceWith(
-    classMethod(
+    t.classMethod(
       'method',
-      identifier(fieldName),
+      t.identifier(fieldName),
       [],
-      blockStatement([
-        returnStatement(
-          newExpression(identifier(asClassName(fieldMeta.typeDecoratorLocalName)), [
-            arrowFunctionExpression(
-              [identifier('innerField')],
-              callExpression(memberExpression(thisExpression(), privateName(identifier('getRawField'))), [
-                binaryExpression('+', stringLiteral(`${fieldName}.`), identifier('innerField')),
+      t.blockStatement([
+        t.returnStatement(
+          t.newExpression(t.identifier(asClassName(fieldMeta.typeDecoratorLocalName)), [
+            t.arrowFunctionExpression(
+              [t.identifier('innerField')],
+              t.callExpression(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))), [
+                t.binaryExpression('+', t.stringLiteral(`${fieldName}.`), t.identifier('innerField')),
               ])
             ),
           ])
@@ -263,26 +250,25 @@ function transformCompositeField(path: NodePath<ClassProperty>, state: State) {
 
 // creates a class method that looks like:
 //   async birthdate() {
-//     return await this.#getRawField('birthdate');
+//     return new FieldGetter(this.#getRawField, "birthdate");
 //   }
-function transformPrimitiveField(path: NodePath<ClassProperty>) {
-  if (!isIdentifier(path.node.key)) {
+function transformPrimitiveField(path: NodePath<t.ClassProperty>) {
+  if (!t.isIdentifier(path.node.key)) {
     return;
   }
 
   let fieldName = path.node.key.name;
   path.replaceWith(
-    classMethod(
+    t.classMethod(
       'method',
-      identifier(fieldName),
+      t.identifier(fieldName),
       [],
-      blockStatement([
-        returnStatement(
-          awaitExpression(
-            callExpression(memberExpression(thisExpression(), privateName(identifier('getRawField'))), [
-              stringLiteral(fieldName),
-            ])
-          )
+      t.blockStatement([
+        t.returnStatement(
+          t.newExpression(t.identifier('FieldGetter'), [
+            t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+            t.stringLiteral(fieldName),
+          ])
         ),
       ]),
       false,

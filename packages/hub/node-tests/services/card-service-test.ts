@@ -272,19 +272,7 @@ if (process.env.COMPILER) {
 
         let card = await cards.loadData('https://cardstack.local/sue', 'isolated');
         expect(card.data.author.name).to.equal('Sue');
-        expect(card.data.id).to.equal('https://cardstack.local/sue');
-
-        // NEXT steps to make this pass:
-        //   The work of embedding related records (and later running computed)
-        //   should happen something like this:
-        //
-        // let updater = new Updater(modules: Omit<CardContent, 'data'>);
-        // try {
-        //   let content = await updater.run(data: RawCard["data"])
-        //   let deps = updater.dependencies();
-        // } catch (err: any) {
-        //   let deps = updater.dependencies(); // dep tracking works even in failure
-        // }
+        expect(card.data.author.id).to.equal('https://cardstack.local/sue');
       });
     });
 

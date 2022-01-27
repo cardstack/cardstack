@@ -9,7 +9,7 @@ import * as t from '@babel/types';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
-import { getObjectKey, error } from './utils/babel';
+import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
@@ -28,7 +28,7 @@ interface State {
   insideExportDefault: boolean;
 
   // keys are local names in this module that we have chosen.
-  neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
+  neededImports: ImportDetails;
 }
 
 export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: File } {
@@ -73,21 +73,6 @@ export function babelPluginCardTemplate() {
       CallExpression: callExpressionEnter,
     },
   };
-}
-
-function addImports(neededImports: State['neededImports'], path: NodePath<t.Program>) {
-  for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
-    path.node.body.push(
-      t.importDeclaration(
-        [
-          exportedName === 'default'
-            ? t.importDefaultSpecifier(t.identifier(localName))
-            : t.importSpecifier(t.identifier(localName), t.identifier(exportedName)),
-        ],
-        t.stringLiteral(moduleSpecifier)
-      )
-    );
-  }
 }
 
 function addBaseModelExport(path: NodePath<t.Program>) {
