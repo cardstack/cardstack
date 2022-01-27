@@ -35,3 +35,7 @@
   font-family: var(--boxel-monospace-font-family);
   color: var(--boxel-purple-500);
 }
+
+.safe-option__id {
+  color: var(--boxel-purple-500);
+}

@@ -635,6 +635,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - RewardeeClaim
+        - RewardTokensAdd
       abis:
         - name: RewardPool
           file: ./abis/generated/RewardPool.json
@@ -651,6 +652,8 @@ dataSources:
           handler: handleRewardeeClaim
         - event: RewardTokensAdded(address,address,address,uint256)
           handler: handleRewardTokensAdded
+        - event: MerkleRootSubmission(bytes32,address,uint256)
+          handler: handleMerkleRootSubmission
       file: ./src/mappings/reward-pool.ts
 
 templates:

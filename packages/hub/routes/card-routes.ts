@@ -1,7 +1,6 @@
 import { RouterContext } from '@koa/router';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
-import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { INSECURE_CONTEXT } from '../services/card-service';
@@ -9,6 +8,7 @@ import { NotFound, CardstackError } from '@cardstack/core/src/utils/errors';
 import { parseQueryString } from '@cardstack/core/src/query';
 import { serializeCardPayloadForFormat, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import { service } from '@cardstack/hub/services';
 
 declare global {
   const __non_webpack_require__: any;
@@ -22,10 +22,10 @@ const requireCard = function (path: string, root: string): any {
 };
 
 export default class CardRoutes {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private cache = inject('file-cache', { as: 'cache' });
-  private cards = inject('card-service', { as: 'cards' });
-  private config = inject('card-routes-config', { as: 'config' });
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private cache = service('file-cache', { as: 'cache' });
+  private cards = service('card-service', { as: 'cards' });
+  private config = service('card-routes-config', { as: 'config' });
 
   private routerInstance: undefined | RouterInstance;
 
@@ -207,9 +207,14 @@ const defaultRouterInstance = {
   },
 };
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/routes' {
+  interface KnownRoutes {
     'card-routes': CardRoutes;
+  }
+}
+
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'card-routes-config': CardRoutesConfig;
   }
 }
