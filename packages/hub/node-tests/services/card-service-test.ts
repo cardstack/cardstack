@@ -301,7 +301,7 @@ if (process.env.COMPILER) {
             createdAt: new Date(2020, 0, 1),
           },
         });
-        let realmManager = await getContainer().lookup('realm-manager');
+        let realmManager = await getContainer().lookup('realm-manager', { type: 'service' });
         let rawCard = await realmManager.read({ realm: realmURL, id: 'post1' });
         expect(rawCard.adoptsFrom).to.equal('../post');
         expect(rawCard.data!.title).to.equal('Hello to you');
