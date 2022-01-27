@@ -29,6 +29,7 @@ export interface FieldMeta {
   cardURL: string;
   type: FieldType;
   typeDecoratorLocalName: string;
+  computed: boolean;
 }
 export interface FieldsMeta {
   [name: string]: FieldMeta;
@@ -175,6 +176,7 @@ function validateUsageAndGetFieldMeta(
     fields[fieldName] = {
       ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<CallExpression>, fieldTypeDecorator),
       type: actualName,
+      computed: fieldPath.isClassMethod(),
     };
   }
 }

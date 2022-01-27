@@ -236,14 +236,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private async lookupFieldsForCard(metaFields: FieldsMeta, realm: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
+    for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
       let fieldURL = resolveCard(cardURL, realm);
       try {
         fields[name] = {
           card: await this.builder.getCompiledCard(fieldURL),
           type,
           name,
-          computed: false,
+          computed,
         };
       } catch (err: any) {
         if (!err.isCardstackError || err.status !== 404) {
