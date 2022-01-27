@@ -548,7 +548,7 @@ type RewardProgram @entity {
   rewardSafes: [RewardSafe]! @derivedFrom(field: "rewardProgram")
   tokenAddEvents: [RewardTokensAdd]! @derivedFrom(field: "rewardProgram")
   rewardClaimEvents: [RewardeeClaim]! @derivedFrom(field: "rewardProgram")
-  merkleRoots: [MerkleRoot]! @derivedFrom(field: "rewardProgram")
+  merkleRoots: [MerkleRootSubmission]! @derivedFrom(field: "rewardProgram")
 }
 
 type RewardSafe @entity {
@@ -583,8 +583,10 @@ type RewardTokensAdd @entity {
   blockNumber: BigInt!
 }
 
-type MerkleRoot @entity {
+type MerkleRootSubmission @entity {
   id: ID!
   rewardProgram: RewardProgram!
   paymentCycle: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
 }

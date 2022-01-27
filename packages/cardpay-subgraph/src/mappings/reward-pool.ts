@@ -3,7 +3,13 @@ import {
   RewardTokensAdded,
   MerkleRootSubmission,
 } from '../../generated/RewardPool/RewardPool';
-import { RewardeeClaim, RewardSafe, RewardTokensAdd, RewardProgram, MerkleRoot } from '../../generated/schema';
+import {
+  RewardeeClaim,
+  RewardSafe,
+  RewardTokensAdd,
+  RewardProgram,
+  MerkleRootSubmission,
+} from '../../generated/schema';
 import { toChecksumAddress, makeEOATransactionForSafe, makeAccount, makeToken } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -91,8 +97,10 @@ export function handleMerkleRootSubmission(event: MerkleRootSubmission): void {
     return;
   }
 
-  let entity = new MerkleRoot(txnHash);
+  let entity = new MerkleRootSubmission(txnHash);
   entity.rewardProgram = rewardProgramID;
   entity.paymentCycle = paymentCycle;
+  entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.save();
 }
