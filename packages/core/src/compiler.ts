@@ -1,7 +1,7 @@
 import { JS_TYPE } from './utils/content';
 import { BabelFileResult, transformFromAstSync } from '@babel/core';
-import type { File } from '@babel/types';
 import difference from 'lodash/difference';
+import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
 import md5 from 'md5';
@@ -428,7 +428,7 @@ export function resolveCard(url: string, realm: string): string {
 export function makeGloballyAddressable(
   url: string,
   card: CompiledCard<Unsaved, ModuleRef>,
-  define: (localPath: string, type: string, source: string, ast: File | undefined) => string
+  define: (localPath: string, type: string, source: string, ast: t.File | undefined) => string
 ): CompiledCard<Saved, GlobalRef> {
   let localToGlobal = new Map<string, string>();
 

@@ -37,7 +37,7 @@ export default function main(babel: typeof Babel) {
           }
 
           if (neededImports.size > 0) {
-            addImports(neededImports, path);
+            addImports(neededImports, path, t);
           }
         },
       },

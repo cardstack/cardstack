@@ -1,13 +1,5 @@
-import {
-  ImportDeclaration,
-  isImportSpecifier,
-  isDecorator,
-  isStringLiteral,
-  isIdentifier,
-  CallExpression,
-  isCallExpression,
-  isClassDeclaration,
-} from '@babel/types';
+import type * as Babel from '@babel/core';
+import type { types as t } from '@babel/core';
 import { BabelFileResult, transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { name, error } from './utils/babel';
@@ -91,12 +83,13 @@ export default function (
   };
 }
 
-export function babelPluginCardSchemaAnalyze() {
+export function babelPluginCardSchemaAnalyze(babel: typeof Babel) {
+  let t = babel.types;
   return {
     visitor: {
-      ImportDeclaration(path: NodePath<ImportDeclaration>, state: State) {
+      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         if (path.node.source.value === '@cardstack/types') {
-          storeMeta(state.opts, path);
+          storeMeta(state.opts, path, t);
           path.remove();
         }
       },
@@ -104,25 +97,25 @@ export function babelPluginCardSchemaAnalyze() {
   };
 }
 
-function storeMeta(key: State['opts'], path: NodePath<ImportDeclaration>) {
+function storeMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: typeof Babel.types) {
   let fields: FieldsMeta = {};
   let parent: ParentMeta | undefined;
   for (let specifier of path.node.specifiers) {
     // all our field-defining decorators are named exports
-    if (!isImportSpecifier(specifier)) {
+    if (!t.isImportSpecifier(specifier)) {
       return;
     }
     let {
       local: { name: fieldTypeDecorator },
     } = specifier;
-    let specifierName = name(specifier.imported);
+    let specifierName = name(specifier.imported, t);
 
     if ((VALID_FIELD_DECORATORS as any)[specifierName]) {
-      validateUsageAndGetFieldMeta(path, fields, fieldTypeDecorator, specifierName as FieldType);
+      validateUsageAndGetFieldMeta(path, fields, fieldTypeDecorator, specifierName as FieldType, t);
     }
 
     if (specifierName === 'adopts') {
-      parent = validateUsageAndGetParentMeta(path, fieldTypeDecorator);
+      parent = validateUsageAndGetParentMeta(path, fieldTypeDecorator, t);
     }
   }
 
@@ -130,18 +123,19 @@ function storeMeta(key: State['opts'], path: NodePath<ImportDeclaration>) {
 }
 
 function validateUsageAndGetFieldMeta(
-  path: NodePath<ImportDeclaration>,
+  path: NodePath<t.ImportDeclaration>,
   fields: FieldsMeta,
   fieldTypeDecorator: string,
-  actualName: FieldType
+  actualName: FieldType,
+  t: typeof Babel.types
 ) {
   for (let fieldIdentifier of path.scope.bindings[fieldTypeDecorator].referencePaths) {
-    if (!isCallExpression(fieldIdentifier.parent) || fieldIdentifier.parent.callee !== fieldIdentifier.node) {
+    if (!t.isCallExpression(fieldIdentifier.parent) || fieldIdentifier.parent.callee !== fieldIdentifier.node) {
       throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator must be called`);
     }
 
     if (
-      !isDecorator(fieldIdentifier.parentPath.parent) ||
+      !t.isDecorator(fieldIdentifier.parentPath.parent) ||
       fieldIdentifier.parentPath.parent.expression !== fieldIdentifier.parent
     ) {
       throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator must be used as a decorator`);
@@ -159,7 +153,7 @@ function validateUsageAndGetFieldMeta(
       throw error(fieldPath, 'field names must not be dynamically computed');
     }
 
-    if (!isIdentifier(fieldPath.node.key) && !isStringLiteral(fieldPath.node.key)) {
+    if (!t.isIdentifier(fieldPath.node.key) && !t.isStringLiteral(fieldPath.node.key)) {
       throw error(fieldIdentifier, 'field names must be identifiers or string literals');
     }
 
@@ -172,33 +166,41 @@ function validateUsageAndGetFieldMeta(
       }
     }
 
-    let fieldName = name(fieldPath.node.key);
+    let fieldName = name(fieldPath.node.key, t);
     fields[fieldName] = {
-      ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<CallExpression>, fieldTypeDecorator),
+      ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<t.CallExpression>, fieldTypeDecorator, t),
       type: actualName,
       computed: fieldPath.isClassMethod(),
     };
   }
 }
 
-function validateUsageAndGetParentMeta(path: NodePath<ImportDeclaration>, fieldTypeDecorator: string): ParentMeta {
+function validateUsageAndGetParentMeta(
+  path: NodePath<t.ImportDeclaration>,
+  fieldTypeDecorator: string,
+  t: typeof Babel.types
+): ParentMeta {
   let adoptsIdentifier = path.scope.bindings[fieldTypeDecorator].referencePaths[0];
 
-  if (!isClassDeclaration(adoptsIdentifier.parentPath.parentPath.parent)) {
+  if (!t.isClassDeclaration(adoptsIdentifier.parentPath.parentPath.parent)) {
     throw error(adoptsIdentifier, '@adopts decorator can only be used on a class');
   }
 
-  return extractDecoratorArguments(adoptsIdentifier.parentPath as NodePath<CallExpression>, fieldTypeDecorator);
+  return extractDecoratorArguments(adoptsIdentifier.parentPath as NodePath<t.CallExpression>, fieldTypeDecorator, t);
 }
 
-function extractDecoratorArguments(callExpression: NodePath<CallExpression>, fieldTypeDecorator: string) {
+function extractDecoratorArguments(
+  callExpression: NodePath<t.CallExpression>,
+  fieldTypeDecorator: string,
+  t: typeof Babel.types
+) {
   if (callExpression.node.arguments.length !== 1) {
     throw error(callExpression, `@${fieldTypeDecorator} decorator accepts exactly one argument`);
   }
 
   let cardTypePath = callExpression.get('arguments')[0];
   let cardType = cardTypePath.node;
-  if (!isIdentifier(cardType)) {
+  if (!t.isIdentifier(cardType)) {
     throw error(cardTypePath, `@${fieldTypeDecorator} argument must be an identifier`);
   }
 
@@ -211,7 +213,7 @@ function extractDecoratorArguments(callExpression: NodePath<CallExpression>, fie
   }
 
   return {
-    cardURL: (definition.parent as ImportDeclaration).source.value,
+    cardURL: (definition.parent as t.ImportDeclaration).source.value,
     typeDecoratorLocalName: definition.node.local.name,
   };
 }
