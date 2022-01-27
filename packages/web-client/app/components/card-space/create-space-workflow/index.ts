@@ -29,10 +29,7 @@ const FAILURE_REASONS = {
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   NO_BUSINESS_ACCOUNT: 'NO_BUSINESS_ACCOUNT',
-  RESTORATION_NO_BUSINESS_ACCOUNT: 'RESTORATION_NO_BUSINESS_ACCOUNT',
   ALL_BUSINESS_ACCOUNTS_TAKEN: 'ALL_BUSINESS_ACCOUNTS_TAKEN',
-  RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN:
-    'RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN',
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -250,9 +247,7 @@ class CreateSpaceWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
-          this.workflow?.cancelationReason ===
-            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT
+          FAILURE_REASONS.NO_BUSINESS_ACCOUNT
         );
       },
     }),
@@ -261,9 +256,7 @@ class CreateSpaceWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN ||
-          this.workflow?.cancelationReason ===
-            FAILURE_REASONS.RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN
+          FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN
         );
       },
     }),
@@ -272,13 +265,11 @@ class CreateSpaceWorkflow extends Workflow {
         'card-space/create-space-workflow/create-business-account-cta',
       includeIf() {
         return (
-          [
-            FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
-            FAILURE_REASONS.RESTORATION_NO_BUSINESS_ACCOUNT,
-            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN,
-            FAILURE_REASONS.RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN,
-          ] as any[]
-        ).includes(this.workflow?.cancelationReason);
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN
+        );
       },
     }),
     ...standardCancelationPostables(),
@@ -312,6 +303,8 @@ class CreateSpaceWorkflow extends Workflow {
     if (!hubAuthentication.isAuthenticated) {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
+
+    // TODO: check if there are any business accounts available for Card Space which haven't been used yet
 
     return errors;
   }
