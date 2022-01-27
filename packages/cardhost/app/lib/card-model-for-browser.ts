@@ -169,6 +169,11 @@ export default class CardModelForBrowser implements CardModel {
     return this.wrapperComponent;
   }
 
+  async getField(name: string) {
+    // TODO: implement
+    return name;
+  }
+
   private makeSetter(segments: string[] = []): Setter {
     let s = (value: any) => {
       let innerSegments = segments.slice();

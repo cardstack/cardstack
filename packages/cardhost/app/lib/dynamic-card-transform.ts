@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { transformFromAstSync, transformSync } from '@babel/core';
 import type { TransformOptions } from '@babel/core';
 import type { File } from '@babel/types';
