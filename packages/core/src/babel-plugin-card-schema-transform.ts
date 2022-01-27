@@ -1,6 +1,7 @@
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
+import { ImportUtil } from 'babel-import-util';
 import { addImports, error, ImportDetails } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
 import { CompiledCard } from './interfaces';
@@ -8,13 +9,13 @@ import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
 import { baseCardURL } from './compiler';
 
-const processedImports = new WeakSet<NodePath<t.ImportDeclaration>>();
 interface State {
+  importUtil: ImportUtil;
+  parentLocalName: string | undefined;
   opts: {
     fields: CompiledCard['fields'];
     meta: PluginMeta;
     parent: CompiledCard;
-    parentLocalName: string | undefined;
   };
 }
 
@@ -23,6 +24,9 @@ export default function main(babel: typeof Babel) {
   return {
     visitor: {
       Program: {
+        enter(path: NodePath<t.Program>, state: State) {
+          state.importUtil = new ImportUtil(babel.types, path);
+        },
         exit(path: NodePath<t.Program>, state: State) {
           let neededImports: ImportDetails = new Map();
           if (Object.keys(state.opts.fields).length > 0) {
@@ -39,12 +43,6 @@ export default function main(babel: typeof Babel) {
       },
 
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
-        // TODO use ed's babel import util reduce the amount of work here
-        // don't re-process the imports we replaced
-        if (processedImports.has(path)) {
-          return;
-        }
-
         let type = cardTypeByURL(path.node.source.value, state);
         if (type === 'primitive') {
           path.remove();
@@ -52,32 +50,32 @@ export default function main(babel: typeof Babel) {
           if (path.node.specifiers.length !== 1 || !t.isImportDefaultSpecifier(path.node.specifiers[0])) {
             throw error(path, `expecting a default import for card`);
           }
-          let cardURL = path.node.source.value;
-          let resolvedModule: string;
-          if (cardURL === state.opts.meta.parent?.cardURL) {
-            resolvedModule = state.opts.parent.schemaModule.global;
-            state.opts.parentLocalName = path.node.specifiers[0].local.name;
-          } else {
-            let fieldMetas = fieldMetasForCardURL(cardURL, state);
-            if (fieldMetas.length === 0) {
-              throw error(path, `could not find fieldMeta for ${cardURL}`);
-            }
-            let [fieldName] = fieldMetas[0]; // all these fields share the same field card--so just use the first one
-            resolvedModule = state.opts.fields[fieldName].card.schemaModule.global;
+
+          if (path.node.source.value === state.opts.meta.parent?.cardURL) {
+            // we note the user provided local name for the parent card so that
+            // we can provide it to babel-import-utils
+            state.parentLocalName = path.node.specifiers[0].local.name;
           }
-          path.replaceWith(
-            t.importDeclaration(
-              [t.importDefaultSpecifier(t.identifier(asClassName(path.node.specifiers[0].local.name)))],
-              t.stringLiteral(resolvedModule)
-            )
-          );
+
+          // we'll use babel-import-utils to build the import declarations
+          path.remove();
         }
       },
 
-      // TODO do we want @adopts to be transpiled into ES class extension?
+      // TODO do we want @adopts to be transpiled into ES class extension or
+      // maybe we use composition (and perhaps use a Proxy to project the
+      // composed schema's field methods)?
       ClassDeclaration(path: NodePath<t.ClassDeclaration>, state: State) {
-        if (state.opts.meta.parent?.cardURL && state.opts.parentLocalName) {
-          path.node.superClass = t.identifier(asClassName(state.opts.parentLocalName));
+        if (state.opts.meta.parent?.cardURL && state.opts.parent.schemaModule.global && state.parentLocalName) {
+          let superClass = path.get('superClass') as NodePath<t.Identifier>;
+          superClass.replaceWith(
+            state.importUtil.import(
+              superClass,
+              state.opts.parent.schemaModule.global,
+              'default',
+              asClassName(state.parentLocalName)
+            )
+          );
         }
       },
 
@@ -232,14 +230,22 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
       [],
       t.blockStatement([
         t.returnStatement(
-          t.newExpression(t.identifier(asClassName(fieldMeta.typeDecoratorLocalName)), [
-            t.arrowFunctionExpression(
-              [t.identifier('innerField')],
-              t.callExpression(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))), [
-                t.binaryExpression('+', t.stringLiteral(`${fieldName}.`), t.identifier('innerField')),
-              ])
+          t.newExpression(
+            state.importUtil.import(
+              path,
+              state.opts.fields[fieldName].card.schemaModule.global,
+              'default',
+              asClassName(fieldMeta.typeDecoratorLocalName)
             ),
-          ])
+            [
+              t.arrowFunctionExpression(
+                [t.identifier('innerField')],
+                t.callExpression(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))), [
+                  t.binaryExpression('+', t.stringLiteral(`${fieldName}.`), t.identifier('innerField')),
+                ])
+              ),
+            ]
+          )
         ),
       ]),
       false,
@@ -281,8 +287,6 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babe
   );
 }
 
-// TODO There could be collisions here--take a look at Ed's util for a better
-// solution
 function asClassName(name: string): string {
   if (name.toLowerCase().endsWith('class')) {
     name = name.slice(0, -5);

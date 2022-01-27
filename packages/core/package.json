@@ -21,6 +21,7 @@
     "@types/babel__core": "^7.1.12",
     "@types/inflection": "^1.5.28",
     "@types/lodash": "^4.14.168",
+    "babel-import-util": "^1.1.0",
     "date-fns": "^2.22.1",
     "ember-cli-htmlbars": "^5.7.1",
     "http-status-codes": "^2.1.4",
