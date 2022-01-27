@@ -18,6 +18,8 @@ import {
 } from '@cardstack/web-client/models/workflow';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 import RestorableWorkflowComponent from '../../card-pay/restorable-workflow-component';
+import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
+import { taskFor } from 'ember-concurrency-ts';
 
 const FAILURE_REASONS = {
   L2_DISCONNECTED: 'L2_DISCONNECTED',
@@ -26,10 +28,13 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  NO_BUSINESS_ACCOUNT: 'NO_BUSINESS_ACCOUNT',
+  ALL_BUSINESS_ACCOUNTS_TAKEN: 'ALL_BUSINESS_ACCOUNTS_TAKEN',
 } as const;
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.conversationalName} wallet`,
+  `Select business account`,
   `Pick display name`,
   `Save Card Space details`,
   `Create Card Space`,
@@ -41,6 +46,7 @@ class CreateSpaceWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
+  @service declare merchantInfo: MerchantInfoService;
 
   name: WorkflowName = 'CARD_SPACE_CREATION';
   version = WORKFLOW_VERSION;
@@ -52,6 +58,7 @@ class CreateSpaceWorkflow extends Workflow {
         new WorkflowMessage({
           message: `Hello, welcome to Card Space, we're happy to see you!`,
         }),
+
         new NetworkAwareWorkflowMessage({
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
@@ -76,6 +83,7 @@ class CreateSpaceWorkflow extends Workflow {
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
+
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
@@ -88,13 +96,61 @@ class CreateSpaceWorkflow extends Workflow {
             return !this.isHubAuthenticated;
           },
         }),
+        new NetworkAwareWorkflowMessage({
+          message: `Looks like you already authenticated with the Cardstack Hub. Please continue with the next step of this workflow.`,
+          includeIf() {
+            return this.isHubAuthenticated;
+          },
+        }),
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
           componentName: 'card-pay/hub-authentication',
-          includeIf(this: NetworkAwareWorkflowCard) {
-            return !this.isHubAuthenticated;
+          async check() {
+            let { layer2Network, merchantInfo } = this
+              .workflow as CreateSpaceWorkflow;
+
+            let hasMerchantSafes =
+              layer2Network.safes.value.filterBy('type', 'merchant').length > 0;
+
+            if (!hasMerchantSafes) {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.NO_BUSINESS_ACCOUNT,
+              };
+            } else {
+              let availableMerchantInfos = await taskFor(
+                merchantInfo.fetchMerchantInfosAvailableForCardSpace
+              ).perform();
+
+              let hasAvailableMerchants = availableMerchantInfos.length > 0;
+
+              if (!hasAvailableMerchants) {
+                return {
+                  success: false,
+                  reason: FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN,
+                };
+              } else {
+                return {
+                  success: true,
+                };
+              }
+            }
           },
         }),
+        new WorkflowMessage({
+          message: `Please select a business account you would like to associate with your Card Space. The business ID will be used in the URL to access your Card Space.`,
+        }),
+        new WorkflowCard({
+          cardName: 'SELECT_BUSINESS_ACCOUNT',
+          componentName:
+            'card-space/create-space-workflow/select-business-account',
+        }),
+      ],
+      completedDetail: `Business selected`,
+    }),
+    new Milestone({
+      title: MILESTONE_TITLES[2],
+      postables: [
         new WorkflowMessage({
           message: `Please pick a display name for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
         }),
@@ -106,7 +162,7 @@ class CreateSpaceWorkflow extends Workflow {
       completedDetail: `Display name picked`,
     }),
     new Milestone({
-      title: MILESTONE_TITLES[2],
+      title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
           message: `Nice choice!`,
@@ -122,7 +178,7 @@ class CreateSpaceWorkflow extends Workflow {
       completedDetail: `Card Space details saved`,
     }),
     new Milestone({
-      title: MILESTONE_TITLES[3],
+      title: MILESTONE_TITLES[4],
       postables: [
         new WorkflowMessage({
           message: `We have sent your URL reservation badge to your connected account (just check your Card Wallet mobile app).`,
@@ -185,6 +241,37 @@ class CreateSpaceWorkflow extends Workflow {
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
     }),
+    new WorkflowMessage({
+      message: `It looks like you haven't created a business account yet. In order to create your Card Space, you must first create your first business account. This is required
+          because your Card Space URL will depend on your business account ID.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.NO_BUSINESS_ACCOUNT
+        );
+      },
+    }),
+    new WorkflowMessage({
+      message: `It looks like you all your business accounts have already been used to create a Card Space. In order to create your Card Space, you must first create a new business account.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN
+        );
+      },
+    }),
+    new WorkflowCard({
+      componentName:
+        'card-space/create-space-workflow/create-business-account-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.NO_BUSINESS_ACCOUNT ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.ALL_BUSINESS_ACCOUNTS_TAKEN
+        );
+      },
+    }),
     ...standardCancelationPostables(),
   ]);
 
@@ -216,6 +303,8 @@ class CreateSpaceWorkflow extends Workflow {
     if (!hubAuthentication.isAuthenticated) {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
+
+    // TODO: check if there are any business accounts available for Card Space which haven't been used yet
 
     return errors;
   }

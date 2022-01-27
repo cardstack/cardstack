@@ -1,5 +1,6 @@
 <ActionCardContainer
   @isComplete={{@isComplete}}
+  {{did-insert this.checkIfAuthenticated}}
 >
   <Boxel::ActionChin
     @state={{this.authState}}
@@ -53,7 +54,7 @@
       </i.ActionStatusArea>
     </:in-progress>
     <:memorialized as |m|>
-      <m.ActionStatusArea>
+      <m.ActionStatusArea data-test-authentication-memorialized>
         Authenticated with Hub
       </m.ActionStatusArea>
     </:memorialized>

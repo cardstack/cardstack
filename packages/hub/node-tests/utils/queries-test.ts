@@ -9,6 +9,11 @@ describe('Queries utils', function () {
         where: 'a=$1 AND c=$2 AND b IS NULL',
         values: [1, 2],
       });
+
+      expect(buildConditions({ a: 'test', non_literals: { should_be: 'ignored' } })).to.deep.equal({
+        where: 'a=$1',
+        values: ['test'],
+      });
     });
   });
 });

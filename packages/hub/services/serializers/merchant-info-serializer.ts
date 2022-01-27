@@ -8,7 +8,7 @@ import { JSONAPIDocument } from '../../utils/jsonapi-document';
 export default class MerchantInfoSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async serialize(model: MerchantInfo): Promise<JSONAPIDocument> {
+  serialize(model: MerchantInfo): JSONAPIDocument {
     let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
     const result = {
@@ -27,6 +27,16 @@ export default class MerchantInfoSerializer {
           'owner-address': model.ownerAddress,
         },
       },
+    };
+
+    return result as JSONAPIDocument;
+  }
+
+  serializeCollection(models: MerchantInfo[]): JSONAPIDocument {
+    let result = {
+      data: models.map((model) => {
+        return this.serialize(model).data;
+      }),
     };
 
     return result as JSONAPIDocument;

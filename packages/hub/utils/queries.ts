@@ -9,10 +9,17 @@ const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, (letter) => `_${
 // => { where: 'name=$1 AND age=$2', values: [ 'Phil', 45 ] }
 
 export function buildConditions(params: any) {
-  let nonNullParams = pickBy(params, function (value) {
+  // Only allow nulls, strings and numbers in the params
+  let filteredParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([_key, value]) => value == null || typeof value === 'number' || typeof value === 'string'
+    )
+  );
+
+  let nonNullParams = pickBy(filteredParams, function (value) {
     return value !== null;
   });
-  let nullParams = pickBy(params, function (value) {
+  let nullParams = pickBy(filteredParams, function (value) {
     return value === null;
   });
 
