@@ -118,8 +118,10 @@ const ORGS = [
 
 export default class CardstackRoute extends Route {
   @service declare location: LocationService;
+  cardSpaceId = '';
 
-  async model() {
+  model(params: any) {
+    this.cardSpaceId = params['cardSpaceId'];
     return {
       orgs: ORGS,
     };
@@ -127,10 +129,20 @@ export default class CardstackRoute extends Route {
 
   renderTemplate(controller: Controller) {
     if (this.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
-      let displayName = this.location.hostname.replace(
-        `.${config.cardSpaceHostnameSuffix}`,
-        ''
-      );
+      let displayName: string;
+      if (config.environment === 'development') {
+        displayName = this.cardSpaceId;
+        if (!displayName) {
+          throw new Error(
+            'card-space-id query parameter is required for card space user page in development'
+          );
+        }
+      } else {
+        displayName = this.location.hostname.replace(
+          `.${config.cardSpaceHostnameSuffix}`,
+          ''
+        );
+      }
 
       this.render('card-space', {
         into: 'application',
