@@ -1,7 +1,7 @@
 import {
   RewardeeClaim as RewardeeClaimEvent,
   RewardTokensAdded,
-  MerkleRootSubmission,
+  MerkleRootSubmission as MerkleRootSubmissionEvent,
 } from '../../generated/RewardPool/RewardPool';
 import {
   RewardeeClaim,
@@ -83,7 +83,7 @@ export function handleRewardTokensAdded(event: RewardTokensAdded): void {
   entity.save();
 }
 
-export function handleMerkleRootSubmission(event: MerkleRootSubmission): void {
+export function handleMerkleRootSubmission(event: MerkleRootSubmissionEvent): void {
   let txnHash = event.transaction.hash.toHex();
   let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
   let paymentCycle = event.params.paymentCycle;
