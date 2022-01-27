@@ -60,7 +60,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         exit(path: NodePath<t.Program>, state: State) {
           addImports(state.neededImports, path, t);
           addSerializerMap(path, state, t);
-          addBaseModelExport(path, t);
         },
       },
 
@@ -80,16 +79,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
       },
     },
   };
-}
-
-function addBaseModelExport(path: NodePath<t.Program>, t: typeof Babel.types) {
-  path.node.body.push(
-    t.exportNamedDeclaration(
-      null,
-      [t.exportSpecifier(t.identifier('default'), t.identifier('Model'))],
-      t.stringLiteral('@cardstack/core/src/card-model')
-    )
-  );
 }
 
 function addSerializerMap(path: NodePath<t.Program>, state: State, t: typeof Babel.types) {
