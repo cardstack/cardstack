@@ -131,6 +131,9 @@ export default function main(babel: typeof Babel) {
         // @babel/plugin-proposal-class-properties creates a "Class" visitor
         // that you need to hook into.
         for (let bodyItem of path.get('body').get('body')) {
+          if (type === 'primitive') {
+            throw error(bodyItem, `primitive cards cannot have fields`);
+          }
           if (t.isClassProperty(bodyItem.node)) {
             handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
           }
