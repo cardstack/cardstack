@@ -18,15 +18,11 @@ import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../utils/expressions';
 import CardBuilder from './card-builder';
-import { transformFromAstSync, transformSync } from '@babel/core';
-import type { File } from '@babel/types';
+import type { types as t } from '@babel/core';
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
 
-// @ts-ignore
-import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
-// @ts-ignore
-import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { transformToCommonJS } from '../utils/transforms';
 
 const log = logger('hub/search-index');
 
@@ -277,36 +273,14 @@ class IndexerRun implements IndexerHandle {
     return await this.writeDataToIndex(rawCard);
   }
 
-  private define(cardURL: string, localPath: string, type: string, source: string, ast: File | undefined): string {
+  private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
     switch (type) {
       case JS_TYPE:
         this.fileCache.setModule(BROWSER, cardURL, localPath, source);
-        return this.fileCache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source, ast));
+        return this.fileCache.setModule(NODE, cardURL, localPath, transformToCommonJS(localPath, source, ast));
       default:
         return this.fileCache.writeAsset(cardURL, localPath, source);
     }
-  }
-
-  private transformToCommonJS(moduleURL: string, source: string, ast: File | undefined): string {
-    let code: string;
-    if (ast) {
-      let out = transformFromAstSync(ast, source, {
-        configFile: false,
-        babelrc: false,
-        filenameRelative: moduleURL,
-        plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
-      });
-      code = out!.code!;
-    } else {
-      let out = transformSync(source, {
-        configFile: false,
-        babelrc: false,
-        filenameRelative: moduleURL,
-        plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
-      });
-      code = out!.code!;
-    }
-    return code;
   }
 
   private async writeToIndex(
