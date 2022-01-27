@@ -289,10 +289,10 @@ class CreateSpaceWorkflow extends Workflow {
     this.attachWorkflow();
   }
 
-  restorationErrors() {
-    let { hubAuthentication, layer2Network } = this;
+  async restorationErrors() {
+    let { hubAuthentication, layer2Network, merchantInfo } = this;
 
-    let errors = super.restorationErrors();
+    let errors = await super.restorationErrors();
 
     if (!layer2Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);

@@ -327,10 +327,10 @@ with Card Pay.`,
     ...standardCancelationPostables(),
   ]);
 
-  restorationErrors() {
+  async restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
-    let errors = super.restorationErrors();
+    let errors = await super.restorationErrors();
 
     if (!layer1Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);

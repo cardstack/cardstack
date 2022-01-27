@@ -66,7 +66,7 @@ export abstract class Workflow {
   workflowPersistence: WorkflowPersistence;
   workflowPersistenceId?: string;
 
-  restorationErrors(): string[] {
+  async restorationErrors(): Promise<string[]> {
     let errors = [];
     let meta = this.session.getMeta();
     let persistedVersion = meta.version;
@@ -96,7 +96,7 @@ export abstract class Workflow {
     }
     this.session.restoreFromStorage();
     await Promise.all(this.beforeRestorationChecks());
-    let errors = this.restorationErrors();
+    let errors = await this.restorationErrors();
 
     if (errors.length > 0) {
       this.cancel(errors[0]);

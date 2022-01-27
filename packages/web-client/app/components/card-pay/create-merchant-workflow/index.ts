@@ -259,10 +259,10 @@ class CreateMerchantWorkflow extends Workflow {
     this.attachWorkflow();
   }
 
-  restorationErrors() {
+  async restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
-    let errors = super.restorationErrors();
+    let errors = await super.restorationErrors();
 
     if (!layer2Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
