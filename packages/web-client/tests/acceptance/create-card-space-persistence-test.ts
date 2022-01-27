@@ -50,6 +50,7 @@ module('Acceptance | create card space persistence', function (hooks) {
           createSafeToken('DAI.CPXD', '125000000000000000000'),
           createSafeToken('CARD.CPXD', '450000000000000000000'),
         ],
+        infoDID: 'MerchantSafeDID',
       }),
     ]);
 
@@ -72,6 +73,12 @@ module('Acceptance | create card space persistence', function (hooks) {
   });
 
   module('Restoring from a previously saved state', function () {
+    hooks.beforeEach(async function (this: MirageTestContext) {
+      this.server.create('merchant-info', {
+        did: 'MerchantSafeDID',
+      });
+    });
+
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       let state = buildState({
         meta: {
@@ -91,7 +98,7 @@ module('Acceptance | create card space persistence', function (hooks) {
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
-      assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(1)).exists(); // Business account
       assert.dom(milestoneCompletedSel(2)).exists(); // Display name
       assert.dom(milestoneCompletedSel(3)).doesNotExist();
@@ -120,7 +127,7 @@ module('Acceptance | create card space persistence', function (hooks) {
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
-      assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(1)).exists(); // Business account
       assert.dom(milestoneCompletedSel(2)).exists(); // Display name
       assert.dom(milestoneCompletedSel(3)).exists(); // Details
@@ -151,11 +158,13 @@ module('Acceptance | create card space persistence', function (hooks) {
       });
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
-
+      // await pauseTest();
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
       assert.dom(milestoneCompletedSel(1)).exists(); // Select Business Account
       assert.dom(milestoneCompletedSel(2)).exists(); // Display name
       assert.dom(milestoneCompletedSel(3)).doesNotExist();
+      await waitFor('[data-test-cancelation]');
       assert
         .dom('[data-test-cancelation]')
         .includesText(
@@ -193,12 +202,15 @@ module('Acceptance | create card space persistence', function (hooks) {
 
       assert.dom(milestoneCompletedSel(0)).doesNotExist(); // L2 connect
       assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Business account
+      await waitFor('[data-test-cancelation]');
       assert
         .dom('[data-test-cancelation]')
         .includesText(
           'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.'
         );
 
+      // await pauseTest();
+      await waitFor('[data-test-workflow-default-cancelation-restart]');
       await click('[data-test-workflow-default-cancelation-restart]');
 
       assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
@@ -227,14 +239,15 @@ module('Acceptance | create card space persistence', function (hooks) {
       });
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
-      assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(1)).exists(); // Display name
 
       await waitFor('[data-test-milestone="1"] [data-test-boxel-button]');
       await click('[data-test-milestone="1"] [data-test-boxel-button]');
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
-      assert.dom(milestoneCompletedSel(0)).exists(); // L2 connect
+
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Display name
     });
 
@@ -253,9 +266,10 @@ module('Acceptance | create card space persistence', function (hooks) {
       });
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
-
+      // await pauseTest();
       assert.dom(milestoneCompletedSel(0)).doesNotExist();
       assert.dom(milestoneCompletedSel(1)).doesNotExist();
+      await waitFor('[data-test-cancelation]');
       assert
         .dom('[data-test-cancelation]')
         .includesText(
@@ -278,7 +292,7 @@ module('Acceptance | create card space persistence', function (hooks) {
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
 
-      assert.dom(milestoneCompletedSel(0)).exists();
+      await waitFor(milestoneCompletedSel(0)); // L2 connect
       assert.dom(milestoneCompletedSel(1)).doesNotExist();
 
       await waitFor('[data-test-postable="1"][data-test-milestone="1"]');
@@ -307,13 +321,41 @@ module('Acceptance | create card space persistence', function (hooks) {
       });
 
       await visit('/card-space?flow=create-space&flow-id=abc123');
-
-      assert.dom(milestoneCompletedSel(0)).doesNotExist();
+      await waitFor('[data-test-cancelation]');
       assert.dom(milestoneCompletedSel(1)).doesNotExist();
       assert
         .dom('[data-test-cancelation]')
         .includesText(
           'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+        );
+    });
+
+    test('it cancels a persisted flow when there are no available merchants for card space', async function (this: Context, assert) {
+      // @ts-ignore
+      this.server.db.merchantInfos.remove(this.server.db.merchantInfos[0]);
+
+      const state = buildState({
+        meta: {
+          version: WORKFLOW_VERSION,
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'HUB_AUTH',
+            'SELECT_BUSINESS_ACCOUNT',
+          ],
+        },
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'CARD_SPACE_CREATION',
+        state,
+      });
+
+      await visit('/card-space?flow=create-space&flow-id=abc123');
+      await waitFor('[data-test-cancelation]');
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'It looks like you all your business accounts have already been used to create a Card Space. In order to create your Card Space, you must first create a new business account.'
         );
     });
   });

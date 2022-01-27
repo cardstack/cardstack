@@ -313,6 +313,15 @@ class CreateSpaceWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
 
+    let availableMerchantInfos = await taskFor(
+      merchantInfo.fetchMerchantInfosAvailableForCardSpace
+    ).perform();
+
+    let hasAvailableMerchants = availableMerchantInfos.length > 0;
+    if (!hasAvailableMerchants) {
+      errors.push(FAILURE_REASONS.RESTORATION_ALL_BUSINESS_ACCOUNTS_TAKEN);
+    }
+
     return errors;
   }
 

@@ -4,6 +4,7 @@ import {
   click,
   currentURL,
   fillIn,
+  pauseTest,
   settled,
   visit,
   waitFor,
@@ -434,6 +435,8 @@ module('Acceptance | create card space', function (hooks) {
           .dom('[data-test-layer-2-wallet-card] [data-test-address-field]')
           .containsText(differentL2Address)
           .isVisible();
+
+        await pauseTest();
         assert
           .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
           .doesNotExist();
