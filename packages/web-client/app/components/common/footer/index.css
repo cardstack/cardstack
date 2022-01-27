@@ -4,7 +4,6 @@
 
 .cardstack-footer__section {
   display: flex;
-  gap: var(--boxel-sp-lg);
   justify-content: space-between;
   align-items: center;
   padding: var(--boxel-sp-sm) 0 var(--boxel-sp) 0;
@@ -27,6 +26,43 @@
   gap: var(--boxel-sp-xs) var(--boxel-sp);
   flex-wrap: wrap;
   align-items: center;
+}
+
+.cardstack-footer__socials {
+  display: flex;
+  gap: var(--boxel-sp-xs) var(--boxel-sp);
+
+  /*
+   * It is possible to apply a margin between this and the cardstack logo + fine print
+   * with flex gap.
+   * However Safari 15 appears to have a bug where flex column-reverse
+   * will not apply gap correctly. So we apply a margin directly.
+   * See the media query margin as well.
+   */
+  margin: 0 0 0 var(--boxel-sp-lg);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cardstack-footer__discord-icon {
+  --icon-color: var(--boxel-highlight);
+
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.cardstack-footer__social-icon {
+  --icon-color: currentColor;
+
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
+
+.cardstack-footer__fine-print {
+  display: flex;
+  align-items: center;
+  font: var(--boxel-font-sm);
 }
 
 @media screen and (max-width: 560px) {
@@ -52,32 +88,8 @@
     padding-top: var(--boxel-sp-sm);
     border-top: 1px solid #585469;
   }
-}
 
-.cardstack-footer__socials {
-  display: flex;
-  gap: var(--boxel-sp-xs) var(--boxel-sp);
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.cardstack-footer__discord-icon {
-  --icon-color: var(--boxel-highlight);
-
-  width: var(--boxel-icon-sm);
-  height: var(--boxel-icon-sm);
-  margin-right: var(--boxel-sp-xxs);
-}
-
-.cardstack-footer__social-icon {
-  --icon-color: currentColor;
-
-  width: var(--boxel-icon-sm);
-  height: var(--boxel-icon-sm);
-}
-
-.cardstack-footer__fine-print {
-  display: flex;
-  align-items: center;
-  font: var(--boxel-font-sm);
+  .cardstack-footer__socials {
+    margin: 0 0 var(--boxel-sp-lg) 0;
+  }
 }

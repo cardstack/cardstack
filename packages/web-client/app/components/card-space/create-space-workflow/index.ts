@@ -30,7 +30,7 @@ const FAILURE_REASONS = {
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.conversationalName} wallet`,
-  `Pick username`,
+  `Pick display name`,
   `Save Card Space details`,
   `Create Card Space`,
 ];
@@ -81,14 +81,6 @@ class CreateSpaceWorkflow extends Workflow {
     new Milestone({
       title: MILESTONE_TITLES[1],
       postables: [
-        // TODO
-        // new WorkflowMessage({
-        //   message: `It looks like you don’t have a prepaid card in your account. You will need one to pay the **100 SPEND ($1 USD)** Card Space creation fee. Please buy a prepaid card before you continue with this workflow.`,
-        // }),
-        // new WorkflowCard({
-        //   cardName: 'PREPAID_CARD_PURCHASE_INSTRUCTIONS',
-        //   componentName: 'card-pay/prepaid-card-purchase-instructions',
-        // }),
         new NetworkAwareWorkflowMessage({
           message: `To store data in the Cardstack Hub, you need to authenticate using your Card Wallet.
           You only need to do this once per browser/device.`,
@@ -104,14 +96,14 @@ class CreateSpaceWorkflow extends Workflow {
           },
         }),
         new WorkflowMessage({
-          message: `Please pick a username for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
+          message: `Please pick a display name for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
         }),
         new WorkflowCard({
-          cardName: 'CARD_SPACE_USERNAME',
-          componentName: 'card-space/create-space-workflow/username',
+          cardName: 'CARD_SPACE_DISPLAY_NAME',
+          componentName: 'card-space/create-space-workflow/display-name',
         }),
       ],
-      completedDetail: `Username picked`,
+      completedDetail: `Display name picked`,
     }),
     new Milestone({
       title: MILESTONE_TITLES[2],
@@ -154,14 +146,6 @@ class CreateSpaceWorkflow extends Workflow {
     }),
   ];
   epilogue = new PostableCollection([
-    new WorkflowMessage({
-      message: `This is the remaining balance on your prepaid card:`,
-    }),
-    // TODO
-    // new WorkflowCard({
-    //   cardName: 'EPILOGUE_PREPAID_CARD_BALANCE',
-    //   componentName: 'card-pay/prepaid-card-balance',
-    // }),
     new WorkflowMessage({
       message: `Congrats, you have created your Card Space!`,
     }),
@@ -248,6 +232,18 @@ export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComp
 
   get workflowClass() {
     return CreateSpaceWorkflow;
+  }
+
+  get currentCardSpaceDetails() {
+    return {
+      profilePhoto: this.workflow.session.getValue('profileImageUrl'),
+      coverPhoto: this.workflow.session.getValue('coverPhotoUrl'),
+      name: this.workflow.session.getValue('displayName'),
+      host: this.workflow.session.getValue('url'),
+      category: this.workflow.session.getValue('profileCategory'),
+      description: this.workflow.session.getValue('profileDescription'),
+      buttonText: this.workflow.session.getValue('buttonText'),
+    };
   }
 
   @action onDisconnect() {

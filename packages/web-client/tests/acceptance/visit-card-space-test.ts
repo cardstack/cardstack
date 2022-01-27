@@ -8,7 +8,7 @@ import Service from '@ember/service';
 import percySnapshot from '@percy/ember';
 
 class MockLocation extends Service implements LocationService {
-  hostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
+  hostname = `displayNametodo.${config.cardSpaceHostnameSuffix}`;
 }
 
 module('Acceptance | visit card space', function (hooks) {
@@ -22,7 +22,9 @@ module('Acceptance | visit card space', function (hooks) {
   test('renders a user’s card space', async function (assert) {
     await visit('/');
 
-    assert.dom('[data-test-card-space-username]').hasText('usernametodo');
+    assert
+      .dom('[data-test-card-space-display-name]')
+      .hasText('displayNametodo');
 
     await percySnapshot(assert);
   });

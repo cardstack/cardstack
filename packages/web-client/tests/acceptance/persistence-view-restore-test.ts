@@ -216,7 +216,7 @@ module('Acceptance | persistence view and restore', function () {
               version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
               completedCardNames: [
                 'LAYER2_CONNECT',
-                'CARD_SPACE_USERNAME',
+                'CARD_SPACE_DISPLAY_NAME',
                 'CARD_SPACE_DETAILS',
                 'CARD_SPACE_CONFIRM',
               ],

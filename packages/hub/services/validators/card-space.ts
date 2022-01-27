@@ -95,7 +95,7 @@ export default class CardSpaceValidator {
       }
 
       if (this.reservedWords.isProfane(cardSpace.profileName)) {
-        errors.profileName.push(`Username is not allowed`);
+        errors.profileName.push(`Display name is not allowed`);
       }
     }
 

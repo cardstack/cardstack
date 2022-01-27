@@ -10,7 +10,7 @@ if (process.env.COMPILER) {
 
     it(`gives a good error at load time when a card can't compile`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), { adoptsFrom: '../post' });
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
       try {
         await cards.load(`${realmURL}example`);
@@ -29,7 +29,7 @@ if (process.env.COMPILER) {
         adoptsFrom: '../post',
         data: { title: 'Hello World' },
       });
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
       // at this point we expect loading of `example` is broken because it's
@@ -63,7 +63,7 @@ if (process.env.COMPILER) {
         adoptsFrom: '../example',
         data: { title: 'Hello World' },
       });
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
       // at this point we expect loading of `grandchild` is broken
@@ -102,7 +102,7 @@ if (process.env.COMPILER) {
       );
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), { adoptsFrom: '../post' });
 
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
       await cards.update({
         realm: realmURL,
@@ -130,7 +130,7 @@ if (process.env.COMPILER) {
       outputJSONSync(join(getRealmDir(), 'person', 'card.json'), { schema: 'schema.js' });
       outputFileSync(join(getRealmDir(), 'person', 'schema.js'), PERSON_RAW_CARD.files['schema.js']);
 
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
       // add a "country" field to the address field card and observe that the person card includes the new address field
@@ -178,7 +178,7 @@ if (process.env.COMPILER) {
         adoptsFrom: '../example',
       });
 
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
       // add an "author" field to the parent card and observe that the grandchild card inherits this field
@@ -220,7 +220,7 @@ if (process.env.COMPILER) {
         }
       `
       );
-      let si = await getContainer().lookup('searchIndex');
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
       // add a "country" field to the address field card and observe that the post card includes the new address field via the author field

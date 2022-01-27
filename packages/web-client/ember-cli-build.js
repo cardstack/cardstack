@@ -4,6 +4,7 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const path = require('path');
 const concat = require('broccoli-concat');
 const webpack = require('webpack');
+const svgoUniqueId = require('svgo-unique-id');
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
@@ -11,10 +12,22 @@ module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
     svgJar: {
+      strategy: 'inline',
+      sourceDirs: ['public'],
       optimizer: {
+        svgoModule: require('svgo'),
         plugins: [
+          { removeTitle: false },
+          { removeDesc: { removeAny: false } },
+          { removeViewBox: false },
           {
-            cleanupIDs: false,
+            cleanupIDs: { minify: false },
+          },
+          {
+            prefixIds: false,
+          },
+          {
+            uniqueID: svgoUniqueId,
           },
         ],
       },
@@ -59,14 +72,39 @@ module.exports = function (defaults) {
             vm: false,
           },
         },
+        output: {
+          assetModuleFilename: '[path][name]-[contenthash].[ext]',
+        },
         module: {
           rules: [
             {
-              test: /\.(png|jpg|gif|svg|woff|woff2|eot|ttf|otf|flac)$/i,
-              loader: 'file-loader',
-              options: {
-                name: '[path][name]-[contenthash].[ext]',
-              },
+              test: /\.(png|jpg|gif|woff|woff2|eot|ttf|otf|flac)$/i,
+              type: 'asset/resource',
+            },
+            {
+              test: /\.svg$/i,
+              type: 'asset/resource',
+              use: [
+                {
+                  loader: '@hyperbola/svgo-loader',
+                  options: {
+                    plugins: [
+                      { removeTitle: false },
+                      { removeDesc: { removeAny: false } },
+                      { removeViewBox: false },
+                      {
+                        cleanupIDs: { minify: false },
+                      },
+                      {
+                        prefixIds: false,
+                      },
+                      {
+                        uniqueID: svgoUniqueId,
+                      },
+                    ],
+                  },
+                },
+              ],
             },
           ],
         },

@@ -19,6 +19,7 @@ import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/
 import { cardURL } from '@cardstack/core/src/utils';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
+import { service } from '@cardstack/hub/services';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -27,9 +28,9 @@ export const INSECURE_CONTEXT = {};
 const log = logger('hub/card-service');
 
 export default class CardServiceFactory {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
-  private searchIndex = inject('searchIndex');
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private builder = service('card-builder', { as: 'builder' });
+  private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
 
   as(requestContext: unknown): CardService {
@@ -211,8 +212,8 @@ function unimpl(which: string) {
   return new Error(`unimpl ${which}`);
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'card-service': CardServiceFactory;
   }
 }

@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/node';
 import { Memoize } from 'typescript-memoize';
 
 import logger from '@cardstack/logger';
-import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
+import { Registry, Container, inject, getOwner } from '@cardstack/di';
 
 import initSentry from './initializers/sentry';
 import initFirebase from './initializers/firebase';
@@ -29,7 +29,6 @@ import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
-import StatusRoute from './routes/status';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
@@ -39,7 +38,6 @@ import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations
 import OrdersRoute from './routes/orders';
 import ReservationsRoute from './routes/reservations';
 import InventoryRoute from './routes/inventory';
-import RelayService from './services/relay';
 import SubgraphService from './services/subgraph';
 import OrderService from './services/order';
 import InventoryService from './services/inventory';
@@ -70,20 +68,11 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
-import RealmManager from './services/realm-manager';
-
-import CardBuilder from './services/card-builder';
-import CardRoutes from './routes/card-routes';
-import { FileCacheConfig } from './services/file-cache-config';
-import FileCache from './services/file-cache';
 import ExchangeRatesService from './services/exchange-rates';
-import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
-import { SearchIndex } from './services/search-index';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
-import RealmsConfig from './services/realms-config';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
@@ -105,6 +94,8 @@ import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
+import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
+import { registerServices } from '@cardstack/hub/services';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -173,13 +164,11 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
-  registry.register('relay', RelayService);
   registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
-  registry.register('status-route', StatusRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
@@ -193,21 +182,17 @@ export function createRegistry(): Registry {
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
 
   if (process.env.COMPILER) {
-    registry.register('card-service', CardService);
-    registry.register('realmsConfig', RealmsConfig);
-    registry.register('realm-manager', RealmManager);
-    registry.register('file-cache-config', FileCacheConfig);
-    registry.register('file-cache', FileCache);
-    registry.register('card-routes', CardRoutes);
     registry.register(
       'card-routes-config',
       class {
         routeCard = config.has('compiler.routeCard') ? config.get('compiler.routeCard') : undefined;
-      }
+      },
+      { type: 'service' }
     );
-    registry.register('card-builder', CardBuilder);
-    registry.register('searchIndex', SearchIndex);
   }
+
+  registerServices(registry);
+  registerRoutes(registry);
 
   return registry;
 }
@@ -222,9 +207,9 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private cardRoutes: KnownServices['card-routes'] | undefined;
   private healthCheck = inject('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
+  private cardRoutes: KnownRoutes['card-routes'] | undefined;
 
   constructor() {
     runInitializers();
@@ -232,7 +217,7 @@ export class HubServer {
 
   async ready() {
     if (process.env.COMPILER) {
-      this.cardRoutes = await getOwner(this).lookup('card-routes');
+      this.cardRoutes = await getOwner(this).lookup('card-routes', { type: 'route' });
     }
   }
 
@@ -291,7 +276,7 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-    let searchIndex = await getOwner(this).lookup('searchIndex');
+    let searchIndex = await getOwner(this).lookup('searchIndex', { type: 'service' });
     await searchIndex.indexAllRealms();
   }
 }

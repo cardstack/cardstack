@@ -3,6 +3,7 @@ import { SKUInventory } from './subgraph';
 import * as JSONAPI from 'jsonapi-typescript';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import Logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 
 let log = Logger('routes/utils:inventory');
 
@@ -16,7 +17,7 @@ interface SKUReservations {
 export default class InventoryService {
   subgraph = inject('subgraph');
   web3 = inject('web3-http', { as: 'web3' });
-  relay = inject('relay');
+  relay = service('relay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   async getSKUSummaries(issuer?: string): Promise<JSONAPI.ResourceObject[]> {
