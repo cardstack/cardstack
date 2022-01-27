@@ -46,7 +46,7 @@ if (process.env.COMPILER) {
 
               @contains(string)
               async summary() {
-                  return (await this.fullName) + " is a person. Their story is: " + await this.bio.short;
+                  return (await this.fullName) + " is a person. Their story is: " + await this.aboutMe.short;
               }
             }
           `,
@@ -60,14 +60,14 @@ if (process.env.COMPILER) {
         data: {
           firstName: 'Arthur',
           lastName: 'Faulkner',
-          bio: {
+          aboutMe: {
             short: 'son of Ed',
           },
         },
       });
     });
 
-    it.only(`can access a one-level-deep computed field`, async function () {
+    it(`can access a one-level-deep computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Arthur Faulkner');
     });

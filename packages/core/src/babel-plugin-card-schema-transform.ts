@@ -27,7 +27,7 @@ export default function main(babel: typeof Babel) {
           let neededImports: ImportDetails = new Map();
           if (Object.keys(state.opts.fields).length > 0) {
             neededImports.set('FieldGetter', {
-              moduleSpecifier: '@cardstack/core/field-getter',
+              moduleSpecifier: '@cardstack/core/src/field-getter',
               exportedName: 'default',
             });
           }

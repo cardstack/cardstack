@@ -502,7 +502,7 @@ if (process.env.COMPILER) {
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
         expect(source).to.containsSource(`
-          import FieldGetter from "@cardstack/core/field-getter";
+          import FieldGetter from "@cardstack/core/src/field-getter";
         `);
         expect(source).to.containsSource(`
           async birthdate() {
