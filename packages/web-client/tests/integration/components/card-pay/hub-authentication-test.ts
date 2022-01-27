@@ -171,7 +171,7 @@ module(
           />
         `);
         assert
-          .dom('[data-test-memorialized]')
+          .dom('[data-test-authentication-memorialized]')
           .containsText('Authenticated with Hub');
       });
     });
