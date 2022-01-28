@@ -15,6 +15,7 @@ import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { Client } from 'pg';
+import vm from 'vm';
 
 declare global {
   const __non_webpack_require__: any;
@@ -148,8 +149,27 @@ export default class FileCache {
     return this.readFile(this.resolveModule(moduleURL, env));
   }
 
-  loadModule(moduleURL: string): any {
-    return __non_webpack_require__(this.resolveModule(moduleURL));
+  loadModule(moduleIdentifier: string): any {
+    console.log(`loadModule(${moduleIdentifier})`);
+
+    if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
+      let code = this.getModule(moduleIdentifier);
+      if (!code) {
+        throw new Error(`unable to find code for ${moduleIdentifier}`);
+      }
+      let context = {
+        exports: {},
+        require: (specifier: string) => this.loadModule(specifier),
+      };
+      vm.createContext(context);
+      vm.runInContext(code, context, { filename: this.resolveModule(moduleIdentifier) });
+      return context.exports;
+    }
+
+    if (moduleIdentifier.startsWith('@cardstack/core/')) {
+    }
+
+    throw new Error(`don't know how to loadModule ${moduleIdentifier}`);
   }
 
   deleteCardModules(cardURL: string): void {
