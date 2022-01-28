@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { transformFromAstSync, transformSync } from '@babel/core';
 import type { TransformOptions } from '@babel/core';
-import type { File } from '@babel/types';
 import { ColocatedBabelPlugin } from '@cardstack/core/src/utils/babel';
+import type { types as t } from '@babel/core';
 
 import { precompile } from '@glimmer/compiler';
 // import { precompile } from 'ember-source/dist/ember-template-compiler';
@@ -23,7 +23,7 @@ import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 export default function dynamicCardTransform(
   moduleURL: string,
   source: string,
-  ast?: File
+  ast?: t.File
 ): string {
   let code: string;
   if (ast) {

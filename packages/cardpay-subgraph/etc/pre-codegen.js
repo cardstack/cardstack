@@ -169,6 +169,9 @@ function getAbi(path) {
   }
   let file = readFileSync(path, { encoding: 'utf8' })
     .replace(/^export default /, '')
+    .replace('// mitigation for unexpected vs code debugger breakpoint', '')
+    .replace('function noop() {}', '')
+    .replace('noop();', '')
     .replace(/;$/, '');
   return eval(file);
 }

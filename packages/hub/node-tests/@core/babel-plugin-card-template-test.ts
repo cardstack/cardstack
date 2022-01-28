@@ -50,7 +50,6 @@ if (process.env.COMPILER) {
     });
 
     it('modifies the source', async function () {
-      expect(code).to.containsSource(`export { default as Model } from "@cardstack/core/src/card-model";`);
       expect(code).to.containsSource(
         `export const serializerMap = {
           date: ["birthdate", "address.settlementDate"]

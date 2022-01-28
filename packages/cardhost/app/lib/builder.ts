@@ -9,7 +9,7 @@ import {
   assertDocumentDataIsResource,
   CardModel,
 } from '@cardstack/core/src/interfaces';
-import type { File } from '@babel/types';
+import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -303,7 +303,7 @@ export default class LocalRealm implements Builder {
     localModule: string,
     type: string,
     source: string,
-    ast: File | undefined
+    ast: t.File | undefined
   ): string {
     let moduleIdentifier = `@cardstack/local-realm-compiled/${encodeCardURL(
       cardURL

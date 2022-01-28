@@ -3,9 +3,10 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
-import { NodePath, transformSync } from '@babel/core';
-import { File } from '@babel/types';
-import * as t from '@babel/types';
+import { transformSync } from '@babel/core';
+import { NodePath } from '@babel/traverse';
+import type * as Babel from '@babel/core';
+import type { types as t } from '@babel/core';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
@@ -13,6 +14,7 @@ import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
+import { CallExpression } from '@babel/types';
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
@@ -31,7 +33,7 @@ interface State {
   neededImports: ImportDetails;
 }
 
-export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: File } {
+export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
   try {
     let out = transformSync(templateSource, {
       ast: true,
@@ -46,7 +48,8 @@ export default function (templateSource: string, options: CardComponentPluginOpt
   }
 }
 
-export function babelPluginCardTemplate() {
+export function babelPluginCardTemplate(babel: typeof Babel) {
+  let t = babel.types;
   return {
     visitor: {
       Program: {
@@ -55,9 +58,8 @@ export function babelPluginCardTemplate() {
           state.neededImports = new Map();
         },
         exit(path: NodePath<t.Program>, state: State) {
-          addImports(state.neededImports, path);
-          addSerializerMap(path, state);
-          addBaseModelExport(path);
+          addImports(state.neededImports, path, t);
+          addSerializerMap(path, state, t);
         },
       },
 
@@ -70,26 +72,20 @@ export function babelPluginCardTemplate() {
         },
       },
 
-      CallExpression: callExpressionEnter,
+      CallExpression: {
+        enter(path: NodePath<CallExpression>, state: State) {
+          callExpressionEnter(path, state, t);
+        },
+      },
     },
   };
 }
 
-function addBaseModelExport(path: NodePath<t.Program>) {
-  path.node.body.push(
-    t.exportNamedDeclaration(
-      null,
-      [t.exportSpecifier(t.identifier('default'), t.identifier('Model'))],
-      t.stringLiteral('@cardstack/core/src/card-model')
-    )
-  );
-}
-
-function addSerializerMap(path: NodePath<t.Program>, state: State) {
+function addSerializerMap(path: NodePath<t.Program>, state: State, t: typeof Babel.types) {
   let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
   state.opts.serializerMap = serializerMap;
 
-  let serializerMapPropertyDefinition = buildSerializerMapProp(serializerMap);
+  let serializerMapPropertyDefinition = buildSerializerMapProp(serializerMap, t);
 
   path.node.body.push(
     t.exportNamedDeclaration(
@@ -100,7 +96,7 @@ function addSerializerMap(path: NodePath<t.Program>, state: State) {
   );
 }
 
-function buildSerializerMapProp(serializerMap: SerializerMap): t.ObjectExpression['properties'] {
+function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
 
   for (let serializer in serializerMap) {
@@ -119,21 +115,21 @@ function buildSerializerMapProp(serializerMap: SerializerMap): t.ObjectExpressio
   return props;
 }
 
-function callExpressionEnter(path: NodePath<t.CallExpression>, state: State) {
+function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {
   if (shouldSkipExpression(path, state)) {
     return;
   }
 
-  let { options, template: inputTemplate } = handleArguments(path);
+  let { options, template: inputTemplate } = handleArguments(path, t);
 
   let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.neededImports);
   path.node.arguments[0] = t.stringLiteral(template);
 
-  if (shouldInlineHBS(options, neededScope)) {
+  if (shouldInlineHBS(options, neededScope, t)) {
     state.opts.inlineHBS = template;
   }
 
-  updateScope(options, neededScope);
+  updateScope(options, neededScope, t);
 }
 
 function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): boolean {
@@ -143,12 +139,15 @@ function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): b
   );
 }
 
-function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>) {
+function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>, t: typeof Babel.types) {
   // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
-  return !getObjectKey(options, 'scope') && neededScope.size == 0;
+  return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
 }
 
-function handleArguments(path: NodePath<t.CallExpression>): {
+function handleArguments(
+  path: NodePath<t.CallExpression>,
+  t: typeof Babel.types
+): {
   options: NodePath<t.ObjectExpression>;
   template: string;
 } {
@@ -178,7 +177,7 @@ function handleArguments(path: NodePath<t.CallExpression>): {
     throw error(options, 'must be an object expression');
   }
 
-  let strictMode = getObjectKey(options, 'strictMode');
+  let strictMode = getObjectKey(options, 'strictMode', t);
 
   if (!strictMode?.isBooleanLiteral() || !strictMode.node.value) {
     throw error(options as NodePath<any>, 'Card Template precompileOptions requires strictMode to be true');
@@ -232,14 +231,14 @@ function findVariableName(
   return candidate;
 }
 
-function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>): void {
+function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {
   let scopeVars: t.ObjectExpression['properties'] = [];
 
   for (let name of names) {
     scopeVars.push(t.objectProperty(t.identifier(name), t.identifier(name), undefined, true));
   }
 
-  let scope = getObjectKey(options, 'scope');
+  let scope = getObjectKey(options, 'scope', t);
 
   if (!scope) {
     options.node.properties.push(
