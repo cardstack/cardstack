@@ -83,8 +83,8 @@ export default class CardSpacesRoute {
       if (!merchant || !merchant.length) {
         merchantInfoError = [
           {
-            relationship: 'merchant-info',
             detail: `Given merchant-id ${merchantId} was not found`,
+            relationship: 'merchant-info',
           },
         ];
       } else {
@@ -93,9 +93,9 @@ export default class CardSpacesRoute {
         if (merchantInfo.ownerAddress !== ctx.state.userAddress) {
           merchantInfoError = [
             {
+              detail: `Given merchant-id ${merchantId} is not owned by the user`,
               relationship: 'merchant-info',
               status: 403,
-              detail: `Given merchant-id ${merchantId} is not owned by the user`,
             },
           ];
         }
