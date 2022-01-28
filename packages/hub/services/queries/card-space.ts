@@ -33,22 +33,21 @@ export default class CardSpaceQueries {
 
     await db.query(
       `UPDATE card_spaces SET
-        profile_name = $3,
-        profile_image_url = $4,
-        profile_cover_image_url = $5,
-        profile_description = $6,
-        profile_button_text = $7,
-        profile_category = $8,
-        bio_title = $9,
-        bio_description = $10,
-        links = $11,
-        donation_title = $12,
-        donation_description = $13,
-        donation_suggestion_amount_1 = $14,
-        donation_suggestion_amount_2 = $15,
-        donation_suggestion_amount_3 = $16,
-        donation_suggestion_amount_4 = $17,
-        merchant_id = $18
+        profile_name = $2,
+        profile_image_url = $3,
+        profile_cover_image_url = $4,
+        profile_description = $5,
+        profile_button_text = $6,
+        profile_category = $7,
+        bio_title = $8,
+        bio_description = $9,
+        links = $10,
+        donation_title = $11,
+        donation_description = $12,
+        donation_suggestion_amount_1 = $13,
+        donation_suggestion_amount_2 = $14,
+        donation_suggestion_amount_3 = $15,
+        donation_suggestion_amount_4 = $16
       WHERE ID = $1`,
       [
         model.id,
@@ -67,7 +66,6 @@ export default class CardSpaceQueries {
         model.donationSuggestionAmount2,
         model.donationSuggestionAmount3,
         model.donationSuggestionAmount4,
-        model.merchantId,
       ]
     );
   }
@@ -75,9 +73,9 @@ export default class CardSpaceQueries {
   async query(filter: CardSpaceQueriesFilter): Promise<CardSpace[]> {
     let db = await this.databaseManager.getClient();
 
-    const conditions = buildConditions(filter);
+    const conditions = buildConditions(filter, 'card_spaces');
 
-    const query = `SELECT id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4 FROM card_spaces WHERE ${conditions.where}`;
+    const query = `SELECT card_spaces.id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, merchant_infos.id as merchant_id, name, owner_address FROM card_spaces JOIN merchant_infos ON card_spaces.merchant_id = merchant_infos.id WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
@@ -98,6 +96,9 @@ export default class CardSpaceQueries {
         donationSuggestionAmount2: row['donation_suggestion_amount_2'],
         donationSuggestionAmount3: row['donation_suggestion_amount_3'],
         donationSuggestionAmount4: row['donation_suggestion_amount_4'],
+        merchantId: row['merchant_id'],
+        merchantName: row['name'],
+        merchantOwnerAddress: row['owner_address'],
       };
     });
   }

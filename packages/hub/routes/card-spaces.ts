@@ -30,6 +30,9 @@ export interface CardSpace {
   donationSuggestionAmount2?: number;
   donationSuggestionAmount3?: number;
   donationSuggestionAmount4?: number;
+
+  merchantName?: string;
+  merchantOwnerAddress?: string;
 }
 
 export default class CardSpacesRoute {
@@ -137,12 +140,12 @@ export default class CardSpacesRoute {
     let cardSpaceId = ctx.params.id;
     let cardSpace = (await this.cardSpaceQueries.query({ id: cardSpaceId }))[0] as CardSpace;
 
-    // if (cardSpace) {
-    //   if (ctx.state.userAddress !== cardSpace.ownerAddress) {
-    //     ctx.status = 403;
-    //     return;
-    //   }
-    // }
+    if (cardSpace) {
+      if (ctx.state.userAddress !== cardSpace.merchantOwnerAddress) {
+        ctx.status = 403;
+        return;
+      }
+    }
 
     if (!cardSpace) {
       ctx.status = 404;

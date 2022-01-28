@@ -483,11 +483,13 @@ describe('PUT /api/card-spaces', function () {
       .expect(404);
   });
 
-  it.skip('returns 403 when resource does not belong to wallet', async function () {
+  it('returns 403 when resource does not belong to wallet', async function () {
+    let merchantId = uuidv4();
+
     await (
       await getContainer().lookup('merchant-info-queries')
     ).insert({
-      id: uuidv4(), // Can’t insert without an id?
+      id: merchantId,
       ownerAddress: '0x1234',
       name: 'Satoshi?',
       slug: 'satoshi',
@@ -498,8 +500,8 @@ describe('PUT /api/card-spaces', function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'Test', 'Test', 'Visit this Space', '0x00']
+      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, merchant_id) VALUES($1, $2, $3, $4, $5, $6)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'Test', 'Test', 'Visit this Space', merchantId]
     );
 
     await request()
@@ -529,11 +531,24 @@ describe('PUT /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it.skip('updates the resource', async function () {
+  it('updates the resource', async function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
+    let merchantId = uuidv4();
+
+    await (
+      await getContainer().lookup('merchant-info-queries')
+    ).insert({
+      id: merchantId,
+      ownerAddress: stubUserAddress,
+      name: 'Satoshi?',
+      slug: 'satoshi',
+      color: 'black',
+      textColor: 'red',
+    });
+
     await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, profile_image_url, profile_cover_image_url, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, profile_image_url, profile_cover_image_url, merchant_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
       [
         'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
         'Satoshi Nakamoto',
@@ -542,7 +557,7 @@ describe('PUT /api/card-spaces', function () {
         'Visit this Space',
         'https://test.com/profile.jpg',
         'https://test.com/cover.jpg',
-        '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+        merchantId,
       ]
     );
 
@@ -587,31 +602,45 @@ describe('PUT /api/card-spaces', function () {
             'profile-image-url': 'https://test.com/profile.jpg',
             'profile-cover-image-url': 'https://test.com/cover.jpg',
             'profile-button-text': 'Visit this Space',
-            'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
             'bio-title': 'Innovator',
             'bio-description': "I'm a wealthy industrialist and philanthropist, and a bicyclist.",
             links: [{ title: 'Link1', url: 'https://test.com' }],
             'donation-title': 'The Human Fund',
             'donation-description': 'A donation will be made in your name to the Human Fund',
           },
+          relationships: {
+            'merchant-info': {
+              data: {
+                id: merchantId,
+                type: 'merchant-infos',
+              },
+            },
+          },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it.skip('returns errors when updating a resource with invalid attributes', async function () {
+  it('returns errors when updating a resource with invalid attributes', async function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
+
+    let merchantId = uuidv4();
+
+    await (
+      await getContainer().lookup('merchant-info-queries')
+    ).insert({
+      id: merchantId,
+      ownerAddress: stubUserAddress,
+      name: 'Satoshi?',
+      slug: 'satoshi',
+      color: 'black',
+      textColor: 'red',
+    });
+
     await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
-      [
-        'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
-        'Test',
-        'Test',
-        'Test',
-        'Visit this Space',
-        '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
-      ]
+      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, merchant_id) VALUES($1, $2, $3, $4, $5, $6)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'Test', 'Test', 'Visit this Space', merchantId]
     );
 
     let payload = {
