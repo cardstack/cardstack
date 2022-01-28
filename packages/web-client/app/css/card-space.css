@@ -33,4 +33,6 @@
 
 .card-space-main-content {
   grid-column: 2/-1;
+  max-height: 100vh;
+  overflow-y: auto;
 }
