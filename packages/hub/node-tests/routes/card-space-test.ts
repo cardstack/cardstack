@@ -56,7 +56,7 @@ describe('POST /api/card-spaces', function () {
     await (
       await getContainer().lookup('merchant-info-queries')
     ).insert({
-      id: merchantId, // Can’t insert without an id?
+      id: merchantId,
       ownerAddress: stubUserAddress,
       name: 'Satoshi?',
       slug: 'satoshi',
@@ -243,7 +243,7 @@ describe('POST /api/card-spaces', function () {
     await (
       await getContainer().lookup('merchant-info-queries')
     ).insert({
-      id: merchantId, // Can’t insert without an id?
+      id: merchantId,
       ownerAddress: stubUserAddress,
       name: 'Satoshi?',
       slug: 'satoshi',
