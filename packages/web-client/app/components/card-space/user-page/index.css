@@ -1,7 +1,3 @@
-.card-space-user-page {
-  --annoying-neighbour-space: clamp(120px, 30%, 350px);
-}
-
 .card-space-user-page__toggle-view-button {
   appearance: none;
   border: none;

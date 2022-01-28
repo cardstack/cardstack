@@ -1,4 +1,6 @@
 .card-space-user-page__background-card {
+  --annoying-neighbour-space: clamp(120px, 30%, 350px);
+
   aspect-ratio: 13/5;
   background: var(--background-image-url, transparent);
   min-width: 100%;
