@@ -1,3 +1,4 @@
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
 import { configureHubWithCompiler } from '../helpers/cards';
 
@@ -25,6 +26,7 @@ if (process.env.COMPILER) {
         realm,
         id: 'person',
         schema: 'schema.js',
+        isolated: 'isolated.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
@@ -50,6 +52,9 @@ if (process.env.COMPILER) {
               }
             }
           `,
+          // firstName, lastName, summary, and bio.short should be considered as used
+          // fields since summary depends on all of them, right?
+          'isolated.js': templateOnlyComponentTemplate(`<div><@fields.summary/></div>`),
         },
       });
 
@@ -77,8 +82,16 @@ if (process.env.COMPILER) {
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
-    // TODO this works a little differently, because it means that the Schema
-    // class itself has promise like functions
-    it('can access a composite field');
+    it.skip('can access a composite field', async function () {
+      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+
+      // what actually is returned here? since it's a contained card it probably
+      // is not a CardModel--maybe it's a POJO of all the usedFields that are in
+      // the contained card? since aboutMe.short is a used field does that imply
+      // that aboutMe is a used field?
+      expect(await card.getField('aboutMe')).to.deep.equal({ short: 'son of Ed' });
+    });
+
+    it('can have a field that is the same card as itself');
   });
 }
