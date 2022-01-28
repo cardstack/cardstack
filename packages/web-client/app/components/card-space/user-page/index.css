@@ -1,4 +1,5 @@
 /* this needs adjusting to center it properly */
+/* it also needs box shadow */
 .card-space-user-page__toggle-view-button {
   appearance: none;
   border: none;
@@ -7,24 +8,19 @@
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
   top: 0;
   z-index: 1;
-  margin: auto;
   background: var(--boxel-green);
-  font-family: OpenSans;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: normal;
   text-align: center;
   left: 50%;
 }
 
 .card-space-user-page__compact-content-column {
-  max-width: 300px;
+  max-width: 18.75rem;
 }
 
 .card-space-user-page__prose-content-column {
-  max-width: 500px;
+  max-width: 31.25rem;
   display: flex;
   flex-direction: column;
   gap: var(--boxel-sp-sm);
