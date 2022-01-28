@@ -6,6 +6,7 @@
     <button
       class="card-space-user-page__toggle-view-button"
       type="button"
+      data-test-card-space-toggle-view-button
       {{on "click" this.switchMode}}
     >
       {{#if (eq this.mode "view")}}

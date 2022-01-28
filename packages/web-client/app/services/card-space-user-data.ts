@@ -1,6 +1,29 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
+export interface ICardSpaceUserData {
+  currentUserData: {
+    id: string;
+    url?: string;
+    profileName?: string;
+    profileDescription?: string;
+    profileCategory?: string;
+    profileButtonText?: string;
+    profileImageUrl?: string;
+    profileCoverImageUrl?: string;
+    bioTitle?: string;
+    bioDescription?: string;
+    links?: any[];
+    donationTitle?: string;
+    donationDescription?: string;
+    donationSuggestionAmount1?: number;
+    donationSuggestionAmount2?: number;
+    donationSuggestionAmount3?: number;
+    donationSuggestionAmount4?: number;
+    ownerAddress?: string;
+    merchantId?: string;
+  };
+}
 export default class CardSpaceUserData extends Service {
   @tracked currentUserData = {
     id: 'id',
