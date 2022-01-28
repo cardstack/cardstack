@@ -1,4 +1,5 @@
 <CardSpace::UserPage::LayoutCardContainer
+  @header="Layout"
   @editable={{@editable}}
   @isEditing={{this.isEditing}}
   @isSubmitting={{this.isSubmitting}}
@@ -8,9 +9,6 @@
   @save={{this.save}}
   @errorMessage={{this.submissionErrorMessage}}
 >
-  <:header>
-    Layout
-  </:header>
   <:default as |BackgroundEditButton|>
     <div>
       <div class="card-space-user-page__background-card" style={{css-var background-image-url=(concat "url(" this.background ")")}}>

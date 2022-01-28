@@ -8,7 +8,7 @@
   {{#if @editable}}
     <Boxel::Header>
       <:default>
-        {{yield to="header"}}
+        {{@header}}
       </:default>
       <:actions>
           <button
@@ -35,7 +35,7 @@
   @errorMessage={{@errorMessage}}
 >
   <:header>
-    {{yield to="header"}}
+    {{@header}}
   </:header>
   <:default>
     {{yield to="edit"}}
