@@ -50,13 +50,7 @@ if (process.env.COMPILER) {
       await cards.create({
         realm,
         id: 'fancy-date',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-          import { adopts } from "@cardstack/types";
-          import date from "https://cardstack.com/base/date";
-          export default @adopts(date) class FancyDate { }`,
-        },
+        adoptsFrom: 'https://cardstack.com/base/date',
       });
       let { compiled } = await cards.load(`${realm}fancy-date`);
       expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
@@ -401,13 +395,7 @@ if (process.env.COMPILER) {
       let fancyDateCard: RawCard = {
         realm,
         id: 'fancy-date',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { adopts } from "@cardstack/types";
-            import date from "https://cardstack.com/base/date";
-            export default @adopts(date) class FancyDate { }`,
-        },
+        adoptsFrom: 'https://cardstack.com/base/date',
       };
       let bioCard: RawCard = {
         realm,
@@ -537,14 +525,6 @@ if (process.env.COMPILER) {
         `);
       });
 
-      it('can compile a schema.js that adopts from a primitive card that is itself primitive', async function () {
-        let { compiled } = await cards.load(`${realm}fancy-date`);
-        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        expect(source).to.containsSource(`
-          export default class FancyDate {}
-        `);
-      });
-
       it('can compile a schema.js that adopts from a composite card has no additional fields', async function () {
         let { compiled } = await cards.load(`${realm}fancy-person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
@@ -591,7 +571,7 @@ if (process.env.COMPILER) {
           expect(err.message).to.equal(
             `Card ${cardURL(
               badCard
-            )} adopting from primitive parent ${parentURL} must be of primitive type itself. It cannot become a composite card by containing fields.`
+            )} adopting from primitive parent ${parentURL} must be of primitive type itself and should not have a schema.js file.`
           );
         }
       });
