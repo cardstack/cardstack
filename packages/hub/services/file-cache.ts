@@ -167,6 +167,8 @@ export default class FileCache {
     }
 
     if (moduleIdentifier.startsWith('@cardstack/core/')) {
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
+      return require(`@cardstack/core/src/${moduleIdentifier}`);
     }
 
     throw new Error(`don't know how to loadModule ${moduleIdentifier}`);

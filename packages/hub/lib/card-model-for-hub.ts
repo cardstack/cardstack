@@ -83,8 +83,7 @@ export default class CardModelForHub implements CardModel {
     // created the first time it's needed
     let SchemaClass = this.fileCache.loadModule(this.state.schemaModule).default;
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
-    let value = await schemaInstance[name]();
-    return value;
+    return await schemaInstance[name]();
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {

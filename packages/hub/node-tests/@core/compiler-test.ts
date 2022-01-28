@@ -493,7 +493,7 @@ if (process.env.COMPILER) {
           import FieldGetter from "@cardstack/core/src/field-getter";
         `);
         expect(source).to.containsSource(`
-          async birthdate() {
+          get birthdate() {
             return new FieldGetter(this.#getRawField, "birthdate");
           }
         `);
@@ -508,7 +508,7 @@ if (process.env.COMPILER) {
           import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
         `);
         expect(source).to.containsSource(`
-          async aboutMe() {
+          get aboutMe() {
             return new BioClass(innerField => this.#getRawField("aboutMe." + innerField));
           }
         `);

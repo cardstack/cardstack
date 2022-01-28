@@ -46,7 +46,7 @@ if (process.env.COMPILER) {
 
               @contains(string)
               async summary() {
-                  return (await this.fullName) + " is a person. Their story is: " + await this.aboutMe.short;
+                return (await this.fullName()) + " is a person. Their story is: " + await this.aboutMe.short;
               }
             }
           `,
@@ -67,14 +67,18 @@ if (process.env.COMPILER) {
       });
     });
 
-    it.skip(`can access a one-level-deep computed field`, async function () {
+    it(`can access a one-level-deep computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Arthur Faulkner');
     });
 
-    it.skip(`can access a two-level-deep computed field`, async function () {
+    it(`can access a two-level-deep computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
+
+    // TODO this works a little differently, because it means that the Schema
+    // class itself has promise like functions
+    it('can access a composite field');
   });
 }

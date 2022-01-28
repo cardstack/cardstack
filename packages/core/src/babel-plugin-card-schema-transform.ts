@@ -214,7 +214,7 @@ function fieldMetasForCardURL(url: string, state: State): [string, FieldMeta][] 
 }
 
 // creates a class method that looks like:
-//   async aboutMe() {
+//   get aboutMe() {
 //     return new BioClass((innerField) => this.#getRawField("aboutMe." + innerField) )
 //   }
 function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
@@ -225,7 +225,7 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
   let fieldMeta = state.opts.meta.fields[fieldName];
   path.replaceWith(
     t.classMethod(
-      'method',
+      'get',
       t.identifier(fieldName),
       [],
       t.blockStatement([
@@ -251,13 +251,13 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
       false,
       false,
       false,
-      true // async = true
+      false
     )
   );
 }
 
 // creates a class method that looks like:
-//   async birthdate() {
+//   get birthdate() {
 //     return new FieldGetter(this.#getRawField, "birthdate");
 //   }
 function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babel.types) {
@@ -268,7 +268,7 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babe
   let fieldName = path.node.key.name;
   path.replaceWith(
     t.classMethod(
-      'method',
+      'get',
       t.identifier(fieldName),
       [],
       t.blockStatement([
@@ -282,7 +282,7 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babe
       false,
       false,
       false,
-      true // async = true
+      false
     )
   );
 }
