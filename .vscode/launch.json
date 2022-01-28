@@ -91,7 +91,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "bridge-to-l1",
+        "bridge",
+        "to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
         "10",
         "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
@@ -121,7 +122,8 @@
 
         // Kovan DAI Bridge args
         "index.ts",
-        "bridge-to-l2",
+        "bridge",
+        "to-l2",
         "200",
         "${config:cardCli.network.l1.daiToken}", // Kovan DAI 
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
@@ -141,7 +143,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "await-bridged-to-l2",
+        "bridge",
+        "await-to-l2",
         "21746764", // from block
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
         "--network",
@@ -160,7 +163,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "await-bridged-to-l1",
+        "bridge",
+        "await-to-l1",
         "22144982", // from block
         "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
         "--network",
@@ -179,6 +183,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "bridge",
         "withdrawal-limits",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "--network",
@@ -197,7 +202,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "claim-tokens-bridged-to-l1",
+        "bridge",
+        "claim-on-l1",
         "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
         // encodedData
         "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb16a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c130000000000000000000000000000000000000000000000008ac7230489e80000",
@@ -219,7 +225,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "safes-view",
+        "safe",
+        "list",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -236,7 +243,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "safe-view",
+        "safe",
+        "view",
         "--network",
         "${config:cardCli.network.l2.name}",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
@@ -254,7 +262,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "safe-transfer-tokens",
+        "safe",
+        "transfer-tokens",
         "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
@@ -275,7 +284,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "safe-transfer-tokens-gas-estimate",
+        "safe",
+        "transfer-tokens-gas-estimate",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
@@ -296,11 +306,11 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaidcard-create",
+        "prepaid-card",
+        "create",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "false",
         "100",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -311,14 +321,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay testnet: Bulk Split Prepaid Card",
+      "name": "Cardpay testnet: Split Prepaid Card Equally",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
         "index.ts",
-        "split",
+        "prepaid-card",
+        "split-equally",
         "0xE1C3D39e2377F20325f0Fdf40b835c768E257C66", // prepaid card address
         "2000", // face value
         "21", // quantity
@@ -338,7 +349,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaidcard-split",
+        "prepaidcard",
+        "split",
         "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5", // prepaid card address
         "", // customization DID
         "100", // face values
@@ -359,7 +371,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaidcard-transfer",
+        "prepaid-card",
+        "transfer",
         "0xEB10912969E24EB119d4463dA12ae7967dd1FcC7", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network",
@@ -378,7 +391,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaidcard-provision",
+        "prepaid-card-market",
+        "provision",
         "0xc8b04fee58da85eab44879150cd06aafedbfa70705c9f7c1eb517aaad8f786ae", // sku
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient
         "staging", // environment
@@ -399,7 +413,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "register-merchant",
+        "merchant",
+        "register",
         "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
         "",
         "--network",
@@ -418,6 +433,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "prepaid-card",
         "payment-limits",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -435,6 +451,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "prepaid-card",
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0x70fdd952d8b4DC0E3E91d2e7392bdb600d637b40", // Hassan's prepaid card --feel free to use your own
@@ -455,6 +472,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "prepaid-card-market",
         "sku-info",
         "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
         "--network",
@@ -473,7 +491,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaid-card-inventory",
+        "prepaid-card-market",
+        "inventory",
         "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -491,7 +510,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "prepaid-card-inventories",
+        "prepaid-card-market",
+        "inventories",
         "staging", // environment
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -509,9 +529,10 @@
       "env": {},
       "args": [
         "index.ts",
-        "add-prepaid-card-inventory",
+        "prepaid-card-market",
+        "add",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
-        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid cards to remove
+        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid card to add
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -528,7 +549,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "remove-prepaid-card-inventory",
+        "prepaid-card-market",
+        "remove",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
         "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid cards to remove
         "--network",
@@ -547,7 +569,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "set-prepaid-card-ask",
+        "prepaid-card-market",
+        "set-ask",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
         "0x9df6e66eaa9809a86c87711637f857050ed2fbb7b79bb1a38560f383c3df4358", // sku
         "20",
@@ -567,6 +590,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "merchant",
         "revenue-balances",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "--network",
@@ -585,6 +609,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "merchant",
         "claim-revenue",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
@@ -605,6 +630,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "merchant",
         "claim-revenue-gas-estimate",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
@@ -625,6 +651,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "prepaid-card",
         "price-for-face-value",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "10000",
@@ -644,7 +671,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "new-prepaidcard-gas-fee",
+        "prepaid-card",
+        "creation-gas-fee",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -662,7 +690,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "usd-price",
+        "price",
+        "usd",
         "DAI",
         "5",
         "--network",
@@ -681,7 +710,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "eth-price",
+        "price",
+        "eth",
         "DAI",
         "100",
         "--network",
@@ -700,7 +730,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "price-oracle-updated-at",
+        "price",
+        "updated-at",
         "DAI",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -718,6 +749,7 @@
       "env": {},
       "args": [
         "index.ts",
+        "rewards",
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         // "--rewardProgramId",
@@ -738,7 +770,9 @@
       "env": {},
       "args": [
         "index.ts",
-        "register-reward-program",
+        "rewards",
+        "admin",
+        "create-program",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
         "0x159ADe032073d930E85f95AbBAB9995110c43C71",  //reward program
         "--network",
@@ -757,7 +791,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "register-rewardee",
+        "rewards",
+        "register",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "--network",
@@ -776,7 +811,9 @@
       "env": {},
       "args": [
         "index.ts",
-        "add-reward-tokens",
+        "rewards",
+        "admin",
+        "add-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", //single owner safe
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //address
@@ -797,7 +834,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "reward-pool-balance",
+        "rewards",
+        "pool-balances",
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program id
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -815,7 +853,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "claim-rewards",
+        "rewards",
+        "claim",
         "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
         "0x0000000000000000000000005e4e148baae93424b969a0ea67ff54c315248bba00000000000000000000000000000000000000000000000000000000000000d00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000000de0b6b3a7640000",
         "0x554badb5d8f79c28610854156701ee15e624c2fec46aeca5adf4c07c54eeee27",
@@ -835,7 +874,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "claimable-reward-proofs",
+        "rewards",
+        "claimable-proofs",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         // "--rewardProgramId",
         // "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
@@ -857,7 +897,9 @@
       "env": {},
       "args": [
         "index.ts",
-        "lock-reward-program",
+        "rewards",
+        "admin",
+        "lock",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "--network",
@@ -869,14 +911,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay testnet: Update Reward Program Admin",
+      "name": "Cardpay testnet: Set Reward Program Admin",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {},
       "args": [
         "index.ts",
-        "update-reward-program-admin",
+        "rewards",
+        "admin",
+        "set-admin",
         "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
         "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
@@ -896,7 +940,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "withdraw-reward-safe",
+        "rewards",
+        "withdraw-from-safe",
         "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
@@ -917,7 +962,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "transfer-reward-safe",
+        "rewards",
+        "transfer-safe",
         "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0",
         "0x853fD3376b6f0b2b839Bd841FbdC6C1f93B3BFBD",
         "--network",
@@ -936,6 +982,8 @@
       "env": {},
       "args": [
         "index.ts",
+        "rewards",
+        "admin",
         "recover-reward-tokens",
         "0x906B5c2877dEad3c5565b042094d182b7575ADdE", // safe address (justin's depot)
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", // reward program id
@@ -958,7 +1006,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "view-reward-program",
+        "rewards",
+        "view",
         "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", // reward program id
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -976,7 +1025,8 @@
       "env": {},
       "args": [
         "index.ts",
-        "view-reward-programs",
+        "rewards",
+        "list",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",

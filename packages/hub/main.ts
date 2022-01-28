@@ -15,6 +15,7 @@ import { Memoize } from 'typescript-memoize';
 
 import logger from '@cardstack/logger';
 import { Registry, Container, inject, getOwner } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 
 import initSentry from './initializers/sentry';
 import initFirebase from './initializers/firebase';
@@ -58,7 +59,6 @@ import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
-import HealthCheck from './services/health-check';
 import Upload from './routes/upload';
 import UploadQueries from './services/queries/upload';
 import NonceTracker from './services/nonce-tracker';
@@ -122,7 +122,6 @@ export function createRegistry(): Registry {
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('exchange-rates', ExchangeRatesService);
   registry.register('exchange-rates-route', ExchangeRatesRoute);
-  registry.register('health-check', HealthCheck);
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
   registry.register('upload-queries', UploadQueries);
@@ -207,7 +206,7 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private healthCheck = inject('health-check', { as: 'healthCheck' });
+  private healthCheck = service('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
   private cardRoutes: KnownRoutes['card-routes'] | undefined;
 

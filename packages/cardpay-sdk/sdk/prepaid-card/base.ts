@@ -416,6 +416,11 @@ export default class PrepaidCard {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let minimumFaceValue = parseInt(await prepaidCardMgr.methods.minimumFaceValue().call());
+    if (!faceValues.every((faceValue) => faceValue >= minimumFaceValue)) {
+      throw new Error(`faceValue must be greater than or equal to ${minimumFaceValue}`);
+    }
     let daiOracleAddress = await getOracle('DAI.CPXD', this.layer2Web3);
     let daiOracle = new this.layer2Web3.eth.Contract(DAIOracleABI as AbiItem[], daiOracleAddress);
     if (!(await daiOracle.methods.isSnappedToUSD().call()) && !force) {

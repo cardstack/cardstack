@@ -6,6 +6,7 @@ import { buildConditions } from '../../utils/queries';
 interface CardSpaceQueriesFilter {
   id?: string;
   url?: string;
+  ownerAddress?: string;
 }
 
 export default class CardSpaceQueries {
@@ -15,7 +16,7 @@ export default class CardSpaceQueries {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO card_spaces (id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      'INSERT INTO card_spaces (id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address, merchant_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
       [
         model.id,
         model.url,
@@ -26,6 +27,7 @@ export default class CardSpaceQueries {
         model.profileButtonText,
         model.profileCategory,
         model.ownerAddress,
+        model.merchantId,
       ]
     );
   }

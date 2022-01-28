@@ -33,6 +33,7 @@
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
     "postinstall": "cd ./packages/cardpay-sdk && yarn codegen; cd -",
+    "cardpay": "cd ./packages/cardpay-cli && yarn cardpay",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:hub": "cd ./packages/hub && yarn build",
@@ -87,7 +88,7 @@
   },
   "private": true,
   "volta": {
-    "node": "14.17.1",
-    "yarn": "1.22.10"
+    "node": "14.18.3",
+    "yarn": "1.22.17"
   }
 }

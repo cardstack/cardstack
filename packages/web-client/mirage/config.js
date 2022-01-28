@@ -23,6 +23,9 @@ export default function () {
   });
 
   this.post('/merchant-infos');
+  this.get('/merchant-infos', function (schema) {
+    return schema.merchantInfos.all();
+  });
 
   this.get(
     '/merchant-infos/validate-slug/:slug',
