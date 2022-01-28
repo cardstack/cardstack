@@ -81,6 +81,8 @@ export default class CardModelForHub implements CardModel {
     // created the first time it's needed
     let SchemaClass = this.fileCache.loadModule(this.state.schemaModule).default;
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
+
+    // TODO need to deserialize value
     return await schemaInstance[name];
   }
 
