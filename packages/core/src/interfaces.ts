@@ -200,6 +200,7 @@ export interface CardModel {
   innerComponent: unknown;
   serializerMap: SerializerMap;
   url: string;
+  id: string | undefined;
   data: Record<string, any>;
   getField(name: string): Promise<any>;
   format: Format;

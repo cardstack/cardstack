@@ -113,6 +113,10 @@ export default class CardModelForBrowser implements CardModel {
     return this.state.serializerMap;
   }
 
+  get id(): string {
+    return this.url;
+  }
+
   get url(): string {
     if (this.state.type === 'created') {
       throw new Error(
