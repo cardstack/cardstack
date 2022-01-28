@@ -5,7 +5,7 @@ import { reads } from 'macro-decorators';
 import Component from '@glimmer/component';
 
 export default class DegradedServiceBannerComponent extends Component {
-  statusPageUrl = config.urls.statusPageUrl;
+  statusPageBase = config.urls.statusPageBase;
   @service declare degradedServiceDetector: DegradedServiceDetector;
 
   @reads('degradedServiceDetector.notificationShown')
