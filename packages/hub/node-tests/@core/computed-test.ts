@@ -92,6 +92,10 @@ if (process.env.COMPILER) {
       expect(await card.getField('aboutMe')).to.deep.equal({ short: 'son of Ed' });
     });
 
+    // we can use the field meta short cut here to just return raw data without
+    // having to load the schema module
+    it('can access a primitive field');
+    it('can access a field that requires deserialization');
     it('can have a field that is the same card as itself');
   });
 }
