@@ -102,6 +102,14 @@ export default class NotifyMerchantClaim {
     let notificationBody = `You just claimed ${Web3.utils.fromWei(
       amountInWei
     )} ${token} from your${merchantName} business account`;
+    let notificationData = {
+      notificationType: 'merchant_claim',
+      transactionInformation: JSON.stringify({
+        merchantId: result.merchantSafe.id,
+      }),
+      ownerAddress,
+      network,
+    };
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
@@ -114,9 +122,7 @@ export default class NotifyMerchantClaim {
         }),
         pushClientId,
         notificationBody,
-        notificationData: {
-          notificationType: 'merchant_claim',
-        },
+        notificationData,
         notificationType: 'merchant_claim',
       };
 

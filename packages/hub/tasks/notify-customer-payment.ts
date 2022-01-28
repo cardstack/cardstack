@@ -139,6 +139,8 @@ export default class NotifyCustomerPayment {
     let notificationData = {
       notificationType: 'customer_payment',
       transactionInformation: JSON.stringify(omit(result, 'merchant')),
+      ownerAddress,
+      network,
     };
 
     for (const pushClientId of pushClientIdsForNotification) {

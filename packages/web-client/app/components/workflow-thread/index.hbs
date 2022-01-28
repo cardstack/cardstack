@@ -9,6 +9,7 @@
   ...attributes
 >
   <:header>
+    <Common::DegradedServiceBanner class="workflow-thread__degraded-service-banner" />
     <Boxel::ThreadHeader @title={{this.workflow.displayName}}>
       {{#if @onClose}}
         <Boxel::Button
@@ -74,6 +75,26 @@
   </:content>
 
   <:sidebar as |SidebarSection|>
+    <FromElsewhere @name="sidebar-preview-content" as |preview outsideParams|>
+      {{#if preview}}
+      <SidebarSection>
+        {{#if outsideParams.title}}
+          <div class="workflow-thread__sidebar-preview-title" data-test-sidebar-preview-title>
+            {{outsideParams.title}}
+          </div>
+        {{/if}}
+        <div {{scale-down-to-width "var(--boxel-sidebar-max-width)"}} data-test-sidebar-preview-body>
+          {{component preview}}
+        </div>
+        {{#if outsideParams.description}}
+          <div class="workflow-thread__sidebar-preview-description" data-test-sidebar-preview-description>
+            {{outsideParams.description}}
+          </div>
+        {{/if}}
+      </SidebarSection>
+      <hr class="workflow-thread__sidebar-preview-separator" data-test-sidebar-preview-separator/>
+      {{/if}}
+    </FromElsewhere>
     <SidebarSection>
       <Boxel::Sidebar::CardContainer
         @header={{html-safe (concat "Workflow:<br>" this.workflow.displayName)}}

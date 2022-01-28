@@ -54,7 +54,7 @@ describe('CardSpaceValidator', function () {
     } as CardSpace;
 
     let errors = await subject.validate(cardSpace);
-    expect(errors.profileName).deep.equal(['Username is not allowed']);
+    expect(errors.profileName).deep.equal(['Display name is not allowed']);
   });
 
   it('validates links', async function () {

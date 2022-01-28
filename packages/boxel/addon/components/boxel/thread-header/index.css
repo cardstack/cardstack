@@ -5,9 +5,12 @@
   align-items: center;
   padding: var(--boxel-sp);
   background-color: var(--boxel-light);
-  border-radius: inherit;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+}
+
+.boxel-thread-header:first-child {
+  border-radius: inherit;
 }
 
 .boxel-thread-header__label {

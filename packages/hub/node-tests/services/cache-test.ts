@@ -13,7 +13,7 @@ if (process.env.COMPILER) {
     let { getContainer } = setupHub(this);
 
     this.beforeEach(async function () {
-      cache = await getContainer().lookup('file-cache');
+      cache = await getContainer().lookup('file-cache', { type: 'service' });
     });
 
     it('.setModule', function () {

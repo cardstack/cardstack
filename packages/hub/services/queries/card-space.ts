@@ -5,6 +5,7 @@ import { buildConditions } from '../../utils/queries';
 
 interface CardSpaceQueriesFilter {
   id?: string;
+  ownerAddress?: string;
 }
 
 export default class CardSpaceQueries {

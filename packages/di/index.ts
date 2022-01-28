@@ -1,4 +1,13 @@
-export { Container, Registry, KnownServices, inject, getOwner, injectionReady } from './dependency-injection';
+export {
+  Container,
+  Registry,
+  KnownServices as TypedKnownServices,
+  DefaultKnownServices as KnownServices,
+  inject,
+  getOwner,
+  injectionReady,
+  InjectOptions,
+} from './dependency-injection';
 export {
   Container as ContainerInterface,
   Factory,

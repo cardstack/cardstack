@@ -16,6 +16,26 @@ module.exports = {
     return true;
   },
 
+  options: {
+    svgJar: {
+      strategy: 'inline',
+      optimizer: {
+        svgoModule: require('svgo'),
+        plugins: [
+          {
+            cleanupIDs: { minify: false },
+          },
+          {
+            prefixIds: false,
+          },
+          {
+            uniqueID: require('svgo-unique-id'),
+          },
+        ],
+      },
+    },
+  },
+
   getBoxelOptions() {
     let parent = this.app || this.parent;
     let boxelOptions = parent && parent.options && parent.options.boxel;

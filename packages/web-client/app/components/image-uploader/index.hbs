@@ -1,4 +1,4 @@
-<div class="image-uploader__container">
+<div class="image-uploader__container" ...attributes>
     <div class="image-uploader__preview">
       {{#if (has-block)}}
         {{yield (component "avatar" src=@image loading=(eq @state "loading"))}}

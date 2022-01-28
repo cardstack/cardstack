@@ -6,12 +6,13 @@ import mimeMatch from 'mime-match';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { parseBody } from '../middleware';
+import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
-  statusRoute = inject('status-route', { as: 'statusRoute' });
+  status = route('status');
   prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
   });
@@ -49,7 +50,7 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
-      statusRoute,
+      status: statusRoute,
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
@@ -69,6 +70,7 @@ export default class APIRouter {
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
+    apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);
     apiSubrouter.post('/orders', parseBody, ordersRoute.post);

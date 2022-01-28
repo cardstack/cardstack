@@ -3,9 +3,13 @@ import { inject } from '@cardstack/di';
 import { MerchantInfo } from '../../routes/merchant-infos';
 import { buildConditions } from '../../utils/queries';
 
-interface MerchantInfoQueriesFilter {
+export interface MerchantInfoQueriesFilter {
   id?: string;
   slug?: string;
+  ownerAddress?: string;
+  customFilter?: {
+    availableForCardSpace?: boolean;
+  };
 }
 
 export default class MerchantInfoQueries {
@@ -14,10 +18,15 @@ export default class MerchantInfoQueries {
   async fetch(filter: MerchantInfoQueriesFilter): Promise<MerchantInfo[]> {
     let db = await this.databaseManager.getClient();
 
-    const conditions = buildConditions(filter);
+    let conditions = buildConditions(filter);
+    let query = `SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE ${conditions.where}`;
 
-    const query = `SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE ${conditions.where}`;
-    const queryResult = await db.query(query, conditions.values);
+    if (filter.customFilter?.availableForCardSpace) {
+      // Merchants that haven't been used in a card space yet
+      query += ' AND merchant_infos.id NOT IN (SELECT merchant_id FROM card_spaces WHERE merchant_id IS NOT NULL)';
+    }
+
+    let queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
       return {
