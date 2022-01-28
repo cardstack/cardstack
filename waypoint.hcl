@@ -192,7 +192,12 @@ app "cardie" {
     }
 }
 
-app "cardpay-subgraph-extraction" {
+# This name has been chosen to be much shorter than 32 characters
+# If the name comes close to 32 characters there are unreliable
+# deployments. See 
+#  https://github.com/hashicorp/waypoint/issues/2957
+# for more details
+app "cardpay-subg-ext" {
     path = "./packages/cardpay-subgraph-extraction"
 
     build {
@@ -222,7 +227,7 @@ app "cardpay-subgraph-extraction" {
 
         hook {
             when    = "before"
-            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subgraph-extraction","1"] # need this to purge old ecs services
+            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subg-ext","1"] # need this to purge old ecs services
         }
     }
 }
