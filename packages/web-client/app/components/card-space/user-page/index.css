@@ -2,6 +2,26 @@
   --annoying-neighbour-space: clamp(120px, 30%, 350px);
 }
 
+.card-space-user-page__toggle-view-button {
+  appearance: none;
+  border: none;
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-lg);
+  position: fixed;
+  border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
+  top: 0;
+  z-index: 1;
+  margin: auto;
+  background: var(--boxel-green);
+  font-family: OpenSans;
+  font-size: 11px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  text-align: center;
+  left: 50%;
+}
+
 .card-space-user-page__compact-content-column {
   max-width: 300px;
 }

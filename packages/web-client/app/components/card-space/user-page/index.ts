@@ -27,7 +27,7 @@ export default class CardSpaceUserPage extends Component {
     return this.isOwner && this.mode === 'edit';
   }
 
-  @action switchMode(mode: 'view' | 'edit') {
-    this.mode = mode;
+  @action switchMode() {
+    this.mode = this.mode === 'view' ? 'edit' : 'view';
   }
 }
