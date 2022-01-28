@@ -14,7 +14,6 @@ import MerchantInfoQueries from '../services/queries/merchant-info';
 
 export interface CardSpace {
   id: string;
-  merchantId?: string;
   profileName?: string;
   profileDescription?: string;
   profileCategory?: string;
@@ -30,7 +29,7 @@ export interface CardSpace {
   donationSuggestionAmount2?: number;
   donationSuggestionAmount3?: number;
   donationSuggestionAmount4?: number;
-
+  merchantId?: string;
   merchantName?: string;
   merchantOwnerAddress?: string;
 }
