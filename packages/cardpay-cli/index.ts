@@ -22,6 +22,7 @@ global.fetch = fetch;
       },
       mnemonic: {
         alias: 'm',
+        default: process.env.MNEMONIC_PHRASE,
         type: 'string',
         description: 'Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE',
       },
