@@ -46,7 +46,7 @@ if (process.env.COMPILER) {
 
               @contains(string)
               async summary() {
-                return (await this.fullName()) + " is a person. Their story is: " + await this.aboutMe.short;
+                return (await this.fullName) + " is a person. Their story is: " + (await this.aboutMe.short);
               }
             }
           `,

@@ -519,8 +519,10 @@ if (process.env.COMPILER) {
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.containsSource(`
-          async fullName() {
-            return "Mr or Mrs " + (await this.lastName);
+          get fullName() {
+            return (async () => {
+              return "Mr or Mrs " + (await this.lastName);
+            })();
           }
         `);
       });

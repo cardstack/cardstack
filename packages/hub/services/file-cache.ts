@@ -150,7 +150,7 @@ export default class FileCache {
   }
 
   loadModule(moduleIdentifier: string): any {
-    console.log(`loadModule(${moduleIdentifier})`);
+    log.trace(`loadModule(${moduleIdentifier})`);
 
     if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
       let code = this.getModule(moduleIdentifier);

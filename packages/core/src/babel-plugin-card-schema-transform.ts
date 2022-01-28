@@ -133,6 +133,8 @@ export default function main(babel: typeof Babel) {
         for (let bodyItem of path.get('body').get('body')) {
           if (t.isClassProperty(bodyItem.node)) {
             handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
+          } else if (t.isClassMethod(bodyItem.node)) {
+            handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
           }
         }
       },
@@ -141,6 +143,44 @@ export default function main(babel: typeof Babel) {
 }
 
 function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
+  forEachValidFieldDecorator(path, t, (p) => {
+    let path = p as NodePath<t.ClassProperty>;
+    if (!t.isIdentifier(path.node.key)) {
+      return;
+    }
+    let type = cardTypeByFieldName(path.node.key.name, state);
+    if (!type) {
+      throw error(path.get('key'), `cannot find field in card`);
+    }
+    if (type === 'primitive') {
+      transformPrimitiveField(path, t);
+    } else {
+      transformCompositeField(path, state, t);
+    }
+  });
+}
+
+function handleClassMethod(path: NodePath<t.ClassMethod>, _state: State, t: typeof Babel.types) {
+  forEachValidFieldDecorator(path, t, (p) => {
+    let path = p as NodePath<t.ClassMethod>;
+    path.node.kind = 'get';
+    path.node.async = false;
+    let body = path.get('body');
+    // wraps the original method body with:
+    //  return (async () => {
+    //    ... original body ...
+    //  })();
+    body.replaceWith(
+      t.blockStatement([t.returnStatement(t.callExpression(t.arrowFunctionExpression([], body.node, true), []))])
+    );
+  });
+}
+
+function forEachValidFieldDecorator(
+  path: NodePath<t.ClassMethod | t.ClassProperty>,
+  t: typeof Babel.types,
+  cb: (path: NodePath<t.ClassMethod | t.ClassProperty>) => void
+) {
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
@@ -168,15 +208,7 @@ function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: t
       continue;
     }
 
-    let type = cardTypeByFieldName(path.node.key.name, state);
-    if (!type) {
-      throw error(path.get('key'), `cannot find field in card`);
-    }
-    if (type === 'primitive') {
-      transformPrimitiveField(path, t);
-    } else {
-      transformCompositeField(path, state, t);
-    }
+    cb(path);
   }
 }
 
