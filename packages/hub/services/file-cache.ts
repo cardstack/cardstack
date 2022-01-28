@@ -168,6 +168,7 @@ export default class FileCache {
 
     if (moduleIdentifier.startsWith('@cardstack/core/')) {
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(`@cardstack/core/src/${moduleIdentifier}`);
     }
 
