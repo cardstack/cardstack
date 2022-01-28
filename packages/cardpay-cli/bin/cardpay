@@ -22,4 +22,4 @@ check_node_version() {
 }
 
 check_node_version
-node ${BASEDIR}/index.js $@
+node ${BASEDIR}/index.js "$@"
