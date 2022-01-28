@@ -567,15 +567,16 @@ if (process.env.COMPILER) {
         `);
       });
 
-      it(`does not allow a card that adopts a primitive card to have fields`, async function () {
+      it(`doesn't allow a card that adopts from a primitive card to become a composite card by having fields`, async function () {
+        let parentURL = cardURL(fancyDateCard);
         let badCard = {
           realm,
           id: 'bad-date',
           schema: 'schema.js',
           files: {
             'schema.js': `
-              import { adopts } from "@cardstack/types";
-              import fancyDate from "../fancy-date";
+              import { adopts, contains } from "@cardstack/types";
+              import fancyDate from "${parentURL}";
               import string from "https://cardstack.com/base/string";
               export default @adopts(fancyDate) class BadDate {
                 @contains(string) constellation;
@@ -587,8 +588,11 @@ if (process.env.COMPILER) {
           await cards.create(badCard);
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
-          expect(err.message).to.include(`primitive cards cannot have fields`);
-          expect(err.status).to.equal(400);
+          expect(err.message).to.equal(
+            `Card ${cardURL(
+              badCard
+            )} adopting from primitive parent ${parentURL} must be of primitive type itself. It cannot become a composite card by containing fields.`
+          );
         }
       });
     });

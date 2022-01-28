@@ -75,6 +75,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
       }
 
+      if (parentCard.url !== baseCardURL) {
+        let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
+        if (isParentPrimitive && cardSource?.files?.['schema.js']?.includes('@contains')) {
+          throw new CardstackError(
+            `Card ${cardSource.realm}${cardSource.id} adopting from primitive parent ${parentCard.url} must be of primitive type itself. It cannot become a composite card by containing fields.`
+          );
+        }
+      }
+
       if (schemaModule) {
         this.prepareSchema(schemaModule, meta, fields, parentCard, modules);
       } else {
