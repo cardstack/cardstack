@@ -18,7 +18,6 @@ import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
-import { INSECURE_CONTEXT } from '../services/card-service';
 import { service } from '@cardstack/hub/services';
 
 export interface NewCardParams {
@@ -52,7 +51,6 @@ interface LoadedState {
 }
 
 export default class CardModelForHub implements CardModel {
-  private cardService = service('card-service', { as: 'cardService' });
   private fileCache = service('file-cache', { as: 'fileCache' });
   private realmManager = service('realm-manager', { as: 'realmManager' });
   private searchIndex = service('searchIndex');
@@ -217,15 +215,12 @@ export default class CardModelForHub implements CardModel {
         break;
       case 'loaded':
         {
-          // TODO we started out with the old data--so just hang on to it (this
-          // is this.rawData)
-          let original = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(this.url, this.format);
           let updatedRawCard = merge(
             {
               id: this.state.id,
               realm: this.state.realm,
             },
-            { data: original.data },
+            { data: this.state.rawData }, // the original data
             { data: this.data }
           );
 
