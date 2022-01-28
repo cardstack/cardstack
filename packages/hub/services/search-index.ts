@@ -323,19 +323,9 @@ class IndexerRun implements IndexerHandle {
       if (!rawCard.adoptsFrom || !isCardstackError(e) || e.status !== 404) {
         throw e;
       }
-      // this is a new card, in which case we get the compiled card from the
-      // parent. the only remnant of the parent that we need to adjust for our
-      // own compiled is the URL
       isNew = true;
-      compiled = await this.builder.getCompiledCard(rawCard.adoptsFrom);
-      // TODO The outer parts of this compiled card are still not correct for
-      // us--like adoptsFrom.
-      // TODO instead of mutating we should create a new
-      // object. this will help us with constructing our own fields. we can just
-      // splat in the parent's compiled and then add our own stuff. also need to
-      // make sure to fill in the componentInfos' parent if unset. consider
-      // moving this as a function into the compiler: `compileDerive`
-      compiled.url = url;
+      let parentCompiled = await this.builder.getCompiledCard(rawCard.adoptsFrom);
+      compiled = wrapCompiledCard(parentCompiled, rawCard, url);
       let {
         rows: [{ deps: result }],
       } = await this.db.query(expressionToSql(['select deps from cards where url =', param(rawCard.adoptsFrom)]));
@@ -462,10 +452,20 @@ function getComponentModules(card: CompiledCard): Record<string, any> {
   return Object.fromEntries(infos);
 }
 
-declare module '@cardstack/hub/services' {
-  interface HubServices {
-    searchIndex: SearchIndex;
-  }
+function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): CompiledCard {
+  return {
+    url,
+    realm: raw.realm,
+    adoptsFrom: compiled,
+    fields: compiled.fields,
+    schemaModule: compiled.schemaModule,
+    serializer: compiled.serializer,
+    isolated: compiled.isolated,
+    embedded: compiled.embedded,
+    edit: compiled.edit,
+    modules: compiled.modules,
+    deps: [...compiled.deps, compiled.url],
+  };
 }
 
 function readCursor(cursor: Cursor, rowCount: number): Promise<Record<string, any>[]> {
@@ -478,4 +478,10 @@ function readCursor(cursor: Cursor, rowCount: number): Promise<Record<string, an
       }
     });
   });
+}
+
+declare module '@cardstack/hub/services' {
+  interface HubServices {
+    searchIndex: SearchIndex;
+  }
 }
