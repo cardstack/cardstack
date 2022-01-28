@@ -92,6 +92,7 @@ export default class CardSpacesRoute {
           merchantInfoError = [
             {
               relationship: 'merchant-info',
+              status: 403,
               detail: `Given merchant-id ${merchantId} is not owned by the user`,
             },
           ];
@@ -100,7 +101,7 @@ export default class CardSpacesRoute {
     }
 
     if (merchantInfoError) {
-      ctx.status = 403;
+      ctx.status = merchantInfoError[0].status || 422;
       ctx.body = {
         errors: serializeErrors({ merchantInfo: merchantInfoError }),
       };

@@ -35,10 +35,12 @@ export interface NestedAttributeError {
   index: number;
   attribute: string;
   detail: string;
+  status?: number;
 }
 
 export interface RelationshipError {
   relationship: string;
+  status?: number;
   detail: string;
 }
 
@@ -55,7 +57,7 @@ export function serializeErrors(errors: any) {
         };
       } else if (errorIsNestedAttributeError(error)) {
         return {
-          status: '422',
+          status: `${error.status || '422'}`,
           title: 'Invalid attribute',
           source: {
             pointer: `/data/attributes/${kebabCase(attribute)}/${error.index}/${kebabCase(error.attribute)}`,
@@ -64,7 +66,7 @@ export function serializeErrors(errors: any) {
         };
       } else {
         return {
-          status: '422',
+          status: `${error.status || '422'}`,
           title: 'Invalid relationship',
           source: {
             pointer: `/data/relationships/${kebabCase(attribute)}`,

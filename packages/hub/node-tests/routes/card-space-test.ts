@@ -197,7 +197,7 @@ describe('POST /api/card-spaces', function () {
           {
             detail: `Given merchant-id ${merchantId} is not owned by the user`,
             source: { pointer: '/data/relationships/merchant-info' },
-            status: '422', // FIXME ugh
+            status: '403',
             title: 'Invalid relationship',
           },
         ],
@@ -281,7 +281,7 @@ describe('POST /api/card-spaces', function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(403) // 😭
+      .expect(422)
       .expect({
         errors: [
           {
