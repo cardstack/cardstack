@@ -1,0 +1,41 @@
+<Boxel::CardContainer
+  class={{cn "card-space__layout-card-container" card-space__layout-card-container--editable=@editable}}
+  @displayBoundaries={{true}}
+  ...attributes
+>
+  {{#if @editable}}
+    <Boxel::Header>
+      <:default>
+        {{yield to="header"}}
+      </:default>
+      <:actions>
+          <button
+            data-test-edit-button
+            type="button"
+            {{on 'click' @onClickEdit}}
+          >
+            Edit
+          </button>
+      </:actions>
+    </Boxel::Header>
+  {{/if}}
+
+  {{yield (component "card-space/user-page/layout-card-container/button-with-click-handler" onClick=@onClickEdit show=@editable)}}
+</Boxel::CardContainer>
+
+<CardSpace::UserPage::CardEditModal
+  @isEditing={{@isEditing}}
+  @isSubmitting={{@isSubmitting}}
+  @submissionDisabled={{@submissionDisabled}}
+  @onClose={{@onEndEdit}}
+  @save={{@save}}
+  @size={{@editSize}}
+  @errorMessage={{@errorMessage}}
+>
+  <:header>
+    {{yield to="header"}}
+  </:header>
+  <:default>
+    {{yield to="edit"}}
+  </:default>
+</CardSpace::UserPage::CardEditModal>

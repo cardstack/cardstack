@@ -1,0 +1,22 @@
+.card-space-user-page__background-card {
+  aspect-ratio: 13/5;
+  background: var(--background-image-url, transparent);
+  min-width: 100%;
+  max-width: 100%;
+  max-height: 500px;
+  min-height: 200px;
+  margin-bottom: calc(var(--annoying-neighbour-space) * -1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--boxel-sp-xxl) 0 calc(var(--annoying-neighbour-space) + var(--boxel-sp-lg)) 0;
+}
+
+.card-space-user-page__background-card-content {
+  display: flex;
+  gap: var(--boxel-sp-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: var(--boxel-sp-lg);
+}

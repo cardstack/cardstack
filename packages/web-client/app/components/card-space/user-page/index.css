@@ -1,0 +1,14 @@
+.card-space-user-page {
+  --annoying-neighbour-space: clamp(120px, 30%, 350px);
+}
+
+.card-space-user-page__compact-content-column {
+  max-width: 300px;
+}
+
+.card-space-user-page__prose-content-column {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--boxel-sp-sm);
+}

@@ -1,0 +1,63 @@
+<CardSpace::UserPage::LayoutCardContainer
+  @editable={{@editable}}
+  @isEditing={{this.isEditing}}
+  @isSubmitting={{this.isSubmitting}}
+  @submissionDisabled={{this.submissionDisabled}}
+  @onClickEdit={{this.onClickEdit}}
+  @onEndEdit={{this.onEndEdit}}
+  @save={{this.save}}
+  @errorMessage={{this.submissionErrorMessage}}
+>
+  <:header>
+    Layout
+  </:header>
+  <:default as |BackgroundEditButton|>
+    <div>
+      <div class="card-space-user-page__background-card" style={{css-var background-image-url=(concat "url(" this.background ")")}}>
+        <BackgroundEditButton>
+          Customize background
+        </BackgroundEditButton>
+      </div>
+
+      <div class="card-space-user-page__background-card-content">
+        {{yield}}
+      </div>
+    </div>
+  </:default>
+  <:edit>
+     <ImageUploader
+        @state={{this.imageUploadState}}
+        @errorMessage={{this.imageUploadErrorMessage}}
+        @image={{this.backgroundInputValue}}
+        @cta="Select a Photo"
+        @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+        @acceptedFileTypes={{this.acceptedFileTypes}}
+        @onUpload={{this.onUpload}}
+        @onError={{this.logUploadError}}
+        @onRemoveImage={{this.onImageRemoved}}
+      as |ImageUploaderAvatar|>
+        <ImageUploaderAvatar
+          @alt="Cover photo"
+          @rounded={{true}}
+        />
+      </ImageUploader>
+  </:edit>
+</CardSpace::UserPage::LayoutCardContainer>
+
+{{#in-element this.imageEditorElement}}
+  <ImageEditor
+    @isOpen={{this.showEditor}}
+    @onClose={{fn (mut this.showEditor) false}}
+    @image={{this.processedImage.preview}}
+    @fileType={{this.processedImage.type}}
+    @width={{this.desiredWidth}}
+    @height={{this.desiredHeight}}
+    @saveImageEditData={{perform this.saveImageEditDataTask}}
+    as |preview|
+  >
+    <CardSpace::ProfileCard
+      @coverPhoto={{preview}}
+      data-test-card-space-profile-card-preview
+    />
+  </ImageEditor>
+{{/in-element}}

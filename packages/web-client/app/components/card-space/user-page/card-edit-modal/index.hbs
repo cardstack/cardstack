@@ -1,0 +1,43 @@
+<Boxel::Modal
+  @isOpen={{@isEditing}}
+  @onClose={{this.close}}
+  @size={{or @size "medium"}}
+>
+  <Boxel::CardContainer>
+    <:header>
+      {{yield to="header"}}
+    </:header>
+    <:default>
+      <div class="card-space-user-page__edit-modal-body">
+        {{yield}}
+
+        <div class="card-space-user-page__edit-modal-footer">
+          {{#if @errorMessage}}
+            {{!-- should move to common --}}
+            <CardPay::ErrorMessage class="card-space-user-page__edit-modal-error-message">
+              {{@errorMessage}}
+            </CardPay::ErrorMessage>
+          {{/if}}
+          <div class="card-space-user-page__edit-modal-footer-buttons">
+            {{#unless @isSubmitting}}
+              <Boxel::Button
+                @kind="secondary-light"
+                {{on "click" this.close}}
+              >
+                Cancel
+              </Boxel::Button>
+            {{/unless}}
+            <Boxel::Button
+              @loading={{@isSubmitting}}
+              @disabled={{@submissionDisabled}}
+              @kind="primary"
+              {{on "click" this.save}}
+            >
+              Save
+            </Boxel::Button>
+          </div>
+        </div>
+      </div>
+    </:default>
+  </Boxel::CardContainer>
+</Boxel::Modal>
