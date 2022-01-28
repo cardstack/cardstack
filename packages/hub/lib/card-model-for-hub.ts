@@ -113,6 +113,10 @@ export default class CardModelForHub implements CardModel {
     return this.state.serializerMap;
   }
 
+  get id(): string | undefined {
+    return this.state.id;
+  }
+
   get url(): string {
     if (this.state.type === 'created') {
       throw new Error(`bug: card in state ${this.state.type} does not have a url`);
