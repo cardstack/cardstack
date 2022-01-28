@@ -16,13 +16,14 @@ import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
-import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../utils/expressions';
+import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
 import CardBuilder from './card-builder';
 import type { types as t } from '@babel/core';
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
+import flatMap from 'lodash/flatMap';
 
 const log = logger('hub/search-index');
 
@@ -337,21 +338,27 @@ class IndexerRun implements IndexerHandle {
       if (!deps) {
         throw new Error('This should never happen');
       }
-      // TODO make into an insert--don't use upsert
-      expression = upsert('cards', 'cards_pkey', {
-        url: param(url),
-        realm: param(this.realmURL),
-        generation: param(this.generation || null),
-        ancestors: param(ancestorsOf(compiled)),
-        data: param(rawCard.data ?? null),
-        raw: param(new RawCardSerializer().serialize(rawCard)),
-        compiled: param(new RawCardSerializer().serialize(rawCard, compiled)),
-        searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
-        compileErrors: param(null),
-        deps: param([deps]),
-        schemaModule: param(compiled.schemaModule.global),
-        componentInfos: param(getComponentModules(compiled)),
-      });
+      expression = [
+        'INSERT INTO cards (url, realm, generation, ancestors, data, raw, compiled, "searchData", "compileErrors", deps, "schemaModule", "componentInfos") VALUES (',
+        ...(flatMap(
+          [
+            param(url),
+            param(this.realmURL),
+            param(this.generation || null),
+            param(ancestorsOf(compiled)),
+            param(rawCard.data ?? null),
+            param(new RawCardSerializer().serialize(rawCard)),
+            param(new RawCardSerializer().serialize(rawCard, compiled)),
+            param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+            param(null),
+            param([deps]),
+            param(compiled.schemaModule.global),
+            param(getComponentModules(compiled)),
+          ],
+          (p, i, all) => (i === all.length - 1 ? [p] : [p, ',']) // add commas in
+        ) as (string | Param)[]),
+        ')',
+      ];
     } else {
       expression = [
         'UPDATE cards SET generation =',
