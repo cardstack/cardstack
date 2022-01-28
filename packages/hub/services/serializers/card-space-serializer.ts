@@ -20,7 +20,6 @@ export default class CardSpaceSerializer {
         type: 'card-spaces',
         attributes: {
           did,
-          // url: model.url, FIXME and owner address
           'profile-name': model.profileName,
           'profile-description': model.profileDescription,
           'profile-category': model.profileCategory,
@@ -36,7 +35,6 @@ export default class CardSpaceSerializer {
           'donation-suggestion-amount-2': model.donationSuggestionAmount2,
           'donation-suggestion-amount-3': model.donationSuggestionAmount3,
           'donation-suggestion-amount-4': model.donationSuggestionAmount4,
-          // 'owner-address': model.ownerAddress,
         },
         relationships: {
           'merchant-info': {
