@@ -12,7 +12,7 @@ CARDPAY_BIN=".cardpay/bin"
 get_tarball() {
   printf "$cyan> Downloading tarball...$reset\n"
   url=https://install.cardstack.com/cardpay.tgz
-  tarball_tmp=$(mktemp -t cardpay.tgz.temp)
+  tarball_tmp=$(mktemp)
   if curl --fail -L -o "$tarball_tmp" "$url"; then
     printf "$cyan> Extracting to ~/.cardpay...$reset\n"
     temp=$(mktemp -d cardpay.XXXXXXXXXX)
