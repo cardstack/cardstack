@@ -22,7 +22,25 @@
       {{/if}}
     </:default>
     <:edit>
-      Editing
+      <CardPay::LabeledValue
+        @fieldMode="label"
+        @label="Name"
+      >
+        <Boxel::Input
+          @value={{this.bioTitleInputValue}}
+          @onInput={{this.onBioTitleInput}}
+        />
+      </CardPay::LabeledValue>
+      <CardPay::LabeledValue
+        @fieldMode="label"
+        @label="Bio"
+      >
+        {{!-- this needs to be changed to a textarea --}}
+        <Boxel::Input
+          @value={{this.bioDescriptionInputValue}}
+          @onInput={{this.onBioDescriptionInput}}
+        />
+      </CardPay::LabeledValue>
     </:edit>
   </CardSpace::UserPage::CardContainer>
 {{/if}}

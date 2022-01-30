@@ -14,6 +14,8 @@ export default class UserPageBioCardComponent extends Component {
   @service declare cardSpaceUserData: CardSpaceUserData;
   @tracked state: typeof CardStates[keyof typeof CardStates] =
     CardStates.DEFAULT;
+  @tracked bioTitleInputValue = '';
+  @tracked bioDescriptionInputValue = '';
 
   get showInViewMode() {
     return (
@@ -41,20 +43,37 @@ export default class UserPageBioCardComponent extends Component {
   }
 
   @action onClickEdit() {
+    this.bioDescriptionInputValue = this.bioDescription || '';
+    this.bioTitleInputValue = this.bioTitle || '';
     this.state = CardStates.EDITING;
+  }
+
+  @action onBioTitleInput(value: string) {
+    this.bioTitleInputValue = value;
+  }
+  @action onBioDescriptionInput(value: string) {
+    this.bioDescriptionInputValue = value;
   }
 
   @action async save() {
     try {
       this.state = CardStates.SUBMITTING;
-      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      await this.cardSpaceUserData.post({
+        bioTitle: this.bioTitleInputValue,
+        bioDescription: this.bioDescriptionInputValue,
+      });
       this.state = CardStates.DEFAULT;
+
+      // JSON API error detection
     } catch (e) {
+      // display error message
       this.state = CardStates.EDITING;
     }
   }
 
   @action onEndEdit() {
+    this.bioDescriptionInputValue = '';
+    this.bioTitleInputValue = '';
     this.state = CardStates.DEFAULT;
   }
 }
