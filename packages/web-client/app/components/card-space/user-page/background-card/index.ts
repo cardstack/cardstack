@@ -178,7 +178,10 @@ export default class UserPageBackgroundCardComponent extends Component {
         profileCoverImageUrl: this.backgroundInputValue,
       });
       this.state = CardStates.DEFAULT;
+
+      // JSON-API error detection
     } catch (e) {
+      // display error messages
       this.state = CardStates.EDITING;
     }
   }
