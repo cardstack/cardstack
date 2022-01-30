@@ -16,8 +16,13 @@
         <ul>
           {{#each this.links as |link|}}
             <li>
-              <a href={{link.url}}>
-                {{link.title}}
+              <a class="card-space-user-page__link" href={{link.url}}>
+                <div class="card-space-user-page__link-title">
+                  {{link.title}}
+                </div>
+                <div class="card-space-user-page__link-url">
+                  {{link.url}}
+                </div>
               </a>
             </li>
           {{/each}}
@@ -26,7 +31,15 @@
         <CardSpace::UserPage::CardTitle>
           My Links
         </CardSpace::UserPage::CardTitle>
-        Add links here
+        <div class="card-space-user-page__link">
+          <div class="card-space-user-page__link-title">
+            Your link title
+          </div>
+
+          <div class="card-space-user-page__link-url">
+            Your link url
+          </div>
+        </div>
       {{/if}}
     </:default>
     <:edit>

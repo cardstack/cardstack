@@ -1,0 +1,20 @@
+.card-space-user-page__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--boxel-sp);
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
+}
+
+.card-space-user-page__link-title {
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.card-space-user-page__link-url {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
