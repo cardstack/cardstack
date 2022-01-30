@@ -15,6 +15,13 @@ export default class UserPageDonationsCardComponent extends Component {
   @tracked state: typeof CardStates[keyof typeof CardStates] =
     CardStates.DEFAULT;
 
+  get showInViewMode() {
+    const { donationDescription, donationTitle } =
+      this.cardSpaceUserData.currentUserData;
+
+    return donationDescription || donationTitle;
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }

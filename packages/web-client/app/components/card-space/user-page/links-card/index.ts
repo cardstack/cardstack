@@ -15,6 +15,10 @@ export default class UserPageLinksCardComponent extends Component {
   @tracked state: typeof CardStates[keyof typeof CardStates] =
     CardStates.DEFAULT;
 
+  get showInViewMode() {
+    return this.cardSpaceUserData.currentUserData.links.length;
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }

@@ -15,6 +15,13 @@ export default class UserPageBioCardComponent extends Component {
   @tracked state: typeof CardStates[keyof typeof CardStates] =
     CardStates.DEFAULT;
 
+  get showInViewMode() {
+    return (
+      this.cardSpaceUserData.currentUserData.bioTitle ||
+      this.cardSpaceUserData.currentUserData.bioDescription
+    );
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }
