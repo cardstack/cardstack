@@ -10,37 +10,75 @@
   >
     <:default>
     {{#if this.showInViewMode}}
-      {{#if this.donationTitle}}
         <CardSpace::UserPage::CardTitle>
-          {{this.donationTitle}}
+          {{!-- Make donation title required via clientside validations, but leave a default just in case --}}
+          {{!-- Maybe hub should have more detailed validations for individual "cards"? --}}
+          {{or this.donationTitle (concat "Support " this.displayName)}}
         </CardSpace::UserPage::CardTitle>
-        {{/if}}
         {{#if this.donationDescription}}
-          {{this.donationDescription}}
+          <div class="card-space-user-page__donation-description">
+            {{this.donationDescription}}
+          </div>
         {{/if}}
         {{#if this.donationSuggestionAmountList}}
-          <ol>
+          <ol class="card-space-user-page__donation-list">
             {{#each this.donationSuggestionAmountList as |donation|}}
               <li>
-                {{donation}}
+                <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+                  <div class="card-space-user-page__donation-choice-amount-group">
+                    {{svg-jar "spend" width="20" height="20" role="presentation"}}
+                    <div class="card-space-user-page__donation-choice-spend-amount">
+                      §{{format-amount donation}} SPEND
+                    </div>
+                    <div class="card-space-user-page__donation-choice-usd-amount">
+                      ${{spend-to-usd donation}} USD
+                    </div>
+                  </div>
+                </button>
               </li>
             {{/each}}
+              <li>
+                <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+                  <div class="card-space-user-page__donation-choice-plain-text">
+                    {{!-- this should really be customizable --}}
+                    Choose a custom amount
+                  </div>
+                </button>
+              </li>
           </ol>
           {{else}}
-            Pay me here!
+          <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+            <div class="card-space-user-page__donation-choice-plain-text">
+              {{!-- this should really be customizable --}}
+              Choose a custom amount
+            </div>
+          </button>
         {{/if}}
       {{else}}
         <CardSpace::UserPage::CardTitle>
           Donation module
         </CardSpace::UserPage::CardTitle>
-        Receive donations from supporters and choose custom denominations
-        <ul>
-          {{#each (array 1 2 3 4) as |donation|}}
+        <div class="card-space-user-page__donation-description">
+          Receive donations from supporters and choose custom denominations
+        </div>
+        <ol class="card-space-user-page__donation-list">
+          {{#each (array 1 2 3 4) as |number|}}
             <li>
-              {{donation}}
+              <div class="card-space-user-page__donation-choice">
+                <div class="card-space-user-page__donation-choice-plain-text">
+                  Amount {{number}}
+                </div>
+              </div>
             </li>
           {{/each}}
-        </ul>
+          <li>
+            <div class="card-space-user-page__donation-choice">
+              <div class="card-space-user-page__donation-choice-plain-text">
+                Choose a custom amount
+              </div>
+            </div>
+          </li>
+        </ol>
       {{/if}}
     </:default>
     <:edit>
