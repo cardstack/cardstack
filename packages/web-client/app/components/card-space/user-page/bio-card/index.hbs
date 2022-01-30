@@ -5,6 +5,7 @@
     @isEditing={{this.isEditing}}
     @isSubmitting={{this.isSubmitting}}
     @onClickEdit={{this.onClickEdit}}
+    @errorMessage={{this.submissionErrorMessage}}
     @onEndEdit={{this.onEndEdit}}
     @save={{this.save}}
   >
@@ -22,16 +23,18 @@
       {{/if}}
     </:default>
     <:edit>
-      <CardPay::LabeledValue
+      <Boxel::Field
         @fieldMode="label"
         @label="Name"
       >
         <Boxel::Input
           @value={{this.bioTitleInputValue}}
           @onInput={{this.onBioTitleInput}}
+          @errorMessage={{this.validationErrorMessages.bioTitle}}
+          @invalid={{this.validationErrorMessages.bioTitle}}
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
+      </Boxel::Field>
+      <Boxel::Field
         @fieldMode="label"
         @label="Bio"
       >
@@ -39,8 +42,10 @@
         <Boxel::Input
           @value={{this.bioDescriptionInputValue}}
           @onInput={{this.onBioDescriptionInput}}
+          @errorMessage={{this.validationErrorMessages.bioDescription}}
+          @invalid={{this.validationErrorMessages.bioDescription}}
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     </:edit>
   </CardSpace::UserPage::CardContainer>
 {{/if}}

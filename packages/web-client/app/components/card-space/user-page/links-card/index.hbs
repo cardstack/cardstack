@@ -7,6 +7,7 @@
     @onClickEdit={{this.onClickEdit}}
     @onEndEdit={{this.onEndEdit}}
     @save={{this.save}}
+    @errorMessage={{this.submissionErrorMessage}}
   >
     <:default>
       {{#if this.showInViewMode}}
@@ -43,7 +44,44 @@
       {{/if}}
     </:default>
     <:edit>
-      Editing
+      {{#each this.editedLinks as |editedLink index|}}
+      <div class="card-space-user-page__edited-link">
+        <Boxel::Field
+          @fieldMode="edit"
+          @label="Link Title"
+          class="card-space-user-page__edited-link-title"
+        >
+          <Boxel::Input
+            @value={{editedLink.title}}
+            @onInput={{editedLink.updateTitle}}
+            @errorMessage={{editedLink.titleValidationError}}
+            @invalid={{editedLink.titleValidationError}}
+          />
+        </Boxel::Field>
+        <Boxel::Field
+          @fieldMode="edit"
+          @label="URL"
+          class="card-space-user-page__edited-link-url"
+        >
+          <Boxel::Input
+            @value={{editedLink.url}}
+            @onInput={{editedLink.updateUrl}}
+            @errorMessage={{editedLink.urlValidationError}}
+            @invalid={{editedLink.urlValidationError}}
+          />
+        </Boxel::Field>
+        <button type="button" class="card-space-user-page__edited-link-delete" {{on "click" (fn this.removeItemAt index)}}>
+          {{svg-jar "trash"}}
+        </button>
+      </div>
+      {{/each}}
+      <Boxel::Button
+        @kind="secondary-light"
+        @size="small"
+        {{on "click" this.addItem}}
+      >
+        Add Link
+      </Boxel::Button>
     </:edit>
   </CardSpace::UserPage::CardContainer>
 {{/if}}

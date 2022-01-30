@@ -1,6 +1,7 @@
 {{#if (or @editable this.showInViewMode)}}
   <CardSpace::UserPage::CardContainer
     @header="Donations"
+    @errorMessage={{this.submissionErrorMessage}}
     @editable={{@editable}}
     @isEditing={{this.isEditing}}
     @isSubmitting={{this.isSubmitting}}
@@ -82,7 +83,54 @@
       {{/if}}
     </:default>
     <:edit>
-      Editing
+      <Boxel::Field @label="donationDescription" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationDescription}}
+          @errorMessage={{this.validationErrorMessages.donationDescription}}
+          @value={{this.donationDescriptionInputValue}}
+          @onInput={{this.onDonationDescriptionInput}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationTitle" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationTitle}}
+          @errorMessage={{this.validationErrorMessages.donationTitle}}
+          @value={{this.donationTitleInputValue}}
+          @onInput={{this.onDonationTitleInput}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount1" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount1}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount1}}
+          @value={{this.donationSuggestionAmount1InputValue}}
+          @onInput={{this.onDonationSuggestionAmount1Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount2" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount2}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount2}}
+          @value={{this.donationSuggestionAmount2InputValue}}
+          @onInput={{this.onDonationSuggestionAmount2Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount3" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount3}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount3}}
+          @value={{this.donationSuggestionAmount3InputValue}}
+          @onInput={{this.onDonationSuggestionAmount3Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount4" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount4}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount4}}
+          @value={{this.donationSuggestionAmount4InputValue}}
+          @onInput={{this.onDonationSuggestionAmount4Input}}
+        />
+      </Boxel::Field>
     </:edit>
   </CardSpace::UserPage::CardContainer>
 {{/if}}

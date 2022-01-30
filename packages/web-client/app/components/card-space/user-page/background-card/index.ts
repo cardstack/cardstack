@@ -10,6 +10,10 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import CardSpaceUserData from '@cardstack/web-client/services/card-space-user-data';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { processJsonApiErrors } from '@cardstack/web-client/utils/json-api';
+
+const UNKNOWN_CARD_SPACE_BACKGROUND_ERROR = 'CARD_SPACE_BACKGROUND_ERROR';
+const CARD_SPACE_BACKGROUND_VALIDATION = 'CARD_SPACE_BACKGROUND_VALIDATION';
 
 const CardStates = {
   DEFAULT: 'default',
@@ -23,6 +27,7 @@ export default class UserPageBackgroundCardComponent extends Component {
   @service declare hubAuthentication: HubAuthentication;
   @tracked state: typeof CardStates[keyof typeof CardStates] =
     CardStates.DEFAULT;
+  @tracked submissionErrorMessage = '';
 
   @tracked backgroundInputValue = '';
   imageEditorElement = document.getElementById(IMAGE_EDITOR_ELEMENT_ID);
@@ -168,19 +173,60 @@ export default class UserPageBackgroundCardComponent extends Component {
 
   @action onClickEdit() {
     this.state = CardStates.EDITING;
+    this.imageUploadState = 'default';
+    this.imageUploadErrorMessage = '';
     this.backgroundInputValue = this.background;
   }
 
   @action async save() {
+    let extraErrors: any = [];
+    let extraValidations: any = {};
+    let hasUnmanagedValidationError = false; // is there something we PUT that is not managed by this component?
+    this.submissionErrorMessage = '';
     try {
       this.state = CardStates.SUBMITTING;
-      await this.cardSpaceUserData.post({
+      let response = await this.cardSpaceUserData.post({
         profileCoverImageUrl: this.backgroundInputValue,
       });
       this.state = CardStates.DEFAULT;
 
-      // JSON-API error detection
+      if (response.errors) {
+        let { validations, nonValidationErrors } = processJsonApiErrors(
+          response.errors
+        );
+        extraValidations = validations;
+        extraErrors = nonValidationErrors;
+
+        if (nonValidationErrors.length) {
+          throw new Error(UNKNOWN_CARD_SPACE_BACKGROUND_ERROR);
+        }
+
+        if (Object.keys(validations).length) {
+          for (let attribute in validations) {
+            if (attribute === 'profileCoverImageUrl') {
+              this.imageUploadErrorMessage = validations[attribute].join(', ');
+              this.imageUploadState = 'error';
+            } else {
+              hasUnmanagedValidationError = true;
+            }
+          }
+
+          throw new Error(CARD_SPACE_BACKGROUND_VALIDATION);
+        }
+      }
     } catch (e) {
+      if (
+        e.message !== CARD_SPACE_BACKGROUND_VALIDATION ||
+        hasUnmanagedValidationError
+      ) {
+        Sentry.setExtra('validations', extraValidations);
+        Sentry.setExtra('errors', extraErrors);
+        Sentry.captureException(e);
+        console.error(e);
+        // This is probably not enough and we may need some specific markup (links)
+        this.submissionErrorMessage =
+          'Failed to save your data. Press Save to try again.';
+      }
       // display error messages
       this.state = CardStates.EDITING;
     }
