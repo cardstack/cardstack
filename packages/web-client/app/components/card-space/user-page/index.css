@@ -26,9 +26,12 @@
 }
 
 .card-space-user-page__prose-content-column {
-  width: 31.25rem;
   max-width: 31.25rem;
   display: flex;
   flex-direction: column;
   gap: var(--boxel-sp-sm);
+}
+
+.card-space-user-page__prose-content-column > * {
+  width: 31.25rem;
 }
