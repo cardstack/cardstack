@@ -3,18 +3,28 @@
 <div id="card-space-user-page-image-editor" style="z-index: calc(var(--boxel-layer-modal-default) + 1); width: 0px; height: 0px; flex-grow: 0; position: absolute;"></div>
 <div class="card-space-user-page" ...attributes>
   {{#if this.isOwner}}
-    <button
-      class="card-space-user-page__toggle-view-button"
-      type="button"
-      data-test-card-space-toggle-view-button
-      {{on "click" this.switchMode}}
-    >
-      {{#if (eq this.mode "view")}}
-        Enter Edit Mode
+    {{#if this.isAuthenticated}}
+      <button
+        class="card-space-user-page__top-floating-button"
+        type="button"
+        data-test-card-space-toggle-view-button
+        {{on "click" this.switchMode}}
+      >
+        {{#if (eq this.mode "view")}}
+          Enter Edit Mode
+        {{else}}
+          Enter Preview Mode
+        {{/if}}
+      </button>
       {{else}}
-        Enter Preview Mode
-      {{/if}}
-    </button>
+      <button
+        class="card-space-user-page__top-floating-button card-space-user-page__floating-authenticate-button"
+        type="button"
+        data-test-card-space-floating-authenticate-button
+      >
+        Authenticate with hub to enable editing
+      </button>
+    {{/if}}
   {{/if}}
   <CardSpace::UserPage::BackgroundCard
     @editable={{this.editable}}

@@ -4,10 +4,12 @@ import { inject as service } from '@ember/service';
 import CardSpaceUserData from '@cardstack/web-client/services/card-space-user-data';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 
 export default class CardSpaceUserPage extends Component {
   @service declare cardSpaceUserData: CardSpaceUserData;
   @service declare layer2Network: Layer2Network;
+  @service declare hubAuthentication: HubAuthentication;
   @tracked mode: 'view' | 'edit' = 'view';
 
   constructor(owner: unknown, args: any) {
@@ -23,8 +25,12 @@ export default class CardSpaceUserPage extends Component {
     );
   }
 
+  get isAuthenticated() {
+    return this.hubAuthentication.isAuthenticated;
+  }
+
   get editable() {
-    return this.isOwner && this.mode === 'edit';
+    return this.isOwner && this.isAuthenticated && this.mode === 'edit';
   }
 
   @action switchMode() {

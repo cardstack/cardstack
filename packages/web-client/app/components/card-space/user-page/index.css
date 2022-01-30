@@ -1,6 +1,6 @@
 /* this needs adjusting to center it properly */
 /* it also needs box shadow */
-.card-space-user-page__toggle-view-button {
+.card-space-user-page__top-floating-button {
   appearance: none;
   border: none;
   padding: var(--boxel-sp-xxs) var(--boxel-sp-lg);
@@ -14,6 +14,12 @@
   text-align: center;
   left: 50%;
 }
+
+.card-space-user-page__floating-authenticate-button {
+  background: var(--boxel-purple-300);
+  color: var(--boxel-purple-700);
+}
+
 
 .card-space-user-page__compact-content-column {
   max-width: 18.75rem;

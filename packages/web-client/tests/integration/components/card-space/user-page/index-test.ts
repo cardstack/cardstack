@@ -2,7 +2,6 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { setupHubAuthenticationToken } from '@cardstack/web-client/tests/helpers/setup';
 import { ICardSpaceUserData } from '@cardstack/web-client/services/card-space-user-data';
 import Service from '@ember/service';
 import {
@@ -49,6 +48,9 @@ module.only('Integration | Component | user-page', function (hooks) {
     `);
 
     assert.dom('[data-test-card-space-toggle-view-button]').doesNotExist();
+    assert
+      .dom('[data-test-card-space-floating-authenticate-button]')
+      .doesNotExist();
     assert.dom('[data-test-card-space-card-container]').exists({ count: 4 });
     assert.dom('[data-test-card-space-layout-card-container]').exists();
     assert
@@ -66,10 +68,10 @@ module.only('Integration | Component | user-page', function (hooks) {
     assert.dom('#card-space-user-page-image-editor').exists({ count: 1 });
   });
 
-  module('viewing as theowner', function (hooks) {
-    setupHubAuthenticationToken(hooks);
+  module('viewing as theowner', function () {
+    test('it allows toggling a Card Space user page to edit mode when viewed as the authenticated owner', async function (assert) {
+      window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
 
-    test('it allows toggling a Card Space user page to edit mode when viewed as the owner', async function (assert) {
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
@@ -91,6 +93,9 @@ module.only('Integration | Component | user-page', function (hooks) {
         .doesNotExist();
       assert
         .dom('[data-test-card-space-layout-card-container][data-test-editable]')
+        .doesNotExist();
+      assert
+        .dom('[data-test-card-space-floating-authenticate-button]')
         .doesNotExist();
       assert
         .dom('[data-test-card-space-toggle-view-button]')
@@ -115,6 +120,31 @@ module.only('Integration | Component | user-page', function (hooks) {
           '[data-test-card-space-layout-card-container]:not([data-test-editable])'
         )
         .doesNotExist();
+      window.TEST__AUTH_TOKEN = undefined;
+    });
+
+    test('it lets the user know to authenticate with hub to enable editing if they own the space and are not authenticated', async function (assert) {
+      window.TEST__AUTH_TOKEN = undefined;
+
+      let layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          owners: [layer2AccountAddress],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
+        }),
+      ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+      await render(hbs`
+        <CardSpace::UserPage/>
+      `);
+
+      assert.dom('[data-test-card-space-toggle-view-button]').doesNotExist();
+      assert
+        .dom('[data-test-card-space-floating-authenticate-button]')
+        .containsText('Authenticate with hub to enable editing');
+      // TODO: assert that the button opens up the hub auth
     });
   });
 });
