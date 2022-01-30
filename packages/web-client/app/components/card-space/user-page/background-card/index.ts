@@ -185,7 +185,7 @@ export default class UserPageBackgroundCardComponent extends Component {
     this.submissionErrorMessage = '';
     try {
       this.state = CardStates.SUBMITTING;
-      let response = await this.cardSpaceUserData.post({
+      let response = await this.cardSpaceUserData.put({
         profileCoverImageUrl: this.backgroundInputValue,
       });
       this.state = CardStates.DEFAULT;

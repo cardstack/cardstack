@@ -82,7 +82,7 @@ export default class UserPageBioCardComponent extends Component {
     try {
       this.submissionErrorMessage = '';
       this.state = CardStates.SUBMITTING;
-      let response = await this.cardSpaceUserData.post({
+      let response = await this.cardSpaceUserData.put({
         bioTitle: this.bioTitleInputValue,
         bioDescription: this.bioDescriptionInputValue,
       });

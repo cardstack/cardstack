@@ -86,7 +86,7 @@ export default class UserPageLinksCardComponent extends Component {
     try {
       this.submissionErrorMessage = '';
       this.state = CardStates.SUBMITTING;
-      let response = await this.cardSpaceUserData.post({
+      let response = await this.cardSpaceUserData.put({
         links: this.editedLinks,
       });
       if (response.errors) {

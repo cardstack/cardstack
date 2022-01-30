@@ -47,7 +47,7 @@ export default class CardSpaceUserData extends Service {
     merchantId: '2acmichael',
   };
 
-  async post(data: any) {
+  async put(data: any) {
     console.log('sending data', data);
     await new Promise<void>((resolve) => setTimeout(resolve, 1000));
     for (let key in data) {

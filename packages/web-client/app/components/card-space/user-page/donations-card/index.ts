@@ -176,7 +176,7 @@ export default class UserPageDonationsCardComponent extends Component {
     try {
       this.submissionErrorMessage = '';
       this.state = CardStates.SUBMITTING;
-      let response = await this.cardSpaceUserData.post({
+      let response = await this.cardSpaceUserData.put({
         donationDescription: this.donationDescriptionInputValue,
         donationTitle: this.donationTitleInputValue,
         donationSuggestionAmount1: Number(
