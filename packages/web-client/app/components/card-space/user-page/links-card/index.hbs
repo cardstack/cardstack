@@ -9,18 +9,25 @@
     @save={{this.save}}
   >
     <:default>
-      <CardSpace::UserPage::CardTitle>
-        My Links
-      </CardSpace::UserPage::CardTitle>
-      <ul>
-        {{#each this.links as |link|}}
-          <li>
-            <a href={{link.url}}>
-              {{link.title}}
-            </a>
-          </li>
-        {{/each}}
-      </ul>
+      {{#if this.showInViewMode}}
+        <CardSpace::UserPage::CardTitle>
+          My Links
+        </CardSpace::UserPage::CardTitle>
+        <ul>
+          {{#each this.links as |link|}}
+            <li>
+              <a href={{link.url}}>
+                {{link.title}}
+              </a>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <CardSpace::UserPage::CardTitle>
+          My Links
+        </CardSpace::UserPage::CardTitle>
+        Add links here
+      {{/if}}
     </:default>
     <:edit>
       Editing

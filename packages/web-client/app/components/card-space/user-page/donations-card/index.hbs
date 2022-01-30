@@ -9,24 +9,38 @@
     @save={{this.save}}
   >
     <:default>
-    {{#if this.donationTitle}}
-      <CardSpace::UserPage::CardTitle>
-        {{this.donationTitle}}
-      </CardSpace::UserPage::CardTitle>
-      {{/if}}
-      {{#if this.donationDescription}}
-        {{this.donationDescription}}
-      {{/if}}
-      {{#if this.donationSuggestionAmountList}}
-        <ol>
-          {{#each this.donationSuggestionAmountList as |donation|}}
+    {{#if this.showInViewMode}}
+      {{#if this.donationTitle}}
+        <CardSpace::UserPage::CardTitle>
+          {{this.donationTitle}}
+        </CardSpace::UserPage::CardTitle>
+        {{/if}}
+        {{#if this.donationDescription}}
+          {{this.donationDescription}}
+        {{/if}}
+        {{#if this.donationSuggestionAmountList}}
+          <ol>
+            {{#each this.donationSuggestionAmountList as |donation|}}
+              <li>
+                {{donation}}
+              </li>
+            {{/each}}
+          </ol>
+          {{else}}
+            Pay me here!
+        {{/if}}
+      {{else}}
+        <CardSpace::UserPage::CardTitle>
+          Donation module
+        </CardSpace::UserPage::CardTitle>
+        Receive donations from supporters and choose custom denominations
+        <ul>
+          {{#each (array 1 2 3 4) as |donation|}}
             <li>
               {{donation}}
             </li>
           {{/each}}
-        </ol>
-        {{else}}
-          Pay me here!
+        </ul>
       {{/if}}
     </:default>
     <:edit>

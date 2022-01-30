@@ -9,10 +9,17 @@
     @save={{this.save}}
   >
     <:default>
-      <CardSpace::UserPage::CardTitle>
-        {{this.bioTitle}}
-      </CardSpace::UserPage::CardTitle>
-      {{this.bioDescription}}
+      {{#if this.showInViewMode}}
+          <CardSpace::UserPage::CardTitle>
+            {{this.bioTitle}}
+          </CardSpace::UserPage::CardTitle>
+          {{this.bioDescription}}
+        {{else}}
+          <CardSpace::UserPage::CardTitle>
+            Your Name
+          </CardSpace::UserPage::CardTitle>
+            Enter a short description of yourself and/or your business.
+      {{/if}}
     </:default>
     <:edit>
       Editing
