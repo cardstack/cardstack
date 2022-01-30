@@ -9,7 +9,18 @@
     @save={{this.save}}
   >
     <:default>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur itaque asperiores distinctio aut delectus, culpa voluptatibus corrupti, sint veritatis quo molestias libero assumenda magni ullam facilis in aliquam earum. Illo, pariatur animi? Quaerat, exercitationem quas nam explicabo quis asperiores repudiandae eos reiciendis libero, unde repellat consequuntur tenetur quasi inventore sunt praesentium provident itaque sit. Culpa soluta tenetur eveniet quisquam sapiente molestias labore minima nesciunt, corrupti minus quidem quia ut! Libero minus quae, quia autem molestiae nisi, impedit, laudantium voluptatum nam adipisci architecto accusamus. Ut harum rerum ipsam quibusdam consequatur sit eos, repudiandae vel eligendi magni repellendus itaque dolorem eaque molestiae!
+      <CardSpace::UserPage::CardTitle>
+        My Links
+      </CardSpace::UserPage::CardTitle>
+      <ul>
+        {{#each this.links as |link|}}
+          <li>
+            <a href={{link.url}}>
+              {{link.title}}
+            </a>
+          </li>
+        {{/each}}
+      </ul>
     </:default>
     <:edit>
       Editing

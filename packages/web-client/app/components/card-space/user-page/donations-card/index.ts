@@ -22,6 +22,23 @@ export default class UserPageDonationsCardComponent extends Component {
     return donationDescription || donationTitle;
   }
 
+  get donationDescription() {
+    return this.cardSpaceUserData.currentUserData.donationDescription;
+  }
+
+  get donationTitle() {
+    return this.cardSpaceUserData.currentUserData.donationTitle;
+  }
+
+  get donationSuggestionAmountList() {
+    return [
+      this.cardSpaceUserData.currentUserData.donationSuggestionAmount1,
+      this.cardSpaceUserData.currentUserData.donationSuggestionAmount2,
+      this.cardSpaceUserData.currentUserData.donationSuggestionAmount3,
+      this.cardSpaceUserData.currentUserData.donationSuggestionAmount4,
+    ].filter((v) => v);
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }

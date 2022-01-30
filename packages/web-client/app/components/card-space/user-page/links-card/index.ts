@@ -19,6 +19,10 @@ export default class UserPageLinksCardComponent extends Component {
     return this.cardSpaceUserData.currentUserData.links.length;
   }
 
+  get links() {
+    return this.cardSpaceUserData.currentUserData.links;
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }

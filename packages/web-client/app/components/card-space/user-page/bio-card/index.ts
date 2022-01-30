@@ -22,6 +22,14 @@ export default class UserPageBioCardComponent extends Component {
     );
   }
 
+  get bioTitle() {
+    return this.cardSpaceUserData.currentUserData.bioTitle;
+  }
+
+  get bioDescription() {
+    return this.cardSpaceUserData.currentUserData.bioDescription;
+  }
+
   get isSubmitting() {
     return this.state === CardStates.SUBMITTING;
   }
