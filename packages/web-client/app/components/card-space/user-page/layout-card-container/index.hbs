@@ -26,6 +26,7 @@
 </Boxel::CardContainer>
 
 <CardSpace::UserPage::CardEditModal
+  @header={{@header}}
   @isEditing={{@isEditing}}
   @isSubmitting={{@isSubmitting}}
   @submissionDisabled={{@submissionDisabled}}
@@ -34,9 +35,6 @@
   @size={{@editSize}}
   @errorMessage={{@errorMessage}}
 >
-  <:header>
-    {{@header}}
-  </:header>
   <:default>
     {{yield to="edit"}}
   </:default>
