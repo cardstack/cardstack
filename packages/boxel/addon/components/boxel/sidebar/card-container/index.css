@@ -1,5 +1,5 @@
 .boxel-sidebar-card-container {
-  --boxel-sidebar-card-container-max-width: 15rem; /* 240px */
+  --boxel-sidebar-card-container-max-width: var(--boxel-sidebar-max-width, 15rem); /* 240px */
 
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);

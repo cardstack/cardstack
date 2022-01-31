@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -598,17 +598,6 @@ $$;
 ALTER FUNCTION graphile_worker.tg_jobs__notify_new_jobs() OWNER TO postgres;
 
 --
--- Name: add(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.add(integer, integer) RETURNS integer
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$select $1 + $2;$_$;
-
-
-ALTER FUNCTION public.add(integer, integer) OWNER TO postgres;
-
---
 -- Name: card_eq(public.card_dep, public.card_dep); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -872,12 +861,14 @@ CREATE TABLE public.cards (
     data jsonb,
     ancestors text[],
     "searchData" jsonb,
-    realm text NOT NULL,
+    realm text,
     generation integer,
     "compileErrors" jsonb,
     deps text[],
     raw jsonb,
-    compiled jsonb
+    compiled jsonb,
+    "schemaModule" text,
+    "componentInfos" jsonb
 );
 
 
@@ -1594,8 +1585,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1613,14 +1604,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-10-25 14:13:27.499839-04
-2	2021-10-25 14:13:27.499839-04
-3	2021-10-25 14:13:27.499839-04
-4	2021-10-25 14:13:27.499839-04
-5	2021-10-25 14:13:27.499839-04
-6	2021-10-25 14:13:27.499839-04
-7	2021-10-25 14:13:27.499839-04
-8	2021-10-25 14:13:27.499839-04
+1	2021-11-29 17:02:42.091944-05
+2	2021-11-29 17:02:42.091944-05
+3	2021-11-29 17:02:42.091944-05
+4	2021-11-29 17:02:42.091944-05
+5	2021-11-29 17:02:42.091944-05
+6	2021-11-29 17:02:42.091944-05
+7	2021-11-29 17:02:42.091944-05
+8	2021-11-29 17:02:42.091944-05
 \.
 
 
@@ -1629,30 +1620,31 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-10-25 14:13:27.499839
-2	20210614080132698_create-prepaid-card-customizations-table	2021-10-25 14:13:27.499839
-3	20210623052200757_create-graphile-worker-schema	2021-10-25 14:13:27.499839
-4	20210809113449561_merchant-infos	2021-10-25 14:13:27.499839
-5	20210817184105100_wallet-orders	2021-10-25 14:13:27.499839
-6	20210920142313915_prepaid-card-reservations	2021-10-25 14:13:27.499839
-7	20210924200122612_order-indicies	2021-10-25 14:13:27.499839
-8	20211006090701108_create-card-spaces	2021-10-25 14:13:27.499839
-9	20211013173917696_beta-testers	2021-10-25 14:13:27.499839
-10	20211014131843187_add-fields-to-card-spaces	2021-10-25 14:13:27.499839
-11	20211020231214235_discord-bots	2021-11-04 13:23:05.679077
-17	20211105180905492_wyre-price-service	2021-11-05 14:24:55.098482
-18	20211013155536724_card-index	2021-11-30 13:54:08.761974
-19	20211110210324178_card-index-part-duex	2021-11-30 13:54:08.761974
-20	20211118084217151_create-uploads	2021-11-30 13:54:08.761974
-21	20211129083801382_create-push-notification-registrations	2021-12-08 16:54:01.261791
-22	20211129123635817_create-notification-types	2021-12-08 16:54:01.320453
-23	20211129130425303_create-notification-preferences	2021-12-08 16:54:01.335368
-24	20211206195559187_card-index-generations	2021-12-08 16:54:01.358891
-46	20211207151150639_sent-push-notifications	2022-01-03 16:22:49.63704
-47	20211207190527999_create-latest-event-block	2022-01-03 16:22:49.63704
-48	20211214163123421_card-index-errors	2022-01-03 16:22:49.63704
-51	20220103201128435_invalidation-ordering	2022-01-05 12:53:32.343481
-54	20220107151914576_rename-beta-testers-table	2022-01-07 10:49:15.639171
+1	20210527151505645_create-prepaid-card-tables	2021-11-29 17:02:42.091944
+2	20210614080132698_create-prepaid-card-customizations-table	2021-11-29 17:02:42.091944
+3	20210623052200757_create-graphile-worker-schema	2021-11-29 17:02:42.091944
+4	20210809113449561_merchant-infos	2021-11-29 17:02:42.091944
+5	20210817184105100_wallet-orders	2021-11-29 17:02:42.091944
+6	20210920142313915_prepaid-card-reservations	2021-11-29 17:02:42.091944
+7	20210924200122612_order-indicies	2021-11-29 17:02:42.091944
+8	20211006090701108_create-card-spaces	2021-11-29 17:02:42.091944
+9	20211013155536724_card-index	2021-11-29 17:02:42.091944
+10	20211013173917696_beta-testers	2021-11-29 17:02:42.091944
+11	20211014131843187_add-fields-to-card-spaces	2021-11-29 17:02:42.091944
+12	20211020231214235_discord-bots	2021-11-29 17:02:42.091944
+13	20211105180905492_wyre-price-service	2021-11-29 17:02:42.091944
+14	20211110210324178_card-index-part-duex	2021-11-29 17:02:42.091944
+15	20211118084217151_create-uploads	2021-11-29 17:02:42.091944
+16	20211129083801382_create-push-notification-registrations	2021-12-06 15:02:22.412913
+17	20211206195559187_card-index-generations	2021-12-06 15:02:22.412913
+18	20211129123635817_create-notification-types	2021-12-17 13:10:31.316468
+19	20211129130425303_create-notification-preferences	2021-12-17 13:10:31.316468
+20	20211207151150639_sent-push-notifications	2021-12-17 13:10:31.316468
+21	20211207190527999_create-latest-event-block	2021-12-17 13:10:31.316468
+22	20211214163123421_card-index-errors	2021-12-17 13:10:31.316468
+23	20220103201128435_invalidation-ordering	2022-01-03 16:31:26.924877
+24	20220107151914576_rename-beta-testers-table	2022-01-11 15:53:25.427206
+27	20220111204952452_index-optimizations	2022-01-11 16:20:55.314311
 \.
 
 
@@ -1660,7 +1652,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 54, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 27, true);
 
 
 --

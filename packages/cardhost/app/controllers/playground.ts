@@ -1,4 +1,4 @@
-import CardModel from '@cardstack/core/src/card-model';
+import { CardModel } from '@cardstack/core/src/interfaces';
 import Controller from '@ember/controller';
 import { inject } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -11,7 +11,7 @@ export default class ApplicationController extends Controller {
   @tracked models: CardModel[] | undefined;
 
   @task async queryUsersTask(): Promise<void> {
-    this.models = await this.cards.query({
+    this.models = await this.cards.query('embedded', {
       filter: { type: 'https://demo.com/user' },
     });
   }

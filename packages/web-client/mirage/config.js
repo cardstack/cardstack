@@ -23,6 +23,9 @@ export default function () {
   });
 
   this.post('/merchant-infos');
+  this.get('/merchant-infos', function (schema) {
+    return schema.merchantInfos.all();
+  });
 
   this.get(
     '/merchant-infos/validate-slug/:slug',
@@ -93,14 +96,11 @@ export default function () {
   );
 
   // prevent sporadic test failure because of degradation banner
-  this.get(
-    `${config.urls.statusPageUrl}/api/v2/incidents/unresolved.json`,
-    function () {
-      return {
-        incidents: [],
-      };
-    }
-  );
+  this.get(config.urls.statusPageUrl, function () {
+    return {
+      incidents: [],
+    };
+  });
 
   this.passthrough((request) => {
     return (

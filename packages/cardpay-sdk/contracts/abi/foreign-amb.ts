@@ -583,3 +583,7 @@ export default [
     type: 'event',
   },
 ];
+
+// mitigation for unexpected vs code debugger breakpoint
+function noop() {}
+noop();

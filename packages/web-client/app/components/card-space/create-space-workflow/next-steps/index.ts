@@ -4,7 +4,7 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 
 class CreateSpaceWorkflowNextStepsComponent extends Component<WorkflowCardComponentArgs> {
   get visitSpaceHref() {
-    let displayName = this.args.workflowSession.getValue('displayName');
+    let displayName = this.args.workflowSession.getValue('profileName');
     return `//${displayName}.${config.cardSpaceHostnameSuffix}`;
   }
 }

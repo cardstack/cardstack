@@ -606,8 +606,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       issuerName: 'JJ',
       layer2WalletAddress: layer2AccountAddress,
       pattern: {
-        patternUrl:
-          '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
+        patternUrl: patternChoice,
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',

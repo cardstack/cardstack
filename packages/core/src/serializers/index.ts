@@ -6,12 +6,11 @@ import get from 'lodash/get';
 import {
   ResourceObject,
   Saved,
-  Card,
   JSONAPIDocument,
-  Format,
   SerializerMap,
   SerializerName,
   Unsaved,
+  CardContent,
 } from '../interfaces';
 
 export { RawCardDeserializer } from './raw-card-deserializer';
@@ -49,7 +48,7 @@ const SERIALIZERS = {
   date: DateSerializer,
 };
 
-export function deserializaAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
+export function deserializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
   return _serializeAttributes(attrs, 'deserialize', serializerMap);
 }
 
@@ -106,12 +105,12 @@ function serializeAttribute(
   }
 }
 
-export function serializeCardPayloadForFormat(card: Card, format: Format): JSONAPIDocument<Saved> {
-  let componentInfo = card.compiled[format];
-  let resource = serializeResource('card', card.compiled.url, card.raw.data, componentInfo.usedFields);
+export function serializeCardPayloadForFormat(card: CardContent): JSONAPIDocument<Saved> {
+  let { usedFields, componentModule } = card;
+  let resource = serializeResource('card', card.url, card.data, usedFields);
   resource.meta = merge(
     {
-      componentModule: componentInfo.moduleName.global,
+      componentModule,
     },
     resource.meta
   );

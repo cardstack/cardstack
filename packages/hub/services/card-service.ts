@@ -1,7 +1,7 @@
-import { Card, CompiledCard, Unsaved, RawCard } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
-import { inject } from '@cardstack/di';
+import { getOwner, inject } from '@cardstack/di';
 import {
   field,
   addExplicitParens,
@@ -16,9 +16,10 @@ import {
   Expression,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
-import { cardURL } from '@cardstack/core/src/utils';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
+import CardModelForHub from '../lib/card-model-for-hub';
+import { service } from '@cardstack/hub/services';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -27,33 +28,51 @@ export const INSECURE_CONTEXT = {};
 const log = logger('hub/card-service');
 
 export default class CardServiceFactory {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
-  private searchIndex = inject('searchIndex');
-  private db = inject('database-manager', { as: 'db' });
-
-  as(requestContext: unknown): CardService {
-    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db);
+  async as(requestContext: unknown): Promise<CardService> {
+    return await getOwner(this).instantiate(CardService, requestContext);
   }
 }
 
 export class CardService {
-  constructor(
-    _requestContext: unknown,
-    private realmManager: CardServiceFactory['realmManager'],
-    private builder: CardServiceFactory['builder'],
-    private searchIndex: CardServiceFactory['searchIndex'],
-    private db: CardServiceFactory['db']
-  ) {}
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private builder = service('card-builder', { as: 'builder' });
+  private searchIndex = service('searchIndex');
+  private db = inject('database-manager', { as: 'db' });
+
+  constructor(_requestContext: unknown) {}
 
   async load(cardURL: string): Promise<Card> {
     log.trace('load', cardURL);
-    let db = await this.db.getPool();
     let deserializer = new RawCardDeserializer();
+    let result = await this.loadCardFromDB(['compiled'], cardURL);
+    let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
+    if (!compiled) {
+      throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
+    }
+    return {
+      compiled,
+      raw,
+    };
+  }
+
+  async loadData(cardURL: string, format: Format): Promise<CardModel> {
+    log.trace('load', cardURL);
+
+    let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
+    return await this.makeCardModelFromDatabase(format, result);
+  }
+
+  private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
+    let db = await this.db.getPool();
+    let _columns = [...new Set([...columns, 'compileErrors', 'deps'])].map(
+      // add double quotes to deal with mixed case columns and commas separators
+      (c, index, all) => `"${c}"${index !== all.length - 1 ? ',' : ''}`
+    );
+    let expression: Expression = ['select', ..._columns, 'from cards where url =', param(cardURL)];
     try {
       let {
         rows: [result],
-      } = await db.query('SELECT compiled, "compileErrors", deps from cards where url = $1', [cardURL]);
+      } = await db.query(expressionToSql(expression));
       if (!result) {
         throw new NotFound(`Card ${cardURL} was not found`);
       }
@@ -64,14 +83,7 @@ export class CardService {
         }
         throw err;
       }
-      let { raw, compiled } = deserializer.deserialize(result.compiled.data, result.compiled);
-      if (!compiled) {
-        throw new CardstackError(`bug: db entry for ${cardURL} is missing the compiled card`);
-      }
-      return {
-        compiled,
-        raw,
-      };
+      return result;
     } finally {
       db.release();
     }
@@ -99,25 +111,33 @@ export class CardService {
     await this.searchIndex.deleteCard(raw);
   }
 
-  async query(query: Query): Promise<Card[]> {
+  async query(format: Format, query: Query): Promise<CardModel[]> {
     let client = await this.db.getPool();
     try {
-      let expression: CardExpression = ['select compiled from cards'];
+      let expression: CardExpression = ['select url, data, "schemaModule", "componentInfos" from cards'];
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      let deserializer = new RawCardDeserializer();
-      return result.rows.map((row) => {
-        let { raw, compiled } = deserializer.deserialize(row.compiled.data, row.compiled);
-        if (!compiled) {
-          throw new Error(`bug: database entry for ${cardURL(raw)} is missing the compiled card`);
-        }
-        return { raw, compiled };
-      });
+      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
     } finally {
       client.release();
     }
+  }
+
+  async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
+    let cardId = this.realmManager.parseCardURL(result.url);
+    return await getOwner(this).instantiate(CardModelForHub, {
+      type: 'loaded',
+      id: cardId.id,
+      realm: cardId.realm,
+      format,
+      rawData: result.data ?? {},
+      schemaModule: result.schemaModule,
+      usedFields: result.componentInfos[format].usedFields,
+      componentModule: result.componentInfos[format].moduleName.global,
+      serializerMap: result.componentInfos[format].serializerMap,
+    });
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
@@ -211,8 +231,10 @@ function unimpl(which: string) {
   return new Error(`unimpl ${which}`);
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
+    // Note that we are only registering CardServiceFactory and not CardService
+    // so that consumers will be force to provide a request context via .as()
     'card-service': CardServiceFactory;
   }
 }

@@ -1,37 +1,45 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CompiledCard, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import {
+  CompiledCard,
+  ComponentInfo,
+  Format,
+  FORMATS,
+  ModuleRef,
+  RawCard,
+  Unsaved,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { serializableError } from '@cardstack/core/src/utils/errors';
+import { isCardstackError, serializableError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
-import { Expression, expressionToSql, param, PgPrimitive, upsert } from '../utils/expressions';
+import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
 import CardBuilder from './card-builder';
-import { transformSync } from '@babel/core';
+import type { types as t } from '@babel/core';
 import logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 
-// @ts-ignore
-import TransformModulesCommonJS from '@babel/plugin-transform-modules-commonjs';
-// @ts-ignore
-import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { transformToCommonJS } from '../utils/transforms';
+import flatMap from 'lodash/flatMap';
 
 const log = logger('hub/search-index');
 
 function assertNever(value: never) {
   throw new Error(`unsupported operation ${value}`);
 }
-export class SearchIndex {
-  private realmManager = inject('realm-manager', { as: 'realmManager' });
-  private builder = inject('card-builder', { as: 'builder' });
+export default class SearchIndex {
+  private realmManager = service('realm-manager', { as: 'realmManager' });
+  private builder = service('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
-  private fileCache = inject('file-cache', { as: 'fileCache' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
   private notifyQueuePromise: Promise<void> = Promise.resolve();
 
   async indexAllRealms(): Promise<void> {
+    log.trace('indexAllRealms: begin');
     await Promise.all(
       this.realmManager.realms.map((realm) => {
         return this.runIndexing(realm.url, async (ops) => {
@@ -41,6 +49,7 @@ export class SearchIndex {
         });
       })
     );
+    log.trace('indexAllRealms: end');
   }
 
   notify(cardURL: string, action: 'save' | 'delete'): void {
@@ -73,6 +82,7 @@ export class SearchIndex {
 
   private async indexCardFromNotification(cardURL: string, action: 'save' | 'delete') {
     let cardID = this.realmManager.parseCardURL(cardURL);
+    log.trace('indexCardFromNotification', cardURL);
     await this.runIndexing(cardID.realm, async (ops) => {
       switch (action) {
         case 'save': {
@@ -106,6 +116,13 @@ export class SearchIndex {
     log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
       return await ops.internalSave(raw, compiled, compiler);
+    });
+  }
+
+  async indexData(raw: RawCard): Promise<CompiledCard> {
+    log.trace('indexData', cardURL(raw));
+    return await this.runIndexing(raw.realm, async (ops) => {
+      return await ops.internalSaveData(raw);
     });
   }
 
@@ -145,11 +162,14 @@ class IndexerRun implements IndexerHandle {
     private fileCache: SearchIndex['fileCache']
   ) {}
 
-  async loadMeta(): Promise<PgPrimitive> {
-    let metaResult = await this.db.query(
-      expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)])
-    );
-    return metaResult.rows[0]?.meta;
+  async loadMeta(): Promise<PgPrimitive | undefined> {
+    let {
+      rows: [result],
+    } = await this.db.query(expressionToSql(['select meta from realm_metas where realm=', param(this.realmURL)]));
+    if (!result) {
+      return;
+    }
+    return result.meta;
   }
 
   setMeta(meta: PgPrimitive) {
@@ -157,6 +177,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   private async storeMeta(): Promise<void> {
+    log.trace('Storing meta');
     await this.db.query(
       expressionToSql(
         upsert('realm_metas', 'realm_metas_pkey', { realm: param(this.realmURL), meta: param(this.newMeta) })
@@ -231,6 +252,7 @@ class IndexerRun implements IndexerHandle {
       let compiledCard = await compiler.compile();
       await this.internalSave(card, compiledCard, compiler);
     } catch (err: any) {
+      log.trace('Save: Error during compile', cardURL(card));
       await this.saveErrorState(card, err, compiler);
     }
   }
@@ -241,53 +263,120 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src) =>
-      this.define(cardURL(rawCard), local, type, src)
+    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
+      this.define(cardURL(rawCard), local, type, src, ast)
     );
     return await this.writeToIndex(rawCard, definedCard, compiler);
   }
 
-  private define(cardURL: string, localPath: string, type: string, source: string): string {
+  // used directly by the hub when mutating card data only
+  async internalSaveData(rawCard: RawCard): Promise<CompiledCard> {
+    return await this.writeDataToIndex(rawCard);
+  }
+
+  private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
     switch (type) {
       case JS_TYPE:
         this.fileCache.setModule(BROWSER, cardURL, localPath, source);
-        return this.fileCache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source));
+        return this.fileCache.setModule(NODE, cardURL, localPath, transformToCommonJS(localPath, source, ast));
       default:
         return this.fileCache.writeAsset(cardURL, localPath, source);
     }
   }
 
-  private transformToCommonJS(moduleURL: string, source: string): string {
-    let out = transformSync(source, {
-      configFile: false,
-      babelrc: false,
-      filenameRelative: moduleURL,
-      plugins: [ClassPropertiesPlugin, TransformModulesCommonJS],
-    });
-    return out!.code!;
-  }
-
   private async writeToIndex(
-    card: RawCard,
+    rawCard: RawCard,
     compiledCard: CompiledCard,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let url = cardURL(card);
+    let url = cardURL(rawCard);
+    log.trace('Writing card to index', url);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(card.data ?? null),
-      raw: param(new RawCardSerializer().serialize(card)),
-      compiled: param(new RawCardSerializer().serialize(card, compiledCard)),
-      searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
+      data: param(rawCard.data ?? null),
+      raw: param(new RawCardSerializer().serialize(rawCard)),
+      compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
+      searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
+
+      schemaModule: param(compiledCard.schemaModule.global),
+      componentInfos: param(getComponentModules(compiledCard)),
     });
+
     await this.db.query(expressionToSql(expression));
     this.touched.set(url, this.touchCounter++);
     return compiledCard;
+  }
+
+  private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
+    let url = cardURL(rawCard);
+    log.trace('Writing card to index', url);
+    let compiled;
+    let isNew = false;
+    let deps: string[] | undefined;
+    try {
+      compiled = await this.builder.getCompiledCard(url);
+    } catch (e: any) {
+      if (!rawCard.adoptsFrom || !isCardstackError(e) || e.status !== 404) {
+        throw e;
+      }
+      isNew = true;
+      let parentCompiled = await this.builder.getCompiledCard(rawCard.adoptsFrom);
+      compiled = wrapCompiledCard(parentCompiled, rawCard, url);
+      let {
+        rows: [{ deps: result }],
+      } = await this.db.query(expressionToSql(['select deps from cards where url =', param(rawCard.adoptsFrom)]));
+      deps = [...(result as string[]), rawCard.adoptsFrom];
+    }
+
+    let expression: Expression;
+    if (isNew) {
+      if (!deps) {
+        throw new Error('This should never happen');
+      }
+      expression = [
+        'INSERT INTO cards (url, realm, generation, ancestors, data, raw, compiled, "searchData", "compileErrors", deps, "schemaModule", "componentInfos") VALUES (',
+        ...(flatMap(
+          [
+            param(url),
+            param(this.realmURL),
+            param(this.generation || null),
+            param(ancestorsOf(compiled)),
+            param(rawCard.data ?? null),
+            param(new RawCardSerializer().serialize(rawCard)),
+            param(new RawCardSerializer().serialize(rawCard, compiled)),
+            param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+            param(null),
+            param([deps]),
+            param(compiled.schemaModule.global),
+            param(getComponentModules(compiled)),
+          ],
+          (p, i, all) => (i === all.length - 1 ? [p] : [p, ',']) // add commas in
+        ) as (string | Param)[]),
+        ')',
+      ];
+    } else {
+      expression = [
+        'UPDATE cards SET generation =',
+        param(this.generation || null),
+        ', data =',
+        param(rawCard.data ?? null),
+        ', raw =',
+        param(new RawCardSerializer().serialize(rawCard)),
+        ', "searchData" =',
+        param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        'WHERE url =',
+        param(url),
+      ];
+    }
+    await this.db.query(expressionToSql(expression));
+
+    this.touched.set(url, this.touchCounter++);
+    return compiled;
   }
 
   private async saveErrorState(card: RawCard, err: any, compiler: Compiler): Promise<void> {
@@ -302,6 +391,8 @@ class IndexerRun implements IndexerHandle {
       compiled: param(null),
       searchData: param(null),
       compileErrors: param(serializableError(err)),
+      schemaModule: param(null),
+      componentInfos: param(null),
       deps: param([...compiler.dependencies]),
     });
     this.touched.set(url, this.touchCounter++);
@@ -333,6 +424,8 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
   return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
 }
 
+// TODO consider using the compiler to return a function that can be used to
+// generate these values for a card
 function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
   let result: Record<string, any> = {};
 
@@ -351,10 +444,35 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
   return result;
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    searchIndex: SearchIndex;
+function getComponentModules(card: CompiledCard): Record<string, any> {
+  let infos: [Format, ComponentInfo][] = [];
+  for (const format of FORMATS) {
+    infos.push([
+      format,
+      {
+        moduleName: card[format].moduleName,
+        usedFields: card[format].usedFields,
+        serializerMap: card[format].serializerMap,
+      },
+    ]);
   }
+  return Object.fromEntries(infos);
+}
+
+function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): CompiledCard {
+  return {
+    url,
+    realm: raw.realm,
+    adoptsFrom: compiled,
+    fields: compiled.fields,
+    schemaModule: compiled.schemaModule,
+    serializer: compiled.serializer,
+    isolated: compiled.isolated,
+    embedded: compiled.embedded,
+    edit: compiled.edit,
+    modules: compiled.modules,
+    deps: [...compiled.deps, compiled.url],
+  };
 }
 
 function readCursor(cursor: Cursor, rowCount: number): Promise<Record<string, any>[]> {
@@ -367,4 +485,10 @@ function readCursor(cursor: Cursor, rowCount: number): Promise<Record<string, an
       }
     });
   });
+}
+
+declare module '@cardstack/hub/services' {
+  interface HubServices {
+    searchIndex: SearchIndex;
+  }
 }

@@ -50,13 +50,7 @@ if (process.env.COMPILER) {
       await cards.create({
         realm,
         id: 'fancy-date',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-          import { adopts } from "@cardstack/types";
-          import date from "https://cardstack.com/base/date";
-          export default @adopts(date) class FancyDate { }`,
-        },
+        adoptsFrom: 'https://cardstack.com/base/date',
       });
       let { compiled } = await cards.load(`${realm}fancy-date`);
       expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
@@ -66,6 +60,10 @@ if (process.env.COMPILER) {
       await cards.create(PERSON_CARD);
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
+      let nameFieldMeta = compiled.fields['name'];
+      expect(nameFieldMeta).to.have.property('name', 'name');
+      expect(nameFieldMeta).to.have.property('type', 'contains');
+      expect(nameFieldMeta).to.have.property('computed', false);
     });
 
     it('CompiledCard embedded view', async function () {
@@ -257,6 +255,64 @@ if (process.env.COMPILER) {
       }
     });
 
+    it(`gives a good error when a card can't compile because computed field has args`, async function () {
+      let badCard: RawCard = {
+        realm,
+        id: 'bad-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+          import string from "https://cardstack.com/base/string";
+          import { contains } from "@cardstack/types";
+          import person from "../person";
+          export default class BadPerson {
+            @contains(string) lastName;
+            @contains(string)
+            async fullName(arg) {
+              return "Mr or Mrs " + (await this.lastName());
+            }
+          }
+        `,
+        },
+      };
+      try {
+        await cards.create(badCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.include(`computed fields take no arguments`);
+        expect(err.status).to.eq(400);
+      }
+    });
+
+    it(`gives a good error when a card can't compile because computed field has static name`, async function () {
+      let badCard: RawCard = {
+        realm,
+        id: 'bad-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+          import string from "https://cardstack.com/base/string";
+          import { contains } from "@cardstack/types";
+          import person from "../person";
+          export default class BadPerson {
+            @contains(string) lastName;
+            @contains(string)
+            static async fullName() {
+              return "Mr or Mrs " + (await this.lastName());
+            }
+          }
+        `,
+        },
+      };
+      try {
+        await cards.create(badCard);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.include(`computed fields should not be static`);
+        expect(err.status).to.eq(400);
+      }
+    });
+
     describe('@fields iterating', function () {
       let postCard: RawCard = {
         realm,
@@ -332,6 +388,225 @@ if (process.env.COMPILER) {
         expect(getFileCache().getModule(fancyCompiled.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
         );
+      });
+    });
+
+    describe('computed fields', function () {
+      let fancyDateCard: RawCard = {
+        realm,
+        id: 'fancy-date',
+        adoptsFrom: 'https://cardstack.com/base/date',
+      };
+      let bioCard: RawCard = {
+        realm,
+        id: 'bio',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import date from "https://cardstack.com/base/date";
+
+            export default class Bio {
+              @contains(date) birthdate;
+            }
+          `,
+        },
+      };
+      let personCard: RawCard = {
+        realm,
+        id: 'person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import bio from "../bio";
+            export default class Person {
+              @contains(string) lastName;
+              @contains(bio) aboutMe;
+
+              @contains(string)
+              async fullName() {
+                return "Mr or Mrs " + await this.lastName;
+              }
+            }
+          `,
+        },
+      };
+      let fancyPersonCard: RawCard = {
+        realm,
+        id: 'fancy-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts } from "@cardstack/types";
+            import person from "../person";
+            export default @adopts(person) class FancyPerson {
+
+            }
+          `,
+        },
+      };
+      let reallyFancyPersonCard: RawCard = {
+        realm,
+        id: 'really-fancy-person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts, contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import fancyPerson from "../fancy-person";
+            export default @adopts(fancyPerson) class ReallyFancyPerson {
+              @contains(string) middleName;
+            }
+          `,
+        },
+      };
+
+      this.beforeEach(async function () {
+        await cards.create(fancyDateCard);
+        await cards.create(bioCard);
+        await cards.create(personCard);
+        await cards.create(fancyPersonCard);
+        await cards.create(reallyFancyPersonCard);
+      });
+
+      it('can compile schema class constructor for composite card', async function () {
+        let { compiled } = await cards.load(`${realm}bio`);
+        // the browser source has a lot less babel shenanigans
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          #getRawField;
+
+          constructor(get) {
+            this.#getRawField = get;
+          }
+        `);
+      });
+
+      it('can compile primitive field implementation in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}bio`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.not.containsSource(`@contains`);
+        expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
+        expect(source).to.containsSource(`
+          import FieldGetter from "@cardstack/core/src/field-getter";
+        `);
+        expect(source).to.containsSource(`
+          get birthdate() {
+            return new FieldGetter(this.#getRawField, "birthdate");
+          }
+        `);
+      });
+
+      it('can compile composite field implementation in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.not.containsSource(`@contains`);
+        expect(source).to.not.containsSource(`${realm}bio`);
+        expect(source).to.containsSource(`
+          import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
+        `);
+        expect(source).to.containsSource(`
+          get aboutMe() {
+            return new BioClass(innerField => this.#getRawField("aboutMe." + innerField));
+          }
+        `);
+      });
+
+      it('can compile computed field in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.not.containsSource(`@contains`);
+        expect(source).to.containsSource(`
+          get fullName() {
+            return (async () => {
+              return "Mr or Mrs " + (await this.lastName);
+            })();
+          }
+        `);
+      });
+
+      it('can compile a schema.js that adopts from a composite card has no additional fields', async function () {
+        let { compiled } = await cards.load(`${realm}fancy-person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          import PersonClass from "@cardstack/compiled/https-cardstack.local-person/schema.js";
+          export default class FancyPerson extends PersonClass {}
+        `);
+      });
+
+      it('can make a constructor for a schema.js that adopts from a composite card has additional fields', async function () {
+        let { compiled } = await cards.load(`${realm}really-fancy-person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          #getRawField;
+
+          constructor(get) {
+            super(get);
+            this.#getRawField = get;
+          }
+        `);
+      });
+
+      it(`doesn't allow a card that adopts from a primitive card to become a composite card by having fields`, async function () {
+        let parentURL = cardURL(fancyDateCard);
+        let badCard = {
+          realm,
+          id: 'bad-date',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { adopts, contains } from "@cardstack/types";
+              import fancyDate from "${parentURL}";
+              import string from "https://cardstack.com/base/string";
+              export default @adopts(fancyDate) class BadDate {
+                @contains(string) constellation;
+              }`,
+          },
+        };
+
+        try {
+          await cards.create(badCard);
+          throw new Error('failed to throw expected exception');
+        } catch (err: any) {
+          expect(err.message).to.equal(
+            `Card ${cardURL(
+              badCard
+            )} adopting from primitive parent ${parentURL} must be of primitive type itself and should not have a schema.js file.`
+          );
+        }
+      });
+    });
+
+    describe('linksTo', function () {
+      let postCard: RawCard = {
+        realm,
+        id: 'post',
+        schema: 'schema.js',
+        embedded: 'embedded.js',
+        files: {
+          'schema.js': `
+          import { linksTo } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          export default class Post {
+            @linksTo(string)
+            title;
+          }`,
+          'embedded.js': templateOnlyComponentTemplate(`<@fields.title />`),
+        },
+      };
+
+      this.beforeEach(async function () {
+        await cards.create(postCard);
+      });
+
+      it('Can understand linksTo fields', async function () {
+        let { compiled } = await cards.load(`${realm}post`);
+
+        expect(compiled.fields.title.name).to.eq('title');
+        expect(compiled.fields.title.type).to.eq('linksTo');
+        expect(compiled.embedded.usedFields).to.have.members(['title']);
       });
     });
   });
