@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { cardURL } from '@cardstack/core/src/utils';
 import { parse, isSameDay } from 'date-fns';
+import { setupTest } from 'ember-qunit';
 
 import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import {
@@ -58,16 +59,19 @@ class StubCards {
   }
 }
 
-module('@core | card-model-for-browser', function (_hooks) {
+module('@core | card-model-for-browser', function (hooks) {
+  setupTest(hooks);
   test('.data', async function (assert) {
     let stub = new StubCards();
-    let model = this.cardService.makeCardModelFromResponse(
-      stub,
-      cardJSONResponse.data,
-      fakeComponent,
-      serializerMap,
-      'isolated'
-    );
+    let model = this.owner
+      .lookup('service:cards')
+      .makeCardModelFromResponse(
+        stub,
+        cardJSONResponse.data,
+        fakeComponent,
+        serializerMap,
+        'isolated'
+      );
     assert.equal(
       model.data.name,
       attributes.name,
@@ -90,13 +94,15 @@ module('@core | card-model-for-browser', function (_hooks) {
 
   test('.serialize', async function (assert) {
     let stub = new StubCards();
-    let model = this.cardService.makeCardModelFromResponse(
-      stub,
-      cardJSONResponse.data,
-      fakeComponent,
-      serializerMap,
-      'isolated'
-    );
+    let model = this.owner
+      .lookup('service:cards')
+      .makeCardModelFromResponse(
+        stub,
+        cardJSONResponse.data,
+        fakeComponent,
+        serializerMap,
+        'isolated'
+      );
 
     await model.save();
     let op = stub.lastOp;
