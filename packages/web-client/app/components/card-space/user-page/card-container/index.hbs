@@ -22,10 +22,10 @@
       </Boxel::Header>
     {{/if}}
     <div class="card-space-card-container__body">
-      {{#if (or @sufficientContent (not (has-block "placeholders")))}}
+      {{#if (or @sufficientContent (not (has-block "placeholder")))}}
         {{yield}}
       {{else}}
-        {{yield to="placeholders"}}
+        {{yield to="placeholder"}}
       {{/if}}
     </div>
     {{#if @editable}}
