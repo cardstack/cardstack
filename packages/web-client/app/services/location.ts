@@ -9,7 +9,7 @@ export interface LocationService {
  */
 export default class Location extends Service implements LocationService {
   get hostname() {
-    return window.location.hostname;
+    return 'no.pouty.pizza';
   }
 }
 
