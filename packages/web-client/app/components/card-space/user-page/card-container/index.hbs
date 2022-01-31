@@ -7,13 +7,14 @@
     ...attributes
   >
     {{#if @editable}}
-      <Boxel::Header>
+      <Boxel::Header data-test-card-space-card-container-header>
         <:default>
           {{@header}}
         </:default>
         <:actions>
           <button
             type="button"
+            data-test-card-space-card-container-header-edit-button
             {{on 'click' @onClickEdit}}
           >
             Edit
@@ -21,7 +22,7 @@
         </:actions>
       </Boxel::Header>
     {{/if}}
-    <div class="card-space-card-container__body">
+    <div class="card-space-card-container__body" data-test-card-space-card-container-body>
       {{#if (or @sufficientContent (not (has-block "placeholder")))}}
         {{yield}}
       {{else}}
