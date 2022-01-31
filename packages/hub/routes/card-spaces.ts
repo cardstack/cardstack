@@ -76,29 +76,27 @@ export default class CardSpacesRoute {
 
     let merchantInfoError;
 
-    if (cardSpace.merchantId) {
-      let merchantId = cardSpace.merchantId;
-      let merchant = await this.merchantInfoQueries.fetch({ id: merchantId });
+    let merchantId = cardSpace.merchantId;
+    let merchant = await this.merchantInfoQueries.fetch({ id: merchantId });
 
-      if (!merchant || !merchant.length) {
+    if (!merchant || !merchant.length) {
+      merchantInfoError = [
+        {
+          detail: `Given merchant-id ${merchantId} was not found`,
+          relationship: 'merchant-info',
+        },
+      ];
+    } else {
+      let merchantInfo = merchant[0];
+
+      if (merchantInfo.ownerAddress !== ctx.state.userAddress) {
         merchantInfoError = [
           {
-            detail: `Given merchant-id ${merchantId} was not found`,
+            detail: `Given merchant-id ${merchantId} is not owned by the user`,
             relationship: 'merchant-info',
+            status: 403,
           },
         ];
-      } else {
-        let merchantInfo = merchant[0];
-
-        if (merchantInfo.ownerAddress !== ctx.state.userAddress) {
-          merchantInfoError = [
-            {
-              detail: `Given merchant-id ${merchantId} is not owned by the user`,
-              relationship: 'merchant-info',
-              status: 403,
-            },
-          ];
-        }
       }
     }
 
