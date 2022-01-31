@@ -13,11 +13,11 @@ class CardSpaceEditDetailsButtonTextComponent extends Component<WorkflowCardComp
   options = OPTIONS;
 
   get buttonTextValue() {
-    return this.args.workflowSession.getValue<string>('buttonText');
+    return this.args.workflowSession.getValue<string>('profileButtonText');
   }
 
   @action setButtonTextValue(val: string) {
-    this.args.workflowSession.setValue('buttonText', val);
+    this.args.workflowSession.setValue('profileButtonText', val);
   }
 }
 
