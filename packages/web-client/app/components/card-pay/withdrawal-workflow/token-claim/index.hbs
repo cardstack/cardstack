@@ -20,9 +20,9 @@
       />
     </div>
     {{#if this.errorMessage}}
-      <CardPay::ErrorMessage as |supportURL|>
+      <Common::ErrorMessage as |supportURL|>
         {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
-      </CardPay::ErrorMessage>
+      </Common::ErrorMessage>
     {{/if}}
     <div class="token-claim__footnote">
       * The actual value depends on the current exchange rate and is determined at the time of authorization.

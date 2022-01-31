@@ -62,7 +62,7 @@
       {{/unless}}
     </div>
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-withdrawal-transaction-amount-error as |supportURL|>
+      <Common::ErrorMessage data-test-withdrawal-transaction-amount-error as |supportURL|>
         {{#if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else if (eq this.error.message "INSUFFICIENT_FUNDS")}}
@@ -70,7 +70,7 @@
         {{else}}
           There was a problem initiating the withdrawal of your tokens from {{network-display-info "layer2" "fullName"}}. Please try again, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
-      </CardPay::ErrorMessage>
+      </Common::ErrorMessage>
     {{/if}}
     <div class="withdrawal-transaction-amount__footnote" data-test-approximate-value-footnote>
       * The actual value depends on the current exchange rate and is determined at the time of authorization.

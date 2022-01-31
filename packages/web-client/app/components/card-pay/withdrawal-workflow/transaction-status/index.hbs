@@ -50,9 +50,9 @@
       </p>
     {{/if}}
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-withdrawal-transaction-status-error as |supportURL|>
+      <Common::ErrorMessage data-test-withdrawal-transaction-status-error as |supportURL|>
         There was a problem completing the bridging of your tokens to {{network-display-info "layer1" "fullName"}}. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
-      </CardPay::ErrorMessage>
+      </Common::ErrorMessage>
     {{/if}}
   </ActionCardContainer::Section>
 </ActionCardContainer>

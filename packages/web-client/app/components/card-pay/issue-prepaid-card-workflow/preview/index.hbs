@@ -71,7 +71,7 @@
       </CardPay::FieldStack>
     </div>
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message as |supportURL|>
+      <Common::ErrorMessage data-test-issue-prepaid-card-error-message as |supportURL|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           {{!-- TODO: This should be accompanied by canceling the workflow --}}
           Looks like there’s no balance in your {{network-display-info "layer2" "fullName"}} wallet to fund your selected prepaid card. Before you can continue, please add funds to your {{network-display-info "layer2" "fullName"}} wallet by bridging some tokens from your {{network-display-info "layer1" "fullName"}} wallet.
@@ -83,7 +83,7 @@
         {{else}}
           There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact  <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
-        </CardPay::ErrorMessage>
+        </Common::ErrorMessage>
     {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
