@@ -1,0 +1,138 @@
+{{#if (or @editable this.showInViewMode)}}
+  <CardSpace::UserPage::CardContainer
+    @header="Donations"
+    @errorMessage={{this.submissionErrorMessage}}
+    @editable={{@editable}}
+    @isEditing={{this.isEditing}}
+    @isSubmitting={{this.isSubmitting}}
+    @onClickEdit={{this.onClickEdit}}
+    @onEndEdit={{this.onEndEdit}}
+    @save={{this.save}}
+  >
+    <:default>
+    {{#if this.showInViewMode}}
+        <CardSpace::UserPage::CardTitle>
+          {{!-- Make donation title required via clientside validations, but leave a default just in case --}}
+          {{!-- Maybe hub should have more detailed validations for individual "cards"? --}}
+          {{or this.donationTitle (concat "Support " this.displayName)}}
+        </CardSpace::UserPage::CardTitle>
+        {{#if this.donationDescription}}
+          <div class="card-space-user-page__donation-description">
+            {{this.donationDescription}}
+          </div>
+        {{/if}}
+        {{#if this.donationSuggestionAmountList}}
+          <ol class="card-space-user-page__donation-list">
+            {{#each this.donationSuggestionAmountList as |donation|}}
+              <li>
+                <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+                  <div class="card-space-user-page__donation-choice-amount-group">
+                    {{svg-jar "spend" width="20" height="20" role="presentation"}}
+                    <div class="card-space-user-page__donation-choice-spend-amount">
+                      §{{format-amount donation}} SPEND
+                    </div>
+                    <div class="card-space-user-page__donation-choice-usd-amount">
+                      ${{spend-to-usd donation}} USD
+                    </div>
+                  </div>
+                </button>
+              </li>
+            {{/each}}
+              <li>
+                <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+                  <div class="card-space-user-page__donation-choice-plain-text">
+                    {{!-- this should really be customizable --}}
+                    Choose a custom amount
+                  </div>
+                </button>
+              </li>
+          </ol>
+          {{else}}
+          <button class="card-space-user-page__donation-choice" type="button" {{on "click" (noop)}}>
+            <div class="card-space-user-page__donation-choice-plain-text">
+              {{!-- this should really be customizable --}}
+              Choose a custom amount
+            </div>
+          </button>
+        {{/if}}
+      {{else}}
+        <CardSpace::UserPage::CardTitle>
+          Donation module
+        </CardSpace::UserPage::CardTitle>
+        <div class="card-space-user-page__donation-description">
+          Receive donations from supporters and choose custom denominations
+        </div>
+        <ol class="card-space-user-page__donation-list">
+          {{#each (array 1 2 3 4) as |number|}}
+            <li>
+              <div class="card-space-user-page__donation-choice">
+                <div class="card-space-user-page__donation-choice-plain-text">
+                  Amount {{number}}
+                </div>
+              </div>
+            </li>
+          {{/each}}
+          <li>
+            <div class="card-space-user-page__donation-choice">
+              <div class="card-space-user-page__donation-choice-plain-text">
+                Choose a custom amount
+              </div>
+            </div>
+          </li>
+        </ol>
+      {{/if}}
+    </:default>
+    <:edit as |EditComponent|>
+    <EditComponent>
+      <Boxel::Field @label="donationDescription" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationDescription}}
+          @errorMessage={{this.validationErrorMessages.donationDescription}}
+          @value={{this.donationDescriptionInputValue}}
+          @onInput={{this.onDonationDescriptionInput}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationTitle" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationTitle}}
+          @errorMessage={{this.validationErrorMessages.donationTitle}}
+          @value={{this.donationTitleInputValue}}
+          @onInput={{this.onDonationTitleInput}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount1" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount1}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount1}}
+          @value={{this.donationSuggestionAmount1InputValue}}
+          @onInput={{this.onDonationSuggestionAmount1Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount2" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount2}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount2}}
+          @value={{this.donationSuggestionAmount2InputValue}}
+          @onInput={{this.onDonationSuggestionAmount2Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount3" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount3}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount3}}
+          @value={{this.donationSuggestionAmount3InputValue}}
+          @onInput={{this.onDonationSuggestionAmount3Input}}
+        />
+      </Boxel::Field>
+      <Boxel::Field @label="donationSuggestionAmount4" @fieldMode="edit">
+        <Boxel::Input
+          @invalid={{this.validationErrorMessages.donationSuggestionAmount4}}
+          @errorMessage={{this.validationErrorMessages.donationSuggestionAmount4}}
+          @value={{this.donationSuggestionAmount4InputValue}}
+          @onInput={{this.onDonationSuggestionAmount4Input}}
+        />
+      </Boxel::Field>
+      </EditComponent>
+    </:edit>
+  </CardSpace::UserPage::CardContainer>
+{{/if}}

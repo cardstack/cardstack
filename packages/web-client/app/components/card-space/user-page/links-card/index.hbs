@@ -1,0 +1,89 @@
+{{#if (or @editable this.showInViewMode)}}
+  <CardSpace::UserPage::CardContainer
+    @header="Links"
+    @editable={{@editable}}
+    @isEditing={{this.isEditing}}
+    @isSubmitting={{this.isSubmitting}}
+    @onClickEdit={{this.onClickEdit}}
+    @onEndEdit={{this.onEndEdit}}
+    @save={{this.save}}
+    @errorMessage={{this.submissionErrorMessage}}
+  >
+    <:default>
+      {{#if this.showInViewMode}}
+        <CardSpace::UserPage::CardTitle>
+          My Links
+        </CardSpace::UserPage::CardTitle>
+        <ul>
+          {{#each this.links as |link|}}
+            <li>
+              <a class="card-space-user-page__link" href={{link.url}}>
+                <div class="card-space-user-page__link-title">
+                  {{link.title}}
+                </div>
+                <div class="card-space-user-page__link-url">
+                  {{link.url}}
+                </div>
+              </a>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <CardSpace::UserPage::CardTitle>
+          My Links
+        </CardSpace::UserPage::CardTitle>
+        <div class="card-space-user-page__link">
+          <div class="card-space-user-page__link-title">
+            Your link title
+          </div>
+
+          <div class="card-space-user-page__link-url">
+            Your link url
+          </div>
+        </div>
+      {{/if}}
+    </:default>
+<:edit as |EditComponent|>
+    <EditComponent>
+      {{#each this.editedLinks as |editedLink index|}}
+      <div class="card-space-user-page__edited-link">
+        <Boxel::Field
+          @fieldMode="edit"
+          @label="Link Title"
+          class="card-space-user-page__edited-link-title"
+        >
+          <Boxel::Input
+            @value={{editedLink.title}}
+            @onInput={{editedLink.updateTitle}}
+            @errorMessage={{editedLink.titleValidationError}}
+            @invalid={{editedLink.titleValidationError}}
+          />
+        </Boxel::Field>
+        <Boxel::Field
+          @fieldMode="edit"
+          @label="URL"
+          class="card-space-user-page__edited-link-url"
+        >
+          <Boxel::Input
+            @value={{editedLink.url}}
+            @onInput={{editedLink.updateUrl}}
+            @errorMessage={{editedLink.urlValidationError}}
+            @invalid={{editedLink.urlValidationError}}
+          />
+        </Boxel::Field>
+        <button type="button" class="card-space-user-page__edited-link-delete" {{on "click" (fn this.removeItemAt index)}}>
+          {{svg-jar "trash"}}
+        </button>
+      </div>
+      {{/each}}
+      <Boxel::Button
+        @kind="secondary-light"
+        @size="small"
+        {{on "click" this.addItem}}
+      >
+        Add Link
+      </Boxel::Button>
+    </EditComponent>
+    </:edit>
+  </CardSpace::UserPage::CardContainer>
+{{/if}}

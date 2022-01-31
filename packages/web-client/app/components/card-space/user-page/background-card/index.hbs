@@ -1,0 +1,71 @@
+<CardSpace::UserPage::LayoutCardContainer
+  @header="Layout"
+  @editable={{@editable}}
+  @errorMessage={{this.submissionErrorMessage}}
+  @onClickEdit={{this.onClickEdit}}
+>
+  <:default as |BackgroundEditButton|>
+    <div>
+      <div class="card-space-user-page__background-card" style={{css-var background-image-url=(concat "url(" this.background ")")}}>
+        <BackgroundEditButton>
+          Customize background
+        </BackgroundEditButton>
+      </div>
+
+      <div class="card-space-user-page__background-card-content">
+        {{yield}}
+      </div>
+    </div>
+  </:default>
+  <:edit as |EditComponent|>
+    <EditComponent
+     @state={{this.editingState}}
+     @close={{this.stopEditing}}
+     @disabled={{this.submissionDisabled}}
+     @save={{this.save}}
+    >
+      <:default>
+        <ImageUploader
+          @state={{this.imageUploadState}}
+          @errorMessage={{this.imageUploadErrorMessage}}
+          @image={{this.backgroundInputValue}}
+          @cta="Select a Photo"
+          @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+          @acceptedFileTypes={{this.acceptedFileTypes}}
+          @onUpload={{this.onUpload}}
+          @onError={{this.logUploadError}}
+          @onRemoveImage={{this.onImageRemoved}}
+        as |ImageUploaderAvatar|>
+          <ImageUploaderAvatar
+            @alt="Cover photo"
+          />
+        </ImageUploader>
+      </:default>
+      <:error as |ErrorMessage|>
+        {{#if this.submissionErrorMessage}}
+          <ErrorMessage>
+            {{this.submissionErrorMessage}}
+          </ErrorMessage>
+        {{/if}}
+      </:error>
+    </EditComponent>
+  </:edit>
+</CardSpace::UserPage::LayoutCardContainer>
+
+{{#in-element this.imageEditorElement}}
+  <ImageEditor
+    @isOpen={{this.showEditor}}
+    @onClose={{fn (mut this.showEditor) false}}
+    @image={{this.processedImage.preview}}
+    @fileType={{this.processedImage.type}}
+    @width={{this.desiredWidth}}
+    @height={{this.desiredHeight}}
+    @saveImageEditData={{perform this.saveImageEditDataTask}}
+    as |preview|
+  >
+    <CardSpace::ProfileCard
+      @coverPhoto={{preview}}
+      data-test-card-space-profile-card-preview
+    />
+  </ImageEditor>
+{{/in-element}}

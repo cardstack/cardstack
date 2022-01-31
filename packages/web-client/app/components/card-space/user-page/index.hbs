@@ -1,0 +1,49 @@
+{{!-- yet another place to fix after boxel's modal has been adjusted to work with multiple layers --}}
+{{!-- template-lint-disable no-inline-styles --}}
+<div id="card-space-user-page-image-editor" style="z-index: calc(var(--boxel-layer-modal-default) + 1); width: 0px; height: 0px; flex-grow: 0; position: absolute;"></div>
+<div class="card-space-user-page" ...attributes>
+  {{#if this.isOwner}}
+    {{#if this.isAuthenticated}}
+      <button
+        class="card-space-user-page__top-floating-button"
+        type="button"
+        data-test-card-space-toggle-view-button
+        {{on "click" this.switchMode}}
+      >
+        {{#if (eq this.mode "view")}}
+          Enter Edit Mode
+        {{else}}
+          Enter Preview Mode
+        {{/if}}
+      </button>
+      {{else}}
+      <button
+        class="card-space-user-page__top-floating-button card-space-user-page__floating-authenticate-button"
+        type="button"
+        data-test-card-space-floating-authenticate-button
+      >
+        Authenticate with hub to enable editing
+      </button>
+    {{/if}}
+  {{/if}}
+  <CardSpace::UserPage::BackgroundCard
+    @editable={{this.editable}}
+  >
+    <div class="card-space-user-page__compact-content-column">
+      <CardSpace::UserPage::ProfileCard
+        @editable={{this.editable}}
+      />
+    </div>
+    <div class="card-space-user-page__prose-content-column">
+      <CardSpace::UserPage::BioCard
+        @editable={{this.editable}}
+      />
+      <CardSpace::UserPage::LinksCard
+        @editable={{this.editable}}
+      />
+      <CardSpace::UserPage::DonationsCard
+        @editable={{this.editable}}
+      />
+    </div>
+  </CardSpace::UserPage::BackgroundCard>
+</div>

@@ -30,3 +30,9 @@
 .card-space-create-panel {
   padding: var(--boxel-sp) var(--boxel-sp-xs) var(--boxel-sp-xs);
 }
+
+.card-space-main-content {
+  grid-column: 2/-1;
+  max-height: 100vh;
+  overflow-y: auto;
+}

@@ -1,0 +1,59 @@
+<CardSpace::UserPage::CardContainer
+  @header="About Me"
+  @editable={{@editable}}
+  @sufficientContent={{this.showInViewMode}}
+  @onClickEdit={{this.startEditing}}
+>
+  <:placeholder>
+    <CardSpace::UserPage::CardTitle>
+      Your Name
+    </CardSpace::UserPage::CardTitle>
+      Enter a short description of yourself and/or your business.
+  </:placeholder>
+  <:default>
+    <CardSpace::UserPage::CardTitle>
+      {{this.bioTitle}}
+    </CardSpace::UserPage::CardTitle>
+    {{this.bioDescription}}
+  </:default>
+  <:edit as |EditComponent|>
+    <EditComponent
+      @state={{this.editingState}}
+      @close={{this.stopEditing}}
+      @save={{this.save}}
+    >
+      <:default>
+        <Boxel::Field
+          @fieldMode="label"
+          @label="Name"
+        >
+          <Boxel::Input
+            @value={{this.bioTitleInputValue}}
+            @onInput={{this.onBioTitleInput}}
+            @errorMessage={{this.validationErrorMessages.bioTitle}}
+            @invalid={{this.validationErrorMessages.bioTitle}}
+          />
+        </Boxel::Field>
+        <Boxel::Field
+          @fieldMode="label"
+          @label="Bio"
+        >
+          {{!-- this needs to be changed to a textarea --}}
+          <Boxel::Input
+            @value={{this.bioDescriptionInputValue}}
+            @onInput={{this.onBioDescriptionInput}}
+            @errorMessage={{this.validationErrorMessages.bioDescription}}
+            @invalid={{this.validationErrorMessages.bioDescription}}
+          />
+        </Boxel::Field>
+      </:default>
+      <:error as |ErrorMessage|>
+      {{#if this.submissionErrorMessage}}
+        <ErrorMessage>
+          {{this.submissionErrorMessage}}
+        </ErrorMessage>
+      {{/if}}
+      </:error>
+    </EditComponent>
+  </:edit>
+</CardSpace::UserPage::CardContainer>

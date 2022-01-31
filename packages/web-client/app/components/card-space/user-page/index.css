@@ -1,0 +1,37 @@
+/* this needs adjusting to center it properly */
+/* it also needs box shadow */
+.card-space-user-page__top-floating-button {
+  appearance: none;
+  border: none;
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-lg);
+  position: fixed;
+  border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
+  top: 0;
+  z-index: 1;
+  background: var(--boxel-green);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: center;
+  left: 50%;
+}
+
+.card-space-user-page__floating-authenticate-button {
+  background: var(--boxel-purple-300);
+  color: var(--boxel-purple-700);
+}
+
+
+.card-space-user-page__compact-content-column {
+  max-width: 18.75rem;
+}
+
+.card-space-user-page__prose-content-column {
+  max-width: 31.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--boxel-sp-sm);
+}
+
+.card-space-user-page__prose-content-column > * {
+  width: 31.25rem;
+}

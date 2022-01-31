@@ -1,0 +1,43 @@
+.card-space-user-page__donation-list > * + * {
+  margin-top: var(--boxel-sp-sm);
+}
+
+.card-space-user-page__donation-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
+  min-height: calc(var(--boxel-sp-lg) * 2 + var(--boxel-font-size));
+}
+
+.card-space-user-page__donation-description {
+  margin-bottom: var(--boxel-sp-lg);
+}
+
+button.card-space-user-page__donation-choice {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  text-align: center;
+}
+
+.card-space-user-page__donation-choice-amount-group {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--boxel-sp-xs);
+  width: max-content;
+}
+
+.card-space-user-page__donation-choice-spend-amount,
+.card-space-user-page__donation-choice-plain-text {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.card-space-user-page__donation-choice-usd-amount {
+  grid-column: 2;
+  font-size: 0.8125rem;
+  color: var(--boxel-purple-500);
+}
