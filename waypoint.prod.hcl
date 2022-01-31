@@ -200,10 +200,5 @@ app "cardpay-subg-ext" {
             task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
             disable_alb = true
         }
-
-        hook {
-            when    = "before"
-            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subg-ext","1"] # need this to purge old ecs services
-        }
     }
 }
