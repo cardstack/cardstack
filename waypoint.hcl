@@ -200,6 +200,12 @@ app "cardie" {
 app "cardpay-subg-ext" {
     path = "./packages/cardpay-subgraph-extraction"
 
+    config {
+        env = {
+            ENVIRONMENT = "staging"
+        }
+    }
+
     build {
         use "docker" {
           dockerfile = "Dockerfile"

@@ -1,4 +1,4 @@
-subgraph_extractor>=0.0.6
+subgraph_extractor>=0.0.7
 click
 cloudpathlib[s3]
 schedule

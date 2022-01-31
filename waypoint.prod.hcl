@@ -162,9 +162,19 @@ app "hub-event-listener" {
   }
 }
 
-
-app "cardpay-subgraph-extraction" {
+# This name has been chosen to be much shorter than 32 characters
+# If the name comes close to 32 characters there are unreliable
+# deployments. See 
+#  https://github.com/hashicorp/waypoint/issues/2957
+# for more details
+app "cardpay-subg-ext" {
     path = "./packages/cardpay-subgraph-extraction"
+
+    config {
+        env = {
+            ENVIRONMENT = "production"
+        }
+    }
 
     build {
         use "docker" {
@@ -174,7 +184,7 @@ app "cardpay-subgraph-extraction" {
         registry {
             use "aws-ecr" {
                 region     = "us-east-1"
-                repository = "cardpay-production-subgraph-extraction"
+                repository = "cardpay-staging-subgraph-extraction"
                 tag        = "latest"
             }
         }
@@ -184,16 +194,16 @@ app "cardpay-subgraph-extraction" {
         use "aws-ecs" {
             region = "us-east-1"
             memory = "512"
-            cluster = "cardpay-production-subgraph-extraction"
+            cluster = "cardpay-staging-subgraph-extraction"
             count = 1
-            subnets = ["subnet-0544d680b5f494842","subnet-051e48e37cf15329c"]
-            task_role_name = "cardpay-production-subgraph-extraction-ecr-task"
+            subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
+            task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
             disable_alb = true
         }
 
         hook {
             when    = "before"
-            command = ["./scripts/purge-services.sh", "cardpay-production-subgraph-extraction", "waypoint-cardpay-subgraph-extraction","1"] # need this to purge old ecs services
+            command = ["./scripts/purge-services.sh", "cardpay-staging-subgraph-extraction", "waypoint-cardpay-subg-ext","1"] # need this to purge old ecs services
         }
     }
 }
