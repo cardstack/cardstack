@@ -2,15 +2,18 @@
   @isOpen={{this.isEditing}}
   @onClose={{this.close}}
   @size={{or @size "medium"}}
+  data-test-card-space-card-edit-modal
 >
   <Boxel::CardContainer>
     <:header>
       {{@header}}
     </:header>
     <:default>
-      <div class="card-space-user-page__edit-modal-body">
+      <div class="card-space-user-page__edit-modal-body" data-test-card-space-card-edit-modal-body>
         {{#if @title}}
-          <CardSpace::UserPage::CardTitle>
+          <CardSpace::UserPage::CardTitle
+            data-test-card-space-card-edit-modal-title
+          >
             {{@title}}
           </CardSpace::UserPage::CardTitle>
         {{/if}}
@@ -26,6 +29,7 @@
             {{#unless this.isSubmitting}}
               <Boxel::Button
                 @kind="secondary-light"
+                data-test-card-space-card-edit-modal-cancel-button
                 {{on "click" this.close}}
               >
                 Cancel
@@ -35,6 +39,7 @@
               @loading={{this.isSubmitting}}
               @disabled={{@disabled}}
               @kind="primary"
+              data-test-card-space-card-edit-modal-save-button
               {{on "click" this.save}}
             >
               Save
