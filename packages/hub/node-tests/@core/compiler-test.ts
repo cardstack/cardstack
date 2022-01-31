@@ -484,6 +484,31 @@ if (process.env.COMPILER) {
         `);
       });
 
+      it('can compile schema class promise functions', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.containsSource(`
+          then(resolve) {
+            let fields = ["lastName", "aboutMe", "fullName"];
+            return Promise.all(fields.map(field => this[field])).then(values => resolve(Object.fromEntries(fields.map((field, i) => [field, values[i]]))));
+          }
+        `);
+        expect(source).to.containsSource(`
+          catch(err) {
+            if (err) {
+              err();
+            }
+          }
+        `);
+        expect(source).to.containsSource(`
+          finally(cb) {
+            if (cb) {
+              cb();
+            }
+          }
+        `);
+      });
+
       it('can compile primitive field implementation in schema.js module', async function () {
         let { compiled } = await cards.load(`${realm}bio`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');

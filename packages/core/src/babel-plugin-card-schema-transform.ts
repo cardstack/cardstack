@@ -84,59 +84,67 @@ export default function main(babel: typeof Babel) {
         path.remove();
       },
 
-      Class(path: NodePath<t.Class>, state: State) {
-        let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
-        // you can't upgrade a primitive card to a composite card--you are
-        // either a primitive card or a composite card. so if we adopt from a
-        // card that is primitive, then we ourselves must be primitive as well.
-        if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
-          path.get('body').node.body.unshift(
-            // creates a private property that looks like:
-            //   #getRawField;
-            t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
+      Class: {
+        enter(path: NodePath<t.Class>, state: State) {
+          let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
+          // you can't upgrade a primitive card to a composite card--you are
+          // either a primitive card or a composite card. so if we adopt from a
+          // card that is primitive, then we ourselves must be primitive as well.
+          if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
+            path.get('body').node.body.unshift(
+              // creates a private property that looks like:
+              //   #getRawField;
+              t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
 
-            // creates a constructor that looks like:
-            //   constructor(get) {
-            //     super(get); // when we adopt from a non-base card
-            //     this.#getRawField = get;
-            //   }
-            t.classMethod(
-              'constructor',
-              t.identifier('constructor'),
-              [t.identifier('get')],
-              t.blockStatement([
-                ...(state.opts.meta.parent?.cardURL
-                  ? [
-                      // if we extend a non base card, then add a super()
-                      t.expressionStatement(t.callExpression(t.identifier('super'), [t.identifier('get')])),
-                    ]
-                  : []),
-                t.expressionStatement(
-                  t.assignmentExpression(
-                    '=',
-                    t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
-                    t.identifier('get')
-                  )
-                ),
-              ]),
-              false,
-              false,
-              false,
-              false
-            )
-          );
-        }
-
-        // The ClassProperty visitor doesn't seem to work. It looks like
-        // @babel/plugin-proposal-class-properties creates a "Class" visitor
-        // that you need to hook into.
-        for (let bodyItem of path.get('body').get('body')) {
-          if (t.isClassProperty(bodyItem.node)) {
-            handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
-          } else if (t.isClassMethod(bodyItem.node)) {
-            handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
+              // creates a constructor that looks like:
+              //   constructor(get) {
+              //     super(get); // when we adopt from a non-base card
+              //     this.#getRawField = get;
+              //   }
+              t.classMethod(
+                'constructor',
+                t.identifier('constructor'),
+                [t.identifier('get')],
+                t.blockStatement([
+                  ...(state.opts.meta.parent?.cardURL
+                    ? [
+                        // if we extend a non base card, then add a super()
+                        t.expressionStatement(t.callExpression(t.identifier('super'), [t.identifier('get')])),
+                      ]
+                    : []),
+                  t.expressionStatement(
+                    t.assignmentExpression(
+                      '=',
+                      t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+                      t.identifier('get')
+                    )
+                  ),
+                ]),
+                false,
+                false,
+                false,
+                false
+              )
+            );
           }
-        }
+
+          // The ClassProperty visitor doesn't seem to work. It looks like
+          // @babel/plugin-proposal-class-properties creates a "Class" visitor
+          // that you need to hook into.
+          for (let bodyItem of path.get('body').get('body')) {
+            if (t.isClassProperty(bodyItem.node)) {
+              handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
+            } else if (t.isClassMethod(bodyItem.node)) {
+              handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
+            }
+          }
+        },
+
+        exit(path: NodePath<t.Class>, state: State) {
+          if (isCompositeCard(state) && Object.keys(state.opts.meta.fields).length > 0) {
+            addPromiseLikeFunctions(path.get('body'), state, t);
+          }
+        },
       },
     },
   };
@@ -210,6 +218,101 @@ function forEachValidFieldDecorator(
 
     cb(path);
   }
+}
+
+function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: typeof Babel.types) {
+  path.node.body.push(
+    // adds a class method that looks like:
+    //   then(resolve) {
+    //     let fields = ['lastName', 'aboutMe', 'fullName'];
+    //     return Promise.all(fields.map(field => this[field]))
+    //       .then(values => resolve(Object.fromEntries(fields.map((field, i) => [field, values[i]]))))
+    //   }
+    t.classMethod(
+      'method',
+      t.identifier('then'),
+      [t.identifier('resolve')],
+      t.blockStatement([
+        t.variableDeclaration('let', [
+          t.variableDeclarator(
+            t.identifier('fields'),
+            t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))
+          ),
+        ]),
+        t.returnStatement(
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
+                t.callExpression(t.memberExpression(t.identifier('fields'), t.identifier('map')), [
+                  t.arrowFunctionExpression(
+                    [t.identifier('field')],
+                    t.memberExpression(t.thisExpression(), t.identifier('field'), true)
+                  ),
+                ]),
+              ]),
+              t.identifier('then')
+            ),
+            [
+              t.arrowFunctionExpression(
+                [t.identifier('values')],
+                t.callExpression(t.identifier('resolve'), [
+                  t.callExpression(t.memberExpression(t.identifier('Object'), t.identifier('fromEntries')), [
+                    t.callExpression(t.memberExpression(t.identifier('fields'), t.identifier('map')), [
+                      t.arrowFunctionExpression(
+                        [t.identifier('field'), t.identifier('i')],
+                        t.arrayExpression([
+                          t.identifier('field'),
+                          t.memberExpression(t.identifier('values'), t.identifier('i'), true),
+                        ])
+                      ),
+                    ]),
+                  ]),
+                ])
+              ),
+            ]
+          )
+        ),
+      ])
+    ),
+    // adds a class method that looks like:
+    //  catch(err) {
+    //    if (err) {
+    //      err();
+    //    }
+    //  }
+    t.classMethod(
+      'method',
+      t.identifier('catch'),
+      [t.identifier('err')],
+      t.blockStatement([
+        t.ifStatement(
+          t.identifier('err'),
+          t.blockStatement([t.expressionStatement(t.callExpression(t.identifier('err'), []))])
+        ),
+      ])
+    ),
+    // adds a class method that looks like:
+    //  finally(cb) {
+    //    if (cb) {
+    //      cb();
+    //    }
+    //  }
+    t.classMethod(
+      'method',
+      t.identifier('finally'),
+      [t.identifier('cb')],
+      t.blockStatement([
+        t.ifStatement(
+          t.identifier('cb'),
+          t.blockStatement([t.expressionStatement(t.callExpression(t.identifier('cb'), []))])
+        ),
+      ])
+    )
+  );
+}
+
+function isCompositeCard(state: State) {
+  return cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state) === 'composite';
 }
 
 // we consider a primitive card any card that has no fields
