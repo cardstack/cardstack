@@ -6,14 +6,14 @@
   ...attributes
 >
   {{#if @editable}}
-    <Boxel::Header>
+    <Boxel::Header data-test-card-space-layout-card-container-header>
       <:default>
         {{@header}}
       </:default>
       <:actions>
           <button
-            data-test-edit-button
             type="button"
+            data-test-card-space-layout-card-container-header-edit-button
             {{on 'click' @onClickEdit}}
           >
             Edit
