@@ -35,12 +35,19 @@ export interface NestedAttributeError {
   index: number;
   attribute: string;
   detail: string;
+  status?: number;
+}
+
+export interface RelationshipError {
+  relationship: string;
+  status?: number;
+  detail: string;
 }
 
 export function serializeErrors(errors: any) {
   return Object.keys(errors).flatMap((attribute) => {
     let errorsForAttribute = errors[attribute];
-    return errorsForAttribute.map((error: string | NestedAttributeError) => {
+    return errorsForAttribute.map((error: string | NestedAttributeError | RelationshipError) => {
       if (typeof error === 'string') {
         return {
           status: '422',
@@ -48,14 +55,33 @@ export function serializeErrors(errors: any) {
           source: { pointer: `/data/attributes/${kebabCase(attribute)}` },
           detail: error,
         };
+      } else if (errorIsNestedAttributeError(error)) {
+        return {
+          status: `${error.status || '422'}`,
+          title: 'Invalid attribute',
+          source: {
+            pointer: `/data/attributes/${kebabCase(attribute)}/${error.index}/${kebabCase(error.attribute)}`,
+          },
+          detail: error.detail,
+        };
       } else {
         return {
-          status: '422',
-          title: 'Invalid attribute',
-          source: { pointer: `/data/attributes/${kebabCase(attribute)}/${error.index}/${kebabCase(error.attribute)}` },
+          status: `${error.status || '422'}`,
+          title: 'Invalid relationship',
+          source: {
+            pointer: `/data/relationships/${kebabCase(attribute)}`,
+          },
           detail: error.detail,
         };
       }
     });
   });
+}
+
+function errorIsNestedAttributeError(error: any): error is NestedAttributeError {
+  if ((error as NestedAttributeError).attribute) {
+    return true;
+  }
+
+  return false;
 }

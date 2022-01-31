@@ -9,10 +9,11 @@ import WorkerClient from '../services/worker-client';
 import CardSpaceQueries from '../services/queries/card-space';
 import CardSpaceValidator from '../services/validators/card-space';
 import { serializeErrors } from './utils/error';
+import { validateRequiredFields } from './utils/validation';
+import MerchantInfoQueries from '../services/queries/merchant-info';
 
 export interface CardSpace {
   id: string;
-  url?: string;
   profileName?: string;
   profileDescription?: string;
   profileCategory?: string;
@@ -28,8 +29,9 @@ export interface CardSpace {
   donationSuggestionAmount2?: number;
   donationSuggestionAmount3?: number;
   donationSuggestionAmount4?: number;
-  ownerAddress?: string;
   merchantId?: string;
+  merchantName?: string;
+  merchantOwnerAddress?: string;
 }
 
 export default class CardSpacesRoute {
@@ -43,6 +45,9 @@ export default class CardSpacesRoute {
   cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
     as: 'cardSpaceValidator',
   });
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -54,36 +59,70 @@ export default class CardSpacesRoute {
       return;
     }
 
+    if (!validateRequiredFields(ctx, { requiredRelationships: ['merchant-info'] })) {
+      return;
+    }
+
     const cardSpace: CardSpace = {
       id: shortUuid.uuid(),
-      url: this.sanitizeText(ctx.request.body.data.attributes['url']),
+      merchantId: this.sanitizeText(ctx.request.body.data.relationships['merchant-info'].data.id),
       profileName: this.sanitizeText(ctx.request.body.data.attributes['profile-name']),
       profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
       profileCategory: this.sanitizeText(ctx.request.body.data.attributes['profile-category']),
       profileButtonText: this.sanitizeText(ctx.request.body.data.attributes['profile-button-text']),
       profileImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']),
       profileCoverImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-cover-image-url']),
-      ownerAddress: ctx.state.userAddress,
     };
 
-    let errors = await this.cardSpaceValidator.validate(cardSpace);
-    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
+    let merchantInfoError;
 
-    if (hasErrors) {
-      ctx.status = 422;
+    let merchantId = cardSpace.merchantId;
+    let merchant = (await this.merchantInfoQueries.fetch({ id: merchantId }))[0];
+
+    if (merchant) {
+      if (merchant.ownerAddress !== ctx.state.userAddress) {
+        merchantInfoError = [
+          {
+            detail: `Given merchant-id ${merchantId} is not owned by the user`,
+            relationship: 'merchant-info',
+            status: 403,
+          },
+        ];
+      }
+    } else {
+      merchantInfoError = [
+        {
+          detail: `Given merchant-id ${merchantId} was not found`,
+          relationship: 'merchant-info',
+        },
+      ];
+    }
+
+    if (merchantInfoError) {
+      ctx.status = merchantInfoError[0].status || 422;
       ctx.body = {
-        errors: serializeErrors(errors),
+        errors: serializeErrors({ merchantInfo: merchantInfoError }),
       };
     } else {
-      await this.cardSpaceQueries.insert(cardSpace);
+      let errors = await this.cardSpaceValidator.validate(cardSpace);
+      let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
 
-      await this.workerClient.addJob('persist-off-chain-card-space', {
-        id: cardSpace.id,
-      });
+      if (hasErrors) {
+        ctx.status = 422;
+        ctx.body = {
+          errors: serializeErrors(errors),
+        };
+      } else {
+        await this.cardSpaceQueries.insert(cardSpace);
 
-      let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
-      ctx.status = 201;
-      ctx.body = serialized;
+        await this.workerClient.addJob('persist-off-chain-card-space', {
+          id: cardSpace.id,
+        });
+
+        let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
+        ctx.status = 201;
+        ctx.body = serialized;
+      }
     }
     ctx.type = 'application/vnd.api+json';
   }
@@ -97,7 +136,7 @@ export default class CardSpacesRoute {
     let cardSpace = (await this.cardSpaceQueries.query({ id: cardSpaceId }))[0] as CardSpace;
 
     if (cardSpace) {
-      if (ctx.state.userAddress !== cardSpace.ownerAddress) {
+      if (ctx.state.userAddress !== cardSpace.merchantOwnerAddress) {
         ctx.status = 403;
         return;
       }
@@ -173,21 +212,6 @@ export default class CardSpacesRoute {
     ctx.status = 200;
     ctx.body = {
       errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/profile-name'),
-    };
-    ctx.type = 'application/vnd.api+json';
-  }
-
-  async postUrlValidation(ctx: Koa.Context) {
-    if (!ensureLoggedIn(ctx)) {
-      return;
-    }
-
-    let url: string = ctx.request.body.data.attributes.url;
-    let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
-
-    ctx.status = 200;
-    ctx.body = {
-      errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/url'),
     };
     ctx.type = 'application/vnd.api+json';
   }
