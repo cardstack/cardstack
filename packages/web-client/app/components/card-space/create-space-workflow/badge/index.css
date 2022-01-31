@@ -13,9 +13,9 @@
   flex-direction: column;
   padding: 2.5rem;
   background-color: var(--boxel-navy);
-  background-image: url('/images/illustrations/card-space-reservation.svg');
+  background-image: url("/images/illustrations/card-space-reservation.svg");
   border-radius: var(--boxel-border-radius);
-  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 15px 30px rgb(0 0 0 / 35%));
 }
 
 .badge-card__badge-icon {

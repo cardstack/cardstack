@@ -93,14 +93,16 @@
   padding: 10px;
 }
 
+/* stylelint-disable selector-class-pattern */
 .field-renderer__placeholder.field-renderer__placeholder--album_art {
   color: transparent;
   width: 260px;
   height: 260px;
   background:
-    url('../@cardstack/boxel/images/placeholders/album_art.svg') center/cover
+    url("../@cardstack/boxel/images/placeholders/album_art.svg") center/cover
     no-repeat;
 }
+/* stylelint-enable selector-class-pattern */
 
 .cover-art-field img {
   object-fit: cover;
@@ -172,12 +174,12 @@
   padding: 0;
   border: none;
   background:
-    url('../@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
+    url("../@cardstack/boxel/images/icons/icon-minus-circle.svg") center/16px
     16px no-repeat;
 }
 
 .item__add-btn {
-  background-image: url('../@cardstack/boxel/images/icons/icon-plus-circle-highlight-bg.svg');
+  background-image: url("../@cardstack/boxel/images/icons/icon-plus-circle-highlight-bg.svg");
   position: absolute;
   top: 15px;
   right: 0;
@@ -229,7 +231,7 @@
   width: 50px;
   height: 50px;
   background:
-    url('../@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
+    url("../@cardstack/boxel/images/icons/dropdown-arrows.svg") center/15px 15px
     no-repeat;
 }
 
@@ -265,6 +267,7 @@
   height: auto;
 }
 
+/* stylelint-disable-next-line max-line-length */
 .field-renderer--comparison-mode.field-renderer--collection + .field-renderer--comparison-mode.field-renderer--collection {
   margin-top: 20px;
 }

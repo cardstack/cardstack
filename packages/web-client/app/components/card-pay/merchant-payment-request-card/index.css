@@ -34,7 +34,7 @@
 }
 
 .merchant-payment-request-card__get-card-wallet--desktop .merchant-payment-request-card__testflight-link {
-  --icon-color: currentColor;
+  --icon-color: currentcolor;
 
   display: flex;
   align-items: center;
@@ -53,11 +53,13 @@
 
 .merchant-payment-request-card__get-card-wallet--mobile .merchant-payment-request-card__card-wallet {
   display: grid;
+  /* stylelint-disable declaration-block-no-redundant-longhand-properties */
   grid-template-columns: min-content auto;
   grid-template-rows: min-content auto;
   grid-template-areas:
     "icon name"
     "icon cta";
+  /* stylelint-enable declaration-block-no-redundant-longhand-properties */
   gap: 0 var(--boxel-sp-xs);
 }
 

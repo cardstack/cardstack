@@ -4,12 +4,12 @@
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 15%);
 }
 
 .boxel-action-container--is-complete {
   max-width: 36.6rem; /* 585px; */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
 
 /* Card Header */

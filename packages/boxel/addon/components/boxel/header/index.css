@@ -3,18 +3,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--boxel-sp-xxxs) 0 var(--boxel-sp-sm);
-
   min-height: var(--boxel-header-min-height, 1.875rem); /* 30px */
   background-color: var(--boxel-header-background-color, var(--boxel-purple-100));
   color: var(--boxel-header-text-color, var(--boxel-dark));
-
   border-top-right-radius: calc(var(--boxel-border-radius) - 1px);
   border-top-left-radius: calc(var(--boxel-border-radius) - 1px);
-
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
-
   transition:
     background-color var(--boxel-transition),
     color var(--boxel-transition);

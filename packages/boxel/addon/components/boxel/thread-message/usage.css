@@ -10,12 +10,12 @@
 
 .thread-message-usage__card {
   max-width: var(--outer-max-width);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 15%);
   transition: all var(--boxel-transition);
 }
 
 .thread-message-usage__card--memorialized {
   max-width: var(--inner-max-width);
   margin-left: var(--boxel-thread-message-margin-left);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }

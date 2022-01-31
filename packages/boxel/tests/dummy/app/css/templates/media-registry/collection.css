@@ -10,7 +10,7 @@
 
 /* Play btn */
 .collection__play-btn {
-  --icon-color: rgba(0, 0, 0, 0.5);
+  --icon-color: rgb(0 0 0 / 50%);
   --icon-border: white;
 
   width: 60px;

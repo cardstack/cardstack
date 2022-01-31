@@ -13,7 +13,7 @@
 
   margin-top: var(--boxel-sp-sm);
   padding-left: calc(var(--arrow-space) + var(--boxel-sp-xs));
-  background-image: url('/images/icons/curve-arrow.svg');
+  background-image: url("/images/icons/curve-arrow.svg");
   background-repeat: no-repeat;
   background-position: left center;
   background-size: var(--arrow-space) 14px;

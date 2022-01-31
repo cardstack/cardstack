@@ -41,7 +41,7 @@
 }
 
 .media-registry__queue.with-box-shadow {
-  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 5px 0 15px rgb(0 0 0 / 50%);
 }
 
 .media-registry__hover-zone {
@@ -56,10 +56,12 @@
   cursor: pointer;
 }
 
+/* stylelint-disable selector-class-pattern */
 .media-registry__hover-zone--crd_records {
   transform: translateY(55px);
   height: 60px;
 }
+/* stylelint-enable selector-class-pattern */
 
 .media-registry__left-edge-queue:hover,
 .media-registry__hover-zone:hover ~ .media-registry__left-edge-queue,
@@ -121,10 +123,12 @@
 }
 
 /* Dummy */
+/* stylelint-disable selector-class-pattern */
 .boxel-org-switcher-button__logo--bunny_records,
 .boxel-org-switcher-button__logo--crd_records {
   background-size: 1.7rem 1.7rem;
 }
+/* stylelint-enable selector-class-pattern */
 
 .boxel-org-switcher-button__logo--realtunes-publishing {
   --boxel-org-switcher-button-background-size: auto 3rem;

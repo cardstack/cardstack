@@ -1,5 +1,5 @@
 .issue-prepaid-card-workflow-confirmation {
-  background-image: url('/images/backgrounds/Background_confetti.png');
+  background-image: url("/images/backgrounds/Background_confetti.png");
 }
 
 .issue-prepaid-card-workflow-confirmation__card-container {
@@ -8,5 +8,5 @@
 }
 
 .issue-prepaid-card-workflow-confirmation__card {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
 }
