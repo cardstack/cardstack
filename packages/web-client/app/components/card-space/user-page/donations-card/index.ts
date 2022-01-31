@@ -172,7 +172,6 @@ export default class UserPageDonationsCardComponent extends Component {
   @action async save() {
     let extraErrors: any = [];
     let extraValidations: any = {};
-    let hasUnmanagedValidationError = false; // is there something we PUT that is not managed by this component?
     try {
       this.submissionErrorMessage = '';
       this.state = CardStates.SUBMITTING;
@@ -209,7 +208,7 @@ export default class UserPageDonationsCardComponent extends Component {
               this.validationErrorMessages[attribute as ManagedAttribute] =
                 validations[attribute].join(', ');
             } else {
-              hasUnmanagedValidationError = true;
+              throw new Error(UNKNOWN_CARD_SPACE_DONATIONS_ERROR);
             }
           }
           // eslint-disable-next-line no-self-assign
@@ -222,10 +221,7 @@ export default class UserPageDonationsCardComponent extends Component {
         this.state = CardStates.DEFAULT;
       }
     } catch (e) {
-      if (
-        e.message !== CARD_SPACE_DONATIONS_VALIDATION ||
-        hasUnmanagedValidationError
-      ) {
+      if (e.message !== CARD_SPACE_DONATIONS_VALIDATION) {
         Sentry.setExtra('validations', extraValidations);
         Sentry.setExtra('errors', extraErrors);
         Sentry.captureException(e);

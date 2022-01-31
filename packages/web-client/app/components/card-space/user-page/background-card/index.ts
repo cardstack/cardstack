@@ -181,7 +181,6 @@ export default class UserPageBackgroundCardComponent extends Component {
   @action async save() {
     let extraErrors: any = [];
     let extraValidations: any = {};
-    let hasUnmanagedValidationError = false; // is there something we PUT that is not managed by this component?
     this.submissionErrorMessage = '';
     try {
       this.state = CardStates.SUBMITTING;
@@ -207,7 +206,7 @@ export default class UserPageBackgroundCardComponent extends Component {
               this.imageUploadErrorMessage = validations[attribute].join(', ');
               this.imageUploadState = 'error';
             } else {
-              hasUnmanagedValidationError = true;
+              throw new Error(UNKNOWN_CARD_SPACE_BACKGROUND_ERROR);
             }
           }
 
@@ -215,10 +214,7 @@ export default class UserPageBackgroundCardComponent extends Component {
         }
       }
     } catch (e) {
-      if (
-        e.message !== CARD_SPACE_BACKGROUND_VALIDATION ||
-        hasUnmanagedValidationError
-      ) {
+      if (e.message !== CARD_SPACE_BACKGROUND_VALIDATION) {
         Sentry.setExtra('validations', extraValidations);
         Sentry.setExtra('errors', extraErrors);
         Sentry.captureException(e);

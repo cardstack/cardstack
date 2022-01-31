@@ -78,7 +78,6 @@ export default class UserPageBioCardComponent extends Component {
   @action async save() {
     let extraErrors: any = [];
     let extraValidations: any = {};
-    let hasUnmanagedValidationError = false; // is there something we PUT that is not managed by this component?
     try {
       this.submissionErrorMessage = '';
       this.state = CardStates.SUBMITTING;
@@ -103,7 +102,8 @@ export default class UserPageBioCardComponent extends Component {
               this.validationErrorMessages[attribute as ManagedAttribute] =
                 validations[attribute].join(', ');
             } else {
-              hasUnmanagedValidationError = true;
+              // Some other part of the PUT was invalid
+              throw new Error(UNKNOWN_CARD_SPACE_BIO_ERROR);
             }
           }
           // eslint-disable-next-line no-self-assign
@@ -116,10 +116,7 @@ export default class UserPageBioCardComponent extends Component {
         this.state = CardStates.DEFAULT;
       }
     } catch (e) {
-      if (
-        e.message !== CARD_SPACE_BIO_VALIDATION ||
-        hasUnmanagedValidationError
-      ) {
+      if (e.message !== CARD_SPACE_BIO_VALIDATION) {
         Sentry.setExtra('validations', extraValidations);
         Sentry.setExtra('errors', extraErrors);
         Sentry.captureException(e);
