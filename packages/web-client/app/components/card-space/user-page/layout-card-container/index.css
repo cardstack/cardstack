@@ -1,0 +1,9 @@
+.card-space__layout-card-container {
+  width: 100%;
+  height: auto;
+  min-height: 100vh;
+}
+
+.card-space__layout-card-container:not(.card-space__layout-card-container--editable) {
+  border-radius: 0;
+}

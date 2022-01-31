@@ -1,0 +1,12 @@
+<Boxel::Button
+  @kind="primary"
+  @size="base"
+  {{on "click" @onClick}}
+  ...attributes
+>
+  {{#if (has-block)}}
+    {{yield}}
+  {{else}}
+    Customize
+  {{/if}}
+</Boxel::Button>

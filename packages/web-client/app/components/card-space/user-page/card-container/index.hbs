@@ -1,0 +1,58 @@
+{{#if (or @editable @sufficientContent)}}
+  <Boxel::CardContainer
+    data-test-card-space-card-container
+    data-test-editable={{@editable}}
+    class="card-space__card-container"
+    @displayBoundaries={{true}}
+    ...attributes
+  >
+    {{#if @editable}}
+      <Boxel::Header>
+        <:default>
+          {{@header}}
+        </:default>
+        <:actions>
+          <button
+            type="button"
+            {{on 'click' @onClickEdit}}
+          >
+            Edit
+          </button>
+        </:actions>
+      </Boxel::Header>
+    {{/if}}
+    <div class="card-space-card-container__body">
+      {{#if (or @sufficientContent (not (has-block "placeholders")))}}
+        {{yield}}
+      {{else}}
+        {{yield to="placeholders"}}
+      {{/if}}
+    </div>
+    {{#if @editable}}
+      <div class="card-space__card-container-edit-button-container">
+        {{#let (component "card-space/user-page/card-container/button-with-click-handler" onClick=@onClickEdit show=@editable) as |EditButton|}}
+          {{#if (has-block "edit-button")}}
+            {{yield EditButton to="edit-button"}}
+          {{else}}
+            <EditButton>
+              Customize
+            </EditButton>
+          {{/if}}
+        {{/let}}
+      </div>
+    {{/if}}
+  </Boxel::CardContainer>
+
+  {{#if (has-block "edit")}}
+    {{yield
+      (component
+        "card-space/user-page/card-edit-modal"
+        header=@header
+        title=@header
+        size="medium"
+        state="CLOSED"
+      )
+      to="edit"
+    }}
+  {{/if}}
+{{/if}}

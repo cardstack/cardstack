@@ -1,0 +1,9 @@
+.card-space-card-container__body {
+  padding: var(--boxel-sp-lg);
+}
+
+.card-space__card-container-edit-button-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--boxel-sp-lg);
+}
