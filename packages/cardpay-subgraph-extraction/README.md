@@ -45,3 +45,11 @@ Locations can be cloud or local. It will default to a log level of INFO but can 
 This will start an infinite loop running all the config files in the config directory, each set to run twice per minimum partition size if it's partitioned on `block_number`, assuming each block takes 5s. If no duration is identified it will run once per hour.
 
 The timing is not exact, as they will run sequentially, and it will not run faster than once per 10s.
+
+### Releasing
+
+You can release a new version on staging by running the following command in the root of the monorepo:
+
+     waypoint up -app=cardpay-subg-ext -prune-retain=0
+
+This will remove the previous deployment, build the docker image and deploy a new service.
