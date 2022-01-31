@@ -1,0 +1,21 @@
+.card-space-user-page__edit-modal-body {
+  padding: var(--boxel-sp-xl);
+}
+
+.card-space-user-page__edit-modal-footer {
+  margin-top: var(--boxel-sp-xxxl);
+}
+
+.card-space-user-page__edit-modal-footer-buttons {
+  display: flex;
+  justify-content: end;
+}
+
+.card-space-user-page__edit-modal-footer-buttons > * + * {
+  margin-left: var(--boxel-sp-sm);
+}
+
+.card-space-user-page__edit-modal-error-message {
+  text-align: right;
+  margin-bottom: var(--boxel-sp);
+}
