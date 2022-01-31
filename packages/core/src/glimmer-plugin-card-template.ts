@@ -388,7 +388,7 @@ function rewriteElementNode(options: {
 }): Statement[] {
   let { field, modelArgument, state, format } = options;
 
-  let { inlineHBS } = field.card[format];
+  let { inlineHBS } = field.card.componentInfos[format];
 
   if (inlineHBS) {
     return inlineTemplateForField(inlineHBS, modelArgument, state);
@@ -417,7 +417,11 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName.global, 'default');
+  let componentName = importAndChooseName(
+    classify(field.card.url),
+    field.card.componentInfos[format].moduleName.global,
+    'default'
+  );
 
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);

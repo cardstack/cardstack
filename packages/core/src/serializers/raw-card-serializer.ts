@@ -34,10 +34,8 @@ export class RawCardSerializer {
       let resource = serializeResource('compiled-metas', compiled.url, compiled, [
         'schemaModule',
         'serializer',
-        'isolated',
-        'embedded',
-        'edit',
         'deps',
+        'componentInfos',
       ]);
 
       resource.relationships ||= {};
