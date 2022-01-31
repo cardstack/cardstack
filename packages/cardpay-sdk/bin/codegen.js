@@ -40,6 +40,9 @@ interface SupportedAbisMap {
 }
 
 export const SUPPORTED_ABIS: SupportedAbisMap = ${JSON.stringify(supportedAbisMap, null, 2)};
+// mitigation for unexpected vs code debugger breakpoint
+function noop() {};
+noop();
 `
 );
 console.log(`Generated ${generatedFile}`);

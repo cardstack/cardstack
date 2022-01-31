@@ -4,12 +4,23 @@ import {
   Setter,
   CardEnv,
   Saved,
+  Unsaved,
   ResourceObject,
   assertDocumentDataIsResource,
-} from './interfaces';
+  CardModel,
+  RawCardData,
+  Format,
+  ComponentInfo,
+} from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import { deserializaAttributes, serializeAttributes, serializeResource } from './serializers';
+import {
+  deserializeAttributes,
+  serializeAttributes,
+  serializeResource,
+} from '@cardstack/core/src/serializers';
+import { cardURL } from '@cardstack/core/src/utils';
+import { Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
 
 export interface NewCardParams {
   realm: string;
@@ -20,79 +31,127 @@ export interface CreatedState {
   type: 'created';
   realm: string;
   parentCardURL: string;
+  innerComponent: unknown;
+  serializerMap: SerializerMap;
 }
 
 export interface LoadedState {
   type: 'loaded';
+  format: Format;
   url: string;
+  serializerMap: SerializerMap;
   rawServerResponse: ResourceObject<Saved>;
+  innerComponent: unknown;
   deserialized: boolean;
   original: CardModel | undefined;
 }
 
-export default class CardModel {
-  static serializerMap: SerializerMap;
+export default class CardModelForBrowser implements CardModel {
   setters: Setter;
   private declare _data: any;
+  private state: CreatedState | LoadedState;
+  private wrapperComponent: unknown | undefined;
 
-  constructor(private cards: CardEnv, private innerComponent: unknown, private state: CreatedState | LoadedState) {
+  constructor(
+    private cards: CardEnv,
+    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>
+  ) {
+    if (state.type == 'created') {
+      this.state = state;
+    } else {
+      this.state = {
+        ...state,
+        deserialized: false,
+        original: undefined,
+      };
+    }
     this.setters = this.makeSetter();
-    Object.defineProperty(
-      this,
-      '_data',
-      cards.tracked(this, '_data', {
-        enumerable: true,
-        writable: true,
-        configurable: true,
-      })
-    );
+    let prop = cards.tracked(this, '_data', {
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+    if (prop) {
+      Object.defineProperty(this, '_data', prop);
+    }
   }
 
-  static fromResponse(cards: CardEnv, cardResponse: ResourceObject, component: unknown): CardModel {
-    return new this(cards, component, {
-      type: 'loaded',
-      url: cardResponse.id,
-      rawServerResponse: cloneDeep(cardResponse),
-      deserialized: false,
-      original: undefined,
+  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
+    if (this.state.type !== 'loaded') {
+      throw new Error(`tried to adopt from an unsaved card`);
+    }
+    if (id) {
+      try {
+        await this.cards.load(cardURL({ realm, id }), 'isolated');
+        throw new Conflict(`Card ${id} already exists in realm ${realm}`);
+      } catch (e: any) {
+        if (!isCardstackError(e) || e.status !== 404) {
+          throw e;
+        }
+        // we expect a 404 here, so we can continue
+      }
+    }
+
+    return new (this.constructor as typeof CardModelForBrowser)(this.cards, {
+      type: 'created',
+      realm,
+      parentCardURL: this.state.url,
+      innerComponent: this.innerComponent,
+      serializerMap: this.serializerMap,
     });
   }
 
+  setData(_data: RawCardData) {
+    throw new Error('unimplemented');
+  }
+
+  get innerComponent(): unknown {
+    return this.state.innerComponent;
+  }
+
+  get serializerMap(): SerializerMap {
+    return this.state.serializerMap;
+  }
+
+  get id(): string {
+    return this.url;
+  }
+
   get url(): string {
-    if (this.state.type === 'loaded') {
-      return this.state.url;
+    if (this.state.type === 'created') {
+      throw new Error(
+        `bug: card in state ${this.state.type} does not have a url`
+      );
     }
-    throw new Error(`bug: card in state ${this.state.type} does not have a url`);
+    return this.state.url;
+  }
+
+  get format(): Format {
+    if (this.state.type === 'created') {
+      return 'isolated';
+    }
+    return this.state.format;
   }
 
   async editable(): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);
     }
-    let editable = await this.cards.load(this.state.url, 'edit');
+    let editable = (await this.cards.load(
+      this.state.url,
+      'edit'
+    )) as CardModelForBrowser;
     (editable.state as LoadedState).original = this;
     return editable;
-  }
-
-  adoptIntoRealm(realm: string): CardModel {
-    if (this.state.type !== 'loaded') {
-      throw new Error(`tried to adopt from an unsaved card`);
-    }
-    return new (this.constructor as typeof CardModel)(this.cards, this.innerComponent, {
-      type: 'created',
-      realm,
-      parentCardURL: this.state.url,
-    });
   }
 
   get data(): any {
     switch (this.state.type) {
       case 'loaded':
         if (!this.state.deserialized) {
-          this._data = deserializaAttributes(
+          this._data = deserializeAttributes(
             this.state.rawServerResponse.attributes,
-            // @ts-ignore This works as expected, whats up typescript?
-            this.constructor.serializerMap
+            this.serializerMap
           );
           this.state.deserialized = true;
         }
@@ -104,13 +163,19 @@ export default class CardModel {
     }
   }
 
-  private wrapperComponent: unknown | undefined;
-
   get component(): unknown {
     if (!this.wrapperComponent) {
-      this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
+      this.wrapperComponent = this.cards.prepareComponent(
+        this,
+        this.innerComponent
+      );
     }
     return this.wrapperComponent;
+  }
+
+  async getField(name: string) {
+    // TODO: implement
+    return name;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -150,14 +215,20 @@ export default class CardModel {
     return s;
   }
 
+  serialize(): ResourceObject<Saved | Unsaved> {
+    throw new Error('unimplemented');
+  }
+
+  get usedFields(): ComponentInfo['usedFields'] {
+    // the server just gives the browser whatever fields are appropriate for the
+    // format and the browser just has to accept that
+    throw new Error('used fields are not supported in browser');
+  }
+
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
-    let attributes = serializeAttributes(
-      this.data,
-      // @ts-ignore
-      this.constructor.serializerMap
-    );
+    let attributes = serializeAttributes(this.data, this.serializerMap);
 
     switch (this.state.type) {
       case 'created':
@@ -166,6 +237,7 @@ export default class CardModel {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
             payload: {
+              // TODO use this.serialize
               data: serializeResource('card', undefined, attributes),
             },
           },
@@ -177,6 +249,7 @@ export default class CardModel {
           update: {
             cardURL: this.state.url,
             payload: {
+              // TODO use this.serialize
               data: serializeResource('card', this.state.url, attributes),
             },
           },
@@ -189,12 +262,17 @@ export default class CardModel {
     let { data } = response;
     assertDocumentDataIsResource(data);
 
+    let { serializerMap, innerComponent } = this.state;
+
     this.state = {
       type: 'loaded',
+      format: this.format,
       url: data.id,
       rawServerResponse: cloneDeep(data),
       deserialized: false,
       original,
+      serializerMap,
+      innerComponent,
     };
   }
 }

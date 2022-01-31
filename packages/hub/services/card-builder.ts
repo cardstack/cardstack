@@ -19,7 +19,7 @@ export default class CardBuilder implements BuilderInterface {
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
     log.trace('getCompiledCard: %s', url);
-    let { compiled } = await this.cards.as(INSECURE_CONTEXT).load(url);
+    let { compiled } = await (await this.cards.as(INSECURE_CONTEXT)).load(url);
     if (!compiled) {
       throw new NotFound(`CardBuilder could not find ${url}`);
     }

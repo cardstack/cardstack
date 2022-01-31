@@ -110,7 +110,7 @@ module('@core | compiler-basics', function (hooks) {
       schema: 'schema.js',
       files: {
         'schema.js': `
-          import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
+          import { contains, containsMany, linksTo } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
           import person from "${LOCAL_REALM}person";
@@ -119,10 +119,10 @@ module('@core | compiler-basics', function (hooks) {
             @contains(string)
             title;
 
-            @belongsTo(person)
+            @containsMany(person)
             author;
 
-            @hasMany(date)
+            @linksTo(date)
             date;
 
             foo = 'bar'
@@ -466,36 +466,6 @@ module('@core | compiler-basics', function (hooks) {
       } catch (err) {
         assert.ok(
           /contains decorator accepts exactly one argument/.test(err.message),
-          err.message
-        );
-      }
-    });
-
-    test('hasMany with wrong number of arguments', async function (assert) {
-      let card: RawCard = {
-        id: 'post',
-        realm: LOCAL_REALM,
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { hasMany } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-
-            class X {
-              @hasMany(string, 1)
-              title;
-            }
-          `,
-        },
-      };
-      assert.expect(1);
-      try {
-        this.builder.createRawCard(card);
-
-        await this.builder.getCompiledCard(cardURL(card));
-      } catch (err) {
-        assert.ok(
-          /@hasMany decorator accepts exactly one argument/.test(err.message),
           err.message
         );
       }

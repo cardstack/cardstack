@@ -1,4 +1,3 @@
-import CardModel from '@cardstack/core/src/card-model';
 import {
   CompiledCard,
   Format,
@@ -8,7 +7,9 @@ import {
   CardId,
   JSONAPIDocument,
   assertDocumentDataIsResource,
+  CardModel,
 } from '@cardstack/core/src/interfaces';
+import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -150,7 +151,7 @@ export default class LocalRealm implements Builder {
       let definedCard = makeGloballyAddressable(
         url,
         compiledCard,
-        (local, type, src) => this.define(url, local, type, src)
+        (local, type, src, ast) => this.define(url, local, type, src, ast)
       );
       this.compiledCardCache.set(url, definedCard);
       return definedCard;
@@ -301,7 +302,8 @@ export default class LocalRealm implements Builder {
     cardURL: string,
     localModule: string,
     type: string,
-    source: string
+    source: string,
+    ast: t.File | undefined
   ): string {
     let moduleIdentifier = `@cardstack/local-realm-compiled/${encodeCardURL(
       cardURL
@@ -314,7 +316,7 @@ export default class LocalRealm implements Builder {
 
     switch (type) {
       case JS_TYPE: {
-        eval(dynamicCardTransform(moduleIdentifier, source));
+        eval(dynamicCardTransform(moduleIdentifier, source, ast));
         return moduleIdentifier;
       }
       case CSS_TYPE:

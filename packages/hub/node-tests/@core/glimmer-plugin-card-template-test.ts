@@ -84,6 +84,7 @@ if (process.env.COMPILER) {
           fields: {
             title: {
               card: compiledStringCard,
+              computed: true,
               name: 'title',
               type: 'contains',
             },
@@ -105,6 +106,7 @@ if (process.env.COMPILER) {
           fields: {
             title: {
               card: compiledStringCard,
+              computed: true,
               name: 'title',
               type: 'contains',
             },
@@ -127,6 +129,7 @@ if (process.env.COMPILER) {
           fields: {
             createdAt: {
               type: 'contains',
+              computed: true,
               card: compiledDateCard,
               name: 'createdAt',
             },
@@ -156,11 +159,13 @@ if (process.env.COMPILER) {
           fields: {
             title: {
               card: compiledStringCard,
+              computed: true,
               name: 'title',
               type: 'contains',
             },
             list: {
               card: compiledListCard,
+              computed: true,
               name: 'list',
               type: 'contains',
             },
@@ -189,11 +194,13 @@ if (process.env.COMPILER) {
           fields: {
             items: {
               card: compiledStringCard,
+              computed: true,
               name: 'items',
               type: 'containsMany',
             },
             list: {
               card: compiledListCard,
+              computed: true,
               name: 'list',
               type: 'contains',
             },
@@ -243,11 +250,13 @@ if (process.env.COMPILER) {
           fields: {
             items: {
               name: 'items',
+              computed: true,
               card: compiledDateCard,
               type: 'containsMany',
             },
             list: {
               name: 'list',
+              computed: true,
               card: compiledListCard,
               type: 'contains',
             },
@@ -364,21 +373,25 @@ if (process.env.COMPILER) {
           fields: {
             title: {
               type: 'contains',
+              computed: true,
               card: compiledStringCard,
               name: 'title',
             },
             startDate: {
               type: 'contains',
+              computed: true,
               card: compiledDateCard,
               name: 'startDate',
             },
             items: {
               type: 'containsMany',
+              computed: true,
               card: compiledStringCard,
               name: 'items',
             },
             events: {
               type: 'containsMany',
+              computed: true,
               card: compiledDateCard,
               name: 'events',
             },
@@ -447,6 +460,7 @@ if (process.env.COMPILER) {
             fields: {
               birthdays: {
                 name: 'birthdays',
+                computed: true,
                 card: compiledDateCard,
                 type: 'containsMany',
               },

@@ -54,10 +54,7 @@ function buildUsedFieldListFromComponents(
   }
 }
 
-export function buildSerializerMapFromUsedFields(
-  fields: CompiledCard['fields'],
-  usedFields: string[]
-): SerializerMap | undefined {
+export function buildSerializerMapFromUsedFields(fields: CompiledCard['fields'], usedFields: string[]): SerializerMap {
   let map: any = {};
 
   for (const fieldPath of usedFields) {

@@ -864,7 +864,9 @@ CREATE TABLE public.cards (
     "compileErrors" jsonb,
     deps text[],
     raw jsonb,
-    compiled jsonb
+    compiled jsonb,
+    "schemaModule" text,
+    "componentInfos" jsonb
 );
 
 
@@ -1641,6 +1643,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 23	20220103201128435_invalidation-ordering	2022-01-12 15:29:48.931908
 26	20220107151914576_rename-beta-testers-table	2022-01-28 10:20:05.090531
 27	20220119232151260_space-belongs-to-merchant	2022-01-28 10:20:05.090531
+28	20220111204952452_index-optimizations	2022-01-31 16:55:56.640815
 \.
 
 
@@ -1648,7 +1651,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 27, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 28, true);
 
 
 --

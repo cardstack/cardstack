@@ -122,6 +122,7 @@ export class RawCardDeserializer {
     let field: Field = {
       name: attrs?.name,
       type: attrs?.fieldType,
+      computed: attrs?.computed,
       card,
     };
     return field;
