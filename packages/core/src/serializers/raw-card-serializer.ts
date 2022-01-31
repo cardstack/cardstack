@@ -59,7 +59,7 @@ export class RawCardSerializer {
   private includeField(parent: CompiledCard, field: Field) {
     let id = `${parent.url}/${field.name}`;
     if (!findIncluded(this.doc, { type: 'fields', id })) {
-      let resource = serializeResource('fields', id, field, ['name', { fieldType: 'type' }]);
+      let resource = serializeResource('fields', id, field, ['name', 'computed', { fieldType: 'type' }]);
       resource.relationships ||= {};
       resource.relationships.card = {
         data: this.includeCompiledMeta(field.card),

@@ -3,7 +3,7 @@ import tmp from 'tmp';
 import { join } from 'path';
 import FileCacheConfig from '../../services/file-cache-config';
 import { contextFor, registry, setupHub } from './server';
-import CardServiceFactory, { CardService, INSECURE_CONTEXT } from '../../services/card-service';
+import { CardService, INSECURE_CONTEXT } from '../../services/card-service';
 import FileCache from '../../services/file-cache';
 import { TEST_REALM } from '@cardstack/core/tests/helpers';
 import { RealmConfig } from '@cardstack/core/src/interfaces';
@@ -85,7 +85,7 @@ export function configureCompiler(mochaContext: Mocha.Suite) {
 export function cardHelpers(mochaContext: Mocha.Suite) {
   let fileCache: FileCache;
   let fileCacheConfig: TestFileCacheConfig;
-  let currentCardService: CardServiceFactory | undefined;
+  let currentCardService: CardService | undefined;
   let cardServiceProxy = new Proxy(
     {},
     {
@@ -96,7 +96,7 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
         if (!currentCardService) {
           throw new Error(`tried to use cardService outside of an active test`);
         }
-        return (currentCardService.as(INSECURE_CONTEXT) as any)[propertyName];
+        return (currentCardService as any)[propertyName].bind(currentCardService);
       },
     }
   );
@@ -106,7 +106,7 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
     if (!container) {
       throw new Error('Make sure cardHelpers are run after setupHub. It needs a configured container');
     }
-    currentCardService = await container.lookup('card-service', { type: 'service' });
+    currentCardService = await (await container.lookup('card-service', { type: 'service' })).as(INSECURE_CONTEXT);
     fileCacheConfig = (await container.lookup('file-cache-config', { type: 'service' })) as TestFileCacheConfig;
     fileCache = await container.lookup('file-cache', { type: 'service' });
 

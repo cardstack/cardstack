@@ -7,10 +7,11 @@ import {
   JSONAPIDocument,
   Query,
   ResourceObject,
+  CardModel,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
+  SerializerMap,
 } from '@cardstack/core/src/interfaces';
-import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -23,6 +24,8 @@ import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 import { buildQueryString } from '@cardstack/core/src/query';
+import CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
+import { cloneDeep } from 'lodash';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -44,8 +47,14 @@ export default class Cards extends Service {
     let { data } = cardResponse;
     assertDocumentDataIsResource(data);
 
-    let { component, Model } = await this.codeForCard(data);
-    return Model.fromResponse(this.cardEnv(), data, component);
+    let { component, serializerMap } = await this.codeForCard(data);
+    return this.makeCardModelFromResponse(
+      this.cardEnv(),
+      data,
+      component,
+      serializerMap,
+      format
+    );
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -57,12 +66,18 @@ export default class Cards extends Service {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      let { component, Model } = await this.codeForCard(data);
-      return Model.fromResponse(this.cardEnv(), data, component);
+      let { component, serializerMap } = await this.codeForCard(data);
+      return this.makeCardModelFromResponse(
+        this.cardEnv(),
+        data,
+        component,
+        serializerMap,
+        'isolated'
+      );
     }
   }
 
-  async query(query: Query): Promise<CardModel[]> {
+  async query(format: Format, query: Query): Promise<CardModel[]> {
     // if (this.inLocalRealm(url)) {
     //   let builder = await this.builder();
     //   cardResponse = await builder.load(url, format);
@@ -74,16 +89,42 @@ export default class Cards extends Service {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        let { component, Model } = await this.codeForCard(cardResponse);
-        return Model.fromResponse(this.cardEnv(), cardResponse, component);
+        let { component, serializerMap } = await this.codeForCard(cardResponse);
+        return this.makeCardModelFromResponse(
+          this.cardEnv(),
+          cardResponse,
+          component,
+          serializerMap,
+          format
+        );
       })
     );
+  }
+
+  makeCardModelFromResponse(
+    cards: CardEnv,
+    cardResponse: ResourceObject,
+    innerComponent: unknown,
+    serializerMap: SerializerMap,
+    format: Format
+  ): CardModel {
+    return new CardModelForBrowser(cards, {
+      type: 'loaded',
+      url: cardResponse.id,
+      rawServerResponse: cloneDeep(cardResponse),
+      innerComponent,
+      serializerMap,
+      format,
+    });
   }
 
   private inLocalRealm(cardURL: string): boolean {
     return cardURL.startsWith(this.localRealmURL);
   }
 
+  // TODO  I think we can refactor this out, the CardModelForBrowser already has a
+  // browser environment specific implementation so there probably isn't a reason to
+  // have a separate object that holds environment implementation.
   private cardEnv(): CardEnv {
     return {
       load: this.load.bind(this),
@@ -187,9 +228,10 @@ export default class Cards extends Service {
     );
   }
 
-  private async codeForCard(
-    card: ResourceObject
-  ): Promise<{ component: unknown; Model: typeof CardModel }> {
+  private async codeForCard(card: ResourceObject): Promise<{
+    component: unknown;
+    serializerMap: SerializerMap;
+  }> {
     let componentModule = card.meta?.componentModule;
     if (!componentModule) {
       throw new Error('No componentModule to load');
@@ -199,11 +241,11 @@ export default class Cards extends Service {
     }
     let module = await this.loadModule<{
       default: unknown;
-      Model: typeof CardModel;
+      serializerMap: SerializerMap;
     }>(componentModule);
     return {
       component: module.default,
-      Model: module.Model,
+      serializerMap: module.serializerMap,
     };
   }
 

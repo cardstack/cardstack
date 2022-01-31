@@ -24,12 +24,13 @@ if (process.env.COMPILER) {
         inlineHBS: undefined,
         defaultFieldFormat: 'embedded',
         usedFields: [],
+        serializerMap: {},
       };
       let src = templateOnlyComponentTemplate(
         '<div><h1><@fields.name /></h1><@fields.birthdate /> <@fields.address /></div>'
       );
 
-      code = transformCardComponent(src, options);
+      code = transformCardComponent(src, options).source;
     });
 
     it('updates usedFields on options', async function () {
@@ -44,17 +45,15 @@ if (process.env.COMPILER) {
       ]);
     });
 
+    it('includes the serializerMap', async function () {
+      expect(options.serializerMap).to.deep.equal({ date: ['birthdate', 'address.settlementDate'] });
+    });
+
     it('modifies the source', async function () {
       expect(code).to.containsSource(
-        // eslint-disable-next-line no-useless-escape
-        `import BaseModel from \"@cardstack/core/src/card-model\";`
-      );
-      expect(code).to.containsSource(
-        `export class Model extends BaseModel {
-      static serializerMap = {
-        date: ["birthdate", "address.settlementDate"]
-      };
-    }`
+        `export const serializerMap = {
+          date: ["birthdate", "address.settlementDate"]
+        };`
       );
     });
   });

@@ -1,15 +1,13 @@
 import { JS_TYPE } from './utils/content';
-import { BabelFileResult, transformSync } from '@babel/core';
-// @ts-ignore
-import decoratorsPlugin from '@babel/plugin-proposal-decorators';
-// @ts-ignore
-import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { BabelFileResult, transformFromAstSync } from '@babel/core';
 import difference from 'lodash/difference';
+import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
 import md5 from 'md5';
 
-import cardSchemaPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema';
+import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
+import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
@@ -58,7 +56,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let options = {};
     let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let { cardSource } = this;
-    let schemaModule: ModuleRef | undefined = await this.prepareSchema(cardSource, options, modules);
+    let schemaModule: ModuleRef | undefined = this.analyzeSchema(cardSource, options, modules);
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
@@ -77,7 +75,18 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
       }
 
-      if (!schemaModule) {
+      if (parentCard.url !== baseCardURL) {
+        let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
+        if (isParentPrimitive && schemaModule) {
+          throw new CardstackError(
+            `Card ${cardSource.realm}${cardSource.id} adopting from primitive parent ${parentCard.url} must be of primitive type itself and should not have a schema.js file.`
+          );
+        }
+      }
+
+      if (schemaModule) {
+        this.prepareSchema(schemaModule, meta, fields, parentCard, modules);
+      } else {
         schemaModule = parentCard.schemaModule;
       }
 
@@ -182,11 +191,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private async prepareSchema(
+  private analyzeSchema(
     cardSource: RawCard<Unsaved>,
     options: any,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ): Promise<LocalRef | undefined> {
+  ): LocalRef | undefined {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -196,35 +205,54 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       return undefined;
     }
     let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
-    let out: BabelFileResult;
-    try {
-      out = transformSync(schemaSrc, {
-        plugins: [
-          [cardSchemaPlugin, options],
-          [decoratorsPlugin, { decoratorsBeforeExport: false }],
-          classPropertiesPlugin,
-        ],
-      })!;
-    } catch (error: any) {
-      throw augmentBadRequest(error);
-    }
+    let { code, ast } = analyzeSchemaBabelPlugin(schemaSrc, options);
 
     modules[schemaLocalFilePath] = {
       type: JS_TYPE,
-      source: out!.code!,
+      source: code!,
+      ast: ast!,
     };
     return { local: schemaLocalFilePath };
   }
 
+  private prepareSchema(
+    schemaModule: LocalRef,
+    meta: PluginMeta,
+    fields: CompiledCard['fields'],
+    parent: CompiledCard,
+    modules: CompiledCard<Unsaved, LocalRef>['modules']
+  ) {
+    let { source, ast } = modules[schemaModule.local];
+    if (!ast) {
+      throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
+    }
+
+    let out: BabelFileResult;
+    try {
+      out = transformFromAstSync(ast, source, {
+        ast: true,
+        plugins: [[cardSchemaTransformPlugin, { meta, fields, parent }]],
+      })!;
+    } catch (error: any) {
+      throw augmentBadRequest(error);
+    }
+    modules[schemaModule.local] = {
+      type: JS_TYPE,
+      source: out!.code!,
+      ast: out!.ast!,
+    };
+  }
+
   private async lookupFieldsForCard(metaFields: FieldsMeta, realm: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
+    for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
       let fieldURL = resolveCard(cardURL, realm);
       try {
         fields[name] = {
           card: await this.builder.getCompiledCard(fieldURL),
           type,
           name,
+          computed,
         };
       } catch (err: any) {
         if (!err.isCardstackError || err.status !== 404) {
@@ -347,19 +375,21 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
+      serializerMap: {},
     };
 
-    let code: string;
-    code = transformCardComponent(templateSource, options);
+    let { source, ast } = transformCardComponent(templateSource, options);
     let moduleName = hashFilenameFromFields(localFile, fields);
     modules[moduleName] = {
       type: JS_TYPE,
-      source: code,
+      source,
+      ast,
     };
     let componentInfo: ComponentInfo<LocalRef> = {
       moduleName: { local: moduleName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
+      serializerMap: options.serializerMap,
     };
 
     return componentInfo;
@@ -407,12 +437,12 @@ export function resolveCard(url: string, realm: string): string {
 export function makeGloballyAddressable(
   url: string,
   card: CompiledCard<Unsaved, ModuleRef>,
-  define: (localPath: string, type: string, source: string) => string
+  define: (localPath: string, type: string, source: string, ast: t.File | undefined) => string
 ): CompiledCard<Saved, GlobalRef> {
   let localToGlobal = new Map<string, string>();
 
-  for (let [localPath, { type, source }] of Object.entries(card.modules)) {
-    let globalRef = define(localPath, type, source);
+  for (let [localPath, { type, source, ast }] of Object.entries(card.modules)) {
+    let globalRef = define(localPath, type, source, ast);
     localToGlobal.set(localPath, globalRef);
   }
 
@@ -433,6 +463,7 @@ export function makeGloballyAddressable(
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
+      serializerMap: info.serializerMap,
     };
   }
 
