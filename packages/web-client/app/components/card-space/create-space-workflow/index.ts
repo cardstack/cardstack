@@ -1,6 +1,5 @@
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import RouterService from '@ember/routing/router-service';
 import config from '@cardstack/web-client/config/environment';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -302,16 +301,30 @@ class CreateSpaceWorkflow extends Workflow {
   beforeRestorationChecks() {
     return [];
   }
+
+  merchantInfoResource = useResource(this, MerchantInfo, () => ({
+    infoDID: this.session.getValue('merchantInfoDID'),
+  }));
+
+  get cardSpaceDetails() {
+    return {
+      profilePhoto: this.session.getValue('profileImageUrl'),
+      coverPhoto: this.session.getValue('profileCoverImageUrl'),
+      name: this.session.getValue('profileName'),
+      host: this.merchantInfoResource.id
+        ? `${this.merchantInfoResource.id}.card.space`
+        : null,
+      category: this.session.getValue('profileCategory'),
+      description: this.session.getValue('profileDescription'),
+      buttonText: this.session.getValue('profileButtonText'),
+    };
+  }
 }
 
 export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComponent<CreateSpaceWorkflow> {
   @service declare layer2Network: Layer2Network;
 
   @tracked detailsEditFormShown: boolean = true;
-
-  merchantInfo = useResource(this, MerchantInfo, () => ({
-    infoDID: this.workflow.session.getValue('merchantInfoDID'),
-  }));
 
   get workflowClass() {
     return CreateSpaceWorkflow;
