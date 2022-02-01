@@ -1,15 +1,10 @@
 import { module, test } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
-import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
-import { setupBuilder } from '../helpers/setup';
+import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 module('Integration | card-service', function (hooks) {
-  setupRenderingTest(hooks);
-  setupBuilder(hooks);
+  let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);
 
   let cards: Cards;
   hooks.beforeEach(function () {
@@ -17,12 +12,12 @@ module('Integration | card-service', function (hooks) {
   });
 
   module('blog post', function (hooks) {
-    let cardID = `${LOCAL_REALM}post-1`;
+    let cardID = `${localRealmURL}post-1`;
 
     hooks.beforeEach(function () {
-      this.builder.createRawCard({
+      createCard({
         id: 'post',
-        realm: LOCAL_REALM,
+        realm: localRealmURL,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'isolated.js',
@@ -46,10 +41,10 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      this.builder.createRawCard({
+      createCard({
         id: 'post-1',
-        realm: LOCAL_REALM,
-        adoptsFrom: `${LOCAL_REALM}post`,
+        realm: localRealmURL,
+        adoptsFrom: `${localRealmURL}post`,
         data: {
           title: 'A blog post title',
           createdAt: '2021-03-02T19:51:32.121Z',
@@ -58,9 +53,7 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load a cards isolated component`, async function (assert) {
-      let { component } = await cards.load(cardID, 'isolated');
-      this.set('component', component);
-      await render(hbs`<this.component />`);
+      await renderCard({ id: 'post-1' });
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('Mar 2, 2021');
     });
@@ -85,9 +78,7 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load a cards edit component`, async function (assert) {
-      let { component } = await cards.load(cardID, 'edit');
-      this.set('component', component);
-      await render(hbs`<this.component />`);
+      await renderCard({ id: 'post-1' }, 'edit');
       assert
         .dom('[data-test-field-name="title"]')
         .hasValue('A blog post title');
@@ -95,9 +86,9 @@ module('Integration | card-service', function (hooks) {
     });
 
     test('Serialization works on nested cards', async function (assert) {
-      this.builder.createRawCard({
+      createCard({
         id: 'post-list',
-        realm: LOCAL_REALM,
+        realm: localRealmURL,
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
@@ -111,7 +102,7 @@ module('Integration | card-service', function (hooks) {
         files: {
           'schema.js': `
             import { containsMany } from "@cardstack/types";
-            import post from "${LOCAL_REALM}post";
+            import post from "${localRealmURL}post";
 
             export default class Hello {
               @containsMany(post)
@@ -124,12 +115,11 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let model = await cards.load(`${LOCAL_REALM}post-list`, 'isolated');
-      this.set('component', model.component);
-      await render(hbs`<this.component />`);
+      await renderCard({ id: 'post-list' });
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('May 17, 2021');
 
+      let model = await cards.load(`${localRealmURL}post-list`, 'isolated');
       assert.ok(
         model.data.posts[0].createdAt instanceof Date,
         'CreatedAt is an instance of Date'
