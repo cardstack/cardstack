@@ -74,7 +74,7 @@ module('Acceptance | create card space', function (hooks) {
         .containsText('Name');
       assert
         .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
-        .containsText('blank.card.space');
+        .containsText('blank.pouty.pizza');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-category]'
@@ -160,7 +160,7 @@ module('Acceptance | create card space', function (hooks) {
         .exists();
       assert
         .dom('[data-test-profile-card-host]')
-        .hasText('vandelay.card.space');
+        .hasText('vandelay.pouty.pizza');
 
       // Display name
       await waitFor(postableSel(2, 1));
@@ -209,7 +209,7 @@ module('Acceptance | create card space', function (hooks) {
       assert.dom(postableSel(4, 1)).containsText(`URL reservation`);
       assert
         .dom(`${postableSel(4, 1)} [data-test-full-card-space-domain]`)
-        .containsText(`${subdomain}.card.space`);
+        .containsText(`${subdomain}.pouty.pizza`);
 
       // Confirm
       await waitFor(postableSel(4, 3));
