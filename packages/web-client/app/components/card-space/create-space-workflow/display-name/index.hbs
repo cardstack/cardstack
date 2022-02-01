@@ -101,6 +101,12 @@
   >
     <CardSpace::ProfileCard
       @profilePhoto={{preview}}
+      @coverPhoto={{@workflowSession.workflow.cardSpaceDetails.coverPhoto}}
+      @name={{@workflowSession.workflow.cardSpaceDetails.name}}
+      @host={{@workflowSession.workflow.cardSpaceDetails.host}}
+      @category={{@workflowSession.workflow.cardSpaceDetails.category}}
+      @description={{@workflowSession.workflow.cardSpaceDetails.description}}
+      @buttonText={{@workflowSession.workflow.cardSpaceDetails.buttonText}}
       data-test-card-space-profile-card-preview
     />
   </ImageEditor>
