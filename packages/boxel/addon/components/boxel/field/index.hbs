@@ -17,19 +17,19 @@
         {{svg-jar @icon class="boxel-field__icon" role="presentation"}}
       {{/if}}
 
-      {{#if @address}}
-        <div class="boxel-field__address">{{@address}}</div>
-      {{/if}}
+      <div>
+        {{#if @value}}
+          <div class="boxel-field__value">{{@value}}</div>
+        {{/if}}
 
-      {{#if @value}}
-        <div class="boxel-field__value">{{@value}}</div>
-      {{/if}}
+        {{#if @address}}
+          <div class="boxel-field__address">{{@address}}</div>
+        {{/if}}
 
-      {{#if (has-block)}}
-        <div>
+        {{#if (has-block)}}
           {{yield}}
-        </div>
-      {{/if}}
+        {{/if}}
+      </div>
     </div>
   </Tag>
 {{/let}}

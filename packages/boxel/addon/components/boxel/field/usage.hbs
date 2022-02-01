@@ -1,19 +1,31 @@
 <Freestyle::Usage @name="Field">
   <:example>
     <Boxel::Field
+      @tag={{this.tag}}
       @label={{this.label}}
+      @value={{this.value}}
       @fieldId={{this.id}}
       @vertical={{this.vertical}}
       @smallLabel={{this.smallLabel}}
+      @address={{this.address}}
+      @icon={{this.icon}}
     >
-      {{this.value}}
+      {{!-- yield content --}}
     </Boxel::Field>
   </:example>
 
   <:api as |Args|>
     <Args.String
+      @name="tag"
+      @description="html tag to use for the field (ie. use 'label' tag if this is an input/textarea field)"
+      @defaultValue="div"
+      @value={{this.tag}}
+      @onInput={{fn (mut this.tag)}}
+    />
+
+    <Args.String
       @name="fieldId"
-      @description="optional field id"
+      @description="field id"
       @value={{this.id}}
       @onInput={{fn (mut this.id)}}
     />
@@ -29,12 +41,25 @@
       @value={{this.value}}
       @onInput={{fn (mut this.value)}}
     />
-    {{!-- TODO: @address, @icon --}}
 
-    {{!-- TODO: better name --}}
+    <Args.String
+      @name="address"
+      @description="eth address value"
+      @value={{this.address}}
+      @onInput={{fn (mut this.address)}}
+    />
+
+    <Args.String
+      @name="icon"
+      @description="icon name"
+      @value={{this.icon}}
+      @onInput={{fn (mut this.icon)}}
+    />
+
+    {{!-- find better name? --}}
     <Args.Bool
       @name="smallLabel"
-      @description="Whether the label column should have a smaller width"
+      @description="Whether the label column should have a smaller width (only applies to horizontal layout)"
       @defaultValue="false"
       @onInput={{fn (mut this.smallLabel)}}
       @value={{this.smallLabel}}
