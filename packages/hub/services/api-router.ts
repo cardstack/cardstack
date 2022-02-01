@@ -84,7 +84,6 @@ export default class APIRouter {
       cardSpacesRoute.postProfileCategoryValidation
     );
     apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
-    apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);
     apiSubrouter.delete(

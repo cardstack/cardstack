@@ -36,8 +36,8 @@ if (process.env.COMPILER) {
     it('string card', async function () {
       let { compiled } = await cards.load('https://cardstack.com/base/string');
       expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
-      expect(compiled.embedded.inlineHBS).to.equal('{{@model}}');
-      expect(compiled.embedded.usedFields).to.deep.equal([]);
+      expect(compiled.componentInfos.embedded.inlineHBS).to.equal('{{@model}}');
+      expect(compiled.componentInfos.embedded.usedFields).to.deep.equal([]);
       expect(!compiled.serializer, 'String card has no deserializer').to.be.ok;
     });
 
@@ -70,7 +70,7 @@ if (process.env.COMPILER) {
       await cards.create(PERSON_CARD);
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
 
-      expect(getFileCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
+      expect(getFileCache().getModule(compiled.componentInfos.embedded.moduleName.global)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
@@ -83,15 +83,15 @@ if (process.env.COMPILER) {
       await cards.create(PERSON_CARD);
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
 
-      expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
+      expect(compiled.componentInfos.edit.usedFields).to.deep.equal(['name', 'birthdate']);
       expect(
-        getFileCache().getModule(compiled.edit.moduleName.global),
+        getFileCache().getModule(compiled.componentInfos.edit.moduleName.global),
         'Edit template is rendered for text'
       ).to.containsSource(
         '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
       );
       expect(
-        getFileCache().getModule(compiled.edit.moduleName.global),
+        getFileCache().getModule(compiled.componentInfos.edit.moduleName.global),
         'Edit template is rendered for date'
       ).to.containsSource(
         '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
@@ -128,13 +128,13 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}post`);
       expect(compiled.fields).to.have.all.keys('title', 'author');
 
-      expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
+      expect(compiled.componentInfos.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
 
-      expect(getFileCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
+      expect(getFileCache().getModule(compiled.componentInfos.embedded.moduleName.global)).to.containsSource(
         `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><HttpsCardstackComBaseDateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
       );
 
-      expect(compiled.isolated.usedFields).to.deep.equal(['author']);
+      expect(compiled.componentInfos.isolated.usedFields).to.deep.equal(['author']);
     });
 
     it('deeply nested cards', async function () {
@@ -201,19 +201,19 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}post-list`);
       expect(compiled.fields).to.have.all.keys('posts');
 
-      expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
+      expect(compiled.componentInfos.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
 
       expect(
-        getFileCache().getModule(compiled.isolated.moduleName.global),
+        getFileCache().getModule(compiled.componentInfos.isolated.moduleName.global),
         'Isolated template includes PostField component'
       ).to.containsSource(
         `{{#each @model.posts as |Post|}}<HttpsCardstackLocalPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`
       );
 
-      expect(compiled.embedded.usedFields).to.deep.equal(['posts.title']);
+      expect(compiled.componentInfos.embedded.usedFields).to.deep.equal(['posts.title']);
 
       expect(
-        getFileCache().getModule(compiled.embedded.moduleName.global),
+        getFileCache().getModule(compiled.componentInfos.embedded.moduleName.global),
         'Embedded template inlines post title'
       ).to.containsSource(`<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`);
     });
@@ -339,7 +339,7 @@ if (process.env.COMPILER) {
 
       it('iterators of fields and inlines templates', async function () {
         let { compiled } = await cards.load(`${realm}post`);
-        expect(getFileCache().getModule(compiled.embedded.moduleName.global)).to.containsSource(
+        expect(getFileCache().getModule(compiled.componentInfos.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label></article>'
         );
       });
@@ -382,10 +382,10 @@ if (process.env.COMPILER) {
         let { compiled: timelyCompiled } = await cards.load(cardURL(timelyPostCard));
         let { compiled: fancyCompiled } = await cards.load(cardURL(fancyPostCard));
 
-        expect(getFileCache().getModule(timelyCompiled.embedded.moduleName.global)).to.containsSource(
+        expect(getFileCache().getModule(timelyCompiled.componentInfos.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
         );
-        expect(getFileCache().getModule(fancyCompiled.embedded.moduleName.global)).to.containsSource(
+        expect(getFileCache().getModule(fancyCompiled.componentInfos.embedded.moduleName.global)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
         );
       });
@@ -606,7 +606,7 @@ if (process.env.COMPILER) {
 
         expect(compiled.fields.title.name).to.eq('title');
         expect(compiled.fields.title.type).to.eq('linksTo');
-        expect(compiled.embedded.usedFields).to.have.members(['title']);
+        expect(compiled.componentInfos.embedded.usedFields).to.have.members(['title']);
       });
     });
   });

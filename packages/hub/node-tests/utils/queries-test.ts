@@ -15,5 +15,12 @@ describe('Queries utils', function () {
         values: ['test'],
       });
     });
+
+    it('can prepend a table name', async function () {
+      expect(buildConditions({ a: 1, b: 2 }, 'table_name')).to.deep.equal({
+        where: 'table_name.a=$1 AND table_name.b=$2',
+        values: [1, 2],
+      });
+    });
   });
 });

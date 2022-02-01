@@ -46,6 +46,8 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
 
     this.merchantSafes = merchantSafes;
 
+    let safeToSelect;
+
     if (merchantSafes.length > 0) {
       let merchantAddress = this.args.workflowSession.getValue(
         'merchantSafeAddress'
@@ -54,13 +56,17 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
       if (merchantAddress) {
         let safe = merchantSafes.findBy('address', merchantAddress);
         if (safe) {
-          this.selectedSafe = safe;
+          safeToSelect = safe;
         } else {
-          this.selectedSafe = merchantSafes[0];
+          safeToSelect = merchantSafes[0];
         }
       } else {
-        this.selectedSafe = merchantSafes[0];
+        safeToSelect = merchantSafes[0];
       }
+    }
+
+    if (safeToSelect) {
+      this.chooseSafe(safeToSelect);
     }
   }
 
@@ -70,6 +76,8 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
       'merchantSafeAddress',
       this.selectedSafe!.address
     );
+
+    this.args.workflowSession.setValue('merchantInfoDID', safe.infoDID);
   }
 }
 
