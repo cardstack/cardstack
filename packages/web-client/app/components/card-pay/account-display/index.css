@@ -42,7 +42,7 @@
 }
 
 .account-display__address {
-  color: var(--boxel-purple-500);
+  /* color: var(--boxel-purple-500); */
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--address-font-size);
   line-height: var(--address-line-height);

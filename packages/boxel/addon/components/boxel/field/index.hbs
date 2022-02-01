@@ -1,7 +1,6 @@
 {{#let (element (or @tag "div")) as |Tag|}}
   <Tag
     class={{cn "boxel-field"
-      boxel-field--edit=(eq @fieldMode "edit")
       boxel-field--horizontal=(not @vertical)
       boxel-field--small-label=(eq @horizontalLabelSize "small")
     }}
