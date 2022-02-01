@@ -27,7 +27,7 @@
   display: block;
   object-fit: cover;
   object-position: center;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgb(0 0 0 / 15%);
   height: var(--cover-art-cover-size);
   width: var(--cover-art-cover-size);
   transition:

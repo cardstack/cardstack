@@ -16,9 +16,9 @@ button.workflow-tracker__toggle {
   top: 6rem;
   right: var(--boxel-sp-lg);
   background-color: var(--workflow-tracker-background);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgb(255 255 255 / 25%);
   border-radius: var(--boxel-border-radius);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 35%);
   color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
@@ -42,7 +42,7 @@ button.workflow-tracker__toggle {
 }
 
 .workflow-tracker__heading--scrolled {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 35%);
 }
 
 .workflow-tracker__list {
@@ -50,7 +50,7 @@ button.workflow-tracker__toggle {
 }
 
 .workflow-tracker__list + .workflow-tracker__heading {
-  box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 -2px 2px rgb(0 0 0 / 35%);
 }
 
 .workflow-tracker__li + .workflow-tracker__li .workflow-tracker__li-content {

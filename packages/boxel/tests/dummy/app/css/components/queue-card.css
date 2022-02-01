@@ -79,7 +79,7 @@
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp);
-  display: -webkit-box;
+  display: box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -139,7 +139,7 @@
 }
 
 .queue-card--light-theme .queue-card__footer {
-  border-color: rgba(55, 53, 67, 0.15);
+  border-color: rgb(55 53 67 / 15%);
 }
 
 /* Status */

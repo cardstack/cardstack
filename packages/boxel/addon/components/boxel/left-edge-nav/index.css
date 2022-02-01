@@ -1,6 +1,6 @@
-@import './basic-button/index.css';
-@import './card-management-button/index.css';
-@import './selectable-button/index.css';
+@import "./basic-button/index.css";
+@import "./card-management-button/index.css";
+@import "./selectable-button/index.css";
 
 .boxel-left-edge-nav {
   display: grid;
