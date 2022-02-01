@@ -1,14 +1,17 @@
 import { module, test } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
-import setupBuilder from '../helpers/setup-builder';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
-import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import type {
+  Builder,
+  CompiledCard,
+  RawCard,
+} from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { cardURL } from '@cardstack/core/src/utils';
+import type Cards from 'cardhost/services/cards';
+import { setupCardTest } from '../helpers/setup';
 
 module('@core | compiler-adoption', function (hooks) {
-  setupRenderingTest(hooks);
-  setupBuilder(hooks);
+  let { createCard } = setupCardTest(hooks);
 
   let parentCard: CompiledCard;
 
@@ -35,10 +38,14 @@ module('@core | compiler-adoption', function (hooks) {
     },
   };
 
+  let builder: Builder;
+  let cardService: Cards;
   hooks.beforeEach(async function () {
-    this.builder.createRawCard(PERSON_CARD);
+    createCard(PERSON_CARD);
+    cardService = this.owner.lookup('service:cards');
+    builder = await cardService.builder();
 
-    parentCard = await this.builder.getCompiledCard(`${LOCAL_REALM}person`);
+    parentCard = await builder.getCompiledCard(`${LOCAL_REALM}person`);
   });
 
   module('fields', function (/*hooks*/) {
@@ -48,9 +55,9 @@ module('@core | compiler-adoption', function (hooks) {
         realm: LOCAL_REALM,
         adoptsFrom: '../person',
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
-      let compiled = await this.builder.getCompiledCard(cardURL(card));
+      let compiled = await builder.getCompiledCard(cardURL(card));
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
       assert.equal(
@@ -78,9 +85,9 @@ module('@core | compiler-adoption', function (hooks) {
       `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
-      let compiled = await this.builder.getCompiledCard(cardURL(card));
+      let compiled = await builder.getCompiledCard(cardURL(card));
       assert.deepEqual(Object.keys(compiled.fields), [
         'name',
         'birthdate',
@@ -107,10 +114,10 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.builder.createRawCard(card);
+      createCard(card);
       assert.expect(1);
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.equal(
           err.message,
@@ -120,7 +127,7 @@ module('@core | compiler-adoption', function (hooks) {
     });
 
     test('A child card can NOT overwrite an existing field, even from a grandparent', async function (assert) {
-      this.builder.createRawCard({
+      createCard({
         id: 'user',
         realm: LOCAL_REALM,
         schema: 'schema.js',
@@ -155,10 +162,10 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.builder.createRawCard(card);
+      createCard(card);
       assert.expect(1);
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.equal(
           err.message,
@@ -183,12 +190,12 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
-      let compiledCard = await this.builder.getCompiledCard(cardURL(card));
+      let compiledCard = await builder.getCompiledCard(cardURL(card));
 
       assert.ok(
-        await this.cardService.loadModule(
+        await cardService.loadModule(
           compiledCard.componentInfos.embedded.moduleName.global
         ),
         'Has a embedded component'
@@ -196,7 +203,7 @@ module('@core | compiler-adoption', function (hooks) {
     });
 
     test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
-      this.builder.createRawCard({
+      createCard({
         id: 'user',
         realm: LOCAL_REALM,
         schema: 'schema.js',
@@ -225,11 +232,11 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
-      let compiledCard = await this.builder.getCompiledCard(cardURL(card));
+      let compiledCard = await builder.getCompiledCard(cardURL(card));
       assert.ok(
-        await this.cardService.loadModule(
+        await cardService.loadModule(
           compiledCard.componentInfos.embedded.moduleName.global
         ),
         'Has a embedded component'
@@ -257,9 +264,9 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.builder.createRawCard(card);
+      createCard(card);
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@adopts decorator can only be used on a class/.test(err.message),
@@ -283,10 +290,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@adopts decorator accepts exactly one argument/.test(err.message),
@@ -309,10 +316,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@adopts argument must be an identifier/.test(err.message),
@@ -335,10 +342,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@adopts argument is not defined/.test(err.message),
@@ -362,10 +369,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
 
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@adopts argument must come from a module default export/.test(
