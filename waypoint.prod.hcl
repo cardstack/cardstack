@@ -194,10 +194,10 @@ app "cardpay-subg-ext" {
         use "aws-ecs" {
             region = "us-east-1"
             memory = "512"
-            cluster = "cardpay-staging-subgraph-extraction"
+            cluster = "cardpay-production-subgraph-extraction"
             count = 1
-            subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
-            task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
+            subnets = ["subnet-0544d680b5f494842","subnet-051e48e37cf15329c"]
+            task_role_name = "cardpay-production-subgraph-extraction-ecr-task"
             disable_alb = true
         }
     }
