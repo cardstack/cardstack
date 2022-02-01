@@ -4,6 +4,40 @@
   data-test-card-space-details-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Fill out the Card Space details">
+    {{#if @isComplete}}
+      <CardPay::LabeledValue
+        @label="Description"
+      >
+        {{@workflowSession.state.profileDescription}}
+      </CardPay::LabeledValue>
+
+      <CardPay::LabeledValue
+        @label="Cover image"
+      >
+        <Avatar
+          @src={{@workflowSession.state.profileCoverImageUrl}}
+          @alt="Cover image"
+          @rounded={{false}}
+        />
+      </CardPay::LabeledValue>
+
+      <CardPay::LabeledValue
+        @label="Button text"
+      >
+        {{@workflowSession.state.profileButtonText}}
+      </CardPay::LabeledValue>
+
+      <CardPay::LabeledValue
+        @label="Category"
+      >
+        {{@workflowSession.state.profileCategory}}
+      </CardPay::LabeledValue>
+    {{else}}
+      <CardSpace::EditDetails
+        @workflowSession={{@workflowSession}}
+        @onSave={{this.onSave}}
+      />
+    {{/if}}
   </ActionCardContainer::Section>
 
   <Boxel::ActionChin
@@ -15,7 +49,7 @@
         {{on "click" this.save}}
         data-test-card-space-details-start-button
       >
-        Get Started
+        Save Choices
       </d.ActionButton>
     </:default>
     <:memorialized as |m|>
