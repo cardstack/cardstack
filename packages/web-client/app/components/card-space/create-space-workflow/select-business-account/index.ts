@@ -76,6 +76,8 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
       'merchantSafeAddress',
       this.selectedSafe!.address
     );
+
+    this.args.workflowSession.setValue('merchantInfoDID', safe.infoDID);
   }
 }
 
