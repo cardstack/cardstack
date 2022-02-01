@@ -3,15 +3,20 @@ import {
   ADDRESS_RAW_CARD,
 } from '@cardstack/core/tests/helpers/fixtures';
 import { module, test, skip } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupBuilder } from '../helpers/setup';
-import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
+import { setupCardTest } from '../helpers/setup';
+import type {
+  RawCard,
+  CompiledCard,
+  Builder,
+} from '@cardstack/core/src/interfaces';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { cardURL } from '@cardstack/core/src/utils';
+
+import type Cards from 'cardhost/services/cards';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -19,11 +24,15 @@ async function evalModule(src: string): Promise<any> {
 }
 
 module('@core | compiler-basics', function (hooks) {
-  setupRenderingTest(hooks);
-  setupBuilder(hooks);
-  hooks.beforeEach(function () {
-    this.builder.createRawCard(ADDRESS_RAW_CARD);
-    this.builder.createRawCard(PERSON_RAW_CARD);
+  let { createCard } = setupCardTest(hooks);
+
+  let builder: Builder;
+  let cardService: Cards;
+  hooks.beforeEach(async function () {
+    cardService = this.owner.lookup('service:cards');
+    builder = await cardService.builder();
+    createCard(ADDRESS_RAW_CARD);
+    createCard(PERSON_RAW_CARD);
   });
 
   skip('it has a working evalModule', async function (assert) {
@@ -43,20 +52,20 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('can compile the base card', async function (assert) {
-    let compiled = await this.builder.getCompiledCard(baseCardURL);
+    let compiled = await builder.getCompiledCard(baseCardURL);
 
     assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
-      await this.cardService.loadModule(
+      await cardService.loadModule(
         compiled.componentInfos.isolated.moduleName.global
       ),
       'Isolated module exists'
     );
     assert.ok(
-      await this.cardService.loadModule(
+      await cardService.loadModule(
         compiled.componentInfos.embedded.moduleName.global
       ),
       'Embedded module exists'
@@ -72,10 +81,10 @@ module('@core | compiler-basics', function (hooks) {
         'schema.js': `export default class Post {}`,
       },
     };
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
-    let source = await this.cardService.loadModule<any>(
+    let compiled = await builder.getCompiledCard(cardURL(card));
+    let source = await cardService.loadModule<any>(
       compiled.schemaModule.global
     );
     assert.equal(
@@ -96,9 +105,9 @@ module('@core | compiler-basics', function (hooks) {
         'embedded.js': templateOnlyComponentTemplate('{{@model}}'),
       },
     };
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let compiled = await builder.getCompiledCard(cardURL(card));
     assert.equal(
       compiled.componentInfos.embedded.inlineHBS,
       `{{@model}}`,
@@ -107,7 +116,7 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('it discovers three kinds of fields', async function (assert) {
-    await this.builder.createRawCard(PERSON_RAW_CARD);
+    await createCard(PERSON_RAW_CARD);
     let card: RawCard = {
       id: 'post',
       realm: LOCAL_REALM,
@@ -133,9 +142,9 @@ module('@core | compiler-basics', function (hooks) {
           }`,
       },
     };
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let compiled = await builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title', 'author', 'date']);
   });
 
@@ -156,9 +165,9 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let compiled = await builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
@@ -179,9 +188,9 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let compiled = await builder.getCompiledCard(cardURL(card));
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
@@ -202,9 +211,9 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.builder.createRawCard(card);
+    createCard(card);
 
-    let compiled = await this.builder.getCompiledCard(cardURL(card));
+    let compiled = await builder.getCompiledCard(cardURL(card));
     let title = compiled.fields.title;
     assert.equal(title.type, 'contains');
     assert.equal(title.card.url, 'https://cardstack.com/base/string');
@@ -231,9 +240,9 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
 
-      this.builder.createRawCard(card);
+      createCard(card);
 
-      let raw = await this.builder.getRawCard(cardURL(card));
+      let raw = await builder.getRawCard(cardURL(card));
       assert.deepEqual(raw.data, { title: 'Hello World' });
     });
   });
@@ -266,8 +275,8 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
 
-      this.builder.createRawCard(card);
-      compiled = await this.builder.getCompiledCard(cardURL(card));
+      createCard(card);
+      compiled = await builder.getCompiledCard(cardURL(card));
     });
 
     test('it inlines a simple field template', async function (assert) {
@@ -280,13 +289,11 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('it inlines a compound field template', async function (assert) {
-      this.builder.createRawCard(PERSON_RAW_CARD);
+      createCard(PERSON_RAW_CARD);
 
-      let compiled = await this.builder.getCompiledCard(
-        cardURL(PERSON_RAW_CARD)
-      );
+      let compiled = await builder.getCompiledCard(cardURL(PERSON_RAW_CARD));
 
-      let code = await this.cardService.loadModule<any>(
+      let code = await cardService.loadModule<any>(
         compiled.componentInfos.embedded.moduleName.global
       );
 
@@ -309,10 +316,10 @@ module('@core | compiler-basics', function (hooks) {
           `,
         },
       };
-      this.builder.createRawCard(card);
+      createCard(card);
       assert.expect(1);
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator must be called/.test(err.message),
@@ -338,9 +345,9 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
       assert.expect(1);
-      this.builder.createRawCard(card);
+      createCard(card);
       try {
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator must be used as a decorator/.test(
@@ -368,9 +375,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /the @contains decorator can only go on class properties/.test(
@@ -402,9 +409,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /field names must not be dynamically computed/.test(err.message),
@@ -434,9 +441,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /field names must be identifiers or string literals/.test(
@@ -466,9 +473,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /contains decorator accepts exactly one argument/.test(err.message),
@@ -496,9 +503,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument must be an identifier/.test(err.message),
@@ -525,9 +532,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument is not defined/.test(err.message),
@@ -554,9 +561,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.builder.createRawCard(card);
+        createCard(card);
 
-        await this.builder.getCompiledCard(cardURL(card));
+        await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
           /@contains argument must come from a module default export/.test(
