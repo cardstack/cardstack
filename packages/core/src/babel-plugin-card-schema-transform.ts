@@ -245,14 +245,6 @@ function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, babe
       true
     ),
 
-    // adds a class getter that looks like:
-    //   get allValues() {
-    //     if (!this.#allValuesPromise) {
-    //       this.#allValuesPromise = Promise.all(this.allFields.map(field => this[field]));
-    //     }
-    //     return this.#allValuesPromise;
-    //   }
-
     // adds a class method that looks like:
     //   then(resolve) {
     //     let allValues = getAllValues(this);
