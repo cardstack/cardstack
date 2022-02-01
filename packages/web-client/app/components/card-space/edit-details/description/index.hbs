@@ -1,0 +1,16 @@
+<CardPay::LabeledValue
+  @label="Description"
+>
+  <Boxel::Input
+    @value={{this.description}}
+    @onInput={{this.setDescription}}
+    @invalid={{this.validationMessage}}
+    @errorMessage={{this.validationMessage}}
+    @required={{true}}
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    {{on "blur" this.validateDescription}}
+  />
+</CardPay::LabeledValue>
