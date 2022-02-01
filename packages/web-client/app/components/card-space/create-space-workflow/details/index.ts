@@ -11,6 +11,13 @@ class CreateSpaceWorkflowDetailsComponent extends Component<WorkflowCardComponen
     this.args.onIncomplete?.();
   }
 
+  get isDisabled() {
+    return (
+      !this.args.workflowSession.getValue('profileDescription') ||
+      !this.args.workflowSession.getValue('profileButtonText') ||
+      !this.args.workflowSession.getValue('profileCategory') ||
+      !this.args.workflowSession.getValue('profileCoverImageUrl')
+    );
   }
 }
 

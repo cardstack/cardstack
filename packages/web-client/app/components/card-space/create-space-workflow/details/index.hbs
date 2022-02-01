@@ -8,7 +8,7 @@
 
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @disabled={{or @frozen this.isDisabled}}
   >
     <:default as |d|>
       <d.ActionButton
