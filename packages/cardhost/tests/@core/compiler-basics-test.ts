@@ -7,7 +7,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import setupBuilder from '../helpers/setup-builder';
+import { setupBuilder } from '../helpers/setup';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';

@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import setupBuilder from '../helpers/setup-builder';
+import { setupBuilder } from '../helpers/setup';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';

@@ -3,7 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
-import setupBuilder from '../helpers/setup-builder';
+import { setupBuilder } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 
