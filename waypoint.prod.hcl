@@ -184,7 +184,7 @@ app "cardpay-subg-ext" {
         registry {
             use "aws-ecr" {
                 region     = "us-east-1"
-                repository = "cardpay-staging-subgraph-extraction"
+                repository = "cardpay-production-subgraph-extraction"
                 tag        = "latest"
             }
         }
