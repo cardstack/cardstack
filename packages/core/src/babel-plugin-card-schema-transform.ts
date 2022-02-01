@@ -222,6 +222,10 @@ function forEachValidFieldDecorator(
 
 function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: typeof Babel.types) {
   path.node.body.push(
+    // creates a private property that looks like:
+    //   #allValuesPromise;
+    t.classPrivateProperty(t.privateName(t.identifier('allValuesPromise')), null, null, false),
+
     // adds a class getter that looks like:
     //   get allFields() {
     //     return ['lastName', 'aboutMe', 'fullName'];
@@ -237,29 +241,47 @@ function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: t
 
     // adds a class getter that looks like:
     //   get allValues() {
-    //     return Promise.all(this.allFields.map(field => this[field]))
+    //     if (!this.#allValuesPromise) {
+    //       this.#allValuesPromise = Promise.all(this.allFields.map(field => this[field]));
+    //     }
+    //     return this.#allValuesPromise;
     //   }
     t.classMethod(
       'get',
       t.identifier('allValues'),
       [],
       t.blockStatement([
-        t.returnStatement(
-          t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
-            t.callExpression(
-              t.memberExpression(
-                t.memberExpression(t.thisExpression(), t.identifier('allFields')),
-                t.identifier('map')
-              ),
-              [
-                t.arrowFunctionExpression(
-                  [t.identifier('field')],
-                  t.memberExpression(t.thisExpression(), t.identifier('field'), true)
-                ),
-              ]
+        t.ifStatement(
+          t.unaryExpression(
+            '!',
+            t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise'))),
+            true
+          ),
+          t.blockStatement([
+            t.expressionStatement(
+              t.assignmentExpression(
+                '=',
+                t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise'))),
+
+                t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
+                  t.callExpression(
+                    t.memberExpression(
+                      t.memberExpression(t.thisExpression(), t.identifier('allFields')),
+                      t.identifier('map')
+                    ),
+                    [
+                      t.arrowFunctionExpression(
+                        [t.identifier('field')],
+                        t.memberExpression(t.thisExpression(), t.identifier('field'), true)
+                      ),
+                    ]
+                  ),
+                ])
+              )
             ),
           ])
         ),
+        t.returnStatement(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise')))),
       ])
     ),
 
