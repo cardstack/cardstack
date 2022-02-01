@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc && chmod +x ./index.js",
     "cardpay": "ts-node ./index.ts",
+    "command-docs": "ts-node ./bin/update-command-docs.ts",
     "pkg": "npm-run-all pkg:*",
     "pkg:build": "rm -rf ./dist && rm -rf ~/.cardpay-cli-dist && mkdir ~/.cardpay-cli-dist && find . -name '*.ts' -print -o -name '*.json' -print | cpio -pdm ~/.cardpay-cli-dist && cp ../../yarn.lock ~/.cardpay-cli-dist && pushd ~/.cardpay-cli-dist && yarn install && ./node_modules/.bin/tsc && popd",
     "pkg:assemble": "mkdir -p ./dist/bin && cp -r ~/.cardpay-cli-dist/* ./dist && cp ./bin/cardpay ./dist/bin && rm -rf ~/.cardpay-cli-dist",
