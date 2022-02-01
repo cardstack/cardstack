@@ -9,11 +9,6 @@ export function buildYargs(args: string[]) {
     .help()
     .command(commands)
     .options({
-      network: {
-        alias: 'n',
-        type: 'string',
-        description: "The Layer 1 network to run this script in ('kovan' or 'mainnet')",
-      },
       mnemonic: {
         alias: 'm',
         default: process.env.MNEMONIC_PHRASE,

@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 import { getSDK } from '@cardstack/cardpay-sdk';
@@ -18,6 +18,9 @@ export default {
         type: 'string',
         default: '1',
         description: 'The amount of the specified token (*not* in units of wei, but in eth)',
+      })
+      .options({
+        network: NETWORK_OPTION_ANY,
       });
   },
   async handler(args: Arguments) {

@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -15,7 +15,8 @@ export default {
       .positional('recipient', {
         type: 'string',
         description: 'Layer 2 address that is the owner of the bridged tokens, defaults to wallet address',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, fromBlock, recipient } = args as unknown as {

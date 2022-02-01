@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
@@ -15,7 +15,8 @@ export default {
       .positional('prepaidCards', {
         type: 'string',
         description: 'A list of prepaid cards (separated by spaces) to remove from inventory',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, fundingCard, prepaidCards } = args as unknown as {

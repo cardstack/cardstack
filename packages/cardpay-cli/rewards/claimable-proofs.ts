@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { Proof, getSDK, WithSymbol } from '@cardstack/cardpay-sdk';
 import groupBy from 'lodash/groupBy';
@@ -21,7 +21,8 @@ export default {
       .option('tokenAddress', {
         type: 'string',
         description: 'The address of the tokens that are being claimed as rewards',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, address, rewardProgramId, tokenAddress } = args as unknown as {

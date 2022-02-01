@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -15,7 +15,8 @@ export default {
       .positional('txnHash', {
         type: 'string',
         description: 'Layer 2 transaction hash of the bridging transaction',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, fromBlock, txnHash } = args as unknown as {

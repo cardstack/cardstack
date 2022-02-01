@@ -89,9 +89,9 @@ Positionals:
   tokenAddress  The address of the token to get the balance of. Defaults to native token for network  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay bridge await-to-l1 <fromBlock> <txnHash>`
@@ -104,9 +104,9 @@ Positionals:
   txnHash    Layer 2 transaction hash of the bridging transaction  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge await-to-l2 <fromBlock> [recipient]`
@@ -119,9 +119,9 @@ Positionals:
   recipient  Layer 2 address that is the owner of the bridged tokens, defaults to wallet address  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge claim-on-l1 <messageId> <encodedData> <signatures..>`
@@ -135,9 +135,9 @@ Positionals:
   signatures   The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)  [array] [required] [default: []]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
 ## `cardpay bridge to-l1 <safeAddress> <amount> <tokenAddress> <receiver>`
@@ -152,9 +152,9 @@ Positionals:
   receiver      Layer 1 address to receive the bridged tokens  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge to-l2 <amount> <tokenAddress> [receiver]`
@@ -168,9 +168,9 @@ Positionals:
   receiver      Layer 2 address to be the owner of L2 safe, defaults to same as L1 address  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
 ## `cardpay bridge withdrawal-limits <token>`
@@ -182,9 +182,9 @@ Positionals:
   token  The layer 2 CPXD token address of the token being withdrawn  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay hub auth <hubRootUrl>`
@@ -196,9 +196,9 @@ Positionals:
   hubRootUrl  The URL of the hub server to authenticate with  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`
@@ -212,9 +212,9 @@ Positionals:
   amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`
@@ -228,9 +228,9 @@ Positionals:
   amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant register <fundingCard> <infoDID>`
@@ -243,9 +243,9 @@ Positionals:
   infoDID      The DID string that can be resolved to a DID document representing the merchant's information  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant revenue-balances <merchantSafe>`
@@ -257,9 +257,9 @@ Positionals:
   merchantSafe  The address of the merchant's safe whose balances are to be viewed  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>`
@@ -274,10 +274,10 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
       --force          Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card creation-gas-fee <tokenAddress>`
@@ -289,9 +289,9 @@ Positionals:
   tokenAddress  The token address of the token that will be used to pay for the prepaid card  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card pay-merchant <merchantSafe> <prepaidCard> <spendAmount>`
@@ -305,9 +305,9 @@ Positionals:
   spendAmount   The amount to send to the merchant in units of SPEND  [number] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card payment-limits`
@@ -316,9 +316,9 @@ Get the minimum and maximum prepaid card payment limits in SPEND
 
 ```
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card price-for-face-value <tokenAddress> <spendFaceValue>`
@@ -331,9 +331,9 @@ Positionals:
   spendFaceValue  The desired face value in SPEND for the prepaid card  [number] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card split <prepaidCard> <customizationDID> <faceValues..>`
@@ -347,9 +347,9 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card split-equally <prepaidCard> <faceValue> <quantity>`
@@ -363,9 +363,9 @@ Positionals:
   quantity     The amount of prepaid cards to create  [number] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card transfer <prepaidCard> <newOwner>`
@@ -378,9 +378,9 @@ Positionals:
   newOwner     The address of the new owner  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market add <fundingCard> <prepaidCard>`
@@ -393,9 +393,9 @@ Positionals:
   prepaidCard  The prepaid card to add to the inventory  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market inventory <sku>`
@@ -407,9 +407,9 @@ Positionals:
   sku  The SKU to obtain inventory for  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market inventories <environment>`
@@ -421,9 +421,9 @@ Positionals:
   environment  The environment to query  [string] [required] [choices: "staging", "production"]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market provision <sku> <recipient> <environment> <secret>`
@@ -438,9 +438,9 @@ Positionals:
   secret       The "provisioner secret" phrase to enable provisioning  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`
@@ -453,9 +453,9 @@ Positionals:
   prepaidCards  A list of prepaid cards (separated by spaces) to remove from inventory  [array] [required] [default: []]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`
@@ -469,9 +469,9 @@ Positionals:
   askPrice     The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU  [number] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market sku-info <sku>`
@@ -483,9 +483,9 @@ Positionals:
   sku  The SKU to obtain details for  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay price eth <token> [amount]`
@@ -498,9 +498,9 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay price updated-at <token>`
@@ -512,9 +512,9 @@ Positionals:
   token  The token symbol (without the .CPXD suffix)  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay price usd <token> [amount]`
@@ -527,9 +527,9 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`
@@ -544,9 +544,9 @@ Positionals:
   amount           The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`
@@ -560,9 +560,9 @@ Positionals:
   blob             Hex encoding of rule blob  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin create-program <prepaidCard> <admin>`
@@ -575,9 +575,9 @@ Positionals:
   prepaidCard  The address of the prepaid card that is being used to pay the reward program registration fee  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin lock <fundingCard> <rewardProgramId>`
@@ -590,9 +590,9 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`
@@ -607,9 +607,9 @@ Positionals:
   amount           The amount of tokens to recover into safe  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin set-admin <fundingCard> <rewardProgramId> <newAdmin>`
@@ -623,9 +623,9 @@ Positionals:
   newAdmin         The EOA admin of reward program  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
@@ -639,10 +639,10 @@ Positionals:
   proof       The proof used to claim reward  [string] [required]
 
 Options:
-  -n, --network             The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic            Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
+  -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards claimable-proofs <address>`
@@ -654,11 +654,11 @@ Positionals:
   address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
 
 Options:
-  -n, --network          The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
       --rewardProgramId  The reward program id.  [string]
       --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards list`
@@ -667,9 +667,9 @@ List reward programs
 
 ```
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards pool-balances <rewardProgramId>`
@@ -681,9 +681,9 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards register <prepaidCard> <rewardProgramId>`
@@ -696,9 +696,9 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards reward-balances <address>`
@@ -710,10 +710,10 @@ Positionals:
   address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
 
 Options:
-  -n, --network          The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
       --rewardProgramId  The reward program id.  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards transfer-safe <rewardSafe> <newOwner>`
@@ -726,9 +726,9 @@ Positionals:
   newOwner    The address of the new owner  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`
@@ -743,9 +743,9 @@ Positionals:
   amount        The amount of tokens to transfer (not in units of wei, but in eth)  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards view <rewardProgramId>`
@@ -757,9 +757,9 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe list [address] [safeType]`
@@ -772,9 +772,9 @@ Positionals:
   safeType  The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`
@@ -789,9 +789,9 @@ Positionals:
   amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`
@@ -806,9 +806,9 @@ Positionals:
   amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe view [safeAddress]`
@@ -820,9 +820,9 @@ Positionals:
   safeAddress  The address of the safe to view  [string]
 
 Options:
-  -n, --network        The Layer 1 network to run this script in ('kovan' or 'mainnet')  [string] [required]
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 <!-- END CLI DOCS GENERATED BY yarn command-docs -->

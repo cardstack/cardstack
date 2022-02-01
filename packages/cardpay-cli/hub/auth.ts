@@ -1,16 +1,18 @@
 import { Argv } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command: 'auth <hubRootUrl>',
   describe: 'Get an authentication token that can be used to make API requests to a Cardstack Hub server',
   builder(yargs: Argv) {
-    return yargs.positional('hubRootUrl', {
-      type: 'string',
-      description: 'The URL of the hub server to authenticate with',
-    });
+    return yargs
+      .positional('hubRootUrl', {
+        type: 'string',
+        description: 'The URL of the hub server to authenticate with',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { hubRootUrl, network, mnemonic } = args as unknown as {

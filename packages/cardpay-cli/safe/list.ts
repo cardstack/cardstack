@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK, Safe } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { displaySafe } from './utils';
 
@@ -16,7 +16,8 @@ export default {
       .positional('safeType', {
         type: 'string',
         description: "The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'",
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, address, safeType } = args as unknown as {
