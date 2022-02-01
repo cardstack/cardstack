@@ -49,6 +49,7 @@
       @name="horizontalLabelSize"
       @description="Width of the label column (only applies to horizontal layout)"
       @options={{array "small" "default"}}
+      @defaultValue="minmax(4rem, 25%)"
       @onInput={{fn (mut this.horizontalLabelSize)}}
       @value={{this.horizontalLabelSize}}
     />
@@ -56,4 +57,15 @@
       @description="Yield value or form field"
     />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Usage with input or textarea">
+  <:example>
+    <Boxel::Field
+      @tag="label"
+      @label="Name"
+    >
+      <Boxel::Input />
+    </Boxel::Field>
+  </:example>
 </Freestyle::Usage>

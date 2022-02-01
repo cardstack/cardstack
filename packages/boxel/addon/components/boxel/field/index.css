@@ -11,7 +11,7 @@
 }
 
 .boxel-field--small-label {
-  --boxel-field-label-size: minmax(4rem, 15%);
+  --boxel-field-label-size: minmax(4rem, 10%);
 }
 
 .boxel-field__label {
