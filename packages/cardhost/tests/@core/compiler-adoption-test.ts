@@ -54,8 +54,8 @@ module('@core | compiler-adoption', function (hooks) {
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
       assert.equal(
-        compiled.embedded.moduleName,
-        parentCard.embedded.moduleName,
+        compiled.componentInfos.embedded.moduleName,
+        parentCard.componentInfos.embedded.moduleName,
         'It reports the module name for the template that it adopts'
       );
     });
@@ -189,7 +189,7 @@ module('@core | compiler-adoption', function (hooks) {
 
       assert.ok(
         await this.cardService.loadModule(
-          compiledCard.embedded.moduleName.global
+          compiledCard.componentInfos.embedded.moduleName.global
         ),
         'Has a embedded component'
       );
@@ -230,7 +230,7 @@ module('@core | compiler-adoption', function (hooks) {
       let compiledCard = await this.builder.getCompiledCard(cardURL(card));
       assert.ok(
         await this.cardService.loadModule(
-          compiledCard.embedded.moduleName.global
+          compiledCard.componentInfos.embedded.moduleName.global
         ),
         'Has a embedded component'
       );
