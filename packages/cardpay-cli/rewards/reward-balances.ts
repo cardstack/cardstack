@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { displayRewardTokenBalance } from './utils';
@@ -16,7 +16,8 @@ export default {
       .option('rewardProgramId', {
         type: 'string',
         description: 'The reward program id.',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, address, rewardProgramId } = args as unknown as {

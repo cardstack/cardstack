@@ -1,16 +1,18 @@
 import { Argv } from 'yargs';
 import { fromWei, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command: 'creation-gas-fee <tokenAddress>',
   describe: 'Get the gas fee in the units of the specified token for creating a new prepaid card',
   builder(yargs: Argv) {
-    return yargs.positional('tokenAddress', {
-      type: 'string',
-      description: 'The token address of the token that will be used to pay for the prepaid card',
-    });
+    return yargs
+      .positional('tokenAddress', {
+        type: 'string',
+        description: 'The token address of the token that will be used to pay for the prepaid card',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, tokenAddress } = args as unknown as {

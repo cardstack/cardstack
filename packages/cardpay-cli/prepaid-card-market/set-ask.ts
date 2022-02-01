@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
@@ -23,7 +23,8 @@ export default {
         type: 'number',
         description:
           'The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, fundingCard, sku, askPrice } = args as unknown as {

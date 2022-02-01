@@ -1,12 +1,12 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 const { toWei } = Web3.utils;
 
 export default {
-  command: 'to-l1  <safeAddress> <amount> <tokenAddress> <receiver>',
+  command: 'to-l1 <safeAddress> <amount> <tokenAddress> <receiver>',
   describe: 'Bridge tokens to the layer 1 network',
   builder(yargs: Argv) {
     return yargs
@@ -25,7 +25,8 @@ export default {
       .positional('receiver', {
         description: 'Layer 1 address to receive the bridged tokens',
         type: 'string',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, safeAddress, receiver, amount, tokenAddress } = args as unknown as {

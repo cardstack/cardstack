@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { fromWei, toWei } from 'web3-utils';
@@ -20,7 +20,8 @@ export default {
       .positional('amount', {
         type: 'string',
         description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, merchantSafe, tokenAddress, amount } = args as unknown as {

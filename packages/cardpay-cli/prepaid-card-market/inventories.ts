@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
@@ -33,11 +33,13 @@ export default {
   command: 'inventories <environment>',
   describe: 'Get all the inventories available in the market contract',
   builder(yargs: Argv) {
-    return yargs.positional('environment', {
-      type: 'string',
-      choices: ['staging', 'production'],
-      description: 'The environment to query',
-    });
+    return yargs
+      .positional('environment', {
+        type: 'string',
+        choices: ['staging', 'production'],
+        description: 'The environment to query',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, environment } = args as unknown as {
