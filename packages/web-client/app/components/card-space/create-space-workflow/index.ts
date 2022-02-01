@@ -20,6 +20,8 @@ import { standardCancelationPostables } from '@cardstack/web-client/models/workf
 import RestorableWorkflowComponent from '../../card-pay/restorable-workflow-component';
 import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { taskFor } from 'ember-concurrency-ts';
+import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
+import { useResource } from 'ember-resources';
 
 const FAILURE_REASONS = {
   L2_DISCONNECTED: 'L2_DISCONNECTED',
@@ -319,6 +321,10 @@ export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComp
 
   @tracked detailsEditFormShown: boolean = true;
 
+  merchantInfo = useResource(this, MerchantInfo, () => ({
+    infoDID: this.workflow.session.getValue('merchantInfoDID'),
+  }));
+
   get workflowClass() {
     return CreateSpaceWorkflow;
   }
@@ -328,7 +334,7 @@ export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComp
       profilePhoto: this.workflow.session.getValue('profileImageUrl'),
       coverPhoto: this.workflow.session.getValue('profileCoverImageUrl'),
       name: this.workflow.session.getValue('profileName'),
-      host: this.workflow.session.getValue('url'),
+      host: this.merchantInfo.id ? `${this.merchantInfo.id}.card.space` : null,
       category: this.workflow.session.getValue('profileCategory'),
       description: this.workflow.session.getValue('profileDescription'),
       buttonText: this.workflow.session.getValue('profileButtonText'),

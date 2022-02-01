@@ -93,6 +93,7 @@ const defaultMerchantSafe: MerchantSafe = {
   type: 'merchant',
   accumulatedSpendValue: 0,
   merchant: 'EOA_ADDRESS', // should be overwritten in factory
+  infoDID: 'did:cardstack:example-did', // should be overwritten in factory
 };
 /**
  * Defaults create a freshly created merchant without customization:

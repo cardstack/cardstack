@@ -17,6 +17,7 @@ import {
   createDepotSafe,
   createMerchantSafe,
   createSafeToken,
+  getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 
@@ -36,11 +37,14 @@ module('Acceptance | create card space', function (hooks) {
 
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+  let testDID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 
   module('tests without layer 2 connection', function (hooks) {
     hooks.beforeEach(async function (this: MirageTestContext) {
       this.server.create('merchant-info', {
-        did: 'MerchantSafeDID',
+        did: testDID,
+        id: await getFilenameFromDid(testDID),
+        slug: 'vandelay',
       });
     });
     test('initiating the workflow', async function (assert) {
@@ -115,7 +119,7 @@ module('Acceptance | create card space', function (hooks) {
             createSafeToken('DAI.CPXD', '125000000000000000000'),
             createSafeToken('CARD.CPXD', '450000000000000000000'),
           ],
-          infoDID: 'MerchantSafeDID',
+          infoDID: testDID,
         }),
       ]);
 
@@ -154,6 +158,9 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-card-space-select-business-account-is-complete]')
         .exists();
+      assert
+        .dom('[data-test-profile-card-host]')
+        .hasText('vandelay.card.space');
 
       // Display name
       await waitFor(postableSel(2, 1));
@@ -234,9 +241,6 @@ module('Acceptance | create card space', function (hooks) {
       // I haven't added assertions on images. they are not required fields.)
       // These should fail as the workflow is filled out and starts modifying the correct values in the
       // workflow session
-      assert
-        .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
-        .containsText('blank.card.space');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-category]'
