@@ -488,31 +488,28 @@ if (process.env.COMPILER) {
         let { compiled } = await cards.load(`${realm}person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
-          #allValuesPromise;
-
-          get allFields() {
+          import { getAllValues } from "@cardstack/core/src/utils/schema-class";
+        `);
+        expect(source).to.containsSource(`
+          static get allFields() {
             return ["lastName", "aboutMe", "fullName"];
           }
 
-          get allValues() {
-            if (!this.#allValuesPromise) {
-              this.#allValuesPromise = Promise.all(this.allFields.map(field => this[field]));
-            }
-            return this.#allValuesPromise;
-          }
-
           then(resolve) {
-            return this.allValues.then(values => resolve(Object.fromEntries(this.allFields.map((field, i) => [field, values[i]]))));
+            let allValues = getAllValues(this);
+            return allValues.then(values => resolve(Object.fromEntries(Person.allFields.map((field, i) => [field, values[i]]))));
           }
         `);
         expect(source).to.containsSource(`
           catch(err) {
-            this.allValues.catch(err);
+            let allValues = getAllValues(this);
+            allValues.catch(err);
           }
         `);
         expect(source).to.containsSource(`
           finally(cb) {
-            this.allValues.finally(cb);
+            let allValues = getAllValues(this);
+            allValues.finally(cb);
           }
         `);
       });

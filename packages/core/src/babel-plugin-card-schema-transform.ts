@@ -142,7 +142,7 @@ export default function main(babel: typeof Babel) {
 
         exit(path: NodePath<t.Class>, state: State) {
           if (isCompositeCard(state) && Object.keys(state.opts.meta.fields).length > 0) {
-            addPromiseLikeFunctions(path.get('body'), state, t);
+            addPromiseLikeFunctions(path.get('body'), state, babel);
           }
         },
       },
@@ -220,14 +220,18 @@ function forEachValidFieldDecorator(
   }
 }
 
-function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: typeof Babel.types) {
-  path.node.body.push(
-    // creates a private property that looks like:
-    //   #allValuesPromise;
-    t.classPrivateProperty(t.privateName(t.identifier('allValuesPromise')), null, null, false),
+function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let className = (path.parent as NodePath<t.ClassDeclaration>['node']).id.name;
+  let getAllValues = babel.template(`
+    let allValues = %%getAllValues%%(this);
+  `)({
+    getAllValues: state.importUtil.import(path, '@cardstack/core/src/utils/schema-class', 'getAllValues'),
+  }) as t.Statement;
 
+  path.node.body.push(
     // adds a class getter that looks like:
-    //   get allFields() {
+    //   static get allFields() {
     //     return ['lastName', 'aboutMe', 'fullName'];
     //   }
     t.classMethod(
@@ -236,7 +240,9 @@ function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: t
       [],
       t.blockStatement([
         t.returnStatement(t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))),
-      ])
+      ]),
+      false,
+      true
     ),
 
     // adds a class getter that looks like:
@@ -246,125 +252,55 @@ function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: t
     //     }
     //     return this.#allValuesPromise;
     //   }
-    t.classMethod(
-      'get',
-      t.identifier('allValues'),
-      [],
-      t.blockStatement([
-        t.ifStatement(
-          t.unaryExpression(
-            '!',
-            t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise'))),
-            true
-          ),
-          t.blockStatement([
-            t.expressionStatement(
-              t.assignmentExpression(
-                '=',
-                t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise'))),
-
-                t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
-                  t.callExpression(
-                    t.memberExpression(
-                      t.memberExpression(t.thisExpression(), t.identifier('allFields')),
-                      t.identifier('map')
-                    ),
-                    [
-                      t.arrowFunctionExpression(
-                        [t.identifier('field')],
-                        t.memberExpression(t.thisExpression(), t.identifier('field'), true)
-                      ),
-                    ]
-                  ),
-                ])
-              )
-            ),
-          ])
-        ),
-        t.returnStatement(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('allValuesPromise')))),
-      ])
-    ),
 
     // adds a class method that looks like:
     //   then(resolve) {
-    //     return this.allValues.then(values => resolve(Object.fromEntries(this.allFields.map((field, i) => [field, values[i]]))));
+    //     let allValues = getAllValues(this);
+    //     return allValues.then(values => resolve(Object.fromEntries(PersonClass.allFields.map((field, i) => [field, values[i]]))));
     //   }
     t.classMethod(
       'method',
       t.identifier('then'),
       [t.identifier('resolve')],
       t.blockStatement([
-        t.returnStatement(
-          t.callExpression(
-            t.memberExpression(t.memberExpression(t.thisExpression(), t.identifier('allValues')), t.identifier('then')),
-            [
-              t.arrowFunctionExpression(
-                [t.identifier('values')],
-                t.callExpression(t.identifier('resolve'), [
-                  t.callExpression(t.memberExpression(t.identifier('Object'), t.identifier('fromEntries')), [
-                    t.callExpression(
-                      t.memberExpression(
-                        t.memberExpression(t.thisExpression(), t.identifier('allFields')),
-                        t.identifier('map')
-                      ),
-                      [
-                        t.arrowFunctionExpression(
-                          [t.identifier('field'), t.identifier('i')],
-                          t.arrayExpression([
-                            t.identifier('field'),
-                            t.memberExpression(t.identifier('values'), t.identifier('i'), true),
-                          ])
-                        ),
-                      ]
-                    ),
-                  ]),
-                ])
-              ),
-            ]
-          )
-        ),
+        getAllValues,
+        babel.template(`
+          return allValues.then(values => resolve(Object.fromEntries(%%className%%.allFields.map((field, i) => [field, values[i]]))));
+        `)({ className: t.identifier(className) }) as t.Statement,
       ])
     ),
 
     // adds a class method that looks like:
     //   catch(err) {
-    //     this.allValues.catch(err)
+    //     let allValues = getAllValues(this);
+    //     allValues.catch(err)
     //   }
     t.classMethod(
       'method',
       t.identifier('catch'),
       [t.identifier('err')],
       t.blockStatement([
-        t.expressionStatement(
-          t.callExpression(
-            t.memberExpression(
-              t.memberExpression(t.thisExpression(), t.identifier('allValues')),
-              t.identifier('catch')
-            ),
-            [t.identifier('err')]
-          )
-        ),
+        getAllValues,
+        babel.template.ast(`
+        allValues.catch(err);
+      `) as t.Statement,
       ])
     ),
 
     // adds a class method that looks like:
     //   finally(cb) {
-    //     this.allValues.finally(cb);
+    //     let allValues = getAllValues(this);
+    //     allValues.finally(cb);
     //   }
     t.classMethod(
       'method',
       t.identifier('finally'),
       [t.identifier('cb')],
       t.blockStatement([
-        t.expressionStatement(
-          t.callExpression(
-            t.memberExpression(
-              t.memberExpression(t.thisExpression(), t.identifier('allValues')),
-              t.identifier('finally')
-            ),
-            [t.identifier('cb')]
-          )
-        ),
+        getAllValues,
+        babel.template.ast(`
+        allValues.finally(cb);
+      `) as t.Statement,
       ])
     )
   );
