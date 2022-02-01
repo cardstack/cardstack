@@ -3,14 +3,12 @@
     <Boxel::Field
       @tag={{this.tag}}
       @label={{this.label}}
-      @value={{this.value}}
       @fieldId={{this.id}}
       @vertical={{this.vertical}}
-      @smallLabel={{this.smallLabel}}
-      @address={{this.address}}
+      @smallLabel={{this.horizontalLabelSize}}
       @icon={{this.icon}}
     >
-      {{!-- yield content --}}
+      {{this.value}}
     </Boxel::Field>
   </:example>
 
@@ -22,7 +20,6 @@
       @value={{this.tag}}
       @onInput={{fn (mut this.tag)}}
     />
-
     <Args.String
       @name="fieldId"
       @description="field id"
@@ -36,33 +33,10 @@
       @onInput={{fn (mut this.label)}}
     />
     <Args.String
-      @name="value"
-      @description="text value"
-      @value={{this.value}}
-      @onInput={{fn (mut this.value)}}
-    />
-
-    <Args.String
-      @name="address"
-      @description="eth address value"
-      @value={{this.address}}
-      @onInput={{fn (mut this.address)}}
-    />
-
-    <Args.String
       @name="icon"
       @description="icon name"
       @value={{this.icon}}
       @onInput={{fn (mut this.icon)}}
-    />
-
-    {{!-- find better name? --}}
-    <Args.Bool
-      @name="smallLabel"
-      @description="Whether the label column should have a smaller width (only applies to horizontal layout)"
-      @defaultValue="false"
-      @onInput={{fn (mut this.smallLabel)}}
-      @value={{this.smallLabel}}
     />
     <Args.Bool
       @name="vertical"
@@ -70,6 +44,13 @@
       @defaultValue="false"
       @onInput={{fn (mut this.vertical)}}
       @value={{this.vertical}}
+    />
+    <Args.String
+      @name="horizontalLabelSize"
+      @description="Width of the label column (only applies to horizontal layout)"
+      @options={{array "small" "default"}}
+      @onInput={{fn (mut this.horizontalLabelSize)}}
+      @value={{this.horizontalLabelSize}}
     />
     <Args.Yield
       @description="Yield value or form field"

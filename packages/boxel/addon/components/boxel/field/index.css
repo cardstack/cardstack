@@ -1,12 +1,13 @@
 .boxel-field {
   display: grid;
-  gap: var(--boxel-sp-xs) var(--boxel-sp-lg);
+  gap: var(--boxel-sp-xs) 0;
 }
 
 .boxel-field--horizontal {
   --boxel-field-label-size: minmax(4rem, 25%);
 
   grid-template-columns: var(--boxel-field-label-size) 1fr;
+  gap: 0 var(--boxel-sp-lg);
 }
 
 .boxel-field--small-label {
@@ -20,7 +21,7 @@
   text-transform: uppercase;
 }
 
-.boxel-field__contents {
+.boxel-field--with-icon {
   display: flex;
 }
 
@@ -28,10 +29,4 @@
   width: var(--boxel-icon-sm);
   height: var(--boxel-icon-sm);
   margin-right: var(--boxel-sp-xxs);
-}
-
-.boxel-field__address {
-  font-family: var(--boxel-monospace-font-family);
-  max-width: 22ch;
-  word-break: break-all;
 }

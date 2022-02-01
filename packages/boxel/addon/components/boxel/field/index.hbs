@@ -3,7 +3,7 @@
     class={{cn "boxel-field"
       boxel-field--edit=(eq @fieldMode "edit")
       boxel-field--horizontal=(not @vertical)
-      boxel-field--small-label=@smallLabel
+      boxel-field--small-label=(eq @horizontalLabelSize "small")
     }}
     data-test-boxel-field
     data-test-boxel-field-id={{@fieldId}}
@@ -12,24 +12,16 @@
     <div class="boxel-field__label" data-test-boxel-field-label>
       {{@label}}
     </div>
-    <div class="boxel-field__contents">
-      {{#if @icon}}
+
+    {{#if @icon}}
+      <div class="boxel-field--with-icon">
         {{svg-jar @icon class="boxel-field__icon" role="presentation"}}
-      {{/if}}
-
-      <div>
-        {{#if @value}}
-          <div class="boxel-field__value">{{@value}}</div>
-        {{/if}}
-
-        {{#if @address}}
-          <div class="boxel-field__address">{{@address}}</div>
-        {{/if}}
-
-        {{#if (has-block)}}
+        <div>
           {{yield}}
-        {{/if}}
+        </div>
       </div>
-    </div>
+    {{else}}
+      {{yield}}
+    {{/if}}
   </Tag>
 {{/let}}

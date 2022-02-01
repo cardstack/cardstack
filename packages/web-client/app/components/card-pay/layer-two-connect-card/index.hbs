@@ -19,26 +19,26 @@
       data-test-layer-2-wallet-summary
     >
       <CardPay::FieldStack>
-        <Boxel::Field
-          @label="Network"
-          @value={{network-display-info "layer2" "fullName"}}
-        />
+        <Boxel::Field @label="Network">
+          {{network-display-info "layer2" "fullName"}}
+        </Boxel::Field>
 
         {{#if this.isConnected}}
-          <Boxel::Field
-            @label="Account"
-            @address={{this.layer2Network.walletInfo.firstAddress}}
-            data-test-address-field
-          />
+          <Boxel::Field @label="Account" data-test-address-field>
+            <CardPay::AccountDisplay
+              @address={{this.layer2Network.walletInfo.firstAddress}}
+              @wrapped={{true}}
+            />
+          </Boxel::Field>
           <Boxel::Field @label="Depot balance" data-test-balance-container>
             {{#if this.layer2Network.isFetchingDepot}}
               <Boxel::LoadingIndicator data-test-balance-container-loading/>
             {{else if this.balancesToShow.length}}
-            <CardPay::BalancesList as |Balance|>
-              {{#each this.balancesToShow as |b|}}
-                <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
-              {{/each}}
-            </CardPay::BalancesList>
+              <CardPay::BalancesList as |Balance|>
+                {{#each this.balancesToShow as |b|}}
+                  <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+                {{/each}}
+              </CardPay::BalancesList>
             {{else}}
               None
             {{/if}}
@@ -48,10 +48,11 @@
         {{!-- future: show Prepaid Cards, Badges --}}
         <Boxel::Field
           @label="Status"
-          @value={{if this.isConnected "Connected" "Disconnected"}}
           @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
           data-test-layer-2-wallet-connected-status
-        />
+        >
+          {{if this.isConnected "Connected" "Disconnected"}}
+        </Boxel::Field>
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
 

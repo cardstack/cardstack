@@ -5,13 +5,19 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
     <div class="withdrawal-transaction-amount__fields">
-      <Boxel::Field @vertical={{this.isConfirmed}} @label="Withdrawal source" @smallLabel={{true}}>
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Withdrawal source"
+      >
         <CardPay::SafeChooserDropdown::SafeOption
           @safe={{this.currentSafe}}
           data-test-withdrawal-source
         />
       </Boxel::Field>
-      <Boxel::Field @vertical={{this.isConfirmed}} @label="Source balance" @smallLabel={{true}}>
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Source balance"
+      >
         <CardPay::BalanceDisplay
           class="withdrawal-transaction-amount__balance"
           @size="small"
@@ -26,7 +32,6 @@
         @tag={{unless this.isConfirmed "label"}}
         @vertical={{this.isConfirmed}}
         @label="Amount to withdraw"
-        @smallLabel={{true}}
         data-test-amount-label
       >
         {{#if this.isConfirmed}}
@@ -54,7 +59,6 @@
       {{#unless this.isConfirmed}}
         <Boxel::Field
           @label="Approximate value*"
-          @smallLabel={{true}}
           data-test-approximate-value-label
         >
           {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}

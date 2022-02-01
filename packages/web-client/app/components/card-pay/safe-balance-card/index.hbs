@@ -18,9 +18,13 @@
           <CardPay::FieldStack>
             <Boxel::Field
               @label={{this.safeAddressLabel}}
-              @address={{this.safe.address}}
               data-test-safe-address
-            />
+            >
+              <CardPay::AccountDisplay
+                @address={{this.safe.address}}
+                @wrapped={{true}}
+              />
+            </Boxel::Field>
             <Boxel::Field @label={{this.safeBalanceLabel}} data-test-balance-label>
               {{#if this.balancesToShow.length}}
                 <CardPay::BalancesList as |Balance|>

@@ -8,7 +8,6 @@
       <Boxel::Field
         @vertical={{this.isUnlockingOrUnlocked}}
         @label="Funding from"
-        @smallLabel={{true}}
       >
         <CardPay::DepositWorkflow::TransactionAmount::BalanceView
           @wallet={{network-display-info "layer1" "fullName"}}
@@ -24,7 +23,6 @@
         @tag={{unless this.isUnlockingOrUnlocked "label"}}
         @vertical={{this.isUnlockingOrUnlocked}}
         @label="Amount to deposit"
-        @smallLabel={{true}}
       >
         {{#if this.isUnlockingOrUnlocked}}
           <CardPay::BalanceDisplay
@@ -50,7 +48,6 @@
       {{#unless this.isUnlockingOrUnlocked}}
         <Boxel::Field
           @label="Approximate value*"
-          @smallLabel={{true}}
         >
           {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
         </Boxel::Field>
