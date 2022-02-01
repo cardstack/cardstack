@@ -161,3 +161,44 @@ app "hub-event-listener" {
       }
   }
 }
+
+# This name has been chosen to be much shorter than 32 characters
+# If the name comes close to 32 characters there are unreliable
+# deployments. See 
+#  https://github.com/hashicorp/waypoint/issues/2957
+# for more details
+app "cardpay-subg-ext" {
+    path = "./packages/cardpay-subgraph-extraction"
+
+    config {
+        env = {
+            ENVIRONMENT = "production"
+        }
+    }
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "cardpay-production-subgraph-extraction"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "cardpay-production-subgraph-extraction"
+            count = 1
+            subnets = ["subnet-0544d680b5f494842","subnet-051e48e37cf15329c"]
+            task_role_name = "cardpay-production-subgraph-extraction-ecr-task"
+            disable_alb = true
+        }
+    }
+}
