@@ -222,50 +222,79 @@ function forEachValidFieldDecorator(
 
 function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: typeof Babel.types) {
   path.node.body.push(
+    // adds a class getter that looks like:
+    //   get allFields() {
+    //     return ['lastName', 'aboutMe', 'fullName'];
+    //   }
+    t.classMethod(
+      'get',
+      t.identifier('allFields'),
+      [],
+      t.blockStatement([
+        t.returnStatement(t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))),
+      ])
+    ),
+
+    // adds a class getter that looks like:
+    //   get allValues() {
+    //     return Promise.all(this.allFields.map(field => this[field]))
+    //   }
+    t.classMethod(
+      'get',
+      t.identifier('allValues'),
+      [],
+      t.blockStatement([
+        t.returnStatement(
+          t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
+            t.callExpression(
+              t.memberExpression(
+                t.memberExpression(t.thisExpression(), t.identifier('allFields')),
+                t.identifier('map')
+              ),
+              [
+                t.arrowFunctionExpression(
+                  [t.identifier('field')],
+                  t.memberExpression(t.thisExpression(), t.identifier('field'), true)
+                ),
+              ]
+            ),
+          ])
+        ),
+      ])
+    ),
+
     // adds a class method that looks like:
     //   then(resolve) {
-    //     let fields = ['lastName', 'aboutMe', 'fullName'];
-    //     return Promise.all(fields.map(field => this[field]))
-    //       .then(values => resolve(Object.fromEntries(fields.map((field, i) => [field, values[i]]))))
+    //     return this.allValues.then(values => resolve(Object.fromEntries(this.allFields.map((field, i) => [field, values[i]]))));
     //   }
     t.classMethod(
       'method',
       t.identifier('then'),
       [t.identifier('resolve')],
       t.blockStatement([
-        t.variableDeclaration('let', [
-          t.variableDeclarator(
-            t.identifier('fields'),
-            t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))
-          ),
-        ]),
         t.returnStatement(
           t.callExpression(
-            t.memberExpression(
-              t.callExpression(t.memberExpression(t.identifier('Promise'), t.identifier('all')), [
-                t.callExpression(t.memberExpression(t.identifier('fields'), t.identifier('map')), [
-                  t.arrowFunctionExpression(
-                    [t.identifier('field')],
-                    t.memberExpression(t.thisExpression(), t.identifier('field'), true)
-                  ),
-                ]),
-              ]),
-              t.identifier('then')
-            ),
+            t.memberExpression(t.memberExpression(t.thisExpression(), t.identifier('allValues')), t.identifier('then')),
             [
               t.arrowFunctionExpression(
                 [t.identifier('values')],
                 t.callExpression(t.identifier('resolve'), [
                   t.callExpression(t.memberExpression(t.identifier('Object'), t.identifier('fromEntries')), [
-                    t.callExpression(t.memberExpression(t.identifier('fields'), t.identifier('map')), [
-                      t.arrowFunctionExpression(
-                        [t.identifier('field'), t.identifier('i')],
-                        t.arrayExpression([
-                          t.identifier('field'),
-                          t.memberExpression(t.identifier('values'), t.identifier('i'), true),
-                        ])
+                    t.callExpression(
+                      t.memberExpression(
+                        t.memberExpression(t.thisExpression(), t.identifier('allFields')),
+                        t.identifier('map')
                       ),
-                    ]),
+                      [
+                        t.arrowFunctionExpression(
+                          [t.identifier('field'), t.identifier('i')],
+                          t.arrayExpression([
+                            t.identifier('field'),
+                            t.memberExpression(t.identifier('values'), t.identifier('i'), true),
+                          ])
+                        ),
+                      ]
+                    ),
                   ]),
                 ])
               ),
@@ -274,37 +303,45 @@ function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, t: t
         ),
       ])
     ),
+
     // adds a class method that looks like:
-    //  catch(err) {
-    //    if (err) {
-    //      err();
-    //    }
-    //  }
+    //   catch(err) {
+    //     this.allValues.catch(err)
+    //   }
     t.classMethod(
       'method',
       t.identifier('catch'),
       [t.identifier('err')],
       t.blockStatement([
-        t.ifStatement(
-          t.identifier('err'),
-          t.blockStatement([t.expressionStatement(t.callExpression(t.identifier('err'), []))])
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(
+              t.memberExpression(t.thisExpression(), t.identifier('allValues')),
+              t.identifier('catch')
+            ),
+            [t.identifier('err')]
+          )
         ),
       ])
     ),
+
     // adds a class method that looks like:
-    //  finally(cb) {
-    //    if (cb) {
-    //      cb();
-    //    }
-    //  }
+    //   finally(cb) {
+    //     this.allValues.finally(cb);
+    //   }
     t.classMethod(
       'method',
       t.identifier('finally'),
       [t.identifier('cb')],
       t.blockStatement([
-        t.ifStatement(
-          t.identifier('cb'),
-          t.blockStatement([t.expressionStatement(t.callExpression(t.identifier('cb'), []))])
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(
+              t.memberExpression(t.thisExpression(), t.identifier('allValues')),
+              t.identifier('finally')
+            ),
+            [t.identifier('cb')]
+          )
         ),
       ])
     )

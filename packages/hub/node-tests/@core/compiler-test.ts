@@ -488,23 +488,24 @@ if (process.env.COMPILER) {
         let { compiled } = await cards.load(`${realm}person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
+          get allFields() {
+            return ["lastName", "aboutMe", "fullName"];
+          }
+          get allValues() {
+            return Promise.all(this.allFields.map(field => this[field]));
+          }
           then(resolve) {
-            let fields = ["lastName", "aboutMe", "fullName"];
-            return Promise.all(fields.map(field => this[field])).then(values => resolve(Object.fromEntries(fields.map((field, i) => [field, values[i]]))));
+            return this.allValues.then(values => resolve(Object.fromEntries(this.allFields.map((field, i) => [field, values[i]]))));
           }
         `);
         expect(source).to.containsSource(`
           catch(err) {
-            if (err) {
-              err();
-            }
+            this.allValues.catch(err);
           }
         `);
         expect(source).to.containsSource(`
           finally(cb) {
-            if (cb) {
-              cb();
-            }
+            this.allValues.finally(cb);
           }
         `);
       });
