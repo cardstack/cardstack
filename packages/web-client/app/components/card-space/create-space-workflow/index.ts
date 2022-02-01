@@ -324,8 +324,6 @@ class CreateSpaceWorkflow extends Workflow {
 export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComponent<CreateSpaceWorkflow> {
   @service declare layer2Network: Layer2Network;
 
-  @tracked detailsEditFormShown: boolean = true;
-
   get workflowClass() {
     return CreateSpaceWorkflow;
   }
