@@ -6,7 +6,7 @@ import Web3 from 'web3';
 const { toWei } = Web3.utils;
 
 export default {
-  command: 'to-l1  <safeAddress> <amount> <tokenAddress> <receiver>',
+  command: 'to-l1 <safeAddress> <amount> <tokenAddress> <receiver>',
   describe: 'Bridge tokens to the layer 1 network',
   builder(yargs: Argv) {
     return yargs

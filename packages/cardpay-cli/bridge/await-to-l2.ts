@@ -4,7 +4,7 @@ import { getWeb3 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
-  command: 'await-to-l2  <fromBlock> [recipient]',
+  command: 'await-to-l2 <fromBlock> [recipient]',
   describe: 'Wait for token bridging from L1 to L2 to complete',
   builder(yargs: Argv) {
     return yargs
