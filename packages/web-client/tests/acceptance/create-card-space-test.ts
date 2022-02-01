@@ -48,8 +48,6 @@ module('Acceptance | create card space', function (hooks) {
       });
     });
     test('initiating the workflow', async function (assert) {
-      let subdomain = ''; // TODO: replace this when other parts of the form are filled out
-
       await visit('/card-space');
       await click('[data-test-workflow-button="create-space"]');
 
@@ -201,18 +199,8 @@ module('Acceptance | create card space', function (hooks) {
         .dom(milestoneCompletedSel(3))
         .containsText(`Card Space details saved`);
 
-      // Reservation badge
-      await waitFor(postableSel(4, 1));
-      assert
-        .dom(postableSel(4, 0))
-        .containsText(`We have sent your URL reservation badge`);
-      assert.dom(postableSel(4, 1)).containsText(`URL reservation`);
-      assert
-        .dom(`${postableSel(4, 1)} [data-test-full-card-space-domain]`)
-        .containsText(`${subdomain}.card.space`);
-
       // Confirm
-      await waitFor(postableSel(4, 3));
+      await waitFor(postableSel(4, 0));
 
       await click('[data-test-card-space-creation-button]');
       assert.dom('[data-test-card-space-creation-is-complete]').exists();
