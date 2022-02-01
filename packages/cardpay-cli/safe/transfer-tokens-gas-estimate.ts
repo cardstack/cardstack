@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 const { toWei, fromWei } = Web3.utils;
@@ -25,7 +25,8 @@ export default {
       .positional('amount', {
         type: 'string',
         description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, token, safeAddress, recipient, amount } = args as unknown as {

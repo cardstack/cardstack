@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 
@@ -7,10 +7,12 @@ export default {
   command: 'inventory <sku>',
   describe: 'Get the inventory for a specific SKU from the market contract',
   builder(yargs: Argv) {
-    return yargs.positional('sku', {
-      type: 'string',
-      description: 'The SKU to obtain inventory for',
-    });
+    return yargs
+      .positional('sku', {
+        type: 'string',
+        description: 'The SKU to obtain inventory for',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, sku } = args as unknown as {

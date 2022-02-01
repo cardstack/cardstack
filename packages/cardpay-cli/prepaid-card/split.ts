@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { formatPrepaidCards, inventoryInfo } from './utils';
 
@@ -20,7 +20,8 @@ export default {
       .positional('faceValues', {
         type: 'number',
         description: 'A list of face values (separated by spaces) in units of § SPEND to create',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, prepaidCard, customizationDID, faceValues } = args as unknown as {

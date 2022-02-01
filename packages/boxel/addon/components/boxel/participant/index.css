@@ -14,7 +14,7 @@
 .boxel-participant__image {
   width: var(--boxel-participant-icon-size);
   height: var(--boxel-participant-icon-size);
-  background-image: url('/@cardstack/boxel/images/placeholders/profile.svg');
+  background-image: url("/@cardstack/boxel/images/placeholders/profile.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;

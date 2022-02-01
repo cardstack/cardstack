@@ -10,7 +10,7 @@
 }
 
 .deposit-workflow__banner ul li::marker {
-  content: '- ';
+  content: "- ";
 }
 
 .deposit-workflow__banner p {
@@ -30,7 +30,7 @@
 }
 
 .deposit-workflow__banner a {
-  color: currentColor;
+  color: currentcolor;
   font-weight: 600;
   text-decoration: underline;
   transition: color var(--boxel-transition);

@@ -1,4 +1,4 @@
-@import './item/index.css';
+@import "./item/index.css";
 
 .boxel-sort-menu {
   font: var(--boxel-font-sm);

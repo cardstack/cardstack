@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstantByNetwork, getSDK, ERC20ABI } from '@cardstack/cardpay-sdk';
 import { AbiItem } from 'web3-utils';
@@ -8,10 +8,14 @@ export default {
   command: 'token-balance [tokenAddress]',
   describe: 'Get the native token balance for the given wallet tokenAddress and network',
   builder(yargs: Argv) {
-    return yargs.positional('tokenAddress', {
-      type: 'string',
-      description: 'The address of the token to get the balance of. Defaults to native token for network',
-    });
+    return yargs
+      .positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the token to get the balance of. Defaults to native token for network',
+      })
+      .options({
+        network: NETWORK_OPTION_ANY,
+      });
   },
   async handler(args: Arguments) {
     let { network, mnemonic, tokenAddress } = args as unknown as {

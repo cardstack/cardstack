@@ -2,7 +2,7 @@
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 15%);
 
   /* box-shadow is implemented here so it follows the border-radius of this container */
   transition: box-shadow var(--boxel-transition);
@@ -20,7 +20,7 @@
 }
 
 .action-card-container--is-complete {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
 
 .action-card-container__header {

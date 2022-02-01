@@ -33,7 +33,7 @@
     {{!-- TODO: Extract component - Reply to message box --}}
     {{#if (includes @model.user.id @model.thread.participant_ids)}}
       <div class="cardflow__message">
-        <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
+        <div class="cardflow__message-icon-profile" style={{css-url "background-image" @model.user.imgURL}} />
         <Boxel::Input class="cardflow__reply-to field-renderer__input" placeholder="Post a message to this thread" />
       </div>
     {{/if}}

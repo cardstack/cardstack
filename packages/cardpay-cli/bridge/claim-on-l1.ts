@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_1 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -20,6 +20,9 @@ export default {
         type: 'string',
         description:
           'The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)',
+      })
+      .options({
+        network: NETWORK_OPTION_LAYER_1,
       });
   },
   async handler(args: Arguments) {

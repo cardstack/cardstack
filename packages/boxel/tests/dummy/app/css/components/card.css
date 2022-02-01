@@ -18,19 +18,19 @@
   width: 20px;
   height: 50px;
   border-bottom-right-radius: var(--boxel-border-radius);
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 40%);
+  background: linear-gradient(to right, rgb(255 255 255 / 0%) 0%, #fff 40%);
 }
 
 .boxel-card--blank-card {
   width: 100%;
   height: 150px;
   background:
-    url('../../../../public/@cardstack/boxel/images/placeholders/blank-card.png') center/contain
+    url("../../../../public/@cardstack/boxel/images/placeholders/blank-card.png") center/contain
     no-repeat;
 }
 
 .boxel-card__expand-overlay:hover {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/expand.svg');
+  background-image: url("../../../../public/@cardstack/boxel/images/icons/expand.svg");
   background-position: top var(--boxel-sp-xxxs) right var(--boxel-sp-xxxs);
   background-size: 1rem 1rem;
   background-repeat: no-repeat;
@@ -91,12 +91,12 @@
 
 .boxel-card__inner--with-img {
   grid-template:
-    'img .' auto
-    'img .' auto
-    'img title' auto
-    'img desc' auto
-    'img .' auto
-    'img .' auto / auto 1fr;
+    "img ." auto
+    "img ." auto
+    "img title" auto
+    "img desc" auto
+    "img ." auto
+    "img ." auto / auto 1fr;
 }
 
 .boxel-card__inner--with-img .boxel-card__title {
@@ -128,7 +128,7 @@
   width: 26px;
   height: 26px;
   background:
-    url('../../images/media-registry/verifi-logo.svg') center/26px
+    url("../../images/media-registry/verifi-logo.svg") center/26px
     26px no-repeat;
   position: absolute;
   top: 10px;
@@ -137,7 +137,7 @@
 
 .boxel-card--profile .boxel-card__bg-img {
   border-radius: 100px;
-  background-image: url('../../../../public/@cardstack/boxel/images/placeholders/profile.svg');
+  background-image: url("../../../../public/@cardstack/boxel/images/placeholders/profile.svg");
 }
 
 .boxel-card--audio .boxel-card__inner {
@@ -145,7 +145,7 @@
 }
 
 .file-card__icon .boxel-card__inner {
-  background-image: url('../../images/media-registry/file.svg');
+  background-image: url("../../images/media-registry/file.svg");
   background-position: center left 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
@@ -159,7 +159,7 @@
 /* Grid format */
 .boxel-card__inner--grid.boxel-card__inner--with-img {
   grid-column: 1 / -1;
-  grid-template: 'img' 'title' 'desc';
+  grid-template: "img" "title" "desc";
   padding: 10px;
   justify-items: center;
   width: 210px;
@@ -310,7 +310,7 @@
 }
 
 .territory-card--worldwide .boxel-card__inner {
-  background-image: url('../../../../public/@cardstack/boxel/images/icons/world.svg');
+  background-image: url("../../../../public/@cardstack/boxel/images/icons/world.svg");
   background-position: left 18px center;
   background-size: 15px 15px;
   background-repeat: no-repeat;

@@ -10,15 +10,17 @@
 }
 
 .boxel-searchbox__input {
-  --boxel-searchbox-text-color: rgba(255, 255, 255, 0.6);
+  --boxel-searchbox-text-color: rgb(255 255 255 / 60%);
 
   height: 2rem;
   border: none;
   width: 100%;
+  /* stylelint-disable declaration-block-no-redundant-longhand-properties */
   padding-top: var(--boxel-sp-xxxs);
+  padding-right: calc(var(--boxel-searchbox-icon-size) + var(--boxel-sp-xs) + var(--boxel-sp-xxxs));
   padding-bottom: var(--boxel-sp-xxxs);
   padding-left: calc(var(--boxel-searchbox-icon-size) + var(--boxel-sp-xs) + var(--boxel-sp-xs));
-  padding-right: calc(var(--boxel-searchbox-icon-size) + var(--boxel-sp-xs) + var(--boxel-sp-xxxs));
+  /* stylelint-enable declaration-block-no-redundant-longhand-properties */
   border-radius: 100px;
   background-color: var(--boxel-purple-900);
   color: var(--boxel-light);
@@ -29,27 +31,13 @@
   color: var(--boxel-searchbox-text-color);
 }
 
-.boxel-searchbox__input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: var(--boxel-searchbox-text-color);
-}
-
-.boxel-searchbox__input::-moz-placeholder { /* Firefox 19+ */
-  color: var(--boxel-searchbox-text-color);
-}
-
-.boxel-searchbox__input:-ms-input-placeholder { /* IE 10+ */
-  color: var(--boxel-searchbox-text-color);
-}
-
-.boxel-searchbox__input:-moz-placeholder { /* Firefox 18- */
-  color: var(--boxel-searchbox-text-color);
-}
-
 .boxel-searchbox__search-icon {
   --icon-color: var(--boxel-highlight);
 
   left: var(--boxel-sp-xs);
-  width: var(--boxel-searchbox-icon-size); /* absolutely position and vertically center these things, give them the same size */
+
+  /* absolutely position and vertically center these things, give them the same size */
+  width: var(--boxel-searchbox-icon-size);
   height: var(--boxel-searchbox-icon-size);
   position: absolute;
   top: 50%;
