@@ -49,7 +49,6 @@ export default class Cards extends Service {
 
     let { component, serializerMap } = await this.codeForCard(data);
     return this.makeCardModelFromResponse(
-      this.cardEnv(),
       data,
       component,
       serializerMap,
@@ -68,7 +67,6 @@ export default class Cards extends Service {
       assertDocumentDataIsResource(data);
       let { component, serializerMap } = await this.codeForCard(data);
       return this.makeCardModelFromResponse(
-        this.cardEnv(),
         data,
         component,
         serializerMap,
@@ -91,7 +89,6 @@ export default class Cards extends Service {
       data.map(async (cardResponse) => {
         let { component, serializerMap } = await this.codeForCard(cardResponse);
         return this.makeCardModelFromResponse(
-          this.cardEnv(),
           cardResponse,
           component,
           serializerMap,
@@ -102,13 +99,12 @@ export default class Cards extends Service {
   }
 
   makeCardModelFromResponse(
-    cards: CardEnv,
     cardResponse: ResourceObject,
     innerComponent: unknown,
     serializerMap: SerializerMap,
     format: Format
   ): CardModel {
-    return new CardModelForBrowser(cards, {
+    return new CardModelForBrowser(this.cardEnv(), {
       type: 'loaded',
       url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
@@ -131,6 +127,7 @@ export default class Cards extends Service {
       send: this.send.bind(this),
       prepareComponent: this.prepareComponent.bind(this),
       tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
+      loadModule: this.loadModule.bind(this),
     };
   }
 
@@ -228,24 +225,24 @@ export default class Cards extends Service {
     );
   }
 
+  // TODO: We need to consider a more strict type for the card response and it's meta
   private async codeForCard(card: ResourceObject): Promise<{
     component: unknown;
     serializerMap: SerializerMap;
   }> {
-    let componentModule = card.meta?.componentModule;
-    if (!componentModule) {
-      throw new Error('No componentModule to load');
+    let { componentModule } = card.meta || {};
+    if (!componentModule || typeof componentModule !== 'string') {
+      throw new Error('Cards component module must be present and a string');
     }
-    if (typeof componentModule !== 'string') {
-      throw new Error('Cards component module is not a string');
-    }
-    let module = await this.loadModule<{
+
+    let component = await this.loadModule<{
       default: unknown;
       serializerMap: SerializerMap;
     }>(componentModule);
+
     return {
-      component: module.default,
-      serializerMap: module.serializerMap,
+      component: component.default,
+      serializerMap: component.serializerMap,
     };
   }
 
@@ -254,10 +251,7 @@ export default class Cards extends Service {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
       moduleIdentifier = moduleIdentifier.replace('@cardstack/compiled/', '');
-      return await import(
-        /* webpackExclude: /schema\.js$/ */
-        `@cardstack/compiled/${moduleIdentifier}`
-      );
+      return await import(`@cardstack/compiled/${moduleIdentifier}`);
     } else if (moduleIdentifier.startsWith('@cardstack/core/src/')) {
       // module was built by webpack, use webpack's implementation of `await
       // import()`

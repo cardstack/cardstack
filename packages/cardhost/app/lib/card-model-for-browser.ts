@@ -21,6 +21,7 @@ import {
 } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
+import { get, set } from '@ember/object';
 
 export interface NewCardParams {
   realm: string;
@@ -51,6 +52,7 @@ export default class CardModelForBrowser implements CardModel {
   private declare _data: any;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
+  private _schemaInstance: any | undefined;
 
   constructor(
     private cards: CardEnv,
@@ -133,6 +135,19 @@ export default class CardModelForBrowser implements CardModel {
     return this.state.format;
   }
 
+  private get schemaModulePath() {
+    if (this.state.type === 'created') {
+      return '?'; // TODO: Not sure what to do here yet
+    }
+    let { schemaModule } = this.state.rawServerResponse.meta || {};
+    if (!schemaModule || typeof schemaModule !== 'string') {
+      throw new Error(
+        'Card server response doesnt include a schemaModule in its meta'
+      );
+    }
+    return schemaModule;
+  }
+
   async editable(): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);
@@ -155,7 +170,15 @@ export default class CardModelForBrowser implements CardModel {
           );
           this.state.deserialized = true;
         }
-        return this._data;
+        return new Proxy(this._data, {
+          get: (target: any, prop: string, receiver: unknown) => {
+            let existing = Reflect.get(target, prop, receiver);
+            if (existing) {
+              return existing;
+            }
+            return await this.getField(prop);
+          },
+        });
       case 'created':
         return this._data;
       default:
@@ -173,9 +196,38 @@ export default class CardModelForBrowser implements CardModel {
     return this.wrapperComponent;
   }
 
-  async getField(name: string) {
-    // TODO: implement
-    return name;
+  async computeFields() {
+    for (const field of this.usedFields) {
+      let value = await this.getField(field);
+      set(this._data, field, value);
+    }
+  }
+
+  async getField(name: string): Promise<any> {
+    // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
+    // if (this.isComputedField(name)) {
+    //   return get(this.data, name);
+    // }
+
+    // TODO we probably want to cache the schemaInstance. It should only be
+    // created the first time it's needed
+
+    // TODO need to deserialize value
+    let schemaInstance = await this.schemaInstance();
+    return await schemaInstance[name];
+  }
+
+  async schemaInstance() {
+    if (this._schemaInstance) {
+      return this._schemaInstance;
+    }
+    let SchemaClass = (
+      await this.cards.loadModule<{ default: any }>(this.schemaModulePath)
+    ).default;
+    this._schemaInstance = new SchemaClass((fieldPath: string) =>
+      get(this._data, fieldPath)
+    );
+    return this._schemaInstance;
   }
 
   private makeSetter(segments: string[] = []): Setter {

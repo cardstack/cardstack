@@ -239,7 +239,7 @@ export function assertDocumentDataIsResource<Identity extends Saved | Unsaved = 
 export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   id: Identity;
   type: string;
-  attributes?: JSON.Object;
+  attributes?: JSON.Object | undefined;
   relationships?: JSON.Object;
   meta?: JSON.Object;
 }
@@ -266,4 +266,5 @@ export interface CardEnv {
   send(operation: CardOperation): Promise<JSONAPIDocument>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor | void;
+  loadModule<T extends object>(moduleIdentifier: string): Promise<T>;
 }
