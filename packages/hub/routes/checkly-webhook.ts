@@ -7,12 +7,22 @@ import config from 'config';
 import { DEGRADED_THRESHOLD as degradedSubgraphThreshold } from '../routes/status';
 
 // Check names and component names should map to the names and components in Checkly
-type CheckName = 'hub-prod subgraph / RPC node block number diff within threshold';
+type CheckName =
+  | 'hub-prod subgraph / RPC node block number diff within threshold'
+  | 'xdai archive health check (eth_blockNumber)'
+  | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)';
+type ComponentName =
+  | 'Subgraph'
+  | 'Archive RPC Node'
+  | 'RPC node (non-archive)'
+  | 'Hub'
+  | 'Relay Server'
+  | 'Notifications';
 type Checks = {
   [key in CheckName]: {
-    componentName: 'Subgraph'; // Component name in Checkly
-    incidentName: string; // Incident name in Checkly
-    incidentMessage: string; // Will be shown in Statuspage
+    componentName: ComponentName; // Component name in Statuspage
+    incidentName: string; // Incident name in Statuspage
+    incidentMessage: string; // Incident message in Statuspage
   };
 };
 
@@ -24,6 +34,18 @@ export default class ChecklyWebhookRoute {
       componentName: 'Subgraph',
       incidentName: 'Transactions delayed',
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
+    },
+    'xdai archive health check (eth_blockNumber)': {
+      componentName: 'Archive RPC Node',
+      incidentName: 'RPC Node Degradation',
+      incidentMessage:
+        'We are experiencing degraded service with our archive RPC node. This will result in reduced transaction processing times.',
+    },
+    'xdai non-archive health check - late-cold-smoke (eth_blockNumber)': {
+      componentName: 'RPC node (non-archive)',
+      incidentName: 'RPC Node Degradation',
+      incidentMessage:
+        'We are experiencing degraded service with our non-archive RPC node. This will result in reduced application performance.',
     },
   };
 
