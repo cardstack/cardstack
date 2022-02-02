@@ -84,59 +84,67 @@ export default function main(babel: typeof Babel) {
         path.remove();
       },
 
-      Class(path: NodePath<t.Class>, state: State) {
-        let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
-        // you can't upgrade a primitive card to a composite card--you are
-        // either a primitive card or a composite card. so if we adopt from a
-        // card that is primitive, then we ourselves must be primitive as well.
-        if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
-          path.get('body').node.body.unshift(
-            // creates a private property that looks like:
-            //   #getRawField;
-            t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
+      Class: {
+        enter(path: NodePath<t.Class>, state: State) {
+          let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
+          // you can't upgrade a primitive card to a composite card--you are
+          // either a primitive card or a composite card. so if we adopt from a
+          // card that is primitive, then we ourselves must be primitive as well.
+          if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
+            path.get('body').node.body.unshift(
+              // creates a private property that looks like:
+              //   #getRawField;
+              t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
 
-            // creates a constructor that looks like:
-            //   constructor(get) {
-            //     super(get); // when we adopt from a non-base card
-            //     this.#getRawField = get;
-            //   }
-            t.classMethod(
-              'constructor',
-              t.identifier('constructor'),
-              [t.identifier('get')],
-              t.blockStatement([
-                ...(state.opts.meta.parent?.cardURL
-                  ? [
-                      // if we extend a non base card, then add a super()
-                      t.expressionStatement(t.callExpression(t.identifier('super'), [t.identifier('get')])),
-                    ]
-                  : []),
-                t.expressionStatement(
-                  t.assignmentExpression(
-                    '=',
-                    t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
-                    t.identifier('get')
-                  )
-                ),
-              ]),
-              false,
-              false,
-              false,
-              false
-            )
-          );
-        }
-
-        // The ClassProperty visitor doesn't seem to work. It looks like
-        // @babel/plugin-proposal-class-properties creates a "Class" visitor
-        // that you need to hook into.
-        for (let bodyItem of path.get('body').get('body')) {
-          if (t.isClassProperty(bodyItem.node)) {
-            handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
-          } else if (t.isClassMethod(bodyItem.node)) {
-            handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
+              // creates a constructor that looks like:
+              //   constructor(get) {
+              //     super(get); // when we adopt from a non-base card
+              //     this.#getRawField = get;
+              //   }
+              t.classMethod(
+                'constructor',
+                t.identifier('constructor'),
+                [t.identifier('get')],
+                t.blockStatement([
+                  ...(state.opts.meta.parent?.cardURL
+                    ? [
+                        // if we extend a non base card, then add a super()
+                        t.expressionStatement(t.callExpression(t.identifier('super'), [t.identifier('get')])),
+                      ]
+                    : []),
+                  t.expressionStatement(
+                    t.assignmentExpression(
+                      '=',
+                      t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+                      t.identifier('get')
+                    )
+                  ),
+                ]),
+                false,
+                false,
+                false,
+                false
+              )
+            );
           }
-        }
+
+          // The ClassProperty visitor doesn't seem to work. It looks like
+          // @babel/plugin-proposal-class-properties creates a "Class" visitor
+          // that you need to hook into.
+          for (let bodyItem of path.get('body').get('body')) {
+            if (t.isClassProperty(bodyItem.node)) {
+              handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
+            } else if (t.isClassMethod(bodyItem.node)) {
+              handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
+            }
+          }
+        },
+
+        exit(path: NodePath<t.Class>, state: State) {
+          if (isCompositeCard(state) && Object.keys(state.opts.meta.fields).length > 0) {
+            addPromiseLikeFunctions(path.get('body'), state, babel);
+          }
+        },
       },
     },
   };
@@ -210,6 +218,88 @@ function forEachValidFieldDecorator(
 
     cb(path);
   }
+}
+
+function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let className = (path.parent as NodePath<t.ClassDeclaration>['node']).id.name;
+  let getAllValues = babel.template(`
+    let allValues = %%getAllValues%%(this);
+  `)({
+    getAllValues: state.importUtil.import(path, '@cardstack/core/src/utils/schema-class', 'getAllValues'),
+  }) as t.Statement;
+
+  path.node.body.push(
+    // adds a class getter that looks like:
+    //   static get allFields() {
+    //     return ['lastName', 'aboutMe', 'fullName'];
+    //   }
+    t.classMethod(
+      'get',
+      t.identifier('allFields'),
+      [],
+      t.blockStatement([
+        t.returnStatement(t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))),
+      ]),
+      false,
+      true
+    ),
+
+    // adds a class method that looks like:
+    //   then(resolve) {
+    //     let allValues = getAllValues(this);
+    //     return allValues.then(values => resolve(Object.fromEntries(PersonClass.allFields.map((field, i) => [field, values[i]]))));
+    //   }
+    t.classMethod(
+      'method',
+      t.identifier('then'),
+      [t.identifier('resolve')],
+      t.blockStatement([
+        getAllValues,
+        babel.template(`
+          return allValues.then(values => resolve(Object.fromEntries(%%className%%.allFields.map((field, i) => [field, values[i]]))));
+        `)({ className: t.identifier(className) }) as t.Statement,
+      ])
+    ),
+
+    // adds a class method that looks like:
+    //   catch(err) {
+    //     let allValues = getAllValues(this);
+    //     allValues.catch(err)
+    //   }
+    t.classMethod(
+      'method',
+      t.identifier('catch'),
+      [t.identifier('err')],
+      t.blockStatement([
+        getAllValues,
+        babel.template.ast(`
+        allValues.catch(err);
+      `) as t.Statement,
+      ])
+    ),
+
+    // adds a class method that looks like:
+    //   finally(cb) {
+    //     let allValues = getAllValues(this);
+    //     allValues.finally(cb);
+    //   }
+    t.classMethod(
+      'method',
+      t.identifier('finally'),
+      [t.identifier('cb')],
+      t.blockStatement([
+        getAllValues,
+        babel.template.ast(`
+        allValues.finally(cb);
+      `) as t.Statement,
+      ])
+    )
+  );
+}
+
+function isCompositeCard(state: State) {
+  return cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state) === 'composite';
 }
 
 // we consider a primitive card any card that has no fields
