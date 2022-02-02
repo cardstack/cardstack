@@ -10,7 +10,8 @@ import { DEGRADED_THRESHOLD as degradedSubgraphThreshold } from '../routes/statu
 type CheckName =
   | 'hub-prod subgraph / RPC node block number diff within threshold'
   | 'xdai archive health check (eth_blockNumber)'
-  | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)';
+  | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)'
+  | 'relay-production health check';
 type ComponentName =
   | 'Subgraph'
   | 'Archive RPC Node'
@@ -46,6 +47,12 @@ export default class ChecklyWebhookRoute {
       incidentName: 'RPC Node Degradation',
       incidentMessage:
         'We are experiencing degraded service with our non-archive RPC node. This will result in reduced application performance.',
+    },
+    'relay-production health check': {
+      componentName: 'Relay Server',
+      incidentName: 'Relay Server Degradation',
+      incidentMessage:
+        'We are experiencing degraded service with our relay server. This will result in transaction processing failures.',
     },
   };
 
