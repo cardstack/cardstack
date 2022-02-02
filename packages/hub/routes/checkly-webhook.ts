@@ -69,7 +69,7 @@ export default class ChecklyWebhookRoute {
     if (check) {
       let alertType = ctx.request.body.alert_type;
 
-      if (alertType === 'ALERT_FAILURE') {
+      if (['ALERT_DEGRADED', 'ALERT_FAILURE'].includes(alertType)) {
         await this.statuspageApi.createIncident(check.componentName, check.incidentName, check.incidentMessage);
       } else if (alertType == 'ALERT_RECOVERY') {
         await this.statuspageApi.resolveIncident(check.componentName);
