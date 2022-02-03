@@ -209,6 +209,14 @@ export interface CardModel {
   save(): Promise<void>;
 }
 
+export interface CardComponentModule {
+  default: unknown;
+  getCardModelOptions(): {
+    serializerMap: SerializerMap;
+    computedFields: string[];
+  };
+}
+
 export interface RealmConfig {
   url: string;
   directory: string;
@@ -264,7 +272,5 @@ export type CardOperation =
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
   send(operation: CardOperation): Promise<JSONAPIDocument>;
-  prepareComponent(cardModel: CardModel, component: unknown): unknown;
-  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor | void;
   loadModule<T extends object>(moduleIdentifier: string): Promise<T>;
 }

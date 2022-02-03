@@ -7,6 +7,7 @@ import { transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
+import { ImportUtil } from 'babel-import-util';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
@@ -28,6 +29,7 @@ export interface CardComponentPluginOptions {
 interface State {
   opts: CardComponentPluginOptions;
   insideExportDefault: boolean;
+  importUtil: ImportUtil;
 
   // keys are local names in this module that we have chosen.
   neededImports: ImportDetails;
@@ -53,13 +55,15 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
   return {
     visitor: {
       Program: {
-        enter(_path: NodePath, state: State) {
+        enter(path: NodePath<t.Program>, state: State) {
+          state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
           state.neededImports = new Map();
         },
         exit(path: NodePath<t.Program>, state: State) {
           addImports(state.neededImports, path, t);
           addSerializerMap(path, state, t);
+          addGetCardModelOptions(path, state, babel);
         },
       },
 
@@ -81,6 +85,8 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
   };
 }
 
+// TODO refactor this out as we flesh out the addGetCardModelOptions which
+// should eventually be returning serializer functions for our fields
 function addSerializerMap(path: NodePath<t.Program>, state: State, t: typeof Babel.types) {
   let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
   state.opts.serializerMap = serializerMap;
@@ -92,6 +98,37 @@ function addSerializerMap(path: NodePath<t.Program>, state: State, t: typeof Bab
       t.variableDeclaration('const', [
         t.variableDeclarator(t.identifier('serializerMap'), t.objectExpression(serializerMapPropertyDefinition)),
       ])
+    )
+  );
+}
+
+function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  // This will eventually replace addSerializerMap
+  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
+  state.opts.serializerMap = serializerMap;
+
+  path.node.body.push(
+    t.exportNamedDeclaration(
+      t.functionDeclaration(
+        t.identifier('getCardModelOptions'),
+        [],
+        t.blockStatement([
+          babel.template(`
+            return {
+              serializerMap: %%serializerMap%%,
+              computedFields: %%computedFields%%
+            };
+          `)({
+            serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
+            computedFields: t.arrayExpression(
+              Object.values(state.opts.fields)
+                .filter((field) => field.computed)
+                .map((field) => t.stringLiteral(field.name))
+            ),
+          }) as t.Statement,
+        ])
+      )
     )
   );
 }

@@ -16,9 +16,6 @@ import config from 'cardhost/config/environment';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
-import Component from '@glimmer/component';
-import { hbs } from 'ember-cli-htmlbars';
-import { tracked } from '@glimmer/tracking';
 import type Builder from 'cardhost/lib/builder';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
@@ -34,17 +31,15 @@ export default class Cards extends Service {
   overrideRoutingCardWith: string | undefined;
 
   async load(url: string, format: Format): Promise<CardModel> {
-    let cardResponse: JSONAPIDocument;
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      cardResponse = await builder.load(url, format);
-    } else {
-      cardResponse = await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL({ url, query: { format } })
-      );
+      return await builder.load(url, format);
     }
+    let serverResponse = await fetchJSON<JSONAPIDocument>(
+      this.buildCardURL({ url, query: { format } })
+    );
 
-    let { data } = cardResponse;
+    let { data } = serverResponse;
     assertDocumentDataIsResource(data);
 
     let { component, serializerMap } = await this.codeForCard(data);
@@ -125,8 +120,6 @@ export default class Cards extends Service {
     return {
       load: this.load.bind(this),
       send: this.send.bind(this),
-      prepareComponent: this.prepareComponent.bind(this),
-      tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
       loadModule: this.loadModule.bind(this),
     };
   }
@@ -153,7 +146,8 @@ export default class Cards extends Service {
     }
   }
 
-  private async send(op: CardOperation): Promise<JSONAPIDocument> {
+  // TODO figure out a forever home for this
+  async send(op: CardOperation): Promise<CardModel> {
     if (this.operationIsLocal(op)) {
       let builder = await this.builder();
       return await builder.send(op);
@@ -210,19 +204,6 @@ export default class Cards extends Service {
       fullURL.push(buildQueryString(opts.query));
     }
     return fullURL.join('');
-  }
-
-  private prepareComponent(cardModel: CardModel, component: unknown): unknown {
-    return setComponentTemplate(
-      hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
-      class extends Component {
-        component = component;
-        get data() {
-          return cardModel.data;
-        }
-        set = cardModel.setters;
-      }
-    );
   }
 
   // TODO: We need to consider a more strict type for the card response and it's meta

@@ -5,9 +5,10 @@ import {
   Builder,
   CardOperation,
   CardId,
-  JSONAPIDocument,
   assertDocumentDataIsResource,
   CardModel,
+  CardEnv,
+  CardComponentModule,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
@@ -21,6 +22,7 @@ import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
 import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
+import CardModelForBrowser from './card-model-for-browser';
 
 export const LOCAL_REALM = 'https://cardstack.local/';
 export const DEMO_REALM = 'https://demo.com/';
@@ -70,22 +72,39 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async load(url: string, format: Format): Promise<JSONAPIDocument> {
+  async load(url: string, format: Format): Promise<CardModel> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
+    let env: CardEnv = {
+      load: this.cards.load.bind(this.cards),
+      send: this.cards.send.bind(this.cards),
+      loadModule: this.cards.loadModule.bind(this.cards),
+    };
 
-    // TODO: reduce data shape for the given format like we do on the server
-    return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-        meta: {
-          schemaModule: compiled.schemaModule.global,
-          componentModule: compiled.componentInfos[format].moduleName.global,
-        },
+    let component = await this.loadModule<CardComponentModule>(
+      compiled.componentInfos[format].moduleName.global
+    );
+    let { serializerMap } = component.getCardModelOptions();
+
+    // TODO we can optimize this structure in our CardModelForBrowser now that
+    // we are not grabbing the literal JSONAPI response from the server
+    let rawServerResponse = {
+      type: 'card',
+      id: url,
+      attributes: raw.data,
+      meta: {
+        schemaModule: compiled.schemaModule.global,
+        componentModule: compiled.componentInfos[format].moduleName.global,
       },
     };
+    return new CardModelForBrowser(env, {
+      type: 'loaded',
+      url,
+      rawServerResponse,
+      innerComponent: component.default,
+      serializerMap,
+      format,
+    });
   }
 
   async loadForRoute(
@@ -189,7 +208,7 @@ export default class LocalRealm implements Builder {
     return id;
   }
 
-  async send(op: CardOperation): Promise<JSONAPIDocument> {
+  async send(op: CardOperation): Promise<CardModel> {
     if ('create' in op) {
       let resource = op.create.payload.data;
       assertDocumentDataIsResource(resource);

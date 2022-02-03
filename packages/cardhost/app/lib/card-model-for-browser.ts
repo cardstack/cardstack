@@ -13,7 +13,12 @@ import {
   ComponentInfo,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
+import Component from '@glimmer/component';
+// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
+import { setComponentTemplate } from '@ember/component';
+import { hbs } from 'ember-cli-htmlbars';
 import { cloneDeep } from 'lodash';
+import { tracked as _tracked } from '@glimmer/tracking';
 import {
   deserializeAttributes,
   serializeAttributes,
@@ -68,7 +73,7 @@ export default class CardModelForBrowser implements CardModel {
       };
     }
     this.setters = this.makeSetter();
-    let prop = cards.tracked(this, '_data', {
+    let prop = tracked(this, '_data', {
       enumerable: true,
       writable: true,
       configurable: true,
@@ -180,10 +185,7 @@ export default class CardModelForBrowser implements CardModel {
 
   get component(): unknown {
     if (!this.wrapperComponent) {
-      this.wrapperComponent = this.cards.prepareComponent(
-        this,
-        this.innerComponent
-      );
+      this.wrapperComponent = prepareComponent(this, this.innerComponent);
     }
     return this.wrapperComponent;
   }
@@ -323,6 +325,31 @@ export default class CardModelForBrowser implements CardModel {
   }
 }
 
+export function prepareComponent(
+  cardModel: CardModel,
+  component: unknown
+): unknown {
+  return setComponentTemplate(
+    hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
+    class extends Component {
+      component = component;
+      get data() {
+        return cardModel.data;
+      }
+      set = cardModel.setters;
+    }
+  );
+}
+
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
+}
+
+function tracked(
+  target: CardModel,
+  prop: string,
+  desc: PropertyDescriptor
+): PropertyDescriptor | void {
+  //@ts-ignore the types for glimmer tracked don't seem to be lining
+  return _tracked(target, prop, desc);
 }
