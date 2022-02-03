@@ -8,6 +8,4 @@ export default class extends Component {
   @tracked hamburgerMenuOpen = false;
   cardPayLogo = CardPayLogo;
   cardPayLogoPng = 'https://' + config.universalLinkDomain + CardPayLogoPng;
-  supportURL = config.urls.discordSupportChannelUrl;
-  aboutURL = config.urls.testFlightLink;
 }

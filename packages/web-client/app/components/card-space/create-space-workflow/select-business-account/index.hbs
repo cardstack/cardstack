@@ -24,7 +24,7 @@
       </CardPay::LabeledValue>
 
       <CardPay::LabeledValue @label="Card Space URL">
-        {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+        {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
       </CardPay::LabeledValue>
     {{else}}
       <CardPay::FieldStack>
@@ -45,7 +45,7 @@
         </CardPay::LabeledValue>
 
         <CardPay::LabeledValue @label="Card Space URL">
-          {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+          {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
         </CardPay::LabeledValue>
       </CardPay::FieldStack>
     {{/if}}

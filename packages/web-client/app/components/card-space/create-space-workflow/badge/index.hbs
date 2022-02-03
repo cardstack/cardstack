@@ -11,7 +11,7 @@
         <div class="badge-card__domain">.{{this.cardSpaceHostnameSuffixUppercase}}</div>
       </div>
       <div class="badge-card__purpose">Card Space name reservation</div>
-      <span data-test-full-card-space-domain class="badge-card__full-domain">{{@workflowSession.state.subdomain}}.{{this.cardSpaceHostnameSuffix}}</span>
+      <span data-test-full-card-space-domain class="badge-card__full-domain">{{@workflowSession.state.subdomain}}.{{config 'cardSpaceHostnameSuffix'}}</span>
     </div>
   </ActionCardContainer::Section>
 </ActionCardContainer>

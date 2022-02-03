@@ -25,7 +25,6 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   @tracked autoscroll = false;
   @tracked cssThreadAnimationInterval = '0ms';
   threadAnimationInterval = 0; // intentionally not tracked, so that we don't recompute the AnimatedWorkflow
-  appVersion = config.version;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);

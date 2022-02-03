@@ -11,8 +11,6 @@ class CreateSpaceWorkflowBadgeComponent extends Component<WorkflowCardComponentA
     });
   }
 
-  cardSpaceHostnameSuffix = config.cardSpaceHostnameSuffix;
-
   cardSpaceHostnameSuffixUppercase =
     config.cardSpaceHostnameSuffix.toUpperCase();
 }
