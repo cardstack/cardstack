@@ -170,15 +170,7 @@ export default class CardModelForBrowser implements CardModel {
           );
           this.state.deserialized = true;
         }
-        return new Proxy(this._data, {
-          get: (target: any, prop: string, receiver: unknown) => {
-            let existing = Reflect.get(target, prop, receiver);
-            if (existing) {
-              return existing;
-            }
-            return await this.getField(prop);
-          },
-        });
+        return this._data;
       case 'created':
         return this._data;
       default:
@@ -268,7 +260,11 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
-    throw new Error('unimplemented');
+    return serializeResource(
+      'card',
+      this.state.type === 'loaded' ? this.state.url : undefined,
+      serializeAttributes(this.data, this.serializerMap)
+    );
   }
 
   get usedFields(): ComponentInfo['usedFields'] {
@@ -280,7 +276,6 @@ export default class CardModelForBrowser implements CardModel {
   async save(): Promise<void> {
     let response: JSONAPIDocument<Saved>;
     let original: CardModel | undefined;
-    let attributes = serializeAttributes(this.data, this.serializerMap);
 
     switch (this.state.type) {
       case 'created':
@@ -289,8 +284,7 @@ export default class CardModelForBrowser implements CardModel {
             targetRealm: this.state.realm,
             parentCardURL: this.state.parentCardURL,
             payload: {
-              // TODO use this.serialize
-              data: serializeResource('card', undefined, attributes),
+              data: this.serialize(),
             },
           },
         });
@@ -301,8 +295,8 @@ export default class CardModelForBrowser implements CardModel {
           update: {
             cardURL: this.state.url,
             payload: {
-              // TODO use this.serialize
-              data: serializeResource('card', this.state.url, attributes),
+              // cast is safe because we're inside the 'loaded' state branch
+              data: this.serialize() as ResourceObject<Saved>,
             },
           },
         });

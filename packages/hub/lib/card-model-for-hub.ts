@@ -12,7 +12,6 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
 import { getOwner } from '@cardstack/di';
-import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
@@ -183,21 +182,10 @@ export default class CardModelForHub implements CardModel {
 
   serialize(): ResourceObject<Saved | Unsaved> {
     if (this.state.type === 'created') {
-      return serializeResource(
-        'card',
-        undefined,
-        // TODO can we use structuredClone here instead of cloneDeep?
-        serializeAttributes(cloneDeep(this.data), this.serializerMap),
-        this.usedFields
-      );
+      return serializeResource('card', undefined, serializeAttributes(this.data, this.serializerMap), this.usedFields);
     }
     let { usedFields, componentModule } = this.state;
-    let resource = serializeResource(
-      'card',
-      this.url,
-      serializeAttributes(cloneDeep(this.data), this.serializerMap),
-      usedFields
-    );
+    let resource = serializeResource('card', this.url, serializeAttributes(this.data, this.serializerMap), usedFields);
     resource.meta = merge(
       {
         componentModule,
@@ -215,7 +203,7 @@ export default class CardModelForHub implements CardModel {
           id: this.state.id,
           realm: this.state.realm,
           adoptsFrom: this.state.parentCardURL,
-          data: serializeAttributes(cloneDeep(this._data), this.serializerMap),
+          data: serializeAttributes(this._data, this.serializerMap),
         });
         compiled = await this.searchIndex.indexData(raw);
         break;

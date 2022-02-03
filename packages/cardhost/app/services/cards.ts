@@ -98,7 +98,7 @@ export default class Cards extends Service {
     );
   }
 
-  makeCardModelFromResponse(
+  private makeCardModelFromResponse(
     cardResponse: ResourceObject,
     innerComponent: unknown,
     serializerMap: SerializerMap,
@@ -290,4 +290,10 @@ export default class Cards extends Service {
 
 function assertNever(value: never) {
   throw new Error(`unsupported operation ${value}`);
+}
+
+declare module '@ember/service' {
+  interface Registry {
+    cards: Cards;
+  }
 }
