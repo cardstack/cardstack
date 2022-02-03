@@ -1,4 +1,4 @@
-import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
+import { Compiler, generateSearchData, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 import { CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
@@ -283,6 +283,7 @@ class IndexerRun implements IndexerHandle {
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
+    let searchOptimizedData = rawCard.data ? generateSearchData(rawCard.data, compiledCard) : null;
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
       realm: param(this.realmURL),
@@ -291,7 +292,7 @@ class IndexerRun implements IndexerHandle {
       data: param(rawCard.data ?? null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
-      searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
+      searchData: param(searchOptimizedData),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
 
@@ -325,6 +326,7 @@ class IndexerRun implements IndexerHandle {
       deps = [...(result as string[]), rawCard.adoptsFrom];
     }
 
+    let searchOptimizedData = rawCard.data ? generateSearchData(rawCard.data, compiled) : null;
     let expression: Expression;
     if (isNew) {
       if (!deps) {
@@ -341,7 +343,7 @@ class IndexerRun implements IndexerHandle {
             param(rawCard.data ?? null),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
-            param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+            param(searchOptimizedData),
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
@@ -360,7 +362,7 @@ class IndexerRun implements IndexerHandle {
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
-        param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        param(searchOptimizedData),
         'WHERE url =',
         param(url),
       ];
@@ -414,26 +416,6 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
     return [];
   }
   return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
-}
-
-// TODO consider using the compiler to return a function that can be used to
-// generate these values for a card
-function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
-  let result: Record<string, any> = {};
-
-  for (let fieldName of Object.keys(compiled.fields)) {
-    let currentCard: CompiledCard | undefined = compiled;
-    do {
-      let entry = result[currentCard.url];
-      if (!entry) {
-        entry = result[currentCard.url] = {};
-      }
-      entry[fieldName] = data[fieldName];
-      currentCard = currentCard.adoptsFrom;
-    } while (currentCard && currentCard.fields[fieldName]);
-  }
-
-  return result;
 }
 
 function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): CompiledCard {

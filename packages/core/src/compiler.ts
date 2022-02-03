@@ -21,6 +21,7 @@ import {
   LocalRef,
   ModuleRef,
   RawCard,
+  RawCardData,
   Saved,
   Unsaved,
 } from './interfaces';
@@ -479,6 +480,23 @@ export function makeGloballyAddressable(
     modules: card.modules,
     deps: card.deps,
   };
+}
+
+export function generateSearchData(data: RawCardData, compiled: CompiledCard): Record<string, any> | null {
+  let result: Record<string, any> = {};
+  for (let fieldName of Object.keys(compiled.fields)) {
+    let currentCard: CompiledCard | undefined = compiled;
+    do {
+      let entry = result[currentCard.url];
+      if (!entry) {
+        entry = result[currentCard.url] = {};
+      }
+      entry[fieldName] = data[fieldName];
+      currentCard = currentCard.adoptsFrom;
+    } while (currentCard && currentCard.fields[fieldName]);
+  }
+
+  return result;
 }
 
 class TrackedBuilder implements Builder {
