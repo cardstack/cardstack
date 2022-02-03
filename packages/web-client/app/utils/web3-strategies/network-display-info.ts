@@ -52,9 +52,9 @@ let layer2NetworkDisplayInfo: Record<
   Layer2NetworkCopywriting
 > = {
   xdai: {
-    fullName: 'xDai chain',
-    shortName: 'xDai',
-    conversationalName: 'xDai chain',
+    fullName: 'Gnosis Chain',
+    shortName: 'Gnosis',
+    conversationalName: 'Gnosis Chain',
     nativeTokenSymbol: 'DAI',
     daiToken: 'DAI.CPXD',
   },
