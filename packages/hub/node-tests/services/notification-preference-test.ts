@@ -20,7 +20,7 @@ describe('NotificationPreferenceService', function () {
     let preferenceQueries = await getContainer().lookup('notification-preference-queries');
 
     // 1st device
-    await registrationQueries.insert({
+    await registrationQueries.upsert({
       id: 'f6942dbf-1422-4c3f-baa3-24f0c5b5d475',
       ownerAddress: '0x01',
       pushClientId: '123',
@@ -28,7 +28,7 @@ describe('NotificationPreferenceService', function () {
     });
 
     // 2nd device
-    await registrationQueries.insert({
+    await registrationQueries.upsert({
       id: '5ffa1144-6a8d-4a43-98bd-ce526f48b7e4',
       ownerAddress: '0x01',
       pushClientId: '124',
@@ -36,7 +36,7 @@ describe('NotificationPreferenceService', function () {
     });
 
     // 3rd device, disabled
-    await registrationQueries.insert({
+    await registrationQueries.upsert({
       id: 'c7ef64dd-a608-4f0a-8a48-ce58c66e7f20',
       ownerAddress: '0x01',
       pushClientId: '125',
@@ -44,7 +44,7 @@ describe('NotificationPreferenceService', function () {
     });
 
     // device from some other EOA
-    await registrationQueries.insert({
+    await registrationQueries.upsert({
       id: '6ab0df2c-880d-433d-8e37-fb916afaf6ec',
       ownerAddress: '0x02',
       pushClientId: '888',
