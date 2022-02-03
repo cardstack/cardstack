@@ -12,7 +12,7 @@ module('Integration | Helper | format-workflow-message', function (hooks) {
       `In order to make a deposit, you need to connect two wallets:
 
 * Ethereum mainnet wallet: linked to the Ethereum blockchain on mainnet
-* xDai chain wallet: linked to the xDai blockchain for low-cost transactions
+* Gnosis Chain wallet: linked to the Gnosis blockchain for low-cost transactions
 `
     );
 
@@ -23,7 +23,7 @@ module('Integration | Helper | format-workflow-message', function (hooks) {
       `<p>In order to make a deposit, you need to connect two wallets:</p>
 <ul>
 <li>Ethereum mainnet wallet: linked to the Ethereum blockchain on mainnet</li>
-<li>xDai chain wallet: linked to the xDai blockchain for low-cost transactions</li>
+<li>Gnosis Chain wallet: linked to the Gnosis blockchain for low-cost transactions</li>
 </ul>
 `
     );
