@@ -12,6 +12,7 @@ interface FeaturesOptions {
 }
 
 interface UrlsOptions {
+  about: string;
   appStoreLink: string | undefined;
   googlePlayLink: string | undefined;
   testFlightLink: string;

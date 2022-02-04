@@ -90,7 +90,7 @@ module.exports = function (environment) {
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {
-      testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
+      about: 'http://example.com',
       appStoreLink:
         'https://apps.apple.com/us/app/card-wallet-by-cardstack/id1549183378',
       googlePlayLink:

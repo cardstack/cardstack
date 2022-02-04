@@ -9,5 +9,5 @@ export default class extends Component {
   cardPayLogo = CardPayLogo;
   cardPayLogoPng = 'https://' + config.universalLinkDomain + CardPayLogoPng;
   supportURL = config.urls.discordSupportChannelUrl;
-  aboutURL = config.urls.testFlightLink;
+  aboutURL = config.urls.about;
 }
