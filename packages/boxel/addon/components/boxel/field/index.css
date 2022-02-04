@@ -1,2 +1,32 @@
-@import "./edit/index.css";
-@import "./view/index.css";
+.boxel-field {
+  display: grid;
+  gap: var(--boxel-sp-xs) 0;
+}
+
+.boxel-field--horizontal {
+  --boxel-field-label-size: minmax(4rem, 25%);
+
+  grid-template-columns: var(--boxel-field-label-size) 1fr;
+  gap: 0 var(--boxel-sp-lg);
+}
+
+.boxel-field--small-label {
+  --boxel-field-label-size: minmax(4rem, 10%);
+}
+
+.boxel-field__label {
+  color: var(--boxel-purple-400);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-field--with-icon {
+  display: flex;
+}
+
+.boxel-field__icon {
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}

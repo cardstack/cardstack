@@ -167,11 +167,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
 
     this.validate();
-
-    this.args.workflowSession.setValue(
-      'depositedAmount',
-      this.amountAsBigNumber
-    );
   }
 
   get isInvalid() {

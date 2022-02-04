@@ -12,7 +12,6 @@
       {{#unless @isComplete}}
         <Boxel::Field
           @label="Card Preview"
-          @fieldMode="view"
           class="preview__card-preview-field"
         >
           <div class="preview__card">
@@ -36,25 +35,26 @@
         class={{cn "preview__data" preview__data--is-complete=@isComplete}}
         @horizontal={{@isComplete}}
       >
-        <CardPay::LabeledValue
+        <Boxel::Field
           @vertical={{true}}
           @label="Issued by"
-          @value={{@workflowSession.state.issuerName}}
           data-test-prepaid-card-issuer-name-labeled-value
-        />
+        >
+          {{@workflowSession.state.issuerName}}
+        </Boxel::Field>
 
         {{#if @isComplete}}
-          <CardPay::LabeledValue
+          <Boxel::Field
             @vertical={{true}}
             @label="Card address"
             data-test-prepaid-card-address-labeled-value
           >
             {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
             on {{network-display-info "layer2" "fullName"}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
 
-        <CardPay::LabeledValue
+        <Boxel::Field
           @vertical={{true}}
           @label="Face value"
           data-test-prepaid-card-face-value-labeled-value
@@ -67,21 +67,21 @@
             @balance={{format-amount this.faceValue}}
             @usdBalance={{spend-to-usd this.faceValue}}
           />
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       </CardPay::FieldStack>
     </div>
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message as |supportURL|>
+      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message as |mailToSupportUrl|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           {{!-- TODO: This should be accompanied by canceling the workflow --}}
           Looks like there’s no balance in your {{network-display-info "layer2" "fullName"}} wallet to fund your selected prepaid card. Before you can continue, please add funds to your {{network-display-info "layer2" "fullName"}} wallet by bridging some tokens from your {{network-display-info "layer1" "fullName"}} wallet.
           {{!-- TODO: "The balance required to create your desired prepaid card is ${}" --}}
         {{else if (eq this.error.message "TIMEOUT")}}
-          There was a problem creating your prepaid card. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+          There was a problem creating your prepaid card. Please contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}
-          There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact  <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact  <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
         </CardPay::ErrorMessage>
     {{/if}}

@@ -83,7 +83,7 @@ const XDAI = {
   nativeTokenName: 'xDai',
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
-  name: 'xDai Chain',
+  name: 'Gnosis Chain',
   rpcNode: 'https://polished-still-thunder.xdai.quiknode.pro/474f8faa313d36e0dc2604c1373655f7e26fdfb6/',
   rpcArchiveNode: 'https://xdai-archive.blockscout.com',
   rpcWssNode: 'wss://polished-still-thunder.xdai.quiknode.pro/474f8faa313d36e0dc2604c1373655f7e26fdfb6/',

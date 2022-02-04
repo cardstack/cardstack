@@ -1,19 +1,26 @@
-{{#if (eq @fieldMode "edit")}}
-  <Boxel::Field::Edit
-    @fieldId={{@fieldId}}
-    @label={{@label}}
-    @labelClass={{@labelClass}}
+{{#let (element (or @tag "div")) as |Tag|}}
+  <Tag
+    class={{cn "boxel-field"
+      boxel-field--horizontal=(not @vertical)
+      boxel-field--small-label=(eq @horizontalLabelSize "small")
+    }}
+    data-test-boxel-field
+    data-test-boxel-field-id={{@fieldId}}
     ...attributes
   >
-    {{yield}}
-  </Boxel::Field::Edit>
-{{else}}
-  <Boxel::Field::View
-    @fieldId={{@fieldId}}
-    @label={{@label}}
-    @labelClass={{@labelClass}}
-    ...attributes
-  >
-    {{yield}}
-  </Boxel::Field::View>
-{{/if}}
+    <div class="boxel-field__label" data-test-boxel-field-label>
+      {{@label}}
+    </div>
+
+    {{#if @icon}}
+      <div class="boxel-field--with-icon">
+        {{svg-jar @icon class="boxel-field__icon" role="presentation"}}
+        <div>
+          {{yield}}
+        </div>
+      </div>
+    {{else}}
+      {{yield}}
+    {{/if}}
+  </Tag>
+{{/let}}
