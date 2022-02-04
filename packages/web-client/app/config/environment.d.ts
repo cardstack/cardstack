@@ -13,8 +13,8 @@ interface FeaturesOptions {
 
 interface UrlsOptions {
   about: string;
-  appStoreLink: string | undefined;
-  googlePlayLink: string | undefined;
+  appStoreLink: string;
+  googlePlayLink: string;
   discordSupportChannelUrl: string;
   statusPageBase: string;
   statusPageUrl: string;
