@@ -2,7 +2,6 @@ import {
   JSONAPIDocument,
   SerializerMap,
   Setter,
-  CardEnv,
   Saved,
   Unsaved,
   ResourceObject,
@@ -11,6 +10,7 @@ import {
   RawCardData,
   Format,
   ComponentInfo,
+  CardId,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
@@ -27,6 +27,12 @@ import {
 import { cardURL } from '@cardstack/core/src/utils';
 import { Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
 import { get, set } from '@ember/object';
+import Cards from 'cardhost/services/cards';
+import { fetchJSON } from './jsonapi-fetch';
+import config from 'cardhost/config/environment';
+import LocalRealm from './builder';
+
+const { cardServer } = config as any; // Environment types arent working
 
 export interface NewCardParams {
   realm: string;
@@ -60,8 +66,9 @@ export default class CardModelForBrowser implements CardModel {
   private _schemaInstance: any | undefined;
 
   constructor(
-    private cards: CardEnv,
-    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>
+    private cards: Cards,
+    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>,
+    private localRealm?: LocalRealm
   ) {
     if (state.type == 'created') {
       this.state = state;
@@ -99,13 +106,17 @@ export default class CardModelForBrowser implements CardModel {
       }
     }
 
-    return new (this.constructor as typeof CardModelForBrowser)(this.cards, {
-      type: 'created',
-      realm,
-      parentCardURL: this.state.url,
-      innerComponent: this.innerComponent,
-      serializerMap: this.serializerMap,
-    });
+    return new (this.constructor as typeof CardModelForBrowser)(
+      this.cards,
+      {
+        type: 'created',
+        realm,
+        parentCardURL: this.state.url,
+        innerComponent: this.innerComponent,
+        serializerMap: this.serializerMap,
+      },
+      this.localRealm
+    );
   }
 
   setData(_data: RawCardData) {
@@ -281,27 +292,19 @@ export default class CardModelForBrowser implements CardModel {
 
     switch (this.state.type) {
       case 'created':
-        response = await this.cards.send({
-          create: {
-            targetRealm: this.state.realm,
-            parentCardURL: this.state.parentCardURL,
-            payload: {
-              data: this.serialize(),
-            },
-          },
-        });
+        if (this.localRealm) {
+          response = await this.createLocal();
+        } else {
+          response = await this.createRemote();
+        }
         break;
       case 'loaded':
         original = this.state.original;
-        response = await this.cards.send({
-          update: {
-            cardURL: this.state.url,
-            payload: {
-              // cast is safe because we're inside the 'loaded' state branch
-              data: this.serialize() as ResourceObject<Saved>,
-            },
-          },
-        });
+        if (this.localRealm) {
+          response = await this.updateLocal();
+        } else {
+          response = await this.updateRemote();
+        }
         break;
       default:
         throw assertNever(this.state);
@@ -323,6 +326,116 @@ export default class CardModelForBrowser implements CardModel {
       innerComponent,
     };
   }
+
+  private async createRemote(): Promise<JSONAPIDocument> {
+    if (this.state.type !== 'created') {
+      throw new Error(
+        `cannot createRemote() for card model when state is "${this.state.type}"`
+      );
+    }
+    return await fetchJSON<JSONAPIDocument>(
+      buildNewURL(this.state.realm, this.state.parentCardURL),
+      {
+        method: 'POST',
+        body: JSON.stringify({ data: this.serialize() }),
+      }
+    );
+  }
+
+  private async updateRemote(): Promise<JSONAPIDocument> {
+    if (this.state.type !== 'loaded') {
+      throw new Error(
+        `cannot updateRemote() for card model when state is "${this.state.type}"`
+      );
+    }
+    return await fetchJSON<JSONAPIDocument>(buildCardURL(this.url), {
+      method: 'PATCH',
+      body: JSON.stringify({ data: this.serialize() }),
+    });
+  }
+
+  private async createLocal(): Promise<JSONAPIDocument> {
+    if (this.state.type !== 'created') {
+      throw new Error(
+        `cannot createLocal() for card model when state is "${this.state.type}"`
+      );
+    }
+    if (!this.localRealm) {
+      throw new Error(
+        `cannot createLocal() for card model without local realm`
+      );
+    }
+    let resource = this.serialize();
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let id = this.localRealm.generateId();
+    this.localRealm.createRawCard({
+      realm: this.state.realm,
+      id,
+      data,
+      adoptsFrom: this.state.parentCardURL,
+    });
+    let url = cardURL({ realm: this.state.realm, id });
+    return await this.loadFromLocalRealm(url);
+  }
+
+  private async updateLocal(): Promise<JSONAPIDocument> {
+    if (this.state.type !== 'loaded') {
+      throw new Error(
+        `cannot updateLocal() for card model when state is "${this.state.type}"`
+      );
+    }
+    if (!this.localRealm) {
+      throw new Error(
+        `cannot updateLocal() for card model without local realm`
+      );
+    }
+    let cardId = this.parseLocalRealmURL(this.url);
+    if (!cardId) {
+      throw new Error(`${this.url} is not in the local realm`);
+    }
+    let resource = this.serialize();
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let existingRawCard = await this.localRealm.getRawCard(this.url);
+    if (!existingRawCard) {
+      throw new Error(
+        `Tried to update a local card that doesn't exist: ${this.url}`
+      );
+    }
+
+    existingRawCard.data = data;
+    return await this.loadFromLocalRealm(this.url);
+  }
+
+  private async loadFromLocalRealm(url: string): Promise<JSONAPIDocument> {
+    if (!this.localRealm) {
+      throw new Error(
+        `cannot loadFromLocalRealm() for card model without local realm`
+      );
+    }
+    let { raw } = await this.localRealm.loadCard(url);
+    return {
+      data: {
+        type: 'card',
+        id: url,
+        attributes: raw.data,
+      },
+    };
+  }
+
+  private parseLocalRealmURL(url: string): CardId | undefined {
+    if (!this.localRealm) {
+      return;
+    }
+    if (url.startsWith(this.localRealm.realmURL)) {
+      return {
+        realm: this.localRealm.realmURL,
+        id: url.slice(this.localRealm.realmURL.length),
+      };
+    }
+    return;
+  }
 }
 
 export function prepareComponent(
@@ -341,8 +454,17 @@ export function prepareComponent(
   );
 }
 
-function assertNever(value: never) {
-  throw new Error(`should never happen ${value}`);
+function buildNewURL(realm: string, parentCardURL: string): string {
+  return [
+    cardServer,
+    'cards/',
+    encodeURIComponent(realm) + '/',
+    encodeURIComponent(parentCardURL),
+  ].join('');
+}
+
+function buildCardURL(url: string): string {
+  return `${cardServer}cards/${encodeURIComponent(url)}`;
 }
 
 function tracked(
@@ -352,4 +474,8 @@ function tracked(
 ): PropertyDescriptor | void {
   //@ts-ignore the types for glimmer tracked don't seem to be lining
   return _tracked(target, prop, desc);
+}
+
+function assertNever(value: never) {
+  throw new Error(`should never happen ${value}`);
 }

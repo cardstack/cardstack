@@ -2,8 +2,6 @@ import Service from '@ember/service';
 
 import {
   Format,
-  CardEnv,
-  CardOperation,
   JSONAPIDocument,
   Query,
   ResourceObject,
@@ -33,7 +31,7 @@ export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      return await builder.load(url, format);
+      return await builder.loadCardModel(url, format);
     }
     let serverResponse = await fetchJSON<JSONAPIDocument>(
       this.buildCardURL({ url, query: { format } })
@@ -99,7 +97,7 @@ export default class Cards extends Service {
     serializerMap: SerializerMap,
     format: Format
   ): CardModel {
-    return new CardModelForBrowser(this.cardEnv(), {
+    return new CardModelForBrowser(this, {
       type: 'loaded',
       url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
@@ -111,17 +109,6 @@ export default class Cards extends Service {
 
   private inLocalRealm(cardURL: string): boolean {
     return cardURL.startsWith(this.localRealmURL);
-  }
-
-  // TODO  I think we can refactor this out, the CardModelForBrowser already has a
-  // browser environment specific implementation so there probably isn't a reason to
-  // have a separate object that holds environment implementation.
-  private cardEnv(): CardEnv {
-    return {
-      load: this.load.bind(this),
-      send: this.send.bind(this),
-      loadModule: this.loadModule.bind(this),
-    };
   }
 
   private _builderPromise: Promise<Builder> | undefined;
@@ -144,53 +131,6 @@ export default class Cards extends Service {
       reject(err);
       throw err;
     }
-  }
-
-  // TODO figure out a forever home for this
-  async send(op: CardOperation): Promise<CardModel> {
-    if (this.operationIsLocal(op)) {
-      let builder = await this.builder();
-      return await builder.send(op);
-    }
-
-    if ('create' in op) {
-      return await fetchJSON<JSONAPIDocument>(
-        this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
-        {
-          method: 'POST',
-          body: JSON.stringify(op.create.payload),
-        }
-      );
-    } else if ('update' in op) {
-      return await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL({ url: op.update.cardURL }),
-        {
-          method: 'PATCH',
-          body: JSON.stringify(op.update.payload),
-        }
-      );
-    } else {
-      throw assertNever(op);
-    }
-  }
-
-  private operationIsLocal(op: CardOperation): boolean {
-    if ('create' in op) {
-      return this.inLocalRealm(op.create.targetRealm);
-    } else if ('update' in op) {
-      return this.inLocalRealm(op.update.cardURL);
-    } else {
-      throw assertNever(op);
-    }
-  }
-
-  private buildNewURL(realm: string, parentCardURL: string): string {
-    return [
-      cardServer,
-      'cards/',
-      encodeURIComponent(realm) + '/',
-      encodeURIComponent(parentCardURL),
-    ].join('');
   }
 
   private buildCardURL(
@@ -267,10 +207,6 @@ export default class Cards extends Service {
       );
     }
   }
-}
-
-function assertNever(value: never) {
-  throw new Error(`unsupported operation ${value}`);
 }
 
 declare module '@ember/service' {

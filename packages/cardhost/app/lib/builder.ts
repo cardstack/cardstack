@@ -3,12 +3,10 @@ import {
   Format,
   RawCard,
   Builder,
-  CardOperation,
   CardId,
-  assertDocumentDataIsResource,
   CardModel,
-  CardEnv,
   CardComponentModule,
+  Card,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
@@ -20,7 +18,7 @@ import {
 } from '@cardstack/core/src/compiler';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
-import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 import CardModelForBrowser from './card-model-for-browser';
 
@@ -72,14 +70,18 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async load(url: string, format: Format): Promise<CardModel> {
+  get realmURL(): string {
+    return this.ownRealmURL;
+  }
+
+  async loadCard(url: string): Promise<Card> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
-    let env: CardEnv = {
-      load: this.cards.load.bind(this.cards),
-      send: this.cards.send.bind(this.cards),
-      loadModule: this.cards.loadModule.bind(this.cards),
-    };
+    return { compiled, raw };
+  }
+
+  async loadCardModel(url: string, format: Format): Promise<CardModel> {
+    let { compiled, raw } = await this.loadCard(url);
 
     let component = await this.loadModule<CardComponentModule>(
       compiled.componentInfos[format].moduleName.global
@@ -97,14 +99,18 @@ export default class LocalRealm implements Builder {
         componentModule: compiled.componentInfos[format].moduleName.global,
       },
     };
-    return new CardModelForBrowser(env, {
-      type: 'loaded',
-      url,
-      rawServerResponse,
-      innerComponent: component.default,
-      serializerMap,
-      format,
-    });
+    return new CardModelForBrowser(
+      this.cards,
+      {
+        type: 'loaded',
+        url,
+        rawServerResponse,
+        innerComponent: component.default,
+        serializerMap,
+        format,
+      },
+      this
+    );
   }
 
   async loadForRoute(
@@ -206,45 +212,6 @@ export default class LocalRealm implements Builder {
       }
     }
     return id;
-  }
-
-  async send(op: CardOperation): Promise<CardModel> {
-    if ('create' in op) {
-      let resource = op.create.payload.data;
-      assertDocumentDataIsResource(resource);
-      let data = resource.attributes;
-
-      let id = this.generateId();
-
-      this.createRawCard({
-        realm: this.ownRealmURL,
-        id,
-        data,
-        adoptsFrom: op.create.parentCardURL,
-      });
-
-      return this.load(cardURL({ realm: this.ownRealmURL, id }), 'isolated');
-    } else if ('update' in op) {
-      let { cardURL: url } = op.update;
-      let cardId = this.parseOwnRealmURL(url);
-      if (!cardId) {
-        throw new Error(`${url} is not in this realm`);
-      }
-      let resource = op.update.payload.data;
-      assertDocumentDataIsResource(resource);
-      let data = resource.attributes;
-      let existingRawCard = this.rawCards.get(cardId.id);
-      if (!existingRawCard) {
-        throw new Error(
-          `Tried to update a local card that doesn't exist: ${url}`
-        );
-      }
-
-      existingRawCard.data = data;
-      return this.load(url, 'isolated');
-    } else {
-      throw assertNever(op);
-    }
   }
 
   private inOwnRealm(card: RawCard): boolean {

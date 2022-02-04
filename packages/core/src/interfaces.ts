@@ -251,26 +251,3 @@ export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   relationships?: JSON.Object;
   meta?: JSON.Object;
 }
-
-export type CardOperation =
-  | {
-      create: {
-        targetRealm: string;
-        parentCardURL: string;
-        payload: JSONAPIDocument<Unsaved>;
-      };
-    }
-  | {
-      update: {
-        cardURL: string;
-        payload: JSONAPIDocument;
-      };
-    };
-
-// this is the set of environment-specific capabilities a CardModel gets access
-// to
-export interface CardEnv {
-  load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<JSONAPIDocument>;
-  loadModule<T extends object>(moduleIdentifier: string): Promise<T>;
-}
