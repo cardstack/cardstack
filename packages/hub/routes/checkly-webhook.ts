@@ -38,19 +38,19 @@ export default class ChecklyWebhookRoute {
     },
     'xdai archive health check (eth_blockNumber)': {
       componentName: 'Archive RPC node',
-      incidentName: 'RPC Node Degradation',
+      incidentName: 'Transactions delayed',
       incidentMessage:
-        'We are experiencing degraded service with our archive RPC node. This will result in reduced transaction processing times.',
+        'We are experiencing degraded service with our archive RPC node. This will result in increased transaction processing times.',
     },
     'xdai non-archive health check - late-cold-smoke (eth_blockNumber)': {
       componentName: 'RPC node (non-archive)',
-      incidentName: 'RPC Node Degradation',
+      incidentName: 'Transactions delayed',
       incidentMessage:
         'We are experiencing degraded service with our non-archive RPC node. This will result in reduced application performance.',
     },
     'relay-production health check': {
       componentName: 'Relay server',
-      incidentName: 'Relay Server Degradation',
+      incidentName: 'Transactions may fail',
       incidentMessage:
         'We are experiencing degraded service with our relay server. This will result in transaction processing failures.',
     },
