@@ -64,11 +64,11 @@
       </Boxel::Field>
     {{/if}}
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
+      <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |mailToSupportUrl|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.
         {{else if (eq this.error.message "TIMEOUT")}}
-          There was a problem creating your business account. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+          There was a problem creating your business account. Please contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}

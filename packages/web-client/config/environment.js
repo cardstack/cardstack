@@ -93,8 +93,7 @@ module.exports = function (environment) {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
       testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
-      discordSupportChannelUrl:
-        'https://discord.com/channels/584043165066199050/899645340746141806',
+      mailToSupportUrl: 'mailto:support@cardstack.com',
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
     },
