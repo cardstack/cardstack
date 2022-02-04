@@ -6,18 +6,18 @@
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to pay the business account creation fee">
-    <CardPay::LabeledValue @label="Business Name">
+    <Boxel::Field @label="Business Name">
       <CardPay::Merchant
         @name={{@workflowSession.state.merchantName}}
         @size="small"
         @logoBackground={{@workflowSession.state.merchantBgColor}}
         @logoTextColor={{@workflowSession.state.merchantTextColor}}
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business ID" data-test-prepaid-card-choice-merchant-id>
+    </Boxel::Field>
+    <Boxel::Field @label="Business ID" data-test-prepaid-card-choice-merchant-id>
       {{@workflowSession.state.merchantId}}
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business Account Creation Fee">
+    </Boxel::Field>
+    <Boxel::Field @label="Business Account Creation Fee">
       <CardPay::BalanceDisplay
         class="prepaid-card-choice__cost"
         @icon="spend"
@@ -27,8 +27,8 @@
         @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
         data-test-prepaid-card-choice-merchant-fee
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Pay Using Prepaid Card">
+    </Boxel::Field>
+    <Boxel::Field @label="Pay Using Prepaid Card">
       {{#if this.selectedPrepaidCard}}
         <div class="prepaid-card-choice__change-card">
           <CardPay::CardPicker::CardOption
@@ -50,9 +50,9 @@
           @selectedCard={{this.selectedPrepaidCard}}
         />
       {{/if}}
-    </CardPay::LabeledValue>
+    </Boxel::Field>
     {{#if @isComplete}}
-      <CardPay::LabeledValue @label="Business Address">
+      <Boxel::Field @label="Business Address">
         <CardPay::Merchant
           @name={{@workflowSession.state.merchantName}}
           @address={{@workflowSession.state.merchantSafe.address}}
@@ -61,14 +61,14 @@
           @logoTextColor={{@workflowSession.state.merchantTextColor}}
           data-test-prepaid-card-choice-merchant-address
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     {{/if}}
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
+      <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |mailToSupportUrl|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.
         {{else if (eq this.error.message "TIMEOUT")}}
-          There was a problem creating your business account. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+          There was a problem creating your business account. Please contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}

@@ -2,10 +2,6 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.withdrawal-transaction-amount__label {
-  --field-label-width: 15%;
-}
-
 .withdrawal-transaction-amount__balance .balance-display__icon {
   width: var(--boxel-sp-xxl);
   margin-right: 0;

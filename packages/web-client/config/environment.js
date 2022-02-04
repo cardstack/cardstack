@@ -95,8 +95,7 @@ module.exports = function (environment) {
         'https://apps.apple.com/us/app/card-wallet-by-cardstack/id1549183378',
       googlePlayLink:
         'https://play.google.com/store/apps/details?id=com.cardstack.cardpay',
-      discordSupportChannelUrl:
-        'https://discord.com/channels/584043165066199050/899645340746141806',
+      mailToSupportUrl: 'mailto:support@cardstack.com',
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
     },

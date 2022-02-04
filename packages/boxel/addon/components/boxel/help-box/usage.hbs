@@ -6,7 +6,8 @@
     <Boxel::HelpBox
       @prompt={{this.prompt}}
       @buttonText={{this.ctaText}}
-      @onClickButton={{fn this.log "clicked"}}>
+      @url={{this.url}}
+    >
       More content here
     </Boxel::HelpBox>
   </:example>
@@ -21,13 +22,14 @@
     <Args.String
       @name="buttonText"
       @optional={{true}}
-      @defaultValue="Request live support"
+      @defaultValue="Contact Support"
       @value={{this.ctaText}}
       @onInput={{fn (mut this.ctaText)}}
     />
     <Args.Object
-      @name="onClickButton"
-      @description="Action function triggered by the button"
+      @name="url"
+      @value={{this.url}}
+      @description="Destination link for the button"
     />
     <Args.Yield
       @optional={{true}}

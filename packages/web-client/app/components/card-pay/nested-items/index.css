@@ -1,5 +1,5 @@
 .card-pay-nested-items {
-  --inner-indent: var(--boxel-sp-xl);
+  --inner-indent: var(--boxel-sp-xs);
   --innermost-indent: var(--boxel-sp-xxl);
 }
 

@@ -1,9 +1,5 @@
 <div class="layout-display-view__content" data-test-layout-customization-display>
-  <Boxel::Field
-    @label="Card Preview"
-    @fieldMode="view"
-    class="layout-display-view__card-preview-field"
-  >
+  <Boxel::Field @label="Card Preview" @vertical={{true}}>
     <div class="layout-display-view__card">
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
@@ -21,19 +17,21 @@
     </div>
   </Boxel::Field>
   <CardPay::FieldStack class="layout-display-view__data">
-    <CardPay::LabeledValue @vertical={{true}} @label="Issued by*" @value={{@issuerName}}/>
-    <CardPay::LabeledValue @vertical={{true}} @label="Background color">
+    <Boxel::Field @vertical={{true}} @label="Issued by*">
+      {{@issuerName}}
+    </Boxel::Field>
+    <Boxel::Field @vertical={{true}} @label="Background color">
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="background"
         @swatchBackground={{@colorScheme.background}}
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @vertical={{true}} @label="Theme">
+    </Boxel::Field>
+    <Boxel::Field @vertical={{true}} @label="Theme">
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="theme"
         @swatchImage={{@pattern.patternUrl}}
         @blank={{eq @pattern.patternUrl null}}
       />
-    </CardPay::LabeledValue>
+    </Boxel::Field>
   </CardPay::FieldStack>
 </div>

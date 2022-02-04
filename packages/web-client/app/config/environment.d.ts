@@ -15,7 +15,7 @@ interface UrlsOptions {
   about: string;
   appStoreLink: string;
   googlePlayLink: string;
-  discordSupportChannelUrl: string;
+  mailToSupportUrl: string;
   statusPageBase: string;
   statusPageUrl: string;
 }
