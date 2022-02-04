@@ -77,16 +77,6 @@
   object-fit: contain;
 }
 
-.card-pay-dashboard__wallet-badges-google-play-badge {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.card-pay-dashboard__wallet-badges-google-play-soon {
-  font-size: var(--boxel-font-size-xs);
-  text-align: center;
-}
-
 .card-pay-dashboard__wallet-purchase-card-phone {
   display: block;
 }
