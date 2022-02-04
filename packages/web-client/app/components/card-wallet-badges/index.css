@@ -4,11 +4,11 @@
   align-items: center;
 }
 
-.card-wallet-badges > div {
+.card-wallet-badges > a {
   flex-basis: 50%;
 }
 
-.card-wallet-badges > div:last-child {
+.card-wallet-badges > a:last-child {
   text-align: center;
 }
 

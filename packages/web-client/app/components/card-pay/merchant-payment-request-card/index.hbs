@@ -3,28 +3,38 @@
   ...attributes
 >
   <div class="merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet--desktop">
-    <div class="merchant-payment-request-card__card-wallet">
-      {{svg-jar "card-wallet-app-icon" class="merchant-payment-request-card__card-wallet-icon" width="40" height="40"}}
-      <span class="merchant-payment-request-card__card-wallet-text">
+    <div class='merchant-payment-request-card__card-wallet'>
+      {{svg-jar
+        'card-wallet-app-icon'
+        class='merchant-payment-request-card__card-wallet-icon'
+        width='40'
+        height='40'
+      }}
+      <span class='merchant-payment-request-card__card-wallet-text'>
         Card Wallet
       </span>
     </div>
     <CardWalletBadges />
   </div>
-  <div class="merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet--mobile">
-    <a
-      class="merchant-payment-request-card__card-wallet"
-      href={{this.testFlightLink}}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-test-payment-request-beta-access-link
-    >
-      {{svg-jar "card-wallet-app-icon" class="merchant-payment-request-card__card-wallet-icon" width="40" height="40"}}
-      <span class="merchant-payment-request-card__card-wallet-text">
-        Card Wallet
-      </span>
-      Download TestFlight
-    </a>
+  <div
+    class='merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet--mobile'
+  >
+    <div class='merchant-payment-request-card__card-wallet'>
+      <div class='merchant-payment-request-card__card-wallet-icon-and-text'>
+        {{svg-jar
+          'card-wallet-app-icon'
+          class='merchant-payment-request-card__card-wallet-icon'
+          width='40'
+          height='40'
+        }}
+        <span class='merchant-payment-request-card__card-wallet-text'>
+          Card Wallet
+        </span>
+      </div>
+      <CardWalletBadges
+        class='merchant-payment-request-card__wallet-badges--mobile'
+      />
+    </div>
   </div>
   <CardPay::MerchantPaymentRequestCard::PaymentRequest
     class="merchant-payment-request-card__section"
