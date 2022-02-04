@@ -1,0 +1,18 @@
+.card-wallet-badges {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.card-wallet-badges > div {
+  flex-basis: 50%;
+}
+
+.card-wallet-badges > div:last-child {
+  text-align: center;
+}
+
+.card-wallet-badges img {
+  height: 2.8rem;
+  object-fit: contain;
+}

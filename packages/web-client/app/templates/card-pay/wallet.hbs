@@ -35,14 +35,7 @@
             {{svg-jar "card-wallet-app-icon" alt="" role="presentation" height="58"}}
             <h3 class="dashboard-panel-section__title">Buy a prepaid card</h3>
             <p class="dashboard-panel-section__desc">You can buy a prepaid card directly in the Card Wallet mobile application.</p>
-            <div class="card-pay-dashboard__wallet-badges">
-              <div>
-                <a href={{this.appStoreLink}} target="_blank" rel="noopener noreferrer"><img src="/images/icons/download-on-the-app-store-badge.png" alt="Download on the App Store"></a>
-              </div>
-              <div>
-                <a href={{this.googlePlayLink}} target='_blank' rel='noopener noreferrer'><img src="/images/icons/google-play-badge.png" class="card-pay-dashboard__wallet-badges-google-play-badge" alt="Get it on Google Play"></a>
-              </div>
-            </div>
+            <CardWalletBadges class='card-pay-dashboard__wallet-badges' />
             <img src="/images/dashboard/prepaid-card-phone.png" alt="Screenshot of Card Wallet app showing screen to purchase a prepaid card" class="card-pay-dashboard__wallet-purchase-card-phone">
           </p>
         </div>
