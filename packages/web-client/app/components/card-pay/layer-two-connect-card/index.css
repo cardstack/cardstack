@@ -16,21 +16,6 @@
   padding-top: var(--boxel-sp);
 }
 
-.layer-two-connect-card__testflight-link {
-  --icon-color: currentcolor;
-
-  font: 600 var(--boxel-font);
-  padding: var(--boxel-sp-sm);
-}
-
-.layer-two-connect-card__testflight-link > svg {
-  margin-bottom: var(--boxel-sp-sm);
-}
-
-.layer-two-connect-card__testflight-link-icon {
-  flex-shrink: 0;
-}
-
 .layer-two-connect-card__alternate-wallet {
   align-items: center;
   background-color: var(--boxel-light-400);
