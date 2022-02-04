@@ -42,7 +42,7 @@ if (process.env.COMPILER) {
               }
             `,
             'isolated.js': templateOnlyComponentTemplate(
-              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/><@fields.fullName/></div>`,
+              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
               { IsolatedStyles: './isolated.css' }
             ),
             'isolated.css': '.person-isolated { background: red }',
@@ -59,7 +59,7 @@ if (process.env.COMPILER) {
         serializerMap: {},
       };
       let src = templateOnlyComponentTemplate(
-        '<div><h1><@fields.name /></h1><@fields.birthdate /> <@fields.address /></div>'
+        '<div><h1><@fields.name /><@fields.fullName /></h1><@fields.birthdate /> <@fields.address /></div>'
       );
 
       code = transformCardComponent(src, options).source;

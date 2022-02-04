@@ -218,7 +218,7 @@ export default class CardModelForHub implements CardModel {
             { data: this.data }
           );
 
-          serializeAttributes(updatedRawCard.data, this.serializerMap);
+          updatedRawCard.data = serializeAttributes(updatedRawCard.data, this.serializerMap);
           raw = await this.realmManager.update(updatedRawCard);
           compiled = await this.searchIndex.indexData(raw);
         }
