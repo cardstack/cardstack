@@ -6,18 +6,18 @@
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to pay the business account creation fee">
-    <CardPay::LabeledValue @label="Business Name">
+    <Boxel::Field @label="Business Name">
       <CardPay::Merchant
         @name={{@workflowSession.state.merchantName}}
         @size="small"
         @logoBackground={{@workflowSession.state.merchantBgColor}}
         @logoTextColor={{@workflowSession.state.merchantTextColor}}
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business ID" data-test-prepaid-card-choice-merchant-id>
+    </Boxel::Field>
+    <Boxel::Field @label="Business ID" data-test-prepaid-card-choice-merchant-id>
       {{@workflowSession.state.merchantId}}
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business Account Creation Fee">
+    </Boxel::Field>
+    <Boxel::Field @label="Business Account Creation Fee">
       <CardPay::BalanceDisplay
         class="prepaid-card-choice__cost"
         @icon="spend"
@@ -27,8 +27,8 @@
         @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
         data-test-prepaid-card-choice-merchant-fee
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Pay Using Prepaid Card">
+    </Boxel::Field>
+    <Boxel::Field @label="Pay Using Prepaid Card">
       {{#if this.selectedPrepaidCard}}
         <div class="prepaid-card-choice__change-card">
           <CardPay::CardPicker::CardOption
@@ -50,9 +50,9 @@
           @selectedCard={{this.selectedPrepaidCard}}
         />
       {{/if}}
-    </CardPay::LabeledValue>
+    </Boxel::Field>
     {{#if @isComplete}}
-      <CardPay::LabeledValue @label="Business Address">
+      <Boxel::Field @label="Business Address">
         <CardPay::Merchant
           @name={{@workflowSession.state.merchantName}}
           @address={{@workflowSession.state.merchantSafe.address}}
@@ -61,7 +61,7 @@
           @logoTextColor={{@workflowSession.state.merchantTextColor}}
           data-test-prepaid-card-choice-merchant-address
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     {{/if}}
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>

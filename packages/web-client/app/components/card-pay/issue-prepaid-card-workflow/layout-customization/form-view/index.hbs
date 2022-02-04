@@ -1,8 +1,6 @@
 <div data-test-layout-customization-form>
   <CardPay::FieldStack>
-    <CardPay::LabeledValue
-      @label="Card Preview"
-    >
+    <Boxel::Field @label="Card Preview">
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
         @headerBackground={{@colorScheme.background}}
@@ -16,9 +14,9 @@
         @address={{placeholder-address}}
         @network={{network-display-info "layer2" "fullName"}}
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue
-      @fieldMode="edit"
+    </Boxel::Field>
+    <Boxel::Field
+      @tag="label"
       @label="Name of Issuer *"
     >
       <Boxel::Input
@@ -30,8 +28,8 @@
         {{on "blur" (pick "target.value" @onNameInput)}}
         data-test-layout-customization-name-input
       />
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Background Color">
+    </Boxel::Field>
+    <Boxel::Field @label="Background Color">
       {{#if @loadingCustomizations}}
         <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
@@ -59,8 +57,8 @@
           {{/let}}
         </Boxel::RadioInput>
       {{/if}}
-    </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Theme">
+    </Boxel::Field>
+    <Boxel::Field @label="Theme">
       {{#if @loadingCustomizations}}
          <Boxel::LoadingIndicator data-test-customization-theme-loading/>
       {{else}}
@@ -91,6 +89,6 @@
           {{/let}}
         </Boxel::RadioInput>
       {{/if}}
-    </CardPay::LabeledValue>
+    </Boxel::Field>
   </CardPay::FieldStack>
 </div>

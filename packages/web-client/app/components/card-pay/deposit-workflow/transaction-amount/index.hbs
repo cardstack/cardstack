@@ -5,8 +5,7 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
     <div class="transaction-amount__fields">
-      <CardPay::LabeledValue
-        class="transaction-amount__label"
+      <Boxel::Field
         @vertical={{this.isUnlockingOrUnlocked}}
         @label="Funding from"
       >
@@ -19,12 +18,11 @@
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        @fieldMode={{if this.isUnlockingOrUnlocked "view" "edit"}}
+      </Boxel::Field>
+      <Boxel::Field
+        @tag={{unless this.isUnlockingOrUnlocked "label"}}
         @vertical={{this.isUnlockingOrUnlocked}}
         @label="Amount to deposit"
-        class="transaction-amount__label"
       >
         {{#if this.isUnlockingOrUnlocked}}
           <CardPay::BalanceDisplay
@@ -46,11 +44,13 @@
             @errorMessage={{this.validationMessage}}
           />
         {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
       {{#unless this.isUnlockingOrUnlocked}}
-        <CardPay::LabeledValue @label="Approximate value*" class="transaction-amount__label">
+        <Boxel::Field
+          @label="Approximate value*"
+        >
           {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       {{/unless}}
     </div>
     <div class="transaction-amount__footnote">
