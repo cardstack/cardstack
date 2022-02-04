@@ -12,8 +12,6 @@ import {
 } from '@cardstack/core/src/interfaces';
 import config from 'cardhost/config/environment';
 
-// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
-import { setComponentTemplate } from '@ember/component';
 import type Builder from 'cardhost/lib/builder';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
