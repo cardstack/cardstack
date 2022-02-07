@@ -90,9 +90,11 @@ module.exports = function (environment) {
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {
-      appStoreLink: undefined,
-      googlePlayStoreLink: undefined,
-      testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
+      about: 'https://cardstack.com/cardpay',
+      appStoreLink:
+        'https://apps.apple.com/us/app/card-wallet-by-cardstack/id1549183378',
+      googlePlayLink:
+        'https://play.google.com/store/apps/details?id=com.cardstack.cardpay',
       mailToSupportUrl: 'mailto:support@cardstack.com',
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',

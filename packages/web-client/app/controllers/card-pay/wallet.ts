@@ -10,7 +10,9 @@ class CardPayWalletController extends Controller {
   @service declare layer2Network: Layer2Network;
   @service declare router: RouterService;
 
-  testFlightLink = config.urls.testFlightLink;
+  appStoreLink = config.urls.appStoreLink;
+  googlePlayLink = config.urls.googlePlayLink;
+
   queryParams = ['flow', { workflowPersistenceId: 'flow-id' }];
   @tracked flow: string | null = null;
   @tracked workflowPersistenceId: string | null = null;
