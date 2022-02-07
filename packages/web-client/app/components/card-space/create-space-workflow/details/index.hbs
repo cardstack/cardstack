@@ -5,13 +5,13 @@
 >
   <ActionCardContainer::Section @title="Fill out the Card Space details">
     {{#if @isComplete}}
-      <CardPay::LabeledValue
+      <Boxel::Field
         @label="Description"
       >
         {{@workflowSession.state.profileDescription}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
 
-      <CardPay::LabeledValue
+      <Boxel::Field
         @label="Cover image"
       >
         {{#if @workflowSession.state.profileCoverImageUrl}}
@@ -23,19 +23,19 @@
         {{else}}
           No cover image
         {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
 
-      <CardPay::LabeledValue
+      <Boxel::Field
         @label="Button text"
       >
         {{@workflowSession.state.profileButtonText}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
 
-      <CardPay::LabeledValue
+      <Boxel::Field
         @label="Category"
       >
         {{@workflowSession.state.profileCategory}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     {{else}}
       <CardSpace::EditDetails
         @workflowSession={{@workflowSession}}

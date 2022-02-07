@@ -1,5 +1,5 @@
-<CardPay::LabeledValue
-  @fieldMode="view"
+{{!-- this is not a label, because it doesn't seem good for clicking on the label to trigger the hidden input --}}
+<Boxel::Field
   @label="Cover image"
 >
   <ImageUploader
@@ -20,7 +20,7 @@
       data-test-card-space-image-uploader-avatar
     />
   </ImageUploader>
-</CardPay::LabeledValue>
+</Boxel::Field>
 
 {{#in-element this.imageEditorElement}}
   <ImageEditor
