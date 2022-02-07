@@ -3,18 +3,19 @@ import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
-// @ts-ignore
-import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import { transformSync } from '@babel/core';
+import { NodePath } from '@babel/traverse';
+import type * as Babel from '@babel/core';
+import type { types as t } from '@babel/core';
+import { ImportUtil } from 'babel-import-util';
 
-import { NodePath, transformSync } from '@babel/core';
-import * as t from '@babel/types';
+import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
-import { CompiledCard, SerializerName, Format } from './interfaces';
-
-import { getObjectKey, error } from './utils/babel';
+import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
+import { CallExpression } from '@babel/types';
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
@@ -22,47 +23,46 @@ export interface CardComponentPluginOptions {
   // these are for gathering output
   usedFields: string[];
   inlineHBS: string | undefined;
+  serializerMap: SerializerMap;
 }
 
 interface State {
   opts: CardComponentPluginOptions;
   insideExportDefault: boolean;
+  importUtil: ImportUtil;
 
   // keys are local names in this module that we have chosen.
-  neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
+  neededImports: ImportDetails;
 }
 
-const BASE_MODEL_VAR_NAME = 'BaseModel';
-
-export default function (templateSource: string, options: CardComponentPluginOptions): string {
+export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
   try {
     let out = transformSync(templateSource, {
-      plugins: [[babelPluginCardTemplate, options], classPropertiesPlugin],
+      ast: true,
+      plugins: [[babelPluginCardTemplate, options]],
       // HACK: The / resets the relative path setup, removing the cwd of the hub.
       // This allows the error module to look a lot more like the card URL.
       filename: '/' + options.debugPath.replace(/^\//, ''),
     });
-    return out!.code!;
+    return { source: out!.code!, ast: out!.ast! };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
 }
 
-export function babelPluginCardTemplate() {
+export function babelPluginCardTemplate(babel: typeof Babel) {
+  let t = babel.types;
   return {
     visitor: {
       Program: {
-        enter(_path: NodePath, state: State) {
+        enter(path: NodePath<t.Program>, state: State) {
+          state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
           state.neededImports = new Map();
-          state.neededImports.set(BASE_MODEL_VAR_NAME, {
-            moduleSpecifier: '@cardstack/core/src/card-model',
-            exportedName: 'default',
-          });
         },
         exit(path: NodePath<t.Program>, state: State) {
-          addImports(state.neededImports, path);
-          addModelClass(path, state);
+          addImports(state.neededImports, path, t);
+          addGetCardModelOptions(path, state, babel);
         },
       },
 
@@ -75,46 +75,48 @@ export function babelPluginCardTemplate() {
         },
       },
 
-      CallExpression: callExpressionEnter,
+      CallExpression: {
+        enter(path: NodePath<CallExpression>, state: State) {
+          callExpressionEnter(path, state, t);
+        },
+      },
     },
   };
 }
 
-function addImports(neededImports: State['neededImports'], path: NodePath<t.Program>) {
-  for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
-    path.node.body.push(
-      t.importDeclaration(
-        [
-          exportedName === 'default'
-            ? t.importDefaultSpecifier(t.identifier(localName))
-            : t.importSpecifier(t.identifier(localName), t.identifier(exportedName)),
-        ],
-        t.stringLiteral(moduleSpecifier)
-      )
-    );
-  }
-}
-
-function addModelClass(path: NodePath<t.Program>, state: State) {
-  let serializerMapPropertyDefinition = buildSerializerMapProp(state.opts.fields, state.opts.usedFields);
-  let classBody = t.classBody([serializerMapPropertyDefinition]);
+function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
+  state.opts.serializerMap = serializerMap;
 
   path.node.body.push(
     t.exportNamedDeclaration(
-      t.classDeclaration(
-        t.identifier(findVariableName('Model', path, state.neededImports)),
-        t.identifier(BASE_MODEL_VAR_NAME),
-        classBody
+      t.functionDeclaration(
+        t.identifier('getCardModelOptions'),
+        [],
+        t.blockStatement([
+          babel.template(`
+            return {
+              serializerMap: %%serializerMap%%,
+              computedFields: %%computedFields%%,
+              usedFields: %%usedFields%%
+            };
+          `)({
+            serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
+            computedFields: t.arrayExpression(
+              Object.values(state.opts.fields)
+                .filter((field) => field.computed)
+                .map((field) => t.stringLiteral(field.name))
+            ),
+            usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
+          }) as t.Statement,
+        ])
       )
     )
   );
 }
 
-function buildSerializerMapProp(
-  fields: CompiledCard['fields'],
-  usedFields: CardComponentPluginOptions['usedFields']
-): t.ClassProperty {
-  let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
+function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
 
   for (let serializer in serializerMap) {
@@ -129,31 +131,25 @@ function buildSerializerMapProp(
     }
     props.push(t.objectProperty(t.identifier(serializer), t.arrayExpression(fieldListElements)));
   }
-  return t.classProperty(
-    t.identifier('serializerMap'),
-    t.objectExpression(props),
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
+
+  return props;
 }
 
-function callExpressionEnter(path: NodePath<t.CallExpression>, state: State) {
+function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {
   if (shouldSkipExpression(path, state)) {
     return;
   }
 
-  let { options, template: inputTemplate } = handleArguments(path);
+  let { options, template: inputTemplate } = handleArguments(path, t);
 
   let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.neededImports);
   path.node.arguments[0] = t.stringLiteral(template);
 
-  if (shouldInlineHBS(options, neededScope)) {
+  if (shouldInlineHBS(options, neededScope, t)) {
     state.opts.inlineHBS = template;
   }
 
-  updateScope(options, neededScope);
+  updateScope(options, neededScope, t);
 }
 
 function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): boolean {
@@ -163,12 +159,15 @@ function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): b
   );
 }
 
-function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>) {
+function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>, t: typeof Babel.types) {
   // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
-  return !getObjectKey(options, 'scope') && neededScope.size == 0;
+  return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
 }
 
-function handleArguments(path: NodePath<t.CallExpression>): {
+function handleArguments(
+  path: NodePath<t.CallExpression>,
+  t: typeof Babel.types
+): {
   options: NodePath<t.ObjectExpression>;
   template: string;
 } {
@@ -198,7 +197,7 @@ function handleArguments(path: NodePath<t.CallExpression>): {
     throw error(options, 'must be an object expression');
   }
 
-  let strictMode = getObjectKey(options, 'strictMode');
+  let strictMode = getObjectKey(options, 'strictMode', t);
 
   if (!strictMode?.isBooleanLiteral() || !strictMode.node.value) {
     throw error(options as NodePath<any>, 'Card Template precompileOptions requires strictMode to be true');
@@ -252,14 +251,14 @@ function findVariableName(
   return candidate;
 }
 
-function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>): void {
+function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {
   let scopeVars: t.ObjectExpression['properties'] = [];
 
   for (let name of names) {
     scopeVars.push(t.objectProperty(t.identifier(name), t.identifier(name), undefined, true));
   }
 
-  let scope = getObjectKey(options, 'scope');
+  let scope = getObjectKey(options, 'scope', t);
 
   if (!scope) {
     options.node.properties.push(

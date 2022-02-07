@@ -27,7 +27,7 @@
 }
 
 .card-pay-header-nav__tab {
-  --icon-color: currentColor;
+  --icon-color: currentcolor;
 
   display: flex;
   align-items: center;

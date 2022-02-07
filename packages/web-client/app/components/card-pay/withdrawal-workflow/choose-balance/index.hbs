@@ -6,7 +6,7 @@
 >
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a source and balance to withdraw from">
-      <CardPay::LabeledValue @label="Source:" @isCompact={{true}}>
+      <Boxel::Field @label="Source:" @horizontalLabelSize="small">
         <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-choose-balance-from-wallet />
         <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
           <:outer>
@@ -55,15 +55,15 @@
             {{/if}}
           </:innermost>
         </CardPay::NestedItems>
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens*" data-test-choose-balance-receive>
-      <CardPay::LabeledValue @label="In:" @isCompact={{true}}>
+      <Boxel::Field @label="In:" @horizontalLabelSize="small">
         <CardPay::AccountDisplay
           @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
     </ActionCardContainer::Section>
     <div class="choose-balance__footnote" data-test-choose-balance-footnote>
       * You will need to pay the gas fee with your Layer 1 wallet on {{network-display-info "layer1" "fullName"}}

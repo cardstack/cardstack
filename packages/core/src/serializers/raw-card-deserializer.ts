@@ -64,9 +64,7 @@ export class RawCardDeserializer {
       realm: attrs?.realm,
       schemaModule: attrs?.schemaModule,
       serializer: attrs?.serializer,
-      isolated: attrs?.isolated,
-      embedded: attrs?.embedded,
-      edit: attrs?.edit,
+      componentInfos: attrs?.componentInfos,
       fields: {},
       modules: attrs?.modules,
       deps: attrs?.deps,
@@ -122,6 +120,7 @@ export class RawCardDeserializer {
     let field: Field = {
       name: attrs?.name,
       type: attrs?.fieldType,
+      computed: attrs?.computed,
       card,
     };
     return field;

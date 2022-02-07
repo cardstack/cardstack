@@ -7,11 +7,23 @@ import config from 'config';
 import { DEGRADED_THRESHOLD as degradedSubgraphThreshold } from '../routes/status';
 
 // Check names and component names should map to the names and components in Checkly
-type CheckName = 'hub-prod subgraph / RPC node block number diff within threshold';
+type CheckName =
+  | 'hub-prod subgraph / RPC node block number diff within threshold'
+  | 'xdai archive health check (eth_blockNumber)'
+  | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)'
+  | 'relay-production health check';
+type ComponentName =
+  | 'Subgraph'
+  | 'Archive RPC node'
+  | 'RPC node (non-archive)'
+  | 'Hub'
+  | 'Relay server'
+  | 'Notifications';
 type Checks = {
   [key in CheckName]: {
-    componentName: 'Subgraph'; // Component name in Checkly
-    incidentMessage: string; // Will be shown in Statuspage
+    componentName: ComponentName; // Component name in Statuspage
+    incidentName: string; // Incident name in Statuspage
+    incidentMessage: string; // Incident message in Statuspage
   };
 };
 
@@ -21,7 +33,26 @@ export default class ChecklyWebhookRoute {
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {
       componentName: 'Subgraph',
+      incidentName: 'Transactions delayed',
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
+    },
+    'xdai archive health check (eth_blockNumber)': {
+      componentName: 'Archive RPC node',
+      incidentName: 'Transactions delayed',
+      incidentMessage:
+        'We are experiencing degraded service with our archive RPC node. This will result in increased transaction processing times.',
+    },
+    'xdai non-archive health check - late-cold-smoke (eth_blockNumber)': {
+      componentName: 'RPC node (non-archive)',
+      incidentName: 'Transactions delayed',
+      incidentMessage:
+        'We are experiencing degraded service with our non-archive RPC node. This will result in reduced application performance.',
+    },
+    'relay-production health check': {
+      componentName: 'Relay server',
+      incidentName: 'Transactions may fail',
+      incidentMessage:
+        'We are experiencing degraded service with our relay server. This will result in transaction processing failures.',
     },
   };
 
@@ -45,8 +76,8 @@ export default class ChecklyWebhookRoute {
     if (check) {
       let alertType = ctx.request.body.alert_type;
 
-      if (alertType === 'ALERT_FAILURE') {
-        await this.statuspageApi.createIncident(check.componentName, check.incidentMessage);
+      if (['ALERT_DEGRADED', 'ALERT_FAILURE'].includes(alertType)) {
+        await this.statuspageApi.createIncident(check.componentName, check.incidentName, check.incidentMessage);
       } else if (alertType == 'ALERT_RECOVERY') {
         await this.statuspageApi.resolveIncident(check.componentName);
       }

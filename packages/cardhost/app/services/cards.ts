@@ -2,27 +2,23 @@ import Service from '@ember/service';
 
 import {
   Format,
-  CardEnv,
-  CardOperation,
   JSONAPIDocument,
   Query,
   ResourceObject,
+  CardModel,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
+  CardComponentModule,
 } from '@cardstack/core/src/interfaces';
-import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
-// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
-import { setComponentTemplate } from '@ember/component';
-import Component from '@glimmer/component';
-import { hbs } from 'ember-cli-htmlbars';
-import { tracked } from '@glimmer/tracking';
 import type Builder from 'cardhost/lib/builder';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 import { buildQueryString } from '@cardstack/core/src/query';
+import CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
+import { cloneDeep } from 'lodash';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -31,21 +27,22 @@ export default class Cards extends Service {
   overrideRoutingCardWith: string | undefined;
 
   async load(url: string, format: Format): Promise<CardModel> {
-    let cardResponse: JSONAPIDocument;
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      cardResponse = await builder.load(url, format);
-    } else {
-      cardResponse = await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL({ url, query: { format } })
-      );
+      return await builder.loadData(url, format);
     }
+    let serverResponse = await fetchJSON<JSONAPIDocument>(
+      this.buildCardURL({ url, query: { format } })
+    );
 
-    let { data } = cardResponse;
+    let { data } = serverResponse;
     assertDocumentDataIsResource(data);
 
-    let { component, Model } = await this.codeForCard(data);
-    return Model.fromResponse(this.cardEnv(), data, component);
+    return this.makeCardModelFromResponse(
+      data,
+      await this.codeForCard(data),
+      format
+    );
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -57,12 +54,15 @@ export default class Cards extends Service {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      let { component, Model } = await this.codeForCard(data);
-      return Model.fromResponse(this.cardEnv(), data, component);
+      return this.makeCardModelFromResponse(
+        data,
+        await this.codeForCard(data),
+        'isolated'
+      );
     }
   }
 
-  async query(query: Query): Promise<CardModel[]> {
+  async query(format: Format, query: Query): Promise<CardModel[]> {
     // if (this.inLocalRealm(url)) {
     //   let builder = await this.builder();
     //   cardResponse = await builder.load(url, format);
@@ -74,23 +74,43 @@ export default class Cards extends Service {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        let { component, Model } = await this.codeForCard(cardResponse);
-        return Model.fromResponse(this.cardEnv(), cardResponse, component);
+        return this.makeCardModelFromResponse(
+          cardResponse,
+          await this.codeForCard(cardResponse),
+          format
+        );
       })
     );
   }
 
-  private inLocalRealm(cardURL: string): boolean {
-    return cardURL.startsWith(this.localRealmURL);
+  private makeCardModelFromResponse(
+    cardResponse: ResourceObject,
+    componentModule: CardComponentModule,
+    format: Format
+  ): CardModel {
+    let schemaModuleId = cardResponse.meta?.schemaModule;
+    if (!schemaModuleId) {
+      throw new Error(
+        `card payload for ${cardResponse.id} has no meta.schemaModule`
+      );
+    }
+    if (typeof schemaModuleId !== 'string') {
+      throw new Error(
+        `card payload for ${cardResponse.id} meta.schemaModule is not a string`
+      );
+    }
+    return new CardModelForBrowser(this, {
+      type: 'loaded',
+      url: cardResponse.id,
+      rawServerResponse: cloneDeep(cardResponse),
+      componentModule,
+      format,
+      schemaModuleId,
+    });
   }
 
-  private cardEnv(): CardEnv {
-    return {
-      load: this.load.bind(this),
-      send: this.send.bind(this),
-      prepareComponent: this.prepareComponent.bind(this),
-      tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
-    };
+  private inLocalRealm(cardURL: string): boolean {
+    return cardURL.startsWith(this.localRealmURL);
   }
 
   private _builderPromise: Promise<Builder> | undefined;
@@ -115,52 +135,6 @@ export default class Cards extends Service {
     }
   }
 
-  private async send(op: CardOperation): Promise<JSONAPIDocument> {
-    if (this.operationIsLocal(op)) {
-      let builder = await this.builder();
-      return await builder.send(op);
-    }
-
-    if ('create' in op) {
-      return await fetchJSON<JSONAPIDocument>(
-        this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
-        {
-          method: 'POST',
-          body: JSON.stringify(op.create.payload),
-        }
-      );
-    } else if ('update' in op) {
-      return await fetchJSON<JSONAPIDocument>(
-        this.buildCardURL({ url: op.update.cardURL }),
-        {
-          method: 'PATCH',
-          body: JSON.stringify(op.update.payload),
-        }
-      );
-    } else {
-      throw assertNever(op);
-    }
-  }
-
-  private operationIsLocal(op: CardOperation): boolean {
-    if ('create' in op) {
-      return this.inLocalRealm(op.create.targetRealm);
-    } else if ('update' in op) {
-      return this.inLocalRealm(op.update.cardURL);
-    } else {
-      throw assertNever(op);
-    }
-  }
-
-  private buildNewURL(realm: string, parentCardURL: string): string {
-    return [
-      cardServer,
-      'cards/',
-      encodeURIComponent(realm) + '/',
-      encodeURIComponent(parentCardURL),
-    ].join('');
-  }
-
   private buildCardURL(
     opts: { url?: string; query?: Query & { format?: Format } } = {}
   ): string {
@@ -174,37 +148,15 @@ export default class Cards extends Service {
     return fullURL.join('');
   }
 
-  private prepareComponent(cardModel: CardModel, component: unknown): unknown {
-    return setComponentTemplate(
-      hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
-      class extends Component {
-        component = component;
-        get data() {
-          return cardModel.data;
-        }
-        set = cardModel.setters;
-      }
-    );
-  }
-
   private async codeForCard(
     card: ResourceObject
-  ): Promise<{ component: unknown; Model: typeof CardModel }> {
-    let componentModule = card.meta?.componentModule;
-    if (!componentModule) {
-      throw new Error('No componentModule to load');
+  ): Promise<CardComponentModule> {
+    let { componentModule } = card.meta || {};
+    if (!componentModule || typeof componentModule !== 'string') {
+      throw new Error('Cards component module must be present and a string');
     }
-    if (typeof componentModule !== 'string') {
-      throw new Error('Cards component module is not a string');
-    }
-    let module = await this.loadModule<{
-      default: unknown;
-      Model: typeof CardModel;
-    }>(componentModule);
-    return {
-      component: module.default,
-      Model: module.Model,
-    };
+
+    return await this.loadModule<CardComponentModule>(componentModule);
   }
 
   async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
@@ -212,10 +164,7 @@ export default class Cards extends Service {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
       moduleIdentifier = moduleIdentifier.replace('@cardstack/compiled/', '');
-      return await import(
-        /* webpackExclude: /schema\.js$/ */
-        `@cardstack/compiled/${moduleIdentifier}`
-      );
+      return await import(`@cardstack/compiled/${moduleIdentifier}`);
     } else if (moduleIdentifier.startsWith('@cardstack/core/src/')) {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
@@ -252,6 +201,8 @@ export default class Cards extends Service {
   }
 }
 
-function assertNever(value: never) {
-  throw new Error(`unsupported operation ${value}`);
+declare module '@ember/service' {
+  interface Registry {
+    cards: Cards;
+  }
 }

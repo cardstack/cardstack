@@ -15,6 +15,11 @@ import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { Client } from 'pg';
+import vm from 'vm';
+
+declare global {
+  const __non_webpack_require__: any;
+}
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
@@ -61,10 +66,11 @@ function setupCacheDir(cardCacheDir: string): void {
 }
 
 import logger from '@cardstack/logger';
+import { service } from '@cardstack/hub/services';
 const log = logger('hub/file-cache');
 
 export default class FileCache {
-  config = inject('file-cache-config', { as: 'config' });
+  config = service('file-cache-config', { as: 'config' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   client!: Client;
 
@@ -135,8 +141,43 @@ export default class FileCache {
     return this.moduleURL(cardURL, localFile);
   }
 
+  resolveModule(moduleURL: string, env: Environment = 'node'): string {
+    return join(this.dir, env, moduleURL.replace(this.pkgName + '', ''));
+  }
+
   getModule(moduleURL: string, env: Environment = 'node'): string | undefined {
-    return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
+    return this.readFile(this.resolveModule(moduleURL, env));
+  }
+
+  loadModule(moduleIdentifier: string): any {
+    log.trace(`loadModule(${moduleIdentifier})`);
+
+    if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
+      let code = this.getModule(moduleIdentifier);
+      if (!code) {
+        throw new Error(`unable to find code for ${moduleIdentifier}`);
+      }
+      let context = {
+        exports: {},
+        require: (specifier: string) => this.loadModule(specifier),
+      };
+      vm.createContext(context);
+      vm.runInContext(code, context, { filename: this.resolveModule(moduleIdentifier) });
+      return context.exports;
+    }
+
+    if (moduleIdentifier.startsWith('@cardstack/core/src/utils/')) {
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/utils/', '');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require(`@cardstack/core/src/utils/${moduleIdentifier}`);
+    }
+    if (moduleIdentifier.startsWith('@cardstack/core/')) {
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require(`@cardstack/core/src/${moduleIdentifier}`);
+    }
+
+    throw new Error(`don't know how to loadModule ${moduleIdentifier}`);
   }
 
   deleteCardModules(cardURL: string): void {
@@ -160,8 +201,8 @@ export default class FileCache {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'file-cache': FileCache;
   }
 }

@@ -418,3 +418,106 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 });
+
+describe('GET /api/merchant-infos', function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+
+  let { request, getContainer } = setupHub(this);
+
+  it('fetches merchant infos available for association to a new card space', async function () {
+    let cardSpaceQueries = await getContainer().lookup('card-space-queries');
+    let merchantInfoQueries = await getContainer().lookup('merchant-info-queries');
+
+    // 3 merchants (jerry, kramer, george) belonging to first user
+    let merchantInfoId = 'c5cd6479-ec74-4ecd-9aa6-96bdb02d255e';
+    await merchantInfoQueries.insert({
+      id: merchantInfoId,
+      name: '/',
+      slug: 'jerry',
+      color: '/',
+      textColor: '/',
+      ownerAddress: stubUserAddress,
+    });
+
+    await merchantInfoQueries.insert({
+      id: '303c5efa-9cd5-404a-a3fb-9a99969ffcf4',
+      name: '/',
+      slug: 'kramer',
+      color: '/',
+      textColor: '/',
+      ownerAddress: stubUserAddress,
+    });
+
+    await merchantInfoQueries.insert({
+      id: '0b9f7594-0f83-4e09-a1ae-d3272decf8fb',
+      name: '/',
+      slug: 'george',
+      color: '/',
+      textColor: '/',
+      ownerAddress: stubUserAddress,
+    });
+
+    // 1 merchant belonging to the second user
+    await merchantInfoQueries.insert({
+      id: '6484e35a-a581-4246-ac36-c52f69b1cb52',
+      name: '/',
+      slug: 'elaine',
+      color: '/',
+      textColor: '/',
+      ownerAddress: '0x1',
+    });
+
+    // First user registers a card space with jerry merchant
+    await cardSpaceQueries.insert({
+      id: '255aaa5c-92d0-468b-8939-3dd2d72684c3',
+      profileName: 'Test',
+      profileImageUrl: 'https://test.com/test1.png',
+      profileCoverImageUrl: 'https://test.com/test2.png',
+      profileDescription: 'Test',
+      profileButtonText: 'Test',
+      profileCategory: 'Test',
+      merchantId: merchantInfoId,
+    });
+
+    // The first user should be able to register 2 more card spaces (1 merchant used, 2 merchants left)
+    await request()
+      .get('/api/merchant-infos?availableForCardSpace=true')
+      .send({})
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        // kramer and george should be available for card space. jerry is already taken, and elaine belongs to another user
+        data: [
+          {
+            attributes: {
+              color: '/',
+              did: 'did:cardstack:1m6Xtdkc8n7Q7XGwV3Eo2k5qb2777873aaab7bfe',
+              name: '/',
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              slug: 'kramer',
+              'text-color': '/',
+            },
+            id: '303c5efa-9cd5-404a-a3fb-9a99969ffcf4',
+            type: 'merchant-infos',
+          },
+          {
+            attributes: {
+              color: '/',
+              did: 'did:cardstack:1m2rfah5ytCe84ae7dGBnGwp44f435150427e4cc',
+              name: '/',
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              slug: 'george',
+              'text-color': '/',
+            },
+            id: '0b9f7594-0f83-4e09-a1ae-d3272decf8fb',
+            type: 'merchant-infos',
+          },
+        ],
+      });
+  });
+});

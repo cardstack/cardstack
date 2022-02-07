@@ -39,30 +39,17 @@ export default class PushNotificationRegistrationsRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
+    let ownerAddress = ctx.state.userAddress;
+    let pushClientId = ctx.request.body.data.attributes['push-client-id'];
 
-    let existingPushNotificationRegistration = (
-      await this.pushNotificationRegistrationQueries.query({
-        ownerAddress: ctx.state.userAddress,
-        pushClientId: ctx.request.body.data.attributes['push-client-id'],
-      })
-    )[0];
+    let pushNotificationRegistration = {
+      id: shortUuid.uuid(),
+      ownerAddress,
+      pushClientId,
+      disabledAt: null,
+    };
 
-    let pushNotificationRegistration: PushNotificationRegistration;
-
-    if (existingPushNotificationRegistration) {
-      pushNotificationRegistration = existingPushNotificationRegistration;
-      pushNotificationRegistration.disabledAt = null;
-      await this.pushNotificationRegistrationQueries.update(pushNotificationRegistration);
-    } else {
-      pushNotificationRegistration = {
-        id: shortUuid.uuid(),
-        ownerAddress: ctx.state.userAddress,
-        pushClientId: ctx.request.body.data.attributes['push-client-id'],
-        disabledAt: null,
-      };
-
-      await this.pushNotificationRegistrationQueries.insert(pushNotificationRegistration);
-    }
+    await this.pushNotificationRegistrationQueries.upsert(pushNotificationRegistration);
 
     let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
 

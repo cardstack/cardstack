@@ -1,10 +1,12 @@
 .safe-option {
   display: grid;
+  /* stylelint-disable declaration-block-no-redundant-longhand-properties */
   grid-template-columns: var(--boxel-sp-xxl) 1fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas:
     "logo name-and-type"
     "logo address";
+  /* stylelint-enable declaration-block-no-redundant-longhand-properties */
   font-size: var(--boxel-font-size-sm);
 }
 
@@ -33,5 +35,9 @@
 .safe-option__address {
   grid-area: address;
   font-family: var(--boxel-monospace-font-family);
+  color: var(--boxel-purple-500);
+}
+
+.safe-option__id {
   color: var(--boxel-purple-500);
 }

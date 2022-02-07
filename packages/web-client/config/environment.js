@@ -16,6 +16,7 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
+const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.space.test';
 const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
 const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
 const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
@@ -41,7 +42,7 @@ module.exports = function (environment) {
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     cardSpaceHostnameSuffix:
       cardSpaceHostnameSuffixesByTarget[process.env.DEPLOY_TARGET] ??
-      CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
+      CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
@@ -90,12 +91,14 @@ module.exports = function (environment) {
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {
-      appStoreLink: undefined,
-      googlePlayStoreLink: undefined,
-      testFlightLink: 'https://testflight.apple.com/join/OgFq1EZ0',
-      discordSupportChannelUrl:
-        'https://discord.com/channels/584043165066199050/899645340746141806',
-      statusPageUrl: 'https://status.cardstack.com',
+      about: 'https://cardstack.com/cardpay',
+      appStoreLink:
+        'https://apps.apple.com/us/app/card-wallet-by-cardstack/id1549183378',
+      googlePlayLink:
+        'https://play.google.com/store/apps/details?id=com.cardstack.cardpay',
+      mailToSupportUrl: 'mailto:support@cardstack.com',
+      statusPageBase: 'https://status.cardstack.com',
+      statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
     },
     // basically our favicons for now
     walletConnectIcons: [

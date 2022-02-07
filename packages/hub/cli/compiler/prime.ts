@@ -8,6 +8,6 @@ exports.builder = {};
 
 exports.handler = async function (/* argv: Argv */) {
   let container = createContainer();
-  let searchIndex = await container.lookup('searchIndex');
+  let searchIndex = await container.lookup('searchIndex', { type: 'service' });
   await searchIndex.indexAllRealms();
 };

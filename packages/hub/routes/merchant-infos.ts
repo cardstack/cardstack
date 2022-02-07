@@ -5,6 +5,7 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
+import { MerchantInfoQueriesFilter } from '../services/queries/merchant-info';
 
 export interface MerchantInfo {
   id: string;
@@ -32,6 +33,29 @@ export default class MerchantInfosRoute {
 
   constructor() {
     autoBind(this);
+  }
+
+  async get(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let params: MerchantInfoQueriesFilter = {
+      ownerAddress: ctx.state.userAddress,
+      customFilter: undefined,
+    };
+
+    if (ctx.query.availableForCardSpace) {
+      params.customFilter = {
+        availableForCardSpace: true,
+      };
+    }
+
+    let merchantInfos = await this.merchantInfoQueries.fetch(params);
+
+    ctx.type = 'application/vnd.api+json';
+    ctx.status = 200;
+    ctx.body = this.merchantInfoSerializer.serializeCollection(merchantInfos);
   }
 
   async post(ctx: Koa.Context) {

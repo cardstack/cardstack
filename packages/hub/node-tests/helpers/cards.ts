@@ -1,9 +1,9 @@
 import Mocha from 'mocha';
 import tmp from 'tmp';
 import { join } from 'path';
-import { FileCacheConfig } from '../../services/file-cache-config';
+import FileCacheConfig from '../../services/file-cache-config';
 import { contextFor, registry, setupHub } from './server';
-import CardServiceFactory, { CardService, INSECURE_CONTEXT } from '../../services/card-service';
+import { CardService, INSECURE_CONTEXT } from '../../services/card-service';
 import FileCache from '../../services/file-cache';
 import { TEST_REALM } from '@cardstack/core/tests/helpers';
 import { RealmConfig } from '@cardstack/core/src/interfaces';
@@ -56,14 +56,15 @@ export function configureCompiler(mochaContext: Mocha.Suite) {
     let reg = registry(this);
 
     if (process.env.COMPILER) {
-      reg.register('file-cache-config', TestFileCacheConfig);
+      reg.register('file-cache-config', TestFileCacheConfig, { type: 'service' });
 
       testRealmDir = tmp.dirSync().name;
       reg.register(
         'realmsConfig',
         class TestRealmsConfig {
           realms: RealmConfig[] = [BASE_REALM_CONFIG, DEMO_REALM_CONFIG, { url: TEST_REALM, directory: testRealmDir }];
-        }
+        },
+        { type: 'service' }
       );
     }
   });
@@ -84,7 +85,7 @@ export function configureCompiler(mochaContext: Mocha.Suite) {
 export function cardHelpers(mochaContext: Mocha.Suite) {
   let fileCache: FileCache;
   let fileCacheConfig: TestFileCacheConfig;
-  let currentCardService: CardServiceFactory | undefined;
+  let currentCardService: CardService | undefined;
   let cardServiceProxy = new Proxy(
     {},
     {
@@ -95,7 +96,7 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
         if (!currentCardService) {
           throw new Error(`tried to use cardService outside of an active test`);
         }
-        return (currentCardService.as(INSECURE_CONTEXT) as any)[propertyName];
+        return (currentCardService as any)[propertyName].bind(currentCardService);
       },
     }
   );
@@ -105,11 +106,11 @@ export function cardHelpers(mochaContext: Mocha.Suite) {
     if (!container) {
       throw new Error('Make sure cardHelpers are run after setupHub. It needs a configured container');
     }
-    currentCardService = await container.lookup('card-service');
-    fileCacheConfig = (await container.lookup('file-cache-config')) as TestFileCacheConfig;
-    fileCache = await container.lookup('file-cache');
+    currentCardService = await (await container.lookup('card-service', { type: 'service' })).as(INSECURE_CONTEXT);
+    fileCacheConfig = (await container.lookup('file-cache-config', { type: 'service' })) as TestFileCacheConfig;
+    fileCache = await container.lookup('file-cache', { type: 'service' });
 
-    let si = await container.lookup('searchIndex');
+    let si = await container.lookup('searchIndex', { type: 'service' });
     await si.indexAllRealms();
   });
 

@@ -106,7 +106,7 @@ describe('/api/reservations', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('subgraph', StubSubgraph);
-    registry(this).register('relay', StubRelay);
+    registry(this).register('relay', StubRelay, { type: 'service' });
     registry(this).register('web3-http', StubWeb3);
   });
 

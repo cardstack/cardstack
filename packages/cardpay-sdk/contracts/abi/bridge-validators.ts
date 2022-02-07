@@ -179,3 +179,6 @@ export default [
     anonymous: false,
   },
 ];
+// mitigation for unexpected vs code debugger breakpoint
+function noop() {}
+noop();

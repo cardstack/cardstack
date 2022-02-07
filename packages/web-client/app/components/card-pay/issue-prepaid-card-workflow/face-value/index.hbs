@@ -14,15 +14,15 @@
           §1 SPEND = {{format-usd (spend-to-usd 1)}}
         </span>
       </p>
-      <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
+      <Boxel::Field @vertical={{true}} @label="Funding From:">
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @safe={{this.fundingSafe}}
           @token={{this.fundingToken.symbol}}
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
       {{#if @isComplete}}
-        <CardPay::LabeledValue @vertical={{true}} @label="Face Value:">
+        <Boxel::Field @vertical={{true}} @label="Face Value:">
           <CardPay::BalanceDisplay
             class="face-value-card__selected-amount-display"
             @size="large"
@@ -34,7 +34,7 @@
             @text={{concat "≈ " this.selectedFaceValue.approxTokenAmount " " this.fundingTokenSymbol "*"}}
             data-test-face-value-display
           />
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       {{else}}
         <Boxel::RadioInput
           @groupDescription="Select face value"

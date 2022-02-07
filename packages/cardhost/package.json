@@ -1,6 +1,6 @@
 {
   "name": "cardhost",
-  "version": "0.28.15",
+  "version": "0.28.17",
   "private": true,
   "description": "The standard clientside app for hosting Cardstack Cards",
   "repository": {
@@ -33,9 +33,9 @@
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.12.13",
     "@babel/plugin-transform-typescript": "^7.12.13",
-    "@cardstack/base-cards": "0.28.15",
-    "@cardstack/compiled": "0.28.15",
-    "@cardstack/core": "0.28.15",
+    "@cardstack/base-cards": "0.28.17",
+    "@cardstack/compiled": "0.28.17",
+    "@cardstack/core": "0.28.17",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^1.0.2",
     "@ember/test-helpers": "^2.2.8",
@@ -75,6 +75,7 @@
     "broccoli-source": "^3.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.3.1",
+    "date-fns": "^2.22.1",
     "ember-auto-import": "^2.2.4",
     "ember-cli": "~3.27.0",
     "ember-cli-app-version": "^5.0.0",
@@ -149,6 +150,7 @@
     "ember-href-to": "^4.1.0",
     "ember-template-compiler": "^1.9.0-alpha",
     "file-loader": "^6.2.0",
+    "lodash": "^4.17.21",
     "process": "^0.11.10"
   }
 }

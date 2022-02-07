@@ -7,25 +7,40 @@ import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
+import omit from 'lodash/omit';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
     prepaidCardPayments: {
-      prepaidCardOwner: {
+      id: string;
+      timestamp: string;
+      spendAmount: string;
+      issuingTokenAmount: string;
+      issuingTokenUSDPrice: string;
+      issuingToken: {
         id: string;
+        symbol: string;
+        name: string;
+      };
+      prepaidCard: {
+        id: string;
+        customizationDID?: string;
       };
       merchantSafe: {
         id: string;
-        infoDid: string | undefined;
+        infoDid?: string;
+      };
+      transaction: {
+        merchantFeePayments: {
+          feeCollected: string;
+          issuingToken: {
+            symbol: string;
+          };
+        }[];
       };
       merchant: {
         id: string;
       };
-      issuingToken: {
-        symbol: string;
-      };
-      issuingTokenAmount: string;
-      spendAmount: string;
     }[];
   };
 }
@@ -34,21 +49,35 @@ const { network } = config.get('web3') as { network: 'sokol' | 'xdai' };
 const prepaidCardPaymentsQuery = `
 query($txn: String!) {
   prepaidCardPayments(where: { transaction: $txn }) {
-    prepaidCardOwner {
+    id
+    timestamp
+    spendAmount
+    issuingTokenAmount
+    issuingTokenUSDPrice
+    issuingToken {
       id
+      symbol
+      name
+    }
+    prepaidCard {
+      id
+      customizationDID
     }
     merchantSafe {
       id
       infoDid
     }
+    transaction {
+      merchantFeePayments {
+        feeCollected
+        issuingToken {
+          symbol
+        }
+      }
+    }
     merchant {
       id
     }
-    issuingToken {
-      symbol
-    }
-    issuingTokenAmount
-    spendAmount
   }
 }
 `;
@@ -107,6 +136,12 @@ export default class NotifyCustomerPayment {
 
     let spendAmount = result.spendAmount;
     let notificationBody = `${merchantName} received a payment of §${spendAmount}`;
+    let notificationData = {
+      notificationType: 'customer_payment',
+      transactionInformation: JSON.stringify(omit(result, 'merchant')),
+      ownerAddress,
+      network,
+    };
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
@@ -119,6 +154,7 @@ export default class NotifyCustomerPayment {
         pushClientId,
         notificationBody,
         notificationType: 'customer_payment',
+        notificationData,
       };
       await this.workerClient.addJob('send-notifications', notification, {
         jobKey: notification.notificationId,

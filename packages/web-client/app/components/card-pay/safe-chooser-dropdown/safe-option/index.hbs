@@ -9,11 +9,18 @@
       @logoTextColor={{this.data.info.textColor}}
     />
   {{/if}}
-  <div class='safe-option__name-and-type'>
-    <span class='safe-option__name'>{{this.data.info.name}}</span>
-    {{#if this.data.type}}
-      <span class='safe-option__type'>{{this.data.type}}</span>
-    {{/if}}
-  </div>
-  <div class='safe-option__address'>{{@safe.address}}</div>
+  {{#if @showSafeId}}
+    <div class='safe-option__name-and-type'>
+      <span class='safe-option__name'>{{this.data.info.name}}</span>
+    </div>
+    <div class='safe-option__id'>{{this.data.info.id}}</div>
+  {{else}}
+    <div class='safe-option__name-and-type'>
+      <span class='safe-option__name'>{{this.data.info.name}}</span>
+      {{#if this.data.type}}
+        <span class='safe-option__type'>{{this.data.type}}</span>
+      {{/if}}
+    </div>
+    <div class='safe-option__address'>{{@safe.address}}</div>
+  {{/if}}
 </div>

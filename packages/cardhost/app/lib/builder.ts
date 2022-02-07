@@ -1,14 +1,19 @@
-import CardModel from '@cardstack/core/src/card-model';
 import {
   CompiledCard,
   Format,
   RawCard,
   Builder,
-  CardOperation,
   CardId,
+  CardModel,
+  CardComponentModule,
+  Card,
   JSONAPIDocument,
   assertDocumentDataIsResource,
+  ResourceObject,
+  Unsaved,
+  Saved,
 } from '@cardstack/core/src/interfaces';
+import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -20,6 +25,7 @@ import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
 import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
+import CardModelForBrowser from './card-model-for-browser';
 
 export const LOCAL_REALM = 'https://cardstack.local/';
 export const DEMO_REALM = 'https://demo.com/';
@@ -69,21 +75,46 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async load(url: string, format: Format): Promise<JSONAPIDocument> {
+  get realmURL(): string {
+    return this.ownRealmURL;
+  }
+
+  async load(url: string): Promise<Card> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
+    return { compiled, raw };
+  }
 
-    // TODO: reduce data shape for the given format like we do on the server
-    return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-        meta: {
-          componentModule: compiled[format].moduleName.global,
-        },
+  async loadData(url: string, format: Format): Promise<CardModel> {
+    let { compiled, raw } = await this.load(url);
+
+    let componentModule = await this.loadModule<CardComponentModule>(
+      compiled.componentInfos[format].moduleName.global
+    );
+
+    // TODO we can optimize this structure in our CardModelForBrowser now that
+    // we are not grabbing the literal JSONAPI response from the server
+    let rawServerResponse = {
+      type: 'card',
+      id: url,
+      attributes: raw.data,
+      meta: {
+        schemaModule: compiled.schemaModule.global,
+        componentModule: compiled.componentInfos[format].moduleName.global,
       },
     };
+    return new CardModelForBrowser(
+      this.cards,
+      {
+        type: 'loaded',
+        url,
+        rawServerResponse,
+        componentModule,
+        schemaModuleId: compiled.schemaModule.global,
+        format,
+      },
+      this
+    );
   }
 
   async loadForRoute(
@@ -150,7 +181,7 @@ export default class LocalRealm implements Builder {
       let definedCard = makeGloballyAddressable(
         url,
         compiledCard,
-        (local, type, src) => this.define(url, local, type, src)
+        (local, type, src, ast) => this.define(url, local, type, src, ast)
       );
       this.compiledCardCache.set(url, definedCard);
       return definedCard;
@@ -176,6 +207,58 @@ export default class LocalRealm implements Builder {
     }
   }
 
+  async create(
+    parentCardURL: string,
+    resource: ResourceObject<Unsaved>
+  ): Promise<JSONAPIDocument> {
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let id = this.generateId();
+    this.createRawCard({
+      realm: this.realmURL,
+      id,
+      data,
+      adoptsFrom: parentCardURL,
+    });
+    let url = cardURL({ realm: this.realmURL, id });
+    let { raw } = await this.load(url);
+    return {
+      data: {
+        type: 'card',
+        id: url,
+        attributes: raw.data,
+      },
+    };
+  }
+
+  async update(
+    url: string,
+    resource: ResourceObject<Saved>
+  ): Promise<JSONAPIDocument> {
+    let cardId = this.parseOwnRealmURL(url);
+    if (!cardId) {
+      throw new Error(`${url} is not in the local realm`);
+    }
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let existingRawCard = await this.getRawCard(url);
+    if (!existingRawCard) {
+      throw new Error(
+        `Tried to update a local card that doesn't exist: ${url}`
+      );
+    }
+
+    existingRawCard.data = data;
+    let { raw } = await this.load(url);
+    return {
+      data: {
+        type: 'card',
+        id: url,
+        attributes: raw.data,
+      },
+    };
+  }
+
   generateId(): string {
     let id;
     while (!id) {
@@ -185,45 +268,6 @@ export default class LocalRealm implements Builder {
       }
     }
     return id;
-  }
-
-  async send(op: CardOperation): Promise<JSONAPIDocument> {
-    if ('create' in op) {
-      let resource = op.create.payload.data;
-      assertDocumentDataIsResource(resource);
-      let data = resource.attributes;
-
-      let id = this.generateId();
-
-      this.createRawCard({
-        realm: this.ownRealmURL,
-        id,
-        data,
-        adoptsFrom: op.create.parentCardURL,
-      });
-
-      return this.load(cardURL({ realm: this.ownRealmURL, id }), 'isolated');
-    } else if ('update' in op) {
-      let { cardURL: url } = op.update;
-      let cardId = this.parseOwnRealmURL(url);
-      if (!cardId) {
-        throw new Error(`${url} is not in this realm`);
-      }
-      let resource = op.update.payload.data;
-      assertDocumentDataIsResource(resource);
-      let data = resource.attributes;
-      let existingRawCard = this.rawCards.get(cardId.id);
-      if (!existingRawCard) {
-        throw new Error(
-          `Tried to update a local card that doesn't exist: ${url}`
-        );
-      }
-
-      existingRawCard.data = data;
-      return this.load(url, 'isolated');
-    } else {
-      throw assertNever(op);
-    }
   }
 
   private inOwnRealm(card: RawCard): boolean {
@@ -301,7 +345,8 @@ export default class LocalRealm implements Builder {
     cardURL: string,
     localModule: string,
     type: string,
-    source: string
+    source: string,
+    ast: t.File | undefined
   ): string {
     let moduleIdentifier = `@cardstack/local-realm-compiled/${encodeCardURL(
       cardURL
@@ -314,7 +359,7 @@ export default class LocalRealm implements Builder {
 
     switch (type) {
       case JS_TYPE: {
-        eval(dynamicCardTransform(moduleIdentifier, source));
+        eval(dynamicCardTransform(moduleIdentifier, source, ast));
         return moduleIdentifier;
       }
       case CSS_TYPE:

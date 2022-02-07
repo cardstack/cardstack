@@ -1,23 +1,24 @@
 import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
-import { setupApplicationTest } from 'ember-qunit';
-import setupBuilder from '../helpers/setup-builder';
 import {
   ADDRESS_RAW_CARD,
   PERSON_RAW_CARD,
 } from '@cardstack/core/tests/helpers/fixtures';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { cardURL } from '@cardstack/core/src/utils';
+import { setupCardTest } from '../helpers/setup';
 
 module('Acceptance | card routing', function (hooks) {
   let personURL = cardURL(PERSON_RAW_CARD);
   let routeCardURL = `${LOCAL_REALM}my-routes`;
 
-  setupApplicationTest(hooks);
-  setupBuilder(hooks, { routingCard: routeCardURL });
+  let { createCard } = setupCardTest(hooks, {
+    type: 'application',
+    routingCard: routeCardURL,
+  });
 
   hooks.beforeEach(async function () {
-    await this.builder.createRawCard({
+    await createCard({
       id: 'my-routes',
       realm: LOCAL_REALM,
       schema: 'schema.js',
@@ -33,8 +34,8 @@ module('Acceptance | card routing', function (hooks) {
       },
     });
 
-    await this.builder.createRawCard(ADDRESS_RAW_CARD);
-    await this.builder.createRawCard(
+    await createCard(ADDRESS_RAW_CARD);
+    await createCard(
       Object.assign({ data: { name: 'Arthur' } }, PERSON_RAW_CARD)
     );
   });

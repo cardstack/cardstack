@@ -34,10 +34,8 @@ export class RawCardSerializer {
       let resource = serializeResource('compiled-metas', compiled.url, compiled, [
         'schemaModule',
         'serializer',
-        'isolated',
-        'embedded',
-        'edit',
         'deps',
+        'componentInfos',
       ]);
 
       resource.relationships ||= {};
@@ -59,7 +57,7 @@ export class RawCardSerializer {
   private includeField(parent: CompiledCard, field: Field) {
     let id = `${parent.url}/${field.name}`;
     if (!findIncluded(this.doc, { type: 'fields', id })) {
-      let resource = serializeResource('fields', id, field, ['name', { fieldType: 'type' }]);
+      let resource = serializeResource('fields', id, field, ['name', 'computed', { fieldType: 'type' }]);
       resource.relationships ||= {};
       resource.relationships.card = {
         data: this.includeCompiledMeta(field.card),

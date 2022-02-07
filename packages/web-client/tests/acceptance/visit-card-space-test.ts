@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit } from '@ember/test-helpers';
+import { currentURL, visit } from '@ember/test-helpers';
 import config from '@cardstack/web-client/config/environment';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { LocationService } from '@cardstack/web-client/services/location';
@@ -8,7 +8,7 @@ import Service from '@ember/service';
 import percySnapshot from '@percy/ember';
 
 class MockLocation extends Service implements LocationService {
-  hostname = `usernametodo.${config.cardSpaceHostnameSuffix}`;
+  hostname = `displayNametodo.${config.cardSpaceHostnameSuffix}`;
 }
 
 module('Acceptance | visit card space', function (hooks) {
@@ -22,8 +22,19 @@ module('Acceptance | visit card space', function (hooks) {
   test('renders a user’s card space', async function (assert) {
     await visit('/');
 
-    assert.dom('[data-test-card-space-username]').hasText('usernametodo');
+    assert
+      .dom('[data-test-card-space-display-name]')
+      .hasText('displayNametodo');
 
     await percySnapshot(assert);
+  });
+
+  test('redirects from other links', async function (assert) {
+    await visit('/card-pay/wallet');
+
+    assert.equal(currentURL(), '/');
+    assert
+      .dom('[data-test-card-space-display-name]')
+      .hasText('displayNametodo');
   });
 });

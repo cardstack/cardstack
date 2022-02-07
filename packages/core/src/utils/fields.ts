@@ -41,8 +41,8 @@ function buildUsedFieldListFromComponents(
 ): void {
   let field = getFieldForPath(fields, fieldPath);
 
-  if (field && field.card[format].usedFields.length) {
-    for (const nestedFieldPath of field.card[format].usedFields) {
+  if (field && field.card.componentInfos[format].usedFields.length) {
+    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
       buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
     }
   } else {
@@ -54,10 +54,7 @@ function buildUsedFieldListFromComponents(
   }
 }
 
-export function buildSerializerMapFromUsedFields(
-  fields: CompiledCard['fields'],
-  usedFields: string[]
-): SerializerMap | undefined {
+export function buildSerializerMapFromUsedFields(fields: CompiledCard['fields'], usedFields: string[]): SerializerMap {
   let map: any = {};
 
   for (const fieldPath of usedFields) {

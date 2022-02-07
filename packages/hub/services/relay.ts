@@ -57,8 +57,8 @@ export default class RelayService {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     relay: RelayService;
   }
 }

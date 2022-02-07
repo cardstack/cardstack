@@ -8,7 +8,7 @@
   height: var(--details-summary-height);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 35%);
   overflow: hidden;
   transition: height var(--boxel-transition);
 }
@@ -29,7 +29,7 @@
 .balance-view-banner__summary::marker,
 .balance-view-banner__summary::-webkit-details-marker {
   display: none;
-  content: '';
+  content: "";
 }
 
 .balance-view-banner__summary:focus {

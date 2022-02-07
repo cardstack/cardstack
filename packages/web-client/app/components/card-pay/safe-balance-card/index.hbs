@@ -13,15 +13,19 @@
       {{#if this.safe}}
         <ActionCardContainer::Section
           @title="Remaining Balance"
+          {{did-insert this.layer2Network.refreshSafesAndBalances}}
         >
           <CardPay::FieldStack>
-            <CardPay::LabeledValue
+            <Boxel::Field
               @label={{this.safeAddressLabel}}
-              @value={{this.safe.address}}
-              @isAddress={{true}}
               data-test-safe-address
-            />
-            <CardPay::LabeledValue @label={{this.safeBalanceLabel}} data-test-balance-label>
+            >
+              <CardPay::AccountDisplay
+                @address={{this.safe.address}}
+                @wrapped={{true}}
+              />
+            </Boxel::Field>
+            <Boxel::Field @label={{this.safeBalanceLabel}} data-test-balance-label>
               {{#if this.balancesToShow.length}}
                 <CardPay::BalancesList as |Balance|>
                   {{#each this.balancesToShow as |b|}}
@@ -31,7 +35,7 @@
               {{else}}
                 None
               {{/if}}
-            </CardPay::LabeledValue>
+            </Boxel::Field>
           </CardPay::FieldStack>
         </ActionCardContainer::Section>
       {{else}}

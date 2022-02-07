@@ -1,7 +1,6 @@
 import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
-import { setupApplicationTest } from 'ember-qunit';
-import setupBuilder from '../helpers/setup-builder';
+import { setupCardTest } from '../helpers/setup';
 
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
@@ -19,13 +18,12 @@ const EDIT = '[data-test-edit-button]';
 const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Editing', function (hooks) {
-  setupApplicationTest(hooks);
-  setupBuilder(hooks);
+  let { createCard } = setupCardTest(hooks, { type: 'application' });
   let personURL = cardURL(PERSON_RAW_CARD);
 
   hooks.beforeEach(async function () {
-    await this.builder.createRawCard(ADDRESS_RAW_CARD);
-    await this.builder.createRawCard(
+    await createCard(ADDRESS_RAW_CARD);
+    await createCard(
       Object.assign(
         {
           data: {
@@ -63,7 +61,9 @@ module('Acceptance | Card Editing', function (hooks) {
         'The original instance of the card is updated'
       );
 
-    let card = await this.cardService.load(personURL, 'isolated');
+    let card = await this.owner
+      .lookup('service:cards')
+      .load(personURL, 'isolated');
     assert.equal(card.data.name, 'Bob Barker', 'RawCard cache is updated');
     assert.equal(
       card.data.address.city,

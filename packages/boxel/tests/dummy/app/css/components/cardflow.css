@@ -26,7 +26,7 @@
   height: 100%;
   padding: var(--boxel-spacing) var(--boxel-spacing) 0;
   border-top-right-radius: var(--boxel-border-radius);
-  background: rgba(90, 88, 106, 0.5);
+  background: rgb(90 88 106 / 50%);
   overflow: hidden;
   z-index: 10;
 }
@@ -61,12 +61,12 @@
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
 
 .cardflow__taskbar-count {
   padding-left: 22px;
-  background: url('../../../../public/@cardstack/boxel/images/icons/task.svg') left center/15px 15px no-repeat;
+  background: url("../../../../public/@cardstack/boxel/images/icons/task.svg") left center/15px 15px no-repeat;
 }
 
 .cardflow__taskbar-label {
@@ -91,7 +91,7 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.cardflow__message-icon__profile {
+.cardflow__message-icon-profile {
   width: 40px;
   height: 40px;
   border-radius: 100px;

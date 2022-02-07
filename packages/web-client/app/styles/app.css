@@ -55,3 +55,18 @@ ol {
     transform: translateY(0);
   }
 }
+
+/**
+ * Necessary to make our dropdowns usable via keyboard
+ * They should scroll to the item that keyboard navigation has highlighted
+ * and have a visible background to show that pressing enter
+ * or space will select an item
+ */
+.ember-power-select-options {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.ember-power-select-option[aria-current="true"] {
+  background-color: #ccf0ef;
+}

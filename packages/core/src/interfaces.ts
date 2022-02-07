@@ -1,7 +1,7 @@
 import * as JSON from 'json-typescript';
 import difference from 'lodash/difference';
-import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
+import type { types as t } from '@babel/core';
 
 export { Query } from './query';
 
@@ -48,6 +48,10 @@ export interface CardId {
   id: string;
 }
 
+export type RawCardData = Record<string, any>;
+
+// RawCard represents the card "as authored". Nothing is preprocessed or
+// compiled, no other dependent data is included, no derived state is present.
 export interface RawCard<Identity extends Unsaved = Saved> {
   id: Identity;
   realm: string;
@@ -67,7 +71,7 @@ export interface RawCard<Identity extends Unsaved = Saved> {
   files?: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
-  data?: Record<string, any> | undefined;
+  data?: RawCardData | undefined;
 }
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -104,8 +108,10 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
     }
   }
 }
+
 export interface Field {
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  type: 'contains' | 'containsMany' | 'linksTo';
+  computed: boolean;
   card: CompiledCard;
   name: string;
 }
@@ -120,6 +126,9 @@ export type ModuleRef = LocalRef | GlobalRef;
 export type Saved = string;
 export type Unsaved = string | undefined;
 
+// CompiledCard is everything you need when operating at the level of code &
+// schema changes. It should not be needed just to render and edit data of
+// cards.
 export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
   url: Identity;
   realm: string;
@@ -129,15 +138,15 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   };
   schemaModule: Ref;
   serializer?: SerializerName;
-  isolated: ComponentInfo<Ref>;
-  embedded: ComponentInfo<Ref>;
-  edit: ComponentInfo<Ref>;
+
+  componentInfos: Record<Format, ComponentInfo<Ref>>;
 
   modules: Record<
     string, // local module path
     {
       type: string;
       source: string;
+      ast?: t.File;
     }
   >;
 
@@ -147,6 +156,10 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   moduleName: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
+
+  serializerMap: SerializerMap;
+
+  // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;
 
   // the URL of the card that originally defined this component, if it's not ourself
@@ -158,9 +171,55 @@ export interface Card {
   compiled: CompiledCard;
 }
 
+// This is all the thing you need to render and edit data for a card. It's not
+// enough to recompile code & schema -- for that you need CompiledCard.
+export interface CardContent {
+  // Unlike the data in RawCard, this is the fully expanded version that
+  // includes computed values and the data from linked cards.
+  data: Record<string, any>;
+
+  schemaModule: string;
+  componentModule: string;
+  usedFields: string[];
+
+  format: Format;
+  url: string;
+}
+
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
+}
+
+export interface CardModel {
+  setters: Setter | undefined;
+  adoptIntoRealm(realm: string, id?: string): Promise<CardModel>;
+  editable(): Promise<CardModel>;
+  url: string;
+  id: string | undefined;
+  data: Record<string, any>;
+  getField(name: string): Promise<any>;
+  format: Format;
+  setData(data: RawCardData): void;
+  serialize(): ResourceObject<Saved | Unsaved>;
+  component(): Promise<unknown>;
+  usedFields: ComponentInfo['usedFields'];
+  save(): Promise<void>;
+}
+
+export interface CardSchemaModule {
+  default: {
+    new (fieldGetter: (fieldPath: string) => any): unknown;
+  };
+}
+
+export interface CardComponentModule {
+  default: unknown;
+  getCardModelOptions(): {
+    serializerMap: SerializerMap;
+    computedFields: string[];
+    usedFields: string[];
+  };
 }
 
 export interface RealmConfig {
@@ -193,31 +252,7 @@ export function assertDocumentDataIsResource<Identity extends Saved | Unsaved = 
 export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   id: Identity;
   type: string;
-  attributes?: JSON.Object;
+  attributes?: JSON.Object | undefined;
   relationships?: JSON.Object;
   meta?: JSON.Object;
-}
-
-export type CardOperation =
-  | {
-      create: {
-        targetRealm: string;
-        parentCardURL: string;
-        payload: JSONAPIDocument<Unsaved>;
-      };
-    }
-  | {
-      update: {
-        cardURL: string;
-        payload: JSONAPIDocument;
-      };
-    };
-
-// this is the set of environment-specific capabilities a CardModel gets access
-// to
-export interface CardEnv {
-  load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<JSONAPIDocument>;
-  prepareComponent(cardModel: CardModel, component: unknown): unknown;
-  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
 }

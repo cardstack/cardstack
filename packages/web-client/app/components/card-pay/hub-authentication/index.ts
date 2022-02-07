@@ -5,6 +5,7 @@ import { race, rawTimeout, task, TaskGenerator } from 'ember-concurrency';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { tracked } from '@glimmer/tracking';
 import config from '@cardstack/web-client/config/environment';
+import { action } from '@ember/object';
 
 interface CardPayWorkflowHubAuthComponentArgs {
   onComplete: () => void;
@@ -18,7 +19,13 @@ export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWo
   @service declare hubAuthentication: HubAuthentication;
   @tracked error?: Error;
   @tracked authTaskRunningForAWhile = false;
-  supportURL = config.urls.discordSupportChannelUrl;
+  mailToSupportUrl = config.urls.mailToSupportUrl;
+
+  @action checkIfAuthenticated() {
+    if (this.hubAuthentication.isAuthenticated) {
+      this.args.onComplete();
+    }
+  }
 
   @task *authenticationTask(): TaskGenerator<void> {
     try {
@@ -47,7 +54,7 @@ export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWo
   get authState() {
     if (taskFor(this.authenticationTask).isRunning) {
       return 'in-progress';
-    } else if (this.args.isComplete) {
+    } else if (this.args.isComplete || this.hubAuthentication.isAuthenticated) {
       return 'memorialized';
     } else {
       return 'default';

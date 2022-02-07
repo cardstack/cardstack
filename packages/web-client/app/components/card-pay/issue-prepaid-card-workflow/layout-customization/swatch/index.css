@@ -11,7 +11,7 @@
 .layout-customization__swatch {
   width: var(--swatch-width);
   height: var(--swatch-height);
-  border: 1px inset rgba(0, 0, 0, 0.25);
+  border: 1px inset rgb(0 0 0 / 25%);
   border-radius: 5px;
   background-size: contain;
   background: var(--swatch-background); /* stylelint-disable-line declaration-block-no-shorthand-property-overrides */

@@ -26,6 +26,10 @@ You will need the following things properly installed on your computer.
 
 Note that you will have to run the hub for some functionality of this app, see [the hub README](../hub/README.md#running).
 
+To develop the Card Space user page locally, you should:
+1. Add `app.card.space.test` to your `/etc/hosts` as an alias of localhost
+2. Visit `app.card.space.test:4200?card-space-id=${cardSpaceId}` to simulate visiting a card space with that id
+
 ### Required environment variables
 Connecting to the Kovan Testnet with WalletConnect requires an Infura project id. This should be specified in a `.env` file in this package's root as:
 ```

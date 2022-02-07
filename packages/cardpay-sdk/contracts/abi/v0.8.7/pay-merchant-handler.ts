@@ -364,3 +364,7 @@ export default [
     type: 'function',
   },
 ];
+
+// mitigation for unexpected vs code debugger breakpoint
+function noop() {}
+noop();

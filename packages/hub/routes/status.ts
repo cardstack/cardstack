@@ -76,8 +76,8 @@ export default class StatusRoute {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'status-route': StatusRoute;
+declare module '@cardstack/hub/routes' {
+  interface KnownRoutes {
+    status: StatusRoute;
   }
 }

@@ -5,9 +5,8 @@ import type RouterService from '@ember/routing/router-service';
 
 import { task } from 'ember-concurrency';
 
-import CardModel from '@cardstack/core/src/card-model';
 import CardsService from './cards';
-import { Format } from '@cardstack/core/src/interfaces';
+import { Format, CardModel } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
 
 type State =
@@ -20,7 +19,7 @@ type State =
   | {
       name: 'loaded';
       loadedCard: CardModel;
-      format: Format;
+      component: unknown;
     };
 
 export default class Modal extends Service {
@@ -43,6 +42,7 @@ export default class Modal extends Service {
     }
     return;
   }
+
   get cardComponent(): unknown {
     return this.card?.component;
   }
@@ -59,18 +59,18 @@ export default class Modal extends Service {
     this.state = {
       name: 'loaded',
       loadedCard,
-      format,
+      component: await loadedCard.component(),
     };
   }
 
   @task async newCardTask(parentCard: CardModel, realm: string) {
     this.state = { name: 'loading' };
     let editableParent = await parentCard.editable();
-    let loadedCard = editableParent.adoptIntoRealm(realm);
+    let loadedCard = await editableParent.adoptIntoRealm(realm);
     this.state = {
       name: 'loaded',
       loadedCard,
-      format: 'edit',
+      component: await loadedCard.component(),
     };
   }
 
@@ -80,7 +80,7 @@ export default class Modal extends Service {
     this.state = {
       name: 'loaded',
       loadedCard,
-      format: 'edit',
+      component: await loadedCard.component(),
     };
   }
 

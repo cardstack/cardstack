@@ -38,7 +38,10 @@ module(
 
       await click(`[data-test-button-text-option]:nth-child(2)`);
 
-      assert.equal(workflowSession.getValue<string>('buttonText'), OPTIONS[1]);
+      assert.equal(
+        workflowSession.getValue<string>('profileButtonText'),
+        OPTIONS[1]
+      );
       assert
         .dom('[data-test-button-text-option]:nth-child(2) input')
         .isChecked();
@@ -47,7 +50,7 @@ module(
     test('it restores input from session', async function (this: Context, assert) {
       let workflowSession = new WorkflowSession();
       this.set('workflowSession', workflowSession);
-      workflowSession.setValue('buttonText', OPTIONS[1]);
+      workflowSession.setValue('profileButtonText', OPTIONS[1]);
 
       await render(hbs`
         <CardSpace::EditDetails::ButtonText

@@ -4,40 +4,16 @@ import { setupHub } from '../helpers/server';
 describe('CardSpaceValidator', function () {
   let { getContainer } = setupHub(this);
 
-  let invalidUrls = [
-    'www.card.space',
-    'ščž.card.space',
-    '😂.card.space',
-    'satoshi.card.race',
-    'test',
-    'satoshi.nakamoto.card.space',
-    '.card.space',
-    'ftp.card.space',
-    'cardstack.card.space',
-    'christse.card.space',
-    'fuck.card.space',
-  ];
-
-  invalidUrls.forEach(async (url) => {
-    it(`should validate ${url}`, async function () {
-      let subject = await getContainer().lookup('card-space-validator');
-      let errors = await subject.validate({ url } as CardSpace);
-      expect(errors.url).to.have.length.above(0);
-    });
-  });
-
   it('validates urls', async function () {
     let subject = await getContainer().lookup('card-space-validator');
 
     const cardSpace: CardSpace = {
       id: '',
-      url: 'invalid',
       profileImageUrl: 'invalid',
       profileCoverImageUrl: 'invalid',
     };
 
     let errors = await subject.validate(cardSpace);
-    expect(errors.url).deep.equal(['URL is not valid']);
     expect(errors.profileImageUrl).deep.equal(['Invalid URL']);
     expect(errors.profileCoverImageUrl).deep.equal(['Invalid URL']);
   });
@@ -47,7 +23,6 @@ describe('CardSpaceValidator', function () {
 
     const cardSpace: CardSpace = {
       id: '',
-      url: 'mike.card.space',
       profileName: 'long string'.repeat(100),
       profileDescription: 'long string'.repeat(100),
       profileButtonText: 'long string'.repeat(100),
@@ -79,14 +54,13 @@ describe('CardSpaceValidator', function () {
     } as CardSpace;
 
     let errors = await subject.validate(cardSpace);
-    expect(errors.profileName).deep.equal(['Username is not allowed']);
+    expect(errors.profileName).deep.equal(['Display name is not allowed']);
   });
 
   it('validates links', async function () {
     let subject = await getContainer().lookup('card-space-validator');
     const cardSpace: CardSpace = {
       id: '',
-      url: 'mike.card.space',
       links: [
         { title: '', url: 'sth' },
         { title: 'My Twitter', url: 'https://twitter.com/x' },

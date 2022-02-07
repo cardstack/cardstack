@@ -18,7 +18,7 @@
 
 .image-editor__error-overlay {
   position: absolute;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgb(0 0 0 / 75%);
   color: white;
   display: flex;
   width: 100%;

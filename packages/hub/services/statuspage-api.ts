@@ -17,7 +17,7 @@ let pageId = config.get('statuspage.pageId');
 let apiKey = config.get('statuspage.apiKey');
 
 export default class StatuspageApi {
-  async createIncident(componentName: string, name: string) {
+  async createIncident(componentName: string, name: string, body: string) {
     let componentId = await this.getComponentId(componentName);
     let unresolvedIncidents = await this.getUnresolvedIncidents();
     let relatedIncident = this.findIncidentByComponentId(unresolvedIncidents, componentId);
@@ -29,6 +29,7 @@ export default class StatuspageApi {
     return await this.request(`/pages/${pageId}/incidents`, 'POST', {
       incident: {
         name,
+        body,
         impact: 'minor',
         status: 'investigating',
         components: { [componentId]: 'partial_outage' }, // Will update individual components' status
