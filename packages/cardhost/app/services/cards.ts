@@ -29,7 +29,7 @@ export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      return await builder.loadCardModel(url, format);
+      return await builder.loadData(url, format);
     }
     let serverResponse = await fetchJSON<JSONAPIDocument>(
       this.buildCardURL({ url, query: { format } })

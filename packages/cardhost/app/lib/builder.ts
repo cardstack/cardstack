@@ -74,14 +74,14 @@ export default class LocalRealm implements Builder {
     return this.ownRealmURL;
   }
 
-  async loadCard(url: string): Promise<Card> {
+  async load(url: string): Promise<Card> {
     let compiled = await this.getCompiledCard(url);
     let raw = await this.getRawCard(url);
     return { compiled, raw };
   }
 
-  async loadCardModel(url: string, format: Format): Promise<CardModel> {
-    let { compiled, raw } = await this.loadCard(url);
+  async loadData(url: string, format: Format): Promise<CardModel> {
+    let { compiled, raw } = await this.load(url);
 
     let component = await this.loadModule<CardComponentModule>(
       compiled.componentInfos[format].moduleName.global

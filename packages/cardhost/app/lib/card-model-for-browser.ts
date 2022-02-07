@@ -414,7 +414,7 @@ export default class CardModelForBrowser implements CardModel {
         `cannot loadFromLocalRealm() for card model without local realm`
       );
     }
-    let { raw } = await this.localRealm.loadCard(url);
+    let { raw } = await this.localRealm.load(url);
     return {
       data: {
         type: 'card',
