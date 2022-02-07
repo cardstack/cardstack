@@ -143,6 +143,8 @@
     "stylelint-config-standard": "^24.0.0",
     "svgo": "1.3.0",
     "svgo-unique-id": "^1.0.0",
+    "testem": "^3.6.0",
+    "testem-multi-reporter": "^1.2.0",
     "uuid": "^8.3.2",
     "web3": "1.5.2",
     "web3-eth-contract": "1.5.2",
