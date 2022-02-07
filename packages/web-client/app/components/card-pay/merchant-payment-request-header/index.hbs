@@ -15,12 +15,12 @@
   <div class="merchant-payment-request-header__links-container">
     <ul class="merchant-payment-request-header__links">
       <li>
-        <a href={{this.aboutURL}}>
+        <a href={{config 'urls.about'}}>
           About
         </a>
       </li>
       <li>
-        <a href={{this.mailToSupportUrl}}>
+        <a href={{config 'urls.mailToSupportUrl'}}>
           Help
         </a>
       </li>
@@ -34,10 +34,10 @@
       @onClose={{fn (mut this.hamburgerMenuOpen) false}}
     >
       <:body as |MenuItem|>
-        <MenuItem @url={{this.aboutURL}}>
+        <MenuItem @url={{config 'urls.aboutURL'}}>
           About
         </MenuItem>
-        <MenuItem @url={{this.mailToSupportUrl}}>
+        <MenuItem @url={{config 'urls.mailToSupportUrl'}}>
           Help
         </MenuItem>
       </:body>
