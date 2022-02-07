@@ -1,17 +1,20 @@
-import typer
 import json
+import sys
 from pathlib import Path
 
-from .programs.usage import UsageRewardProgram
-from .payment_tree import PaymentTree, Payment
 import pyarrow.parquet as pq
+import typer
+
+from .payment_tree import Payment, PaymentTree
+from .programs.usage import UsageRewardProgram
+
 
 def run_reward_program(
     parameters_file: str = typer.Option(
-        default="/input/parameters.json", help="The parameters file to use"
+        default="./input/parameters.json", help="The parameters file to use"
     ),
     output_location: str = typer.Option(
-        default="/output", help="The directory to write the results to"
+        default="./output", help="The directory to write the results to"
     ),
 ):
     """

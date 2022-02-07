@@ -1,13 +1,13 @@
+import json
+import shutil
 from os import environ
 from tempfile import TemporaryDirectory
 from typing import Any
-from cloudpathlib import AnyPath, CloudPath
-import shutil
-import json
-import boto3
-import typer
 
+import boto3
 import docker
+import typer
+from cloudpathlib import AnyPath, CloudPath
 
 client = docker.from_env()
 
@@ -48,7 +48,6 @@ def run_all(output_location: str, max_block: int = 24589499):
     output_location = AnyPath(output_location)
     for program in get_programs():
         rule = get_rule(program)
-        print(rule)
         for payment_cycle in range(
             rule["core"]["valid_from"],
             min(rule["core"]["valid_to"], max_block),
