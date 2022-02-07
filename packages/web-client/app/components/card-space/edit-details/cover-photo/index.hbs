@@ -8,7 +8,7 @@
     @image={{this.coverImage}}
     @cta="Select a Photo"
     @imageRequirements="Images must be in jpg or png format and max 1MB in size"
-    @acceptedFileTypes=this.acceptedFileTypes
+    @acceptedFileTypes={{this.acceptedFileTypes}}
     @onUpload={{this.onUpload}}
     @onError={{this.logUploadError}}
     @onRemoveImage={{this.onImageRemoved}}
