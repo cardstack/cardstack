@@ -28,6 +28,8 @@ const config = {
 };
 
 if (process.env.CI) {
+  fs.mkdirSync('test-results');
+
   const reporters = [
     {
       ReporterClass: TapReporter,
