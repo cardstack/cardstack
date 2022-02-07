@@ -4,7 +4,6 @@ import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.s
 import CardstackLogo from '../../../images/icons/cardstack.svg';
 import CardstackMobileAppPhone from '../../../images/cardstack-mobile-app-phone.png';
 import CardstackMobileAppPhone2x from '../../../images/cardstack-mobile-app-phone@2x.png';
-import config from '@cardstack/web-client/config/environment';
 import { inject as service } from '@ember/service';
 import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
@@ -26,7 +25,6 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   cardstackLogo = CardstackLogo;
   cardstackMobileAppPhone = CardstackMobileAppPhone;
   cardstackMobileAppPhone2x = CardstackMobileAppPhone2x;
-  testFlightLink = config.urls.testFlightLink;
 
   @reads('layer2Network.isConnected') declare isConnected: boolean;
   constructor(owner: unknown, args: CardPayLayerTwoConnectCardComponentArgs) {
