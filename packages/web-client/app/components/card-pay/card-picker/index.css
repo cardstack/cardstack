@@ -23,7 +23,7 @@
   min-height: var(--default-field-height);
   width: var(--default-field-width);
   padding: var(--boxel-sp-xs) var(--boxel-sp);
-  background: url('/images/icons/caret-dropdown.svg') right 1.125rem center/auto 0.5rem no-repeat;
+  background: url("/images/icons/caret-dropdown.svg") right 1.125rem center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius);
@@ -47,9 +47,9 @@
   width: var(--default-field-width);
   max-height: var(--options-menu-height);
   background-color: var(--boxel-light);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgb(0 0 0 / 15%);
   border-radius: var(--boxel-border-radius);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
   overflow-y: auto;
 }
 
@@ -63,14 +63,14 @@
 
 .card-picker-dropdown__option {
   padding: var(--boxel-sp) var(--boxel-sp-xxxl);
-  background-image: url('/@cardstack/boxel/images/icons/icon-circle-light.svg');
+  background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
   background-repeat: no-repeat;
   background-position: left var(--boxel-sp) top var(--boxel-sp-xxl);
   background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
 }
 
 .card-picker-dropdown__option--selected {
-  background-image: url('/@cardstack/boxel/images/icons/success-bordered.svg');
+  background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
 }
 
 .ember-power-select-selected-item .card-picker-dropdown__option--selected {

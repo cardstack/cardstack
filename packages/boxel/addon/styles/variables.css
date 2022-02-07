@@ -1,6 +1,6 @@
 :root {
-  --boxel-font-family: 'Open Sans', helvetica, arial, sans-serif;
-  --boxel-monospace-font-family: 'Roboto Mono', 'Courier New', courier, monospace;
+  --boxel-font-family: "Open Sans", helvetica, arial, sans-serif;
+  --boxel-monospace-font-family: "Roboto Mono", "Courier New", courier, monospace;
   --boxel-font-xl: var(--boxel-font-size-xl)/calc(43 / 32) var(--boxel-font-family);
   --boxel-font-lg: var(--boxel-font-size-lg)/calc(30 / 22) var(--boxel-font-family);
   --boxel-font: var(--boxel-font-size)/calc(22 / 16) var(--boxel-font-family);        /* default */
@@ -50,8 +50,8 @@
   --boxel-border-radius-sm: 5px;
   --boxel-border-radius: 10px;
   --boxel-transition: 0.2s ease;
-  --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
+  --boxel-box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  --boxel-box-shadow-hover: 0 3px 10px rgb(0 0 0 / 15%);
   --boxel-outline-color: var(--boxel-blue);
   --boxel-outline: 2px solid var(--boxel-outline-color);
 

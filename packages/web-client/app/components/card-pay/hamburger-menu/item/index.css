@@ -1,5 +1,6 @@
 .hamburger-menu__item {
-  /* setting padding here first because in the future we may need to use the sides of these menu items to indicate which is the current selection */
+  /* setting padding here first because in the future we may need to use the sides of
+     these menu items to indicate which is the current selection */
   height: 2.5rem;
   padding: 0 var(--hamburger-menu-padding);
   flex-shrink: 0;

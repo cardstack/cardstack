@@ -154,7 +154,7 @@ td:last-of-type .embedded-collection-table__highlight.boxel-highlight--on {
 
 .embedded-collection-table__footer td.is-first-column .et-cell-content::before,
 .embedded-collection-table__footer td.ember-table__text-align-right:not(.is-first-column)::before {
-  content: 'Total';
+  content: "Total";
   display: inline-block;
   margin-right: 10px;
   font: var(--boxel-font-xs);
@@ -167,5 +167,5 @@ td:last-of-type .embedded-collection-table__highlight.boxel-highlight--on {
 }
 
 .embedded-collection-table__footer td.is-first-column .et-cell-content::before {
-  content: 'Count';
+  content: "Count";
 }

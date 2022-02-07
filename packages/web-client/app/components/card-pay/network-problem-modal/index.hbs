@@ -31,7 +31,7 @@
       </div>
       <div>
         <Boxel::Button @kind="primary" {{on "click" (optional @action)}} data-test-network-problem-modal-action>{{@actionText}}</Boxel::Button>
-        <Boxel::Button @kind="secondary" {{on "click" this.openDiscord}}>Contact Cardstack Support</Boxel::Button>
+        <Boxel::Button @kind="secondary" @as="anchor" @href={{this.mailToSupportUrl}}>Contact Cardstack Support</Boxel::Button>
       </div>
     </Boxel::CardContainer>
   </div>

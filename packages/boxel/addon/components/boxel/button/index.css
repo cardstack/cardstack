@@ -1,5 +1,5 @@
-@import './kind-variants.css';
-@import './size-variants.css';
+@import "./kind-variants.css";
+@import "./size-variants.css";
 
 /**
  * This file provides base styles for a button, and an interface to accept variables defined in

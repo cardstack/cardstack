@@ -9,7 +9,7 @@ import { inject } from '@cardstack/di';
 import logger from '@cardstack/logger';
 const log = logger('hub/contract-subscription-event-handler');
 
-const CONTRACT_EVENTS = [
+export const CONTRACT_EVENTS = [
   {
     abiName: 'pay-merchant-handler',
     contractName: 'payMerchantHandler' as AddressKeys,

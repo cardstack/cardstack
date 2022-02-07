@@ -23,7 +23,7 @@
   height: calc(var(--profile-card-height));
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 20%);
   background: var(--boxel-light);
 }
 

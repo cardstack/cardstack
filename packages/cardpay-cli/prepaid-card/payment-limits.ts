@@ -1,11 +1,15 @@
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
-import { Arguments, CommandModule } from 'yargs';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { Arguments, Argv, CommandModule } from 'yargs';
 
 export default {
   command: 'payment-limits',
   describe: 'Get the minimum and maximum prepaid card payment limits in SPEND',
-  builder: {},
+  builder(yargs: Argv) {
+    return yargs.options({
+      network: NETWORK_OPTION_LAYER_2,
+    });
+  },
   async handler(args: Arguments) {
     let { network, mnemonic } = args as unknown as {
       network: string;

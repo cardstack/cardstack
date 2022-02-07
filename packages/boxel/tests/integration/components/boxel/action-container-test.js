@@ -86,7 +86,7 @@ module('Integration | Component | ActionContainer', function (hooks) {
         <div>
           <Boxel::Field
             @label="Full Name"
-            @fieldMode={{if this.isComplete "view" "edit"}}
+            @tag={{if this.isComplete "div" "label"}}
           >
             {{# if this.isComplete}}
               <span data-test-action-container-test-value>Gary Walker</span>

@@ -30,11 +30,15 @@ export default class PushNotificationRegistrationQueries {
     });
   }
 
-  async insert(model: PushNotificationRegistration) {
+  async upsert(model: PushNotificationRegistration) {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO push_notification_registrations (id, owner_address, push_client_id, disabled_at) VALUES($1, $2, $3, $4)',
+      `INSERT INTO push_notification_registrations (id, owner_address, push_client_id, disabled_at)
+      VALUES($1, $2, $3, $4)
+      ON CONFLICT (owner_address, push_client_id)
+      DO UPDATE SET disabled_at = EXCLUDED.disabled_at;
+    `,
       [model.id, model.ownerAddress, model.pushClientId, model.disabledAt]
     );
   }

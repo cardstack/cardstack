@@ -1,35 +1,28 @@
 <Freestyle::Usage @name="Field">
   <:example>
     <Boxel::Field
+      @tag={{this.tag}}
       @label={{this.label}}
-      @labelClass={{this.labelClass}}
-      @fieldMode={{this.mode}}
       @fieldId={{this.id}}
-      style={{css-var boxel-field-label-width=this.labelWidth}}
+      @vertical={{this.vertical}}
+      @horizontalLabelSize={{this.horizontalLabelSize}}
+      @icon={{this.icon}}
     >
-      {{#if (eq this.mode "edit")}}
-        <Boxel::Input
-          @value={{this.value}}
-          @required={{true}}
-        />
-      {{else}}
-        {{this.value}}
-      {{/if}}
+      {{this.value}}
     </Boxel::Field>
   </:example>
 
   <:api as |Args|>
     <Args.String
-      @name="fieldMode"
-      @description="field mode"
-      @value={{this.mode}}
-      @options={{w "view edit"}}
-      @defaultValue="view"
-      @onInput={{fn (mut this.mode)}}
+      @name="tag"
+      @description="html tag to use for the field (ie. use 'label' tag if this is an input/textarea field)"
+      @defaultValue="div"
+      @value={{this.tag}}
+      @onInput={{fn (mut this.tag)}}
     />
     <Args.String
       @name="fieldId"
-      @description="optional field id"
+      @description="field id"
       @value={{this.id}}
       @onInput={{fn (mut this.id)}}
     />
@@ -40,19 +33,39 @@
       @onInput={{fn (mut this.label)}}
     />
     <Args.String
-      @name="labelClass"
-      @description="optional css class name for the field label"
-      @value={{this.labelClass}}
-      @onInput={{fn (mut this.labelClass)}}
+      @name="icon"
+      @description="icon name"
+      @value={{this.icon}}
+      @onInput={{fn (mut this.icon)}}
+    />
+    <Args.Bool
+      @name="vertical"
+      @description="Whether the field should be displayed vertically"
+      @defaultValue="false"
+      @onInput={{fn (mut this.vertical)}}
+      @value={{this.vertical}}
     />
     <Args.String
-      @name="--boxel-field-label-width"
-      @description="css variable for the width of the label column"
-      @value={{this.labelWidth}}
-      @onInput={{fn (mut this.labelWidth)}}
+      @name="horizontalLabelSize"
+      @description="Width of the label column (only applies to horizontal layout)"
+      @options={{array "small" "default"}}
+      @defaultValue="minmax(4rem, 25%)"
+      @onInput={{fn (mut this.horizontalLabelSize)}}
+      @value={{this.horizontalLabelSize}}
     />
     <Args.Yield
       @description="Yield value or form field"
     />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Usage with input or textarea">
+  <:example>
+    <Boxel::Field
+      @tag="label"
+      @label="Name"
+    >
+      <Boxel::Input />
+    </Boxel::Field>
+  </:example>
 </Freestyle::Usage>

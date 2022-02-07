@@ -18,6 +18,7 @@ if (process.env.COMPILER) {
 
             export default class Bio {
               @contains(string) short;
+              @contains(string) favoriteColor;
             }
           `,
         },
@@ -67,6 +68,7 @@ if (process.env.COMPILER) {
           lastName: 'Faulkner',
           aboutMe: {
             short: 'son of Ed',
+            favoriteColor: 'blue',
           },
         },
       });
@@ -82,14 +84,14 @@ if (process.env.COMPILER) {
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
-    it.skip('can access a composite field', async function () {
+    it('can access a composite field', async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
-
-      // what actually is returned here? since it's a contained card it probably
-      // is not a CardModel--maybe it's a POJO of all the usedFields that are in
-      // the contained card? since aboutMe.short is a used field does that imply
-      // that aboutMe is a used field?
-      expect(await card.getField('aboutMe')).to.deep.equal({ short: 'son of Ed' });
+      expect(await card.getField('aboutMe')).to.deep.equal({
+        short: 'son of Ed',
+        // note that this loads all the fields of aboutMe, including ones that
+        // are not used by the Person template
+        favoriteColor: 'blue',
+      });
     });
 
     // we can use the field meta short cut here to just return raw data without

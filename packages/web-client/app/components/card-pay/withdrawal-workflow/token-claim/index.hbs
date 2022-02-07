@@ -20,8 +20,8 @@
       />
     </div>
     {{#if this.errorMessage}}
-      <CardPay::ErrorMessage as |supportURL|>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      <CardPay::ErrorMessage as |mailToSupportUrl|>
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
       </CardPay::ErrorMessage>
     {{/if}}
     <div class="token-claim__footnote">

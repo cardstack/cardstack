@@ -1,13 +1,5 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import {
-  CompiledCard,
-  ComponentInfo,
-  Format,
-  FORMATS,
-  ModuleRef,
-  RawCard,
-  Unsaved,
-} from '@cardstack/core/src/interfaces';
+import { CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -304,7 +296,7 @@ class IndexerRun implements IndexerHandle {
       deps: param([...compiler.dependencies]),
 
       schemaModule: param(compiledCard.schemaModule.global),
-      componentInfos: param(getComponentModules(compiledCard)),
+      componentInfos: param(compiledCard.componentInfos as Record<Format, any>),
     });
 
     await this.db.query(expressionToSql(expression));
@@ -353,7 +345,7 @@ class IndexerRun implements IndexerHandle {
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
-            param(getComponentModules(compiled)),
+            param(compiled.componentInfos as Record<Format, any>),
           ],
           (p, i, all) => (i === all.length - 1 ? [p] : [p, ',']) // add commas in
         ) as (string | Param)[]),
@@ -444,21 +436,6 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
   return result;
 }
 
-function getComponentModules(card: CompiledCard): Record<string, any> {
-  let infos: [Format, ComponentInfo][] = [];
-  for (const format of FORMATS) {
-    infos.push([
-      format,
-      {
-        moduleName: card[format].moduleName,
-        usedFields: card[format].usedFields,
-        serializerMap: card[format].serializerMap,
-      },
-    ]);
-  }
-  return Object.fromEntries(infos);
-}
-
 function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): CompiledCard {
   return {
     url,
@@ -467,9 +444,7 @@ function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): Co
     fields: compiled.fields,
     schemaModule: compiled.schemaModule,
     serializer: compiled.serializer,
-    isolated: compiled.isolated,
-    embedded: compiled.embedded,
-    edit: compiled.edit,
+    componentInfos: compiled.componentInfos,
     modules: compiled.modules,
     deps: [...compiled.deps, compiled.url],
   };

@@ -33,9 +33,9 @@
   padding: 60px 30px 50px 70px;
   display: grid;
   grid-template:
-    'img title' 2fr
-    'img artist' 1fr
-    'img details' 1fr / minmax(160px, 260px) 1fr;
+    "img title" 2fr
+    "img artist" 1fr
+    "img details" 1fr / minmax(160px, 260px) 1fr;
   gap: 0 30px;
   backdrop-filter: brightness(0.75) blur(50px) contrast(1.2);
   border-radius: 10px 10px 0 0;
@@ -47,7 +47,7 @@
   position: relative;
   height: 0;
   padding-top: 100%;
-  background-image: url('../../../../../public/@cardstack/boxel/images/placeholders/album_art.svg');
+  background-image: url("../../../../../public/@cardstack/boxel/images/placeholders/album_art.svg");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -55,7 +55,7 @@
 }
 
 .item__play-btn {
-  --icon-color: rgba(0, 0, 0, 0.5);
+  --icon-color: rgb(0 0 0 / 50%);
   --icon-border: var(--boxel-light);
   --icon-button-height: 100%;
   --icon-button-width: 100%;
@@ -136,7 +136,7 @@
   text-align: right;
 }
 
-.sidebar-related-card__count__number {
+.sidebar-related-card__count-number {
   font: var(--boxel-font);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp-lg);

@@ -56,35 +56,8 @@
 }
 
 .card-pay-dashboard__wallet-badges {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
   margin-top: var(--boxel-sp-lg);
   margin-bottom: var(--boxel-sp-xl);
-}
-
-.card-pay-dashboard__wallet-badges > div {
-  flex-basis: 50%;
-  height: 3.6rem;
-}
-
-.card-pay-dashboard__wallet-badges > div:last-child {
-  text-align: center;
-}
-
-.card-pay-dashboard__wallet-badges img {
-  height: 2.8rem;
-  object-fit: contain;
-}
-
-.card-pay-dashboard__wallet-badges-google-play-badge {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.card-pay-dashboard__wallet-badges-google-play-soon {
-  font-size: var(--boxel-font-size-xs);
-  text-align: center;
 }
 
 .card-pay-dashboard__wallet-purchase-card-phone {

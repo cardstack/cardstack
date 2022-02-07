@@ -17,7 +17,6 @@ import {
   ComponentInfo,
   FEATURE_NAMES,
   Format,
-  FORMATS,
   GlobalRef,
   LocalRef,
   ModuleRef,
@@ -102,8 +101,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
-    let components = await this.prepareComponents(cardSource, fields, parentCard, modules);
-
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
       if (unexpectedFields.length) {
@@ -118,7 +115,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       schemaModule,
       fields,
       adoptsFrom: parentCard,
-      ...components,
+      componentInfos: await this.prepareComponents(cardSource, fields, parentCard, modules),
       modules,
       deps: [...this.dependencies],
     };
@@ -286,12 +283,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ) {
-    let components: Partial<Pick<CompiledCard<Unsaved, ModuleRef>, Format>> = {};
-    for (const format of FORMATS) {
-      components[format] = await this.prepareComponent(cardSource, fields, parentCard, format, modules);
-    }
-    return components as Pick<CompiledCard, Format>;
+  ): Promise<CompiledCard<Unsaved, ModuleRef>['componentInfos']> {
+    return {
+      isolated: await this.prepareComponent(cardSource, fields, parentCard, 'isolated', modules),
+      embedded: await this.prepareComponent(cardSource, fields, parentCard, 'embedded', modules),
+      edit: await this.prepareComponent(cardSource, fields, parentCard, 'edit', modules),
+    };
   }
 
   private async prepareComponent(
@@ -309,7 +306,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new CardstackError(`card doesn't have a ${which} component OR a parent card. This is not right.`);
       }
 
-      let componentInfo = parentCard[which];
+      let componentInfo = parentCard.componentInfos[which];
       let inheritedFrom = componentInfo.inheritedFrom ?? parentCard.url;
       componentInfo = {
         ...componentInfo,
@@ -339,7 +336,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       } else {
         // directly reuse existing parent component because we didn't extend
         // anything
-        let componentInfo = parentCard[which];
+        let componentInfo = parentCard.componentInfos[which];
         if (!componentInfo.inheritedFrom) {
           componentInfo = {
             ...componentInfo,
@@ -474,9 +471,11 @@ export function makeGloballyAddressable(
     fields: card.fields,
     schemaModule: ensureGlobal(card.schemaModule),
     serializer: card.serializer,
-    isolated: ensureGlobalComponentInfo(card.isolated),
-    embedded: ensureGlobalComponentInfo(card.embedded),
-    edit: ensureGlobalComponentInfo(card.edit),
+    componentInfos: {
+      isolated: ensureGlobalComponentInfo(card.componentInfos.isolated),
+      embedded: ensureGlobalComponentInfo(card.componentInfos.embedded),
+      edit: ensureGlobalComponentInfo(card.componentInfos.edit),
+    },
     modules: card.modules,
     deps: card.deps,
   };

@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_1 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 const { toWei } = Web3.utils;
@@ -21,6 +21,9 @@ export default {
       .positional('receiver', {
         description: 'Layer 2 address to be the owner of L2 safe, defaults to same as L1 address',
         type: 'string',
+      })
+      .options({
+        network: NETWORK_OPTION_LAYER_1,
       });
   },
   async handler(args: Arguments) {

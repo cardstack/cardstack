@@ -21,18 +21,18 @@
       data-test-layer-1-wallet-summary
     >
       <CardPay::FieldStack>
-        <CardPay::LabeledValue
-          @label="Network"
-          @value={{network-display-info "layer1" "fullName"}}
-        />
+        <Boxel::Field @label="Network">
+          {{network-display-info "layer1" "fullName"}}
+        </Boxel::Field>
 
         {{#if this.isConnected}}
-          <CardPay::LabeledValue
-            @label="Address"
-            @value={{this.layer1Network.walletInfo.firstAddress}}
-            @isAddress={{true}}
-          />
-          <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
+          <Boxel::Field @label="Address">
+            <CardPay::AccountDisplay
+              @address={{this.layer1Network.walletInfo.firstAddress}}
+              @wrapped={{true}}
+            />
+          </Boxel::Field>
+          <Boxel::Field @label="Balance*" data-test-balance-container>
             {{#if this.balancesToShow.length}}
               <CardPay::BalancesList as |Balance|>
                 {{#each this.balancesToShow as |b|}}
@@ -42,15 +42,16 @@
             {{else}}
               None
             {{/if}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
-      </CardPay::FieldStack>
 
-      <CardPay::LabeledValue
-        @label="Status"
-        @value={{if this.isConnected "Connected" "Disconnected"}}
-        @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
-      />
+        <Boxel::Field
+          @label="Status"
+          @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
+        >
+          {{if this.isConnected "Connected" "Disconnected"}}
+        </Boxel::Field>
+      </CardPay::FieldStack>
 
       {{#if this.isConnected}}
         <div class="layer-one-connect-card__disclaimer">

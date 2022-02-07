@@ -81,7 +81,7 @@ export default class LocalRealm implements Builder {
         id: url,
         attributes: raw.data,
         meta: {
-          componentModule: compiled[format].moduleName.global,
+          componentModule: compiled.componentInfos[format].moduleName.global,
         },
       },
     };

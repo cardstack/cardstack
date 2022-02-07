@@ -98,7 +98,7 @@ describe('POST /api/push-notification-registrations', async function () {
   it('does not fail when registration is already present + it reenables the existing one', async function () {
     let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration-queries');
 
-    await pushNotificationRegistrationQueries.insert({
+    await pushNotificationRegistrationQueries.upsert({
       id: shortUuid.uuid(),
       ownerAddress: stubUserAddress,
       pushClientId: 'FIREBASE_USER_ID',
@@ -175,7 +175,7 @@ describe('DELETE /api/push-notification-registrations', function () {
   it('deletes push notification registration', async function () {
     let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration-queries');
 
-    await pushNotificationRegistrationQueries.insert({
+    await pushNotificationRegistrationQueries.upsert({
       id: shortUuid.uuid(),
       ownerAddress: stubUserAddress,
       pushClientId: 'FIREBASE_USER_ID',

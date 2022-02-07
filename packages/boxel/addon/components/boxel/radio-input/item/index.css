@@ -37,6 +37,7 @@
 
 .boxel-radio-option__input {
   appearance: none;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-appearance: none;
   width: 1rem;
   height: 1rem;

@@ -10,7 +10,7 @@
   flex-direction: column;
 }
 
-.preview__card-preview-field {
+.preview__content .preview__card-preview-field {
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-end;

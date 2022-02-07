@@ -26,570 +26,803 @@ yarn cardpay safe list --walletConnect
 ```
 
 # Commands
-- [Install](#install)
-- [Running](#running)
-  - [Running within the development environment](#running-within-the-development-environment)
-- [Commands](#commands)
-  - [`cardpay bridge to-l2 <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-to-l2-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay bridge await-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-await-to-l2-from_block-recipient---network_network---mnemonicmnemonic---walletconnect)
-  - [`cardpay bridge to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-to-l1-safe_address-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay bridge await-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-await-to-l1-from_block-txn_hash---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay bridge withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-withdrawal-limits-token---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay bridge claim-on-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-bridge-claim-on-l1-message_id-encoded_data-signatures---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--force] [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-create-safe_address-token_address-customization_did-face_values---networknetwork---force---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card split-equally <PREPAID_CARD> <FACE_VALUE> <QUANTITY> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-split-equally-prepaid_card-face_value-quantity---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-provision-sku-recipient-environment-secret---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-sku-info-sku---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-inventory-sku---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-inventories-environment---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market add <FUNDING_CARD> <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-add-funding_card-prepaid_card---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market remove <FUNDING_CARD> <PREPAID_CARDS..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-remove-funding_card-prepaid_cards---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card-market set-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-market-set-ask-prepaid_card-sku-ask_price---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay merchant register <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-merchant-register-prepaid_card-info_did---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card payment-limits --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-payment-limits---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-pay-merchant-merchant_safe-prepaid_card-spend_amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay merchant revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-merchant-revenue-balances-merchant_safe---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay merchant claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-merchant-claim-revenue-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay merchant claim-revenue-gas-estimate <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-merchant-claim-revenue-gas-estimate-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaid-card creation-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaid-card-creation-gas-fee-token_address---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay safe list [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-list-address-safe_type---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay safe view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-view-safe_address---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay safe transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay safe transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-transfer-tokens-gas-estimate-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay price usd <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-price-usd-token-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay price eth <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-price-eth-token-amount---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay price updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-price-updated-at-token---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay assets token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-assets-token-balance-token_address---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay hub auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-hub-auth-hub_root_url---networknetwork---mnemonicmnemonic---walletconnect)
+
+<!-- BEGIN CLI DOCS GENERATED BY yarn command-docs -->Quick links:
+
+ - [`cardpay assets token-balance [tokenAddress]`](#cardpay-assets-token-balance-tokenaddress)
+ - [`cardpay bridge await-to-l1 <fromBlock> <txnHash>`](#cardpay-bridge-await-to-l1-fromblock-txnhash)
+ - [`cardpay bridge await-to-l2 <fromBlock> [recipient]`](#cardpay-bridge-await-to-l2-fromblock-recipient)
+ - [`cardpay bridge claim-on-l1 <messageId> <encodedData> <signatures..>`](#cardpay-bridge-claim-on-l1-messageid-encodeddata-signatures..)
+ - [`cardpay bridge to-l1 <safeAddress> <amount> <tokenAddress> <receiver>`](#cardpay-bridge-to-l1-safeaddress-amount-tokenaddress-receiver)
+ - [`cardpay bridge to-l2 <amount> <tokenAddress> [receiver]`](#cardpay-bridge-to-l2-amount-tokenaddress-receiver)
+ - [`cardpay bridge withdrawal-limits <token>`](#cardpay-bridge-withdrawal-limits-token)
+ - [`cardpay hub auth <hubRootUrl>`](#cardpay-hub-auth-hubrooturl)
+ - [`cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-merchantsafe-tokenaddress-amount)
+ - [`cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-gas-estimate-merchantsafe-tokenaddress-amount)
+ - [`cardpay merchant register <fundingCard> <infoDID>`](#cardpay-merchant-register-fundingcard-infodid)
+ - [`cardpay merchant revenue-balances <merchantSafe>`](#cardpay-merchant-revenue-balances-merchantsafe)
+ - [`cardpay prepaid-card create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>`](#cardpay-prepaid-card-create-safeaddress-tokenaddress-customizationdid-facevalues..)
+ - [`cardpay prepaid-card creation-gas-fee <tokenAddress>`](#cardpay-prepaid-card-creation-gas-fee-tokenaddress)
+ - [`cardpay prepaid-card pay-merchant <merchantSafe> <prepaidCard> <spendAmount>`](#cardpay-prepaid-card-pay-merchant-merchantsafe-prepaidcard-spendamount)
+ - [`cardpay prepaid-card payment-limits`](#cardpay-prepaid-card-payment-limits)
+ - [`cardpay prepaid-card price-for-face-value <tokenAddress> <spendFaceValue>`](#cardpay-prepaid-card-price-for-face-value-tokenaddress-spendfacevalue)
+ - [`cardpay prepaid-card split <prepaidCard> <customizationDID> <faceValues..>`](#cardpay-prepaid-card-split-prepaidcard-customizationdid-facevalues..)
+ - [`cardpay prepaid-card split-equally <prepaidCard> <faceValue> <quantity>`](#cardpay-prepaid-card-split-equally-prepaidcard-facevalue-quantity)
+ - [`cardpay prepaid-card transfer <prepaidCard> <newOwner>`](#cardpay-prepaid-card-transfer-prepaidcard-newowner)
+ - [`cardpay prepaid-card-market add <fundingCard> <prepaidCard>`](#cardpay-prepaid-card-market-add-fundingcard-prepaidcard)
+ - [`cardpay prepaid-card-market inventory <sku>`](#cardpay-prepaid-card-market-inventory-sku)
+ - [`cardpay prepaid-card-market inventories <environment>`](#cardpay-prepaid-card-market-inventories-environment)
+ - [`cardpay prepaid-card-market provision <sku> <recipient> <environment> <secret>`](#cardpay-prepaid-card-market-provision-sku-recipient-environment-secret)
+ - [`cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`](#cardpay-prepaid-card-market-remove-fundingcard-prepaidcards..)
+ - [`cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-set-ask-fundingcard-sku-askprice)
+ - [`cardpay prepaid-card-market sku-info <sku>`](#cardpay-prepaid-card-market-sku-info-sku)
+ - [`cardpay price eth <token> [amount]`](#cardpay-price-eth-token-amount)
+ - [`cardpay price updated-at <token>`](#cardpay-price-updated-at-token)
+ - [`cardpay price usd <token> [amount]`](#cardpay-price-usd-token-amount)
+ - [`cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`](#cardpay-rewards-admin-add-tokens-safeaddress-rewardprogramid-tokenaddress-amount)
+ - [`cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`](#cardpay-rewards-admin-add-rule-fundingcard-rewardprogramid-blob)
+ - [`cardpay rewards admin create-program <prepaidCard> <admin>`](#cardpay-rewards-admin-create-program-prepaidcard-admin)
+ - [`cardpay rewards admin lock <fundingCard> <rewardProgramId>`](#cardpay-rewards-admin-lock-fundingcard-rewardprogramid)
+ - [`cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`](#cardpay-rewards-admin-recover-reward-tokens-safeaddress-rewardprogramid-tokenaddress-amount)
+ - [`cardpay rewards admin set-admin <fundingCard> <rewardProgramId> <newAdmin>`](#cardpay-rewards-admin-set-admin-fundingcard-rewardprogramid-newadmin)
+ - [`cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-rewardsafe-leaf-proof-acceptpartialclaim)
+ - [`cardpay rewards claimable-proofs <address>`](#cardpay-rewards-claimable-proofs-address)
+ - [`cardpay rewards list`](#cardpay-rewards-list)
+ - [`cardpay rewards pool-balances <rewardProgramId>`](#cardpay-rewards-pool-balances-rewardprogramid)
+ - [`cardpay rewards register <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-prepaidcard-rewardprogramid)
+ - [`cardpay rewards reward-balances <address>`](#cardpay-rewards-reward-balances-address)
+ - [`cardpay rewards transfer-safe <rewardSafe> <newOwner>`](#cardpay-rewards-transfer-safe-rewardsafe-newowner)
+ - [`cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-from-safe-rewardsafe-recipient-tokenaddress-amount)
+ - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
+ - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
+ - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
+ - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
+ - [`cardpay safe view [safeAddress]`](#cardpay-safe-view-safeaddress)
 
 
-## `cardpay bridge to-l2 <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay assets token-balance [tokenAddress]`
 
-Bridge tokens from L1 address to L2 safe
+Get the native token balance for the given wallet tokenAddress and network
 
 ```
-USAGE
-  $ cardpay bridge to-l2 <amount> <tokenAddress> [receiver] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  tokenAddress  The address of the token to get the balance of. Defaults to native token for network  [string]
 
-ARGUMENTS
-  AMOUNT          Amount in ether you would like bridged
-  TOKEN_ADDRESS   The layer 1 token address of the token to bridge
-  RECEIVER        (Optional) Layer 2 address to be owner of L2 safe, defaults to same as L1 address
-  NETWORK         The Layer 1 network to use ("kovan" or "mainnet")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
-## `cardpay bridge await-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay bridge await-to-l1 <fromBlock> <txnHash>`
+
+Wait for token bridging from L2 to L1 to complete validation
+
+```
+Positionals:
+  fromBlock  Layer 2 block height before bridging was initiated  [string] [required]
+  txnHash    Layer 2 transaction hash of the bridging transaction  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay bridge await-to-l2 <fromBlock> [recipient]`
 
 Wait for token bridging from L1 to L2 to complete
 
 ```
-USAGE
-  $ cardpay bridge await-to-l2 <fromBlock> [recipient] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fromBlock  Layer 2 block height before bridging was initiated  [string] [required]
+  recipient  Layer 2 address that is the owner of the bridged tokens, defaults to wallet address  [string]
 
-ARGUMENTS
-  FROM_BLOCK      Layer 2 block height before bridging was initiated
-  RECIPIENT       Layer 2 address that is the owner of the bridged tokens, defaults to wallet address
-  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay bridge to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-Bridge tokens from L2 safe to L1 address
-
-```
-USAGE
-  $ cardpay bridge to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  SAFE_ADDRESS    The layer 2 safe address to bridge the tokens from
-  AMOUNT          Amount in ether you would like bridged
-  TOKEN_ADDRESS   The layer 2 token address of the token to bridge
-  RECEIVER        Layer 1 address to receive the bridge tokens
-  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay bridge await-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-Wait for token bridging from L2 to L1 to complete validation. This will return the messageId, encodedData, and signatures that can be used to claim the bridge tokens in L1
-
-```
-USAGE
-  $ cardpay bridge await-to-l1 <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  FROM_BLOCK      Layer 2 block height before bridging was initiated
-  TXN_HASH        Layer 2 transaction hash of the bridging transaction
-  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay bridge withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-Get the withdrawal limits for bridging a token to layer 1.
-
-```
-USAGE
-  $ cardpay bridge withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  TOKEN           The layer 2 CPXD token address of the token being withdrawn
-  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay bridge claim-on-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay bridge claim-on-l1 <messageId> <encodedData> <signatures..>`
 
 Claim tokens that have been bridged from L2 to L1
 
 ```
-USAGE
-  $ cardpay bridge claim-on-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  messageId    The message id for the bridging (obtained from `cardpay bridge await-to-l1`)  [string] [required]
+  encodedData  The encoded data for the bridging (obtained from `cardpay bridge await-to-l1`)  [string] [required]
+  signatures   The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)  [array] [required] [default: []]
 
-ARGUMENTS
-  MESSAGE_ID      The message id for the bridging (obtained from `cardpay bridge await-to-l1`)
-  ENCODED_DATA    The encoded data for the bridging (obtained from `cardpay bridge await-to-l1`)
-  SIGNATURES      The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)
-  NETWORK         The Layer 1 network to use ("kovan" or "mainnet")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
-## `cardpay prepaid-card create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--force] [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay bridge to-l1 <safeAddress> <amount> <tokenAddress> <receiver>`
 
-Create a prepaid card from the CPXD tokens in a depot safe
-
-```
-USAGE
-  $ cardpay prepaid-card create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--force] [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  SAFE_ADDRESS      Layer 2 safe address with DAI CPXD tokens
-  TOKEN_ADDRESS     The token address of the token to use to pay for the prepaid cards
-  CUSTOMIZATION_DID The DID string that represents the prepaid card customization
-  FACE_VALUES       A list of face values (separated by spaces) in units of § SPEND to create
-  NETWORK           The network to use ("sokol" or "xdai")
-  FORCE             Force the prepaid card to be created even when the DAI rate is not snapped to USD
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card split-equally <PREPAID_CARD> <FACE_VALUE> <QUANTITY> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-Split a prepaid card into more prepaid cards with identical face values inheriting the funding card's customization
+Bridge tokens to the layer 1 network
 
 ```
-USAGE
-  $ cardpay prepaid-card split-equally <PREPAID_CARD> <FACE_VALUE> <QUANTITY> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  safeAddress   The layer 2 safe to bridge the tokens from  [string] [required]
+  amount        Amount of tokens you would like bridged (*not* in units of wei, but in eth)  [string] [required]
+  tokenAddress  The layer 2 token address  [string] [required]
+  receiver      Layer 1 address to receive the bridged tokens  [string] [required]
 
-ARGUMENTS
-  PREPAID_CARD      The address of the prepaid card being split
-  FACE_VALUE        The face value for the new prepaid cards
-  QUANTITY          The amount of prepaid cards to create
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay bridge to-l2 <amount> <tokenAddress> [receiver]`
 
-Split a prepaid card into more prepaid cards (up to a maximum of 10 prepaid cards)
+Bridge tokens to the layer 2 network
 
 ```
-USAGE
-  $ cardpay prepaid-card split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  amount        Amount of tokens you would like bridged (*not* in units of wei, but in eth)  [string] [required]
+  tokenAddress  The layer 1 token address  [string] [required]
+  receiver      Layer 2 address to be the owner of L2 safe, defaults to same as L1 address  [string]
 
-ARGUMENTS
-  PREPAID_CARD      The address of the prepaid card being split
-  CUSTOMIZATION_DID The DID string that represents the prepaid card customization
-  FACE_VALUES       A list of face values (separated by spaces) in units of § SPEND to create
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
-## `cardpay prepaid-card transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay bridge withdrawal-limits <token>`
+
+Get the withdrawal limits for bridging a token to layer 1
+
+```
+Positionals:
+  token  The layer 2 CPXD token address of the token being withdrawn  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay hub auth <hubRootUrl>`
+
+Get an authentication token that can be used to make API requests to a Cardstack Hub server
+
+```
+Positionals:
+  hubRootUrl  The URL of the hub server to authenticate with  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`
+
+Claim merchant revenue earned from prepaid card payments
+
+```
+Positionals:
+  merchantSafe  The address of the merchant's safe whose revenue balance is being claimed  [string] [required]
+  tokenAddress  The address of the tokens that are being claimed as revenue  [string] [required]
+  amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`
+
+Claim merchant revenue earned from prepaid card payments
+
+```
+Positionals:
+  merchantSafe  The address of the merchant's safe whose revenue balance is being claimed  [string] [required]
+  tokenAddress  The address of the tokens that are being claimed as revenue  [string] [required]
+  amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay merchant register <fundingCard> <infoDID>`
+
+Register as a new merchant by paying a merchant registration fee
+
+```
+Positionals:
+  fundingCard  The address of the prepaid card that is being used to pay the merchant registration fee  [string] [required]
+  infoDID      The DID string that can be resolved to a DID document representing the merchant's information  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay merchant revenue-balances <merchantSafe>`
+
+View token balances of unclaimed revenue in the revenue pool for a merchant
+
+```
+Positionals:
+  merchantSafe  The address of the merchant's safe whose balances are to be viewed  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>`
+
+Create prepaid cards using the specified token from the specified safe with the amounts provided
+
+```
+Positionals:
+  safeAddress       The address of the safe whose funds to use to create the prepaid cards  [string] [required]
+  tokenAddress      The token address (defaults to Kovan DAI)  [string] [required]
+  customizationDID  The DID string that represents the prepaid card customization  [string] [required]
+  faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --force          Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card creation-gas-fee <tokenAddress>`
+
+Get the gas fee in the units of the specified token for creating a new prepaid card
+
+```
+Positionals:
+  tokenAddress  The token address of the token that will be used to pay for the prepaid card  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card pay-merchant <merchantSafe> <prepaidCard> <spendAmount>`
+
+Pay a merchant from a prepaid card
+
+```
+Positionals:
+  merchantSafe  The address of the merchant's safe who will receive the payment  [string] [required]
+  prepaidCard   The address of the prepaid card that is being used to pay the merchant  [string] [required]
+  spendAmount   The amount to send to the merchant in units of SPEND  [number] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card payment-limits`
+
+Get the minimum and maximum prepaid card payment limits in SPEND
+
+```
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card price-for-face-value <tokenAddress> <spendFaceValue>`
+
+Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND
+
+```
+Positionals:
+  tokenAddress    The token address of the token that will be used to pay for the prepaid card  [string] [required]
+  spendFaceValue  The desired face value in SPEND for the prepaid card  [number] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card split <prepaidCard> <customizationDID> <faceValues..>`
+
+Split a prepaid card into more prepaid cards (max 10) and place in the default market
+
+```
+Positionals:
+  prepaidCard       The address of the prepaid card to split  [string] [required]
+  customizationDID  The DID string that represents the prepaid card customization  [string] [required]
+  faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card split-equally <prepaidCard> <faceValue> <quantity>`
+
+Split a prepaid card into more prepaid cards with identical face values inheriting the funding card's customization and place in the default market
+
+```
+Positionals:
+  prepaidCard  The address of the prepaid card to split  [string] [required]
+  faceValue    The face value for the new prepaid cards  [number] [required]
+  quantity     The amount of prepaid cards to create  [number] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card transfer <prepaidCard> <newOwner>`
 
 Transfer a prepaid card to a new owner
 
 ```
-USAGE
-  $ cardpay prepaid-card transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  prepaidCard  The address of the prepaid card to transfer  [string] [required]
+  newOwner     The address of the new owner  [string] [required]
 
-ARGUMENTS
-  PREPAID_CARD      The address of the prepaid card to transfer
-  NEW_OWNER         The address of the new owner
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay prepaid-card-market add <fundingCard> <prepaidCard>`
+
+Adds a prepaid card to the inventory
+
+```
+Positionals:
+  fundingCard  The prepaid card used to pay for gas for the txn  [string] [required]
+  prepaidCard  The prepaid card to add to the inventory  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market inventory <sku>`
+
+Get the inventory for a specific SKU from the market contract
+
+```
+Positionals:
+  sku  The SKU to obtain inventory for  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market inventories <environment>`
+
+Get all the inventories available in the market contract
+
+```
+Positionals:
+  environment  The environment to query  [string] [required] [choices: "staging", "production"]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market provision <sku> <recipient> <environment> <secret>`
 
 Provision a prepaid card to an EOA
 
 ```
-USAGE
-  $ cardpay prepaid-card-market provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+Positionals:
+  sku          The sku of the prepaid card to provision  [string] [required]
+  recipient    The address of the recipient of the prepaid card  [string] [required]
+  environment  The environment in which to provision the prepaid card (staging or production)  [string] [required]
+  secret       The "provisioner secret" phrase to enable provisioning  [string] [required]
 
-ARGUMENTS
-  SKU               The SKU of the prepaid card to provision
-  RECIPIENT         The EOA address of the recipient of the prepaid card
-  ENVIRONMENT       The environment to use (staging or production)
-  SECRET            The "provisioner secret" phrase to enable provisioning
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
+## `cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`
 
-## `cardpay prepaid-card price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND. This takes into account the exchange rate for the specified token as well as the gas fee that is charged for creating a new prepaid card.
-
-```
-USAGE
-  $ cardpay prepaid-card price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  TOKEN_ADDRESS      The token address of the token that will be used to pay for the prepaid card
-  SPEND_FACE_VALUE   The desired face value in SPEND for the prepaid card
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card-market sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the details for the prepaid cards available in the market contract for the specified SKU.
+Removes the specified prepaid cards from the inventory and returns them back to the issuer
 
 ```
-USAGE
-  $ cardpay prepaid-card-market sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fundingCard   The prepaid card used to pay for gas for the txn  [string] [required]
+  prepaidCards  A list of prepaid cards (separated by spaces) to remove from inventory  [array] [required] [default: []]
 
-ARGUMENTS
-  SKU                The SKU to obtain details for
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the inventory for a specific SKU from the market contract.
+## `cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`
 
-```
-USAGE
-  $ cardpay prepaid-card-market inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  SKU                The SKU to obtain inventory for
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card-market inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get all the inventories available in the market contract.
-
-```
-USAGE
-  $ cardpay prepaid-card-market inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  ENVIRONMENT        Either "staging" or "production" (this field will go away after environment/network alignment has completed)
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card-market add <FUNDING_CARD> <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Adds a prepaid card to the inventory.
-
-```
-USAGE
-  $ cardpay prepaid-card-market add <FUNDING_CARD> <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  FUNDING_CARD       The prepaid card that is used to pay for gas for the txn
-  PREPAID_CARD       The prepaid card to add to the inventory
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card-market remove <FUNDING_CARD> <PREPAID_CARDS..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Removes the specified prepaid cards from the inventory and returns them back to the issuer.
-
-```
-USAGE
-  $ cardpay prepaid-card-market remove <FUNDING_CARD> <PREPAID_CARDS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  FUNDING_CARD       The prepaid card that is used to pay for gas for the txn
-  PREPAID_CARDS      A list of prepaid cards (separated by spaces) to remove from inventory
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay prepaid-card-market set-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 Set the asking price for prepaid cards associated to a SKU. The ask price is in units of eth in the issuing token for prepaid cards within the SKU
 
 ```
-USAGE
-  $ cardpay prepaid-card-market set-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fundingCard  The prepaid card used to pay for gas for the txn  [string] [required]
+  sku          The SKU whose ask price is being set  [string] [required]
+  askPrice     The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU  [number] [required]
 
-ARGUMENTS
-  PREPAID_CARD       The prepaid card used to pay for gas for the txn
-  SKU                The SKU whose ask price is being set
-  ASK_PRICE          The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay merchant register <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Register a new merchant from a prepaid card. The prepaid card will be used to pay the merchant registration fee.
+## `cardpay prepaid-card-market sku-info <sku>`
+
+Get the details for the prepaid cards available in the market contract for the specified SKU
 
 ```
-USAGE
-  $ cardpay merchant register <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  sku  The SKU to obtain details for  [string] [required]
 
-ARGUMENTS
-  PREPAID_CARD      The address of the prepaid card that is being used to pay the merchant registration fee
-  INFO_DID          The DID string that can be resolved to a DID document representing the merchant's information
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card payment-limits --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the minimum and maximum prepaid card payment limits in SPEND
+## `cardpay price eth <token> [amount]`
+
+Get the ETH value for the specified token in the specified amount
 
 ```
-USAGE
-  $ cardpay prepaid-card payment-limits --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  token   The token symbol (without the .CPXD suffix)  [string] [required]
+  amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
-ARGUMENTS
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Pay a merchant from a prepaid card. The amount of tokens to send to the merchant in units of SPEND.
+## `cardpay price updated-at <token>`
+
+Get the date that the oracle was last updated for the specified token
 
 ```
-USAGE
-  $ cardpay prepaid-card pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  token  The token symbol (without the .CPXD suffix)  [string] [required]
 
-ARGUMENTS
-  MERCHANT_SAFE     The address of the merchant's safe who will receive the payment
-  PREPAID_CARD      The address of the prepaid card that is being used to pay the merchant
-  SPEND_AMOUNT      The amount to send to the merchant in units of SPEND
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
-## `cardpay merchant revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-View token balances of unclaimed revenue in the revenue pool for a merchant.
+## `cardpay price usd <token> [amount]`
+
+Get the USD value for the specified token in the specified amount
 
 ```
-USAGE
-  $ cardpay merchant revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  token   The token symbol (without the .CPXD suffix)  [string] [required]
+  amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
-ARGUMENTS
-  MERCHANT_SAFE     The address of the merchant's safe whose revenue balances are to be viewed
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
-## `cardpay merchant claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Claim merchant revenue earned from prepaid card payments.
+## `cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`
+
+Add Reward Tokens
 
 ```
-USAGE
-  $ cardpay merchant claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  safeAddress      The address of the safe whose funds to use to fill reward pool  [string] [required]
+  rewardProgramId  Reward program id  [string] [required]
+  tokenAddress     The address of the tokens that are being claimed as rewards  [string] [required]
+  amount           The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)  [string] [required]
 
-ARGUMENTS
-  MERCHANT_SAFE     The address of the merchant's safe whose revenue balance is being claimed
-  TOKEN_ADDRESS     The address of the tokens that are being claimed as revenue
-  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`, but in `eth`)
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-## `cardpay merchant claim-revenue-gas-estimate <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Obtain a gas estimate for claiming merchant revenue.
-
-```
-USAGE
-  $ cardpay merchant claim-revenue-gas-estimate <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  MERCHANT_SAFE     The address of the merchant's safe whose revenue balance is being claimed
-  TOKEN_ADDRESS     The address of the tokens that are being claimed as revenue
-  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`, but in `eth`)
-  NETWORK           The network to use ("sokol" or "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card creation-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the gas fee in the units of the specified token for creating a new prepaid card.
+## `cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`
+
+Add a rule to a reward program
 
 ```
-USAGE
-  $ cardpay prepaid-card creation-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fundingCard      The prepaid card used to pay for gas for the txn  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
+  blob             Hex encoding of rule blob  [string] [required]
 
-ARGUMENTS
-  TOKEN_ADDRESS      The token address of the token that will be used to pay for the prepaid card
-  NETWORK            The network to use ("sokol" or "xdai")
-  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-## `cardpay safe list [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-View safes that your wallet is the owner of
-
-```
-USAGE
-  $ cardpay safe list [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  ADDRESS         (Optional) an address of an owner whose safes you wish to view (defaults to the wallet's default account)
-  SAFE_TYPE       (Optional) The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'
-  NETWORK         The network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay safe view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay rewards admin create-program <prepaidCard> <admin>`
 
-View a particular safe
-
-```
-USAGE
-  $ cardpay safe view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  SAFE_ADDRESS    The address of a safe to view
-  NETWORK         The network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay safe transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-
-Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`, but in `eth`. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
+Register reward program
 
 ```
-USAGE
-  $ cardpay safe transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]
+Positionals:
+  admin        The address of the new admin. This is an EOA  [string] [required]
+  prepaidCard  The address of the prepaid card that is being used to pay the reward program registration fee  [string] [required]
 
-ARGUMENTS
-  SAFE_ADDRESS     The address of the safe that is sending the tokens
-  TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
-  RECIPIENT        The token recipient's address
-  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`, but in `eth`).
-  NETWORK          The network to use ("sokol" or "xdai")
-  MNEMONIC         (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT   (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay safe transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay rewards admin lock <fundingCard> <rewardProgramId>`
 
-Obtain the gas estimate to transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`, but in `eth`.
-
-```
-USAGE
-  $ cardpay safe transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]
-
-ARGUMENTS
-  SAFE_ADDRESS     The address of the safe that is sending the tokens
-  TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
-  RECIPIENT        The token recipient's address
-  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`, but in `eth`).
-  NETWORK          The network to use ("sokol" or "xdai")
-  MNEMONIC         (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT   (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay price usd <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the USD value for the specified token name in the specified amount. This returns a floating point number in units of USD.
-```
-USAGE
-  $ cardpay price usd <TOKEN> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          (Optional) The amount of the specified token (not in units of wei, but in `eth`). Defaults to '1'
-  NETWORK         The network to use ("sokol" or "xdai", or if pricing ETH, "kovan" or "mainnet")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay price eth <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the ETH value for the specified token name in the specified amount (in units `eth`).
-```
-USAGE
-  $ cardpay price eth <TOKEN> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
-
-ARGUMENTS
-  TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          (Optional) The amount of the specified token (not in units of `wei`, but in `eth`). Defaults to '1'
-  NETWORK         The network to use ("sokol" or "xdai")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
-```
-
-## `cardpay price updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-This returns the date that the oracle was last updated for the specified token.
+Lock reward program
 
 ```
-USAGE
-  $ cardpay price updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fundingCard      The prepaid card used to pay for gas for the transaction  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
 
-ARGUMENTS
-  TOKEN           The token symbol (without the .CPXD suffix)
-  NETWORK         The network to use ("sokol" or "xdai", or if checking ETH price "kovan" or "mainnet")
-  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay assets token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-This returns the token balance for the given wallet.
+## `cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`
+
+Recover reward tokens from reward pool
 
 ```
-USAGE
-  $ cardpay assets token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  rewardProgramId  The reward program id.  [string] [required]
+  tokenAddress     The address of the tokens that are being recovered from reward pool  [string] [required]
+  safeAddress      The address of the safe that is to receive the recovered tokens  [string] [required]
+  amount           The amount of tokens to recover into safe  [string]
 
-ARGUMENTS
-  TOKEN_ADDRESS     The address of the token to get the balance of. Defaults to native token for network
-  NETWORK           The network to use ("kovan", "mainnet", "sokol", "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
-## `cardpay hub auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-This returns the token balance for the given wallet.
+
+## `cardpay rewards admin set-admin <fundingCard> <rewardProgramId> <newAdmin>`
+
+Update reward program admin
 
 ```
-USAGE
-  $ cardpay hub auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+Positionals:
+  fundingCard      The prepaid card used to pay for gas for the txn  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
+  newAdmin         The EOA admin of reward program  [string] [required]
 
-ARGUMENTS
-  HUB_ROOT_URL      The root URL of the hub instance to authenticate to, e.g. "https://hub.cardstack.com"
-  NETWORK           The network to use ("sokol", "xdai")
-  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
-  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
+
+## `cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
+
+Claim rewards using proof
+
+```
+Positionals:
+  rewardSafe  The address of the rewardSafe which will receive the rewards  [string] [required]
+  leaf        The encoded the encoded bytes of merkle tree  [string] [required]
+  proof       The proof used to claim reward  [string] [required]
+
+Options:
+  -m, --mnemonic            Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
+  -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards claimable-proofs <address>`
+
+View proofs that are claimable
+
+```
+Positionals:
+  address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+
+Options:
+  -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --rewardProgramId  The reward program id.  [string]
+      --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards list`
+
+List reward programs
+
+```
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards pool-balances <rewardProgramId>`
+
+View the reward pool's token balances
+
+```
+Positionals:
+  rewardProgramId  The reward program id.  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards register <prepaidCard> <rewardProgramId>`
+
+Register rewardee
+
+```
+Positionals:
+  prepaidCard      The address of the prepaid card that is being used to pay the merchant  [string] [required]
+  rewardProgramId  Reward program id  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards reward-balances <address>`
+
+View token balances of unclaimed rewards in the reward pool
+
+```
+Positionals:
+  address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+
+Options:
+  -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --rewardProgramId  The reward program id.  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards transfer-safe <rewardSafe> <newOwner>`
+
+Withdraw from reward safe
+
+```
+Positionals:
+  rewardSafe  The address of the rewardSafe that already contains rewards  [string] [required]
+  newOwner    The address of the new owner  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`
+
+Withdraw from reward safe
+
+```
+Positionals:
+  rewardSafe    The address of the rewardSafe that already contains rewards  [string] [required]
+  recipient     The token recipient's address  [string] [required]
+  tokenAddress  The address of the tokens that are being transferred from reward safe  [string] [required]
+  amount        The amount of tokens to transfer (not in units of wei, but in eth)  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards view <rewardProgramId>`
+
+Get info about a reward program
+
+```
+Positionals:
+  rewardProgramId  Reward program id  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay safe list [address] [safeType]`
+
+View contents of the safes owned by the specified address (or default wallet account)
+
+```
+Positionals:
+  address   The address of the safe owner. This defaults to your wallet's default account when not provided  [string]
+  safeType  The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'  [string]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`
+
+Transfer tokens from a safe to an arbitrary recipient
+
+```
+Positionals:
+  safeAddress  The address of the safe that is sending the tokens  [string]
+  token        The token address of the tokens to transfer from the safe  [string]
+  recipient    The token recipient's address  [string]
+  amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`
+
+Obtain a gas estimate to transfer tokens from a safe to an arbitrary recipient
+
+```
+Positionals:
+  safeAddress  The address of the safe that is sending the tokens  [string]
+  token        The token address of the tokens to transfer from the safe  [string]
+  recipient    The token recipient's address  [string]
+  amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay safe view [safeAddress]`
+
+View contents of the safe at the specified address
+
+```
+Positionals:
+  safeAddress  The address of the safe to view  [string]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+<!-- END CLI DOCS GENERATED BY yarn command-docs -->
