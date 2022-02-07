@@ -93,6 +93,15 @@ export class CardService {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
+
+    let cardModel = await this.makeCardModelFromDatabase('isolated', compiledCard);
+    let computedFields = Object.keys(compiledCard.fields).filter((f) => (compiledCard.fields[f].computed ? f : null));
+    let data: Record<string, any> = {};
+    for (let f of computedFields) {
+      let value = await cardModel.getField(f);
+      data[f] = value;
+    }
+
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
     return { raw: rawCard, compiled };
   }
