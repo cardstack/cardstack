@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name="cardpay_reward_programs",
@@ -30,10 +30,8 @@ setup(
         ]
     },
     entry_points={
-        "console_scripts": [
-            "run_reward_program=cardpay_reward_programs.main:cli",
-        ],
+        "console_scripts": ["run_reward_program=cardpay_reward_programs.main:cli"],
     },
-    packages=["cardpay_reward_programs"],
+    packages=find_packages(),
     zip_safe=False,
 )
