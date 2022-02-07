@@ -50,7 +50,7 @@ module('Acceptance | deposit', function (hooks) {
 
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
-    assert.dom(post).containsText('Hi there, we’re happy to see you');
+    assert.dom(post).containsText('Hi there, we’re unhappy to see you');
 
     assert
       .dom(postableSel(0, 1))
