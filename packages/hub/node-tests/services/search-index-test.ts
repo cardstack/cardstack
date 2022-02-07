@@ -250,5 +250,84 @@ if (process.env.COMPILER) {
         'https://cardstack.com/base/string'
       );
     });
+
+    describe('computed field', function () {
+      let greetingCard = {
+        realm: realmURL,
+        id: 'greeting-card',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class GreetingCard {
+              @contains(string) name;
+
+              @contains(string)
+              async greeting() {
+                return "Welcome " + await this.name;
+              }
+            }
+          `,
+        },
+      };
+
+      let sampleGreeting = {
+        realm: realmURL,
+        id: 'sample-greeting',
+        adoptsFrom: '../greeting-card',
+        data: {
+          name: 'Jackie',
+        },
+      };
+
+      // let customGreeting = {
+      //   realm: realmURL,
+      //   id: 'custom-greeting',
+      //   adoptsFrom: '../greeting-card',
+      //   schema: 'schema.js',
+      //   files: {
+      //     'schema.js': `
+      //       import { contains, adopts } from "@cardstack/types";
+      //       import GreetingCard from "../greeting-card";
+      //       import string from "https://cardstack.com/base/string";
+      //       export default @adopts(GreetingCard) class CustomGreetingCard {
+      //         @contains(string) role;
+
+      //         @contains(string)
+      //         async desc() {
+      //           return "Greeting for " + await this.role;
+      //         }
+      //       }
+      //     `,
+      //   },
+      //   data: {
+      //     name: 'Jackie',
+      //     role: 'CEO of dogs',
+      //   },
+      // };
+      this.beforeEach(async function () {
+        await cards.create(greetingCard);
+        await cards.create(sampleGreeting);
+        // await cards.create(customGreeting);
+      });
+
+      it.only('Can search for card computed field for card created with data', async function () {
+        let card = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
+        expect(card.data.name).to.eq('Jackie');
+        expect(card.data.greeting).to.eq('Welcome Jackie');
+      });
+
+      it('Can search for card computed field for card created with data and schema', async function () {
+        let card = await cards.loadData(`${realmURL}custom-greeting`, 'isolated');
+
+        expect(card.data.name).to.eq('Jackie');
+        expect(card.data.greeting).to.eq('Welcome Jackie');
+        expect(card.data.role).to.eq('CEO of dogs');
+        expect(card.data.desc).to.eq('Greeting for CEO of dogs');
+      });
+      it('Can search for card computed field for card after updating data');
+      it('Can search for card computed field for card after updating data and schema');
+    });
   });
 }
