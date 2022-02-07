@@ -19,9 +19,9 @@ setup(
         "eth_utils",
         "eth_abi",
         "eth_typing",
-        "merklelib",
+        "merklelib @ git+https://git@github.com/tintinthong/merklelib@master#egg=merklelib",
         "pysha3",
-        "pyarrow"
+        "pyarrow",
     ],
     extras_require={
         "explore": [
