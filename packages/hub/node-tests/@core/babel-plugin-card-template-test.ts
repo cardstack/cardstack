@@ -82,22 +82,15 @@ if (process.env.COMPILER) {
       expect(options.serializerMap).to.deep.equal({ date: ['birthdate', 'address.settlementDate'] });
     });
 
-    it('modifies the source', async function () {
-      expect(code).to.containsSource(
-        `export const serializerMap = {
-          date: ["birthdate", "address.settlementDate"]
-        };`
-      );
-    });
-
-    it('can make a function to create a card model', async function () {
+    it('can make a function to get options used to create a card model', async function () {
       expect(code).to.containsSource(`
         export function getCardModelOptions() {
           return {
             serializerMap: {
               date: ["birthdate", "address.settlementDate"]
             },
-            computedFields: ["fullName"]
+            computedFields: ["fullName"],
+            usedFields: ["name", "fullName", "birthdate", "address.street", "address.city", "address.state", "address.zip", "address.settlementDate"]
           };
         }
       `);

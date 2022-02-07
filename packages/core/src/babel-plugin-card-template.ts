@@ -62,7 +62,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         },
         exit(path: NodePath<t.Program>, state: State) {
           addImports(state.neededImports, path, t);
-          addSerializerMap(path, state, t);
           addGetCardModelOptions(path, state, babel);
         },
       },
@@ -83,23 +82,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
       },
     },
   };
-}
-
-// TODO refactor this out as we flesh out the addGetCardModelOptions which
-// should eventually be returning serializer functions for our fields
-function addSerializerMap(path: NodePath<t.Program>, state: State, t: typeof Babel.types) {
-  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
-  state.opts.serializerMap = serializerMap;
-
-  let serializerMapPropertyDefinition = buildSerializerMapProp(serializerMap, t);
-
-  path.node.body.push(
-    t.exportNamedDeclaration(
-      t.variableDeclaration('const', [
-        t.variableDeclarator(t.identifier('serializerMap'), t.objectExpression(serializerMapPropertyDefinition)),
-      ])
-    )
-  );
 }
 
 function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
