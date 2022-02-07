@@ -2,7 +2,7 @@
   class="merchant-payment-request-card"
   ...attributes
 >
-  <div class="merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet--desktop">
+  <div class="merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet">
     <div class='merchant-payment-request-card__card-wallet'>
       {{svg-jar
         'card-wallet-app-icon'
@@ -15,26 +15,6 @@
       </span>
     </div>
     <Common::CardWalletBadges />
-  </div>
-  <div
-    class='merchant-payment-request-card__section merchant-payment-request-card__get-card-wallet--mobile'
-  >
-    <div class='merchant-payment-request-card__card-wallet'>
-      <div class='merchant-payment-request-card__card-wallet-icon-and-text'>
-        {{svg-jar
-          'card-wallet-app-icon'
-          class='merchant-payment-request-card__card-wallet-icon'
-          width='40'
-          height='40'
-        }}
-        <span class='merchant-payment-request-card__card-wallet-text'>
-          Card Wallet
-        </span>
-      </div>
-      <Common::CardWalletBadges
-        class='merchant-payment-request-card__wallet-badges--mobile'
-      />
-    </div>
   </div>
   <CardPay::MerchantPaymentRequestCard::PaymentRequest
     class="merchant-payment-request-card__section"
