@@ -88,12 +88,24 @@ export default class Cards extends Service {
     componentModule: CardComponentModule,
     format: Format
   ): CardModel {
+    let schemaModuleId = cardResponse.meta?.schemaModule;
+    if (!schemaModuleId) {
+      throw new Error(
+        `card payload for ${cardResponse.id} has no meta.schemaModule`
+      );
+    }
+    if (typeof schemaModuleId !== 'string') {
+      throw new Error(
+        `card payload for ${cardResponse.id} meta.schemaModule is not a string`
+      );
+    }
     return new CardModelForBrowser(this, {
       type: 'loaded',
       url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
       componentModule,
       format,
+      schemaModuleId,
     });
   }
 
