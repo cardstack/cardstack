@@ -16,6 +16,7 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
+const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.space.test';
 const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
 const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
 const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
@@ -41,7 +42,7 @@ module.exports = function (environment) {
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     cardSpaceHostnameSuffix:
       cardSpaceHostnameSuffixesByTarget[process.env.DEPLOY_TARGET] ??
-      CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
+      CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {

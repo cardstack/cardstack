@@ -6,6 +6,11 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 class IndexController extends Controller {
   @service declare layer2Network: Layer2Network;
+  queryParams = [
+    {
+      cardSpaceId: 'card-space-id',
+    },
+  ];
 
   @action connectToWallet() {
     console.log('Connect to wallet here');
