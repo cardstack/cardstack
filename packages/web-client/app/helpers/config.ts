@@ -4,7 +4,7 @@ import Helper from '@ember/component/helper';
 import { get } from '@ember/object';
 
 export default class extends Helper {
-  config: Config | undefined;
+  config: any | undefined;
 
   constructor() {
     super(...arguments);
@@ -12,14 +12,12 @@ export default class extends Helper {
     this.config = getOwner(this).resolveRegistration('config:environment');
 
     // FIXME is it scandalous to mutate this? Clone…?
-    // @ts-ignore
-    this.config.unknownProperty = (path) => {
+    this.config.unknownProperty = (path: string) => {
       throw new Error(`Unknown config property: ${path}`);
     };
   }
 
   compute([path]: [string]) {
-    // @ts-ignore FIXME, can’t figure it out right now
-    return get(this.config, path);
+    return get(this.config as any, path);
   }
 }
