@@ -195,8 +195,6 @@ export interface CardModel {
   setters: Setter | undefined;
   adoptIntoRealm(realm: string, id?: string): Promise<CardModel>;
   editable(): Promise<CardModel>;
-  innerComponent: unknown;
-  serializerMap: SerializerMap;
   url: string;
   id: string | undefined;
   data: Record<string, any>;
@@ -204,9 +202,24 @@ export interface CardModel {
   format: Format;
   setData(data: RawCardData): void;
   serialize(): ResourceObject<Saved | Unsaved>;
-  component: unknown;
+  component(): Promise<unknown>;
   usedFields: ComponentInfo['usedFields'];
   save(): Promise<void>;
+}
+
+export interface CardSchemaModule {
+  default: {
+    new (fieldGetter: (fieldPath: string) => any): unknown;
+  };
+}
+
+export interface CardComponentModule {
+  default: unknown;
+  getCardModelOptions(): {
+    serializerMap: SerializerMap;
+    computedFields: string[];
+    usedFields: string[];
+  };
 }
 
 export interface RealmConfig {
@@ -239,31 +252,7 @@ export function assertDocumentDataIsResource<Identity extends Saved | Unsaved = 
 export interface ResourceObject<Identity extends Saved | Unsaved = Saved> {
   id: Identity;
   type: string;
-  attributes?: JSON.Object;
+  attributes?: JSON.Object | undefined;
   relationships?: JSON.Object;
   meta?: JSON.Object;
-}
-
-export type CardOperation =
-  | {
-      create: {
-        targetRealm: string;
-        parentCardURL: string;
-        payload: JSONAPIDocument<Unsaved>;
-      };
-    }
-  | {
-      update: {
-        cardURL: string;
-        payload: JSONAPIDocument;
-      };
-    };
-
-// this is the set of environment-specific capabilities a CardModel gets access
-// to
-export interface CardEnv {
-  load(url: string, format: Format): Promise<CardModel>;
-  send(operation: CardOperation): Promise<JSONAPIDocument>;
-  prepareComponent(cardModel: CardModel, component: unknown): unknown;
-  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor | void;
 }

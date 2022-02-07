@@ -5,7 +5,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 module('Integration | Card Rendering', function (hooks) {
   let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);
 
-  hooks.beforeEach(function () {
+  test(`load a cards isolated component`, async function (assert) {
     createCard({
       id: 'post',
       realm: localRealmURL,
@@ -40,12 +40,45 @@ module('Integration | Card Rendering', function (hooks) {
         createdAt: '2021-03-02T19:51:32.121Z',
       },
     });
-  });
-
-  test(`load a cards isolated component`, async function (assert) {
     await renderCard({ id: 'post-1' });
 
     assert.dom('h1').containsText('A blog post title');
     assert.dom('h2').containsText('Mar 2, 2021');
+  });
+
+  test('Can render a computed field', async function (assert) {
+    createCard({
+      id: 'bob',
+      realm: localRealmURL,
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      data: {
+        firstName: 'Bob',
+      },
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+
+          export default class Hello {
+            @contains(string)
+            firstName;
+
+            @contains(string)
+            async foodPref() {
+              return (await this.firstName) + " likes pizza";
+            }
+          }
+        `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<h1><@fields.firstName /></h1><p><@fields.foodPref /></p>`
+        ),
+      },
+    });
+
+    await renderCard({ id: 'bob' });
+
+    assert.dom('h1').containsText('Bob');
+    assert.dom('p').containsText('Bob likes pizza');
   });
 });

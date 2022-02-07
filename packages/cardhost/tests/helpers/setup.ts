@@ -3,7 +3,7 @@ import Builder from 'cardhost/lib/builder';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { setupRenderingTest, setupApplicationTest } from 'ember-qunit';
 import { CardId, Format, RawCard } from '@cardstack/core/src/interfaces';
-import { render } from '@ember/test-helpers';
+import { render, getContext } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { cardURL } from '@cardstack/core/src/utils';
 
@@ -27,7 +27,6 @@ export function setupCardTest(
   hooks: NestedHooks,
   options: CardTestOptions = { type: 'integration' }
 ) {
-  let context: TestContext | undefined;
   let cardService: Cards;
   let builder: Builder;
 
@@ -41,16 +40,11 @@ export function setupCardTest(
   }
 
   hooks.beforeEach(async function () {
-    context = this;
     cardService = this.owner.lookup('service:cards');
     if (options.type === 'application') {
       cardService.overrideRoutingCardWith = options.routingCard;
     }
     builder = await cardService.builder();
-  });
-
-  hooks.afterEach(async function () {
-    context = undefined;
   });
 
   function createCard(rawCard: RawCard) {
@@ -61,8 +55,8 @@ export function setupCardTest(
     cardId: Partial<CardId> & { id: string },
     format: Format = 'isolated'
   ) {
-    let { component } = await cardService.load(testCardURL(cardId), format);
-    context?.set('component', component);
+    let card = await cardService.load(testCardURL(cardId), format);
+    (getContext() as TestContext).set('component', await card.component());
     await render(hbs`<this.component />`);
   }
 
