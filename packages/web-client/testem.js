@@ -28,7 +28,7 @@ const config = {
 };
 
 if (process.env.CI) {
-  fs.mkdirSync('test-results');
+  fs.mkdirSync('../../test-results');
 
   const reporters = [
     {
@@ -39,7 +39,7 @@ if (process.env.CI) {
       ReporterClass: XunitReporter,
       args: [
         false,
-        fs.createWriteStream('test-results/ui.xml'),
+        fs.createWriteStream('../../test-results/ui.xml'),
         { get: () => false },
       ],
     },
