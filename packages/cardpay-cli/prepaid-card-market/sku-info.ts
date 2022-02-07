@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 import { getSDK } from '@cardstack/cardpay-sdk';
@@ -9,10 +9,12 @@ export default {
   command: 'sku-info <sku>',
   describe: 'Get the details for the prepaid cards available in the market contract for the specified SKU',
   builder(yargs: Argv) {
-    return yargs.positional('sku', {
-      type: 'string',
-      description: 'The SKU to obtain details for',
-    });
+    return yargs
+      .positional('sku', {
+        type: 'string',
+        description: 'The SKU to obtain details for',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, sku } = args as unknown as {

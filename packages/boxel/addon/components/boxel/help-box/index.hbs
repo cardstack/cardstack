@@ -8,7 +8,14 @@
       {{yield}}
     </div>
   {{/if}}
-  <Boxel::Button {{on "click" (optional @onClickButton)}} @kind="secondary-light" class="boxel-help-box__button">
-    {{or @buttonText "Request live support"}}
+  <Boxel::Button
+    @as="anchor"
+    @href={{@url}}
+    @kind="secondary-light"
+    class="boxel-help-box__button"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {{or @buttonText "Contact Support"}}
   </Boxel::Button>
 </Boxel::Sidebar::CardContainer>

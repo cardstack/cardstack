@@ -139,9 +139,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   schemaModule: Ref;
   serializer?: SerializerName;
 
-  isolated: ComponentInfo<Ref>;
-  embedded: ComponentInfo<Ref>;
-  edit: ComponentInfo<Ref>;
+  componentInfos: Record<Format, ComponentInfo<Ref>>;
 
   modules: Record<
     string, // local module path

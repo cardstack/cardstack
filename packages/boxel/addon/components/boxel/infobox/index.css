@@ -23,7 +23,8 @@
   flex-direction: column;
   padding: var(--boxel-sp-xl) var(--boxel-sp-xxl);
   border-radius: var(--boxel-border-radius);
-  background: linear-gradient(90deg, rgba(40, 30, 120, 1) 0%, rgba(40, 30, 120, 0.9) 75%, rgba(40, 30, 120, 0.8) 86%, rgba(40, 30, 120, 0) 100%);
+  /* stylelint-disable-next-line max-line-length */
+  background: linear-gradient(90deg, rgb(40 30 120 / 100%) 0%, rgb(40 30 120 / 90%) 75%, rgb(40 30 120 / 80%) 86%, rgb(40 30 120 / 0%) 100%);
 }
 
 .boxel-infobox__title {

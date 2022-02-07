@@ -14,7 +14,7 @@
   justify-content: space-between;
   font: 700 var(--boxel-font);
   letter-spacing: 0;
-  background: url('/images/backgrounds/bridge-background.svg');
+  background: url("/images/backgrounds/bridge-background.svg");
 }
 
 /* excluding disabled/href-less link so that it's clear when the link fails to load */

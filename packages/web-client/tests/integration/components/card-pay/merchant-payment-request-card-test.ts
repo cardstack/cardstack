@@ -2,11 +2,9 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import config from '@cardstack/web-client/config/environment';
 import { MerchantInfoResource } from '@cardstack/web-client/resources/merchant-info';
 
 // selectors
-const BETA_ACCESS_LINK = '[data-test-payment-request-beta-access-link]';
 const EXPLANATION = '[data-test-payment-request-explanation]';
 const MERCHANT = '[data-test-merchant]';
 const MERCHANT_INFO_ADDRESS_ONLY =
@@ -68,9 +66,6 @@ module(
         />
       `);
 
-      assert
-        .dom(BETA_ACCESS_LINK)
-        .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name!);
       assert
         .dom(MERCHANT_LOGO)
@@ -102,9 +97,6 @@ module(
         />
       `);
 
-      assert
-        .dom(BETA_ACCESS_LINK)
-        .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name!);
       assert
         .dom(MERCHANT_LOGO)
@@ -159,9 +151,6 @@ module(
         />
       `);
 
-      assert
-        .dom(BETA_ACCESS_LINK)
-        .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).doesNotExist();
       assert.dom(MERCHANT_INFO_ADDRESS_ONLY).containsText(merchantAddress);
       assert
@@ -189,9 +178,6 @@ module(
         />
       `);
 
-      assert
-        .dom(BETA_ACCESS_LINK)
-        .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).doesNotExist();
       assert.dom(LOADING_INDICATOR).exists();
       assert.dom(AMOUNT).containsText(`§300`);

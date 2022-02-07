@@ -166,6 +166,11 @@ export default class FileCache {
       return context.exports;
     }
 
+    if (moduleIdentifier.startsWith('@cardstack/core/src/utils/')) {
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/utils/', '');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require(`@cardstack/core/src/utils/${moduleIdentifier}`);
+    }
     if (moduleIdentifier.startsWith('@cardstack/core/')) {
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
       // eslint-disable-next-line @typescript-eslint/no-require-imports

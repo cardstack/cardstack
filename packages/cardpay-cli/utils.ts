@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { AbstractProvider } from 'web3-core';
 import { HttpProvider, getConstant, networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import { Options } from 'yargs';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -37,3 +38,24 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
     return new Web3(provider as unknown as AbstractProvider);
   }
 }
+
+export const NETWORK_OPTION_LAYER_1 = {
+  alias: 'n',
+  type: 'string',
+  description: 'The Layer 1 network to run this script on',
+  choices: ['kovan', 'mainnet'],
+} as Options;
+
+export const NETWORK_OPTION_LAYER_2 = {
+  alias: 'n',
+  type: 'string',
+  description: 'The Layer 2 network to run this script on',
+  choices: ['sokol', 'xdai'],
+} as Options;
+
+export const NETWORK_OPTION_ANY = {
+  alias: 'n',
+  type: 'string',
+  description: 'The network to run this script on',
+  choices: ['sokol', 'kovan', 'xdai', 'mainnet'],
+} as Options;

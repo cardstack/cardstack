@@ -16,9 +16,10 @@
   grid-template-rows: 1.25rem 1.875rem;
   grid-template-columns: 1.25rem 1fr 0.5rem;
   gap: 0 var(--boxel-sp);
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   grid-template-areas:
-    'icon title drag'
-    'icon description drag';
+    "icon title drag"
+    "icon description drag";
   align-items: center;
 }
 
@@ -31,9 +32,9 @@
 }
 
 .boxel-card-catalog-tray-item--dragged-item {
-  --boxel-card-catalog-tray-item-border: 1px solid rgba(39, 35, 48, 0.15); /* var(--boxel-purple-900) with 15% opacity */
+  --boxel-card-catalog-tray-item-border: 1px solid rgb(39 35 48 / 15%); /* var(--boxel-purple-900) with 15% opacity */
 
-  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 15px 30px rgb(0 0 0 / 50%));
 }
 
 .boxel-card-catalog-tray-item--used,
@@ -67,7 +68,7 @@
   grid-area: description;
   height: 1.875rem;
   margin: 0;
-  display: -webkit-box;
+  display: box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;

@@ -19,6 +19,7 @@ export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWo
   @service declare hubAuthentication: HubAuthentication;
   @tracked error?: Error;
   @tracked authTaskRunningForAWhile = false;
+  mailToSupportUrl = config.urls.mailToSupportUrl;
 
   @action checkIfAuthenticated() {
     if (this.hubAuthentication.isAuthenticated) {

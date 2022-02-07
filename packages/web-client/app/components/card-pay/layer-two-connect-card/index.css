@@ -11,24 +11,8 @@
   align-items: center;
   display: flex;
   gap: var(--boxel-sp-sm);
-  flex-wrap: wrap;
   justify-content: space-around;
   padding-top: var(--boxel-sp);
-}
-
-.layer-two-connect-card__testflight-link {
-  --icon-color: currentColor;
-
-  font: 600 var(--boxel-font);
-  padding: var(--boxel-sp-sm);
-}
-
-.layer-two-connect-card__testflight-link > svg {
-  margin-bottom: var(--boxel-sp-sm);
-}
-
-.layer-two-connect-card__testflight-link-icon {
-  flex-shrink: 0;
 }
 
 .layer-two-connect-card__alternate-wallet {
@@ -41,7 +25,8 @@
   padding-left: var(--boxel-sp-xxl);
   padding-right: var(--boxel-sp-xxl);
   text-align: left;
-  display: none; /* hide this until we add the destination UI */ /* stylelint-disable-line declaration-block-no-duplicate-properties */
+  /* stylelint-disable-next-line declaration-block-no-duplicate-properties */
+  display: none; /* hide this until we add the destination UI */
 }
 
 .layer-two-connect-card__section {

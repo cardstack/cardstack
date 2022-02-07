@@ -60,7 +60,7 @@
         class='card-space-profile-card__host'
         data-test-profile-card-host
       >
-        {{or @host (concat 'blank.' (config 'cardSpaceHostnameSuffix'))}}
+        {{or @host (concat 'blank.' this.cardSpaceHostnameSuffix)}}
       </div>
 
       <div

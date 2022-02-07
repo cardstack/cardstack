@@ -3,14 +3,6 @@
   justify-content: space-between;
 }
 
-.layout-display-view__card-preview-field {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--boxel-sp-xs);
-}
-
 .layout-display-view__data {
   flex-grow: 1;
   margin-left: var(--boxel-sp-xl);

@@ -8,4 +8,6 @@ export default class extends Component {
   @tracked hamburgerMenuOpen = false;
   cardPayLogo = CardPayLogo;
   cardPayLogoPng = 'https://' + config.universalLinkDomain + CardPayLogoPng;
+  mailToSupportUrl = config.urls.mailToSupportUrl;
+  aboutURL = config.urls.about;
 }

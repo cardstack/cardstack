@@ -7,7 +7,7 @@
   background-color: var(--boxel-light-300);
   color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
 
 .boxel-thread__content-wrapper {

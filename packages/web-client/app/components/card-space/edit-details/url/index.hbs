@@ -1,6 +1,6 @@
 <div class="card-space-url-form" {{did-insert this.restoreFromSession}}>
-  <CardPay::LabeledValue
-    @fieldMode="edit"
+  <Boxel::Field
+    @tag="label"
     @label="URL"
     data-test-card-space-url-field
   >
@@ -14,9 +14,9 @@
           @onBlur={{this.validateUrl}}
         />
       </div>
-      <div class='card-space-url-form__domain'>
-        .{{config 'cardSpaceHostnameSuffix'}}
+      <div class="card-space-url-form__domain">
+        .{{this.cardSpaceHostname}}
       </div>
     </div>
-  </CardPay::LabeledValue>
+  </Boxel::Field>
 </div>

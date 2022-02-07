@@ -48,8 +48,6 @@ module('Acceptance | create card space', function (hooks) {
       });
     });
     test('initiating the workflow', async function (assert) {
-      let subdomain = ''; // TODO: replace this when other parts of the form are filled out
-
       await visit('/card-space');
       await click('[data-test-workflow-button="create-space"]');
 
@@ -74,7 +72,7 @@ module('Acceptance | create card space', function (hooks) {
         .containsText('Name');
       assert
         .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
-        .containsText('blank.pouty.pizza');
+        .containsText('blank.card.space.test');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-category]'
@@ -160,7 +158,7 @@ module('Acceptance | create card space', function (hooks) {
         .exists();
       assert
         .dom('[data-test-profile-card-host]')
-        .hasText('vandelay.pouty.pizza');
+        .hasText('vandelay.card.space.test');
 
       // Display name
       await waitFor(postableSel(2, 1));
@@ -201,18 +199,8 @@ module('Acceptance | create card space', function (hooks) {
         .dom(milestoneCompletedSel(3))
         .containsText(`Card Space details saved`);
 
-      // Reservation badge
-      await waitFor(postableSel(4, 1));
-      assert
-        .dom(postableSel(4, 0))
-        .containsText(`We have sent your URL reservation badge`);
-      assert.dom(postableSel(4, 1)).containsText(`URL reservation`);
-      assert
-        .dom(`${postableSel(4, 1)} [data-test-full-card-space-domain]`)
-        .containsText(`${subdomain}.pouty.pizza`);
-
       // Confirm
-      await waitFor(postableSel(4, 3));
+      await waitFor(postableSel(4, 0));
 
       await click('[data-test-card-space-creation-button]');
       assert.dom('[data-test-card-space-creation-is-complete]').exists();

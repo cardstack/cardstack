@@ -12,7 +12,7 @@
   color: var(--boxel-expandable-banner-text-color);
   background-color: var(--boxel-expandable-banner-background-color);
   border-radius: var(--boxel-border-radius);
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 15%));
   overflow: hidden;
   transition: min-height var(--boxel-transition);
 }
@@ -38,8 +38,10 @@
   align-items: center;
   min-height: var(--boxel-expandable-banner-min-height);
   padding:
-    var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
-    var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
+    var(--boxel-expandable-banner-vertical-gap)
+    calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
+    var(--boxel-expandable-banner-vertical-gap)
+    var(--boxel-expandable-banner-horizontal-gap);
 }
 
 .boxel-expandable-banner__summary-text {
@@ -66,7 +68,7 @@
 .boxel-expandable-banner__summary::marker,
 .boxel-expandable-banner__summary::-webkit-details-marker {
   display: none;
-  content: '';
+  content: "";
 }
 
 .boxel-expandable-banner__summary:focus {

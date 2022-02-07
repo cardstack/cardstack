@@ -1,19 +1,22 @@
-@import './action-status-area/index.css';
+@import "./action-status-area/index.css";
 
 .boxel-action-chin {
   --boxel-action-chin-padding-horizontal: var(--boxel-sp-lg);
   --boxel-action-chin-padding-vertical: var(--boxel-sp-lg);
-  --button-base-height: 2rem; /* The height of the boxel button, used for calculating the min-height to reduce layout shift */
+
+  /* The height of the boxel button, used for calculating the min-height to reduce layout shift */
+  --button-base-height: 2rem;
   --boxel-action-chin-background-color: var(--boxel-purple-750);
   --boxel-action-chin-emphasis-text-color: var(--boxel-light);
   --boxel-action-chin-text-color: var(--boxel-purple-300);
   --icon-color: var(--boxel-action-chin-text-color);
-  --boxel-action-chin-disabled-background: rgba(54, 52, 65, 0.9); /* bg-color at 90% opacity */
+  --boxel-action-chin-disabled-background: rgb(54 52 65 / 90%); /* bg-color at 90% opacity */
 
   position: relative;
   display: grid;
   grid-template-columns: auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
   grid-template-rows: auto;
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   grid-template-areas: "main cancel _ info lock-icon";
   align-items: center;
   padding: var(--boxel-action-chin-padding-vertical) var(--boxel-action-chin-padding-horizontal);

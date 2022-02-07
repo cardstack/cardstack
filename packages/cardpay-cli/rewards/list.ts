@@ -1,12 +1,16 @@
-import { getWeb3 } from '../utils';
-import { Arguments, CommandModule } from 'yargs';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { Arguments, Argv, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { displayRewardProgramInfo } from './utils';
 
 export default {
   command: 'list',
   describe: 'List reward programs',
-  builder: {},
+  builder(yargs: Argv) {
+    return yargs.options({
+      network: NETWORK_OPTION_LAYER_2,
+    });
+  },
   async handler(args: Arguments) {
     let { network, mnemonic } = args as unknown as {
       network: string;

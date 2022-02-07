@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 
@@ -7,10 +7,14 @@ export default {
   command: 'updated-at <token>',
   describe: 'Get the date that the oracle was last updated for the specified token',
   builder(yargs: Argv) {
-    return yargs.positional('token', {
-      type: 'string',
-      description: 'The token symbol (without the .CPXD suffix)',
-    });
+    return yargs
+      .positional('token', {
+        type: 'string',
+        description: 'The token symbol (without the .CPXD suffix)',
+      })
+      .options({
+        network: NETWORK_OPTION_ANY,
+      });
   },
   async handler(args: Arguments) {
     let { network, mnemonic, token } = args as unknown as {

@@ -1,7 +1,7 @@
 /*global fetch */
 import { Argv } from 'yargs';
 import { getConstant, getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getInventoriesFromAPI } from './utils';
 import Web3 from 'web3';
@@ -27,7 +27,8 @@ export default {
       .positional('secret', {
         type: 'string',
         description: 'The "provisioner secret" phrase to enable provisioning',
-      });
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
     let { network, mnemonic, sku, recipient, environment, provisionerSecret } = args as unknown as {

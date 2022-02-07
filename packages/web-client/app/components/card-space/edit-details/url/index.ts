@@ -16,6 +16,8 @@ class CreateSpaceWorkflowEditDetailsUrlComponent extends Component<WorkflowCardC
   @tracked urlValidationState = 'initial';
   @tracked urlValidationMessage: string = '';
 
+  cardSpaceHostnameSuffix = config.cardSpaceHostnameSuffix;
+
   @action restoreFromSession() {
     let url = this.args.workflowSession.getValue<string>('url');
     if (url) {

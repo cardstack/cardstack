@@ -5,13 +5,19 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
     <div class="withdrawal-transaction-amount__fields">
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Withdrawal source" class="withdrawal-transaction-amount__label">
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Withdrawal source"
+      >
         <CardPay::SafeChooserDropdown::SafeOption
           @safe={{this.currentSafe}}
           data-test-withdrawal-source
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Source balance" class="withdrawal-transaction-amount__label">
+      </Boxel::Field>
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Source balance"
+      >
         <CardPay::BalanceDisplay
           class="withdrawal-transaction-amount__balance"
           @size="small"
@@ -21,10 +27,9 @@
           @symbol={{this.currentTokenDetails.symbol}}
           data-test-withdrawal-balance
         />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        class="withdrawal-transaction-amount__label"
-        @fieldMode={{if this.isConfirmed "view" "edit"}}
+      </Boxel::Field>
+      <Boxel::Field
+        @tag={{unless this.isConfirmed "label"}}
         @vertical={{this.isConfirmed}}
         @label="Amount to withdraw"
         data-test-amount-label
@@ -50,25 +55,24 @@
             @disabled={{or @frozen (eq this.amountCtaState 'memorialized')}}
           />
         {{/if}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
       {{#unless this.isConfirmed}}
-        <CardPay::LabeledValue
-          class="withdrawal-transaction-amount__label"
+        <Boxel::Field
           @label="Approximate value*"
           data-test-approximate-value-label
         >
           {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
-        </CardPay::LabeledValue>
+        </Boxel::Field>
       {{/unless}}
     </div>
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-withdrawal-transaction-amount-error as |supportURL|>
+      <CardPay::ErrorMessage data-test-withdrawal-transaction-amount-error as |mailToSupportUrl|>
         {{#if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           You don’t have enough balance to transfer the selected amount of tokens. Try a smaller amount.
         {{else}}
-          There was a problem initiating the withdrawal of your tokens from {{network-display-info "layer2" "fullName"}}. Please try again, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          There was a problem initiating the withdrawal of your tokens from {{network-display-info "layer2" "fullName"}}. Please try again, or contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
       </CardPay::ErrorMessage>
     {{/if}}

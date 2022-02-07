@@ -16,6 +16,7 @@
       {{#if @address}}
         <div class={{cn
           "account-display__address"
+          account-display__address--secondary=(or @name isSmall)
           account-display__address--sm=isSmall
           account-display__address--wrapped=(or @wrapped isLarge)
         }}

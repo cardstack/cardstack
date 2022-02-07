@@ -1,5 +1,6 @@
 .boxel-thread-message {
-  --boxel-thread-message-avatar-size: 2.5rem; /* 40px. Avatar should not be set to be larger than 60px or smaller than 20px. */
+  /* Note: avatar size should not be set to be larger than 60px or smaller than 20px. */
+  --boxel-thread-message-avatar-size: 2.5rem; /* 40px. */
   --boxel-thread-message-meta-height: 1.25rem; /* 20px */
   --boxel-thread-message-gap: var(--boxel-sp);
   --boxel-thread-message-margin-left: calc(var(--boxel-thread-message-avatar-size) + var(--boxel-thread-message-gap));

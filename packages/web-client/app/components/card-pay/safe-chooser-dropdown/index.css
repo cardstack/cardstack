@@ -6,7 +6,7 @@
 }
 
 .safe-chooser-dropdown > .ember-power-select-trigger {
-  background: url('/images/icons/caret-dropdown.svg') right 1.125rem center/auto 0.5rem no-repeat;
+  background: url("/images/icons/caret-dropdown.svg") right 1.125rem center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius-sm);
@@ -43,7 +43,7 @@
 }
 
 .safe-chooser-dropdown__option--selected {
-  background-image: url('/images/icons/checkmark.svg');
+  background-image: url("/images/icons/checkmark.svg");
   background-repeat: no-repeat;
   background-position: right 1.125rem center;
   background-size: 0.75rem 0.75rem;

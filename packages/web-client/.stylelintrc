@@ -2,6 +2,10 @@
   "extends": "stylelint-config-standard",
   "ignoreFiles": [
     "dist/**/*.css",
-    "node_modules/**/*.css",
-  ]
+    "node_modules/**/*.css"
+  ],
+  "rules": {
+    "property-no-vendor-prefix": null,
+    "selector-class-pattern": "^[a-z]([a-z0-9-]+)?(__([a-z0-9]+-?)+)?(--([a-z0-9]+-?)+){0,2}$"
+  }
 }

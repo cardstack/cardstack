@@ -19,40 +19,40 @@
       data-test-layer-2-wallet-summary
     >
       <CardPay::FieldStack>
-        <CardPay::LabeledValue
-          @label="Network"
-          @value={{network-display-info "layer2" "fullName"}}
-        />
+        <Boxel::Field @label="Network">
+          {{network-display-info "layer2" "fullName"}}
+        </Boxel::Field>
 
         {{#if this.isConnected}}
-          <CardPay::LabeledValue
-            @label="Account"
-            @value={{this.layer2Network.walletInfo.firstAddress}}
-            @isAddress={{true}}
-            data-test-address-field
-          />
-          <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
+          <Boxel::Field @label="Account" data-test-address-field>
+            <CardPay::AccountDisplay
+              @address={{this.layer2Network.walletInfo.firstAddress}}
+              @wrapped={{true}}
+            />
+          </Boxel::Field>
+          <Boxel::Field @label="Depot balance" data-test-balance-container>
             {{#if this.layer2Network.isFetchingDepot}}
               <Boxel::LoadingIndicator data-test-balance-container-loading/>
             {{else if this.balancesToShow.length}}
-            <CardPay::BalancesList as |Balance|>
-              {{#each this.balancesToShow as |b|}}
-                <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
-              {{/each}}
-            </CardPay::BalancesList>
+              <CardPay::BalancesList as |Balance|>
+                {{#each this.balancesToShow as |b|}}
+                  <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+                {{/each}}
+              </CardPay::BalancesList>
             {{else}}
               None
             {{/if}}
-          </CardPay::LabeledValue>
+          </Boxel::Field>
         {{/if}}
 
         {{!-- future: show Prepaid Cards, Badges --}}
-        <CardPay::LabeledValue
+        <Boxel::Field
           @label="Status"
-          @value={{if this.isConnected "Connected" "Disconnected"}}
           @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
           data-test-layer-2-wallet-connected-status
-        />
+        >
+          {{if this.isConnected "Connected" "Disconnected"}}
+        </Boxel::Field>
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
 
@@ -86,19 +86,7 @@
             width="138px"
             height="149px"
           >
-          <a
-            class="layer-two-connect-card__testflight-link"
-            href={{config 'urls.testFlightLink'}}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {{svg-jar "test-flight-icon" width="210px" }}
-
-            <div>
-              Download TestFlight
-              {{svg-jar "caret-right-large" class="layer-two-connect-card__testflight-link-icon"}}
-            </div>
-          </a>
+          <Common::CardWalletBadges />
         </div>
       </ActionCardContainer::Section>
       <ActionCardContainer::Section

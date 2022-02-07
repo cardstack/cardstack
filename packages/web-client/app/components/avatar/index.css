@@ -33,7 +33,7 @@
   left: 0;
   width: var(--image-size);
   height: var(--image-size);
-  background-color: rgba(100, 100, 100, 0.5);
+  background-color: rgb(100 100 100 / 50%);
 }
 
 .avatar__loading-indicator {

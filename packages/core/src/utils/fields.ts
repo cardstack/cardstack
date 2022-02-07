@@ -41,8 +41,8 @@ function buildUsedFieldListFromComponents(
 ): void {
   let field = getFieldForPath(fields, fieldPath);
 
-  if (field && field.card[format].usedFields.length) {
-    for (const nestedFieldPath of field.card[format].usedFields) {
+  if (field && field.card.componentInfos[format].usedFields.length) {
+    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
       buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
     }
   } else {

@@ -6,7 +6,7 @@
 >
   <ActionCardContainer::Section @title="Select a business account" class="merchant-customization">
     {{#if @isComplete}}
-      <CardPay::LabeledValue
+      <Boxel::Field
         class="merchant-customization__name"
         @label="Business Name"
       >
@@ -17,18 +17,18 @@
           @size="large"
           @vertical={{true}}
         />
-      </CardPay::LabeledValue>
+      </Boxel::Field>
 
-      <CardPay::LabeledValue @label="Business ID">
+      <Boxel::Field @label="Business ID">
         {{this.merchantData.id}}
-      </CardPay::LabeledValue>
+      </Boxel::Field>
 
-      <CardPay::LabeledValue @label="Card Space URL">
-        {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
-      </CardPay::LabeledValue>
+      <Boxel::Field @label="Card Space URL">
+        {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+      </Boxel::Field>
     {{else}}
       <CardPay::FieldStack>
-        <CardPay::LabeledValue
+        <Boxel::Field
           @label="Business Account"
         >
           <CardPay::SafeChooserDropdown
@@ -42,11 +42,11 @@
             The business ID will be used for your Card Space URL. Only business accounts that
             you haven't yet been used for Card Space are shown.
           </div>
-        </CardPay::LabeledValue>
+        </Boxel::Field>
 
-        <CardPay::LabeledValue @label="Card Space URL">
-          {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
-        </CardPay::LabeledValue>
+        <Boxel::Field @label="Card Space URL">
+          {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+        </Boxel::Field>
       </CardPay::FieldStack>
     {{/if}}
   </ActionCardContainer::Section>

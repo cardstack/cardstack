@@ -77,8 +77,8 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
       ?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }
 
-  @action openDiscord() {
-    window.open(config.urls.discordSupportChannelUrl, '_blank');
+  get mailToSupportUrl() {
+    return config.urls.mailToSupportUrl;
   }
 
   get lastMilestonePostable() {
