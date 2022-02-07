@@ -46,3 +46,8 @@ jobs:
         if: always()
         with:
           files: test-results/**/*.xml
+      - name: FIXME archive test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: test-results/ui.xml
