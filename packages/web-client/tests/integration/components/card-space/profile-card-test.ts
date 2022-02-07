@@ -18,7 +18,7 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
     assert.dom('[data-test-profile-card-name]').containsText('Name');
     assert
       .dom('[data-test-profile-card-host]')
-      .containsText('blank.pouty.pizza');
+      .containsText('blank.card.space.test');
     assert.dom('[data-test-profile-card-category]').containsText('Category');
     assert
       .dom('[data-test-profile-card-description]')
