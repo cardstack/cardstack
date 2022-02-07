@@ -7,6 +7,11 @@ import {
   CardModel,
   CardComponentModule,
   Card,
+  JSONAPIDocument,
+  assertDocumentDataIsResource,
+  ResourceObject,
+  Unsaved,
+  Saved,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
@@ -18,7 +23,7 @@ import {
 } from '@cardstack/core/src/compiler';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import dynamicCardTransform from './dynamic-card-transform';
-import { encodeCardURL } from '@cardstack/core/src/utils';
+import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 import CardModelForBrowser from './card-model-for-browser';
 
@@ -200,6 +205,58 @@ export default class LocalRealm implements Builder {
       this.remoteRawCards.set(url, raw);
       return compiled;
     }
+  }
+
+  async create(
+    parentCardURL: string,
+    resource: ResourceObject<Unsaved>
+  ): Promise<JSONAPIDocument> {
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let id = this.generateId();
+    this.createRawCard({
+      realm: this.realmURL,
+      id,
+      data,
+      adoptsFrom: parentCardURL,
+    });
+    let url = cardURL({ realm: this.realmURL, id });
+    let { raw } = await this.load(url);
+    return {
+      data: {
+        type: 'card',
+        id: url,
+        attributes: raw.data,
+      },
+    };
+  }
+
+  async update(
+    url: string,
+    resource: ResourceObject<Saved>
+  ): Promise<JSONAPIDocument> {
+    let cardId = this.parseOwnRealmURL(url);
+    if (!cardId) {
+      throw new Error(`${url} is not in the local realm`);
+    }
+    assertDocumentDataIsResource(resource);
+    let data = resource.attributes;
+    let existingRawCard = await this.getRawCard(url);
+    if (!existingRawCard) {
+      throw new Error(
+        `Tried to update a local card that doesn't exist: ${url}`
+      );
+    }
+
+    existingRawCard.data = data;
+    let { raw } = await this.load(url);
+    return {
+      data: {
+        type: 'card',
+        id: url,
+        attributes: raw.data,
+      },
+    };
   }
 
   generateId(): string {

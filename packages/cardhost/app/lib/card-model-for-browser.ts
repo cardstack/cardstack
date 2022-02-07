@@ -275,7 +275,10 @@ export default class CardModelForBrowser implements CardModel {
     switch (this.state.type) {
       case 'created':
         if (this.localRealm) {
-          response = await this.createLocal();
+          response = await this.localRealm.create(
+            this.state.parentCardURL,
+            this.serialize()
+          );
         } else {
           response = await this.createRemote();
         }
@@ -283,7 +286,10 @@ export default class CardModelForBrowser implements CardModel {
       case 'loaded':
         original = this.state.original;
         if (this.localRealm) {
-          response = await this.updateLocal();
+          response = await this.localRealm.update(
+            this.url,
+            this.serialize() as ResourceObject<Saved> // loaded state is always saved
+          );
         } else {
           response = await this.updateRemote();
         }
@@ -332,89 +338,6 @@ export default class CardModelForBrowser implements CardModel {
       method: 'PATCH',
       body: JSON.stringify({ data: this.serialize() }),
     });
-  }
-
-  private async createLocal(): Promise<JSONAPIDocument> {
-    if (this.state.type !== 'created') {
-      throw new Error(
-        `cannot createLocal() for card model when state is "${this.state.type}"`
-      );
-    }
-    if (!this.localRealm) {
-      throw new Error(
-        `cannot createLocal() for card model without local realm`
-      );
-    }
-    let resource = this.serialize();
-    assertDocumentDataIsResource(resource);
-    let data = resource.attributes;
-    let id = this.localRealm.generateId();
-    this.localRealm.createRawCard({
-      realm: this.state.realm,
-      id,
-      data,
-      adoptsFrom: this.state.parentCardURL,
-    });
-    let url = cardURL({ realm: this.state.realm, id });
-    return await this.loadFromLocalRealm(url);
-  }
-
-  private async updateLocal(): Promise<JSONAPIDocument> {
-    if (this.state.type !== 'loaded') {
-      throw new Error(
-        `cannot updateLocal() for card model when state is "${this.state.type}"`
-      );
-    }
-    if (!this.localRealm) {
-      throw new Error(
-        `cannot updateLocal() for card model without local realm`
-      );
-    }
-    let cardId = this.parseLocalRealmURL(this.url);
-    if (!cardId) {
-      throw new Error(`${this.url} is not in the local realm`);
-    }
-    let resource = this.serialize();
-    assertDocumentDataIsResource(resource);
-    let data = resource.attributes;
-    let existingRawCard = await this.localRealm.getRawCard(this.url);
-    if (!existingRawCard) {
-      throw new Error(
-        `Tried to update a local card that doesn't exist: ${this.url}`
-      );
-    }
-
-    existingRawCard.data = data;
-    return await this.loadFromLocalRealm(this.url);
-  }
-
-  private async loadFromLocalRealm(url: string): Promise<JSONAPIDocument> {
-    if (!this.localRealm) {
-      throw new Error(
-        `cannot loadFromLocalRealm() for card model without local realm`
-      );
-    }
-    let { raw } = await this.localRealm.load(url);
-    return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-      },
-    };
-  }
-
-  private parseLocalRealmURL(url: string): CardId | undefined {
-    if (!this.localRealm) {
-      return;
-    }
-    if (url.startsWith(this.localRealm.realmURL)) {
-      return {
-        realm: this.localRealm.realmURL,
-        id: url.slice(this.localRealm.realmURL.length),
-      };
-    }
-    return;
   }
 }
 
