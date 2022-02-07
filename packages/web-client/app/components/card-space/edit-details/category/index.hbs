@@ -38,7 +38,7 @@
           @name="category"
           @checked={{eq this.categoryValue category}}
           @onChange={{fn this.setCategoryValue category}}
-          data-test-category-option
+          data-test-category-option={{category}}
         >
           {{category}}
         </option.component>
