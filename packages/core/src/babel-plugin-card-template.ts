@@ -86,7 +86,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
 
 function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
   let t = babel.types;
-  // This will eventually replace addSerializerMap
   let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
   state.opts.serializerMap = serializerMap;
 
