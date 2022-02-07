@@ -11,3 +11,9 @@
   height: 2.8rem;
   object-fit: contain;
 }
+
+@media screen and (max-width: 480px) {
+  .card-wallet-badges img {
+    height: 2.5rem;
+  }
+}
