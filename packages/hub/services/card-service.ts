@@ -1,4 +1,4 @@
-import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
+import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel, RawCardData } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
@@ -93,16 +93,13 @@ export class CardService {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
-
-    let cardModel = await this.makeCardModelFromDatabase('isolated', compiledCard);
     let computedFields = Object.keys(compiledCard.fields).filter((f) => (compiledCard.fields[f].computed ? f : null));
-    let data: Record<string, any> = {};
-    for (let f of computedFields) {
-      let value = await cardModel.getField(f);
-      data[f] = value;
-    }
-
-    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
+    let compiled = await this.searchIndex.indexCard(
+      rawCard,
+      compiledCard,
+      compiler,
+      computedFields.length && rawCard.data ? this : undefined
+    );
     return { raw: rawCard, compiled };
   }
 
@@ -134,15 +131,19 @@ export class CardService {
     }
   }
 
-  async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
+  async makeCardModelFromDatabase(
+    format: Format,
+    result: Record<string, any>,
+    rawData?: RawCardData
+  ): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
     return await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: cardId.id,
       realm: cardId.realm,
       format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
+      rawData: result.data ?? rawData,
+      schemaModule: result.schemaModule.global,
       usedFields: result.componentInfos[format].usedFields,
       componentModule: result.componentInfos[format].moduleName.global,
       serializerMap: result.componentInfos[format].serializerMap,
