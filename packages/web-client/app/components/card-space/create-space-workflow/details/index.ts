@@ -15,8 +15,7 @@ class CreateSpaceWorkflowDetailsComponent extends Component<WorkflowCardComponen
     return (
       !this.args.workflowSession.getValue('profileDescription') ||
       !this.args.workflowSession.getValue('profileButtonText') ||
-      !this.args.workflowSession.getValue('profileCategory') ||
-      !this.args.workflowSession.getValue('profileCoverImageUrl')
+      !this.args.workflowSession.getValue('profileCategory')
     );
   }
 }

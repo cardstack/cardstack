@@ -14,11 +14,15 @@
       <CardPay::LabeledValue
         @label="Cover image"
       >
-        <Avatar
-          @src={{@workflowSession.state.profileCoverImageUrl}}
-          @alt="Cover image"
-          @rounded={{false}}
-        />
+        {{#if @workflowSession.state.profileCoverImageUrl}}
+          <Avatar
+            @src={{@workflowSession.state.profileCoverImageUrl}}
+            @alt="Cover image"
+            @rounded={{false}}
+          />
+        {{else}}
+          No cover image
+        {{/if}}
       </CardPay::LabeledValue>
 
       <CardPay::LabeledValue
