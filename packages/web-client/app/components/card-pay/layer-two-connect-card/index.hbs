@@ -72,6 +72,11 @@
         class="layer-two-connect-card__section layer-two-connect-card__section--one"
         data-test-layer-2-connect-prompt
       >
+        {{#if @includeExplanations}}
+          <p class="layer-two-connect-card__explanation">
+            Please install the Card Wallet app on your mobile phone and create/add an account.
+          </p>
+        {{/if}}
         <div class="layer-two-connect-card__link-container">
           <img
             srcset="{{this.cardstackMobileAppPhone}},
