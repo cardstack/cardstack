@@ -2,14 +2,9 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-}
-
-.card-wallet-badges > a {
-  flex-basis: 50%;
-}
-
-.card-wallet-badges > a:last-child {
-  text-align: center;
+  gap: var(--boxel-sp-xxs);
+  flex-wrap: wrap;
+  line-height: 0;
 }
 
 .card-wallet-badges img {
