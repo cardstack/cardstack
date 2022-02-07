@@ -1,6 +1,7 @@
 import { inject as service } from '@ember/service';
 import Component from '@glimmer/component';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
+import config from '@cardstack/web-client/config/environment';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
@@ -15,6 +16,8 @@ class CreateSpaceWorkflowSelectBusiness extends Component<WorkflowCardComponentA
   @tracked merchantSafes: MerchantSafe[] | null = null;
   @tracked selectedSafe: MerchantSafe | null = null;
   @service declare merchantInfo: MerchantInfoService;
+
+  cardSpaceHostnameSuffix = config.cardSpaceHostnameSuffix;
 
   get merchantData() {
     if (this.selectedSafe) {
