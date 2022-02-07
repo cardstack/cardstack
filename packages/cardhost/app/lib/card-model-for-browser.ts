@@ -9,7 +9,6 @@ import {
   RawCardData,
   Format,
   ComponentInfo,
-  CardId,
   CardComponentModule,
   CardSchemaModule,
 } from '@cardstack/core/src/interfaces';
@@ -25,7 +24,6 @@ import {
   serializeAttributes,
   serializeResource,
 } from '@cardstack/core/src/serializers';
-import { cardURL } from '@cardstack/core/src/utils';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import Cards from 'cardhost/services/cards';
