@@ -39,7 +39,7 @@ if (process.env.CI) {
       ReporterClass: XunitReporter,
       args: [
         false,
-        fs.createWriteStream('../../test-results/ui.xml'),
+        fs.createWriteStream('../../test-results/web-client.xml'),
         { get: () => false },
       ],
     },
