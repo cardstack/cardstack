@@ -176,7 +176,7 @@ export default class CardModelForHub implements CardModel {
     return this._data;
   }
 
-  get component(): unknown {
+  async component(): Promise<unknown> {
     throw new Error('Hub does not have use of component');
   }
 

@@ -195,8 +195,6 @@ export interface CardModel {
   setters: Setter | undefined;
   adoptIntoRealm(realm: string, id?: string): Promise<CardModel>;
   editable(): Promise<CardModel>;
-  innerComponent: unknown;
-  serializerMap: SerializerMap;
   url: string;
   id: string | undefined;
   data: Record<string, any>;
@@ -204,9 +202,15 @@ export interface CardModel {
   format: Format;
   setData(data: RawCardData): void;
   serialize(): ResourceObject<Saved | Unsaved>;
-  component: unknown;
+  component(): Promise<unknown>;
   usedFields: ComponentInfo['usedFields'];
   save(): Promise<void>;
+}
+
+export interface CardSchemaModule {
+  default: {
+    new (fieldGetter: (fieldPath: string) => any): unknown;
+  };
 }
 
 export interface CardComponentModule {
@@ -214,6 +218,7 @@ export interface CardComponentModule {
   getCardModelOptions(): {
     serializerMap: SerializerMap;
     computedFields: string[];
+    usedFields: string[];
   };
 }
 

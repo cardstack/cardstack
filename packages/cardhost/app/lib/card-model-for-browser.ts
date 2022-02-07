@@ -1,6 +1,5 @@
 import {
   JSONAPIDocument,
-  SerializerMap,
   Setter,
   Saved,
   Unsaved,
@@ -11,6 +10,8 @@ import {
   Format,
   ComponentInfo,
   CardId,
+  CardComponentModule,
+  CardSchemaModule,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
@@ -25,8 +26,8 @@ import {
   serializeResource,
 } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
-import { Conflict, isCardstackError } from '@cardstack/core/src/utils/errors';
-import { get, set } from '@ember/object';
+import set from 'lodash/set';
+import get from 'lodash/get';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -43,17 +44,18 @@ export interface CreatedState {
   type: 'created';
   realm: string;
   parentCardURL: string;
-  innerComponent: unknown;
-  serializerMap: SerializerMap;
+  componentModule: CardComponentModule;
+  schemaModuleId: string;
+  format: Format;
 }
 
 export interface LoadedState {
   type: 'loaded';
   format: Format;
   url: string;
-  serializerMap: SerializerMap;
   rawServerResponse: ResourceObject<Saved>;
-  innerComponent: unknown;
+  componentModule: CardComponentModule;
+  schemaModuleId: string;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -90,30 +92,20 @@ export default class CardModelForBrowser implements CardModel {
     }
   }
 
-  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
+  // TODO: add failing test for `_id` being unimplemented here and then fix
+  async adoptIntoRealm(realm: string, _id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    if (id) {
-      try {
-        await this.cards.load(cardURL({ realm, id }), 'isolated');
-        throw new Conflict(`Card ${id} already exists in realm ${realm}`);
-      } catch (e: any) {
-        if (!isCardstackError(e) || e.status !== 404) {
-          throw e;
-        }
-        // we expect a 404 here, so we can continue
-      }
-    }
-
     return new (this.constructor as typeof CardModelForBrowser)(
       this.cards,
       {
         type: 'created',
         realm,
         parentCardURL: this.state.url,
-        innerComponent: this.innerComponent,
-        serializerMap: this.serializerMap,
+        componentModule: this.state.componentModule,
+        schemaModuleId: this.state.schemaModuleId,
+        format: this.state.format,
       },
       this.localRealm
     );
@@ -121,14 +113,6 @@ export default class CardModelForBrowser implements CardModel {
 
   setData(_data: RawCardData) {
     throw new Error('unimplemented');
-  }
-
-  get innerComponent(): unknown {
-    return this.state.innerComponent;
-  }
-
-  get serializerMap(): SerializerMap {
-    return this.state.serializerMap;
   }
 
   get id(): string {
@@ -145,23 +129,7 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get format(): Format {
-    if (this.state.type === 'created') {
-      return 'isolated';
-    }
     return this.state.format;
-  }
-
-  private get schemaModulePath() {
-    if (this.state.type === 'created') {
-      return '?'; // TODO: Not sure what to do here yet
-    }
-    let { schemaModule } = this.state.rawServerResponse.meta || {};
-    if (!schemaModule || typeof schemaModule !== 'string') {
-      throw new Error(
-        'Card server response doesnt include a schemaModule in its meta'
-      );
-    }
-    return schemaModule;
   }
 
   async editable(): Promise<CardModel> {
@@ -172,6 +140,7 @@ export default class CardModelForBrowser implements CardModel {
       this.state.url,
       'edit'
     )) as CardModelForBrowser;
+
     (editable.state as LoadedState).original = this;
     return editable;
   }
@@ -182,7 +151,7 @@ export default class CardModelForBrowser implements CardModel {
         if (!this.state.deserialized) {
           this._data = deserializeAttributes(
             this.state.rawServerResponse.attributes,
-            this.serializerMap
+            this.state.componentModule.getCardModelOptions().serializerMap
           );
           this.state.deserialized = true;
         }
@@ -194,18 +163,26 @@ export default class CardModelForBrowser implements CardModel {
     }
   }
 
-  get component(): unknown {
+  async component(): Promise<unknown> {
     if (!this.wrapperComponent) {
-      this.wrapperComponent = prepareComponent(this, this.innerComponent);
+      let innerComponent = this.state.componentModule.default;
+      let self = this;
+
+      let syncData: Record<string, any> = {};
+      for (let field of this.usedFields) {
+        set(syncData, field, await this.getField(field));
+      }
+
+      this.wrapperComponent = setComponentTemplate(
+        hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
+        class extends Component {
+          component = innerComponent;
+          data = syncData;
+          set = self.setters;
+        }
+      );
     }
     return this.wrapperComponent;
-  }
-
-  async computeFields() {
-    for (const field of this.usedFields) {
-      let value = await this.getField(field);
-      set(this._data, field, value);
-    }
   }
 
   async getField(name: string): Promise<any> {
@@ -222,16 +199,20 @@ export default class CardModelForBrowser implements CardModel {
     return await schemaInstance[name];
   }
 
+  private async getRawField(fieldPath: string): Promise<any> {
+    // TODO: deserialize only this field, instead of forcing all of this.data to
+    // be deserialized
+    return get(this.data, fieldPath);
+  }
+
   async schemaInstance() {
     if (this._schemaInstance) {
       return this._schemaInstance;
     }
     let SchemaClass = (
-      await this.cards.loadModule<{ default: any }>(this.schemaModulePath)
+      await this.cards.loadModule<CardSchemaModule>(this.state.schemaModuleId)
     ).default;
-    this._schemaInstance = new SchemaClass((fieldPath: string) =>
-      get(this._data, fieldPath)
-    );
+    this._schemaInstance = new SchemaClass(this.getRawField.bind(this));
     return this._schemaInstance;
   }
 
@@ -276,14 +257,15 @@ export default class CardModelForBrowser implements CardModel {
     return serializeResource(
       'card',
       this.state.type === 'loaded' ? this.state.url : undefined,
-      serializeAttributes(this.data, this.serializerMap)
+      serializeAttributes(
+        this.data,
+        this.state.componentModule.getCardModelOptions().serializerMap
+      )
     );
   }
 
   get usedFields(): ComponentInfo['usedFields'] {
-    // the server just gives the browser whatever fields are appropriate for the
-    // format and the browser just has to accept that
-    throw new Error('used fields are not supported in browser');
+    return this.state.componentModule.getCardModelOptions().usedFields;
   }
 
   async save(): Promise<void> {
@@ -313,8 +295,6 @@ export default class CardModelForBrowser implements CardModel {
     let { data } = response;
     assertDocumentDataIsResource(data);
 
-    let { serializerMap, innerComponent } = this.state;
-
     this.state = {
       type: 'loaded',
       format: this.format,
@@ -322,8 +302,8 @@ export default class CardModelForBrowser implements CardModel {
       rawServerResponse: cloneDeep(data),
       deserialized: false,
       original,
-      serializerMap,
-      innerComponent,
+      componentModule: this.state.componentModule,
+      schemaModuleId: this.state.schemaModuleId,
     };
   }
 
@@ -436,22 +416,6 @@ export default class CardModelForBrowser implements CardModel {
     }
     return;
   }
-}
-
-export function prepareComponent(
-  cardModel: CardModel,
-  component: unknown
-): unknown {
-  return setComponentTemplate(
-    hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
-    class extends Component {
-      component = component;
-      get data() {
-        return cardModel.data;
-      }
-      set = cardModel.setters;
-    }
-  );
 }
 
 function buildNewURL(realm: string, parentCardURL: string): string {

@@ -59,7 +59,6 @@ module('Integration | Card Rendering', function (hooks) {
         'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import datetime from "https://cardstack.com/base/datetime";
 
           export default class Hello {
             @contains(string)

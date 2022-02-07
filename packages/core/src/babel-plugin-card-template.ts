@@ -117,7 +117,8 @@ function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: 
           babel.template(`
             return {
               serializerMap: %%serializerMap%%,
-              computedFields: %%computedFields%%
+              computedFields: %%computedFields%%,
+              usedFields: %%usedFields%%
             };
           `)({
             serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
@@ -126,6 +127,7 @@ function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: 
                 .filter((field) => field.computed)
                 .map((field) => t.stringLiteral(field.name))
             ),
+            usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
           }) as t.Statement,
         ])
       )

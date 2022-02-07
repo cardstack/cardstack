@@ -83,10 +83,9 @@ export default class LocalRealm implements Builder {
   async loadData(url: string, format: Format): Promise<CardModel> {
     let { compiled, raw } = await this.load(url);
 
-    let component = await this.loadModule<CardComponentModule>(
+    let componentModule = await this.loadModule<CardComponentModule>(
       compiled.componentInfos[format].moduleName.global
     );
-    let { serializerMap } = component.getCardModelOptions();
 
     // TODO we can optimize this structure in our CardModelForBrowser now that
     // we are not grabbing the literal JSONAPI response from the server
@@ -105,8 +104,8 @@ export default class LocalRealm implements Builder {
         type: 'loaded',
         url,
         rawServerResponse,
-        innerComponent: component.default,
-        serializerMap,
+        componentModule,
+        schemaModuleId: compiled.schemaModule.global,
         format,
       },
       this

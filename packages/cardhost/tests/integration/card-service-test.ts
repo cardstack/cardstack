@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import type Cards from 'cardhost/services/cards';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
@@ -85,7 +85,7 @@ module('Integration | card-service', function (hooks) {
       assert.dom('[data-test-field-name="createdAt"]').hasAnyValue();
     });
 
-    test('Serialization works on nested cards', async function (assert) {
+    skip('Serialization works on nested cards', async function (assert) {
       createCard({
         id: 'post-list',
         realm: localRealmURL,

@@ -19,7 +19,7 @@ type State =
   | {
       name: 'loaded';
       loadedCard: CardModel;
-      format: Format;
+      component: unknown;
     };
 
 export default class Modal extends Service {
@@ -42,6 +42,7 @@ export default class Modal extends Service {
     }
     return;
   }
+
   get cardComponent(): unknown {
     return this.card?.component;
   }
@@ -58,7 +59,7 @@ export default class Modal extends Service {
     this.state = {
       name: 'loaded',
       loadedCard,
-      format,
+      component: await loadedCard.component(),
     };
   }
 
@@ -69,7 +70,7 @@ export default class Modal extends Service {
     this.state = {
       name: 'loaded',
       loadedCard,
-      format: 'edit',
+      component: await loadedCard.component(),
     };
   }
 
@@ -79,7 +80,7 @@ export default class Modal extends Service {
     this.state = {
       name: 'loaded',
       loadedCard,
-      format: 'edit',
+      component: await loadedCard.component(),
     };
   }
 
