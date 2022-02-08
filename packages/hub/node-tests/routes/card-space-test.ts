@@ -57,8 +57,6 @@ describe('GET /api/card-spaces/:slug', function () {
       textColor: 'red',
     });
 
-    let merchantDid = encodeDID({ type: 'MerchantInfo', uniqueId: merchantId });
-
     const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
     const cardSpace: CardSpace = {
       id,
@@ -117,7 +115,7 @@ describe('GET /api/card-spaces/:slug', function () {
             id: merchantId,
             attributes: {
               color: 'black',
-              did: merchantDid,
+              did: encodeDID({ type: 'MerchantInfo', uniqueId: merchantId }),
               name: 'Satoshi?',
               'owner-address': stubUserAddress,
               slug: 'satoshi',
