@@ -41,3 +41,9 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
         run: yarn test:web-client:percy
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        if: always()
+        with:
+          check_name: 'Test results'
+          files: test-results/**/*.xml

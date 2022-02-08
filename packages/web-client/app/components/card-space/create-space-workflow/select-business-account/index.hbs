@@ -24,7 +24,7 @@
       </Boxel::Field>
 
       <Boxel::Field @label="Card Space URL">
-        {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+        {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
       </Boxel::Field>
     {{else}}
       <CardPay::FieldStack>
@@ -45,7 +45,7 @@
         </Boxel::Field>
 
         <Boxel::Field @label="Card Space URL">
-          {{this.merchantData.id}}.{{this.cardSpaceHostnameSuffix}}
+          {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
         </Boxel::Field>
       </CardPay::FieldStack>
     {{/if}}
