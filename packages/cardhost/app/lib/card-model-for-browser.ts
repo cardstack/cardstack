@@ -213,18 +213,10 @@ export default class CardModelForBrowser implements CardModel {
       return this._schemaInstance;
     }
     let SchemaClass = (
-      await this.loadModule<CardSchemaModule>(this.state.schemaModuleId)
+      await this.cards.loadModule<CardSchemaModule>(this.state.schemaModuleId)
     ).default;
     this._schemaInstance = new SchemaClass(this.getRawField.bind(this));
     return this._schemaInstance;
-  }
-
-  private async loadModule<T extends Object>(moduleId: string): Promise<T> {
-    if (this.localRealm) {
-      return await this.localRealm.loadModule<T>(moduleId);
-    } else {
-      return await this.cards.loadModule<T>(moduleId);
-    }
   }
 
   private makeSetter(segments: string[] = []): Setter {

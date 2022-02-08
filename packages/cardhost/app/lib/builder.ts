@@ -18,6 +18,7 @@ import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import {
+  baseCardURL,
   Compiler,
   makeGloballyAddressable,
 } from '@cardstack/core/src/compiler';
@@ -88,7 +89,7 @@ export default class LocalRealm implements Builder {
   async loadData(url: string, format: Format): Promise<CardModel> {
     let { compiled, raw } = await this.load(url);
 
-    let componentModule = await this.loadModule<CardComponentModule>(
+    let componentModule = await this.cards.loadModule<CardComponentModule>(
       compiled.componentInfos[format].moduleName.global
     );
 
@@ -326,10 +327,7 @@ export default class LocalRealm implements Builder {
   async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
     let module = this.localModules.get(moduleIdentifier);
     if (!module) {
-      // in the scenario where you are adopting a remote card into the local
-      // realm, the local modules won't exist yet. in that case fallback to
-      // loading the modules remotely
-      return await this.cards.loadModule(moduleIdentifier);
+      throw new Error(`missing local module ${moduleIdentifier}`);
     }
     switch (module.state) {
       case 'preparing':
