@@ -1,24 +1,12 @@
-import { module, test } from 'qunit';
-import { cardURL } from '@cardstack/core/src/utils';
+import { module, test, skip } from 'qunit';
 import { parse, isSameDay } from 'date-fns';
-import { setupTest } from 'ember-qunit';
-
-import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
-import {
-  CardOperation,
-  JSONAPIDocument,
-  Format,
-  Saved,
-  CardModel,
-} from '@cardstack/core/src/interfaces';
+import { setupCardTest } from '../helpers/setup';
+import { lookup } from '../helpers/lookup';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
-
-const serializerMap = {
-  date: ['birthdate', 'address.settlementDate'],
-};
 
 let attributes = {
   name: 'Bob Barker',
@@ -31,47 +19,70 @@ let attributes = {
   },
 };
 
-let cardJSONResponse = {
-  data: {
-    id: cardURL(PERSON_RAW_CARD),
-    type: 'card',
-    attributes,
-    meta: {
-      componentModule: '',
-    },
-  },
-};
-
-const fakeComponent: unknown = {};
-
-class StubCards {
-  lastOp: CardOperation | undefined;
-  async load(_url: string, _format: Format): Promise<CardModel> {
-    throw new Error('unimplemented');
-  }
-  async send(op: CardOperation): Promise<JSONAPIDocument<Saved>> {
-    this.lastOp = op;
-    return { data: { type: 'cards', id: 'x' } };
-  }
-  prepareComponent() {}
-  tracked(_target: CardModel, _prop: string, desc: PropertyDescriptor) {
-    return desc;
-  }
-}
-
 module('@core | card-model-for-browser', function (hooks) {
-  setupTest(hooks);
+  let { createCard, localRealmURL } = setupCardTest(hooks);
+
+  hooks.beforeEach(async function () {
+    await createCard({
+      realm: localRealmURL,
+      id: 'address',
+      schema: 'schema.js',
+      embedded: 'embedded.js',
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          import date from "https://cardstack.com/base/date";
+    
+          export default class Address {
+            @contains(string) street;
+            @contains(string) city;
+            @contains(string) state;
+            @contains(string) zip;
+            @contains(date) settlementDate;
+          }
+        `,
+        'embedded.js': templateOnlyComponentTemplate(
+          `<p><@fields.street /><br /> <@fields.city />, <@fields.state /> <@fields.zip /></p><p>Moved In: <@fields.settlementDate /></p>`
+        ),
+      },
+    });
+
+    await createCard({
+      realm: localRealmURL,
+      id: 'person',
+      schema: 'schema.js',
+      embedded: 'embedded.js',
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          import date from "https://cardstack.com/base/date";
+          import address from "https://cardstack.local/address";
+    
+          export default class Person {
+            @contains(string) name;
+            @contains(date) birthdate;
+            @contains(address) address;
+          }
+        `,
+        'embedded.js': templateOnlyComponentTemplate(`<@fields.name />`),
+      },
+    });
+
+    await createCard({
+      id: 'bob',
+      realm: localRealmURL,
+      adoptsFrom: `${localRealmURL}person`,
+      data: attributes,
+    });
+  });
+
   test('.data', async function (assert) {
-    let stub = new StubCards();
-    let model = this.owner
-      .lookup('service:cards')
-      .makeCardModelFromResponse(
-        stub,
-        cardJSONResponse.data,
-        fakeComponent,
-        serializerMap,
-        'isolated'
-      );
+    let model = await lookup(this, 'cards').load(
+      `${localRealmURL}bob`,
+      'isolated'
+    );
     assert.equal(
       model.data.name,
       attributes.name,
@@ -92,31 +103,35 @@ module('@core | card-model-for-browser', function (hooks) {
     );
   });
 
-  test('.serialize', async function (assert) {
-    let stub = new StubCards();
-    let model = this.owner
-      .lookup('service:cards')
-      .makeCardModelFromResponse(
-        stub,
-        cardJSONResponse.data,
-        fakeComponent,
-        serializerMap,
-        'isolated'
-      );
+  skip('unused fields are not present', async function (assert) {
+    let model = await lookup(this, 'cards').load(
+      `${localRealmURL}bob`,
+      'embedded'
+    );
+    assert.equal(
+      model.data.name,
+      attributes.name,
+      'name field value is correct'
+    );
+    assert.equal(
+      model.data.birthdate,
+      undefined,
+      'birthdate field should be missing'
+    );
+  });
 
-    await model.save();
-    let op = stub.lastOp;
-    if (!op || !('update' in op)) {
-      throw new Error(`did not find create operation`);
-    }
+  test('.serialize', async function (assert) {
+    let model = await lookup(this, 'cards').load(
+      `${localRealmURL}bob`,
+      'isolated'
+    );
+    let payload = await model.serialize();
     assert.deepEqual(
-      op.update.payload,
+      payload as any,
       {
-        data: {
-          id: cardURL(PERSON_RAW_CARD),
-          type: 'card',
-          attributes,
-        },
+        id: `${localRealmURL}bob`,
+        type: 'card',
+        attributes,
       },
       'A model can be serialized once instantiated'
     );

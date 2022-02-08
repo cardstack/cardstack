@@ -72,7 +72,7 @@ module('Acceptance | create card space', function (hooks) {
         .containsText('Name');
       assert
         .dom('[data-test-sidebar-preview-body] [data-test-profile-card-host]')
-        .containsText('blank.card.space');
+        .containsText('blank.card.space.test');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-category]'
@@ -158,7 +158,7 @@ module('Acceptance | create card space', function (hooks) {
         .exists();
       assert
         .dom('[data-test-profile-card-host]')
-        .hasText('vandelay.card.space');
+        .hasText('vandelay.card.space.test');
 
       // Display name
       await waitFor(postableSel(2, 1));

@@ -12,10 +12,10 @@ interface FeaturesOptions {
 }
 
 interface UrlsOptions {
-  appStoreLink: string | undefined;
-  googlePlayLink: string | undefined;
-  testFlightLink: string;
-  discordSupportChannelUrl: string;
+  about: string;
+  appStoreLink: string;
+  googlePlayLink: string;
+  mailToSupportUrl: string;
   statusPageBase: string;
   statusPageUrl: string;
 }

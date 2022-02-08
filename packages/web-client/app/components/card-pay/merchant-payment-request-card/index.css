@@ -11,8 +11,7 @@
   padding: var(--section-vertical-padding) 0;
 }
 
-/* section for getting people to download card wallet, desktop */
-.merchant-payment-request-card__get-card-wallet--desktop {
+.merchant-payment-request-card__get-card-wallet {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,54 +20,17 @@
   font-size: var(--boxel-font-size);
   font-weight: 600;
   line-height: calc(22 / 16);
+  flex-wrap: wrap;
 }
 
-.merchant-payment-request-card__get-card-wallet--desktop .merchant-payment-request-card__card-wallet {
+.merchant-payment-request-card__get-card-wallet .merchant-payment-request-card__card-wallet {
   display: flex;
   align-items: center;
   gap: var(--boxel-sp-sm);
-}
-
-.merchant-payment-request-card__get-card-wallet--desktop .merchant-payment-request-card__card-wallet-icon {
   flex-shrink: 0;
 }
 
-.merchant-payment-request-card__get-card-wallet--desktop .merchant-payment-request-card__testflight-link {
-  --icon-color: currentcolor;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--boxel-sp-xs);
-}
-
-/* section for getting people to download card wallet, mobile */
-.merchant-payment-request-card__get-card-wallet--mobile {
-  display: none;
-  border-bottom: 1px solid var(--boxel-light-300);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: calc(19 / 14);
-}
-
-.merchant-payment-request-card__get-card-wallet--mobile .merchant-payment-request-card__card-wallet {
-  display: grid;
-  /* stylelint-disable declaration-block-no-redundant-longhand-properties */
-  grid-template-columns: min-content auto;
-  grid-template-rows: min-content auto;
-  grid-template-areas:
-    "icon name"
-    "icon cta";
-  /* stylelint-enable declaration-block-no-redundant-longhand-properties */
-  gap: 0 var(--boxel-sp-xs);
-}
-
-.merchant-payment-request-card__get-card-wallet--mobile .merchant-payment-request-card__card-wallet-text {
-  font-weight: 700;
-}
-
-.merchant-payment-request-card__get-card-wallet--mobile .merchant-payment-request-card__card-wallet-icon {
-  grid-area: icon;
+.merchant-payment-request-card__get-card-wallet .merchant-payment-request-card__card-wallet-icon {
   flex-shrink: 0;
 }
 
@@ -76,13 +38,5 @@
   .merchant-payment-request-card {
     --horizontal-padding: var(--boxel-sp-lg);
     --section-vertical-padding: var(--boxel-sp-lg);
-  }
-
-  .merchant-payment-request-card__get-card-wallet--desktop {
-    display: none;
-  }
-
-  .merchant-payment-request-card__get-card-wallet--mobile {
-    display: block;
   }
 }

@@ -1,50 +1,48 @@
 <Boxel::Modal @size="large" @isOpen={{this.modal.isShowing}} @onClose={{this.close}} data-test-modal>
-  {{#if this.modal.isLoading}}
-    <CardContainer>
-      <h1>Loading...</h1>
-    </CardContainer>
-  {{else}}
-    {{#if (eq this.modal.state.format 'edit')}}
-      <CardContainer class={{cn "modal" this.modal.state.format}}>
-        <:default>
-          <this.modal.cardComponent />
-        </:default>
-
-        <:action-chin>
-          <Boxel::Button
-            {{on "click" this.modal.close}}
-            class="card-modal__action-chin-button"
-            @kind="secondary"
-            data-test-modal-cancel
-          >
-            Cancel
-          </Boxel::Button>
-          <Boxel::Button
-            {{on "click" this.modal.save}}
-            class="card-modal__action-chin-button"
-            @kind="primary"
-            data-test-modal-save
-          >
-            Save
-          </Boxel::Button>
-        </:action-chin>
+  {{#let this.modal.state as |state|}}
+    {{#if (eq state.name "loading") }}
+      <CardContainer>
+        <h1>Loading...</h1>
       </CardContainer>
-    {{else}}
-      <CardContainer
-        class={{cn "modal" this.modal.state.format}}
-        @card={{this.modal.card}}
-        @editable={{true}}
+    {{else if (eq state.name "loaded") }}
+      <CardContainer 
+        class={{cn "modal" state.loadedCard.format}}
+        @card={{state.loadedCard}}
+        @editable={{not-eq state.loadedCard.format "edit"}}
       >
         <:actions>
-          <button data-test-modal-close {{on "click" this.close}}>Close</button>
+          {{#if (not-eq state.loadedCard.format 'edit') }}
+            <button data-test-modal-close {{on "click" this.close}}>Close</button>
+          {{/if}}
         </:actions>
 
         <:default>
-          <this.modal.cardComponent />
+          <state.component />
         </:default>
+
+        <:action-chin>
+          {{#if (eq state.loadedCard.format 'edit') }}
+            <Boxel::Button
+              {{on "click" this.modal.close}}
+              class="card-modal__action-chin-button"
+              @kind="secondary"
+              data-test-modal-cancel
+            >
+              Cancel
+            </Boxel::Button>
+            <Boxel::Button
+              {{on "click" this.modal.save}}
+              class="card-modal__action-chin-button"
+              @kind="primary"
+              data-test-modal-save
+            >
+              Save
+            </Boxel::Button>
+          {{/if}}
+        </:action-chin>
       </CardContainer>
     {{/if}}
-  {{/if}}
+  {{/let}}
 </Boxel::Modal>
 
 <div

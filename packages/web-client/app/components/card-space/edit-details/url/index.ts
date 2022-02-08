@@ -16,17 +16,19 @@ class CreateSpaceWorkflowEditDetailsUrlComponent extends Component<WorkflowCardC
   @tracked urlValidationState = 'initial';
   @tracked urlValidationMessage: string = '';
 
+  cardSpaceHostnameSuffix = config.cardSpaceHostnameSuffix;
+
   @action restoreFromSession() {
     let url = this.args.workflowSession.getValue<string>('url');
     if (url) {
-      this.subdomain = url.replace('.card.space', '');
+      this.subdomain = url.replace(`.${config.cardSpaceHostnameSuffix}`, '');
       this.url = url;
       this.validateUrl();
     }
   }
 
   @action onSubdomainInput(value: string) {
-    this.url = `${value}.card.space`;
+    this.url = `${value}.${config.cardSpaceHostnameSuffix}`;
     this.validateUrl();
   }
 

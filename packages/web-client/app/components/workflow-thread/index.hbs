@@ -122,13 +122,9 @@
       </Boxel::Sidebar::CardContainer>
     </SidebarSection>
     <SidebarSection>
-      <Boxel::HelpBox
-        @buttonText="Go to Discord"
-        @onClickButton={{this.openDiscord}}
-      >
+      <Boxel::HelpBox @url={{this.mailToSupportUrl}}>
         <p class="workflow-thread__help-content">
-          If you are experiencing issues or have questions, please take a screenshot and send it
-          to the Card Pay beta channel and we’ll try our best to help!
+          If you are experiencing issues or have any questions please contact us.
         </p>
       </Boxel::HelpBox>
       <div class="workflow-thread__app-version">

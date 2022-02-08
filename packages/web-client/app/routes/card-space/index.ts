@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import * as short from 'short-uuid';
 
-export default class CardSpaceRoute extends Route {
+export default class CardSpaceIndexRoute extends Route {
   queryParams = {
     flow: {
       refreshModel: true,

@@ -3,6 +3,7 @@ import { parseISO, parse, format } from 'date-fns';
 import merge from 'lodash/merge';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   ResourceObject,
   Saved,
@@ -49,11 +50,11 @@ const SERIALIZERS = {
 };
 
 export function deserializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
-  return _serializeAttributes(attrs, 'deserialize', serializerMap);
+  return _serializeAttributes(cloneDeep(attrs), 'deserialize', serializerMap);
 }
 
 export function serializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
-  return _serializeAttributes(attrs, 'serialize', serializerMap);
+  return _serializeAttributes(cloneDeep(attrs), 'serialize', serializerMap);
 }
 
 function _serializeAttributes(
