@@ -1,6 +1,7 @@
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
+import config from '@cardstack/web-client/config/environment';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -311,7 +312,7 @@ class CreateSpaceWorkflow extends Workflow {
       coverPhoto: this.session.getValue('profileCoverImageUrl'),
       name: this.session.getValue('profileName'),
       host: this.merchantInfoResource.id
-        ? `${this.merchantInfoResource.id}.card.space`
+        ? `${this.merchantInfoResource.id}.${config.cardSpaceHostnameSuffix}`
         : null,
       category: this.session.getValue('profileCategory'),
       description: this.session.getValue('profileDescription'),
