@@ -107,8 +107,14 @@ export class CardService {
     let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
+    let computedFields = Object.keys(compiledCard.fields).filter((f) => (compiledCard.fields[f].computed ? f : null));
     await this.realmManager.update(raw);
-    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
+    let compiled = await this.searchIndex.indexCard(
+      raw,
+      compiledCard,
+      compiler,
+      computedFields.length && raw.data ? this : undefined
+    );
     return { raw, compiled };
   }
 

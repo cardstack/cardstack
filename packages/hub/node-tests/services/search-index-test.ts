@@ -289,7 +289,7 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            export default class GreetingCard {
+            export default class DifferentGreetingCard {
               @contains(string) name;
 
               @contains(string)
@@ -328,14 +328,18 @@ if (process.env.COMPILER) {
       //     role: 'good dog',
       //   },
       // };
+
       this.beforeEach(async function () {
+        let si = await getContainer().lookup('searchIndex', { type: 'service' });
+        await si.indexAllRealms();
+
         await cards.create(greetingCard);
         await cards.create(sampleGreeting);
         await cards.create(differentGreetingCard);
         // await cards.create(customGreeting);
       });
 
-      it('Can search for card computed field for card created with data', async function () {
+      it.only('Can search for card computed field for card created with data', async function () {
         let baseCard = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         expect(baseCard.data.name).to.not.exist;
         expect(baseCard.data.greeting).to.not.exist;
@@ -345,7 +349,7 @@ if (process.env.COMPILER) {
         expect(card.data.greeting).to.eq('Welcome Jackie');
       });
 
-      it('Can search for card computed field for card created with data and schema', async function () {
+      it.only('Can search for card computed field for card created with data and schema', async function () {
         let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
         expect(card.data.name).to.eq('Woody');
         expect(card.data.greeting).to.eq('Welcome Woody');
@@ -353,14 +357,57 @@ if (process.env.COMPILER) {
 
       it.skip('Can search for card computed field for card created with data and schema that adopts from another card', async function () {
         let card = await cards.loadData(`${realmURL}custom-greeting`, 'isolated');
-
         expect(card.data.name).to.eq('Jackie');
         expect(card.data.greeting).to.eq('Welcome Jackie');
         expect(card.data.role).to.eq('good dog');
         expect(card.data.desc).to.eq('Greeting for good dog');
       });
-      it('Can search for card computed field for card after updating data');
-      it('Can search for card computed field for card after updating data and schema');
+
+      it.only('Can search for card computed field for card after updating data', async function () {
+        await cards.update({
+          realm: realmURL,
+          id: 'sample-greeting',
+          adoptsFrom: '../greeting-card',
+          data: {
+            name: 'Woody',
+          },
+        });
+
+        let card = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
+        expect(card.data.name).to.eq('Woody');
+        expect(card.data.greeting).to.eq('Welcome Woody');
+      });
+
+      it.only('Can search for card computed field for card after updating data and schema', async function () {
+        await cards.update({
+          realm: realmURL,
+          id: 'different-greeting-card',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              export default class DifferentGreetingCard {
+                @contains(string) name;
+                @contains(string) breed;
+
+                @contains(string)
+                async greeting() {
+                  return "Hello " + await this.name + " the " + await this.breed;
+                }
+              }
+            `,
+          },
+          data: {
+            name: 'Jackie',
+            breed: 'beagle',
+          },
+        });
+
+        let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
+        expect(card.data.name).to.eq('Jackie');
+        expect(card.data.greeting).to.eq('Hello Jackie the beagle');
+      });
     });
   });
 }
