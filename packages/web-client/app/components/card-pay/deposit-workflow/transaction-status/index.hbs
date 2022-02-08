@@ -60,8 +60,8 @@
       </p>
     {{/if}}
     {{#if (or this.bridgeError this.blockCountError)}}
-      <CardPay::ErrorMessage data-test-deposit-transaction-status-error as |mailToSupportUrl|>
-        There was a problem completing the bridging of your tokens to {{network-display-info "layer2" "fullName"}}. Please contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
+      <CardPay::ErrorMessage data-test-deposit-transaction-status-error>
+        There was a problem completing the bridging of your tokens to {{network-display-info "layer2" "fullName"}}. Please contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
       </CardPay::ErrorMessage>
     {{/if}}
   </ActionCardContainer::Section>

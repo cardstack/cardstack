@@ -57,18 +57,18 @@
       * The actual value depends on the current exchange rate and is determined at the time of authorization.
     </div>
     {{#if (and this.errorMessage this.depositTaskRetryable)}}
-      <CardPay::ErrorMessage data-test-deposit-error-message as |mailToSupportUrl|>
+      <CardPay::ErrorMessage data-test-deposit-error-message>
         {{this.errorMessage}}
-        Please try again if you want to continue with this workflow. If you haven't received a signing request, click on "Resend Signing Request" below, or contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack Support</a>
+        Please try again if you want to continue with this workflow. If you haven't received a signing request, click on "Resend Signing Request" below, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack Support</a>
       </CardPay::ErrorMessage>
     {{else if this.errorMessage}}
-      <CardPay::ErrorMessage data-test-deposit-error-message as |mailToSupportUrl|>
+      <CardPay::ErrorMessage data-test-deposit-error-message>
         {{this.errorMessage}}
-        Please try again if you want to continue with this workflow, or contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        Please try again if you want to continue with this workflow, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
       </CardPay::ErrorMessage>
     {{else if this.depositTaskRetryable}}
-      <CardPay::ErrorMessage data-test-deposit-error-message as |mailToSupportUrl|>
-        If you haven't received a signing request, make sure to check your connected {{network-display-info "layer1" "fullName"}} wallet. You can also try to click on "Resend Signing Request" below, or contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack Support</a>.
+      <CardPay::ErrorMessage data-test-deposit-error-message>
+        If you haven't received a signing request, make sure to check your connected {{network-display-info "layer1" "fullName"}} wallet. You can also try to click on "Resend Signing Request" below, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack Support</a>.
       </CardPay::ErrorMessage>
     {{/if}}
   </ActionCardContainer::Section>

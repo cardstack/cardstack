@@ -71,17 +71,17 @@
       </CardPay::FieldStack>
     </div>
     {{#if this.error}}
-      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message as |mailToSupportUrl|>
+      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
           {{!-- TODO: This should be accompanied by canceling the workflow --}}
           Looks like there’s no balance in your {{network-display-info "layer2" "fullName"}} wallet to fund your selected prepaid card. Before you can continue, please add funds to your {{network-display-info "layer2" "fullName"}} wallet by bridging some tokens from your {{network-display-info "layer1" "fullName"}} wallet.
           {{!-- TODO: "The balance required to create your desired prepaid card is ${}" --}}
         {{else if (eq this.error.message "TIMEOUT")}}
-          There was a problem creating your prepaid card. Please contact <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+          There was a problem creating your prepaid card. Please contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}
-          There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact  <a href={{mailToSupportUrl}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact  <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
         </CardPay::ErrorMessage>
     {{/if}}
