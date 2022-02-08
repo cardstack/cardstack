@@ -287,7 +287,7 @@ class IndexerRun implements IndexerHandle {
   ): Promise<CompiledCard> {
     let data: Record<string, any> = rawCard.data ?? {};
     if (cardService) {
-      let cardModel = await cardService.makeCardModelFromDatabase('isolated', compiledCard, data);
+      let cardModel = await cardService.makeCardModelFromDatabase('isolated', compiledCard, data); // ok to getting the card model here?
       let computedFields = Object.keys(compiledCard.fields).filter((f) => (compiledCard.fields[f].computed ? f : null));
       for (let f of computedFields) {
         let value = await cardModel.getField(f);
@@ -302,7 +302,7 @@ class IndexerRun implements IndexerHandle {
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(data ?? null),
+      data: param(Object.keys(data).length > 0 ? data : null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
       searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
@@ -321,7 +321,7 @@ class IndexerRun implements IndexerHandle {
   private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
-    let compiled;
+    let compiled: CompiledCard;
     let isNew = false;
     let deps: string[] | undefined;
     try {
