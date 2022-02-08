@@ -1,7 +1,6 @@
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
-import config from '@cardstack/web-client/config/environment';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -326,20 +325,6 @@ export default class CreateSpaceWorkflowComponent extends RestorableWorkflowComp
 
   get workflowClass() {
     return CreateSpaceWorkflow;
-  }
-
-  get currentCardSpaceDetails() {
-    return {
-      profilePhoto: this.workflow.session.getValue('profileImageUrl'),
-      coverPhoto: this.workflow.session.getValue('profileCoverImageUrl'),
-      name: this.workflow.session.getValue('profileName'),
-      host: this.merchantInfo.id
-        ? `${this.merchantInfo.id}.${config.cardSpaceHostnameSuffix}`
-        : null,
-      category: this.workflow.session.getValue('profileCategory'),
-      description: this.workflow.session.getValue('profileDescription'),
-      buttonText: this.workflow.session.getValue('profileButtonText'),
-    };
   }
 
   @action onDisconnect() {
