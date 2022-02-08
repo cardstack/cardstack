@@ -338,8 +338,9 @@ if (process.env.COMPILER) {
         await cards.create(differentGreetingCard);
         // await cards.create(customGreeting);
       });
+      // TODO: add a two-level nested computed field in the sample cards
 
-      it.only('Can search for card computed field for card created with data', async function () {
+      it('Can search for card computed field for card created with data', async function () {
         let baseCard = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         expect(baseCard.data.name).to.not.exist;
         expect(baseCard.data.greeting).to.not.exist;
@@ -349,7 +350,7 @@ if (process.env.COMPILER) {
         expect(card.data.greeting).to.eq('Welcome Jackie');
       });
 
-      it.only('Can search for card computed field for card created with data and schema', async function () {
+      it('Can search for card computed field for card created with data and schema', async function () {
         let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
         expect(card.data.name).to.eq('Woody');
         expect(card.data.greeting).to.eq('Welcome Woody');
@@ -363,7 +364,7 @@ if (process.env.COMPILER) {
         expect(card.data.desc).to.eq('Greeting for good dog');
       });
 
-      it.only('Can search for card computed field for card after updating data', async function () {
+      it('Can search for card computed field for card after updating data', async function () {
         await cards.update({
           realm: realmURL,
           id: 'sample-greeting',
@@ -378,7 +379,9 @@ if (process.env.COMPILER) {
         expect(card.data.greeting).to.eq('Welcome Woody');
       });
 
-      it.only('Can search for card computed field for card after updating data and schema', async function () {
+      it('Can search for card computed field for card after updating data and schema', async function () {
+        // Q: Is this the correct update example?
+        // If the parent's schema is updated, should the child's schema automatically change?
         await cards.update({
           realm: realmURL,
           id: 'different-greeting-card',
