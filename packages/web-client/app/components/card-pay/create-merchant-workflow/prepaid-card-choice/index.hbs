@@ -72,7 +72,7 @@
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}
-          There was a problem creating your business account. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{config 'urls.malToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          There was a problem creating your business account. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
       </CardPay::ErrorMessage>
     {{/if}}
