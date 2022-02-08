@@ -72,6 +72,34 @@ if (process.env.COMPILER) {
           },
         },
       });
+
+      // await cards.create({
+      //   realm,
+      //   id: 'new-person',
+      //   schema: 'schema.js',
+      //   isolated: 'isolated.js',
+      //   files: {
+      //     'schema.js': `
+      //       import { contains, adopts } from "@cardstack/types";
+      //       import string from "https://cardstack.com/base/string";
+      //       import person from "../person";
+      //       export default @adopts(person) class NewPerson {
+      //         @contains(string) middleName;
+
+      //         @contains(string)
+      //         async middle() {
+      //           return "Hello " + (await this.middleName);
+      //         }
+      //       }
+      //     `,
+      //     'isolated.js': templateOnlyComponentTemplate(`<div><@fields.middle/></div>`),
+      //   },
+      //   data: {
+      //     firstName: 'Arthur',
+      //     lastName: 'Faulkner',
+      //     middleName: 'M',
+      //   },
+      // });
     });
 
     it(`can access a one-level-deep computed field`, async function () {
@@ -92,6 +120,11 @@ if (process.env.COMPILER) {
         // are not used by the Person template
         favoriteColor: 'blue',
       });
+    });
+
+    it.skip(`can access computed field data in card with its own schema that adopts from another card`, async function () {
+      let card = await cards.loadData(`${realm}new-person`, 'isolated');
+      expect(await card.getField('middle')).to.equal('Hello M');
     });
 
     // we can use the field meta short cut here to just return raw data without
