@@ -70,13 +70,11 @@ module('Acceptance | Card Creation', function (hooks) {
     await visit(`/?url=${personURL}`);
     assert.equal(currentURL(), `/?url=${personURL}`);
     await waitFor(PERSON);
-    assert.dom(PERSON).hasText('Hi! I am Arthur');
 
     await click(NEW_WITH_ID);
     assert.dom(MODAL).exists('The modal is opened');
     await waitFor('[data-test-field-name="name"]');
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
-    await fillIn('[data-test-field-name="city"]', 'San Francisco');
     await click(SAVE);
     await waitFor(PERSON);
     assert.includes(
