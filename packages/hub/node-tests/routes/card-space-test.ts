@@ -114,7 +114,7 @@ describe('GET /api/card-spaces/:slug', function () {
 
   it('returns 404 when user does not exist', async function () {
     await request()
-      .get('/api/card-spaces/satoshi.card.space')
+      .get('/api/card-spaces/satoshi')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(404);
