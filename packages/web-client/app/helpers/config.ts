@@ -10,14 +10,15 @@ export default class extends Helper {
     super(...arguments);
 
     this.config = getOwner(this).resolveRegistration('config:environment');
-
-    // FIXME is it scandalous to mutate this? Clone…?
-    this.config.unknownProperty = (path: string) => {
-      throw new Error(`Unknown config property: ${path}`);
-    };
   }
 
   compute([path]: [string]) {
-    return get(this.config as any, path);
+    let configValue = get(this.config as any, path);
+
+    if (configValue === undefined || configValue === null) {
+      throw new Error(`Unknown config property: ${path}`);
+    }
+
+    return configValue;
   }
 }
