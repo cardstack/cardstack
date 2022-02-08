@@ -62,6 +62,8 @@ module('Acceptance | Card Creation', function (hooks) {
       );
   });
 
+  // TODO we need a mechanism to create cards on the server. I think probably
+  // that means that the /sources/new API endpoint needs to be implemented
   skip('Creating a local card from a remote card');
 
   test('Creating a card with an ID', async function (assert) {
