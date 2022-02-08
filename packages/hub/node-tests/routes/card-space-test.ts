@@ -2,6 +2,7 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { CardSpace } from '../../routes/card-spaces';
 import { registry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
+import { encodeDID } from '@cardstack/did-resolver';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -56,6 +57,8 @@ describe('GET /api/card-spaces/:slug', function () {
       textColor: 'red',
     });
 
+    let merchantDid = encodeDID({ type: 'MerchantInfo', uniqueId: merchantId });
+
     const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
     const cardSpace: CardSpace = {
       id,
@@ -108,6 +111,20 @@ describe('GET /api/card-spaces/:slug', function () {
             },
           },
         },
+        included: [
+          {
+            type: 'merchant-infos',
+            id: merchantId,
+            attributes: {
+              color: 'black',
+              did: merchantDid,
+              name: 'Satoshi?',
+              'owner-address': stubUserAddress,
+              slug: 'satoshi',
+              'text-color': 'red',
+            },
+          },
+        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });

@@ -45,6 +45,9 @@ export default class CardSpacesRoute {
   cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
     as: 'cardSpaceValidator',
   });
+  merchantInfoSerializer = inject('merchant-info-serializer', {
+    as: 'merchantInfoSerializer',
+  });
   merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
     as: 'merchantInfoQueries',
   });
@@ -63,7 +66,12 @@ export default class CardSpacesRoute {
       return;
     }
 
+    let merchant = (await this.merchantInfoQueries.fetch({ id: cardSpace.merchantId }))[0];
+
     let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
+
+    let serializedMerchant = await this.merchantInfoSerializer.serialize(merchant);
+    serialized.included = [serializedMerchant.data];
 
     ctx.status = 200;
     ctx.body = serialized;
