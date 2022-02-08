@@ -326,7 +326,10 @@ export default class LocalRealm implements Builder {
   async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
     let module = this.localModules.get(moduleIdentifier);
     if (!module) {
-      throw new Error(`missing local module ${moduleIdentifier}`);
+      // in the scenario where you are adopting a remote card into the local
+      // realm, the local modules won't exist yet. in that case fallback to
+      // loading the modules remotely
+      return await this.cards.loadModule(moduleIdentifier);
     }
     switch (module.state) {
       case 'preparing':
