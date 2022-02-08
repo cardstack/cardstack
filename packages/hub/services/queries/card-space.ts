@@ -3,11 +3,15 @@ import { inject } from '@cardstack/di';
 import { CardSpace } from '../../routes/card-spaces';
 import { buildConditions } from '../../utils/queries';
 
-interface CardSpaceQueriesFilter {
-  id?: string;
-  ownerAddress?: string;
-  merchantSlug?: string;
+interface CardSpaceSlugFilter {
+  merchantSlug: string;
 }
+
+interface CardSpaceIdFilter {
+  id: string;
+}
+
+type CardSpaceQueriesFilter = CardSpaceSlugFilter | CardSpaceIdFilter;
 
 export default class CardSpaceQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -77,8 +81,7 @@ export default class CardSpaceQueries {
 
     let conditions;
 
-    // FIXME abstraction problem?
-    if (filter.merchantSlug) {
+    if (filterIsSlug(filter)) {
       conditions = buildConditions({ slug: filter.merchantSlug }, 'merchant_infos');
     } else {
       conditions = buildConditions(filter, 'card_spaces');
@@ -111,6 +114,10 @@ export default class CardSpaceQueries {
       };
     });
   }
+}
+
+function filterIsSlug(filter: CardSpaceQueriesFilter): filter is CardSpaceSlugFilter {
+  return (filter as CardSpaceSlugFilter).merchantSlug !== undefined;
 }
 
 declare module '@cardstack/di' {
