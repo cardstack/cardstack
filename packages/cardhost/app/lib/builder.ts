@@ -18,7 +18,6 @@ import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import {
-  baseCardURL,
   Compiler,
   makeGloballyAddressable,
 } from '@cardstack/core/src/compiler';
