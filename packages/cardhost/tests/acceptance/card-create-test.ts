@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, skip, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupCardTest } from '../helpers/setup';
 
@@ -15,6 +15,7 @@ import { cardURL } from '@cardstack/core/src/utils';
 const PERSON = '[data-test-person]';
 const MODAL = '[data-test-modal]';
 const NEW = '[data-test-new-button-local]';
+const NEW_WITH_ID = '[data-test-new-button-with-id]';
 const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Creation', function (hooks) {
@@ -39,7 +40,7 @@ module('Acceptance | Card Creation', function (hooks) {
     );
   });
 
-  test('Creating a card', async function (assert) {
+  test('Creating a local card from a local card', async function (assert) {
     await visit(`/?url=${personURL}`);
     assert.equal(currentURL(), `/?url=${personURL}`);
     await waitFor(PERSON);
@@ -59,5 +60,27 @@ module('Acceptance | Card Creation', function (hooks) {
         'Hi! I am Bob Barker',
         'The original instance of the card is updated'
       );
+  });
+
+  skip('Creating a local card from a remote card');
+
+  test('Creating a card with an ID', async function (assert) {
+    await visit(`/?url=${personURL}`);
+    assert.equal(currentURL(), `/?url=${personURL}`);
+    await waitFor(PERSON);
+    assert.dom(PERSON).hasText('Hi! I am Arthur');
+
+    await click(NEW_WITH_ID);
+    assert.dom(MODAL).exists('The modal is opened');
+    await waitFor('[data-test-field-name="name"]');
+    await fillIn('[data-test-field-name="name"]', 'Bob Barker');
+    await fillIn('[data-test-field-name="city"]', 'San Francisco');
+    await click(SAVE);
+    await waitFor(PERSON);
+    assert.includes(
+      currentURL(),
+      'CUSTOM_ID',
+      'The card is created with a pre-supplied ID'
+    );
   });
 });

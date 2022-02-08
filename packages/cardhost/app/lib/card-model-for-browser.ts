@@ -30,6 +30,7 @@ import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import LocalRealm from './builder';
+import { cardURL } from '@cardstack/core/src/utils';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -40,6 +41,7 @@ export interface NewCardParams {
 
 export interface CreatedState {
   type: 'created';
+  id?: string;
   realm: string;
   parentCardURL: string;
   componentModule: CardComponentModule;
@@ -90,8 +92,7 @@ export default class CardModelForBrowser implements CardModel {
     }
   }
 
-  // TODO: add failing test for `_id` being unimplemented here and then fix
-  async adoptIntoRealm(realm: string, _id?: string): Promise<CardModel> {
+  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
@@ -104,6 +105,7 @@ export default class CardModelForBrowser implements CardModel {
       this.cards,
       {
         type: 'created',
+        id,
         realm,
         parentCardURL: this.state.url,
         componentModule: this.state.componentModule,
@@ -259,7 +261,11 @@ export default class CardModelForBrowser implements CardModel {
   serialize(): ResourceObject<Saved | Unsaved> {
     return serializeResource(
       'card',
-      this.state.type === 'loaded' ? this.state.url : undefined,
+      this.state.type === 'loaded'
+        ? this.state.url
+        : this.state.id
+        ? cardURL({ realm: this.state.realm, id: this.state.id })
+        : undefined,
       serializeAttributes(
         this.data,
         this.state.componentModule.getCardModelOptions().serializerMap

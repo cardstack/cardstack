@@ -214,7 +214,9 @@ export default class LocalRealm implements Builder {
   ): Promise<JSONAPIDocument> {
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
-    let id = this.generateId();
+    let id = resource.id
+      ? this.parseOwnRealmURL(resource.id)!.id
+      : this.generateId();
     this.createRawCard({
       realm: this.realmURL,
       id,
