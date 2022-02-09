@@ -1,9 +1,8 @@
 import { InputValidationState } from '@cardstack/boxel/addon/components/boxel/input/validation-state';
-import { ImageUploadSuccessResult } from '@cardstack/web-client/components/image-uploader';
+import { IMAGE_UPLOADER_STATES } from '@cardstack/web-client/components/common/image-upload-interface';
 import config from '@cardstack/web-client/config/environment';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
-import { ImageValidation } from '@cardstack/web-client/utils/image';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Component from '@glimmer/component';
@@ -21,22 +20,25 @@ export const IMAGE_EDITOR_ELEMENT_ID = 'card-space-image-editor';
 export default class DisplayNameComponent extends Component<WorkflowCardComponentArgs> {
   @service('hub-authentication') declare hubAuthentication: HubAuthentication;
 
-  imageEditorElement = document.getElementById(IMAGE_EDITOR_ELEMENT_ID);
-  desiredWidth = 400;
-  desiredHeight = 400;
-  acceptedFileTypes = ['image/jpeg', 'image/png'];
+  // image edit/upload options
+  editorOptions = {
+    width: 400,
+    height: 400,
+    rootElement: document.getElementById(IMAGE_EDITOR_ELEMENT_ID),
+  };
+  validationOptions = {
+    fileType: ['image/jpeg', 'image/png'],
+    maxFileSize: 1000 * 1000,
+  };
+
   @tracked displayName = '';
   @tracked displayNameInputState: InputValidationState = 'initial';
   @tracked displayNameInputErrorMessage = '';
   @tracked profileImage = '';
-  @tracked processedImage = {
-    type: '',
-    filename: '',
-    preview: '',
-  };
-  @tracked showEditor = false;
   @tracked imageUploadErrorMessage = '';
-  @tracked imageUploadState = 'valid';
+  @tracked
+  imageUploadState: typeof IMAGE_UPLOADER_STATES[keyof typeof IMAGE_UPLOADER_STATES] =
+    IMAGE_UPLOADER_STATES.default;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -51,13 +53,6 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
 
   get disableCompletion() {
     return !this.args.isComplete && this.displayNameInputState !== 'valid';
-  }
-
-  get imageValidation() {
-    return new ImageValidation({
-      fileType: this.acceptedFileTypes,
-      maxFileSize: 1 * 1000 * 1000, // 1 MB
-    });
   }
 
   @restartableTask *updateDisplayNameTask(displayName: string): any {
@@ -106,28 +101,6 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
     taskFor(this.updateDisplayNameTask).perform(displayName);
   }
 
-  @action async onUpload(image: ImageUploadSuccessResult): Promise<void> {
-    let validationResult = await this.imageValidation.validate(image.file);
-
-    if (!validationResult.valid) {
-      this.imageUploadErrorMessage = validationResult.message;
-      this.imageUploadState = 'error';
-      return;
-    }
-
-    this.processImage(image);
-  }
-
-  processImage(image: ImageUploadSuccessResult) {
-    this.processedImage = {
-      type: image.file.type,
-      filename: image.file.name,
-      preview: image.preview,
-    };
-    this.showEditor = true;
-    this.imageUploadErrorMessage = '';
-  }
-
   @action edit() {
     this.updateDisplayName(this.displayName);
     this.args.onIncomplete?.();
@@ -141,25 +114,22 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
     taskFor(this.saveImageEditDataTask).cancelAll();
     this.args.workflowSession.delete('profileImageUrl');
     this.profileImage = '';
-    this.imageUploadState = 'valid';
+    this.imageUploadState = IMAGE_UPLOADER_STATES.default;
     this.imageUploadErrorMessage = '';
   }
 
   @task *saveImageEditDataTask(data: {
     preview: string;
     file: Blob;
+    filename: string;
   }): TaskGenerator<void> {
     try {
       this.profileImage = data.preview;
       let formdata = new FormData();
 
-      formdata.append(
-        this.processedImage.filename,
-        data.file,
-        this.processedImage.filename
-      );
+      formdata.append(data.filename, data.file, data.filename);
 
-      this.imageUploadState = 'loading';
+      this.imageUploadState = IMAGE_UPLOADER_STATES.loading;
       let response = yield (yield fetch(`${config.hubURL}/upload`, {
         method: 'POST',
         body: formdata,
@@ -172,7 +142,7 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
         let url = response.data.attributes.url;
         this.args.workflowSession.setValue('profileImageUrl', url);
         this.profileImage = url;
-        this.imageUploadState = 'valid';
+        this.imageUploadState = IMAGE_UPLOADER_STATES.default;
       } else if (response.errors) {
         if (
           response.errors.length === 1 &&
@@ -205,19 +175,19 @@ export default class DisplayNameComponent extends Component<WorkflowCardComponen
       Sentry.captureException(e);
       this.args.workflowSession.delete('profileImageUrl');
       this.profileImage = '';
-      this.imageUploadState = 'error';
+      this.imageUploadState = IMAGE_UPLOADER_STATES.error;
       this.imageUploadErrorMessage = 'Failed to upload file';
-    } finally {
-      this.processedImage = {
-        type: '',
-        filename: '',
-        preview: '',
-      };
     }
   }
 
-  @action logUploadError(e: Error) {
-    console.error('Failed to upload file to browser', e);
-    Sentry.captureException(e);
+  @action onError(e: Error, isValidation: boolean) {
+    this.imageUploadState = IMAGE_UPLOADER_STATES.error;
+    this.imageUploadErrorMessage = isValidation
+      ? e.message
+      : 'Failed to upload file';
+    if (!isValidation) {
+      console.error('Failed to upload file to browser', e);
+      Sentry.captureException(e);
+    }
   }
 }
