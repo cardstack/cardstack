@@ -9,16 +9,16 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { createDepotSafe } from '@cardstack/web-client/utils/test-factories';
 import config from '@cardstack/web-client/config/environment';
 import { IMAGE_EDITOR_ELEMENT_ID } from '@cardstack/web-client/components/card-space/create-space-workflow/display-name';
-import { mockPngUpload } from '@cardstack/web-client/components/image-uploader';
+import { mockPngUpload } from '@cardstack/web-client/components/common/image-upload-action';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 
 const DISPLAY_NAME_FIELD = '[data-test-card-space-display-name-field]';
 const DISPLAY_NAME = '[data-test-card-space-display-name]';
 const DISPLAY_NAME_INPUT = '[data-test-card-space-display-name-input] input';
-const IMAGE_UPLOADER = '[data-test-card-space-image-uploader]';
-const IMAGE_UPLOADER_ERROR_MESSAGE = '[data-test-image-uploader-error]';
+const IMAGE_UPLOADER = '[data-test-card-space-profile-image-uploader]';
+const IMAGE_UPLOADER_ERROR_MESSAGE = '[data-test-image-upload-interface-error]';
 const IMAGE_UPLOADER_AVATAR =
-  '[data-test-card-space-image-uploader-avatar] [data-test-avatar-image]';
+  '[data-test-card-space-profile-image-uploader-avatar] [data-test-avatar-image]';
 const AVATAR = '[data-test-card-space-avatar] [data-test-avatar-image]';
 const IMAGE_EDITOR_SAVE_BUTTON = '[data-test-image-editor-save-button]';
 const EDIT_BUTTON = '[data-test-card-space-display-name-edit-button]';
@@ -193,7 +193,7 @@ module(
 
       // this opens the image editor. users would normally trigger this
       // by clicking the image uploader
-      await mockPngUpload(sampleImage, IMAGE_UPLOADER);
+      await mockPngUpload(sampleImage);
 
       await waitFor(`${IMAGE_EDITOR_SAVE_BUTTON}:not(:disabled)`);
 
@@ -231,7 +231,7 @@ module(
 
       // this opens the image editor. users would normally trigger this
       // by clicking the image uploader
-      await mockPngUpload(sampleImage, IMAGE_UPLOADER);
+      await mockPngUpload(sampleImage);
 
       await waitFor(`${IMAGE_EDITOR_SAVE_BUTTON}:not(:disabled)`);
 
