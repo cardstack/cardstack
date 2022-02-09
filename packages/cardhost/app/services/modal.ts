@@ -63,10 +63,20 @@ export default class Modal extends Service {
     };
   }
 
-  @task async newCardTask(parentCard: CardModel, realm: string) {
+  @task async newCardTask(
+    parentCard: CardModel,
+    realm: string,
+    withId: boolean
+  ) {
+    // this is a contrived example for our tests meant to demonstrate that an ID
+    // can be supplied to a new card
+    let id = withId
+      ? `CUSTOM_ID_${Math.floor(Math.random() * 1000000)}`
+      : undefined;
+
     this.state = { name: 'loading' };
     let editableParent = await parentCard.editable();
-    let loadedCard = await editableParent.adoptIntoRealm(realm);
+    let loadedCard = await editableParent.adoptIntoRealm(realm, id);
     this.state = {
       name: 'loaded',
       loadedCard,

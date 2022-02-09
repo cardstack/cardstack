@@ -88,7 +88,7 @@ export default class LocalRealm implements Builder {
   async loadData(url: string, format: Format): Promise<CardModel> {
     let { compiled, raw } = await this.load(url);
 
-    let componentModule = await this.loadModule<CardComponentModule>(
+    let componentModule = await this.cards.loadModule<CardComponentModule>(
       compiled.componentInfos[format].moduleName.global
     );
 
@@ -213,7 +213,9 @@ export default class LocalRealm implements Builder {
   ): Promise<JSONAPIDocument> {
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
-    let id = this.generateId();
+    let id = resource.id
+      ? this.parseOwnRealmURL(resource.id)!.id
+      : this.generateId();
     this.createRawCard({
       realm: this.realmURL,
       id,
