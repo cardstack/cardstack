@@ -104,7 +104,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'Test results'
+          check_name: 'web-client test results'
           files: test-results/**/*.xml
 
   change_check:
