@@ -375,7 +375,7 @@ if (process.env.COMPILER) {
         // await cards.create(customGreeting);
       });
 
-      it.only('Can search for card computed field for card created with data', async function () {
+      it('Can search for card computed field for card created with data', async function () {
         let baseCard = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         expect(baseCard.data).to.not.exist;
 
@@ -384,7 +384,7 @@ if (process.env.COMPILER) {
         expect(card.data.greeting).to.eq('Welcome Jackie to 123 Dog Street');
       });
 
-      it.only('Can search for card computed field for card created with data and schema', async function () {
+      it('Can search for card computed field for card created with data and schema', async function () {
         // is this a correct example or for should this test be for a case like the skipped test below?
         let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
         expect(card.data.name).to.eq('Woody');
@@ -398,7 +398,7 @@ if (process.env.COMPILER) {
         expect(card.data.desc).to.eq('Greeting for good dog');
       });
 
-      it.only('Can search for card computed field for card after updating data', async function () {
+      it('Can search for card computed field for card after updating data', async function () {
         await cards.update({
           realm: realmURL,
           id: 'sample-greeting',
@@ -416,7 +416,7 @@ if (process.env.COMPILER) {
         expect(card.data.greeting).to.eq('Welcome Woody to 123 Cat Ave');
       });
 
-      it.only('Can search for card computed field for card after updating data and schema', async function () {
+      it('Can search for card computed field for card after updating data and schema', async function () {
         // Is this a correct update example?
         await cards.update({
           realm: realmURL,
@@ -461,13 +461,15 @@ if (process.env.COMPILER) {
         //     'schema.js': `
         //       import { contains } from "@cardstack/types";
         //       import string from "https://cardstack.com/base/string";
+        //       import address from "../address";
         //       export default class GreetingCard {
         //         @contains(string) name;
+        //         @contains(address) address;
         //         @contains(string) breed;
 
         //         @contains(string)
         //         async greeting() {
-        //           return "Hello " + await this.name + " the " + await this.breed;
+        //           return "Hello " + (await this.name) + " the " + (await this.breed);
         //         }
         //       }
         //     `,
