@@ -254,7 +254,15 @@ module(
         await mockPngUpload(imageDataUri);
         await waitUntil(() => onErrorSpy.calledOnce);
 
-        assert.ok(onErrorSpy.calledOnce);
+        // check that we have the right validation message,
+        // and a boolean to indicate that it's a validation message
+        // this is so we can use the validation message in the UI
+        // and skip sending to sentry
+        assert.equal(
+          onErrorSpy.lastCall.args[0].message,
+          'Please upload an image with a file type of gif'
+        );
+        assert.equal(onErrorSpy.lastCall.args[1], true);
         assert.ok(onUploadSpy.notCalled);
       });
     });

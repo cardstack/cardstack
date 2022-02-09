@@ -59,7 +59,9 @@ export default class CoverPhotoComponent extends Component<{
         file: Blob;
         filename: string;
       }) => Promise<void>);
-  onError: ((error: Error) => void) | ((error: Error) => Promise<void>);
+  onError:
+    | ((error: Error, isValidation?: boolean) => void)
+    | ((error: Error, isValidation?: boolean) => Promise<void>);
 }> {
   uploader!: HTMLInputElement;
   @tracked processedImage: {
@@ -111,7 +113,7 @@ export default class CoverPhotoComponent extends Component<{
       let validationResult = await this.imageValidation.validate(file);
 
       if (!validationResult.valid) {
-        this.args.onError(new Error(validationResult.message));
+        this.args.onError(new Error(validationResult.message), true);
         return;
       }
 
