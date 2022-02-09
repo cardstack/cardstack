@@ -3,6 +3,9 @@
   @isOpen={{@isOpen}}
   @onClose={{@onClose}}
   data-test-image-editor
+  data-test-image-editor-width={{@width}}
+  data-test-image-editor-height={{@height}}
+  data-test-image-editor-value={{@image}}
   ...attributes
 >
   <ActionCardContainer @header="Edit image" class="image-editor__card">
@@ -37,7 +40,7 @@
           </Boxel::Button>
         </div>
       </div>
-      <div class="image-editor__preview-section">
+      <div class="image-editor__preview-section" data-test-image-editor-preview-section>
         {{yield this.preview}}
       </div>
       {{#if this.errored}}
