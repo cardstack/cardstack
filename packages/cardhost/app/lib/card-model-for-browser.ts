@@ -96,12 +96,12 @@ export default class CardModelForBrowser implements CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    let localRealm;
-    if (this.localRealm) {
-      localRealm = this.localRealm;
-    } else if (LOCAL_REALM && !this.localRealm) {
-      localRealm = await this.cards.builder();
+
+    let localRealm: LocalRealm | undefined;
+    if (realm === LOCAL_REALM) {
+      localRealm = this.localRealm ?? (await this.cards.builder());
     }
+
     return new (this.constructor as typeof CardModelForBrowser)(
       this.cards,
       {
@@ -113,7 +113,7 @@ export default class CardModelForBrowser implements CardModel {
         schemaModuleId: this.state.schemaModuleId,
         format: this.state.format,
       },
-      localRealm ?? this.localRealm
+      localRealm
     );
   }
 
