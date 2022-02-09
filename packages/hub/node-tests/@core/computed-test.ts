@@ -17,7 +17,6 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
 
             export default class Bio {
-              getRawField = "don't collide!";
               @contains(string) short;
               @contains(string) favoriteColor;
             }
@@ -35,6 +34,7 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
             import bio from "../bio";
             export default class Person {
+              getRawField = "don't collide!";
               @contains(string) firstName;
               @contains(string) lastName;
 
@@ -114,7 +114,7 @@ if (process.env.COMPILER) {
         data: {
           firstName: 'Ains Ooal',
           lastName: 'Gown',
-          seriesName: 'Overload',
+          seriesName: 'Overlord',
           aboutMe: {
             short: 'Supreme overload of darkness',
             favoriteColor: 'black',
@@ -123,6 +123,7 @@ if (process.env.COMPILER) {
       });
       let card = await cards.loadData(`${realm}ains`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Ains Ooal Gown');
+      expect(await card.getField('seriesName')).to.equal('Overlord');
     });
 
     // we can use the field meta short cut here to just return raw data without
