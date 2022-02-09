@@ -1,26 +1,24 @@
-import { Client } from 'pg';
 import { setupHub } from '../helpers/server';
+import { PrismaClient } from '@prisma/client';
 
 describe('GET /api/prepaid-card-patterns', function () {
-  let db: Client;
-  let { getContainer, request } = setupHub(this);
+  let { request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    db = await dbManager.getClient();
+    const prismaClient = new PrismaClient();
+    // FIXME serviceify? with transaction/rollback like DatabaseManager
 
     let rows = [
       ['543423cb-de7e-44c2-a9e1-902b4648b8fb', 'https://example.com/a.svg', 'Pattern A'],
       ['72b654e4-dd4a-4a89-a78c-43a9baa7f354', 'https://example.com/b.svg', 'Pattern B'],
     ];
-    for (const row of rows) {
-      try {
-        await db.query('INSERT INTO prepaid_card_patterns(id, pattern_url, description) VALUES($1, $2, $3)', row);
-      } catch (e) {
-        console.error(e);
-      }
-    }
+
+    await prismaClient.prepaid_card_patterns.createMany({data: rows.map(row => ( {id: row[0], pattern_url: row[1], description: row[2] }))});
   });
+
+  this.afterEach(async function() {
+    await prismaClient.prepaid_card_patterns.deleteMany({});
+  })
 
   it('responds with 200 and available header patterns', async function () {
     await request()
