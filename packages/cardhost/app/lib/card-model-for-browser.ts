@@ -29,7 +29,7 @@ import get from 'lodash/get';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
-import LocalRealm from './builder';
+import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
 
 const { cardServer } = config as any; // Environment types arent working
@@ -96,10 +96,11 @@ export default class CardModelForBrowser implements CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    let builder = await this.cards.builder();
     let localRealm;
-    if (realm === builder.realmURL) {
-      localRealm = builder;
+    if (this.localRealm) {
+      localRealm = this.localRealm;
+    } else if (LOCAL_REALM && !this.localRealm) {
+      localRealm = await this.cards.builder();
     }
     return new (this.constructor as typeof CardModelForBrowser)(
       this.cards,
@@ -259,13 +260,16 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
+    let url: string | undefined;
+    if (this.state.type === 'loaded') {
+      url = this.state.url;
+    } else if (this.state.id != null) {
+      url = cardURL({ realm: this.state.realm, id: this.state.id });
+    }
+
     return serializeResource(
       'card',
-      this.state.type === 'loaded'
-        ? this.state.url
-        : this.state.id
-        ? cardURL({ realm: this.state.realm, id: this.state.id })
-        : undefined,
+      url,
       serializeAttributes(
         this.data,
         this.state.componentModule.getCardModelOptions().serializerMap
