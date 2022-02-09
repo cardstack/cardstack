@@ -407,6 +407,7 @@ if (process.env.COMPILER) {
             import date from "https://cardstack.com/base/date";
 
             export default class Bio {
+              getRawField = "don't collide!";
               @contains(date) birthdate;
             }
           `,
@@ -476,10 +477,10 @@ if (process.env.COMPILER) {
         // the browser source has a lot less babel shenanigans
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
-          #getRawField;
+          getRawField0;
 
           constructor(get) {
-            this.#getRawField = get;
+            this.getRawField0 = get;
           }
         `);
       });
@@ -524,7 +525,7 @@ if (process.env.COMPILER) {
         `);
         expect(source).to.containsSource(`
           get birthdate() {
-            return new FieldGetter(this.#getRawField, "birthdate");
+            return new FieldGetter(this.getRawField0, "birthdate");
           }
         `);
       });
@@ -539,7 +540,7 @@ if (process.env.COMPILER) {
         `);
         expect(source).to.containsSource(`
           get aboutMe() {
-            return new BioClass(innerField => this.#getRawField("aboutMe." + innerField));
+            return new BioClass(innerField => this.getRawField("aboutMe." + innerField));
           }
         `);
       });
@@ -570,11 +571,11 @@ if (process.env.COMPILER) {
         let { compiled } = await cards.load(`${realm}really-fancy-person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
-          #getRawField;
+          getRawField;
 
           constructor(get) {
             super(get);
-            this.#getRawField = get;
+            this.getRawField = get;
           }
         `);
       });
