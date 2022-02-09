@@ -60,15 +60,5 @@ module('Acceptance | Card Editing', function (hooks) {
         'Hi! I am Bob Barker',
         'The original instance of the card is updated'
       );
-
-    let card = await this.owner
-      .lookup('service:cards')
-      .load(personURL, 'isolated');
-    assert.equal(card.data.name, 'Bob Barker', 'RawCard cache is updated');
-    assert.equal(
-      card.data.address.city,
-      'San Francisco',
-      'RawCard cache is updated'
-    );
   });
 });

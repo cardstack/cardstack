@@ -4,6 +4,8 @@ import { setupCardTest } from '../helpers/setup';
 import { lookup } from '../helpers/lookup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
+import type CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
+
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
@@ -16,6 +18,7 @@ let attributes = {
     city: 'Los Angeles',
     state: 'CA',
     settlementDate: '1990-01-01',
+    zip: '11111',
   },
 };
 
@@ -33,7 +36,7 @@ module('@core | card-model-for-browser', function (hooks) {
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
-    
+
           export default class Address {
             @contains(string) street;
             @contains(string) city;
@@ -59,7 +62,7 @@ module('@core | card-model-for-browser', function (hooks) {
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
           import address from "https://cardstack.local/address";
-    
+
           export default class Person {
             @contains(string) name;
             @contains(date) birthdate;
@@ -79,10 +82,12 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.data', async function (assert) {
-    let model = await lookup(this, 'cards').load(
+    let model = (await lookup(this, 'cards').load(
       `${localRealmURL}bob`,
       'isolated'
-    );
+    )) as CardModelForBrowser;
+    await model.computeData();
+
     assert.equal(
       model.data.name,
       attributes.name,
@@ -99,7 +104,7 @@ module('@core | card-model-for-browser', function (hooks) {
     );
     assert.ok(
       isSameDay(model.data.address.settlementDate, p('1990-01-01')),
-      'Dates are serialized to Dates'
+      'Nested card Dates are serialized to Dates'
     );
   });
 
@@ -121,10 +126,11 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.serialize', async function (assert) {
-    let model = await lookup(this, 'cards').load(
+    let model = (await lookup(this, 'cards').load(
       `${localRealmURL}bob`,
       'isolated'
-    );
+    )) as CardModelForBrowser;
+    await model.computeData();
     let payload = await model.serialize();
     assert.deepEqual(
       payload as any,
