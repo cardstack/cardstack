@@ -184,11 +184,12 @@ export default class CardModelForHub implements CardModel {
     if (this.state.type === 'created') {
       return serializeResource('card', undefined, serializeAttributes(this.data, this.serializerMap), this.usedFields);
     }
-    let { usedFields, componentModule } = this.state;
+    let { usedFields, componentModule, schemaModule } = this.state;
     let resource = serializeResource('card', this.url, serializeAttributes(this.data, this.serializerMap), usedFields);
     resource.meta = merge(
       {
         componentModule,
+        schemaModule,
       },
       resource.meta
     );

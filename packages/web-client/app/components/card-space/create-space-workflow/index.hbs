@@ -8,7 +8,6 @@
 
 {{!-- TODO: remove these and place in a better place when we have solved the Boxel modal layer problem --}}
 {{!-- template-lint-disable no-inline-styles --}}
-<div id="create-space-workflow-modal" style="width: 0px; height: 0px; flex-grow: 0;"></div>
 <div id="card-space-image-editor" style="width: 0px; height: 0px; flex-grow: 0;"></div>
 
 <Listener
@@ -24,17 +23,18 @@
 
 
 {{#unless this.workflow.isCanceled}}
+  {{!-- CardSpace::ProfileCard --}}
   <ToElsewhere
     @named="sidebar-preview-content"
     @send={{component
       "card-space/profile-card"
-      profilePhoto=this.currentCardSpaceDetails.profilePhoto
-      coverPhoto=this.currentCardSpaceDetails.coverPhoto
-      name=this.currentCardSpaceDetails.name
-      host=this.currentCardSpaceDetails.host
-      category=this.currentCardSpaceDetails.category
-      description=this.currentCardSpaceDetails.description
-      buttonText=this.currentCardSpaceDetails.buttonText
+      profilePhoto=this.workflow.cardSpaceDetails.profilePhoto
+      coverPhoto=this.workflow.cardSpaceDetails.coverPhoto
+      name=this.workflow.cardSpaceDetails.name
+      host=this.workflow.cardSpaceDetails.host
+      category=this.workflow.cardSpaceDetails.category
+      description=this.workflow.cardSpaceDetails.description
+      buttonText=this.workflow.cardSpaceDetails.buttonText
     }}
     @outsideParams={{hash
       title="Live Preview"

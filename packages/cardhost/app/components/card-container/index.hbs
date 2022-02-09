@@ -6,8 +6,9 @@
     <:actions>
       {{#if @editable}}
         <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
-        <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
-        <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
+        <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM false)}}>New (Server)</button>
+        <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM false)}}>New (Local)</button>
+        <button data-test-new-button-with-id {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM true)}}>New (with ID)</button>
       {{/if}}
       {{yield to="actions"}}
     </:actions>

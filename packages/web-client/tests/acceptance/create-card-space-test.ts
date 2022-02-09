@@ -189,8 +189,17 @@ module('Acceptance | create card space', function (hooks) {
         .dom(postableSel(3, 2))
         .containsText(`Fill out the Card Space details`);
 
-      await click('[data-test-card-space-details-start-button]');
-      await click('[data-test-card-space-edit-details-save-button]');
+      // fill in required details
+      await fillIn(
+        '[data-test-card-space-description-field]',
+        'Description here'
+      );
+      await click(
+        '[data-test-card-space-category-field] [data-test-category-option="Music"]'
+      );
+      await click('[data-test-button-text-option="Visit this Creator"]');
+
+      await click('[data-test-card-space-details-save-button]');
 
       assert.dom('[data-test-card-space-details-is-complete]').exists();
 
@@ -225,25 +234,21 @@ module('Acceptance | create card space', function (hooks) {
       assert
         .dom('[data-test-sidebar-preview-body] [data-test-profile-card-name]')
         .containsText('Hello there');
-      // TODO: fill these in as we update the workflow (these are the required fields.
-      // I haven't added assertions on images. they are not required fields.)
-      // These should fail as the workflow is filled out and starts modifying the correct values in the
-      // workflow session
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-category]'
         )
-        .containsText('Category');
+        .containsText('Music');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-description]'
         )
-        .containsText('Description');
+        .containsText('Description here');
       assert
         .dom(
           '[data-test-sidebar-preview-body] [data-test-profile-card-button-text]'
         )
-        .containsText('Button Text');
+        .containsText('Visit this Creator');
 
       await percySnapshot(assert);
 

@@ -29,7 +29,8 @@ import get from 'lodash/get';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
-import LocalRealm from './builder';
+import LocalRealm, { LOCAL_REALM } from './builder';
+import { cardURL } from '@cardstack/core/src/utils';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -40,6 +41,7 @@ export interface NewCardParams {
 
 export interface CreatedState {
   type: 'created';
+  id?: string;
   realm: string;
   parentCardURL: string;
   componentModule: CardComponentModule;
@@ -90,22 +92,28 @@ export default class CardModelForBrowser implements CardModel {
     }
   }
 
-  // TODO: add failing test for `_id` being unimplemented here and then fix
-  async adoptIntoRealm(realm: string, _id?: string): Promise<CardModel> {
+  async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
+
+    let localRealm: LocalRealm | undefined;
+    if (realm === LOCAL_REALM) {
+      localRealm = this.localRealm ?? (await this.cards.builder());
+    }
+
     return new (this.constructor as typeof CardModelForBrowser)(
       this.cards,
       {
         type: 'created',
+        id,
         realm,
         parentCardURL: this.state.url,
         componentModule: this.state.componentModule,
         schemaModuleId: this.state.schemaModuleId,
         format: this.state.format,
       },
-      this.localRealm
+      localRealm
     );
   }
 
@@ -208,18 +216,10 @@ export default class CardModelForBrowser implements CardModel {
       return this._schemaInstance;
     }
     let SchemaClass = (
-      await this.loadModule<CardSchemaModule>(this.state.schemaModuleId)
+      await this.cards.loadModule<CardSchemaModule>(this.state.schemaModuleId)
     ).default;
     this._schemaInstance = new SchemaClass(this.getRawField.bind(this));
     return this._schemaInstance;
-  }
-
-  private async loadModule<T extends Object>(moduleId: string): Promise<T> {
-    if (this.localRealm) {
-      return await this.localRealm.loadModule<T>(moduleId);
-    } else {
-      return await this.cards.loadModule<T>(moduleId);
-    }
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -260,9 +260,16 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
+    let url: string | undefined;
+    if (this.state.type === 'loaded') {
+      url = this.state.url;
+    } else if (this.state.id != null) {
+      url = cardURL({ realm: this.state.realm, id: this.state.id });
+    }
+
     return serializeResource(
       'card',
-      this.state.type === 'loaded' ? this.state.url : undefined,
+      url,
       serializeAttributes(
         this.data,
         this.state.componentModule.getCardModelOptions().serializerMap

@@ -4,41 +4,64 @@
   data-test-card-space-details-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Fill out the Card Space details">
+    {{#if @isComplete}}
+      <Boxel::Field
+        @label="Description"
+      >
+        {{@workflowSession.state.profileDescription}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Cover image"
+      >
+        {{#if @workflowSession.state.profileCoverImageUrl}}
+          <Avatar
+            @src={{@workflowSession.state.profileCoverImageUrl}}
+            @alt="Cover image"
+            @rounded={{false}}
+          />
+        {{else}}
+          No cover image
+        {{/if}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Button text"
+      >
+        {{@workflowSession.state.profileButtonText}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Category"
+      >
+        {{@workflowSession.state.profileCategory}}
+      </Boxel::Field>
+    {{else}}
+      <CardSpace::EditDetails
+        @workflowSession={{@workflowSession}}
+      />
+    {{/if}}
   </ActionCardContainer::Section>
 
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @disabled={{or @frozen this.isDisabled}}
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" this.toggleDetailsForm}}
-        data-test-card-space-details-start-button
+        {{on "click" this.save}}
+        data-test-card-space-details-save-button
       >
-        Get Started
+        Save Choices
       </d.ActionButton>
     </:default>
     <:memorialized as |m|>
       <m.ActionButton
         data-test-card-space-details-edit-button
-        {{on "click" this.toggleDetailsForm}}
+        {{on "click" this.edit}}
       >
         Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>
-
-  {{#in-element this.detailsModalElement}}
-    <Boxel::Modal
-      @size="medium"
-      @isOpen={{this.detailsModalShown}}
-      @onClose={{this.toggleDetailsForm}}
-      class='create-space-workflow-details__modal'
-    >
-      <CardSpace::EditDetails
-        @workflowSession={{@workflowSession}}
-        @onSave={{this.onSave}}
-      />
-    </Boxel::Modal>
-  {{/in-element}}
 </ActionCardContainer>
