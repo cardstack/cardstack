@@ -4,8 +4,6 @@ import { setupCardTest } from '../helpers/setup';
 import { lookup } from '../helpers/lookup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
-import type CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
-
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
@@ -82,11 +80,10 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.data', async function (assert) {
-    let model = (await lookup(this, 'cards').load(
+    let model = await lookup(this, 'cards').load(
       `${localRealmURL}bob`,
       'isolated'
-    )) as CardModelForBrowser;
-    await model.computeData();
+    );
 
     assert.equal(
       model.data.name,
@@ -126,11 +123,10 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.serialize', async function (assert) {
-    let model = (await lookup(this, 'cards').load(
+    let model = await lookup(this, 'cards').load(
       `${localRealmURL}bob`,
       'isolated'
-    )) as CardModelForBrowser;
-    await model.computeData();
+    );
     let payload = await model.serialize();
     assert.deepEqual(
       payload as any,

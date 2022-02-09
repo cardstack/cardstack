@@ -85,7 +85,10 @@ export default class CardModelForBrowser implements CardModel {
         original: undefined,
       };
     }
+
+    // TEMP: needed until serializerMap restructure
     this.inversedSerializerMap = inversedSerializerMap(this.serializerMap);
+
     this.setters = this.makeSetter();
     let prop = tracked(this, '_data', {
       enumerable: true,
@@ -186,6 +189,7 @@ export default class CardModelForBrowser implements CardModel {
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
         class extends Component {
           component = innerComponent;
+          // TODO: Ed mentioned something about this needing to be full separate. Should we clone?
           data = self.data;
           set = self.setters;
         }
@@ -200,9 +204,14 @@ export default class CardModelForBrowser implements CardModel {
     //   return get(this.data, name);
     // }
 
-    let klass = await this.schemaClass();
-    let schemaInstance = new klass(this.getRawField.bind(this)) as any;
+    if (!this._schemaInstance) {
+      let klass = await this.schemaClass();
+      // We can't await the instance creation in a separate, as it's thenable and confuses async methods
+      this._schemaInstance = new klass(this.getRawField.bind(this)) as any;
+    }
 
+    // If the path is deeply nested, we need to recurse the down
+    // the schema instances until we get to a field getter
     function getGetter(schema: any, path: string): any {
       let [key, ...tail] = path.split('.');
       let getter = schema[key];
@@ -212,7 +221,7 @@ export default class CardModelForBrowser implements CardModel {
       return getter;
     }
 
-    let getter = getGetter(schemaInstance, fieldPath);
+    let getter = getGetter(this._schemaInstance, fieldPath);
     return await getter;
   }
 
@@ -225,35 +234,14 @@ export default class CardModelForBrowser implements CardModel {
     return {};
   }
 
-  deserializeField(fieldPath: string, value: any): any {
-    if (!value) {
-      return;
-    }
-    let serializerName = get(this.inversedSerializerMap, fieldPath);
-    if (serializerName) {
-      let serializer = SERIALIZERS[serializerName];
-      return serializer.deserialize(value);
-    }
-
-    return value;
-  }
-
-  serializeField(fieldPath: string, value: any): any {
-    if (!value) {
-      return;
-    }
-    let serializerName = get(this.inversedSerializerMap, fieldPath);
-    if (serializerName) {
-      let serializer = SERIALIZERS[serializerName];
-      return serializer.serialize(value);
-    }
-
-    return value;
-  }
-
   private async getRawField(fieldPath: string): Promise<any> {
     let value = get(this.rawData, fieldPath);
-    return this.deserializeField(fieldPath, value);
+    return serializeField(
+      this.inversedSerializerMap,
+      fieldPath,
+      value,
+      'deserialize'
+    );
   }
 
   async schemaClass() {
@@ -315,18 +303,16 @@ export default class CardModelForBrowser implements CardModel {
     let attributes = cloneDeep(this.data);
     let map = this.inversedSerializerMap;
     for (let field of Object.keys(map)) {
-      let value = get(attributes, field);
-      set(attributes, field, this.serializeField(field, value));
+      let value = serializeField(
+        this.inversedSerializerMap,
+        field,
+        get(attributes, field),
+        'serialize'
+      );
+      set(attributes, field, value);
     }
 
-    return serializeResource(
-      'card',
-      url,
-      serializeAttributes(
-        attributes
-        this.state.componentModule.getCardModelOptions().serializerMap
-      )
-    );
+    return serializeResource('card', url, attributes);
   }
 
   get serializerMap(): ComponentInfo['serializerMap'] {
@@ -434,4 +420,22 @@ function tracked(
 
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
+}
+
+function serializeField(
+  serializerMap: Record<string, SerializerName>,
+  fieldPath: string,
+  value: any,
+  action: 'serialize' | 'deserialize'
+) {
+  if (!value) {
+    return;
+  }
+  let serializerName = get(serializerMap, fieldPath);
+  if (serializerName) {
+    let serializer = SERIALIZERS[serializerName];
+    return serializer[action](value);
+  }
+
+  return value;
 }

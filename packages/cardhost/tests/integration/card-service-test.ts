@@ -3,7 +3,6 @@ import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 import type Cards from 'cardhost/services/cards';
-import type CardModelForBrowser from 'cardhost/lib/card-model-for-browser';
 
 module('Integration | card-service', function (hooks) {
   let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);
@@ -61,8 +60,7 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load a card's isolated view and model`, async function (assert) {
-      let model = (await cards.load(cardID, 'isolated')) as CardModelForBrowser;
-      await model.computeData();
+      let model = await cards.load(cardID, 'isolated');
       assert.equal(model.url, cardID, '@model id is correct');
       assert.equal(
         model.data.title,
