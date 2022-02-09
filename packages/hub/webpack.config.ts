@@ -184,6 +184,8 @@ module.exports = {
     // the migration files which rely on a relative path calculation from
     // __dirname
     'node-pg-migrate': 'commonjs node-pg-migrate',
+    _http_common: '_http_common', // Adapted from https://github.com/prisma/prisma/issues/6564#issuecomment-850273211
+    encoding: 'encoding',
   },
 
   module: {

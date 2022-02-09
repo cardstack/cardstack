@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model card_drop_recipients {
+  user_id              String   @id
+  user_name            String
+  address              String?
+  airdrop_txn_hash     String?
+  airdrop_prepaid_card String?
+  created_at           DateTime @default(now()) @db.Timestamp(6)
+  updated_at           DateTime @default(now()) @db.Timestamp(6)
+}
+
+model card_spaces {
+  id                           String         @id @db.Uuid
+  profile_cover_image_url      String?
+  profile_name                 String
+  profile_image_url            String?
+  profile_description          String
+  profile_button_text          String
+  profile_category             String
+  created_at                   DateTime       @default(now()) @db.Timestamp(6)
+  bio_title                    String?
+  bio_description              String?
+  links                        Json[]         @db.Json
+  donation_title               String?
+  donation_description         String?
+  merchant_id                  String         @unique(map: "card_spaces_merchant_id_unique_index") @db.Uuid
+  donation_suggestion_amount_1 Int?
+  donation_suggestion_amount_2 Int?
+  donation_suggestion_amount_3 Int?
+  donation_suggestion_amount_4 Int?
+  merchant_infos               merchant_infos @relation(fields: [merchant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model cards {
+  url            String   @id
+  data           Json?
+  ancestors      String[]
+  searchData     Json?
+  realm          String
+  generation     Int?
+  compileErrors  Json?
+  deps           String[]
+  raw            Json?
+  compiled       Json?
+  schemaModule   String?
+  componentInfos Json?
+}
+
+model discord_bots {
+  bot_id          String                   @id
+  bot_type        String
+  status          discord_bots_status_enum
+  created_at      DateTime                 @default(now()) @db.Timestamp(6)
+  last_message_id String?
+
+  @@index([bot_type, status], map: "discord_bots_bot_type_status_index")
+}
+
+model dm_channels {
+  channel_id String   @id
+  user_id    String
+  command    String?
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model latest_event_block {
+  id           Int      @id @default(1)
+  block_number Int
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
+}
+
+model merchant_infos {
+  id            String       @id @db.Uuid
+  name          String
+  slug          String       @unique(map: "merchant_infos_slug_unique_index")
+  color         String
+  text_color    String
+  owner_address String
+  created_at    DateTime     @default(now()) @db.Timestamp(6)
+  card_spaces   card_spaces?
+}
+
+model notification_preferences {
+  owner_address        String
+  notification_type_id String                               @db.Uuid
+  push_client_id       String
+  status               notification_preferences_status_enum @default(enabled)
+  created_at           DateTime                             @default(now()) @db.Timestamp(6)
+  notification_types   notification_types                   @relation(fields: [notification_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([owner_address, notification_type_id, push_client_id], map: "notification_preferences_owner_address_notification_type_id_pus")
+  @@index([owner_address], map: "notification_preferences_owner_address_index")
+}
+
+model notification_types {
+  id                       String                         @id @db.Uuid
+  notification_type        String
+  default_status           notification_types_status_enum @default(enabled)
+  created_at               DateTime                       @default(now()) @db.Timestamp(6)
+  notification_preferences notification_preferences[]
+}
+
+model pgmigrations {
+  id     Int      @id @default(autoincrement())
+  name   String   @db.VarChar(255)
+  run_on DateTime @db.Timestamp(6)
+}
+
+model prepaid_card_color_schemes {
+  id                          String                        @id @db.Uuid
+  background                  String
+  pattern_color               String
+  text_color                  String
+  description                 String
+  prepaid_card_customizations prepaid_card_customizations[]
+}
+
+model prepaid_card_customizations {
+  id                         String                     @id @db.Uuid
+  owner_address              String
+  issuer_name                String
+  color_scheme_id            String                     @db.Uuid
+  pattern_id                 String                     @db.Uuid
+  created_at                 DateTime                   @default(now()) @db.Timestamp(6)
+  prepaid_card_color_schemes prepaid_card_color_schemes @relation(fields: [color_scheme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  prepaid_card_patterns      prepaid_card_patterns      @relation(fields: [pattern_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model prepaid_card_patterns {
+  id                          String                        @id @db.Uuid
+  pattern_url                 String?
+  description                 String
+  prepaid_card_customizations prepaid_card_customizations[]
+}
+
+model push_notification_registrations {
+  id             String    @id @db.Uuid
+  owner_address  String
+  push_client_id String
+  disabled_at    DateTime? @db.Timestamp(6)
+  created_at     DateTime  @default(now()) @db.Timestamp(6)
+
+  @@unique([owner_address, push_client_id], map: "push_notification_registrations_owner_address_push_client_id_un")
+}
+
+model realm_metas {
+  realm String @id
+  meta  Json?
+}
+
+model reservations {
+  id                   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_address         String
+  sku                  String
+  transaction_hash     String?
+  prepaid_card_address String?
+  created_at           DateTime        @default(now()) @db.Timestamp(6)
+  updated_at           DateTime        @default(now()) @db.Timestamp(6)
+  wallet_orders        wallet_orders[]
+
+  @@index([id, user_address], map: "reservations_id_user_address_index")
+  @@index([updated_at, prepaid_card_address], map: "reservations_updated_at_prepaid_card_address_index")
+  @@index([updated_at, prepaid_card_address, sku], map: "reservations_updated_at_prepaid_card_address_sku_index")
+  @@index([user_address], map: "reservations_user_address_index")
+}
+
+model sent_push_notifications {
+  notification_id    String   @id
+  push_client_id     String?
+  notification_type  String?
+  notification_title String?
+  notification_body  String?
+  notification_data  Json?    @db.Json
+  message_id         String?
+  created_at         DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([created_at], map: "sent_push_notifications_created_at_index")
+}
+
+model uploads {
+  id            String   @id @db.Uuid
+  cid           String
+  service       String
+  url           String
+  filename      String
+  size          Int
+  type          String
+  owner_address String
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+}
+
+model wallet_orders {
+  order_id              String                    @id
+  user_address          String
+  wallet_id             String
+  status                wallet_orders_status_enum
+  custodial_transfer_id String?
+  created_at            DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at            DateTime                  @default(now()) @db.Timestamp(6)
+  reservation_id        String?                   @db.Uuid
+  reservations          reservations?             @relation(fields: [reservation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
+
+  @@index([custodial_transfer_id, status], map: "wallet_orders_custodial_transfer_id_status_index")
+  @@index([reservation_id], map: "wallet_orders_reservation_id_index")
+}
+
+model wyre_prices {
+  sku                   String   @id
+  source_currency       String
+  dest_currency         String
+  source_currency_price Decimal  @db.Decimal
+  includes_fee          Boolean  @default(false)
+  disabled              Boolean  @default(false)
+  created_at            DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([disabled], map: "wyre_prices_disabled_index")
+}
+
+enum discord_bots_status_enum {
+  connecting
+  connected
+  listening
+  disconnected
+  unresponsive
+}
+
+enum notification_preferences_status_enum {
+  enabled
+  disabled
+}
+
+enum notification_types_status_enum {
+  enabled
+  disabled
+}
+
+enum wallet_orders_status_enum {
+  waiting_for_order @map("waiting-for-order")
+  received_order @map("received-order")
+  waiting_for_reservation @map("waiting-for-reservation")
+  provisioning
+  error_provisioning @map("error-provisioning")
+  complete
+}
