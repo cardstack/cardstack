@@ -4,14 +4,15 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 export default class CardSpaceEditDetailsDescriptionComponent extends Component<WorkflowCardComponentArgs> {
-  @tracked validationMessage: string | null = null;
-  @tracked description: string | null = null;
+  @tracked validationMessage = '';
+  @tracked description = '';
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    let description = this.args.workflowSession.getValue('profileDescription');
+    let description =
+      this.args.workflowSession.getValue<string>('profileDescription');
     if (description) {
-      this.setDescription(description as string);
+      this.setDescription(description);
     }
   }
 
@@ -23,7 +24,7 @@ export default class CardSpaceEditDetailsDescriptionComponent extends Component<
       this.validationMessage = validationMessage;
       this.args.workflowSession.delete('profileDescription');
     } else {
-      this.validationMessage = null;
+      this.validationMessage = '';
       this.args.workflowSession.setValue('profileDescription', value);
     }
   }
