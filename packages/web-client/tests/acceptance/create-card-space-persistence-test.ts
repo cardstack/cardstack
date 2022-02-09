@@ -96,7 +96,6 @@ module('Acceptance | create card space persistence', function (hooks) {
       assert.dom(milestoneCompletedSel(2)).exists(); // Display name
       assert.dom(milestoneCompletedSel(3)).doesNotExist();
       assert.dom('[data-test-milestone="3"][data-test-postable="2"]').exists();
-      assert.dom('[data-test-card-space-details-start-button]').isNotDisabled();
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {

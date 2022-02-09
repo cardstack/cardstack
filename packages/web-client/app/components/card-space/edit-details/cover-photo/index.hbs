@@ -1,0 +1,47 @@
+{{!-- this is not a label, because it doesn't seem good for clicking on the label to trigger the hidden input --}}
+<Boxel::Field
+  @label="Cover image"
+>
+  <ImageUploader
+    @state={{this.imageUploadState}}
+    @errorMessage={{this.imageUploadErrorMessage}}
+    @image={{this.coverImage}}
+    @cta="Select a Photo"
+    @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+    @acceptedFileTypes={{this.acceptedFileTypes}}
+    @onUpload={{this.onUpload}}
+    @onError={{this.logUploadError}}
+    @onRemoveImage={{this.onImageRemoved}}
+    data-test-card-space-image-uploader
+  as |ImageUploaderAvatar|>
+    <ImageUploaderAvatar
+      @alt="Cover image"
+      @rounded={{false}}
+      data-test-card-space-image-uploader-avatar
+    />
+  </ImageUploader>
+</Boxel::Field>
+
+{{#in-element this.imageEditorElement}}
+  <ImageEditor
+    @isOpen={{this.showEditor}}
+    @onClose={{fn (mut this.showEditor) false}}
+    @image={{this.processedImage.preview}}
+    @fileType={{this.processedImage.type}}
+    @width={{this.desiredWidth}}
+    @height={{this.desiredHeight}}
+    @saveImageEditData={{perform this.saveImageEditDataTask}}
+    as |preview|
+  >
+    <CardSpace::ProfileCard
+      @profilePhoto={{this.profilePhoto}}
+      @coverPhoto={{preview}}
+      @name={{@workflowSession.workflow.cardSpaceDetails.name}}
+      @host={{@workflowSession.workflow.cardSpaceDetails.host}}
+      @category={{@workflowSession.workflow.cardSpaceDetails.category}}
+      @description={{@workflowSession.workflow.cardSpaceDetails.description}}
+      @buttonText={{@workflowSession.workflow.cardSpaceDetails.buttonText}}
+      data-test-card-space-profile-card-preview
+    />
+  </ImageEditor>
+{{/in-element}}
