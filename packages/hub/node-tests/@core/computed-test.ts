@@ -116,7 +116,7 @@ if (process.env.COMPILER) {
           lastName: 'Gown',
           seriesName: 'Overlord',
           aboutMe: {
-            short: 'Supreme overload of darkness',
+            short: 'Supreme overlord of darkness',
             favoriteColor: 'black',
           },
         },
