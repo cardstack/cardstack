@@ -66,7 +66,7 @@ export default class Modal extends Service {
   @task async newCardTask(
     parentCard: CardModel,
     realm: string,
-    withId = false
+    withId: boolean
   ) {
     // this is a contrived example for our tests meant to demonstrate that an ID
     // can be supplied to a new card
