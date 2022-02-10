@@ -69,7 +69,6 @@ module('Acceptance | Card Creation', function (hooks) {
     await visit(`/?url=${remoteCard}`);
     assert.equal(currentURL(), `/?url=${remoteCard}`);
     await waitFor(POST);
-    assert.dom(POST).hasText('Hi this is a demo');
 
     await click(NEW);
     assert.dom(MODAL).exists('The modal is opened');
