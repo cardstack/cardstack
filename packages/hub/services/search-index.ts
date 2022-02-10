@@ -16,7 +16,6 @@ import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
-import { CardService } from './card-service';
 
 const log = logger('hub/search-index');
 
@@ -104,12 +103,11 @@ export default class SearchIndex {
   async indexCard(
     raw: RawCard,
     compiled: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>,
-    cardService?: CardService
+    compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
     log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSave(raw, compiled, compiler, cardService);
+      return await ops.internalSave(raw, compiled, compiler);
     });
   }
 
@@ -255,13 +253,12 @@ class IndexerRun implements IndexerHandle {
   async internalSave(
     rawCard: RawCard,
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>,
-    cardService?: CardService
+    compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
-    return await this.writeToIndex(rawCard, definedCard, compiler, cardService);
+    return await this.writeToIndex(rawCard, definedCard, compiler);
   }
 
   // used directly by the hub when mutating card data only
@@ -282,19 +279,8 @@ class IndexerRun implements IndexerHandle {
   private async writeToIndex(
     rawCard: RawCard,
     compiledCard: CompiledCard,
-    compiler: Compiler<Unsaved>,
-    cardService?: CardService
+    compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let data: Record<string, any> = rawCard.data ?? {};
-    if (cardService) {
-      let cardModel = await cardService.makeCardModelFromDatabase('isolated', compiledCard, data); // ok to getting the card model here?
-      let computedFields = Object.keys(compiledCard.fields).filter((f) => (compiledCard.fields[f].computed ? f : null));
-      for (let f of computedFields) {
-        let value = await cardModel.getField(f);
-        data[f] = value;
-      }
-    }
-
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
     let expression = upsert('cards', 'cards_pkey', {
@@ -302,13 +288,12 @@ class IndexerRun implements IndexerHandle {
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(Object.keys(data).length > 0 ? data : null),
+      data: param(rawCard.data ?? null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
       searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
-
       schemaModule: param(compiledCard.schemaModule.global),
       componentInfos: param(compiledCard.componentInfos as Record<Format, any>),
     });

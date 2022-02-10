@@ -252,24 +252,6 @@ if (process.env.COMPILER) {
     });
 
     describe('computed field', function () {
-      let addressCard = {
-        realm: realmURL,
-        id: 'address',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-              import { contains } from "@cardstack/types";
-              import string from "https://cardstack.com/base/string";
-              import date from "https://cardstack.com/base/date";
-
-              export default class Address {
-                @contains(string) street;
-                @contains(date) date;
-              }
-            `,
-        },
-      };
-
       let greetingCard = {
         realm: realmURL,
         id: 'greeting-card',
@@ -278,30 +260,16 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import address from "../address";
+
             export default class GreetingCard {
               @contains(string) name;
-              @contains(address) address;
 
               @contains(string)
               async greeting() {
-                return "Welcome " + (await this.name) + " to " + (await this.address.street);
+                return "Welcome " + (await this.name) + "!";
               }
             }
           `,
-        },
-      };
-
-      let sampleGreeting = {
-        realm: realmURL,
-        id: 'sample-greeting',
-        adoptsFrom: '../greeting-card',
-        data: {
-          name: 'Jackie',
-          address: {
-            street: '123 Dog Street',
-            date: '2018-12-21',
-          },
         },
       };
 
@@ -313,111 +281,80 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import address from "../address";
+
             export default class DifferentGreetingCard {
               @contains(string) name;
-              @contains(address) address;
 
               @contains(string)
-              async greeting() {
-                return "Greetings to " + (await this.name) + " from " + (await this.address.street);
+              async differentGreeting() {
+                return "Greetings to " + (await this.name) + "!";
               }
             }
           `,
         },
         data: {
           name: 'Woody',
-          address: {
-            street: '321 Dog Street',
-            date: '2022-02-08',
-          },
         },
       };
 
-      // let customGreeting = {
-      //   realm: realmURL,
-      //   id: 'custom-greeting',
-      //   schema: 'schema.js',
-      //   files: {
-      //     'schema.js': `
-      //       import { contains, adopts } from "@cardstack/types";
-      //       import greetingCard from "../greeting-card";
-      //       import string from "https://cardstack.com/base/string";
-      //       import address from "../address";
-      //       export default @adopts(greetingCard) class CustomGreetingCard {
-      //         @contains(string) role;
-      //         @contains(address) address;
-
-      //         @contains(string)
-      //         async desc() {
-      //           return "Greeting for " + await this.role;
-      //         }
-      //       }
-      //     `,
-      //   },
-      //   data: {
-      //     name: 'Jackie',
-      //     role: 'good dog',
-      //     address: {
-      //      street: '123 Dog Street',
-      //     }
-      //   },
-      // };
-
       this.beforeEach(async function () {
-        let si = await getContainer().lookup('searchIndex', { type: 'service' });
-        await si.indexAllRealms();
-
-        await cards.create(addressCard);
         await cards.create(greetingCard);
-        await cards.create(sampleGreeting);
         await cards.create(differentGreetingCard);
-        // await cards.create(customGreeting);
+
+        let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
+        let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
+        sampleGreeting.setData({
+          name: 'Jackie',
+        });
+        await sampleGreeting.save();
       });
 
       it('Can search for card computed field for card created with data', async function () {
-        let baseCard = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
-        expect(baseCard.data).to.not.exist;
-
-        let card = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
-        // is this correct?
-        expect(card.data.greeting).to.eq('Welcome Jackie to 123 Dog Street');
-      });
-
-      it('Can search for card computed field for card created with data and schema', async function () {
-        // is this a correct example or for should this test be for a case like the skipped test below?
-        let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
-        expect(card.data.name).to.eq('Woody');
-        expect(card.data.greeting).to.eq('Greetings to Woody from 321 Dog Street');
-      });
-
-      it.skip('Can search for card computed field for card created with data and schema that adopts from another card', async function () {
-        let card = await cards.loadData(`${realmURL}custom-greeting`, 'isolated');
-        expect(card.data.greeting).to.eq('Welcome Jackie to 123 Dog Street');
-        expect(card.data.role).to.eq('good dog');
-        expect(card.data.desc).to.eq('Greeting for good dog');
-      });
-
-      it('Can search for card computed field for card after updating data', async function () {
-        await cards.update({
-          realm: realmURL,
-          id: 'sample-greeting',
-          adoptsFrom: '../greeting-card',
-          data: {
-            name: 'Woody',
-            address: {
-              street: '123 Cat Ave',
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Welcome Jackie!',
             },
           },
         });
 
-        let card = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
-        expect(card.data.name).to.eq('Woody');
-        expect(card.data.greeting).to.eq('Welcome Woody to 123 Cat Ave');
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
+      });
+
+      it('Can search for card computed field for card after updating data', async function () {
+        let cardModel = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
+        cardModel.setData({
+          name: 'Woody',
+        });
+        await cardModel.save();
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Welcome Woody!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
+      });
+
+      it('Can search for card computed field for card created with data and schema', async function () {
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}different-greeting-card`,
+            eq: {
+              differentGreeting: 'Greetings to Woody!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}different-greeting-card`]);
       });
 
       it('Can search for card computed field for card after updating data and schema', async function () {
-        // Is this a correct update example?
         await cards.update({
           realm: realmURL,
           id: 'different-greeting-card',
@@ -426,15 +363,13 @@ if (process.env.COMPILER) {
             'schema.js': `
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
-              import address from "../address";
               export default class DifferentGreetingCard {
                 @contains(string) name;
                 @contains(string) breed;
-                @contains(address) address;
 
                 @contains(string)
-                async greeting() {
-                  return "Hello " + (await this.name) + " the " + (await this.breed) + ". Your new address is " + (await this.address.street);
+                async differentGreeting() {
+                  return "Greetings to " + (await this.name) + " the " + (await this.breed) + "!";
                 }
               }
             `,
@@ -442,42 +377,19 @@ if (process.env.COMPILER) {
           data: {
             name: 'Jackie',
             breed: 'beagle',
-            address: {
-              street: '101 Beagle Boulevard',
+          },
+        });
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}different-greeting-card`,
+            eq: {
+              differentGreeting: 'Greetings to Jackie the beagle!',
             },
           },
         });
 
-        let card = await cards.loadData(`${realmURL}different-greeting-card`, 'isolated');
-        expect(card.data.name).to.eq('Jackie');
-        expect(card.data.greeting).to.eq('Hello Jackie the beagle. Your new address is 101 Beagle Boulevard');
-
-        // If the parent's computed is updated, should the change apply to the cards adopting from it that were previously created?
-        // await cards.update({
-        //   realm: realmURL,
-        //   id: 'greeting-card',
-        //   schema: 'schema.js',
-        //   files: {
-        //     'schema.js': `
-        //       import { contains } from "@cardstack/types";
-        //       import string from "https://cardstack.com/base/string";
-        //       import address from "../address";
-        //       export default class GreetingCard {
-        //         @contains(string) name;
-        //         @contains(address) address;
-        //         @contains(string) breed;
-
-        //         @contains(string)
-        //         async greeting() {
-        //           return "Hello " + (await this.name) + " the " + (await this.breed);
-        //         }
-        //       }
-        //     `,
-        //   },
-        // });
-
-        // let card = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
-        // expect(card.data.greeting).to.eq('Hello Jackie the beagle');
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}different-greeting-card`]);
       });
     });
   });
