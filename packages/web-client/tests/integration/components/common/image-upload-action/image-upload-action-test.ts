@@ -1,14 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import {
-  click,
-  find,
-  render,
-  waitFor,
-  waitUntil,
-  // triggerEvent,
-  // waitFor,
-} from '@ember/test-helpers';
+import { click, find, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { mockPngUpload } from '@cardstack/web-client/components/common/image-upload-action';
 import config from '@cardstack/web-client/config/environment';
