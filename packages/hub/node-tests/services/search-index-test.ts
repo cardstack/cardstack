@@ -251,7 +251,7 @@ if (process.env.COMPILER) {
       );
     });
 
-    describe('computed field', function () {
+    describe.only('computed field', function () {
       let greetingCard = {
         realm: realmURL,
         id: 'greeting-card',
@@ -273,33 +273,8 @@ if (process.env.COMPILER) {
         },
       };
 
-      let differentGreetingCard = {
-        realm: realmURL,
-        id: 'different-greeting-card',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-
-            export default class DifferentGreetingCard {
-              @contains(string) name;
-
-              @contains(string)
-              async differentGreeting() {
-                return "Greetings to " + (await this.name) + "!";
-              }
-            }
-          `,
-        },
-        data: {
-          name: 'Woody',
-        },
-      };
-
       this.beforeEach(async function () {
         await cards.create(greetingCard);
-        await cards.create(differentGreetingCard);
 
         let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
@@ -307,6 +282,15 @@ if (process.env.COMPILER) {
           name: 'Jackie',
         });
         await sampleGreeting.save();
+
+        await cards.create({
+          realm: realmURL,
+          id: 'different-greeting-card',
+          adoptsFrom: '../sample-greeting',
+          data: {
+            name: 'Miles',
+          },
+        });
       });
 
       it('Can search for card computed field for card created with data', async function () {
@@ -344,9 +328,9 @@ if (process.env.COMPILER) {
       it('Can search for card computed field for card created with data and schema', async function () {
         let results = await cards.query('isolated', {
           filter: {
-            on: `${realmURL}different-greeting-card`,
+            on: `${realmURL}sample-greeting`,
             eq: {
-              differentGreeting: 'Greetings to Woody!',
+              greeting: 'Welcome Miles!',
             },
           },
         });
@@ -361,15 +345,16 @@ if (process.env.COMPILER) {
           schema: 'schema.js',
           files: {
             'schema.js': `
-              import { contains } from "@cardstack/types";
+              import { contains, adopts } from "@cardstack/types";
+              import sampleGreeting from "../sample-greeting";
               import string from "https://cardstack.com/base/string";
-              export default class DifferentGreetingCard {
-                @contains(string) name;
+
+              export default @adopts(sampleGreeting) class DifferentGreetingCard {
                 @contains(string) breed;
 
                 @contains(string)
-                async differentGreeting() {
-                  return "Greetings to " + (await this.name) + " the " + (await this.breed) + "!";
+                async summary() {
+                  return (await this.name) + " is a " + (await this.breed);
                 }
               }
             `,
@@ -382,9 +367,9 @@ if (process.env.COMPILER) {
 
         let results = await cards.query('isolated', {
           filter: {
-            on: `${realmURL}different-greeting-card`,
+            on: `${realmURL}sample-greeting`,
             eq: {
-              differentGreeting: 'Greetings to Jackie the beagle!',
+              greeting: 'Jackie is a beagle',
             },
           },
         });
