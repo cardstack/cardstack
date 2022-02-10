@@ -1,7 +1,6 @@
 import { setupHub } from '../helpers/server';
 import { PrismaClient } from '@prisma/client';
 
-const prismaClient = new PrismaClient();
 
 describe('GET /api/prepaid-card-patterns', function () {
   let { getContainer, request } = setupHub(this);
