@@ -1,4 +1,4 @@
-import { module, skip, test } from 'qunit';
+import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupCardTest } from '../helpers/setup';
 
@@ -11,8 +11,10 @@ import {
   PERSON_RAW_CARD,
 } from '@cardstack/core/tests/helpers/fixtures';
 import { cardURL } from '@cardstack/core/src/utils';
+import { DEMO_REALM, LOCAL_REALM } from 'cardhost/lib/builder';
 
 const PERSON = '[data-test-person]';
+const POST = '[data-test-post]';
 const MODAL = '[data-test-modal]';
 const NEW = '[data-test-new-button-local]';
 const NEW_WITH_ID = '[data-test-new-button-with-id]';
@@ -62,9 +64,26 @@ module('Acceptance | Card Creation', function (hooks) {
       );
   });
 
-  // TODO we need a mechanism to create cards on the server. I think probably
-  // that means that the /sources/new API endpoint needs to be implemented
-  skip('Creating a local card from a remote card');
+  test('Creating a local card from a remote card', async function (assert) {
+    let remoteCard = `${DEMO_REALM}post-0`;
+    await visit(`/?url=${remoteCard}`);
+    assert.equal(currentURL(), `/?url=${remoteCard}`);
+    await waitFor(POST);
+
+    await click(NEW);
+    assert.dom(MODAL).exists('The modal is opened');
+    await waitFor('[data-test-field-name="title"]');
+    await fillIn('[data-test-field-name="title"]', 'Hello World');
+    await click(SAVE);
+    await waitFor(POST);
+    assert.dom(MODAL).exists('The modal stays open');
+    assert.dom(POST).hasText('Hello World');
+    assert.includes(
+      currentURL(),
+      encodeURIComponent(LOCAL_REALM),
+      'the card URL is in the local realm'
+    );
+  });
 
   test('Creating a card with an ID', async function (assert) {
     await visit(`/?url=${personURL}`);

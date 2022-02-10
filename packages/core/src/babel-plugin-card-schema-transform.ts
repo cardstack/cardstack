@@ -2,7 +2,7 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
-import { addImports, error, ImportDetails } from './utils/babel';
+import { addImports, error, ImportDetails, unusedClassMember } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
@@ -12,6 +12,7 @@ import { baseCardURL } from './compiler';
 interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
+  getRawFieldIdentifier: string;
   opts: {
     fields: CompiledCard['fields'];
     meta: PluginMeta;
@@ -86,6 +87,7 @@ export default function main(babel: typeof Babel) {
 
       Class: {
         enter(path: NodePath<t.Class>, state: State) {
+          state.getRawFieldIdentifier = unusedClassMember(path, 'getRawField', t);
           let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
           // you can't upgrade a primitive card to a composite card--you are
           // either a primitive card or a composite card. so if we adopt from a
@@ -93,13 +95,13 @@ export default function main(babel: typeof Babel) {
           if (type === 'composite' && Object.keys(state.opts.meta.fields).length > 0) {
             path.get('body').node.body.unshift(
               // creates a private property that looks like:
-              //   #getRawField;
-              t.classPrivateProperty(t.privateName(t.identifier('getRawField')), null, null, false),
+              //   getRawField;
+              t.classProperty(t.identifier(state.getRawFieldIdentifier), null),
 
               // creates a constructor that looks like:
               //   constructor(get) {
               //     super(get); // when we adopt from a non-base card
-              //     this.#getRawField = get;
+              //     this.getRawField = get;
               //   }
               t.classMethod(
                 'constructor',
@@ -115,7 +117,7 @@ export default function main(babel: typeof Babel) {
                   t.expressionStatement(
                     t.assignmentExpression(
                       '=',
-                      t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+                      t.memberExpression(t.thisExpression(), t.identifier(state.getRawFieldIdentifier)),
                       t.identifier('get')
                     )
                   ),
@@ -161,7 +163,7 @@ function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: t
       throw error(path.get('key'), `cannot find field in card`);
     }
     if (type === 'primitive') {
-      transformPrimitiveField(path, t);
+      transformPrimitiveField(path, state, t);
     } else {
       transformCompositeField(path, state, t);
     }
@@ -337,7 +339,7 @@ function fieldMetasForCardURL(url: string, state: State): [string, FieldMeta][] 
 
 // creates a class method that looks like:
 //   get aboutMe() {
-//     return new BioClass((innerField) => this.#getRawField("aboutMe." + innerField) )
+//     return new BioClass((innerField) => this.getRawField("aboutMe." + innerField) )
 //   }
 function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
@@ -362,7 +364,7 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
             [
               t.arrowFunctionExpression(
                 [t.identifier('innerField')],
-                t.callExpression(t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))), [
+                t.callExpression(t.memberExpression(t.thisExpression(), t.identifier(state.getRawFieldIdentifier)), [
                   t.binaryExpression('+', t.stringLiteral(`${fieldName}.`), t.identifier('innerField')),
                 ])
               ),
@@ -380,9 +382,9 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
 
 // creates a class method that looks like:
 //   get birthdate() {
-//     return new FieldGetter(this.#getRawField, "birthdate");
+//     return new FieldGetter(this.getRawField, "birthdate");
 //   }
-function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babel.types) {
+function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
@@ -396,7 +398,7 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, t: typeof Babe
       t.blockStatement([
         t.returnStatement(
           t.newExpression(t.identifier('FieldGetter'), [
-            t.memberExpression(t.thisExpression(), t.privateName(t.identifier('getRawField'))),
+            t.memberExpression(t.thisExpression(), t.identifier(state.getRawFieldIdentifier)),
             t.stringLiteral(fieldName),
           ])
         ),

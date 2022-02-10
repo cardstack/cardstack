@@ -34,6 +34,7 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
             import bio from "../bio";
             export default class Person {
+              getRawField = "don't collide!";
               @contains(string) firstName;
               @contains(string) lastName;
 
@@ -92,6 +93,37 @@ if (process.env.COMPILER) {
         // are not used by the Person template
         favoriteColor: 'blue',
       });
+    });
+
+    it('can access a computed field defined in parent card', async function () {
+      await cards.create({
+        realm,
+        id: 'ains',
+        adoptsFrom: '../person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts, contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import person from "../person";
+            export default @adopts(person) class Isekai {
+              @contains(string) seriesName;
+            }
+          `,
+        },
+        data: {
+          firstName: 'Ains Ooal',
+          lastName: 'Gown',
+          seriesName: 'Overlord',
+          aboutMe: {
+            short: 'Supreme overlord of darkness',
+            favoriteColor: 'black',
+          },
+        },
+      });
+      let card = await cards.loadData(`${realm}ains`, 'isolated');
+      expect(await card.getField('fullName')).to.equal('Ains Ooal Gown');
+      expect(await card.getField('seriesName')).to.equal('Overlord');
     });
 
     // we can use the field meta short cut here to just return raw data without

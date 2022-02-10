@@ -16,7 +16,6 @@ Router.map(function () {
   this.route('card-space', function () {
     this.route('profile-card-temp');
   });
-  this.route('image-uploader-temp');
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });

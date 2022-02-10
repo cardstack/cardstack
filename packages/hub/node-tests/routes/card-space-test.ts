@@ -1,6 +1,8 @@
 import { Job, TaskSpec } from 'graphile-worker';
+import { CardSpace } from '../../routes/card-spaces';
 import { registry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
+import { encodeDID } from '@cardstack/did-resolver';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -38,6 +40,101 @@ class StubWorkerClient {
     return Promise.resolve({} as Job);
   }
 }
+
+describe('GET /api/card-spaces/:slug', function () {
+  let { request, getContainer } = setupHub(this);
+
+  it('fetches a card space', async function () {
+    let merchantId = uuidv4();
+    await (
+      await getContainer().lookup('merchant-info-queries')
+    ).insert({
+      id: merchantId,
+      ownerAddress: stubUserAddress,
+      name: 'Satoshi?',
+      slug: 'satoshi',
+      color: 'black',
+      textColor: 'red',
+    });
+
+    const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
+    const cardSpace: CardSpace = {
+      id,
+      profileName: 'Satoshi Nakamoto',
+      profileDescription: "Satoshi's place",
+      profileCategory: 'entertainment',
+      profileImageUrl: 'https://test.com/test1.png',
+      profileCoverImageUrl: 'https://test.com/test2.png',
+      profileButtonText: 'Visit this Space',
+      merchantId,
+    };
+
+    await (await getContainer().lookup('card-space-queries')).insert(cardSpace);
+
+    await request()
+      .get('/api/card-spaces/satoshi')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        meta: {
+          network: 'sokol',
+        },
+        data: {
+          type: 'card-spaces',
+          id,
+          attributes: {
+            did: 'did:cardstack:1csqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
+            'profile-name': 'Satoshi Nakamoto',
+            'profile-description': "Satoshi's place",
+            'profile-category': 'entertainment',
+            'profile-cover-image-url': 'https://test.com/test2.png',
+            'profile-button-text': 'Visit this Space',
+            'bio-description': null,
+            'bio-title': null,
+            'donation-description': null,
+            'donation-suggestion-amount-1': null,
+            'donation-suggestion-amount-2': null,
+            'donation-suggestion-amount-3': null,
+            'donation-suggestion-amount-4': null,
+            'donation-title': null,
+            links: [],
+          },
+          relationships: {
+            'merchant-info': {
+              data: {
+                type: 'merchant-infos',
+                id: merchantId,
+              },
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            id: merchantId,
+            attributes: {
+              color: 'black',
+              did: encodeDID({ type: 'MerchantInfo', uniqueId: merchantId }),
+              name: 'Satoshi?',
+              'owner-address': stubUserAddress,
+              slug: 'satoshi',
+              'text-color': 'red',
+            },
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 404 when user does not exist', async function () {
+    await request()
+      .get('/api/card-spaces/satoshi')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(404);
+  });
+});
 
 describe('POST /api/card-spaces', function () {
   this.beforeEach(function () {

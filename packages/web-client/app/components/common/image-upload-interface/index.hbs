@@ -1,0 +1,27 @@
+<div class="image-upload-interface__container" ...attributes>
+    <div class="image-upload-interface__preview">
+      {{#if (has-block)}}
+        {{yield (component "avatar" src=@image loading=(eq @state this.states.loading))}}
+      {{else}}
+        <Avatar
+          @src={{@image}}
+          @loading={{eq @state this.states.loading}}
+        />
+      {{/if}}
+    </div>
+  <div class="image-upload-interface__controls">
+    <Boxel::Button @kind="secondary-light" @size="small" class="image-upload-interface__button" aria-label="Upload an image" data-test-image-upload-interface-upload-button {{on "click" @startUpload}}>{{@cta}}</Boxel::Button>
+    {{#if @image}}
+      <Boxel::Button @kind="secondary-light" @size="small" class="image-upload-interface__button image-upload-interface__button--icon" aria-label="Remove current image" {{on "click" @onRemoveImage}} data-test-image-upload-interface-delete-button>{{svg-jar "trash" width=18 height=18}}</Boxel::Button>
+    {{/if}}
+  </div>
+  {{#if (eq @state this.states.error)}}
+    <div class="image-upload-interface__error-message" data-test-image-upload-interface-error>
+      {{@errorMessage}}
+    </div>
+  {{else}}
+    <div class="image-upload-interface__requirements" data-test-image-upload-interface-requirements>
+      {{@imageRequirements}}
+    </div>
+  {{/if}}
+</div>

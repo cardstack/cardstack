@@ -391,6 +391,47 @@ if (process.env.COMPILER) {
       });
     });
 
+    describe('schema transpile', function () {
+      it('can handle unconsumed field import', async function () {
+        await cards.create({
+          realm,
+          id: 'foo',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+
+              export default class Foo {
+                @contains(string) bar;
+              }
+            `,
+          },
+        });
+
+        let card = await cards.create({
+          realm,
+          id: 'person',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              import date from "https://cardstack.com/base/date";
+              import Foo from "../foo";
+
+              export default class Person {
+                @contains(string) name;
+              }
+            `,
+          },
+        });
+
+        // success is really just not throwing an exception
+        expect(card.compiled.url).to.eq(`${realm}person`);
+      });
+    });
+
     describe('computed fields', function () {
       let fancyDateCard: RawCard = {
         realm,
@@ -407,6 +448,7 @@ if (process.env.COMPILER) {
             import date from "https://cardstack.com/base/date";
 
             export default class Bio {
+              getRawField = "don't collide!";
               @contains(date) birthdate;
             }
           `,
@@ -476,10 +518,10 @@ if (process.env.COMPILER) {
         // the browser source has a lot less babel shenanigans
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
-          #getRawField;
+          getRawField0;
 
           constructor(get) {
-            this.#getRawField = get;
+            this.getRawField0 = get;
           }
         `);
       });
@@ -524,7 +566,7 @@ if (process.env.COMPILER) {
         `);
         expect(source).to.containsSource(`
           get birthdate() {
-            return new FieldGetter(this.#getRawField, "birthdate");
+            return new FieldGetter(this.getRawField0, "birthdate");
           }
         `);
       });
@@ -539,7 +581,7 @@ if (process.env.COMPILER) {
         `);
         expect(source).to.containsSource(`
           get aboutMe() {
-            return new BioClass(innerField => this.#getRawField("aboutMe." + innerField));
+            return new BioClass(innerField => this.getRawField("aboutMe." + innerField));
           }
         `);
       });
@@ -570,11 +612,11 @@ if (process.env.COMPILER) {
         let { compiled } = await cards.load(`${realm}really-fancy-person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.containsSource(`
-          #getRawField;
+          getRawField;
 
           constructor(get) {
             super(get);
-            this.#getRawField = get;
+            this.getRawField = get;
           }
         `);
       });

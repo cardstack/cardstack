@@ -1,0 +1,28 @@
+<input
+  {{did-insert this.setUploader}}
+  type="file"
+  accept={{@validationOptions.fileType}}
+  hidden
+  id={{concat "hidden-file-input-" (unique-id)}}
+  data-test-image-upload-action-file-input
+  {{on "change" this.onFileChanged}}
+>
+
+{{yield this.startUpload}}
+
+{{#if @useEditor}}
+  {{#in-element @editorOptions.rootElement}}
+    <Common::ImageUploadAction::ImageEditor
+      @isOpen={{this.showEditor}}
+      @onClose={{this.closeEditor}}
+      @image={{this.processedImage.preview}}
+      @fileType={{this.processedImage.type}}
+      @width={{@editorOptions.width}}
+      @height={{@editorOptions.height}}
+      @saveImageEditData={{this.onImageEditComplete}}
+      as |preview|
+    >
+      {{yield preview to="editor-preview"}}
+    </Common::ImageUploadAction::ImageEditor>
+  {{/in-element}}
+{{/if}}

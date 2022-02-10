@@ -47,6 +47,20 @@ export function addImports(neededImports: ImportDetails, path: NodePath<t.Progra
   }
 }
 
+export function unusedClassMember(path: NodePath<t.Class>, nameLike: string, t: typeof Babel.types): string {
+  let i = 0;
+  let classMemberNames = path
+    .get('body')
+    .get('body')
+    .filter((p) => (t.isClassMethod(p.node) || t.isClassProperty(p.node)) && t.isIdentifier(p.node.key))
+    // The types don't seem to carry through from the filter, so just reasserting the filtered types
+    .map((p) => ((p.node as t.ClassMethod | t.ClassProperty).key as t.Identifier).name);
+  while (classMemberNames.includes(nameLike)) {
+    nameLike = `${nameLike}${i++}`;
+  }
+  return nameLike;
+}
+
 class CompilerError extends Error {
   constructor(message: string) {
     super(message);
