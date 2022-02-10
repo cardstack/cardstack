@@ -1,4 +1,4 @@
-.image-uploader__container {
+.image-upload-interface__container {
   display: grid;
   width: max-content;
   /* stylelint-disable declaration-block-no-redundant-longhand-properties */
@@ -10,19 +10,19 @@
   /* stylelint-enable declaration-block-no-redundant-longhand-properties */
 }
 
-.image-uploader__preview {
+.image-upload-interface__preview {
   grid-area: preview;
   margin-right: var(--boxel-sp-lg);
 }
 
-.image-uploader__controls {
+.image-upload-interface__controls {
   grid-area: controls;
   display: flex;
   flex-wrap: wrap;
   gap: var(--boxel-sp-xxs);
 }
 
-.image-uploader__button {
+.image-upload-interface__button {
   flex-shrink: 0;
   width: min-content;
   min-width: 0;
@@ -30,13 +30,13 @@
 }
 
 /* TODO: replace this with a boxel button size variant in a future PR */
-.image-uploader__button--icon {
+.image-upload-interface__button--icon {
   --icon-color: currentcolor;
 
   padding: var(--boxel-sp-xxxs);
 }
 
-.image-uploader__error-message {
+.image-upload-interface__error-message {
   grid-area: requirements;
   font: var(--boxel-font-xs);
   max-width: 14rem;
@@ -44,7 +44,7 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.image-uploader__requirements {
+.image-upload-interface__requirements {
   grid-area: requirements;
   font: var(--boxel-font-xs);
   max-width: 14rem;

@@ -42,26 +42,47 @@
       <Boxel::Field
         @label="Profile Picture (Optional)"
       >
-        <ImageUploader
-          @state={{this.imageUploadState}}
-          @errorMessage={{this.imageUploadErrorMessage}}
-          @image={{this.profileImage}}
-          @cta="Select a Photo"
-          @imageRequirements="Images must be in jpg or png format and max 1MB in size"
-          @acceptedFileTypes={{this.acceptedFileTypes}}
-          @onUpload={{this.onUpload}}
-          @onError={{this.logUploadError}}
-          @onRemoveImage={{this.onImageRemoved}}
-          data-test-card-space-image-uploader
-        as |ImageUploaderAvatar|>
-          <ImageUploaderAvatar
-            @alt="Profile"
-            @rounded={{true}}
-            data-test-card-space-image-uploader-avatar
-          />
-        </ImageUploader>
+        <Common::ImageUploadAction
+          @useEditor={{true}}
+          @editorOptions={{this.editorOptions}}
+          @validationOptions={{this.validationOptions}}
+          @onUpload={{perform this.saveImageEditDataTask}}
+          @onError={{this.onError}}
+        >
+          <:default as |startUpload|>
+            <Common::ImageUploadInterface
+              @state={{this.imageUploadState}}
+              @errorMessage={{this.imageUploadErrorMessage}}
+              @image={{this.profileImage}}
+              @cta="Select a Photo"
+              @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+              @onRemoveImage={{this.onImageRemoved}}
+              @startUpload={{startUpload}}
+              data-test-card-space-profile-image-uploader
+            as |ImageUploaderAvatar|>
+              <ImageUploaderAvatar
+                @alt="Profile"
+                @rounded={{true}}
+                data-test-card-space-profile-image-uploader-avatar
+              />
+            </Common::ImageUploadInterface>
+          </:default>
+          <:editor-preview as |preview|>
+            <CardSpace::ProfileCard
+              @profilePhoto={{preview}}
+              @coverPhoto={{@workflowSession.workflow.cardSpaceDetails.coverPhoto}}
+              @name={{@workflowSession.workflow.cardSpaceDetails.name}}
+              @host={{@workflowSession.workflow.cardSpaceDetails.host}}
+              @category={{@workflowSession.workflow.cardSpaceDetails.category}}
+              @description={{@workflowSession.workflow.cardSpaceDetails.description}}
+              @buttonText={{@workflowSession.workflow.cardSpaceDetails.buttonText}}
+              data-test-card-space-profile-card-preview
+            />
+          </:editor-preview>
+        </Common::ImageUploadAction>
+
       </Boxel::Field>
-      {{/if}}
+    {{/if}}
   </ActionCardContainer::Section>
 
   <Boxel::ActionChin
@@ -86,28 +107,3 @@
     </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>
-
-
-{{#in-element this.imageEditorElement}}
-  <ImageEditor
-    @isOpen={{this.showEditor}}
-    @onClose={{fn (mut this.showEditor) false}}
-    @image={{this.processedImage.preview}}
-    @fileType={{this.processedImage.type}}
-    @width={{this.desiredWidth}}
-    @height={{this.desiredHeight}}
-    @saveImageEditData={{perform this.saveImageEditDataTask}}
-    as |preview|
-  >
-    <CardSpace::ProfileCard
-      @profilePhoto={{preview}}
-      @coverPhoto={{@workflowSession.workflow.cardSpaceDetails.coverPhoto}}
-      @name={{@workflowSession.workflow.cardSpaceDetails.name}}
-      @host={{@workflowSession.workflow.cardSpaceDetails.host}}
-      @category={{@workflowSession.workflow.cardSpaceDetails.category}}
-      @description={{@workflowSession.workflow.cardSpaceDetails.description}}
-      @buttonText={{@workflowSession.workflow.cardSpaceDetails.buttonText}}
-      data-test-card-space-profile-card-preview
-    />
-  </ImageEditor>
-{{/in-element}}
