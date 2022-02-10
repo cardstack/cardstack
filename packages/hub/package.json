@@ -23,7 +23,7 @@
     "console": "yarn build_if_missing && node --no-deprecation --experimental-repl-await ./dist/hub.js console",
     "db:test-init": "yarn build && NODE_ENV=test node --no-deprecation -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
-    "test": "PRISMA_QUERY_ENGINE_BINARY=$(pwd)/../../node_modules/.prisma/client/query-engine-debian-openssl-1.1.x yarn build_if_missing && npm-run-all test:*",
+    "test": "yarn build_if_missing && npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha --no-deprecation -r source-map-support/register dist/tests.js --timeout 60000",
     "test:bot": "bin/corde",
     "autotest": "NODE_ENV=test mocha --no-deprecation -w --reporter=min -r source-map-support/register dist/tests.js --timeout 60000"
