@@ -27,9 +27,8 @@ def setup_regular_extraction(config, database_string, output_location):
     # If we find nothing else, assume at least hourly
     min_duration = 3600
     for _table, table_config in config["tables"].items():
-        if table_config["partition_column"] == "block_number":
-            min_partition = min(table_config["partition_sizes"])
-            min_duration = min(min_duration, (min_partition * BLOCK_DURATION) // 2)
+        min_partition = min(table_config["partition_sizes"])
+        min_duration = min(min_duration, (min_partition * BLOCK_DURATION) // 2)
 
     # Don't run more than every 10 seconds
     if min_duration < 10:
