@@ -3,11 +3,9 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 // let log = Logger('route:prepaid-card-patterns');
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export default class PrepaidCardPatternsRoute {
+  prismaClient = inject('prisma-client', { as: 'prismaClient' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -15,7 +13,7 @@ export default class PrepaidCardPatternsRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let data = (await prisma.prepaid_card_patterns.findMany()).map((row) => {
+    let data = (await (await this.prismaClient.getClient()).prepaid_card_patterns.findMany()).map((row) => {
       return {
         id: row.id,
         type: 'prepaid-card-patterns',
