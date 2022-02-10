@@ -10,17 +10,25 @@ export default class PrismaClient {
     console.log('dbconf?', this.dbConfig);
     if (!this.client) {
       this.client = new PrismaClientToWrap({ datasources: { db: { url: this.dbConfig.url } } });
-
-      if (this.dbConfig.useTransactionalRollbacks) {
-        await this.client.$executeRawUnsafe('START TRANSACTION');
-      }
     }
     return this.client;
   }
 
   async teardown() {
-    if (this.dbConfig.useTransactionalRollbacks) {
-      this.client?.$executeRawUnsafe('ROLLBACK');
+    if (this.dbConfig.useTransactionalRollbacks && this.client) {
+      const tablenames = await this.client.$queryRaw<
+        { tablename: string }[]
+      >`SELECT tablename FROM pg_tables WHERE schemaname='public'`;
+
+      for (const { tablename } of tablenames) {
+        if (tablename !== '_prisma_migrations') {
+          try {
+            await this.client.$executeRawUnsafe(`TRUNCATE TABLE "public"."${tablename}" CASCADE;`);
+          } catch (error) {
+            console.log({ error });
+          }
+        }
+      }
     }
   }
 }

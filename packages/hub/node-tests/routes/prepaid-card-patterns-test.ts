@@ -21,10 +21,6 @@ describe('GET /api/prepaid-card-patterns', function () {
     });
   });
 
-  this.afterEach(async function () {
-    await prismaClient!.prepaid_card_patterns.deleteMany({});
-  });
-
   it('responds with 200 and available header patterns', async function () {
     await request()
       .get('/api/prepaid-card-patterns')
