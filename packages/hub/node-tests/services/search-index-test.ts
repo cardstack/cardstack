@@ -341,40 +341,39 @@ if (process.env.COMPILER) {
       it('Can search for card computed field for card after updating data and schema', async function () {
         await cards.update({
           realm: realmURL,
-          id: 'different-greeting-card',
+          id: 'greeting-card',
           schema: 'schema.js',
           files: {
             'schema.js': `
-              import { contains, adopts } from "@cardstack/types";
-              import sampleGreeting from "../sample-greeting";
+              import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
-
-              export default @adopts(sampleGreeting) class DifferentGreetingCard {
+              export default class GreetingCard {
+                @contains(string) name;
                 @contains(string) breed;
 
                 @contains(string)
-                async summary() {
-                  return (await this.name) + " is a " + (await this.breed);
+                async greeting() {
+                  return "Welcome " + (await this.name) + " the " + (await this.breed) + "!";
                 }
               }
             `,
           },
           data: {
-            name: 'Jackie',
+            name: 'J',
             breed: 'beagle',
           },
         });
 
         let results = await cards.query('isolated', {
           filter: {
-            on: `${realmURL}sample-greeting`,
+            on: `${realmURL}greeting-card`,
             eq: {
-              greeting: 'Jackie is a beagle',
+              greeting: 'Welcome J the beagle!',
             },
           },
         });
 
-        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}different-greeting-card`]);
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}greeting-card`]);
       });
     });
   });
