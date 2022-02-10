@@ -5,6 +5,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { ADDRESS_RAW_CARD } from '@cardstack/core/tests/helpers';
+import { SERIALIZERS } from '@cardstack/core/src/serializers';
 
 if (process.env.COMPILER) {
   describe('Babel CardTemplatePlugin', function () {
@@ -79,7 +80,16 @@ if (process.env.COMPILER) {
     });
 
     it('includes the serializerMap', async function () {
-      expect(options.serializerMap).to.deep.equal({ date: ['birthdate', 'address.settlementDate'] });
+      expect(options.serializerMap).to.deep.equal({
+        birthdate: SERIALIZERS['DateSerializer'],
+        'address.settlementDate': SERIALIZERS['DateSerializer'],
+      });
+    });
+
+    it('adds an import for the cards needed Serializer', async function () {
+      expect(code).to.containsSource(`
+        import { DateSerializer } from "@cardstack/core/src/serializers";
+      `);
     });
 
     it('can make a function to get options used to create a card model', async function () {
@@ -87,7 +97,8 @@ if (process.env.COMPILER) {
         export function getCardModelOptions() {
           return {
             serializerMap: {
-              date: ["birthdate", "address.settlementDate"]
+              "birthdate": DateSerializer,
+              "address.settlementDate": DateSerializer
             },
             computedFields: ["fullName"],
             usedFields: ["name", "fullName", "birthdate", "address.street", "address.city", "address.state", "address.zip", "address.settlementDate"]

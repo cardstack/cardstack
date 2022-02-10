@@ -1,5 +1,5 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
+import { CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -51,42 +51,5 @@ function buildUsedFieldListFromComponents(
     } else {
       usedFields.add(fieldPath);
     }
-  }
-}
-
-export function buildSerializerMapFromUsedFields(fields: CompiledCard['fields'], usedFields: string[]): SerializerMap {
-  let map: any = {};
-
-  for (const fieldPath of usedFields) {
-    let field = getFieldForPath(fields, fieldPath);
-
-    if (!field) {
-      continue;
-    }
-
-    buildDeserializerMapForField(map, field, fieldPath);
-  }
-
-  assertValidSerializerMap(map);
-
-  return map;
-}
-
-function buildDeserializerMapForField(map: any, field: Field, usedPath: string): void {
-  if (Object.keys(field.card.fields).length) {
-    let { fields } = field.card;
-    for (const name in fields) {
-      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
-    }
-  } else {
-    if (!field.card.serializer) {
-      return;
-    }
-
-    if (!map[field.card.serializer]) {
-      map[field.card.serializer] = [];
-    }
-
-    map[field.card.serializer].push(usedPath);
   }
 }

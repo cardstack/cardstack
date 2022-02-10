@@ -12,15 +12,11 @@ import {
   SerializerName,
   Unsaved,
   CardContent,
+  PrimitiveSerializer,
 } from '../interfaces';
 
 export { RawCardDeserializer } from './raw-card-deserializer';
 export { RawCardSerializer } from './raw-card-serializer';
-
-export interface PrimitiveSerializer {
-  serialize(val: any): any;
-  deserialize(val: any): any;
-}
 
 const DateTimeSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
@@ -49,8 +45,8 @@ const DateSerializer: PrimitiveSerializer = {
 };
 
 export const SERIALIZERS = {
-  datetime: DateTimeSerializer,
-  date: DateSerializer,
+  DateTimeSerializer: DateTimeSerializer,
+  DateSerializer: DateSerializer,
 };
 
 export function deserializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
@@ -108,18 +104,6 @@ function serializeAttribute(
   } else {
     attrs[path] = serializer[action](value);
   }
-}
-
-// TEMP: This is here to support the future layout of the serializerMaps that will eventually be
-// built into the component
-export function inversedSerializerMap(serializerMap: SerializerMap): Record<string, SerializerName> {
-  let inversedMap: Record<string, SerializerName> = {};
-  for (const type of Object.keys(serializerMap) as SerializerName[]) {
-    for (const key of serializerMap[type] || []) {
-      inversedMap[key] = type;
-    }
-  }
-  return inversedMap;
 }
 
 export function serializeCardPayloadForFormat(card: CardContent): JSONAPIDocument<Saved> {

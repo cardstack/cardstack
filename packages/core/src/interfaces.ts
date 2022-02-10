@@ -1,5 +1,4 @@
 import * as JSON from 'json-typescript';
-import difference from 'lodash/difference';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 
@@ -23,20 +22,16 @@ const featureNamesMap = {
 export type FeatureFile = keyof typeof featureNamesMap & Format;
 export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(FORMATS) as FeatureFile[];
 
-const serializerTypes = {
-  date: '',
-  datetime: '',
+export const SerializerTypes = {
+  DateSerializer: '',
+  DateTimeSerializer: '',
 };
-export type SerializerName = keyof typeof serializerTypes;
-export const SERIALIZER_NAMES = Object.keys(serializerTypes) as SerializerName[];
-export type SerializerMap = { [key in SerializerName]?: string[] };
-
-export function assertValidSerializerMap(map: any): asserts map is SerializerMap {
-  let keys = Object.keys(map);
-  let diff = difference(keys, SERIALIZER_NAMES);
-  if (diff.length > 0) {
-    throw new CardstackError(`Unexpected serializer: ${diff.join(',')}`);
-  }
+export type SerializerName = keyof typeof SerializerTypes;
+export const SERIALIZER_NAMES = Object.keys(SerializerTypes) as SerializerName[];
+export type SerializerMap = Record<string, PrimitiveSerializer>;
+export interface PrimitiveSerializer {
+  serialize(val: any): any;
+  deserialize(val: any): any;
 }
 
 export type CardData = Record<string, any>;

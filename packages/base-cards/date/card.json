@@ -2,5 +2,5 @@
     "schema": "schema.js",
     "embedded": "embedded.js",
     "edit": "edit.js",
-    "deserializer": "date"
+    "deserializer": "DateSerializer"
 }

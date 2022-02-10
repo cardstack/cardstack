@@ -9,13 +9,14 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
 
-import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
+import { CompiledCard, SerializerName, Format, SerializerMap, Field } from './interfaces';
 
 import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
+import { buildUsedFieldsListFromUsageMeta, getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+import { SERIALIZERS } from './serializers';
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
@@ -61,8 +62,12 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
           state.neededImports = new Map();
         },
         exit(path: NodePath<t.Program>, state: State) {
+          let { fields, usedFields } = state.opts;
+          let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
+          state.opts.serializerMap = hydrateSerializerMap(serializerMap);
+          addSerializerMapImports(state.neededImports, serializerMap);
           addImports(state.neededImports, path, t);
-          addGetCardModelOptions(path, state, babel);
+          addGetCardModelOptions({ path, babel, fields, usedFields, serializerMap });
         },
       },
 
@@ -84,10 +89,20 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
   };
 }
 
-function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+function addGetCardModelOptions({
+  path,
+  babel,
+  fields,
+  usedFields,
+  serializerMap,
+}: {
+  path: NodePath<t.Program>;
+  babel: typeof Babel;
+  fields: CompiledCard['fields'];
+  usedFields: string[];
+  serializerMap: IntermediateSerializerMap;
+}) {
   let t = babel.types;
-  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
-  state.opts.serializerMap = serializerMap;
 
   path.node.body.push(
     t.exportNamedDeclaration(
@@ -104,11 +119,11 @@ function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: 
           `)({
             serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
             computedFields: t.arrayExpression(
-              Object.values(state.opts.fields)
+              Object.values(fields)
                 .filter((field) => field.computed)
                 .map((field) => t.stringLiteral(field.name))
             ),
-            usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
+            usedFields: t.arrayExpression(usedFields.map((field) => t.stringLiteral(field))),
           }) as t.Statement,
         ])
       )
@@ -116,20 +131,14 @@ function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: 
   );
 }
 
-function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {
+function buildSerializerMapProp(
+  serializerMap: IntermediateSerializerMap,
+  t: typeof Babel.types
+): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
 
-  for (let serializer in serializerMap) {
-    let fieldList = serializerMap[serializer as SerializerName];
-    if (!fieldList) {
-      continue;
-    }
-
-    let fieldListElements: t.ArrayExpression['elements'] = [];
-    for (let field of fieldList) {
-      fieldListElements.push(t.stringLiteral(field));
-    }
-    props.push(t.objectProperty(t.identifier(serializer), t.arrayExpression(fieldListElements)));
+  for (let fieldPath in serializerMap) {
+    props.push(t.objectProperty(t.stringLiteral(fieldPath), t.identifier(serializerMap[fieldPath])));
   }
 
   return props;
@@ -272,4 +281,54 @@ function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, 
   }
 
   scope.node.body.properties = scope.node.body.properties.concat(scopeVars);
+}
+
+type IntermediateSerializerMap = Record<string, SerializerName>;
+
+export function buildSerializerMapFromUsedFields(
+  fields: CompiledCard['fields'],
+  usedFields: string[]
+): IntermediateSerializerMap {
+  let map: IntermediateSerializerMap = {};
+
+  for (const fieldPath of usedFields) {
+    let field = getFieldForPath(fields, fieldPath);
+
+    if (!field) {
+      continue;
+    }
+
+    buildDeserializerMapForField(map, field, fieldPath);
+  }
+
+  return map;
+}
+
+function buildDeserializerMapForField(map: IntermediateSerializerMap, field: Field, usedPath: string): void {
+  if (Object.keys(field.card.fields).length) {
+    let { fields } = field.card;
+    for (const name in fields) {
+      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
+    }
+  } else {
+    if (!field.card.serializer) {
+      return;
+    }
+
+    map[usedPath] = field.card.serializer;
+  }
+}
+function addSerializerMapImports(neededImports: ImportDetails, serializerMap: IntermediateSerializerMap) {
+  new Set(Object.values(serializerMap)).forEach((i) => {
+    neededImports.set(i, { moduleSpecifier: '@cardstack/core/src/serializers', exportedName: i });
+  });
+}
+
+function hydrateSerializerMap(ismap: IntermediateSerializerMap): SerializerMap {
+  let serializerMap: SerializerMap = {};
+  let keys = Object.keys(ismap);
+  for (const key of keys) {
+    serializerMap[key] = SERIALIZERS[ismap[key]];
+  }
+  return serializerMap;
 }
