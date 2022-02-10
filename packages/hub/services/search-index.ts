@@ -1,5 +1,5 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import { CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -16,6 +16,7 @@ import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
+import { CardService } from './card-service';
 
 const log = logger('hub/search-index');
 
@@ -103,18 +104,19 @@ export default class SearchIndex {
   async indexCard(
     raw: RawCard,
     compiled: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>
+    compiler: Compiler<Unsaved>,
+    cardService: CardService
   ): Promise<CompiledCard> {
     log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSave(raw, compiled, compiler);
+      return await ops.internalSave(raw, compiled, compiler, cardService);
     });
   }
 
-  async indexData(raw: RawCard): Promise<CompiledCard> {
+  async indexData(raw: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     log.trace('indexData', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSaveData(raw);
+      return await ops.internalSaveData(raw, cardModel);
     });
   }
 
@@ -253,17 +255,19 @@ class IndexerRun implements IndexerHandle {
   async internalSave(
     rawCard: RawCard,
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>
+    compiler: Compiler<Unsaved>,
+    cardService?: CardService
   ): Promise<CompiledCard> {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
-    return await this.writeToIndex(rawCard, definedCard, compiler);
+    let cardModel = await cardService?.makeCardModelFromDatabase('isolated', definedCard, rawCard.data);
+    return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 
   // used directly by the hub when mutating card data only
-  async internalSaveData(rawCard: RawCard): Promise<CompiledCard> {
-    return await this.writeDataToIndex(rawCard);
+  async internalSaveData(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
+    return await this.writeDataToIndex(rawCard, cardModel);
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
@@ -279,7 +283,8 @@ class IndexerRun implements IndexerHandle {
   private async writeToIndex(
     rawCard: RawCard,
     compiledCard: CompiledCard,
-    compiler: Compiler<Unsaved>
+    compiler: Compiler<Unsaved>,
+    cardModel?: CardModel
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
@@ -291,7 +296,7 @@ class IndexerRun implements IndexerHandle {
       data: param(rawCard.data ?? null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
-      searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
+      searchData: param(rawCard.data ? await searchOptimizedData(rawCard.data, compiledCard, cardModel) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
       schemaModule: param(compiledCard.schemaModule.global),
@@ -303,10 +308,10 @@ class IndexerRun implements IndexerHandle {
     return compiledCard;
   }
 
-  private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
+  private async writeDataToIndex(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
-    let compiled: CompiledCard;
+    let compiled;
     let isNew = false;
     let deps: string[] | undefined;
     try {
@@ -340,7 +345,7 @@ class IndexerRun implements IndexerHandle {
             param(rawCard.data ?? null),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
-            param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+            param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
@@ -359,7 +364,7 @@ class IndexerRun implements IndexerHandle {
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
-        param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
         'WHERE url =',
         param(url),
       ];
@@ -417,7 +422,11 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
 
 // TODO consider using the compiler to return a function that can be used to
 // generate these values for a card
-function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
+async function searchOptimizedData(
+  data: Record<string, any>,
+  compiled: CompiledCard,
+  cardModel?: CardModel
+): Promise<Record<string, any>> {
   let result: Record<string, any> = {};
 
   for (let fieldName of Object.keys(compiled.fields)) {
@@ -427,7 +436,11 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
       if (!entry) {
         entry = result[currentCard.url] = {};
       }
-      entry[fieldName] = data[fieldName];
+      if (cardModel && currentCard.fields[fieldName].computed) {
+        entry[fieldName] = await cardModel.getField(fieldName);
+      } else {
+        entry[fieldName] = data[fieldName];
+      }
       currentCard = currentCard.adoptsFrom;
     } while (currentCard && currentCard.fields[fieldName]);
   }

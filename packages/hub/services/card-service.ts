@@ -93,7 +93,7 @@ export class CardService {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
     let rawCard = await this.realmManager.create(raw);
-    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
+    let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler, this);
     return { raw: rawCard, compiled };
   }
 
@@ -102,7 +102,7 @@ export class CardService {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
     await this.realmManager.update(raw);
-    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler);
+    let compiled = await this.searchIndex.indexCard(raw, compiledCard, compiler, this);
     return { raw, compiled };
   }
 
@@ -125,19 +125,15 @@ export class CardService {
     }
   }
 
-  async makeCardModelFromDatabase(
-    format: Format,
-    result: Record<string, any>,
-    rawData?: RawCardData
-  ): Promise<CardModel> {
+  async makeCardModelFromDatabase(format: Format, result: Record<string, any>, data?: RawCardData): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
     return await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: cardId.id,
       realm: cardId.realm,
       format,
-      rawData: result.data ?? rawData,
-      schemaModule: result.schemaModule.global,
+      rawData: result.data ?? data,
+      schemaModule: result.schemaModule.global ?? result.schemaModule,
       usedFields: result.componentInfos[format].usedFields,
       componentModule: result.componentInfos[format].moduleName.global,
       serializerMap: result.componentInfos[format].serializerMap,
