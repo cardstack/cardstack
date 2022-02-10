@@ -3,10 +3,15 @@ import { inject } from '@cardstack/di';
 import { CardSpace } from '../../routes/card-spaces';
 import { buildConditions } from '../../utils/queries';
 
-interface CardSpaceQueriesFilter {
-  id?: string;
-  ownerAddress?: string;
+interface CardSpaceSlugFilter {
+  merchantSlug: string;
 }
+
+interface CardSpaceIdFilter {
+  id: string;
+}
+
+type CardSpaceQueriesFilter = CardSpaceSlugFilter | CardSpaceIdFilter;
 
 export default class CardSpaceQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -74,7 +79,13 @@ export default class CardSpaceQueries {
   async query(filter: CardSpaceQueriesFilter): Promise<CardSpace[]> {
     let db = await this.databaseManager.getClient();
 
-    const conditions = buildConditions(filter, 'card_spaces');
+    let conditions;
+
+    if (filterIsSlug(filter)) {
+      conditions = buildConditions({ slug: filter.merchantSlug }, 'merchant_infos');
+    } else {
+      conditions = buildConditions(filter, 'card_spaces');
+    }
 
     const query = `SELECT card_spaces.id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, merchant_infos.id as merchant_id, name, owner_address FROM card_spaces JOIN merchant_infos ON card_spaces.merchant_id = merchant_infos.id WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
@@ -103,6 +114,10 @@ export default class CardSpaceQueries {
       };
     });
   }
+}
+
+function filterIsSlug(filter: CardSpaceQueriesFilter): filter is CardSpaceSlugFilter {
+  return (filter as CardSpaceSlugFilter).merchantSlug !== undefined;
 }
 
 declare module '@cardstack/di' {
