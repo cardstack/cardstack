@@ -391,6 +391,47 @@ if (process.env.COMPILER) {
       });
     });
 
+    describe('schema transpile', function () {
+      it('can handle unconsumed field import', async function () {
+        await cards.create({
+          realm,
+          id: 'foo',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+
+              export default class Foo {
+                @contains(string) bar;
+              }
+            `,
+          },
+        });
+
+        let card = await cards.create({
+          realm,
+          id: 'person',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              import date from "https://cardstack.com/base/date";
+              import Foo from "../foo";
+
+              export default class Person {
+                @contains(string) name;
+              }
+            `,
+          },
+        });
+
+        // success is really just not throwing an exception
+        expect(card.compiled.url).to.eq(`${realm}person`);
+      });
+    });
+
     describe('computed fields', function () {
       let fancyDateCard: RawCard = {
         realm,
