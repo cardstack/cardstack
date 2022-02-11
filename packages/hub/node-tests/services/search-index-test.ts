@@ -276,6 +276,8 @@ if (process.env.COMPILER) {
       this.beforeEach(async function () {
         await cards.create(greetingCard);
 
+        // This child card getes created via adoptIntoRealm, which goes down the
+        // code path that doesn't involve compiling cards
         let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
         sampleGreeting.setData({
@@ -283,6 +285,8 @@ if (process.env.COMPILER) {
         });
         await sampleGreeting.save();
 
+        // This child card gets created via cardService.create, which goes down
+        // the code path that *does* involve compiling cards.
         await cards.create({
           realm: realmURL,
           id: 'different-greeting-card',
@@ -374,6 +378,38 @@ if (process.env.COMPILER) {
         });
 
         expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}greeting-card`]);
+      });
+
+      it('can update computed fields in children when parent gets a schema change', async function () {
+        await cards.update({
+          realm: realmURL,
+          id: 'greeting-card',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              export default class GreetingCard {
+                @contains(string) name;
+                @contains(string)
+                async greeting() {
+                  return "Goodbye " + (await this.name)
+                }
+              }
+            `,
+          },
+        });
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Goodbye Jackie',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
       });
     });
   });
