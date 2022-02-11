@@ -7,7 +7,6 @@ export default class PrismaClient {
   dbConfig: Record<string, any> = config.get('db');
 
   async getClient() {
-    console.log('dbconf?', this.dbConfig);
     if (!this.client) {
       this.client = new PrismaClientToWrap({ datasources: { db: { url: this.dbConfig.url } } });
     }
