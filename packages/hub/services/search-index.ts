@@ -112,7 +112,7 @@ export default class SearchIndex {
   async indexData(raw: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     log.trace('indexData', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSaveData(raw, cardModel);
+      return await ops.writeDataToIndex(raw, cardModel);
     });
   }
 
@@ -268,11 +268,6 @@ class IndexerRun implements IndexerHandle {
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 
-  // used directly by the hub when mutating card data only
-  async internalSaveData(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
-    return await this.writeDataToIndex(rawCard, cardModel);
-  }
-
   private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
     switch (type) {
       case JS_TYPE:
@@ -311,7 +306,8 @@ class IndexerRun implements IndexerHandle {
     return compiledCard;
   }
 
-  private async writeDataToIndex(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
+  // used directly by the hub when mutating card data only
+  async writeDataToIndex(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
     let compiled;
