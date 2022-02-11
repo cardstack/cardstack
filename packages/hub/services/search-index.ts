@@ -282,7 +282,7 @@ class IndexerRun implements IndexerHandle {
     rawCard: RawCard,
     compiledCard: CompiledCard,
     compiler: Compiler<Unsaved>,
-    cardModel?: CardModel
+    cardModel: CardModel
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
@@ -424,7 +424,7 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
 async function searchOptimizedData(
   data: Record<string, any>,
   compiled: CompiledCard,
-  cardModel?: CardModel
+  cardModel: CardModel
 ): Promise<Record<string, any>> {
   let result: Record<string, any> = {};
 
