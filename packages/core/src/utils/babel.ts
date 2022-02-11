@@ -32,21 +32,6 @@ export function error(path: NodePath<any>, message: string) {
 
 export type ImportDetails = Map<string, { moduleSpecifier: string; exportedName: string }>;
 
-export function addImports(neededImports: ImportDetails, path: NodePath<t.Program>, t: typeof Babel.types) {
-  for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
-    path.node.body.push(
-      t.importDeclaration(
-        [
-          exportedName === 'default'
-            ? t.importDefaultSpecifier(t.identifier(localName))
-            : t.importSpecifier(t.identifier(localName), t.identifier(exportedName)),
-        ],
-        t.stringLiteral(moduleSpecifier)
-      )
-    );
-  }
-}
-
 export function unusedClassMember(path: NodePath<t.Class>, nameLike: string, t: typeof Babel.types): string {
   let i = 0;
   let classMemberNames = path
