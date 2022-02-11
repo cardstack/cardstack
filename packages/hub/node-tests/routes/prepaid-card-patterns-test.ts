@@ -1,14 +1,10 @@
 import { setupHub } from '../helpers/server';
-import { PrismaClient } from '@prisma/client';
-
 
 describe('GET /api/prepaid-card-patterns', function () {
   let { getContainer, request } = setupHub(this);
-  let prismaClient: PrismaClient | undefined;
 
   this.beforeEach(async function () {
-    prismaClient = await (await getContainer().lookup('prisma-client')).getClient();
-    // FIXME serviceify? with transaction/rollback like DatabaseManager
+    let prismaClient = await (await getContainer().lookup('prisma-client')).getClient();
 
     let rows = [
       ['543423cb-de7e-44c2-a9e1-902b4648b8fb', 'https://example.com/a.svg', 'Pattern A'],
