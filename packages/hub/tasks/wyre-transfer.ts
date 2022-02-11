@@ -19,8 +19,12 @@ export default class WyreTransferTask {
     let { dest, request } = payload;
     let { wallet, transfer, order } = request;
     let { destAmount: amount, destCurrency: token } = transfer;
+    log.info(
+      `Running wyre transfer task for order ${order.id}: source=${wallet.id}, dest=${dest}, amount=${amount} token=${token}`
+    );
 
     let { id: custodialTransferId } = await this.wyre.transfer(wallet.id, dest, amount, token);
+    log.info(`Received successful wyre transfer for order ${order.id}: ${custodialTransferId}`);
 
     let db = await this.databaseManager.getClient();
     let { status: nextStatus } = await this.order.nextOrderStatus('wyre-receive-funds', order.id);
