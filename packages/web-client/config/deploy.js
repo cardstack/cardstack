@@ -18,6 +18,9 @@ module.exports = function (deployTarget) {
         s3: {
           as: ['s3Pages', 's3WellKnown', 's3Assets'],
         },
+        compress: {
+          as: ['compressOwnAssets', 'compressPrepaidCardPatterns'],
+        },
       },
     },
     'revision-data': {
@@ -36,6 +39,15 @@ module.exports = function (deployTarget) {
       filePattern: s3WellKnownPattern,
       allowOverwrite: true,
       cacheControl: 'max-age=600, public',
+    },
+    compressOwnAssets: {
+      filePattern: '**/*.{js,css,json,ico,map,xml,txt,svg,eot,ttf,woff,woff2}',
+      ignorePattern: 'images/prepaid-card-customizations/**/*.svg',
+      compression: ['best'],
+    },
+    compressPrepaidCardPatterns: {
+      filePattern: 'images/prepaid-card-customizations/**/*.svg',
+      compression: ['gzip'],
     },
     cloudfront: {
       objectPaths: [
