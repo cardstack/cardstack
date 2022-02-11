@@ -14,9 +14,18 @@ export function formatAmount(
     return '';
   }
 
+  let amountWithoutFloatingPointRoundingError = parseFloat(
+    amount as string
+  ).toPrecision(15); // 15 for 64-bit float precision
+  // 23.240000000000002 -> 23.2400000000000
+
+  let amountWithoutTrailingZeros = parseFloat(
+    amountWithoutFloatingPointRoundingError
+  ); // 23.2400000000000 -> 23.24
+
   return formatCurrencyAmount(
-    amount,
-    Math.max(minDecimals, countDecimalPlaces(amount))
+    amountWithoutTrailingZeros,
+    Math.max(minDecimals, countDecimalPlaces(amountWithoutTrailingZeros))
   );
 }
 
