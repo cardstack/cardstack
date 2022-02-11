@@ -1,9 +1,5 @@
-import WorkerClient from './worker-client';
 import * as Sentry from '@sentry/node';
-import Web3SocketService from './web3-socket';
-import Contracts from './contracts';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
-import LatestEventBlockQueries from './queries/latest-event-block';
 import { inject } from '@cardstack/di';
 
 import logger from '@cardstack/logger';
@@ -25,10 +21,10 @@ export const CONTRACT_EVENTS = [
 ];
 
 export class ContractSubscriptionEventHandler {
-  contracts: Contracts = inject('contracts', { as: 'contracts' });
-  web3: Web3SocketService = inject('web3-socket', { as: 'web3' });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
-  latestEventBlockQueries: LatestEventBlockQueries = inject('latest-event-block-queries', {
+  contracts = inject('contracts', { as: 'contracts' });
+  web3 = inject('web3-socket', { as: 'web3' });
+  workerClient = inject('worker-client', { as: 'workerClient' });
+  latestEventBlockQueries = inject('latest-event-block-queries', {
     as: 'latestEventBlockQueries',
   });
 

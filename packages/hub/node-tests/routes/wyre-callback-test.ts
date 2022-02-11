@@ -1,26 +1,15 @@
 import { Client as DBClient } from 'pg';
-import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
-import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';
 import { registry, setupHub } from '../helpers/server';
-
-class StubWyreService {
-  async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
-    return Promise.resolve(handleGetWyreWalletByUserAddress(userAddress));
-  }
-  async getWalletById(walletId: string): Promise<WyreWallet | undefined> {
-    return Promise.resolve(handleGetWyreWalletById(walletId));
-  }
-  async getTransfer(transferId: string): Promise<WyreTransfer | undefined> {
-    return Promise.resolve(handleGetWyreTransfer(transferId));
-  }
-  async getOrder(orderId: string): Promise<WyreOrder | undefined> {
-    return Promise.resolve(handleGetWyreOrder(orderId));
-  }
-  async transfer(source: string, dest: string, amount: number, token: string): Promise<WyreTransfer | undefined> {
-    return Promise.resolve(handleWyreTransfer(source, dest, amount, token));
-  }
-}
+import {
+  StubWyreService,
+  stubCustodialTransferId,
+  stubCustodialWalletId,
+  stubUserAddress,
+  stubWalletOrderId,
+  stubWalletOrderTransferId,
+  adminWalletId,
+} from '../helpers/wyre';
 
 class StubRelayService {
   async provisionPrepaidCard(userAddress: string, reservationId: string): Promise<string> {
@@ -34,219 +23,26 @@ class StubSubgraphService {
   }
 }
 
-// these ID prefixes are part of wyre's own ID scheme
-const adminWalletId = 'WA_ADMIN_WALLET';
-const stubCustodialWalletId = 'WA_CUSTODIAL_WALLET';
-const stubWalletOrderTransferId = 'TF_WALLET_ORDER';
-const stubCustodialTransferId = 'TF_CUSTODIAL_TRANSFER';
-const stubWalletOrderId = 'WO_WALLET_ORDER';
-const stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+class StubWorkerClient {
+  addJob(jobName: string, payload: any, options?: any) {
+    handleAddJob(jobName, payload, options);
+  }
+}
+
 const stubUserAddress2 = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 const stubSKU = 'sku1';
-const stubDepositAddress = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
-const randomAddress = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 const stubProvisionTxnHash = '0x1234567890123456789012345678901234567890';
 const stubPrepaidCardAddress = '0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5';
 const stubReservationId = uuidv4();
 
-let wyreTransferCallCount = 0;
 let provisionPrepaidCardCallCount = 0;
 let waitForPrepaidCardTxnCallCount = 0;
+let addJobCallCount = 0;
 
 function handleWaitForPrepaidCardTxn(txnHash: string) {
   waitForPrepaidCardTxnCallCount++;
   expect(txnHash).to.equal(stubProvisionTxnHash);
   return stubPrepaidCardAddress;
-}
-
-function handleGetWyreWalletByUserAddress(userAddress: string) {
-  if (userAddress === adminWalletName) {
-    return {
-      id: adminWalletId,
-      name: adminWalletName,
-      callbackUrl: null,
-      depositAddresses: {},
-    };
-  }
-  return {
-    id: 'WA_RANDOM_WALLET',
-    name: 'random',
-    callbackUrl: null,
-    depositAddresses: {},
-  };
-}
-
-function handleGetWyreWalletById(walletId: string) {
-  if (walletId === stubCustodialWalletId) {
-    return {
-      id: stubCustodialWalletId,
-      name: stubUserAddress.toLowerCase(),
-      callbackUrl: null,
-      depositAddresses: {
-        ETH: stubDepositAddress,
-      } as { [network: string]: string },
-    };
-  } else if (walletId === 'WA_DOES_NOT_EXIST') {
-    return;
-  }
-
-  return {
-    id: 'WA_RANDOM_WALLET',
-    name: 'random',
-    callbackUrl: null,
-    depositAddresses: {},
-  };
-}
-
-function handleGetWyreTransfer(transferId: string) {
-  switch (transferId) {
-    case stubWalletOrderTransferId:
-      return {
-        id: stubWalletOrderTransferId,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `walletorderholding:${stubWalletOrderId}`,
-        dest: `wallet:${stubCustodialWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case stubCustodialTransferId:
-      return {
-        id: stubCustodialTransferId,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `wallet:${stubCustodialWalletId}`,
-        dest: `wallet:${adminWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case 'TF_PENDING':
-      return {
-        id: 'TF_PENDING',
-        status: 'PENDING' as 'PENDING',
-        source: `wallet:${stubCustodialWalletId}`,
-        dest: `wallet:${adminWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_NON_WALLET_ORDER_SOURCE`:
-      return {
-        id: `TF_NON_WALLET_ORDER_SOURCE`,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `wallet:${adminWalletId}`,
-        dest: `wallet:${stubCustodialWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_NON_EXISTENT_WALLET_ORDER_SOURCE`:
-      return {
-        id: `TF_NON_EXISTENT_WALLET_ORDER_SOURCE`,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `walletorderholding:WO_DOES_NOT_EXIST`,
-        dest: `wallet:${stubCustodialWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_WITH_WALLET_ORDER_TRANSFER_MISMATCH`:
-      return {
-        id: `TF_WITH_WALLET_ORDER_TRANSFER_MISMATCH`,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `walletorderholding:WO_TRANSFER_MISMATCH`,
-        dest: `wallet:${stubCustodialWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_WITH_WALLET_ORDER_DEST_MISMATCH`:
-      return {
-        id: `TF_WITH_WALLET_ORDER_DEST_MISMATCH`,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `walletorderholding:WO_DEST_MISMATCH`,
-        dest: `wallet:${stubCustodialWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_NON_ADMIN_TRANSFER`:
-      return {
-        id: `TF_NON_ADMIN_TRANSFER`,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `wallet:${stubCustodialWalletId}`,
-        dest: `wallet:WA_NON_ADMIN_WALLET`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-    case `TF_ADMIN_TRANSFER_SOURCE_MISMATCH`:
-      return {
-        id: stubCustodialTransferId,
-        status: 'COMPLETED' as 'COMPLETED',
-        source: `wallet:WA_RANDOM_WALLET`,
-        dest: `wallet:${adminWalletId}`,
-        sourceCurrency: 'DAI',
-        destCurrency: 'DAI',
-        destAmount: 100,
-      };
-  }
-  return;
-}
-
-function handleGetWyreOrder(orderId: string) {
-  switch (orderId) {
-    case stubWalletOrderId:
-      return {
-        id: stubWalletOrderId,
-        status: 'COMPLETE' as 'COMPLETE',
-        purchaseAmount: 100,
-        sourceCurrency: 'USD',
-        destCurrency: 'DAI',
-        transferId: stubWalletOrderTransferId,
-        dest: `ethereum:${stubDepositAddress}`,
-      };
-    case 'WO_TRANSFER_MISMATCH':
-      return {
-        id: 'WO_TRANSFER_MISMATCH',
-        status: 'COMPLETE' as 'COMPLETE',
-        purchaseAmount: 100,
-        sourceCurrency: 'USD',
-        destCurrency: 'DAI',
-        transferId: 'TF_MISMATCHED_TRANSFER',
-        dest: `ethereum:${stubDepositAddress}`,
-      };
-    case 'WO_DEST_MISMATCH':
-      return {
-        id: 'WO_DEST_MISMATCH',
-        status: 'COMPLETE' as 'COMPLETE',
-        purchaseAmount: 100,
-        sourceCurrency: 'USD',
-        destCurrency: 'DAI',
-        transferId: `TF_WITH_WALLET_ORDER_DEST_MISMATCH`,
-        dest: `ethereum:${randomAddress}`,
-      };
-  }
-  return;
-}
-
-function handleWyreTransfer(source: string, dest: string, amount: number, token: string) {
-  wyreTransferCallCount++;
-
-  expect(source).to.equal(stubCustodialWalletId);
-  expect(dest).to.equal(adminWalletId);
-  expect(amount).to.equal(100);
-  expect(token).to.equal('DAI');
-
-  return {
-    id: stubCustodialTransferId,
-    status: 'COMPLETED' as 'COMPLETED',
-    source: `wallet:${source}`,
-    dest: `wallet:${dest}`,
-    sourceCurrency: token,
-    destCurrency: token,
-    destAmount: amount,
-  };
 }
 
 function handleProvisionPrepaidCard(userAddress: string, sku: string) {
@@ -261,8 +57,21 @@ function handleProvisionPrepaidCard(userAddress: string, sku: string) {
   return stubProvisionTxnHash;
 }
 
+function handleAddJob(jobName: string, payload: any, options?: any) {
+  addJobCallCount++;
+  expect(jobName).to.equal('wyre-transfer');
+  expect(payload.request.transfer.destCurrency).to.equal('DAI', 'destCurrency is correct');
+  expect(payload.request.transfer.destAmount).to.equal(100, 'destAmount is correct');
+  expect(payload.request.order.id).to.equal(stubWalletOrderId, 'request order id is correct');
+  expect(payload.request.wallet.name).to.equal(stubUserAddress.toLowerCase(), 'request wallet name is correct');
+  expect(payload.request.wallet.id).to.equal(stubCustodialWalletId, 'request wallet id is correct');
+  expect(payload.dest).to.equal(adminWalletId, 'destination wallet id is correct');
+  expect(options.jobKey).to.equal(stubWalletOrderId, 'jobKey is correct');
+}
+
 describe('POST /api/wyre-callback', function () {
   let db: DBClient;
+  let wyreService: StubWyreService;
 
   function post(url: string) {
     return request().post(url);
@@ -272,14 +81,17 @@ describe('POST /api/wyre-callback', function () {
     registry(this).register('wyre', StubWyreService);
     registry(this).register('relay', StubRelayService, { type: 'service' });
     registry(this).register('subgraph', StubSubgraphService);
+    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    wyreTransferCallCount = 0;
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
+    addJobCallCount = 0;
+    wyreService = (await getContainer().lookup('wyre')) as unknown as StubWyreService;
+    wyreService.wyreTransferCallCount = 0;
 
     let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
@@ -298,7 +110,7 @@ describe('POST /api/wyre-callback', function () {
   });
 
   describe('wallet order callbacks', function () {
-    it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
+    it(`can process callback for wallet order`, async function () {
       await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
@@ -311,62 +123,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(1);
-      expect(provisionPrepaidCardCallCount).to.equal(0);
-      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
-
-      let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
-      expect(rows.length).to.equal(1);
-
-      let [row] = rows;
-      expect(row.user_address).to.equal(stubUserAddress.toLowerCase());
-      expect(row.wallet_id).to.equal(stubCustodialWalletId);
-      expect(row.custodial_transfer_id).to.equal(stubCustodialTransferId);
-      expect(row.status).to.equal('received-order');
-    });
-
-    // This is the scenario where the reservationId/orderId correlation has been
-    // set before the callback has been received
-    it(`can process callback for pending wallet order that we already received a prepaid card reservation for`, async function () {
-      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
-        stubReservationId,
-        stubUserAddress.toLowerCase(),
-        stubSKU,
-      ]);
-      await db.query(
-        `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
-        [
-          stubWalletOrderId,
-          stubUserAddress.toLowerCase(),
-          stubCustodialWalletId,
-          stubReservationId,
-          'waiting-for-order',
-        ]
-      );
-      await post(`/callbacks/wyre`)
-        .set('Content-Type', 'application/json')
-        .set('Content-Type', 'application/json')
-        .send({
-          source: `transfer:${stubWalletOrderTransferId}`,
-          dest: `wallet:${stubCustodialWalletId}`,
-          currency: 'DAI',
-          amount: 100,
-          status: 'CONFIRMED',
-        })
-        .expect(204);
-
-      expect(wyreTransferCallCount).to.equal(1);
-      expect(provisionPrepaidCardCallCount).to.equal(0);
-      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
-
-      let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
-      expect(rows.length).to.equal(1);
-
-      let [row] = rows;
-      expect(row.user_address).to.equal(stubUserAddress.toLowerCase());
-      expect(row.wallet_id).to.equal(stubCustodialWalletId);
-      expect(row.custodial_transfer_id).to.equal(stubCustodialTransferId);
-      expect(row.status).to.equal('received-order');
+      expect(addJobCallCount).to.equal(1, 'addJob called once');
     });
 
     it(`ignores callback for pending wallet order we already received reservation for where the user address in the callback does not match the user address in the DB`, async function () {
@@ -398,7 +155,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -444,7 +201,7 @@ describe('POST /api/wyre-callback', function () {
           })
           .expect(204);
 
-        expect(wyreTransferCallCount).to.equal(0);
+        expect(wyreService.wyreTransferCallCount).to.equal(0);
         expect(provisionPrepaidCardCallCount).to.equal(0);
         expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -466,7 +223,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -487,7 +244,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -508,7 +265,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -529,7 +286,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -550,7 +307,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -571,7 +328,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -592,7 +349,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -638,7 +395,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(1);
       expect(waitForPrepaidCardTxnCallCount).to.equal(1);
 
@@ -676,7 +433,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(1);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -704,7 +461,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -738,7 +495,7 @@ describe('POST /api/wyre-callback', function () {
           })
           .expect(204);
 
-        expect(wyreTransferCallCount).to.equal(0);
+        expect(wyreService.wyreTransferCallCount).to.equal(0);
         expect(provisionPrepaidCardCallCount).to.equal(0);
         expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -763,7 +520,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -784,7 +541,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -807,7 +564,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -830,7 +587,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
@@ -853,7 +610,7 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(wyreTransferCallCount).to.equal(0);
+      expect(wyreService.wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
       expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
