@@ -9,12 +9,6 @@ export default function initSentry() {
       enabled: config.get('sentry.enabled'),
       environment: config.get('sentry.environment'),
       release: 'hub@' + packageJson.version,
-      beforeSend(event, hint) {
-        if (hint?.originalException?.toString() === 'Error: USER_REJECTION') {
-          return null;
-        }
-        return event;
-      },
     });
   }
 }
