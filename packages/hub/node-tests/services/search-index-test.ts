@@ -250,5 +250,167 @@ if (process.env.COMPILER) {
         'https://cardstack.com/base/string'
       );
     });
+
+    describe('computed field', function () {
+      let greetingCard = {
+        realm: realmURL,
+        id: 'greeting-card',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+
+            export default class GreetingCard {
+              @contains(string) name;
+
+              @contains(string)
+              async greeting() {
+                return "Welcome " + (await this.name) + "!";
+              }
+            }
+          `,
+        },
+      };
+
+      this.beforeEach(async function () {
+        await cards.create(greetingCard);
+
+        // This child card getes created via adoptIntoRealm, which goes down the
+        // code path that doesn't involve compiling cards
+        let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
+        let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
+        sampleGreeting.setData({
+          name: 'Jackie',
+        });
+        await sampleGreeting.save();
+
+        // This child card gets created via cardService.create, which goes down
+        // the code path that *does* involve compiling cards.
+        await cards.create({
+          realm: realmURL,
+          id: 'different-greeting-card',
+          adoptsFrom: '../sample-greeting',
+          data: {
+            name: 'Miles',
+          },
+        });
+      });
+
+      it('Can search for card computed field for card created with data', async function () {
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Welcome Jackie!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
+      });
+
+      it('Can search for card computed field for card after updating data', async function () {
+        let cardModel = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
+        cardModel.setData({
+          name: 'Woody',
+        });
+        await cardModel.save();
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Welcome Woody!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
+      });
+
+      it('Can search for card computed field for card created with data and schema', async function () {
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}sample-greeting`,
+            eq: {
+              greeting: 'Welcome Miles!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}different-greeting-card`]);
+      });
+
+      it('Can search for card computed field for card after updating data and schema', async function () {
+        await cards.update({
+          realm: realmURL,
+          id: 'greeting-card',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              export default class GreetingCard {
+                @contains(string) name;
+                @contains(string) breed;
+
+                @contains(string)
+                async greeting() {
+                  return "Welcome " + (await this.name) + " the " + (await this.breed) + "!";
+                }
+              }
+            `,
+          },
+          data: {
+            name: 'J',
+            breed: 'beagle',
+          },
+        });
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Welcome J the beagle!',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}greeting-card`]);
+      });
+
+      it('can update computed fields in children when parent gets a schema change', async function () {
+        await cards.update({
+          realm: realmURL,
+          id: 'greeting-card',
+          schema: 'schema.js',
+          files: {
+            'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              export default class GreetingCard {
+                @contains(string) name;
+                @contains(string)
+                async greeting() {
+                  return "Goodbye " + (await this.name)
+                }
+              }
+            `,
+          },
+        });
+
+        let results = await cards.query('isolated', {
+          filter: {
+            on: `${realmURL}greeting-card`,
+            eq: {
+              greeting: 'Goodbye Jackie',
+            },
+          },
+        });
+
+        expect(results.map((card) => card.url)).to.deep.equal([`${realmURL}sample-greeting`]);
+      });
+    });
   });
 }

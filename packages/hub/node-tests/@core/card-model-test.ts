@@ -8,6 +8,7 @@ import merge from 'lodash/merge';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
+import { CardModel } from '@cardstack/core/src/interfaces';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
@@ -66,7 +67,11 @@ if (process.env.COMPILER) {
     });
 
     it('.data', async function () {
-      let model = await cards.makeCardModelFromDatabase('isolated', cardDBResult);
+      // TODO: I made makeCardModelFromDatabase private because it shouldn't be
+      // exposed. This test should be refactored to use public API, and the
+      // public API around data may be changing anyway to account for including
+      // computed fields
+      let model: CardModel = await (cards as any).makeCardModelFromDatabase('isolated', cardDBResult);
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);

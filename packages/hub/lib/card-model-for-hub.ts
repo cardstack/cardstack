@@ -206,7 +206,7 @@ export default class CardModelForHub implements CardModel {
           adoptsFrom: this.state.parentCardURL,
           data: serializeAttributes(this._data, this.serializerMap),
         });
-        compiled = await this.searchIndex.indexData(raw);
+        compiled = await this.searchIndex.indexData(raw, this);
         break;
       case 'loaded':
         {
@@ -221,7 +221,7 @@ export default class CardModelForHub implements CardModel {
 
           updatedRawCard.data = serializeAttributes(updatedRawCard.data, this.serializerMap);
           raw = await this.realmManager.update(updatedRawCard);
-          compiled = await this.searchIndex.indexData(raw);
+          compiled = await this.searchIndex.indexData(raw, this);
         }
         break;
       default:

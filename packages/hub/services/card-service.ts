@@ -125,7 +125,7 @@ export class CardService {
     }
   }
 
-  async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
+  private async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
     return await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',

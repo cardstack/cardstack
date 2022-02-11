@@ -1,21 +1,21 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import { CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { isCardstackError, serializableError } from '@cardstack/core/src/utils/errors';
-import { inject } from '@cardstack/di';
+import { getOwner, inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
-import CardBuilder from './card-builder';
 import type { types as t } from '@babel/core';
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
+import CardModelForHub from '../lib/card-model-for-hub';
 
 const log = logger('hub/search-index');
 
@@ -24,9 +24,7 @@ function assertNever(value: never) {
 }
 export default class SearchIndex {
   private realmManager = service('realm-manager', { as: 'realmManager' });
-  private builder = service('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
-  private fileCache = service('file-cache', { as: 'fileCache' });
   private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
   private notifyQueuePromise: Promise<void> = Promise.resolve();
 
@@ -111,10 +109,10 @@ export default class SearchIndex {
     });
   }
 
-  async indexData(raw: RawCard): Promise<CompiledCard> {
+  async indexData(raw: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     log.trace('indexData', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSaveData(raw);
+      return await ops.writeDataToIndex(raw, cardModel);
     });
   }
 
@@ -122,7 +120,7 @@ export default class SearchIndex {
     let db = await this.database.getPool();
     try {
       log.trace(`starting to index realm`, realmURL);
-      let run = new IndexerRun(db, this.builder, realmURL, this.fileCache);
+      let run = await getOwner(this).instantiate(IndexerRun, db, realmURL);
       let result = await fn(run);
       await run.finalize();
       log.trace(`finished indexing realm`, realmURL);
@@ -142,17 +140,14 @@ export interface IndexerHandle {
 }
 
 class IndexerRun implements IndexerHandle {
+  private builder = service('card-builder', { as: 'builder' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
   private newMeta: PgPrimitive = null;
 
-  constructor(
-    private db: PoolClient,
-    private builder: CardBuilder,
-    private realmURL: string,
-    private fileCache: SearchIndex['fileCache']
-  ) {}
+  constructor(private db: PoolClient, private realmURL: string) {}
 
   async loadMeta(): Promise<PgPrimitive | undefined> {
     let {
@@ -258,12 +253,19 @@ class IndexerRun implements IndexerHandle {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
-    return await this.writeToIndex(rawCard, definedCard, compiler);
-  }
-
-  // used directly by the hub when mutating card data only
-  async internalSaveData(rawCard: RawCard): Promise<CompiledCard> {
-    return await this.writeDataToIndex(rawCard);
+    let format: Format = 'isolated';
+    let cardModel = await getOwner(this).instantiate(CardModelForHub, {
+      type: 'loaded',
+      id: rawCard.id,
+      realm: rawCard.realm,
+      format,
+      rawData: rawCard.data ?? {},
+      schemaModule: definedCard.schemaModule.global,
+      usedFields: definedCard.componentInfos[format].usedFields,
+      componentModule: definedCard.componentInfos[format].moduleName.global,
+      serializerMap: definedCard.componentInfos[format].serializerMap,
+    });
+    return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
@@ -279,7 +281,8 @@ class IndexerRun implements IndexerHandle {
   private async writeToIndex(
     rawCard: RawCard,
     compiledCard: CompiledCard,
-    compiler: Compiler<Unsaved>
+    compiler: Compiler<Unsaved>,
+    cardModel: CardModel
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
@@ -291,10 +294,9 @@ class IndexerRun implements IndexerHandle {
       data: param(rawCard.data ?? null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
-      searchData: param(rawCard.data ? searchOptimizedData(rawCard.data, compiledCard) : null),
+      searchData: param(rawCard.data ? await searchOptimizedData(rawCard.data, compiledCard, cardModel) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
-
       schemaModule: param(compiledCard.schemaModule.global),
       componentInfos: param(compiledCard.componentInfos as Record<Format, any>),
     });
@@ -304,7 +306,8 @@ class IndexerRun implements IndexerHandle {
     return compiledCard;
   }
 
-  private async writeDataToIndex(rawCard: RawCard): Promise<CompiledCard> {
+  // used directly by the hub when mutating card data only
+  async writeDataToIndex(rawCard: RawCard, cardModel: CardModel): Promise<CompiledCard> {
     let url = cardURL(rawCard);
     log.trace('Writing card to index', url);
     let compiled;
@@ -341,7 +344,7 @@ class IndexerRun implements IndexerHandle {
             param(rawCard.data ?? null),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
-            param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+            param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
@@ -360,7 +363,7 @@ class IndexerRun implements IndexerHandle {
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
-        param(rawCard.data ? searchOptimizedData(rawCard.data, compiled) : null),
+        param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
         'WHERE url =',
         param(url),
       ];
@@ -418,7 +421,11 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
 
 // TODO consider using the compiler to return a function that can be used to
 // generate these values for a card
-function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
+async function searchOptimizedData(
+  data: Record<string, any>,
+  compiled: CompiledCard,
+  cardModel: CardModel
+): Promise<Record<string, any>> {
   let result: Record<string, any> = {};
 
   for (let fieldName of Object.keys(compiled.fields)) {
@@ -428,7 +435,11 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
       if (!entry) {
         entry = result[currentCard.url] = {};
       }
-      entry[fieldName] = data[fieldName];
+      if (cardModel && currentCard.fields[fieldName].computed) {
+        entry[fieldName] = await cardModel.getField(fieldName);
+      } else {
+        entry[fieldName] = data[fieldName];
+      }
       currentCard = currentCard.adoptsFrom;
     } while (currentCard && currentCard.fields[fieldName]);
   }
