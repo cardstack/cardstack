@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 const env = config.get('hubEnvironment') as string;
 
-interface WyreConfig {
+export interface WyreConfig {
   accountId: string;
   apiKey: string;
   secretKey: string;
@@ -131,6 +131,13 @@ export default class WyreService {
         muteMessages: true,
       }),
     });
+    if (!result.ok) {
+      throw new Error(
+        `Wyre transfer failed for source=${source}, dest=${dest}, amount=${amount}, token=${token}, status code ${
+          result.status
+        }: ${JSON.stringify(await result.json())}`
+      );
+    }
     let transfer = (await result.json()) as WyreTransfer;
     return transfer;
   }

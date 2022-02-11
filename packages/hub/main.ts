@@ -89,6 +89,7 @@ import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
 import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import WyreTransferTask from './tasks/wyre-transfer';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
@@ -176,6 +177,7 @@ export function createRegistry(): Registry {
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
+  registry.register('wyre-transfer', WyreTransferTask);
   registry.register('web3-storage', Web3Storage);
   registry.register('statuspage-api', StatuspageApi);
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
