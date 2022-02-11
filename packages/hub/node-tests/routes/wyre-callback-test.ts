@@ -24,8 +24,8 @@ class StubSubgraphService {
 }
 
 class StubWorkerClient {
-  addJob(jobName: string, payload: any) {
-    handleAddJob(jobName, payload);
+  addJob(jobName: string, payload: any, options?: any) {
+    handleAddJob(jobName, payload, options);
   }
 }
 
