@@ -11,8 +11,8 @@ describe('GET /api/prepaid-card-patterns', function () {
       ['72b654e4-dd4a-4a89-a78c-43a9baa7f354', 'https://example.com/b.svg', 'Pattern B'],
     ];
 
-    await prismaClient!.prepaid_card_patterns.createMany({
-      data: rows.map((row) => ({ id: row[0], pattern_url: row[1], description: row[2] })),
+    await prismaClient.prepaidCardPatterns.createMany({
+      data: rows.map((row) => ({ id: row[0], patternUrl: row[1], description: row[2] })),
     });
   });
 
