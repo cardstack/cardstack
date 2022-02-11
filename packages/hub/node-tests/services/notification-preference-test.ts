@@ -1,7 +1,9 @@
 import { setupHub } from '../helpers/server';
+import upsertPushNotificationRegistrationArgs from '../../utils/push-notification-registration';
 
-describe('NotificationPreferenceService', function () {
+describe('NotificationPreferenceService', async function () {
   let { getContainer } = setupHub(this);
+  let prisma = await (await getContainer().lookup('prisma-client')).getClient();
 
   this.beforeEach(async function () {
     let dbManager = await getContainer().lookup('database-manager');
@@ -16,40 +18,32 @@ describe('NotificationPreferenceService', function () {
       'customer_payment',
       'enabled',
     ]);
-    let registrationQueries = await getContainer().lookup('push-notification-registration-queries');
     let preferenceQueries = await getContainer().lookup('notification-preference-queries');
 
     // 1st device
-    await registrationQueries.upsert({
-      id: 'f6942dbf-1422-4c3f-baa3-24f0c5b5d475',
-      ownerAddress: '0x01',
-      pushClientId: '123',
-      disabledAt: null,
-    });
+    await prisma.pushNotificationRegistrations.upsert(
+      upsertPushNotificationRegistrationArgs('f6942dbf-1422-4c3f-baa3-24f0c5b5d475', '0x01', '123', null)
+    );
 
     // 2nd device
-    await registrationQueries.upsert({
-      id: '5ffa1144-6a8d-4a43-98bd-ce526f48b7e4',
-      ownerAddress: '0x01',
-      pushClientId: '124',
-      disabledAt: null,
-    });
+    await prisma.pushNotificationRegistrations.upsert(
+      upsertPushNotificationRegistrationArgs('5ffa1144-6a8d-4a43-98bd-ce526f48b7e4', '0x01', '124', null)
+    );
 
     // 3rd device, disabled
-    await registrationQueries.upsert({
-      id: 'c7ef64dd-a608-4f0a-8a48-ce58c66e7f20',
-      ownerAddress: '0x01',
-      pushClientId: '125',
-      disabledAt: '2021-12-09T10:28:16.921',
-    });
+    await prisma.pushNotificationRegistrations.upsert(
+      upsertPushNotificationRegistrationArgs(
+        'c7ef64dd-a608-4f0a-8a48-ce58c66e7f20',
+        '0x01',
+        '125',
+        new Date(Date.parse('2021-12-09T10:28:16.921'))
+      )
+    );
 
     // device from some other EOA
-    await registrationQueries.upsert({
-      id: '6ab0df2c-880d-433d-8e37-fb916afaf6ec',
-      ownerAddress: '0x02',
-      pushClientId: '888',
-      disabledAt: null,
-    });
+    await prisma.pushNotificationRegistrations.upsert(
+      upsertPushNotificationRegistrationArgs('6ab0df2c-880d-433d-8e37-fb916afaf6ec', '0x02', '888', null)
+    );
 
     // Preference override for 1st device
     await preferenceQueries.upsert({

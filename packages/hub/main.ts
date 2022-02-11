@@ -78,7 +78,6 @@ import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
 import PrismaClient from './services/prisma-client';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
 import Contracts from './services/contracts';
@@ -157,7 +156,6 @@ export function createRegistry(): Registry {
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
-  registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
   registry.register('notification-type-queries', NotificationTypeQueries);
   registry.register('notification-preferences-route', NotificationPreferencesRoute);

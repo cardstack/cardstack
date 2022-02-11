@@ -6,7 +6,7 @@ import { inject } from '@cardstack/di';
 import { ensureLoggedIn } from './utils/auth';
 
 import PushNotificationRegistrationSerializer from '../services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationQueries from '../services/queries/push-notification-registration';
+import upsertPushNotificationRegistrationArgs from '../utils/push-notification-registration';
 import shortUuid from 'short-uuid';
 
 export interface PushNotificationRegistration {
@@ -18,16 +18,12 @@ export interface PushNotificationRegistration {
 
 export default class PushNotificationRegistrationsRoute {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaClient = inject('prisma-client', { as: 'prismaClient' });
+
   pushNotificationRegistrationSerialier: PushNotificationRegistrationSerializer = inject(
     'push-notification-registration-serializer',
     {
       as: 'pushNotificationRegistrationSerialier',
-    }
-  );
-  pushNotificationRegistrationQueries: PushNotificationRegistrationQueries = inject(
-    'push-notification-registration-queries',
-    {
-      as: 'pushNotificationRegistrationQueries',
     }
   );
 
@@ -49,7 +45,10 @@ export default class PushNotificationRegistrationsRoute {
       disabledAt: null,
     };
 
-    await this.pushNotificationRegistrationQueries.upsert(pushNotificationRegistration);
+    let prisma = await this.prismaClient.getClient();
+    await prisma.pushNotificationRegistrations.upsert(
+      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), ownerAddress, pushClientId, null)
+    );
 
     let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
 
@@ -63,10 +62,16 @@ export default class PushNotificationRegistrationsRoute {
       return;
     }
 
-    await this.pushNotificationRegistrationQueries.delete({
-      ownerAddress: ctx.state.userAddress,
-      pushClientId: ctx.params.push_client_id,
-    } as PushNotificationRegistration);
+    let prisma = await this.prismaClient.getClient();
+
+    await prisma.pushNotificationRegistrations.delete({
+      where: {
+        ownerAddress_pushClientId: {
+          ownerAddress: ctx.state.userAddress,
+          pushClientId: ctx.params.push_client_id,
+        },
+      },
+    });
 
     ctx.status = 200;
     ctx.type = 'application/vnd.api+json';
