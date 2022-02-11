@@ -251,7 +251,7 @@ if (process.env.COMPILER) {
       );
     });
 
-    describe.only('computed field', function () {
+    describe('computed field', function () {
       let greetingCard = {
         realm: realmURL,
         id: 'greeting-card',

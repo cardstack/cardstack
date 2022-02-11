@@ -4,19 +4,18 @@ import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/seri
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { isCardstackError, serializableError } from '@cardstack/core/src/utils/errors';
-import { inject } from '@cardstack/di';
+import { getOwner, inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
-import CardBuilder from './card-builder';
 import type { types as t } from '@babel/core';
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
-import { CardService } from './card-service';
+import CardModelForHub from '../lib/card-model-for-hub';
 
 const log = logger('hub/search-index');
 
@@ -25,9 +24,7 @@ function assertNever(value: never) {
 }
 export default class SearchIndex {
   private realmManager = service('realm-manager', { as: 'realmManager' });
-  private builder = service('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
-  private fileCache = service('file-cache', { as: 'fileCache' });
   private notifyQueue: { cardURL: string; action: 'save' | 'delete' }[] = [];
   private notifyQueuePromise: Promise<void> = Promise.resolve();
 
@@ -104,12 +101,11 @@ export default class SearchIndex {
   async indexCard(
     raw: RawCard,
     compiled: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>,
-    cardService: CardService
+    compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
     log.trace('indexCard', cardURL(raw));
     return await this.runIndexing(raw.realm, async (ops) => {
-      return await ops.internalSave(raw, compiled, compiler, cardService);
+      return await ops.internalSave(raw, compiled, compiler);
     });
   }
 
@@ -124,7 +120,7 @@ export default class SearchIndex {
     let db = await this.database.getPool();
     try {
       log.trace(`starting to index realm`, realmURL);
-      let run = new IndexerRun(db, this.builder, realmURL, this.fileCache);
+      let run = await getOwner(this).instantiate(IndexerRun, db, realmURL);
       let result = await fn(run);
       await run.finalize();
       log.trace(`finished indexing realm`, realmURL);
@@ -144,17 +140,14 @@ export interface IndexerHandle {
 }
 
 class IndexerRun implements IndexerHandle {
+  private builder = service('card-builder', { as: 'builder' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
   private newMeta: PgPrimitive = null;
 
-  constructor(
-    private db: PoolClient,
-    private builder: CardBuilder,
-    private realmURL: string,
-    private fileCache: SearchIndex['fileCache']
-  ) {}
+  constructor(private db: PoolClient, private realmURL: string) {}
 
   async loadMeta(): Promise<PgPrimitive | undefined> {
     let {
@@ -255,13 +248,23 @@ class IndexerRun implements IndexerHandle {
   async internalSave(
     rawCard: RawCard,
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
-    compiler: Compiler<Unsaved>,
-    cardService?: CardService
+    compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
     let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
-    let cardModel = await cardService?.makeCardModelFromDatabase('isolated', definedCard, rawCard.data);
+    let format: Format = 'isolated';
+    let cardModel = await getOwner(this).instantiate(CardModelForHub, {
+      type: 'loaded',
+      id: rawCard.id,
+      realm: rawCard.realm,
+      format,
+      rawData: rawCard.data ?? {},
+      schemaModule: definedCard.schemaModule.global,
+      usedFields: definedCard.componentInfos[format].usedFields,
+      componentModule: definedCard.componentInfos[format].moduleName.global,
+      serializerMap: definedCard.componentInfos[format].serializerMap,
+    });
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 
