@@ -107,25 +107,15 @@
   word-break: break-word;
 }
 
-.prepaid-card__usd-balance {
-  margin-top: 1rem;
-  font-weight: 700;
+.prepaid-card__balance-usd {
+  font-size: 1.5rem;
 }
 
-.prepaid-card__usd-balance--mock {
-  opacity: 0.25;
-}
-
-.prepaid-card__content-rs {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  display: grid;
-  justify-items: end;
-  gap: var(--boxel-sp);
-  padding: var(--boxel-sp-sm) var(--boxel-sp);
-  text-align: right;
-  z-index: -1;
+.prepaid-card__content-bottom {
+  margin-top: var(--boxel-sp-xs);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 }
 
 .prepaid-card__logo {

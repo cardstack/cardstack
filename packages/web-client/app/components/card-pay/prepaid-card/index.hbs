@@ -42,23 +42,17 @@
         class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}
         data-test-prepaid-card-balance
       >
-        §{{format-amount @balance}}
-      </div>
-      <div
-        class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}
-        data-test-prepaid-card-usd-balance
-      >
-        {{format-usd @usdBalance}}
+        ${{format-amount @usdBalance 2}} <span class="prepaid-card__balance-usd">USD</span>
       </div>
     </div>
-    <div class="prepaid-card__content-rs">
-      <div class="prepaid-card__logo" />
+    <div class="prepaid-card__content-bottom">
       {{#unless @mockOptions}}
         <div class="prepaid-card__attributes" data-test-prepaid-card-attributes>
           <div>{{if @reloadable "Reloadable" "Non-reloadable"}}</div>
           <div>{{if @transferrable "Transferrable" "Non-transferrable"}}</div>
         </div>
       {{/unless}}
+      <div class="prepaid-card__logo" />
     </div>
   </section>
 </article>

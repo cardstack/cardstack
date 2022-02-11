@@ -434,10 +434,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
-      .containsText('10,000');
-    assert
-      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
-      .containsText('100');
+      .containsText('$100.00 USD');
+
     assert.dom(`${post} [data-test-prepaid-card-attributes]`).doesNotExist();
 
     assert.dom(

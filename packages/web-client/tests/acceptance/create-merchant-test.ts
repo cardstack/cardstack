@@ -239,7 +239,7 @@ module('Acceptance | create merchant', function (hooks) {
     await visit('/card-pay/wallet');
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§0', 'expected card balance to have updated');
+      .containsText('0 USD', 'expected card balance to have updated');
   });
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {
