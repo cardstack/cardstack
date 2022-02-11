@@ -144,7 +144,7 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: 
 
   let { options, template: inputTemplate } = handleArguments(path, t);
 
-  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.neededImports);
+  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope, t)) {
@@ -211,16 +211,12 @@ function transformTemplate(
   source: string,
   path: NodePath<t.CallExpression>,
   opts: CardComponentPluginOptions,
-  importNames: State['neededImports']
+  importUtil: ImportUtil
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
 
   function importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string): string {
-    let name = findVariableName(`${desiredName}Field`, path, importNames);
-    importNames.set(name, {
-      moduleSpecifier,
-      exportedName: importedName,
-    });
+    let { name } = importUtil.import(path, moduleSpecifier, importedName, `${desiredName}Field`);
     neededScope.add(name);
     return name;
   }
@@ -238,19 +234,6 @@ function transformTemplate(
   opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
 
   return { template, neededScope };
-}
-
-function findVariableName(
-  desiredName: string,
-  path: NodePath<t.CallExpression> | NodePath<t.Program>,
-  importNames: State['neededImports']
-) {
-  let candidate = desiredName;
-  let counter = 0;
-  while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
-    candidate = `${desiredName}${counter++}`;
-  }
-  return candidate;
 }
 
 function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {
