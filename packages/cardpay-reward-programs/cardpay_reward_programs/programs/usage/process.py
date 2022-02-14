@@ -51,10 +51,20 @@ class UsageRewardProgram:
         valid_from = max_partition
         valid_to = max_partition + self.valid_duration
         con = duckdb.connect(database=":memory:", read_only=False)
-        if table_query == 'parquet_scan([])':
-            column_names =  ["payee", "amount", "transactions", "total_spent", "rewardProgramID", "paymentCycle", "token", "validFrom", "validTo"]
-            return pd.DataFrame(columns = column_names)
-        else: 
+        if table_query == "parquet_scan([])":
+            column_names = [
+                "payee",
+                "amount",
+                "transactions",
+                "total_spent",
+                "rewardProgramID",
+                "paymentCycle",
+                "token",
+                "validFrom",
+                "validTo",
+            ]
+            return pd.DataFrame(columns=column_names)
+        else:
             sql = f"""
             select
             prepaid_card_owner as payee,
@@ -93,7 +103,7 @@ class UsageRewardProgram:
                     max_partition,
                 ],
             )
-            return con.fetchdf() 
+            return con.fetchdf()
 
     def run(self, payment_cycle: int):
         min_block = payment_cycle - self.payment_cycle_length

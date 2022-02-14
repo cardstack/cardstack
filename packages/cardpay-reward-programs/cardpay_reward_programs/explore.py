@@ -28,7 +28,7 @@ reward_ui = st.sidebar.selectbox(
     reward_program["view_functions"],
     format_func=lambda x: x["name"],
 )
-default_config_root = "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/"
+default_config_root = "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
 config_location = st.sidebar.text_input("Config root", default_config_root)
 
 if config_location:
