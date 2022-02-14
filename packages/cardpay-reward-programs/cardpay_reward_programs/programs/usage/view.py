@@ -37,11 +37,12 @@ def view_historical(config):
         "This program is designed to reward end users for making payments across the network"
     )
     min_block = 24117248
+    max_block = 25117248
     min_block, max_block = st.slider(
         "End block",
         min_value=min_block,
-        max_value=25117248,
-        value=(min_block, 25117248),
+        max_value=max_block,
+        value=(min_block, max_block),
     )
 
     program = create_program(config)

@@ -7,6 +7,7 @@ This is designed to reward users using any part of the cardpay network
 import re
 
 import duckdb
+import pandas as pd
 
 from ..utils import get_files
 
@@ -50,45 +51,49 @@ class UsageRewardProgram:
         valid_from = max_partition
         valid_to = max_partition + self.valid_duration
         con = duckdb.connect(database=":memory:", read_only=False)
-        sql = f"""
-        select
-        prepaid_card_owner as payee,
+        if table_query == 'parquet_scan([])':
+            column_names =  ["payee", "amount", "transactions", "total_spent", "rewardProgramID", "paymentCycle", "token", "validFrom", "validTo"]
+            return pd.DataFrame(columns = column_names)
+        else: 
+            sql = f"""
+            select
+            prepaid_card_owner as payee,
 
-        (? *
-        1 + (1-(percent_rank() over (order by sum(spend_amount_uint64)  desc))) * (?)
-        *
-        1 + (1-(percent_rank() over (order by count(*)  desc))) * (?))::integer as amount,
+            (? *
+            1 + (1-(percent_rank() over (order by sum(spend_amount_uint64)  desc))) * (?)
+            *
+            1 + (1-(percent_rank() over (order by count(*)  desc))) * (?))::integer as amount,
 
-        count(*) as transactions,
-        sum(spend_amount_uint64) as total_spent,
+            count(*) as transactions,
+            sum(spend_amount_uint64) as total_spent,
 
-        ? as "rewardProgramID",
-        ?::integer as "paymentCycle",
-        ? as token,
-        ?::integer as "validFrom",
-        ?::integer as "validTo"
+            ? as "rewardProgramID",
+            ?::integer as "paymentCycle",
+            ? as token,
+            ?::integer as "validFrom",
+            ?::integer as "validTo"
 
-        from {table_query}
-        where block_number_uint64 >= ? and block_number_uint64 < ?
-        group by prepaid_card_owner
-        order by transactions desc
-        """
-        con.execute(
-            sql,
-            [
-                self.base_reward,
-                self.spend_factor,
-                self.transaction_factor,
-                self.reward_program_id,
-                payment_cycle,
-                self.token,
-                valid_from,
-                valid_to,
-                min_partition,
-                max_partition,
-            ],
-        )
-        return con.fetchdf()
+            from {table_query}
+            where block_number_uint64 >= ? and block_number_uint64 < ?
+            group by prepaid_card_owner
+            order by transactions desc
+            """
+            con.execute(
+                sql,
+                [
+                    self.base_reward,
+                    self.spend_factor,
+                    self.transaction_factor,
+                    self.reward_program_id,
+                    payment_cycle,
+                    self.token,
+                    valid_from,
+                    valid_to,
+                    min_partition,
+                    max_partition,
+                ],
+            )
+            return con.fetchdf() 
 
     def run(self, payment_cycle: int):
         min_block = payment_cycle - self.payment_cycle_length
