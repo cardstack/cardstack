@@ -4,3 +4,4 @@
 tmp/
 input/*
 dist/*
+mycache/*
