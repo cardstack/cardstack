@@ -28,15 +28,8 @@ export default function main(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
-        exit(path: NodePath<t.Program>, state: State) {
+        exit(path: NodePath<t.Program>, _state: State) {
           let neededImports: ImportDetails = new Map();
-          if (Object.keys(state.opts.fields).length > 0) {
-            neededImports.set('FieldGetter', {
-              moduleSpecifier: '@cardstack/core/src/field-getter',
-              exportedName: 'default',
-            });
-          }
-
           if (neededImports.size > 0) {
             addImports(neededImports, path, t);
           }
@@ -136,15 +129,7 @@ export default function main(babel: typeof Babel) {
           for (let bodyItem of path.get('body').get('body')) {
             if (t.isClassProperty(bodyItem.node)) {
               handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
-            } else if (t.isClassMethod(bodyItem.node)) {
-              handleClassMethod(bodyItem as NodePath<t.ClassMethod>, state, t);
             }
-          }
-        },
-
-        exit(path: NodePath<t.Class>, state: State) {
-          if (isCompositeCard(state) && Object.keys(state.opts.meta.fields).length > 0) {
-            addPromiseLikeFunctions(path.get('body'), state, babel);
           }
         },
       },
@@ -167,22 +152,6 @@ function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: t
     } else {
       transformCompositeField(path, state, t);
     }
-  });
-}
-
-function handleClassMethod(path: NodePath<t.ClassMethod>, _state: State, t: typeof Babel.types) {
-  forEachValidFieldDecorator(path, t, (p) => {
-    let path = p as NodePath<t.ClassMethod>;
-    path.node.kind = 'get';
-    path.node.async = false;
-    let body = path.get('body');
-    // wraps the original method body with:
-    //  return (async () => {
-    //    ... original body ...
-    //  })();
-    body.replaceWith(
-      t.blockStatement([t.returnStatement(t.callExpression(t.arrowFunctionExpression([], body.node, true), []))])
-    );
   });
 }
 
@@ -220,88 +189,6 @@ function forEachValidFieldDecorator(
 
     cb(path);
   }
-}
-
-function addPromiseLikeFunctions(path: NodePath<t.ClassBody>, state: State, babel: typeof Babel) {
-  let t = babel.types;
-  let className = (path.parent as NodePath<t.ClassDeclaration>['node']).id.name;
-  let getAllValues = babel.template(`
-    let allValues = %%getAllValues%%(this);
-  `)({
-    getAllValues: state.importUtil.import(path, '@cardstack/core/src/utils/schema-class', 'getAllValues'),
-  }) as t.Statement;
-
-  path.node.body.push(
-    // adds a class getter that looks like:
-    //   static get allFields() {
-    //     return ['lastName', 'aboutMe', 'fullName'];
-    //   }
-    t.classMethod(
-      'get',
-      t.identifier('allFields'),
-      [],
-      t.blockStatement([
-        t.returnStatement(t.arrayExpression(Object.keys(state.opts.meta.fields).map((f) => t.stringLiteral(f)))),
-      ]),
-      false,
-      true
-    ),
-
-    // adds a class method that looks like:
-    //   then(resolve) {
-    //     let allValues = getAllValues(this);
-    //     return allValues.then(values => resolve(Object.fromEntries(PersonClass.allFields.map((field, i) => [field, values[i]]))));
-    //   }
-    t.classMethod(
-      'method',
-      t.identifier('then'),
-      [t.identifier('resolve')],
-      t.blockStatement([
-        getAllValues,
-        babel.template(`
-          return allValues.then(values => resolve(Object.fromEntries(%%className%%.allFields.map((field, i) => [field, values[i]]))));
-        `)({ className: t.identifier(className) }) as t.Statement,
-      ])
-    ),
-
-    // adds a class method that looks like:
-    //   catch(err) {
-    //     let allValues = getAllValues(this);
-    //     allValues.catch(err)
-    //   }
-    t.classMethod(
-      'method',
-      t.identifier('catch'),
-      [t.identifier('err')],
-      t.blockStatement([
-        getAllValues,
-        babel.template.ast(`
-        allValues.catch(err);
-      `) as t.Statement,
-      ])
-    ),
-
-    // adds a class method that looks like:
-    //   finally(cb) {
-    //     let allValues = getAllValues(this);
-    //     allValues.finally(cb);
-    //   }
-    t.classMethod(
-      'method',
-      t.identifier('finally'),
-      [t.identifier('cb')],
-      t.blockStatement([
-        getAllValues,
-        babel.template.ast(`
-        allValues.finally(cb);
-      `) as t.Statement,
-      ])
-    )
-  );
-}
-
-function isCompositeCard(state: State) {
-  return cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state) === 'composite';
 }
 
 // we consider a primitive card any card that has no fields
@@ -382,7 +269,7 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
 
 // creates a class method that looks like:
 //   get birthdate() {
-//     return new FieldGetter(this.getRawField, "birthdate");
+//     return this.getRawField("birthdate");
 //   }
 function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
   if (!t.isIdentifier(path.node.key)) {
@@ -397,8 +284,7 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, 
       [],
       t.blockStatement([
         t.returnStatement(
-          t.newExpression(t.identifier('FieldGetter'), [
-            t.memberExpression(t.thisExpression(), t.identifier(state.getRawFieldIdentifier)),
+          t.callExpression(t.memberExpression(t.thisExpression(), t.identifier(state.getRawFieldIdentifier)), [
             t.stringLiteral(fieldName),
           ])
         ),

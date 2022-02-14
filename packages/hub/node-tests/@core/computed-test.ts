@@ -44,13 +44,13 @@ if (process.env.COMPILER) {
               @contains(bio) aboutMe;
 
               @contains(string)
-              async fullName() {
-                return (await this.firstName) + " " + (await this.lastName);
+              get fullName() {
+                return this.firstName + " " + this.lastName;
               }
 
               @contains(string)
-              async summary() {
-                return (await this.fullName) + " is a person. Their story is: " + (await this.aboutMe.short);
+              get summary() {
+                return this.fullName + " is a person. Their story is: " + this.aboutMe.short;
               }
             }
           `,
@@ -85,17 +85,14 @@ if (process.env.COMPILER) {
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
-    it('can access a composite field', async function () {
+    it('can access a synchronous composite field', async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
-      expect(await card.getField('aboutMe')).to.deep.equal({
-        short: 'son of Ed',
-        // note that this loads all the fields of aboutMe, including ones that
-        // are not used by the Person template
-        favoriteColor: 'blue',
-      });
+      let aboutMe = await card.getField('aboutMe');
+      expect(aboutMe.short).to.equal('son of Ed');
+      expect(aboutMe.favoriteColor).to.equal('blue');
     });
 
-    it('can access a computed field defined in parent card', async function () {
+    it('can access a synchronous computed field defined in parent card', async function () {
       await cards.create({
         realm,
         id: 'ains',
@@ -126,9 +123,10 @@ if (process.env.COMPILER) {
       expect(await card.getField('seriesName')).to.equal('Overlord');
     });
 
-    // we can use the field meta short cut here to just return raw data without
-    // having to load the schema module
-    it('can access a primitive field');
+    it('can access an asynchronous field via a contained card');
+    it('can access an asynchronous computed field');
+    it('can access an asynchronous computed field defined in parent card');
+
     it('can access a field that requires deserialization');
     it('can have a field that is the same card as itself');
   });

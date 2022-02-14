@@ -205,7 +205,7 @@ export default class CardModelForBrowser implements CardModel {
     return await schemaInstance[name];
   }
 
-  private async getRawField(fieldPath: string): Promise<any> {
+  private getRawField(fieldPath: string): any {
     // TODO: deserialize only this field, instead of forcing all of this.data to
     // be deserialized
     return get(this.data, fieldPath);

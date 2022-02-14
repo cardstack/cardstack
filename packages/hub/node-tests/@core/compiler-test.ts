@@ -468,8 +468,8 @@ if (process.env.COMPILER) {
               @contains(bio) aboutMe;
 
               @contains(string)
-              async fullName() {
-                return "Mr or Mrs " + await this.lastName;
+              get fullName() {
+                return "Mr or Mrs " + this.lastName;
               }
             }
           `,
@@ -526,47 +526,14 @@ if (process.env.COMPILER) {
         `);
       });
 
-      it('can compile schema class promise functions', async function () {
-        let { compiled } = await cards.load(`${realm}person`);
-        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        expect(source).to.containsSource(`
-          import { getAllValues } from "@cardstack/core/src/utils/schema-class";
-        `);
-        expect(source).to.containsSource(`
-          static get allFields() {
-            return ["lastName", "aboutMe", "fullName"];
-          }
-
-          then(resolve) {
-            let allValues = getAllValues(this);
-            return allValues.then(values => resolve(Object.fromEntries(Person.allFields.map((field, i) => [field, values[i]]))));
-          }
-        `);
-        expect(source).to.containsSource(`
-          catch(err) {
-            let allValues = getAllValues(this);
-            allValues.catch(err);
-          }
-        `);
-        expect(source).to.containsSource(`
-          finally(cb) {
-            let allValues = getAllValues(this);
-            allValues.finally(cb);
-          }
-        `);
-      });
-
       it('can compile primitive field implementation in schema.js module', async function () {
         let { compiled } = await cards.load(`${realm}bio`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
         expect(source).to.containsSource(`
-          import FieldGetter from "@cardstack/core/src/field-getter";
-        `);
-        expect(source).to.containsSource(`
           get birthdate() {
-            return new FieldGetter(this.getRawField0, "birthdate");
+            return this.getRawField0("birthdate");
           }
         `);
       });
@@ -586,18 +553,18 @@ if (process.env.COMPILER) {
         `);
       });
 
-      it('can compile computed field in schema.js module', async function () {
+      it('can compile synchronous computed field in schema.js module', async function () {
         let { compiled } = await cards.load(`${realm}person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
         expect(source).to.not.containsSource(`@contains`);
         expect(source).to.containsSource(`
           get fullName() {
-            return (async () => {
-              return "Mr or Mrs " + (await this.lastName);
-            })();
+            return "Mr or Mrs " + this.lastName;
           }
         `);
       });
+
+      it('can compile async computed field in schema.js module');
 
       it('can compile a schema.js that adopts from a composite card has no additional fields', async function () {
         let { compiled } = await cards.load(`${realm}fancy-person`);
