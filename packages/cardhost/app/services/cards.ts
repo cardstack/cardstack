@@ -83,11 +83,11 @@ export default class Cards extends Service {
     );
   }
 
-  private makeCardModelFromResponse(
+  private async makeCardModelFromResponse(
     cardResponse: ResourceObject,
     componentModule: CardComponentModule,
     format: Format
-  ): CardModel {
+  ): Promise<CardModel> {
     let schemaModuleId = cardResponse.meta?.schemaModule;
     if (!schemaModuleId) {
       throw new Error(
@@ -99,7 +99,7 @@ export default class Cards extends Service {
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
     }
-    return new CardModelForBrowser(this, {
+    let model = new CardModelForBrowser(this, {
       type: 'loaded',
       url: cardResponse.id,
       rawServerResponse: cloneDeep(cardResponse),
@@ -107,6 +107,9 @@ export default class Cards extends Service {
       format,
       schemaModuleId,
     });
+    // TODO: We need to figure out what to do with async mode.data
+    await model.computeData();
+    return model;
   }
 
   private inLocalRealm(cardURL: string): boolean {
