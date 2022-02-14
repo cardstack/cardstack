@@ -22,7 +22,6 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { taskFor } from 'ember-concurrency-ts';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import RouterService from '@ember/routing/router-service';
-import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 import RestorableWorkflowComponent from '../restorable-workflow-component';
 
@@ -203,12 +202,10 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
-          session.getValue('merchantRegistrationFee')
-        )} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
@@ -218,12 +215,10 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
-          session.getValue('merchantRegistrationFee')
-        )} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

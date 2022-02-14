@@ -107,7 +107,7 @@
   word-break: break-word;
 }
 
-.prepaid-card__balance-usd {
+.prepaid-card__balance-currency-symbol {
   font-size: 1.5rem;
 }
 
@@ -116,6 +116,10 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+}
+
+.prepaid-card__content-bottom--without-attributes .prepaid-card__logo {
+  margin-left: auto;
 }
 
 .prepaid-card__logo {
