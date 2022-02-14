@@ -20,7 +20,19 @@ cardpay <command> <arguments> [options]
 The commands are listed below (which you can view using --help option). Each command has arguments specific to it. The options indicate how you wish to connect to your wallet. You can either provide your mnemonic seed (as either an environment variable `MNEMONIC_PHRASE` or using the `--mnemonic` param. Or you can specify `--walletConnect` to use the cardpay wallet app. A QR code will be displayed that you can scan in your cardwallet app, which will connect the CLI to your cardwallet.
 
 ## Running within the development environment
-If you wish to run the CLI within the development environment, then you can use the `yarn cardpay` yarn script. Simple run the command in the `packages/cardpay-cli` workspace and prefix the command with `yarn`. e.g.
+If you wish to run the CLI within the development environment, then you can use the `yarn cardpay` yarn script.
+
+First, ensure that the monorepo and cardpay-sdk package are setup correctly:
+```sh
+cd cardstack
+yarn
+cd packages/cardpay-sdk
+yarn prepack
+cd ../cardpay-cli
+```
+
+Then, simply run the command in the `packages/cardpay-cli` workspace and prefix the command with `yarn`. e.g.
+
 ```sh
 yarn cardpay safe list --walletConnect
 ```
