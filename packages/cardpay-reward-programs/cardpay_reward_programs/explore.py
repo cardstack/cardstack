@@ -10,12 +10,12 @@ reward_program = st.sidebar.selectbox(
             "name": "CardPay Usage",
             "view_functions": [
                 {
-                    "name": "Range",
-                    "view": programs.usage.view.view_range,
-                },
-                {
                     "name": "Historical",
                     "view": programs.usage.view.view_historical,
+                },
+                {
+                    "name": "Range",
+                    "view": programs.usage.view.view_range,
                 },
             ],
         }
