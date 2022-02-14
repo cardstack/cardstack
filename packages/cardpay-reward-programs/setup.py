@@ -27,6 +27,10 @@ setup(
         "explore": [
             "streamlit",
             "altair",
+        ],
+        "dev": [
+            "black",
+            "isort"
         ]
     },
     entry_points={
