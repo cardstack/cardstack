@@ -1,6 +1,8 @@
 import * as JSON from 'json-typescript';
-import { RawCard, CompiledCard, Field } from '../interfaces';
-import { serializeResource, findIncluded } from './index';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import { RawCard, CompiledCard, Field, ResourceObject, Unsaved, Saved } from '../interfaces';
+import { findIncluded } from './index';
 
 export class RawCardSerializer {
   doc: any;
@@ -66,4 +68,31 @@ export class RawCardSerializer {
     }
     return { type: 'fields', id };
   }
+}
+
+function serializeResource<Identity extends Saved | Unsaved>(
+  type: string,
+  id: Identity,
+  payload: any,
+  attributes?: (string | Record<string, string>)[]
+): ResourceObject<Identity> {
+  let resource: ResourceObject<Identity> = {
+    id,
+    type,
+  };
+  resource.attributes = {};
+
+  if (!attributes) {
+    attributes = Object.keys(payload);
+  }
+
+  for (const attr of attributes) {
+    if (typeof attr === 'object') {
+      let [aliasName, name] = Object.entries(attr)[0];
+      set(resource.attributes, aliasName, get(payload, name) ?? null);
+    } else {
+      set(resource.attributes, attr, get(payload, attr) ?? null);
+    }
+  }
+  return resource;
 }

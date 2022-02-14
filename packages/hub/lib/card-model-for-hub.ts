@@ -10,7 +10,7 @@ import {
   Unsaved,
   RawCardData,
 } from '@cardstack/core/src/interfaces';
-import { deserializeAttributes, serializeAttributes, serializeResource } from '@cardstack/core/src/serializers';
+import { deserializeAttributes, serializeAttributes, serializeCardAsResource } from '@cardstack/core/src/serializers';
 import { getOwner } from '@cardstack/di';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
@@ -182,10 +182,11 @@ export default class CardModelForHub implements CardModel {
 
   serialize(): ResourceObject<Saved | Unsaved> {
     if (this.state.type === 'created') {
-      return serializeResource('card', undefined, serializeAttributes(this.data, this.serializerMap), this.usedFields);
+      return serializeCardAsResource(undefined, this.data, this.serializerMap);
     }
-    let { usedFields, componentModule, schemaModule } = this.state;
-    let resource = serializeResource('card', this.url, serializeAttributes(this.data, this.serializerMap), usedFields);
+
+    let resource = serializeCardAsResource(this.url, this.data, this.serializerMap, this.usedFields);
+    let { componentModule, schemaModule } = this.state;
     resource.meta = merge(
       {
         componentModule,
@@ -193,6 +194,7 @@ export default class CardModelForHub implements CardModel {
       },
       resource.meta
     );
+
     return resource;
   }
 
