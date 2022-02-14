@@ -19,7 +19,7 @@ setup(
         "eth_utils",
         "eth_abi",
         "eth_typing",
-        "merklelib @ git+https://git@github.com/tintinthong/merklelib@master#egg=merklelib",
+        "merklelib @ git+https://git@github.com/cardstack/merklelib@master#egg=merklelib",
         "pysha3",
         "pyarrow",
     ],
@@ -28,10 +28,7 @@ setup(
             "streamlit",
             "altair",
         ],
-        "dev": [
-            "black",
-            "isort"
-        ]
+        "dev": ["black", "isort"],
     },
     entry_points={
         "console_scripts": ["run_reward_program=cardpay_reward_programs.main:cli"],
