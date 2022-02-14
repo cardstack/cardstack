@@ -372,7 +372,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
-      serializerMap: {},
     };
 
     let { source, ast } = transformCardComponent(templateSource, options);
@@ -386,7 +385,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       moduleName: { local: moduleName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
-      serializerMap: options.serializerMap,
     };
 
     return componentInfo;
@@ -460,7 +458,6 @@ export function makeGloballyAddressable(
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
-      serializerMap: info.serializerMap,
     };
   }
 

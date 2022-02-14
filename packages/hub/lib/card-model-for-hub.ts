@@ -2,13 +2,14 @@ import {
   CardModel,
   SerializerMap,
   CompiledCard,
-  ComponentInfo,
   RawCard,
   Format,
   ResourceObject,
   Saved,
   Unsaved,
   RawCardData,
+  CardComponentModule,
+  ComponentUsedFields,
 } from '@cardstack/core/src/interfaces';
 import { deserializeAttributes, serializeAttributes, serializeCardAsResource } from '@cardstack/core/src/serializers';
 import { getOwner } from '@cardstack/di';
@@ -29,8 +30,7 @@ export interface CreatedState {
   realm: string;
   id?: string;
   parentCardURL: string;
-  serializerMap: SerializerMap;
-  usedFields: ComponentInfo['usedFields'];
+  componentModule: CardComponentModule;
   deserialized: boolean;
   schemaModule: CompiledCard['schemaModule']['global'];
 }
@@ -40,11 +40,9 @@ interface LoadedState {
   id: string;
   realm: string;
   format: Format;
-  serializerMap: SerializerMap;
   rawData: NonNullable<RawCard['data']>;
   schemaModule: CompiledCard['schemaModule']['global'];
-  componentModule: ComponentInfo['moduleName']['global'];
-  usedFields: ComponentInfo['usedFields'];
+  componentModule: CardComponentModule;
   deserialized: boolean;
   original: CardModel | undefined;
 }
@@ -96,11 +94,10 @@ export default class CardModelForHub implements CardModel {
       type: 'created',
       realm,
       id,
-      usedFields: this.usedFields,
       parentCardURL: this.url,
-      serializerMap: this.serializerMap,
       deserialized: true,
       schemaModule: this.state.schemaModule,
+      componentModule: this.state.componentModule,
     });
   }
 
@@ -109,7 +106,7 @@ export default class CardModelForHub implements CardModel {
   }
 
   get serializerMap(): SerializerMap {
-    return this.state.serializerMap;
+    return this.state.componentModule.getCardModelOptions().serializerMap;
   }
 
   get id(): string | undefined {
@@ -130,8 +127,8 @@ export default class CardModelForHub implements CardModel {
     return this.state.format;
   }
 
-  get usedFields(): ComponentInfo['usedFields'] {
-    return this.state.usedFields;
+  get usedFields(): ComponentUsedFields {
+    return this.state.componentModule.getCardModelOptions().usedFields;
   }
 
   async editable(): Promise<CardModel> {
@@ -234,11 +231,9 @@ export default class CardModelForHub implements CardModel {
       format: this.format,
       id: raw.id,
       realm: raw.realm,
-      serializerMap: compiled.componentInfos['isolated'].serializerMap,
+      componentModule: this.state.componentModule,
       rawData: raw.data ?? {},
       schemaModule: compiled.schemaModule.global,
-      componentModule: compiled.componentInfos['isolated'].moduleName.global,
-      usedFields: compiled.componentInfos['isolated'].usedFields,
       original: undefined,
       deserialized: false,
     };

@@ -66,7 +66,7 @@ if (process.env.COMPILER) {
       cardDBResult = result;
     });
 
-    it('.data', async function () {
+    it.only('.data', async function () {
       // TODO: I made makeCardModelFromDatabase private because it shouldn't be
       // exposed. This test should be refactored to use public API, and the
       // public API around data may be changing anyway to account for including

@@ -148,11 +148,11 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   deps: string[];
 }
 
+export type ComponentUsedFields = string[]; // ["title", "author.firstName"]
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   moduleName: Ref;
-  usedFields: string[]; // ["title", "author.firstName"]
-
-  serializerMap: SerializerMap;
+  // Used in serialization and during compilation build up nested used fields list
+  usedFields: ComponentUsedFields;
 
   // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;

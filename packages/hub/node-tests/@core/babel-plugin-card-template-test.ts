@@ -5,7 +5,6 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { ADDRESS_RAW_CARD } from '@cardstack/core/tests/helpers';
-import { SERIALIZERS } from '@cardstack/core/src/serializers';
 
 if (process.env.COMPILER) {
   describe('Babel CardTemplatePlugin', function () {
@@ -57,7 +56,6 @@ if (process.env.COMPILER) {
         inlineHBS: undefined,
         defaultFieldFormat: 'embedded',
         usedFields: [],
-        serializerMap: {},
       };
       let src = templateOnlyComponentTemplate(
         '<div><h1><@fields.name /><@fields.fullName /></h1><@fields.birthdate /> <@fields.address /></div>'
@@ -77,13 +75,6 @@ if (process.env.COMPILER) {
         'address.zip',
         'address.settlementDate',
       ]);
-    });
-
-    it('includes the serializerMap', async function () {
-      expect(options.serializerMap).to.deep.equal({
-        birthdate: SERIALIZERS['DateSerializer'],
-        'address.settlementDate': SERIALIZERS['DateSerializer'],
-      });
     });
 
     it('adds an import for the cards needed Serializer', async function () {

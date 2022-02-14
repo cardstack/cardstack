@@ -254,6 +254,9 @@ class IndexerRun implements IndexerHandle {
       this.define(cardURL(rawCard), local, type, src, ast)
     );
     let format: Format = 'isolated';
+
+    let componentModule = await this.fileCache.loadModule(definedCard.componentInfos[format].moduleName.global);
+
     let cardModel = await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: rawCard.id,
@@ -261,9 +264,7 @@ class IndexerRun implements IndexerHandle {
       format,
       rawData: rawCard.data ?? {},
       schemaModule: definedCard.schemaModule.global,
-      usedFields: definedCard.componentInfos[format].usedFields,
-      componentModule: definedCard.componentInfos[format].moduleName.global,
-      serializerMap: definedCard.componentInfos[format].serializerMap,
+      componentModule,
     });
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }

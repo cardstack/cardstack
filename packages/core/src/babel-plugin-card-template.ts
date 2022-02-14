@@ -9,22 +9,20 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
 
-import { CompiledCard, SerializerName, Format, SerializerMap, Field } from './interfaces';
+import { CompiledCard, SerializerName, Format, Field, ComponentUsedFields } from './interfaces';
 
 import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta, getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
-import { SERIALIZERS } from './serializers';
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
   // these are for gathering output
-  usedFields: string[];
+  usedFields: ComponentUsedFields;
   inlineHBS: string | undefined;
-  serializerMap: SerializerMap;
 }
 
 interface State {
@@ -64,7 +62,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         exit(path: NodePath<t.Program>, state: State) {
           let { fields, usedFields } = state.opts;
           let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
-          state.opts.serializerMap = hydrateSerializerMap(serializerMap);
           addSerializerMapImports(state.neededImports, serializerMap);
           addImports(state.neededImports, path, t);
           addGetCardModelOptions({ path, babel, fields, usedFields, serializerMap });
@@ -322,13 +319,4 @@ function addSerializerMapImports(neededImports: ImportDetails, serializerMap: In
   new Set(Object.values(serializerMap)).forEach((i) => {
     neededImports.set(i, { moduleSpecifier: '@cardstack/core/src/serializers', exportedName: i });
   });
-}
-
-function hydrateSerializerMap(ismap: IntermediateSerializerMap): SerializerMap {
-  let serializerMap: SerializerMap = {};
-  let keys = Object.keys(ismap);
-  for (const key of keys) {
-    serializerMap[key] = SERIALIZERS[ismap[key]];
-  }
-  return serializerMap;
 }

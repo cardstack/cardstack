@@ -11,6 +11,7 @@ import {
   ComponentInfo,
   CardComponentModule,
   CardSchemaModule,
+  SerializerMap,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
@@ -288,7 +289,7 @@ export default class CardModelForBrowser implements CardModel {
     return serializeCardAsResource(url, this.data, this.serializerMap);
   }
 
-  get serializerMap(): ComponentInfo['serializerMap'] {
+  get serializerMap(): SerializerMap {
     return this.state.componentModule.getCardModelOptions().serializerMap;
   }
 
