@@ -135,7 +135,7 @@ export class CardService {
       rawData: result.data ?? {},
       schemaModule: result.schemaModule,
       usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
+      componentModule: result.componentInfos[format].componentModule.global,
       serializerMap: result.componentInfos[format].serializerMap,
     });
   }

@@ -154,7 +154,8 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 }
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
-  moduleName: Ref;
+  componentModule: Ref;
+  metaModule?: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
   serializerMap: SerializerMap;

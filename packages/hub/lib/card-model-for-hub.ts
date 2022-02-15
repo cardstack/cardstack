@@ -44,7 +44,7 @@ interface LoadedState {
   serializerMap: SerializerMap;
   rawData: NonNullable<RawCard['data']>;
   schemaModule: CompiledCard['schemaModule']['global'];
-  componentModule: ComponentInfo['moduleName']['global'];
+  componentModule: ComponentInfo['componentModule']['global'];
   usedFields: ComponentInfo['usedFields'];
   deserialized: boolean;
   original: CardModel | undefined;
@@ -237,7 +237,7 @@ export default class CardModelForHub implements CardModel {
       serializerMap: compiled.componentInfos['isolated'].serializerMap,
       rawData: raw.data ?? {},
       schemaModule: compiled.schemaModule.global,
-      componentModule: compiled.componentInfos['isolated'].moduleName.global,
+      componentModule: compiled.componentInfos['isolated'].componentModule.global,
       usedFields: compiled.componentInfos['isolated'].usedFields,
       original: undefined,
       deserialized: false,
