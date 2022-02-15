@@ -5,6 +5,8 @@ import { inject } from '@cardstack/di';
 import logger from '@cardstack/logger';
 const log = logger('hub/contract-subscription-event-handler');
 
+export const HISTORIC_BLOCKS_AVAILABLE = 10000;
+
 export const CONTRACT_EVENTS = [
   {
     abiName: 'pay-merchant-handler',
@@ -32,10 +34,13 @@ export class ContractSubscriptionEventHandler {
     let web3Instance = this.web3.getInstance();
 
     let subscriptionOptions = {};
-    let latestBlock = await this.latestEventBlockQueries.read();
+    let subscriptionEventLatestBlock = await this.latestEventBlockQueries.read();
 
-    if (latestBlock) {
-      subscriptionOptions = { fromBlock: latestBlock };
+    if (subscriptionEventLatestBlock) {
+      let latestBlock = await web3Instance.eth.getBlockNumber();
+      let fromBlock = Math.max(latestBlock - HISTORIC_BLOCKS_AVAILABLE + 1, subscriptionEventLatestBlock);
+
+      subscriptionOptions = { fromBlock };
     }
 
     for (let contractEvent of CONTRACT_EVENTS) {
