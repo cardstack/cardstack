@@ -13,7 +13,6 @@ import IsIOS from '../services/is-ios';
 import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/web-client/config/environment';
-import { formatAmount } from '../helpers/format-amount';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
 
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
@@ -57,11 +56,7 @@ export default class PayController extends Controller {
       return {
         amount,
         displayed: {
-          amount: `§${formatAmount(amount)}`,
-          secondaryAmount: convertAmountToNativeDisplay(
-            spendToUsd(amount)!,
-            'USD'
-          ),
+          amount: convertAmountToNativeDisplay(spendToUsd(amount)!, 'USD'),
         },
       };
     } else if (this.currency === 'USD') {
@@ -73,15 +68,12 @@ export default class PayController extends Controller {
         amount,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, 'USD'),
-          secondaryAmount: `§${formatAmount(
-            convertToSpend(Number(amount), 'USD', 1)!
-          )}`,
         },
       };
     } else {
       let rate = this.model.exchangeRates?.[this.currency];
       let amount: number;
-      let formattedSpendAmount: string | undefined;
+      let usdAmount: string | undefined;
       if (rate) {
         amount = Number(
           roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
@@ -93,19 +85,22 @@ export default class PayController extends Controller {
           spendAmount = convertToSpend(amount, this.currency, rate);
         }
 
-        formattedSpendAmount = `§${formatAmount(spendAmount)}`;
+        usdAmount = convertAmountToNativeDisplay(
+          spendToUsd(spendAmount)!,
+          'USD'
+        );
       } else {
         amount = Number(
           roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
         );
-        formattedSpendAmount = undefined;
+        usdAmount = undefined;
       }
 
       return {
         amount,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, this.currency),
-          secondaryAmount: formattedSpendAmount,
+          secondaryAmount: usdAmount,
         },
       };
     }
