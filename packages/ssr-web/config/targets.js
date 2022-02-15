@@ -11,4 +11,5 @@ const browsers = [
 
 module.exports = {
   browsers,
+  node: 'current'
 };

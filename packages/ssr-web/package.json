@@ -110,7 +110,7 @@
     "ember-css-url": "^0.2.1",
     "ember-data": "~3.25.0",
     "ember-export-application-global": "^2.0.1",
-    "ember-fetch": "^8.0.4",
+    "ember-fetch": "^8.1.1",
     "ember-focus-trap": "^0.6.0",
     "ember-head": "^0.1.0",
     "ember-load-initializers": "^2.1.2",

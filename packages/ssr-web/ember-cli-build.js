@@ -11,6 +11,9 @@ process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
+    'ember-fetch': {
+      preferNative: true,
+    },
     svgJar: {
       strategy: 'inline',
       sourceDirs: ['public'],
