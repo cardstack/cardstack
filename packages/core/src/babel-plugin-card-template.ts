@@ -11,7 +11,7 @@ import { ImportUtil } from 'babel-import-util';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
-import { getObjectKey, error, ImportDetails, addImports } from './utils/babel';
+import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
@@ -30,9 +30,6 @@ interface State {
   opts: CardComponentPluginOptions;
   insideExportDefault: boolean;
   importUtil: ImportUtil;
-
-  // keys are local names in this module that we have chosen.
-  neededImports: ImportDetails;
 }
 
 export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
@@ -58,10 +55,8 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
-          state.neededImports = new Map();
         },
         exit(path: NodePath<t.Program>, state: State) {
-          addImports(state.neededImports, path, t);
           addGetCardModelOptions(path, state, babel);
         },
       },
@@ -142,7 +137,7 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: 
 
   let { options, template: inputTemplate } = handleArguments(path, t);
 
-  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.neededImports);
+  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope, t)) {
@@ -209,16 +204,12 @@ function transformTemplate(
   source: string,
   path: NodePath<t.CallExpression>,
   opts: CardComponentPluginOptions,
-  importNames: State['neededImports']
+  importUtil: ImportUtil
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
 
   function importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string): string {
-    let name = findVariableName(`${desiredName}Field`, path, importNames);
-    importNames.set(name, {
-      moduleSpecifier,
-      exportedName: importedName,
-    });
+    let { name } = importUtil.import(path, moduleSpecifier, importedName, `${desiredName}Field`);
     neededScope.add(name);
     return name;
   }
@@ -236,19 +227,6 @@ function transformTemplate(
   opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
 
   return { template, neededScope };
-}
-
-function findVariableName(
-  desiredName: string,
-  path: NodePath<t.CallExpression> | NodePath<t.Program>,
-  importNames: State['neededImports']
-) {
-  let candidate = desiredName;
-  let counter = 0;
-  while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
-    candidate = `${desiredName}${counter++}`;
-  }
-  return candidate;
 }
 
 function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {

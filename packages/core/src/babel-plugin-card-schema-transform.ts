@@ -2,7 +2,7 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
-import { addImports, error, ImportDetails, unusedClassMember } from './utils/babel';
+import { error, unusedClassMember } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
@@ -27,12 +27,6 @@ export default function main(babel: typeof Babel) {
       Program: {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
-        },
-        exit(path: NodePath<t.Program>, _state: State) {
-          let neededImports: ImportDetails = new Map();
-          if (neededImports.size > 0) {
-            addImports(neededImports, path, t);
-          }
         },
       },
 
