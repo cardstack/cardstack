@@ -316,11 +316,11 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get serializerMap(): ComponentInfo['serializerMap'] {
-    return this.state.componentModule.getCardModelOptions().serializerMap;
+    return this.state.componentModule.ComponentMeta.serializerMap;
   }
 
   get usedFields(): ComponentInfo['usedFields'] {
-    return this.state.componentModule.getCardModelOptions().usedFields;
+    return this.state.componentModule.ComponentMeta.usedFields;
   }
 
   async save(): Promise<void> {
