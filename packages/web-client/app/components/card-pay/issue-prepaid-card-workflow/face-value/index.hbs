@@ -7,13 +7,6 @@
 >
   <ActionCardContainer::Section @title="Choose the face value of your prepaid card" class="face-value-card__section">
     <div class="face-value-card__container">
-      <p class="face-value-card__exchange">
-        <span>Prepaid cards are denominated in SPEND:</span>
-        <span class="face-value-card__exchange-rate">
-          {{svg-jar "spend" width="20" height="20" role="presentation"}}
-          §1 SPEND = {{format-usd (spend-to-usd 1)}}
-        </span>
-      </p>
       <Boxel::Field @vertical={{true}} @label="Funding From:">
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
@@ -26,12 +19,10 @@
           <CardPay::BalanceDisplay
             class="face-value-card__selected-amount-display"
             @size="large"
-            @icon="spend"
-            @sign="§"
-            @symbol="SPEND"
-            @balance={{format-amount this.selectedFaceValue.spendAmount}}
-            @usdBalance={{spend-to-usd this.selectedFaceValue.spendAmount}}
-            @text={{concat "≈ " this.selectedFaceValue.approxTokenAmount " " this.fundingTokenSymbol "*"}}
+            @sign="$"
+            @symbol="USD"
+            @balance={{format-amount (spend-to-usd this.selectedFaceValue.spendAmount) 2}}
+            @text={{concat "= " this.selectedFaceValue.approxTokenAmount " " this.fundingTokenSymbol "*"}}
             data-test-face-value-display
           />
         </Boxel::Field>
@@ -59,12 +50,6 @@
         </Boxel::RadioInput>
       {{/if}}
     </div>
-    <small class="face-value-card__footnote">
-      * The value of the {{this.fundingTokenSymbol}} token that backs your prepaid card
-      may fluctuate based on the {{uppercase this.fundingToken.name}}-USD exchange rate.
-      Due to this, the face value of the card at the time of issuance may differ slightly
-      from the spendable balance of the card at the time the card is used for purchases.
-    </small>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}

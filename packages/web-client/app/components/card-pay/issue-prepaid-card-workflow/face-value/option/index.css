@@ -15,4 +15,5 @@
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
+  margin-top: 2px;
 }

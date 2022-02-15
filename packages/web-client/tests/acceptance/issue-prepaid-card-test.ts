@@ -367,9 +367,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .doesNotExist();
     assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isNotDisabled();
     assert.dom(`[${FACEVALUE_OPTION}="50000"] input`).isDisabled();
-    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('50,000 SPEND');
-    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('$500 USD');
-    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('≈ 500 DAI.CPXD');
+    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('$500.00 USD');
+    assert.dom(`[${FACEVALUE_OPTION}="50000"]`).containsText('= 500 DAI.CPXD');
     assert.dom(`[${FACEVALUE_OPTION}="10000"] input`).isNotDisabled();
     assert.dom(`[${FACEVALUE_OPTION}="5000"] input`).isNotDisabled();
     await click(`[${FACEVALUE_OPTION}="5000"]`);
@@ -386,7 +385,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     assert.dom(`[${FACEVALUE_OPTION}]`).doesNotExist();
-    assert.dom('[data-test-face-value-display]').containsText('5,000 SPEND');
     await click(
       `${postableSel(
         2,
@@ -403,9 +401,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-face-value-display]').containsText('10,000 SPEND');
     assert.dom('[data-test-face-value-display]').containsText('$100.00 USD');
-    assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
+    assert.dom('[data-test-face-value-display]').containsText('= 100 DAI.CPXD');
 
     await waitFor(milestoneCompletedSel(2));
     assert.dom(milestoneCompletedSel(2)).containsText('Face value chosen');
@@ -429,15 +426,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
       )
-      .containsText('10,000 SPEND')
       .containsText('$100.00 USD');
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
-      .containsText('10,000');
-    assert
-      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
-      .containsText('100');
+      .containsText('$100.00 USD');
+
     assert.dom(`${post} [data-test-prepaid-card-attributes]`).doesNotExist();
 
     assert.dom(

@@ -21,7 +21,7 @@ import {
 import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
+
 import {
   createDepotSafe,
   createPrepaidCardSafe,
@@ -239,7 +239,7 @@ module('Acceptance | create merchant', function (hooks) {
     await visit('/card-pay/wallet');
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§0', 'expected card balance to have updated');
+      .containsText('0 USD', 'expected card balance to have updated');
   });
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {
@@ -511,12 +511,10 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
-          merchantRegistrationFee
-        )} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -553,12 +551,10 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
-          merchantRegistrationFee
-        )} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')

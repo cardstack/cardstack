@@ -96,10 +96,8 @@ module(
         );
       });
       assert.dom('.prepaid-card__address').containsText('0xF848...2aD7');
-      assert.dom('[data-test-prepaid-card-balance]').containsText('§500');
-      assert
-        .dom('[data-test-prepaid-card-usd-balance]')
-        .containsText('$5.00 USD');
+      assert.dom('[data-test-prepaid-card-balance]').containsText('$5.00 USD');
+
       assert
         .dom(
           '[data-test-prepaid-card-pattern="/images/backgrounds/mock-theme-1.svg"]'
@@ -141,10 +139,7 @@ module(
         .dom('[data-test-prepaid-card-issuer-name]')
         .containsText('Luke and Michael');
       assert.dom('.prepaid-card__address').containsText('0xF848...2aD7');
-      assert.dom('[data-test-prepaid-card-balance]').containsText('§500');
-      assert
-        .dom('[data-test-prepaid-card-usd-balance]')
-        .containsText('$5.00 USD');
+      assert.dom('[data-test-prepaid-card-balance]').containsText('$5.00 USD');
       assert
         .dom(
           '[data-test-prepaid-card-pattern="/images/backgrounds/mock-theme-1.svg"]'

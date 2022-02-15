@@ -11,6 +11,7 @@ import {
   ComponentInfo,
   CardComponentModule,
   CardSchemaModule,
+  SerializerName,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
@@ -20,9 +21,9 @@ import { hbs } from 'ember-cli-htmlbars';
 import { cloneDeep } from 'lodash';
 import { tracked as _tracked } from '@glimmer/tracking';
 import {
-  deserializeAttributes,
-  serializeAttributes,
+  inversedSerializerMap,
   serializeResource,
+  SERIALIZERS,
 } from '@cardstack/core/src/serializers';
 import set from 'lodash/set';
 import get from 'lodash/get';
@@ -66,6 +67,9 @@ export default class CardModelForBrowser implements CardModel {
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
   private _schemaInstance: any | undefined;
+  private _schemaClass: CardSchemaModule['default'] | undefined;
+
+  private inversedSerializerMap: Record<string, SerializerName>;
 
   constructor(
     private cards: Cards,
@@ -81,6 +85,10 @@ export default class CardModelForBrowser implements CardModel {
         original: undefined,
       };
     }
+
+    // TEMP: needed until serializerMap restructure
+    this.inversedSerializerMap = inversedSerializerMap(this.serializerMap);
+
     this.setters = this.makeSetter();
     let prop = tracked(this, '_data', {
       enumerable: true,
@@ -147,26 +155,27 @@ export default class CardModelForBrowser implements CardModel {
       'edit'
     )) as CardModelForBrowser;
 
+    // TODO: This is temp until we figure out the async data issue
+    // Without this .data is not populated
+    await editable.computeData();
+
     (editable.state as LoadedState).original = this;
     return editable;
   }
 
+  // TODO: Consolidate this into getField work
+  // It cant happen until the syncData we generate
+  // in component is the same data we use elsewhere
   get data(): any {
-    switch (this.state.type) {
-      case 'loaded':
-        if (!this.state.deserialized) {
-          this._data = deserializeAttributes(
-            this.state.rawServerResponse.attributes,
-            this.state.componentModule.getCardModelOptions().serializerMap
-          );
-          this.state.deserialized = true;
-        }
-        return this._data;
-      case 'created':
-        return this._data;
-      default:
-        throw assertNever(this.state);
+    return this._data;
+  }
+
+  async computeData() {
+    let syncData: Record<string, any> = {};
+    for (let field of this.usedFields) {
+      set(syncData, field, await this.getField(field));
     }
+    this._data = syncData;
   }
 
   async component(): Promise<unknown> {
@@ -174,16 +183,14 @@ export default class CardModelForBrowser implements CardModel {
       let innerComponent = this.state.componentModule.default;
       let self = this;
 
-      let syncData: Record<string, any> = {};
-      for (let field of this.usedFields) {
-        set(syncData, field, await this.getField(field));
-      }
+      await this.computeData();
 
       this.wrapperComponent = setComponentTemplate(
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
         class extends Component {
           component = innerComponent;
-          data = syncData;
+          // TODO: Ed mentioned something about this needing to be full separate. Should we clone?
+          data = self.data;
           set = self.setters;
         }
       );
@@ -191,35 +198,61 @@ export default class CardModelForBrowser implements CardModel {
     return this.wrapperComponent;
   }
 
-  async getField(name: string): Promise<any> {
+  async getField(fieldPath: string): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
     //   return get(this.data, name);
     // }
 
-    // TODO we probably want to cache the schemaInstance. It should only be
-    // created the first time it's needed
+    if (!this._schemaInstance) {
+      let klass = await this.schemaClass();
+      // We can't await the instance creation in a separate, as it's thenable and confuses async methods
+      this._schemaInstance = new klass(this.getRawField.bind(this)) as any;
+    }
 
-    // TODO need to deserialize value
-    let schemaInstance = await this.schemaInstance();
-    return await schemaInstance[name];
+    // If the path is deeply nested, we need to recurse the down
+    // the schema instances until we get to a field getter
+    function getGetter(schema: any, path: string): any {
+      let [key, ...tail] = path.split('.');
+      let getter = schema[key];
+      if (tail && tail.length) {
+        return getGetter(getter, tail.join('.'));
+      }
+      return getter;
+    }
+
+    let getter = getGetter(this._schemaInstance, fieldPath);
+    return await getter;
+  }
+
+  get rawData(): any {
+    if (this.state.type === 'loaded') {
+      return this.state.rawServerResponse.attributes;
+    }
+
+    // TODO: not sure
+    return {};
   }
 
   private getRawField(fieldPath: string): any {
-    // TODO: deserialize only this field, instead of forcing all of this.data to
-    // be deserialized
-    return get(this.data, fieldPath);
+    let value = get(this.rawData, fieldPath);
+    return serializeField(
+      this.inversedSerializerMap,
+      fieldPath,
+      value,
+      'deserialize'
+    );
   }
 
-  async schemaInstance() {
-    if (this._schemaInstance) {
-      return this._schemaInstance;
+  async schemaClass() {
+    if (this._schemaClass) {
+      return this._schemaClass;
     }
-    let SchemaClass = (
+    this._schemaClass = (
       await this.cards.loadModule<CardSchemaModule>(this.state.schemaModuleId)
     ).default;
-    this._schemaInstance = new SchemaClass(this.getRawField.bind(this));
-    return this._schemaInstance;
+
+    return this._schemaClass;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -267,14 +300,23 @@ export default class CardModelForBrowser implements CardModel {
       url = cardURL({ realm: this.state.realm, id: this.state.id });
     }
 
-    return serializeResource(
-      'card',
-      url,
-      serializeAttributes(
-        this.data,
-        this.state.componentModule.getCardModelOptions().serializerMap
-      )
-    );
+    let attributes = cloneDeep(this.data);
+    let map = this.inversedSerializerMap;
+    for (let field of Object.keys(map)) {
+      let value = serializeField(
+        this.inversedSerializerMap,
+        field,
+        get(attributes, field),
+        'serialize'
+      );
+      set(attributes, field, value);
+    }
+
+    return serializeResource('card', url, attributes);
+  }
+
+  get serializerMap(): ComponentInfo['serializerMap'] {
+    return this.state.componentModule.getCardModelOptions().serializerMap;
   }
 
   get usedFields(): ComponentInfo['usedFields'] {
@@ -378,4 +420,22 @@ function tracked(
 
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
+}
+
+function serializeField(
+  serializerMap: Record<string, SerializerName>,
+  fieldPath: string,
+  value: any,
+  action: 'serialize' | 'deserialize'
+) {
+  if (!value) {
+    return;
+  }
+  let serializerName = get(serializerMap, fieldPath);
+  if (serializerName) {
+    let serializer = SERIALIZERS[serializerName];
+    return serializer[action](value);
+  }
+
+  return value;
 }
