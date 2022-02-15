@@ -7,27 +7,6 @@
   gap: var(--boxel-sp);
 }
 
-.face-value-card__exchange {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--boxel-sp-xs) var(--boxel-sp);
-  background-color: var(--boxel-light-400);
-  border-radius: 200px;
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.face-value-card__exchange-rate {
-  display: flex;
-  align-items: center;
-  font: 700 var(--boxel-font-sm);
-}
-
-.face-value-card__exchange-rate svg {
-  margin: 0 var(--boxel-sp-xs);
-}
-
 .face-value-card__selected-amount-display {
   display: flex;
   align-items: center;
@@ -38,11 +17,4 @@
   padding: var(--boxel-sp-xl) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
-}
-
-.face-value-card__footnote {
-  display: block;
-  color: var(--boxel-purple-400);
-  font: var(--boxel-font-xs);
-  letter-spacing: var(--boxel-lsp-lg);
 }

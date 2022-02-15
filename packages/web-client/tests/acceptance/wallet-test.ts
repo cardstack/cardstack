@@ -67,7 +67,7 @@ module('Acceptance | wallet', function (hooks) {
 
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§2,324')
+      .containsText('$23.24 USD')
       .containsText('0x1234...abcd');
 
     assert
@@ -102,7 +102,7 @@ module('Acceptance | wallet', function (hooks) {
 
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§4,648')
+      .containsText('$46.48 USD')
       .containsText('0x5678...abcd');
 
     await percySnapshot(assert);

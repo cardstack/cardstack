@@ -18,7 +18,7 @@ const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your business account. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the 100 SPEND ($1.00 USD) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the $1.00 USD business account creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
 const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your business account. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
@@ -102,7 +102,7 @@ module(
         );
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
-        .containsText('100 SPEND');
+        .containsText('$1.00 USD');
       assert
         .dom('[data-test-merchant]')
         .hasAttribute('data-test-merchant', 'Mandello');
@@ -159,7 +159,7 @@ module(
         .containsText(prepaidCardAddress);
       assert
         .dom(`[data-test-prepaid-card-choice-selected-card]`)
-        .containsText('2,324 SPEND');
+        .containsText('$23.24 USD');
 
       await selectPrepaidCard(prepaidCardAddress2);
 
@@ -173,7 +173,7 @@ module(
         .containsText(prepaidCardAddress2);
       assert
         .dom(`[data-test-prepaid-card-choice-selected-card]`)
-        .containsText('500 SPEND');
+        .containsText('$5.00 USD');
     });
 
     test('it displays the correct data in in-progress state', async function (assert) {
@@ -188,7 +188,7 @@ module(
         );
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
-        .containsText('100 SPEND');
+        .containsText('$1.00 USD');
       assert
         .dom('[data-test-prepaid-card-choice-merchant-id]')
         .containsText('mandello1');

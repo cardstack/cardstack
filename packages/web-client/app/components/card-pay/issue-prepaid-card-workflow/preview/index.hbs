@@ -61,11 +61,9 @@
         >
           <CardPay::BalanceDisplay
             class="preview__spend-face-value"
-            @icon="spend"
-            @sign="§"
-            @symbol="SPEND"
-            @balance={{format-amount this.faceValue}}
-            @usdBalance={{spend-to-usd this.faceValue}}
+            @sign="$"
+            @symbol="USD"
+            @balance={{format-amount (spend-to-usd this.faceValue) 2}}
           />
         </Boxel::Field>
       </CardPay::FieldStack>
