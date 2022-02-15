@@ -4,8 +4,6 @@
 This is designed to reward users using any part of the cardpay network
 """
 
-import re
-
 import duckdb
 import pandas as pd
 
