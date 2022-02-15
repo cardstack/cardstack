@@ -5,3 +5,4 @@ tmp/
 input/*
 dist/*
 mycache/*
+__pycache__
