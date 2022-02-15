@@ -10,14 +10,14 @@ import pandas as pd
 from ..utils import get_files
 
 
-class UsageRewardProgram:
-    def __init__(
-        self, config_location, reward_program_id: str, payment_cycle_length: int
-    ):
+class Program:
+    def __init__(self, config_location, reward_program_id: str, payment_cycle_length: int):
         self.config_location = config_location
         self.reward_program_id = reward_program_id
         self.payment_cycle_length = payment_cycle_length
 
+
+class UsageRewardProgram(Program):
     def set_parameters(
         self,
         token: str,
@@ -34,9 +34,7 @@ class UsageRewardProgram:
 
     def _get_table_query(self, min_partition: int, max_partition: int):
         table = "prepaid_card_payment"
-        local_files = get_files(
-            self.config_location, table, min_partition, max_partition
-        )
+        local_files = get_files(self.config_location, table, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 
     def run_query(
