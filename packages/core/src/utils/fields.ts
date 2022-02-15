@@ -1,5 +1,7 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
+import reduce from 'lodash/reduce';
+import md5 from 'md5';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -12,6 +14,18 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
   }
 
   return field;
+}
+
+export function hashCardFields(fields: CompiledCard['fields']): string {
+  return md5(
+    reduce(
+      fields,
+      (result, f, name) => {
+        return (result += name + f.card.url);
+      },
+      ''
+    )
+  );
 }
 
 export function buildUsedFieldsListFromUsageMeta(

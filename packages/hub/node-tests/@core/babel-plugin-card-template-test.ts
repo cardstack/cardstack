@@ -52,11 +52,11 @@ if (process.env.COMPILER) {
 
       options = {
         fields: personCard.fields,
+        metaModulePath: './embedded-meta.js',
         debugPath: personCard.url,
         inlineHBS: undefined,
         defaultFieldFormat: 'embedded',
         usedFields: [],
-        serializerMap: {},
       };
       let src = templateOnlyComponentTemplate(
         '<div><h1><@fields.name /><@fields.fullName /></h1><@fields.birthdate /> <@fields.address /></div>'
@@ -78,21 +78,9 @@ if (process.env.COMPILER) {
       ]);
     });
 
-    it('includes the serializerMap', async function () {
-      expect(options.serializerMap).to.deep.equal({ date: ['birthdate', 'address.settlementDate'] });
-    });
-
-    it('can make a function to get options used to create a card model', async function () {
+    it('exports ComponentMeta', async function () {
       expect(code).to.containsSource(`
-        export function getCardModelOptions() {
-          return {
-            serializerMap: {
-              date: ["birthdate", "address.settlementDate"]
-            },
-            computedFields: ["fullName"],
-            usedFields: ["name", "fullName", "birthdate", "address.street", "address.city", "address.state", "address.zip", "address.settlementDate"]
-          };
-        }
+        export { ComponentMeta } from "${options.metaModulePath}";
       `);
     });
   });

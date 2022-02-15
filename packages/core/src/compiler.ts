@@ -3,11 +3,10 @@ import { BabelFileResult, transformFromAstSync } from '@babel/core';
 import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
-import reduce from 'lodash/reduce';
-import md5 from 'md5';
 
 import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
 import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
+import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
@@ -27,6 +26,7 @@ import {
 import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
+import { hashCardFields } from './utils/fields';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -366,45 +366,54 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     format: Format,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<ComponentInfo<LocalRef>> {
+    let fieldsHash = hashCardFields(fields);
+    let componentModule = appendToFilename(localFile, '-' + fieldsHash);
+    let metaModuleFileName = appendToFilename(componentModule, '__meta');
+
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
+      metaModulePath: './' + metaModuleFileName,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
-      serializerMap: {},
     };
 
-    let { source, ast } = transformCardComponent(templateSource, options);
-    let componentModule = hashFilenameFromFields(localFile, fields);
+    let componentTransformResult = transformCardComponent(templateSource, options);
     modules[componentModule] = {
       type: JS_TYPE,
-      source,
-      ast,
+      source: componentTransformResult.source,
+      ast: componentTransformResult.ast,
     };
+
+    let metaOptions: CardComponentMetaPluginOptions = {
+      debugPath: debugPath + '__meta',
+      fields: options.fields,
+      usedFields: options.usedFields,
+      serializerMap: {},
+    };
+    let componentMetaResult = generateComponentMeta(metaOptions);
+    modules[metaModuleFileName] = {
+      type: JS_TYPE,
+      source: componentMetaResult.source,
+      ast: componentMetaResult.ast,
+    };
+
     let componentInfo: ComponentInfo<LocalRef> = {
       componentModule: { local: componentModule },
+      metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
-      serializerMap: options.serializerMap,
+      serializerMap: metaOptions.serializerMap,
     };
 
     return componentInfo;
   }
 }
 
-function hashFilenameFromFields(localFile: string, fields: CompiledCard['fields']): string {
-  let { basename, extension } = getBasenameAndExtension(localFile);
-  let hash = md5(
-    reduce(
-      fields,
-      (result, f, name) => {
-        return (result += name + f.card.url);
-      },
-      ''
-    )
-  );
-  return `${basename}-${hash}${extension}`;
+function appendToFilename(filename: string, toAppend: string): string {
+  let { basename, extension } = getBasenameAndExtension(filename);
+  return `${basename}${toAppend}${extension}`;
 }
 
 function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
@@ -457,6 +466,7 @@ export function makeGloballyAddressable(
   function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
     return {
       componentModule: ensureGlobal(info.componentModule),
+      metaModule: ensureGlobal(info.metaModule),
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
