@@ -17,9 +17,7 @@ def create_program(config):
         min_value=1024,
         max_value=1024 * 128,
     )
-    base_reward = st.number_input(
-        "Base reward", value=5, step=1, min_value=0, max_value=100
-    )
+    base_reward = st.number_input("Base reward", value=5, step=1, min_value=0, max_value=100)
     transaction_factor = st.number_input(
         "Transaction factor", value=2.0, step=0.1, min_value=0.0, max_value=10.0
     )
@@ -33,9 +31,7 @@ def create_program(config):
 
 
 def view_historical(config):
-    st.write(
-        "This program is designed to reward end users for making payments across the network"
-    )
+    st.write("This program is designed to reward end users for making payments across the network")
     min_block = 24117248
     max_block = 25117248
     min_block, max_block = st.slider(
@@ -81,13 +77,9 @@ def view_historical(config):
 
 
 def view_range(config):
-    st.write(
-        "This program is designed to reward end users for making payments across the network"
-    )
+    st.write("This program is designed to reward end users for making payments across the network")
     min_block = 24117248
-    max_block = st.slider(
-        "End block", min_value=min_block, max_value=25117248, value=25117248
-    )
+    max_block = st.slider("End block", min_value=min_block, max_value=25117248, value=25117248)
 
     program = create_program(config)
 
