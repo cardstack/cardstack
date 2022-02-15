@@ -419,7 +419,7 @@ function rewriteFieldToComponent(
 
   let componentName = importAndChooseName(
     classify(field.card.url),
-    field.card.componentInfos[format].moduleName.global,
+    field.card.componentInfos[format].componentModule.global,
     'default'
   );
 

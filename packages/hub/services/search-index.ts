@@ -262,7 +262,7 @@ class IndexerRun implements IndexerHandle {
       rawData: rawCard.data ?? {},
       schemaModule: definedCard.schemaModule.global,
       usedFields: definedCard.componentInfos[format].usedFields,
-      componentModule: definedCard.componentInfos[format].moduleName.global,
+      componentModule: definedCard.componentInfos[format].componentModule.global,
       serializerMap: definedCard.componentInfos[format].serializerMap,
     });
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);

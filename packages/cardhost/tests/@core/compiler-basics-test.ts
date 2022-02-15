@@ -60,13 +60,13 @@ module('@core | compiler-basics', function (hooks) {
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
       await cardService.loadModule(
-        compiled.componentInfos.isolated.moduleName.global
+        compiled.componentInfos.isolated.componentModule.global
       ),
       'Isolated module exists'
     );
     assert.ok(
       await cardService.loadModule(
-        compiled.componentInfos.embedded.moduleName.global
+        compiled.componentInfos.embedded.componentModule.global
       ),
       'Embedded module exists'
     );
@@ -281,7 +281,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('it inlines a simple field template', async function (assert) {
       assert.ok(
-        compiled.componentInfos.isolated.moduleName.global.includes(
+        compiled.componentInfos.isolated.componentModule.global.includes(
           `/isolated`
         ),
         'templateModule for "isolated" is full url'
@@ -294,7 +294,7 @@ module('@core | compiler-basics', function (hooks) {
       let compiled = await builder.getCompiledCard(cardURL(PERSON_RAW_CARD));
 
       let code = await cardService.loadModule<any>(
-        compiled.componentInfos.embedded.moduleName.global
+        compiled.componentInfos.embedded.componentModule.global
       );
 
       assert.equal(code.default.moduleName, '@glimmer/component/template-only');

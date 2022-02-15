@@ -376,14 +376,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let { source, ast } = transformCardComponent(templateSource, options);
-    let moduleName = hashFilenameFromFields(localFile, fields);
-    modules[moduleName] = {
+    let componentModule = hashFilenameFromFields(localFile, fields);
+    modules[componentModule] = {
       type: JS_TYPE,
       source,
       ast,
     };
     let componentInfo: ComponentInfo<LocalRef> = {
-      moduleName: { local: moduleName },
+      componentModule: { local: componentModule },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
       serializerMap: options.serializerMap,
@@ -456,7 +456,7 @@ export function makeGloballyAddressable(
 
   function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
     return {
-      moduleName: ensureGlobal(info.moduleName),
+      componentModule: ensureGlobal(info.componentModule),
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
