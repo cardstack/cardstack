@@ -69,14 +69,30 @@ if (process.env.COMPILER) {
     it('CompiledCard embedded view', async function () {
       await cards.create(PERSON_CARD);
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
+      let { embedded } = compiled.componentInfos;
 
-      expect(getFileCache().getModule(compiled.componentInfos.embedded.componentModule.global)).to.containsSource(
+      expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
       expect(getFileCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
         PERSON_CARD.files!['embedded.css']
       );
+
+      expect(embedded.usedFields).to.deep.equal(['name', 'birthdate']);
+
+      expect(embedded.serializerMap).to.deep.equal({
+        date: ['birthdate'],
+      });
+      expect(getFileCache().getModule(embedded.metaModule.global, 'browser')).to.containsSource(`
+        export const ComponentMeta = {
+          serializerMap: {
+            date: ["birthdate"]
+          },
+          computedFields: [],
+          usedFields: ["name", "birthdate"]
+        };
+      `);
     });
 
     it('CompiledCard edit view', async function () {

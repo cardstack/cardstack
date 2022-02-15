@@ -115,6 +115,7 @@ if (process.env.COMPILER) {
         'usedFields',
         'serializerMap',
         'componentModule',
+        'metaModule',
         'inlineHBS',
         'inheritedFrom',
       ]);

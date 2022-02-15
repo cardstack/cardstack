@@ -155,7 +155,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   componentModule: Ref;
-  metaModule?: Ref;
+  metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
   serializerMap: SerializerMap;
@@ -214,13 +214,17 @@ export interface CardSchemaModule {
   };
 }
 
-export interface CardComponentModule {
-  default: unknown;
-  getCardModelOptions(): {
+export interface CardComponentMetaModule {
+  ComponentMeta: {
     serializerMap: SerializerMap;
     computedFields: string[];
     usedFields: string[];
   };
+}
+
+export interface CardComponentModule {
+  default: unknown;
+  ComponentMeta: CardComponentMetaModule['ComponentMeta'];
 }
 
 export interface RealmConfig {
