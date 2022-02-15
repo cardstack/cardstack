@@ -1,7 +1,8 @@
 import { module, test, skip } from 'qunit';
-import type Cards from 'cardhost/services/cards';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+
+import type Cards from 'cardhost/services/cards';
 
 module('Integration | card-service', function (hooks) {
   let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);

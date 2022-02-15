@@ -24,6 +24,10 @@ export interface PrimitiveSerializer {
 
 const DateTimeSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
+    // If the model hasn't been deserialized yet it will still be a string
+    if (typeof d === 'string') {
+      return d;
+    }
     return d.toISOString();
   },
   deserialize(d: string): Date {
@@ -44,7 +48,7 @@ const DateSerializer: PrimitiveSerializer = {
   },
 };
 
-const SERIALIZERS = {
+export const SERIALIZERS = {
   datetime: DateTimeSerializer,
   date: DateSerializer,
 };
@@ -104,6 +108,18 @@ function serializeAttribute(
   } else {
     attrs[path] = serializer[action](value);
   }
+}
+
+// TEMP: This is here to support the future layout of the serializerMaps that will eventually be
+// built into the component
+export function inversedSerializerMap(serializerMap: SerializerMap): Record<string, SerializerName> {
+  let inversedMap: Record<string, SerializerName> = {};
+  for (const type of Object.keys(serializerMap) as SerializerName[]) {
+    for (const key of serializerMap[type] || []) {
+      inversedMap[key] = type;
+    }
+  }
+  return inversedMap;
 }
 
 export function serializeCardPayloadForFormat(card: CardContent): JSONAPIDocument<Saved> {

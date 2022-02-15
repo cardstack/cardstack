@@ -16,6 +16,7 @@ import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
+import WyreTransferTask from './tasks/wyre-transfer';
 
 let dbConfig = config.get('db') as Record<string, any>;
 const log = logger('hub/worker');
@@ -65,6 +66,7 @@ export class HubWorker {
         'persist-off-chain-merchant-info': this.instantiateTask(PersistOffChainMerchantInfoTask),
         'persist-off-chain-card-space': this.instantiateTask(PersistOffChainCardSpaceTask),
         'remove-old-sent-notifications': this.instantiateTask(RemoveOldSentNotificationsTask),
+        'wyre-transfer': this.instantiateTask(WyreTransferTask),
         's3-put-json': s3PutJson,
       },
       // https://github.com/graphile/worker#recurring-tasks-crontab

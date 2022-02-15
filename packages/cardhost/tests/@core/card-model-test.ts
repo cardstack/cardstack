@@ -16,6 +16,7 @@ let attributes = {
     city: 'Los Angeles',
     state: 'CA',
     settlementDate: '1990-01-01',
+    zip: '11111',
   },
 };
 
@@ -33,7 +34,7 @@ module('@core | card-model-for-browser', function (hooks) {
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
-    
+
           export default class Address {
             @contains(string) street;
             @contains(string) city;
@@ -59,7 +60,7 @@ module('@core | card-model-for-browser', function (hooks) {
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
           import address from "https://cardstack.local/address";
-    
+
           export default class Person {
             @contains(string) name;
             @contains(date) birthdate;
@@ -83,6 +84,7 @@ module('@core | card-model-for-browser', function (hooks) {
       `${localRealmURL}bob`,
       'isolated'
     );
+
     assert.equal(
       model.data.name,
       attributes.name,
@@ -99,7 +101,7 @@ module('@core | card-model-for-browser', function (hooks) {
     );
     assert.ok(
       isSameDay(model.data.address.settlementDate, p('1990-01-01')),
-      'Dates are serialized to Dates'
+      'Nested card Dates are serialized to Dates'
     );
   });
 

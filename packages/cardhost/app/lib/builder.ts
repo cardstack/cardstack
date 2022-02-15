@@ -103,7 +103,7 @@ export default class LocalRealm implements Builder {
         componentModule: compiled.componentInfos[format].moduleName.global,
       },
     };
-    return new CardModelForBrowser(
+    let model = new CardModelForBrowser(
       this.cards,
       {
         type: 'loaded',
@@ -115,6 +115,8 @@ export default class LocalRealm implements Builder {
       },
       this
     );
+    await model.computeData();
+    return model;
   }
 
   async loadForRoute(
