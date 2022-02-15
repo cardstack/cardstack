@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
@@ -46,7 +46,7 @@ module('Integration | Card Rendering', function (hooks) {
     assert.dom('h2').containsText('Mar 2, 2021');
   });
 
-  test('Can render a computed field', async function (assert) {
+  test('Can render a synchronous computed field', async function (assert) {
     createCard({
       id: 'bob',
       realm: localRealmURL,
@@ -65,8 +65,8 @@ module('Integration | Card Rendering', function (hooks) {
             firstName;
 
             @contains(string)
-            async foodPref() {
-              return (await this.firstName) + " likes pizza";
+            get foodPref() {
+              return this.firstName + " likes pizza";
             }
           }
         `,
@@ -81,4 +81,6 @@ module('Integration | Card Rendering', function (hooks) {
     assert.dom('h1').containsText('Bob');
     assert.dom('p').containsText('Bob likes pizza');
   });
+
+  skip('Can render an async computed field');
 });

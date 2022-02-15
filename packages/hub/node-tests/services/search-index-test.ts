@@ -265,8 +265,8 @@ if (process.env.COMPILER) {
               @contains(string) name;
 
               @contains(string)
-              async greeting() {
-                return "Welcome " + (await this.name) + "!";
+              get greeting() {
+                return "Welcome " + this.name + "!";
               }
             }
           `,
@@ -276,7 +276,7 @@ if (process.env.COMPILER) {
       this.beforeEach(async function () {
         await cards.create(greetingCard);
 
-        // This child card getes created via adoptIntoRealm, which goes down the
+        // This child card gets created via adoptIntoRealm, which goes down the
         // code path that doesn't involve compiling cards
         let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
         let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
@@ -356,8 +356,8 @@ if (process.env.COMPILER) {
                 @contains(string) breed;
 
                 @contains(string)
-                async greeting() {
-                  return "Welcome " + (await this.name) + " the " + (await this.breed) + "!";
+                get greeting() {
+                  return "Welcome " + this.name + " the " + this.breed + "!";
                 }
               }
             `,
@@ -392,8 +392,8 @@ if (process.env.COMPILER) {
               export default class GreetingCard {
                 @contains(string) name;
                 @contains(string)
-                async greeting() {
-                  return "Goodbye " + (await this.name)
+                get greeting() {
+                  return "Goodbye " + this.name
                 }
               }
             `,

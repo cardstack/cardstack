@@ -234,7 +234,7 @@ export default class CardModelForBrowser implements CardModel {
     return {};
   }
 
-  private async getRawField(fieldPath: string): Promise<any> {
+  private getRawField(fieldPath: string): any {
     let value = get(this.rawData, fieldPath);
     return serializeField(
       this.inversedSerializerMap,

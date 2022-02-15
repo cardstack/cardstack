@@ -20,11 +20,9 @@
     <Boxel::Field @label="Business Account Creation Fee">
       <CardPay::BalanceDisplay
         class="prepaid-card-choice__cost"
-        @icon="spend"
-        @sign="§"
-        @symbol="SPEND"
-        @balance={{format-amount this.merchantRegistrationFee}}
-        @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
+        @sign="$"
+        @symbol="USD"
+        @balance={{format-amount (spend-to-usd this.merchantRegistrationFee) 2}}
         data-test-prepaid-card-choice-merchant-fee
       />
     </Boxel::Field>
@@ -66,7 +64,7 @@
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
-          It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.
+          It looks like your prepaid card doesn't have enough funds to pay the {{format-usd (spend-to-usd this.merchantRegistrationFee)}} business account creation fee. Please try another prepaid card, or buy one in Card Wallet.
         {{else if (eq this.error.message "TIMEOUT")}}
           There was a problem creating your business account. Please contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
