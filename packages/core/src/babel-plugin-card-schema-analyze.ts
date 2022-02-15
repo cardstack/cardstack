@@ -15,13 +15,23 @@ export const VALID_FIELD_DECORATORS = {
   contains: true,
   containsMany: true,
 };
+type Decorator = keyof typeof VALID_FIELD_DECORATORS | 'adopts';
+const decoratorArgumentsLimits: Map<Decorator, { min: number; max: number }> = new Map([
+  ['linksTo', { min: 1, max: 2 }],
+  ['contains', { min: 1, max: 2 }],
+  ['containsMany', { min: 1, max: 2 }],
+  ['adopts', { min: 1, max: 1 }],
+]);
 type FieldType = keyof typeof VALID_FIELD_DECORATORS;
+const VALID_FIELD_DECORATOR_OPTS_KEYS = ['computeVia'] as const;
+type DecoratorOption = typeof VALID_FIELD_DECORATOR_OPTS_KEYS[number];
 
 export interface FieldMeta {
   cardURL: string;
   type: FieldType;
   typeDecoratorLocalName: string;
   computed: boolean;
+  computeVia?: string;
 }
 export interface FieldsMeta {
   [name: string]: FieldMeta;
@@ -111,11 +121,11 @@ function storeMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: t
     let specifierName = name(specifier.imported, t);
 
     if ((VALID_FIELD_DECORATORS as any)[specifierName]) {
-      validateUsageAndGetFieldMeta(path, fields, fieldTypeDecorator, specifierName as FieldType, t);
+      validateUsageAndGetFieldMeta(path, fields, fieldTypeDecorator as Decorator, specifierName as FieldType, t);
     }
 
     if (specifierName === 'adopts') {
-      parent = validateUsageAndGetParentMeta(path, fieldTypeDecorator, t);
+      parent = validateUsageAndGetParentMeta(path, fieldTypeDecorator as Decorator, t);
     }
   }
 
@@ -125,7 +135,7 @@ function storeMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: t
 function validateUsageAndGetFieldMeta(
   path: NodePath<t.ImportDeclaration>,
   fields: FieldsMeta,
-  fieldTypeDecorator: string,
+  fieldTypeDecorator: Decorator,
   actualName: FieldType,
   t: typeof Babel.types
 ) {
@@ -166,18 +176,26 @@ function validateUsageAndGetFieldMeta(
       }
     }
 
+    let extractedDecoratorArguments = extractDecoratorArguments(
+      fieldIdentifier.parentPath as NodePath<t.CallExpression>,
+      fieldTypeDecorator,
+      t
+    );
+    let synchronousComputed = fieldPath.isClassMethod() && !fieldPath.node.async;
+    let { computed: asyncComputed } = extractedDecoratorArguments;
+
     let fieldName = name(fieldPath.node.key, t);
     fields[fieldName] = {
-      ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<t.CallExpression>, fieldTypeDecorator, t),
+      ...extractedDecoratorArguments,
       type: actualName,
-      computed: fieldPath.isClassMethod(),
+      computed: asyncComputed || synchronousComputed,
     };
   }
 }
 
 function validateUsageAndGetParentMeta(
   path: NodePath<t.ImportDeclaration>,
-  fieldTypeDecorator: string,
+  fieldTypeDecorator: Decorator,
   t: typeof Babel.types
 ): ParentMeta {
   let adoptsIdentifier = path.scope.bindings[fieldTypeDecorator].referencePaths[0];
@@ -191,29 +209,63 @@ function validateUsageAndGetParentMeta(
 
 function extractDecoratorArguments(
   callExpression: NodePath<t.CallExpression>,
-  fieldTypeDecorator: string,
+  decorator: Decorator,
   t: typeof Babel.types
 ) {
-  if (callExpression.node.arguments.length !== 1) {
-    throw error(callExpression, `@${fieldTypeDecorator} decorator accepts exactly one argument`);
+  let argumentLengths = decoratorArgumentsLimits.get(decorator);
+  if (!argumentLengths) {
+    throw error(callExpression, `@${decorator} is has no configured argument lengths`);
+  }
+  let { min, max } = argumentLengths;
+  if (callExpression.node.arguments.length > max || callExpression.node.arguments.length < min) {
+    throw error(callExpression, `@${decorator} decorator can only have between ${min} and ${max} arguments`);
   }
 
-  let cardTypePath = callExpression.get('arguments')[0];
+  let decoratorArguments = callExpression.get('arguments');
+
+  // First argument is always the card type
+  let cardTypePath = decoratorArguments[0];
   let cardType = cardTypePath.node;
   if (!t.isIdentifier(cardType)) {
-    throw error(cardTypePath, `@${fieldTypeDecorator} argument must be an identifier`);
+    throw error(cardTypePath, `@${decorator} argument must be an identifier`);
   }
 
   let definition = cardTypePath.scope.getBinding(cardType.name)?.path;
   if (!definition) {
-    throw error(cardTypePath, `@${fieldTypeDecorator} argument is not defined`);
+    throw error(cardTypePath, `@${decorator} argument is not defined`);
   }
   if (!definition.isImportDefaultSpecifier()) {
-    throw error(definition, `@${fieldTypeDecorator} argument must come from a module default export`);
+    throw error(definition, `@${decorator} argument must come from a module default export`);
   }
 
-  return {
+  let result: Pick<FieldMeta, 'cardURL' | 'typeDecoratorLocalName'> & { computed?: boolean; computeVia?: string } = {
     cardURL: (definition.parent as t.ImportDeclaration).source.value,
     typeDecoratorLocalName: definition.node.local.name,
   };
+
+  // second argument is the decorator options
+  if (decoratorArguments.length === 2) {
+    let maybeObjectExpression = decoratorArguments[1].node;
+    if (!t.isObjectExpression(maybeObjectExpression)) {
+      throw error(decoratorArguments[1], `@${decorator} second argument must be an object`);
+    }
+    let optionsProps = maybeObjectExpression.properties;
+    for (let prop of optionsProps) {
+      if (
+        t.isObjectProperty(prop) &&
+        t.isIdentifier(prop.key) &&
+        (VALID_FIELD_DECORATOR_OPTS_KEYS as unknown as string[]).includes(prop.key.name) &&
+        t.isStringLiteral(prop.value)
+      ) {
+        result.computed = true;
+        result[prop.key.name as DecoratorOption] = prop.value.value;
+      }
+    }
+  }
+
+  if (decoratorArguments.length > 2) {
+    throw error(callExpression, `@${decorator} have not implemented handling more than 2 arguments`);
+  }
+
+  return result;
 }
