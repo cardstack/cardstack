@@ -218,7 +218,12 @@ function extractDecoratorArguments(
   }
   let { min, max } = argumentLengths;
   if (callExpression.node.arguments.length > max || callExpression.node.arguments.length < min) {
-    throw error(callExpression, `@${decorator} decorator can only have between ${min} and ${max} arguments`);
+    throw error(
+      callExpression,
+      `@${decorator} decorator can only have ${
+        min === max ? min + ' argument' : 'between ' + min + ' and ' + max + ' arguments'
+      }`
+    );
   }
 
   let decoratorArguments = callExpression.get('arguments');

@@ -124,6 +124,7 @@ if (process.env.COMPILER) {
     });
 
     it('can access an asynchronous field via a contained card');
+
     it('can access an asynchronous computed field');
     it('can access an asynchronous computed field defined in parent card');
 
