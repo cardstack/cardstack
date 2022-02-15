@@ -50,6 +50,7 @@ class UsageRewardProgram:
         valid_to = max_partition + self.valid_duration
         con = duckdb.connect(database=":memory:", read_only=False)
         if table_query == "parquet_scan([])":
+            print("Warning: no parquet files were found")
             column_names = [
                 "payee",
                 "amount",
