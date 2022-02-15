@@ -1,0 +1,19 @@
+.face-value-option {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--boxel-sp-xs);
+  width: max-content;
+}
+
+.face-value-option__amount {
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.face-value-option__conversion {
+  grid-column: 2;
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+  margin-top: 2px;
+}

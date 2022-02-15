@@ -1,0 +1,42 @@
+.prepaid-card-choice {
+  overflow: visible;
+}
+
+.prepaid-card-choice > header {
+  border-top-left-radius: var(--boxel-border-radius);
+  border-top-right-radius: var(--boxel-border-radius);
+}
+
+.prepaid-card-choice > .prepaid-card-choice__footer {
+  border-bottom-left-radius: var(--boxel-border-radius);
+  border-bottom-right-radius: var(--boxel-border-radius);
+}
+
+.prepaid-card-choice__cost {
+  --icon-alignment: flex-start;
+
+  font-weight: 700;
+}
+
+.prepaid-card-choice__change-card {
+  display: flex;
+  align-items: flex-start;
+}
+
+.prepaid-card-choice__loading-indicator {
+  --icon-color: var(--boxel-light);
+
+  margin-right: var(--boxel-sp-xs);
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.prepaid-card-choice__in-progress-message {
+  max-width: 20rem;
+}
+
+.prepaid-card-choice__cancel-button {
+  display: inline-block;
+  margin-left: var(--boxel-sp-xxxs);
+  color: var(--boxel-highlight);
+}

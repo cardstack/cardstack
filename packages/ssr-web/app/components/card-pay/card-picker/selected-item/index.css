@@ -1,0 +1,5 @@
+.card-picker-selected-item {
+  margin-right: var(--boxel-sp);
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}

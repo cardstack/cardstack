@@ -1,0 +1,37 @@
+<div class="layout-display-view__content" data-test-layout-customization-display>
+  <Boxel::Field @label="Card Preview" @vertical={{true}}>
+    <div class="layout-display-view__card">
+      <CardPay::PrepaidCard
+        @issuerName={{@issuerName}}
+        @headerBackground={{@colorScheme.background}}
+        @headerPatternUrl={{@pattern.patternUrl}}
+        @headerTextColor={{@colorScheme.textColor}}
+        @headerPatternColor={{@colorScheme.patternColor}}
+        @mockBalance={{true}}
+        @mockOptions={{true}}
+        @balance="123456"
+        @usdBalance="1234.56"
+        @address={{placeholder-address}}
+        @network={{network-display-info "layer2" "fullName"}}
+      />
+    </div>
+  </Boxel::Field>
+  <CardPay::FieldStack class="layout-display-view__data">
+    <Boxel::Field @vertical={{true}} @label="Issued by*">
+      {{@issuerName}}
+    </Boxel::Field>
+    <Boxel::Field @vertical={{true}} @label="Background color">
+      <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+        @type="background"
+        @swatchBackground={{@colorScheme.background}}
+      />
+    </Boxel::Field>
+    <Boxel::Field @vertical={{true}} @label="Theme">
+      <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+        @type="theme"
+        @swatchImage={{@pattern.patternUrl}}
+        @blank={{eq @pattern.patternUrl null}}
+      />
+    </Boxel::Field>
+  </CardPay::FieldStack>
+</div>

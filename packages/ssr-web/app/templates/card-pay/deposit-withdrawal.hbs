@@ -1,0 +1,69 @@
+{{page-title "Deposit & Withdrawal"}}
+
+<section class="card-pay-dashboard__deposit-withdrawal" role="tabpanel" aria-labelledby="card-pay.deposit-withdrawal">
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.layer2Network.depotSafe)}}>
+    <:detail>
+      {{#each @model.panel.sections as |section|}}
+        <CardPay::DashboardPanel::Section @section={{section}}>
+          <:cta>
+            <Boxel::Button
+              {{on "click" (fn this.transitionToDepositWithdrawal section.workflow)}}
+              @kind="primary"
+              @size="touch"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              {{section.cta}}
+            </Boxel::Button>
+          </:cta>
+        </CardPay::DashboardPanel::Section>
+      {{/each}}
+    </:detail>
+  </CardPay::DashboardPanel>
+
+  {{#if this.layer2Network.isConnected}}
+    <section data-test-available-balances-section>
+      <header class="card-pay-dashboard__deposit-withdrawal-header">
+        <h2 class="card-pay-dashboard__deposit-withdrawal-title">Available Balances</h2>
+        <nav class="card-pay-dashboard__deposit-withdrawal-nav">
+          {{#each @model.panel.sections as |section|}}
+            <Boxel::Button
+              {{on "click" (fn this.transitionToDepositWithdrawal section.workflow)}}
+              @kind="secondary-dark"
+              @size="small"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              <span>{{section.cta}}</span>
+              {{svg-jar section.buttonIcon
+                class="card-pay-dashboard__payments-section-header-button-icon"
+                role="presentation"
+              }}
+            </Boxel::Button>
+          {{/each}}
+        </nav>
+      </header>
+
+      <section class='card-pay-dashboard__deposit-withdrawal-cards'>
+        {{#each this.safes as |safe|}}
+          <CardPay::Safe @safe={{safe}} />
+        {{/each}}
+      </section>
+    </section>
+  {{/if}}
+</section>
+
+<Boxel::Modal
+  @size="large"
+  @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
+  @onClose={{this.resetQueryParams}}
+>
+  {{#if (is-network-initialized)}}
+    {{#if (eq this.flow 'deposit')}}
+      <CardPay::DepositWorkflow @onClose={{this.resetQueryParams}} />
+    {{/if}}
+    {{#if (eq this.flow 'withdrawal')}}
+      <CardPay::WithdrawalWorkflow @onClose={{this.resetQueryParams}} />
+    {{/if}}
+  {{/if}}
+</Boxel::Modal>

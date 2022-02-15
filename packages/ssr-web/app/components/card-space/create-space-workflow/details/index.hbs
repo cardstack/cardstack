@@ -1,0 +1,67 @@
+<ActionCardContainer
+  @header="Card Space Setup"
+  @isComplete={{@isComplete}}
+  data-test-card-space-details-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Fill out the Card Space details">
+    {{#if @isComplete}}
+      <Boxel::Field
+        @label="Description"
+      >
+        {{@workflowSession.state.profileDescription}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Cover image"
+      >
+        {{#if @workflowSession.state.profileCoverImageUrl}}
+          <Avatar
+            @src={{@workflowSession.state.profileCoverImageUrl}}
+            @alt="Cover image"
+            @rounded={{false}}
+          />
+        {{else}}
+          No cover image
+        {{/if}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Button text"
+      >
+        {{@workflowSession.state.profileButtonText}}
+      </Boxel::Field>
+
+      <Boxel::Field
+        @label="Category"
+      >
+        {{@workflowSession.state.profileCategory}}
+      </Boxel::Field>
+    {{else}}
+      <CardSpace::EditDetails
+        @workflowSession={{@workflowSession}}
+      />
+    {{/if}}
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{or @frozen this.isDisabled}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" this.save}}
+        data-test-card-space-details-save-button
+      >
+        Save Choices
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton
+        data-test-card-space-details-edit-button
+        {{on "click" this.edit}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

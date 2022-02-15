@@ -1,0 +1,20 @@
+.face-value-card__section {
+  padding-bottom: var(--boxel-sp);
+}
+
+.face-value-card__container {
+  display: grid;
+  gap: var(--boxel-sp);
+}
+
+.face-value-card__selected-amount-display {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  /* bordered display box */
+  justify-content: center;
+  padding: var(--boxel-sp-xl) var(--boxel-sp);
+  border: 1px solid var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+}

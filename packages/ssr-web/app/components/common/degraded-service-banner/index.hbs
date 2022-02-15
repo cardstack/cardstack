@@ -1,0 +1,18 @@
+{{#if this.notificationShown}}
+  <div
+    class={{cn "degraded-service-banner" degraded-service-banner--severe=this.isSevere}}
+    data-test-degraded-service-banner
+    ...attributes
+  >
+    <div class="degraded-service-banner__container">
+      <div class="degraded-service-banner__icon-area">
+        {{svg-jar "failure-bordered" class="degraded-service-banner__icon"}}
+      </div>
+
+      <div>
+        {{this.notificationBody}}
+        For more details, check our <a href={{config 'urls.statusPageBase'}} target="_blank" rel="noopener noreferrer">status page</a>.
+      </div>
+    </div>
+  </div>
+{{/if}}

@@ -1,0 +1,33 @@
+.layer-connect-modal__scroll-wrapper {
+  width: 100%;
+  max-height: 100%;
+  padding: var(--boxel-sp-lg) 0;
+  overflow-y: auto;
+}
+
+.layer-connect-modal__card {
+  position: relative;
+  padding-top: calc(var(--boxel-sp-sm) + 0.75rem);
+  outline-color: transparent;
+  outline-style: solid;
+}
+
+.layer-connect-modal__close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  padding: var(--boxel-sp-sm);
+  height: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  width: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  line-height: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  --icon-color: var(--boxel-dark);
+}
+
+.layer-connect-modal__wrapped-card {
+  box-shadow: none;
+}

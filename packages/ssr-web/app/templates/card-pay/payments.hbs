@@ -1,0 +1,88 @@
+{{page-title "Quick Payments"}}
+
+<section class="card-pay-dashboard__payments" role="tabpanel" aria-labelledby="card-pay.payments">
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.merchantSafes)}}>
+    <:detail>
+      {{#each @model.panel.sections as |section|}}
+        <CardPay::DashboardPanel::Section @section={{section}} class="card-pay-dashboard__payments-column-1">
+          <:cta>
+            <Boxel::Button
+              {{on "click" (fn this.transitionToWorkflow section.workflow)}}
+              @kind="primary"
+              @size="touch"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              {{section.cta}}
+            </Boxel::Button>
+          </:cta>
+          <:disclaimer>
+            {{#if (eq section.workflow "create-business")}}
+              Business accounts are on-chain. We charge a nominal
+              <span class="card-pay-dashboard__payments-fee">$1 USD</span>
+              setup fee to offset gas and other administrative costs. You can use a prepaid card in your account to cover this fee.
+            {{/if}}
+          </:disclaimer>
+        </CardPay::DashboardPanel::Section>
+      {{/each}}
+      <section class="dashboard-panel-section">
+        <div class="dashboard-panel-section__body">
+          <p class="dashboard-panel-section__desc card-pay-dashboard__payments-column-2-desc">
+            Add your payment link to your website and start receiving payments today.
+          </p>
+          <img
+            src="/images/dashboard/payments-networks.webp"
+            srcset="/images/dashboard/payments-networks@2x.webp 2x,
+              /images/dashboard/payments-networks@3x.webp 3x"
+            class="card-pay-dashboard__payments-networks-img"
+              alt="Icons of Social Networks">
+          <img src="/images/dashboard/payments-screens.webp"
+            srcset="/images/dashboard/payments-screens@2x.webp 2x,
+              /images/dashboard/payments-screens@3x.webp 3x"
+            class="card-pay-dashboard__payments-screens-img"
+              alt="example twitter bio highlighting cardpay URL, plus two example transactions images from the Card Wallet app">
+        </div>
+      </section>
+    </:detail>
+  </CardPay::DashboardPanel>
+
+  {{#if this.layer2Network.isConnected}}
+    <section data-test-merchants-section>
+      <header class="card-pay-dashboard__payments-section-header">
+        <h3 class="card-pay-dashboard__payments-title">Business Services</h3>
+        {{#let @model.panel.sections.[0] as |section|}}
+          <Boxel::Button
+            {{on "click" (fn this.transitionToWorkflow section.workflow)}}
+            @kind="secondary-dark"
+            @size="small"
+            @disabled={{section.isCtaDisabled}}
+            data-test-workflow-button={{section.workflow}}
+          >
+            <span>{{section.cta}}</span>
+            {{svg-jar "plus"
+              class="card-pay-dashboard__payments-section-header-button-icon"
+              role="presentation"
+            }}
+          </Boxel::Button>
+        {{/let}}
+      </header>
+      <section class="card-pay-dashboard__payments-cards">
+        {{#each this.merchantSafes as |merchantSafe|}}
+          <CardPay::Safe @safe={{merchantSafe}} />
+        {{/each}}
+      </section>
+    </section>
+  {{/if}}
+</section>
+
+<Boxel::Modal
+  @size="large"
+  @isOpen={{eq this.flow 'create-business'}}
+  @onClose={{this.resetQueryParams}}
+>
+  {{#if (is-network-initialized)}}
+    {{#if (eq this.flow 'create-business')}}
+      <CardPay::CreateMerchantWorkflow @onClose={{this.resetQueryParams}} />
+    {{/if}}
+  {{/if}}
+</Boxel::Modal>

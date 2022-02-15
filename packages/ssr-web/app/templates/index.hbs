@@ -1,0 +1,38 @@
+<Boxel::Dashboard
+  @darkTheme={{true}}
+  data-test-cardstack-dashboard
+>
+  <:body>
+  <div class="cardstack-landing-page-container">
+  <div class="cardstack-landing-page-header">
+    {{svg-jar "cardstack-logo-white-text-horizontal" class="cardstack-landing-page-header__logo" alt="Cardstack"}}
+    App Launcher
+  </div>
+    <div class="cardstack-landing-page-hero">
+      <div class="cardstack-landing-page-hero__content-container">
+        <h2 class="cardstack-landing-page-hero__title">
+          Your Web 3 Tool Box
+        </h2>
+        <p class="cardstack-landing-page-hero__description">
+          Comprehensive suite of tools driving the progression of Web 3
+        </p>
+        <Boxel::Button @as="anchor" @kind="secondary-dark" @size="small" @href="https://cardstack.com/" class="cardstack-landing-page-hero__cta">
+          {{svg-jar "external-link" class="cardstack-landing-page-hero__cta-icon"}} Learn more
+        </Boxel::Button>
+      </div>
+    </div>
+    <ul class="cardstack-landing-page-org-grid">
+      {{#each @model.orgs as |org|}}
+      <li>
+        <OrgCard
+          @org={{org}}
+          @route={{org.route}}
+          @image={{if this.isHorizontal org.topImage org.sideImage}}
+        />
+      </li>
+      {{/each}}
+    </ul>
+    <Common::Footer class="cardstack-landing-page-footer" />
+  </div>
+  </:body>
+</Boxel::Dashboard>

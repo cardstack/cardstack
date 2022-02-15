@@ -1,0 +1,86 @@
+<ActionCardContainer
+  @header={{this.header}}
+  @isComplete={{@isComplete}}
+  class={{cn "withdrawal-workflow-check-balance" (if this.hasSufficientBalance 'is-sufficient' 'is-insufficient')}}
+>
+  <ActionCardContainer::Section
+    @title={{concat (if this.hasSufficientBalance "Sufficient" "Insufficient") " funds for claiming withdrawn tokens"}}
+    class="withdrawal-workflow-check-balance__display-box"
+  >
+    <ActionCardContainer::Section>
+      <Boxel::Field @label={{concat "Current " (uppercase (network-display-info "layer1" "conversationalName")) " Balance:"}}>
+        <CardPay::NestedItems class="withdrawal-workflow-check-balance__details">
+          <:outer>
+            <CardPay::AccountDisplay
+              @size="small"
+              @name="Account:"
+              @address={{truncate-middle this.layer1Network.walletInfo.firstAddress}}
+              data-test-balance-view-account-address
+            />
+          </:outer>
+          <:inner>
+            <div class="withdrawal-workflow-check-balance__balance-container" data-test-balance-amount>
+              <CardPay::BalanceDisplay
+                @size="large"
+                @icon={{this.nativeTokenDisplayInfo.icon}}
+                @balance={{format-wei-amount this.layer1Network.defaultTokenBalance}}
+                @symbol={{this.nativeTokenDisplayInfo.symbol}}
+                @usdBalance={{token-to-usd 'ETH' this.layer1Network.defaultTokenBalance}}
+                class="withdrawal-workflow-check-balance__balance"
+              />
+              {{svg-jar
+                (if this.hasSufficientBalance "success-bordered" "failure-bordered")
+                class="withdrawal-workflow-check-balance__result-icon"
+                width="20"
+                height="20"
+                role="presentation"
+              }}
+            </div>
+          </:inner>
+        </CardPay::NestedItems>
+      </Boxel::Field>
+    </ActionCardContainer::Section>
+    <ActionCardContainer::Section data-test-funds-needed>
+      <Boxel::Field @label="Funds Needed for Transaction:">
+        <CardPay::BalanceDisplay
+          @size="large"
+          @icon={{this.nativeTokenDisplayInfo.icon}}
+          @balance={{format-wei-amount this.minimumBalanceForWithdrawalClaim false}}
+          @symbol={{this.nativeTokenDisplayInfo.symbol}}
+          @usdBalance={{token-to-usd 'ETH' this.minimumBalanceForWithdrawalClaim}}
+        />
+      </Boxel::Field>
+    </ActionCardContainer::Section>
+  </ActionCardContainer::Section>
+  <div class="withdrawal-workflow-check-balance__disclaimer">
+    * The actual value depends on the current exchange rate and is
+    determined at the time of authorization.
+  </div>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{true}}
+  >
+    <:default as |i|>
+      <i.ActionStatusArea class="withdrawal-workflow-check-balance__passed-status" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
+        <div class="withdrawal-workflow-check-balance__passed-status-message">
+          Insufficient {{this.nativeTokenDisplayInfo.symbol}} for withdrawal on
+          {{network-display-info "layer1" "fullName"}}. Please deposit amount specified above.
+        </div>
+      </i.ActionStatusArea>
+      <i.InfoArea>
+        Only visible to you
+      </i.InfoArea>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionStatusArea class="withdrawal-workflow-check-balance__passed-status" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
+        <div class="withdrawal-workflow-check-balance__passed-status-message">
+          Passed the check for {{this.nativeTokenDisplayInfo.symbol}} balance on
+          {{network-display-info "layer1" "fullName"}} for claim step
+        </div>
+      </m.ActionStatusArea>
+      <m.InfoArea>
+        Only visible to you
+      </m.InfoArea>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

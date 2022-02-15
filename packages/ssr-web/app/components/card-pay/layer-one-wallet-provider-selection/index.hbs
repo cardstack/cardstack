@@ -1,0 +1,24 @@
+<Boxel::RadioInput
+  @groupDescription="Select a wallet to connect to"
+  @items={{@walletProviders}}
+  @disabled={{@isConnecting}}
+  @checkedId={{@currentWalletProviderId}}
+  @hideRadio={{true}}
+  ...attributes
+  data-test-wallet-selection
+  as |option|
+>
+  {{#let option.data as |item|}}
+    <option.component
+      @name="wallet-provider-selection"
+      @onChange={{fn (optional @changeWalletProvider) item.id}}
+      data-test-wallet-option={{item.id}}
+    >
+      <div class="card-pay-layer-one-wallet-provider-selection__item">
+        <img src={{item.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
+        <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.name}}</span>
+        <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.description}}</span>
+      </div>
+    </option.component>
+  {{/let}}
+</Boxel::RadioInput>

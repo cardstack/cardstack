@@ -1,0 +1,24 @@
+<div
+  class={{cn "merchant" merchant--vertical=@vertical}}
+  data-test-merchant={{@name}}
+  ...attributes
+>
+  <CardPay::MerchantLogo
+    class="merchant__logo"
+    @name={{@name}}
+    @size={{@size}}
+    @logoBackground={{@logoBackground}}
+    @logoTextColor={{@logoTextColor}}
+  />
+  <div>
+    <div class={{cn "merchant__name" merchant__name--lg=(eq @size "large")}} title={{@name}}>
+      {{@name}}
+    </div>
+    {{#if @address}}
+      <div class="merchant__address">{{@address}}</div>
+    {{/if}}
+    {{#if @text}}
+      <div class="merchant__text">{{@text}}</div>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<ActionCardContainer
+  @header="Confirmation"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="You withdrew" data-test-transaction-confirmed-from-section>
+    <CardPay::Bridge::Item
+      @isLayer2={{true}}
+      @link={{this.blockscoutUrl}}
+      @token={{this.withdrawToken}}
+      @amount={{format-wei-amount this.withdrawnAmount false}}
+      @preposition="from"
+      @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+      @depotAddress={{this.depotAddress}}
+      data-test-withdrawal-transaction-confirmed-from
+    />
+    <CardPay::Bridge::Action
+      @actionTaken={{concat "Burned on " (network-display-info "layer2" "fullName")}}
+    />
+  </ActionCardContainer::Section>
+</ActionCardContainer>
+
+<CardPay::Bridge @link={{this.bridgeExplorerUrl}} />
+
+<ActionCardContainer
+  @header="Confirmation"
+  @suppressHeader={{true}}
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="You received" data-test-transaction-confirmed-to-section>
+    <CardPay::Bridge::Action
+      @actionTaken={{concat "Released on " (network-display-info "layer1" "fullName")}}
+    />
+    <CardPay::Bridge::Item
+      @isLayer1={{true}}
+      @link={{this.withdrawTxnViewerUrl}}
+      @token={{this.receivedToken}}
+      @amount={{format-wei-amount this.withdrawnAmount false}}
+      @preposition="in"
+      @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
+      data-test-withdrawal-transaction-confirmed-to
+    />
+  </ActionCardContainer::Section>
+</ActionCardContainer>

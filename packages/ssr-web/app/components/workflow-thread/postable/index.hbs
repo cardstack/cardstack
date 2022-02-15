@@ -1,0 +1,50 @@
+{{#if (is-postable-on-new-day @postable)}}
+  <Boxel::DateDivider
+    @date={{@postable.timestamp}}
+    class="workflow-date-divider-animated"
+    data-test-date-divider
+  />
+{{/if}}
+{{#if @postable.message}}
+  <Boxel::ThreadMessage
+    @datetime={{@postable.timestamp}}
+    @imgURL={{@postable.author.imgURL}}
+    @name={{@postable.author.name}}
+    @hideName={{true}}
+    @hideMeta={{postable-meta-hidden @postable previous=@previous}}
+    data-test-postable={{@index}}
+    class="workflow-postable-animated"
+    ...attributes
+  >
+    <div class="workflow-thread-postable__markdown">
+      {{format-workflow-message @postable.message}}
+    </div>
+  </Boxel::ThreadMessage>
+{{else}}
+  <Boxel::ThreadMessage
+    @fullWidth={{true}}
+    @datetime={{@postable.timestamp}}
+    @imgURL={{@postable.author.imgURL}}
+    @name={{@postable.author.name}}
+    @hideName={{true}}
+    @hideMeta={{postable-meta-hidden @postable previous=@previous}}
+    data-test-postable={{@index}}
+    class="workflow-postable-animated workflow-postable-animated--has-card"
+    ...attributes
+  >
+    <div class={{cn
+      "workflow-thread-postable__card"
+      workflow-thread-postable__card--is-complete=@postable.isComplete
+    }}>
+      {{component
+        @postable.componentName
+        workflowSession=@postable.session
+        frozen=@frozen
+        config=@postable.config
+        onComplete=(optional @postable.onComplete)
+        onIncomplete=(optional @postable.onIncomplete)
+        isComplete=@postable.isComplete
+      }}
+    </div>
+  </Boxel::ThreadMessage>
+{{/if}}

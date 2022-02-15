@@ -1,0 +1,74 @@
+<ActionCardContainer
+  @header="Business account"
+  @isComplete={{@isComplete}}
+  {{did-insert this.setupBusinessAccountSelection}}
+  data-test-card-space-select-business-account-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Select a business account" class="merchant-customization">
+    {{#if @isComplete}}
+      <Boxel::Field
+        class="merchant-customization__name"
+        @label="Business Name"
+      >
+        <CardPay::Merchant
+          @name={{this.merchantData.name}}
+          @logoBackground={{this.merchantData.backgroundColor}}
+          @logoTextColor={{this.merchantData.logoTextColor}}
+          @size="large"
+          @vertical={{true}}
+        />
+      </Boxel::Field>
+
+      <Boxel::Field @label="Business ID">
+        {{this.merchantData.id}}
+      </Boxel::Field>
+
+      <Boxel::Field @label="Card Space URL">
+        {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
+      </Boxel::Field>
+    {{else}}
+      <CardPay::FieldStack>
+        <Boxel::Field
+          @label="Business Account"
+        >
+          <CardPay::SafeChooserDropdown
+            @safes={{this.merchantSafes}}
+            @selectedSafe={{this.selectedSafe}}
+            @onChooseSafe={{this.chooseSafe}}
+            @showSafeId={{true}}
+          />
+          <div></div>
+          <div class="form-input-info">
+            The business ID will be used for your Card Space URL. Only business accounts that
+            you haven't yet been used for Card Space are shown.
+          </div>
+        </Boxel::Field>
+
+        <Boxel::Field @label="Card Space URL">
+          {{this.merchantData.id}}.{{config 'cardSpaceHostnameSuffix'}}
+        </Boxel::Field>
+      </CardPay::FieldStack>
+    {{/if}}
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        data-test-card-space-select-business-account-save-button
+        {{on 'click' @onComplete}}
+      >
+        Continue
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton
+        {{on "click" @onIncomplete}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

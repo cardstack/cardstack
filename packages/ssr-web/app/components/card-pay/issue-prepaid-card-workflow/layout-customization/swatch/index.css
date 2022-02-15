@@ -1,0 +1,24 @@
+.layout-customization__swatch--background {
+  --swatch-width: var(--background-swatch-width);
+  --swatch-height: var(--background-swatch-height);
+}
+
+.layout-customization__swatch--theme {
+  --swatch-width: var(--theme-swatch-width);
+  --swatch-height: var(--theme-swatch-height);
+}
+
+.layout-customization__swatch {
+  width: var(--swatch-width);
+  height: var(--swatch-height);
+  border: 1px inset rgb(0 0 0 / 25%);
+  border-radius: 5px;
+  background-size: contain;
+  background: var(--swatch-background); /* stylelint-disable-line declaration-block-no-shorthand-property-overrides */
+}
+
+.layout-customization__swatch-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,124 @@
+<ActionCardContainer
+  @header="Withdrawal Amount"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-transaction-amount-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
+    <div class="withdrawal-transaction-amount__fields">
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Withdrawal source"
+      >
+        <CardPay::SafeChooserDropdown::SafeOption
+          @safe={{this.currentSafe}}
+          data-test-withdrawal-source
+        />
+      </Boxel::Field>
+      <Boxel::Field
+        @vertical={{this.isConfirmed}}
+        @label="Source balance"
+      >
+        <CardPay::BalanceDisplay
+          class="withdrawal-transaction-amount__balance"
+          @size="small"
+          @icon={{this.currentTokenDetails.icon}}
+          @name={{this.currentTokenDetails.symbol}}
+          @balance={{format-wei-amount this.currentTokenBalance}}
+          @symbol={{this.currentTokenDetails.symbol}}
+          data-test-withdrawal-balance
+        />
+      </Boxel::Field>
+      <Boxel::Field
+        @tag={{unless this.isConfirmed "label"}}
+        @vertical={{this.isConfirmed}}
+        @label="Amount to withdraw"
+        data-test-amount-label
+      >
+        {{#if this.isConfirmed}}
+          <CardPay::BalanceDisplay
+            class="withdrawal-transaction-amount__token"
+            @size="large"
+            @icon={{this.currentTokenDetails.icon}}
+            @balance={{format-wei-amount this.amountAsBigNumber false}}
+            @symbol={{this.currentTokenSymbol}}
+            @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
+            data-test-amount-entered
+          />
+        {{else}}
+          <Boxel::Input::TokenAmount
+            @onInput={{this.onInputAmount}}
+            @value={{this.amount}}
+            @icon={{this.currentTokenDetails.icon}}
+            @symbol={{this.currentTokenSymbol}}
+            @invalid={{this.isInvalid}}
+            @errorMessage={{this.validationMessage}}
+            @disabled={{or @frozen (eq this.amountCtaState 'memorialized')}}
+          />
+        {{/if}}
+      </Boxel::Field>
+      {{#unless this.isConfirmed}}
+        <Boxel::Field
+          @label="Approximate value*"
+          data-test-approximate-value-label
+        >
+          {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
+        </Boxel::Field>
+      {{/unless}}
+    </div>
+    {{#if this.error}}
+      <CardPay::ErrorMessage data-test-withdrawal-transaction-amount-error>
+        {{#if (eq this.error.message "USER_REJECTION")}}
+          It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
+        {{else if (eq this.error.message "INSUFFICIENT_FUNDS")}}
+          You don’t have enough balance to transfer the selected amount of tokens. Try a smaller amount.
+        {{else}}
+          There was a problem initiating the withdrawal of your tokens from {{network-display-info "layer2" "fullName"}}. Please try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{/if}}
+      </CardPay::ErrorMessage>
+    {{/if}}
+    <div class="withdrawal-transaction-amount__footnote" data-test-approximate-value-footnote>
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{this.amountCtaState}}
+    @disabled={{or @frozen this.isAmountCtaDisabled}}
+    data-test-withdrawal-transaction-amount
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.withdraw}}>
+        {{if this.error "Try Again" "Withdraw"}}
+      </d.ActionButton>
+    </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator
+          class="withdrawal-transaction-amount__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        <div data-test-withdrawal-transaction-amount-in-progress class="withdrawal-transaction-amount__loading-message">
+          Waiting for you to confirm on your Card Wallet mobile app...
+        </div>
+      </i.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <m.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

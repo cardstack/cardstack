@@ -1,0 +1,135 @@
+<Boxel::Thread
+  @autoscroll={{this.autoscroll}}
+  class="workflow-thread workflow-thread-animated"
+  tabindex="0"
+  {{did-insert this.focus}}
+  {{did-insert this.scrollToEnd}}
+  data-test-workflow-thread
+  style={{css-var thread-animation-interval=this.cssThreadAnimationInterval}}
+  ...attributes
+>
+  <:header>
+    <Common::DegradedServiceBanner class="workflow-thread__degraded-service-banner" />
+    <Boxel::ThreadHeader @title={{this.workflow.displayName}}>
+      {{#if @onClose}}
+        <Boxel::Button
+          @size='extra-small'
+          {{on 'click' @onClose}}
+          data-test-return-to-dashboard
+        >
+          Return to Dashboard
+        </Boxel::Button>
+      {{/if}}
+    </Boxel::ThreadHeader>
+  </:header>
+  <:content>
+    {{#if (has-block 'before-content')}}
+      {{yield to='before-content'}}
+    {{/if}}
+    {{#each this.workflow.visibleMilestones as |milestone i|}}
+      {{#each milestone.visiblePostables as |postable j|}}
+        <WorkflowThread::Postable
+          @postable={{postable}}
+          @previous={{object-at milestone.visiblePostables (dec j)}}
+          @frozen={{this.frozen}}
+          @index={{j}}
+          data-test-milestone={{i}}
+        />
+      {{/each}}
+      {{#if milestone.isComplete}}
+        <Boxel::MilestoneBanner
+          @title={{milestone.completedDetail}}
+          @status={{if (eq i (dec this.workflow.milestones.length)) "Workflow completed" "Milestone reached"}}
+          class="workflow-milestone-banner-animated"
+          data-milestone={{i}}
+          data-test-milestone-completed
+          data-test-milestone={{i}}
+        />
+        {{sentry-breadcrumb
+          message=(concat "Milestone completed: " this.workflow.displayName " → " milestone.title)
+        }}
+      {{/if}}
+    {{/each}}
+    {{#if this.workflow.isComplete}}
+      {{#each this.workflow.epilogue.visiblePostables as |postable j|}}
+        <WorkflowThread::Postable
+          @postable={{postable}}
+          @previous={{object-at this.workflow.epilogue.visiblePostables (dec j)}}
+          @frozen={{this.frozen}}
+          @index={{j}}
+          data-test-epilogue
+        />
+      {{/each}}
+    {{else if this.workflow.isCanceled}}
+      {{#each this.workflow.cancelationMessages.visiblePostables as |postable j|}}
+         <WorkflowThread::Postable
+           {{did-insert this.scrollToEnd}}
+           @postable={{postable}}
+           @previous={{if (eq j 0) this.lastMilestonePostable (object-at this.workflow.cancelationMessages.visiblePostables (dec j))}}
+           @index={{j}}
+           data-test-cancelation
+         />
+      {{/each}}
+    {{/if}}
+    <div data-thread-end></div>
+  </:content>
+
+  <:sidebar as |SidebarSection|>
+    <FromElsewhere @name="sidebar-preview-content" as |preview outsideParams|>
+      {{#if preview}}
+      <SidebarSection>
+        {{#if outsideParams.title}}
+          <div class="workflow-thread__sidebar-preview-title" data-test-sidebar-preview-title>
+            {{outsideParams.title}}
+          </div>
+        {{/if}}
+        <div {{scale-down-to-width "var(--boxel-sidebar-max-width)"}} data-test-sidebar-preview-body>
+          {{component preview}}
+        </div>
+        {{#if outsideParams.description}}
+          <div class="workflow-thread__sidebar-preview-description" data-test-sidebar-preview-description>
+            {{outsideParams.description}}
+          </div>
+        {{/if}}
+      </SidebarSection>
+      <hr class="workflow-thread__sidebar-preview-separator" data-test-sidebar-preview-separator/>
+      {{/if}}
+    </FromElsewhere>
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header={{html-safe (concat "Workflow:<br>" this.workflow.displayName)}}
+        @attachNext={{true}}
+      >
+        <div>
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete
+              total=this.workflow.milestones.length
+              completed=this.workflow.completedMilestoneCount
+            }}
+          />
+        </div>
+        <div class="workflow-thread__status">
+          {{this.workflow.progressStatus}}
+        </div>
+      </Boxel::Sidebar::CardContainer>
+
+      <Boxel::Sidebar::CardContainer @header="Milestones">
+        <Boxel::ProgressSteps
+          @progressSteps={{this.workflow.milestones}}
+          @completedCount={{this.workflow.completedMilestoneCount}}
+          @onClickStep={{this.scrollMilestoneIntoView}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+    <SidebarSection>
+      <Boxel::HelpBox @url={{this.mailToSupportUrl}}>
+        <p class="workflow-thread__help-content">
+          If you are experiencing issues or have any questions please contact us.
+        </p>
+      </Boxel::HelpBox>
+      <div class="workflow-thread__app-version">
+        Ver. {{config 'version'}}
+      </div>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>

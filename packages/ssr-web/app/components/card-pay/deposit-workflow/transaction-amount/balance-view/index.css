@@ -1,0 +1,98 @@
+.balance-view {
+  --details-summary-height: 3.125rem; /* 50px */
+  --details-open-height: 11rem;
+  --details-padding-right: calc(var(--boxel-sp) + 3rem);
+
+  position: relative;
+  width: 100%;
+  height: var(--details-summary-height);
+  border: 1px solid var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 35%);
+  overflow: hidden;
+  transition: height var(--boxel-transition);
+}
+
+.balance-view[open] {
+  height: var(--details-open-height);
+  overflow: auto;
+}
+
+.balance-view__summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--details-summary-height);
+  padding: 0 var(--details-padding-right) 0 var(--boxel-sp);
+}
+
+.balance-view__summary::marker,
+.balance-view__summary::-webkit-details-marker {
+  display: none;
+  content: "";
+}
+
+.balance-view__summary:focus {
+  outline-color: var(--boxel-highlight);
+  outline-offset: -5px;
+}
+
+.balance-view[open] .balance-view__summary {
+  height: var(--boxel-sp-lg);
+}
+
+.balance-view__marker::before {
+  display: block;
+  content: "Show";
+}
+
+.balance-view[open] .balance-view__marker::before {
+  content: "Hide";
+}
+
+.balance-view__marker {
+  position: absolute;
+  right: var(--boxel-sp-sm);
+  top: var(--boxel-sp-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.balance-view__marker-icon {
+  margin-left: var(--boxel-sp-xs);
+  transform: rotate(90deg);
+}
+
+.balance-view[open] .balance-view__marker-icon {
+  transform: rotate(-90deg);
+}
+
+/* Details */
+.balance-view__details {
+  padding: 0 var(--boxel-sp-lg);
+}
+
+/* Specific to this card */
+.balance-view__summary-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.balance-view[open] .balance-view__summary-content {
+  display: none;
+}
+
+.balance-view__summary-wallet {
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.balance-view__summary-balance {
+  margin-left: var(--boxel-sp);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}

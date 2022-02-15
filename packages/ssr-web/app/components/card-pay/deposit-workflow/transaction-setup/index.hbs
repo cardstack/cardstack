@@ -1,0 +1,114 @@
+<ActionCardContainer
+  @header="Deposit"
+  @isComplete={{@isComplete}}
+  data-test-deposit-transaction-setup-container
+  data-test-deposit-transaction-setup-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Deposit tokens">
+      <Boxel::Field @label="From:" @horizontalLabelSize="small">
+        {{#if @isComplete}}
+          <CardPay::NestedItems>
+            <:outer>
+              <CardPay::AccountDisplay
+                @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
+                @address={{this.layer1Network.walletInfo.firstAddress}}
+                data-test-deposit-transaction-setup-from-address
+              />
+            </:outer>
+            <:inner>
+              <CardPay::BalanceDisplay
+                @size="large"
+                @icon={{this.selectedToken.icon}}
+                @balance={{format-wei-amount this.selectedToken.balance}}
+                @symbol={{this.selectedToken.symbol}}
+                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedToken.balance}}
+                data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
+              />
+            </:inner>
+          </CardPay::NestedItems>
+        {{else}}
+          <div class="transaction-setup__from">
+            <CardPay::AccountDisplay
+              @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
+              @address={{this.layer1Network.walletInfo.firstAddress}}
+              data-test-deposit-transaction-setup-from-address
+            />
+            <Boxel::RadioInput
+              @groupDescription="Select token to deposit"
+              @items={{this.tokens}}
+              @orientation="vertical"
+              as |token|
+            >
+              {{#let token.data as |t|}}
+                <token.component
+                  @name="token-selection"
+                  @disabled={{eq (format-wei-amount t.balance) "0.00"}}
+                  @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol t.symbol)}}
+                  @onChange={{fn this.chooseSource t}}
+                  data-test-deposit-transaction-setup-from-option={{t.symbol}}
+                >
+                  {{#let (token-to-usd t.symbol t.balance) as |usdBalance|}}
+                    <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                      @balance={{format-wei-amount t.balance}}
+                      @usdBalanceLoading={{is-empty usdBalance}}
+                      @balanceInUsd={{usdBalance}}
+                      @token={{t}}
+                    />
+                  {{/let}}
+                </token.component>
+              {{/let}}
+            </Boxel::RadioInput>
+          </div>
+        {{/if}}
+      </Boxel::Field>
+    </ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Receive tokens">
+      <Boxel::Field @label="In:" @horizontalLabelSize="small">
+        <div>
+          <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-deposit-transaction-setup-to-wallet />
+          <CardPay::NestedItems>
+            <:outer>
+              <CardPay::AccountDisplay
+                @size="small"
+                @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+                data-test-deposit-transaction-setup-to-address
+              />
+            </:outer>
+            <:inner>
+              <CardPay::AccountDisplay
+                @size={{if @isComplete "large"}}
+                @icon="depot"
+                @name="DEPOT:"
+                @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
+                @text={{unless this.layer2Network.depotSafe "New Depot"}}
+                data-test-deposit-transaction-setup-depot-address
+              />
+            </:inner>
+          </CardPay::NestedItems>
+        </div>
+      </Boxel::Field>
+    </ActionCardContainer::Section>
+    {{#if this.noTokenBalance}}
+      <CardPay::ErrorMessage data-test-deposit-transaction-setup-validation>
+        You need DAI or CARD tokens to continue with this workflow.
+      </CardPay::ErrorMessage>
+    {{/if}}
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{or @frozen this.isCtaDisabled}}
+    data-test-deposit-transaction-setup
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.save}}>
+        Continue
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton {{on "click" @onIncomplete}}>
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

@@ -1,0 +1,45 @@
+<ActionCardContainer
+  @header="Confirmation"
+  @isComplete={{@isComplete}}
+  data-test-deposit-confirmation
+>
+  <ActionCardContainer::Section @title="You deposited">
+    <CardPay::Bridge::Item
+      @isLayer1={{true}}
+      @link={{this.depositTxnViewerUrl}}
+      @token={{this.depositedToken}}
+      @amount={{format-wei-amount this.depositedAmount false}}
+      @preposition="from"
+      @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
+      data-test-deposit-confirmation-from
+    />
+    <CardPay::Bridge::Action
+      @icon="lock-wide"
+      @actionTaken="Locked in CARD Protocol reserve pool"
+    />
+  </ActionCardContainer::Section>
+</ActionCardContainer>
+<CardPay::Bridge @link={{this.bridgeExplorerUrl}} />
+<ActionCardContainer
+  @header="Confirmation"
+  @suppressHeader={{true}}
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="You received">
+    <CardPay::Bridge::Action
+      @isArrowAfter={{true}}
+      @icon="coins"
+      @actionTaken={{concat "Minted from CARD Protocol on " (network-display-info "layer2" "fullName")}}
+    />
+    <CardPay::Bridge::Item
+      @isLayer2={{true}}
+      @link={{this.blockscoutUrl}}
+      @token={{this.receivedToken}}
+      @amount={{format-wei-amount this.depositedAmount false}}
+      @preposition="in"
+      @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+      @depotAddress={{this.depotAddress}}
+      data-test-deposit-confirmation-to
+    />
+  </ActionCardContainer::Section>
+</ActionCardContainer>

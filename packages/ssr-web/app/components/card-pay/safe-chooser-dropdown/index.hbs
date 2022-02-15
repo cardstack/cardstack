@@ -1,0 +1,22 @@
+{{#let (or @selectedSafe @safes.firstObject) as |selectedSafe|}}
+  <PowerSelect
+    class="safe-chooser-dropdown"
+    @options={{@safes}}
+    @selected={{selectedSafe}}
+    @onChange={{@onChooseSafe}}
+    @renderInPlace={{true}}
+    @eventType="click" {{!-- to prevent auto-selection of first item, as discussed at https://github.com/cardstack/cardstack/pull/2051 --}}
+    @verticalPosition="below"
+    data-test-safe-chooser-dropdown
+    ...attributes
+  as |safe|>
+    <CardPay::SafeChooserDropdown::SafeOption
+        class={{cn
+        "safe-chooser-dropdown__option"
+        safe-chooser-dropdown__option--selected=(eq safe.address selectedSafe.address)
+      }}
+      @safe={{safe}}
+      @showSafeId={{@showSafeId}}
+    />
+  </PowerSelect>
+{{/let}}

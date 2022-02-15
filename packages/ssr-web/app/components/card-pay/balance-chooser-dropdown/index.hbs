@@ -1,0 +1,21 @@
+<PowerSelect
+  class="balance-chooser-dropdown"
+  @options={{@tokens}}
+  @selected={{@selectedToken}}
+  @onChange={{@chooseToken}}
+  @renderInPlace={{true}}
+  @verticalPosition="below"
+  data-test-balance-chooser-dropdown={{@selectedTokenSymbol}}
+as |token|>
+  <CardPay::BalanceDisplay
+    class={{cn
+      "balance-chooser-dropdown__option"
+      balance-chooser-dropdown__option--selected=(eq token.symbol @selectedTokenSymbol)
+    }}
+    @size="small"
+    @icon={{token.icon}}
+    @name={{token.symbol}}
+    @balance={{format-wei-amount token.balance}}
+    @symbol={{token.symbol}}
+  />
+</PowerSelect>

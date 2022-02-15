@@ -1,0 +1,62 @@
+<ActionCardContainer
+  @header="Balances"
+  @isComplete={{@isComplete}}
+  ...attributes
+>
+  {{#if (eq this.cardState 'memorialized')}}
+    <Listener
+      @emitter={{this.layer2Network}}
+      @event="disconnect"
+      @action={{this.onDisconnect}}
+    />
+    {{#if this.isConnected}}
+      {{#if this.safe}}
+        <ActionCardContainer::Section
+          @title="Remaining Balance"
+          {{did-insert this.layer2Network.refreshSafesAndBalances}}
+        >
+          <CardPay::FieldStack>
+            <Boxel::Field
+              @label={{this.safeAddressLabel}}
+              data-test-safe-address
+            >
+              <CardPay::AccountDisplay
+                @address={{this.safe.address}}
+                @wrapped={{true}}
+              />
+            </Boxel::Field>
+            <Boxel::Field @label={{this.safeBalanceLabel}} data-test-balance-label>
+              {{#if this.balancesToShow.length}}
+                <CardPay::BalancesList as |Balance|>
+                  {{#each this.balancesToShow as |b|}}
+                    <Balance @symbol={{b.symbol}} @amount={{b.balance}} />
+                  {{/each}}
+                </CardPay::BalancesList>
+              {{else}}
+                None
+              {{/if}}
+            </Boxel::Field>
+          </CardPay::FieldStack>
+        </ActionCardContainer::Section>
+      {{else}}
+        <ActionCardContainer::Section
+          @title="Safe Balances"
+          @icon="warning"
+        >
+          <p data-test-safe-not-found>
+            Unable to find safe {{this.safeAddress}}.
+          </p>
+        </ActionCardContainer::Section>
+      {{/if}}
+    {{/if}}
+  {{else}}
+    <ActionCardContainer::Section
+      @title="Safe Balances"
+      @icon="warning"
+    >
+      <p data-test-wallet-disconnected>
+        Cannot display balances because the wallet is disconnected.
+      </p>
+    </ActionCardContainer::Section>
+  {{/if}}
+</ActionCardContainer>

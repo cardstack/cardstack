@@ -1,0 +1,81 @@
+.layer-two-connect-card__body {
+  padding-top: var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__explanation {
+  margin-top: var(--boxel-sp-xs);
+  color: var(--boxel-purple-500);
+}
+
+.layer-two-connect-card__link-container {
+  align-items: center;
+  display: flex;
+  gap: var(--boxel-sp-sm);
+  justify-content: space-around;
+  padding-top: var(--boxel-sp);
+}
+
+.layer-two-connect-card__alternate-wallet {
+  align-items: center;
+  background-color: var(--boxel-light-400);
+  border: 0;
+  color: var(--boxel-purple-400);
+  display: flex;
+  justify-content: space-between;
+  padding-left: var(--boxel-sp-xxl);
+  padding-right: var(--boxel-sp-xxl);
+  text-align: left;
+  /* stylelint-disable-next-line declaration-block-no-duplicate-properties */
+  display: none; /* hide this until we add the destination UI */
+}
+
+.layer-two-connect-card__section {
+  --nested-section-padding: 0 var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__section + .layer-two-connect-card__section {
+  margin-top: 0;
+}
+
+.layer-two-connect-card__section > header::before {
+  display: block;
+  position: absolute;
+  margin-left: -2ch;
+}
+
+.layer-two-connect-card__section--one > header::before {
+  content: "1.";
+}
+
+.layer-two-connect-card__section--two > header::before {
+  content: "2.";
+}
+
+.layer-two-connect-card__alternate-wallet-caret {
+  height: 1.3rem;
+  width: auto;
+
+  --icon-color: var(--boxel-purple-400);
+}
+
+.layer-two-connect-card__alternate-wallet:hover {
+  filter: brightness(102%);
+}
+
+.layer-two-connect-card__loading-qr,
+.layer-two-connect-card__qr-container {
+  text-align: center;
+}
+
+.layer-two-connect-card__loading-qr {
+  display: flex;
+  min-height: 300px;
+}
+
+.layer-two-connect-card__loading-qr > span {
+  margin: auto;
+}
+
+.layer-two-connect-card__account-display {
+  --icon-size: var(--boxel-icon-sm);
+}

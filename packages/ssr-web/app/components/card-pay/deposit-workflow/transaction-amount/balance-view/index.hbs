@@ -1,0 +1,42 @@
+<details class="balance-view" ...attributes>
+  <summary class="balance-view__summary">
+    {{#if @isComplete}}
+      <CardPay::BalanceDisplay
+        class="balance-view__summary-content"
+        @size="small"
+        @name={{concat @wallet " wallet"}}
+        @balance={{@balance}}
+        @symbol={{@tokenSymbol}}
+        data-test-source-token={{@tokenSymbol}}
+      />
+    {{else}}
+      <div class="balance-view__summary-content">
+        <span class="balance-view__summary-wallet">{{@wallet}} wallet</span>
+        <span class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>
+          {{@balance}} {{@tokenSymbol}}
+        </span>
+      </div>
+    {{/if}}
+    <div class="balance-view__marker">
+      {{svg-jar "caret-right" class="balance-view__marker-icon" role="presentation"}}
+    </div>
+  </summary>
+  <CardPay::NestedItems class="balance-view__details">
+    <:outer>
+      <CardPay::AccountDisplay
+        @name={{concat @wallet " wallet"}}
+        @address={{@address}}
+        data-test-source-token={{@tokenSymbol}}
+      />
+    </:outer>
+    <:inner>
+      <CardPay::BalanceDisplay
+        @size="large"
+        @icon={{@tokenIcon}}
+        @balance={{@balance}}
+        @symbol={{@tokenSymbol}}
+        @usdBalance={{@balanceInUsd}}
+      />
+    </:inner>
+  </CardPay::NestedItems>
+</details>

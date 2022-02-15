@@ -1,0 +1,58 @@
+<article
+  class="prepaid-card"
+  style={{css-var
+    header-background=@headerBackground
+    header-theme=(concat "url(" @headerPatternUrl ")")
+    header-text-color=(or @headerTextColor "var(--boxel-dark)")
+    header-pattern-color=(or @headerPatternColor "var(--boxel-light)")
+  }}
+  data-test-prepaid-card={{@address}}
+  data-test-prepaid-card-background={{@headerBackground}}
+  data-test-prepaid-card-pattern={{@headerPatternUrl}}
+  ...attributes
+>
+  <div class="prepaid-card__background prepaid-card__background--color">
+  </div>
+  <div class="prepaid-card__background prepaid-card__background--pattern">
+  </div>
+  <header class="prepaid-card__header">
+    <div>
+      <div>Issued by</div>
+      {{#let (or @issuerName "Enter name") as |name|}}
+        <div class="prepaid-card__name" title={{name}} data-test-prepaid-card-issuer-name>
+          {{name}}
+          {{#if @error}}
+            <span data-test-prepaid-card-load-warning>
+              {{svg-jar "failure-bordered" height="10" width="10" title="Failed to load card customization details"}}
+            </span>
+          {{/if}}
+        </div>
+      {{/let}}
+    </div>
+    <div class="prepaid-card__meta">
+      <div class="prepaid-card__type">PREPAID CARD</div>
+      <div class="prepaid-card__address">{{truncate-middle @address}}</div>
+      <div class="prepaid-card__network">on {{@network}}</div>
+    </div>
+  </header>
+  <section class="prepaid-card__content">
+    <div>
+      <div class="prepaid-card__balance-label">Spendable Balance</div>
+      <div
+        class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}
+        data-test-prepaid-card-balance
+      >
+        ${{format-amount @usdBalance 2}} <span class="prepaid-card__balance-currency-symbol">USD</span>
+      </div>
+    </div>
+    <div class="prepaid-card__content-bottom {{if @mockOptions 'prepaid-card__content-bottom--without-attributes'}}">
+      {{#unless @mockOptions}}
+        <div class="prepaid-card__attributes" data-test-prepaid-card-attributes>
+          <div>{{if @reloadable "Reloadable" "Non-reloadable"}}</div>
+          <div>{{if @transferrable "Transferrable" "Non-transferrable"}}</div>
+        </div>
+      {{/unless}}
+      <div class="prepaid-card__logo" />
+    </div>
+  </section>
+</article>

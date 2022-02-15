@@ -1,0 +1,22 @@
+.card-pay-bridge-action__arrow {
+  position: absolute;
+  left: calc(50% - 1.25rem);
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: var(--boxel-sp-xs);
+}
+
+.card-pay-bridge-action {
+  width: 100%;
+  padding: var(--boxel-sp-lg);
+  background: var(--boxel-purple-100);
+  border-radius: var(--boxel-border-radius);
+  font: var(--boxel-font-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-pay-bridge-action__icon {
+  margin-right: var(--boxel-sp-sm);
+}

@@ -1,0 +1,109 @@
+<ActionCardContainer
+  @header="User Profile"
+  @isComplete={{@isComplete}}
+  data-test-card-space-display-name-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Pick a display name">
+    {{#if @isComplete}}
+      <Boxel::Field
+        @label="Display name"
+        data-test-card-space-display-name
+      >
+        {{this.displayName}}
+      </Boxel::Field>
+      <Boxel::Field
+        @label="Profile Picture (Optional)"
+      >
+      {{#if this.profileImage}}
+        <Avatar
+          @src={{this.profileImage}}
+          @alt="Profile"
+          @rounded={{true}}
+          data-test-card-space-avatar
+        />
+      {{else}}
+        No profile picture
+      {{/if}}
+      </Boxel::Field>
+    {{else}}
+      <Boxel::Field
+        @tag="label"
+        @label="Display name"
+        data-test-card-space-display-name-field
+      >
+        <Boxel::Input::ValidationState
+          @state={{this.displayNameInputState}}
+          @errorMessage={{this.displayNameInputErrorMessage}}
+          @value={{this.displayName}}
+          @onInput={{this.updateDisplayName}}
+          data-test-card-space-display-name-input
+        />
+      </Boxel::Field>
+      <Boxel::Field
+        @label="Profile Picture (Optional)"
+      >
+        <Common::ImageUploadAction
+          @useEditor={{true}}
+          @editorOptions={{this.editorOptions}}
+          @validationOptions={{this.validationOptions}}
+          @onUpload={{perform this.saveImageEditDataTask}}
+          @onError={{this.onError}}
+        >
+          <:default as |startUpload|>
+            <Common::ImageUploadInterface
+              @state={{this.imageUploadState}}
+              @errorMessage={{this.imageUploadErrorMessage}}
+              @image={{this.profileImage}}
+              @cta="Select a Photo"
+              @imageRequirements="Images must be in jpg or png format and max 1MB in size"
+              @onRemoveImage={{this.onImageRemoved}}
+              @startUpload={{startUpload}}
+              data-test-card-space-profile-image-uploader
+            as |ImageUploaderAvatar|>
+              <ImageUploaderAvatar
+                @alt="Profile"
+                @rounded={{true}}
+                data-test-card-space-profile-image-uploader-avatar
+              />
+            </Common::ImageUploadInterface>
+          </:default>
+          <:editor-preview as |preview|>
+            <CardSpace::ProfileCard
+              @profilePhoto={{preview}}
+              @coverPhoto={{@workflowSession.workflow.cardSpaceDetails.coverPhoto}}
+              @name={{@workflowSession.workflow.cardSpaceDetails.name}}
+              @host={{@workflowSession.workflow.cardSpaceDetails.host}}
+              @category={{@workflowSession.workflow.cardSpaceDetails.category}}
+              @description={{@workflowSession.workflow.cardSpaceDetails.description}}
+              @buttonText={{@workflowSession.workflow.cardSpaceDetails.buttonText}}
+              data-test-card-space-profile-card-preview
+            />
+          </:editor-preview>
+        </Common::ImageUploadAction>
+
+      </Boxel::Field>
+    {{/if}}
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{or @frozen this.disableCompletion}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        data-test-card-space-display-name-save-button
+        {{on 'click' this.save}}
+      >
+        Continue
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton
+        data-test-card-space-display-name-edit-button
+        {{on "click" this.edit}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

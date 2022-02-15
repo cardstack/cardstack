@@ -1,0 +1,89 @@
+.workflow-tracker-item {
+  --workflow-tracker-item-color: var(--boxel-light);
+  --workflow-tracker-item-milestone-color: var(--boxel-highlight);
+  --workflow-tracker-item-disabled-color: var(--boxel-purple-200);
+
+  width: 100%;
+  border: 0;
+  border-radius: var(--boxel-border-radius-sm);
+  text-align: left;
+  padding: var(--boxel-sp-sm);
+  display: flex;
+  align-items: center;
+}
+
+.workflow-tracker-item--completed,
+.workflow-tracker-item:disabled {
+  --workflow-tracker-item-color: var(--workflow-tracker-item-disabled-color);
+  --workflow-tracker-item-milestone-color: var(--workflow-tracker-item-disabled-color);
+}
+
+.workflow-tracker-item--completed:hover {
+  --workflow-tracker-item-color: var(--boxel-light);
+  --workflow-tracker-item-milestone-color: var(--boxel-highlight);
+}
+
+.workflow-tracker-item:hover:not(:disabled) {
+  background-color: var(--boxel-purple-400);
+}
+
+.workflow-tracker-item__heading {
+  grid-area: heading;
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.workflow-tracker-item__milestone {
+  grid-area: milestone;
+  color: var(--workflow-tracker-item-milestone-color);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.workflow-tracker-item__heading,
+.workflow-tracker-item__milestone {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-tracker-item__description {
+  width: calc(100% - 25px);
+}
+
+.workflow-tracker-item__description > button {
+  background: transparent;
+  color: var(--workflow-tracker-item-color);
+  border-radius: var(--boxel-border-radius-sm);
+  text-align: left;
+  border: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.workflow-tracker-item__actions {
+  width: 25px;
+}
+
+.workflow-tracker-item__icon {
+  grid-area: icon;
+  justify-self: flex-end;
+  align-self: center;
+  margin-right: 0;
+}
+
+.workflow-tracker-item__delete-icon {
+  background: var(--boxel-danger);
+  border: none;
+  border-radius: 50px;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.workflow-tracker-item__delete-icon:hover {
+  opacity: 1;
+}

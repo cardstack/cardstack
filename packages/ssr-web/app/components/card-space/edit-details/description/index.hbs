@@ -1,0 +1,18 @@
+<Boxel::Field
+  @tag="label"
+  @label="Description"
+>
+  <Boxel::Input
+    @value={{this.description}}
+    @onInput={{this.setDescription}}
+    @invalid={{this.validationMessage}}
+    @errorMessage={{this.validationMessage}}
+    @required={{true}}
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    data-test-card-space-description-field
+    {{on "blur" this.validateDescription}}
+  />
+</Boxel::Field>

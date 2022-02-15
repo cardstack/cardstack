@@ -1,0 +1,14 @@
+<Boxel::CardContainer
+  class={{cn "action-card-container" action-card-container--is-complete=@isComplete}}
+  data-test-action-card={{@dataTestId}}
+  ...attributes
+>
+  {{#if (and @header (not @suppressHeader))}}
+    <Boxel::Header
+      class="action-card-container__header"
+      @header={{@header}}
+    />
+  {{/if}}
+
+  {{yield}}
+</Boxel::CardContainer>

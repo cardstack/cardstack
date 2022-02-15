@@ -1,0 +1,18 @@
+<Boxel::NextStepsBox>
+  <Boxel::Button 
+    @size="base" 
+    @kind="primary" 
+    {{on "click" this.openNewDepositWorkflow}} 
+    data-test-deposit-next-step="new-deposit"
+  >
+    Make Another Deposit
+  </Boxel::Button>
+  <Boxel::Button 
+    @size="base" 
+    @kind="secondary-dark" 
+    {{on "click" this.returnToDashboard}} 
+    data-test-deposit-next-step="dashboard"
+  >
+    Return to Dashboard
+  </Boxel::Button>
+</Boxel::NextStepsBox>

@@ -1,0 +1,72 @@
+html,
+body {
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  display: inline-block;
+}
+
+ul,
+ol {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes drop-fade-below {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drop-fade-above {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * Necessary to make our dropdowns usable via keyboard
+ * They should scroll to the item that keyboard navigation has highlighted
+ * and have a visible background to show that pressing enter
+ * or space will select an item
+ */
+.ember-power-select-options {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.ember-power-select-option[aria-current="true"] {
+  background-color: #ccf0ef;
+}

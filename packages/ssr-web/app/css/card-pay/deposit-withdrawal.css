@@ -1,0 +1,29 @@
+.card-pay-dashboard__deposit-withdrawal > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__deposit-withdrawal .dashboard-details .dashboard-panel-section:last-child {
+  margin-top: var(--boxel-sp-xs);
+}
+
+.card-pay-dashboard__deposit-withdrawal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__deposit-withdrawal-title {
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.card-pay-dashboard__deposit-withdrawal-nav button {
+  margin-left: var(--boxel-sp-sm);
+}
+
+.card-pay-dashboard__deposit-withdrawal-cards {
+  display: grid;
+  gap: var(--boxel-sp-xl) var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+}

@@ -1,0 +1,48 @@
+<Boxel::Field
+  @label="Category"
+  data-test-card-space-category-field
+>
+  <Boxel::RadioInput
+    @groupDescription="Select category"
+    @items={{this.options}}
+    @orientation="vertical"
+    data-test-category-options
+  as |option|>
+    {{#let option.data as |category|}}
+      {{#if (eq category "Other")}}
+        <option.component
+          @name="category"
+          @checked={{this.otherIsChecked}}
+          @onChange={{fn this.setCategoryValue this.otherRadioValue}}
+          data-test-category-option data-test-category-option-other-container
+        >
+          {{#if this.otherIsChecked}}
+            <div class="card-space-category-field__other-container">
+              <span class="card-space-category-field__other-label">Other:</span>
+              <Boxel::Input::ValidationState
+                class="card-space-category-field__other"
+                @state={{this.categoryValidationState}}
+                @value={{readonly this.otherValue}}
+                @onInput={{this.onOtherValueInput}}
+                @errorMessage={{this.categoryValidationMessage}}
+                {{did-insert this.setupOtherValueInput}}
+                data-test-category-option-other
+              />
+            </div>
+          {{else}}
+            {{category}}
+          {{/if}}
+        </option.component>
+      {{else}}
+        <option.component
+          @name="category"
+          @checked={{eq this.categoryValue category}}
+          @onChange={{fn this.setCategoryValue category}}
+          data-test-category-option={{category}}
+        >
+          {{category}}
+        </option.component>
+      {{/if}}
+    {{/let}}
+  </Boxel::RadioInput>
+</Boxel::Field>

@@ -1,0 +1,39 @@
+{{#unless this.isInitializing}}
+  <WorkflowThread class="issue-prepaid-card-workflow" @workflow={{this.workflow}} @onClose={{@onClose}}>
+    <:before-content>
+      <Boxel::ExpandableBanner
+        @icon="info"
+        @summary="Issue a prepaid card"
+        open
+      >
+        <div class="issue-prepaid-card-workflow__banner">
+          <p>
+            As an Issuer, you assist customers in acquiring prepaid cards and reloading the balance when needed.
+            Customers can then use their prepaid cards to purchase a variety of products &amp; services from
+            participating businesses who accept Card Pay as a payment method.
+          </p>
+          <p>
+            <strong>To fund a prepaid card, you need a balance of {{network-display-info "layer2" "daiToken"}} (Dai stablecoin) in your {{network-display-info "layer2" "fullName"}} wallet.</strong>
+          </p>
+          <p>
+            <small>
+              <strong>Fees:</strong> Issuers may charge an issuance fee for each prepaid card they issue to a
+              customer. This could be a flat fee or a percentage of the face value. In addition, issuers may
+              charge a processing fee for issuing prepaid cards that are purchased via credit card payment.
+            </small>
+          </p>
+        </div>
+      </Boxel::ExpandableBanner>
+    </:before-content>
+  </WorkflowThread>
+{{/unless}}
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="disconnect"
+  @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
+/>

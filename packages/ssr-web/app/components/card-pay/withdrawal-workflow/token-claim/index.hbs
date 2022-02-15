@@ -1,0 +1,70 @@
+<ActionCardContainer
+  @header="Token Claim"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-token-claim-is-complete={{@isComplete}}
+  {{did-insert this.resumeClaimBridgedTokens}}
+>
+  <ActionCardContainer::Section
+    @title={{concat "Claim " (network-display-info "layer1" "conversationalName") " tokens"}}
+  >
+    <div class="token-claim__display-box">
+      <div class="token-claim__label">Amount to claim</div>
+      <CardPay::BalanceDisplay
+        class="token-claim__balance-display"
+        @size="large"
+        @icon={{this.tokenDetails.icon}}
+        @balance={{format-wei-amount this.withdrawalAmount false}}
+        @symbol={{this.tokenSymbol}}
+        @text={{concat (format-usd (token-to-usd this.tokenSymbol this.withdrawalAmount)) "*"}}
+        data-test-withdrawal-token-claim-amount
+      />
+    </div>
+    {{#if this.errorMessage}}
+      <CardPay::ErrorMessage>
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      </CardPay::ErrorMessage>
+    {{/if}}
+    <div class="token-claim__footnote">
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{this.ctaState}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.claim}} data-test-claim-button>
+        Claim
+      </d.ActionButton>
+    </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea class="token-claim__in-progress" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator @color="var(--boxel-light)" />
+        <div class="token-claim__in-progress-message">
+          {{#if this.txViewerUrl}}
+            Waiting for transaction to be confirmed on {{network-display-info "layer1" "conversationalName"}}...
+          {{else}}
+            Waiting for you to confirm on {{this.walletProvider.name}}...
+          {{/if}}
+        </div>
+      </i.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-dark" target="_blank" rel="noopener">
+            View on Etherscan
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-light" target="_blank" rel="noopener">
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

@@ -1,0 +1,62 @@
+.safe-chooser-dropdown {
+  --field-height: 3.75rem;
+
+  position: relative;
+  min-height: var(--field-height);
+}
+
+.safe-chooser-dropdown > .ember-power-select-trigger {
+  background: url("/images/icons/caret-dropdown.svg") right 1.125rem center/auto 0.5rem no-repeat;
+  background-color: var(--boxel-light);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius-sm);
+  transition: border-color var(--boxel-transition);
+}
+
+.safe-chooser-dropdown > .ember-power-select-trigger:hover {
+  border-color: var(--boxel-dark);
+  cursor: pointer;
+}
+
+.safe-chooser-dropdown .ember-basic-dropdown-content {
+  max-height: calc(var(--field-height) * 4.5);
+  overflow: auto;
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  background-color: var(--boxel-light);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius-sm);
+}
+
+.safe-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+
+.safe-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}
+
+.safe-chooser-dropdown__option {
+  min-height: var(--field-height);
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xxl) var(--boxel-sp-xs) var(--boxel-sp-xxxs);
+}
+
+.safe-chooser-dropdown__option--selected {
+  background-image: url("/images/icons/checkmark.svg");
+  background-repeat: no-repeat;
+  background-position: right 1.125rem center;
+  background-size: 0.75rem 0.75rem;
+}
+
+.ember-power-select-selected-item .safe-chooser-dropdown__option--selected {
+  background-image: unset;
+}
+
+.safe-chooser-dropdown__option:hover {
+  cursor: pointer;
+}
+
+.ember-power-select-selected-item .safe-chooser-dropdown__option:hover {
+  background-color: initial;
+}

@@ -1,0 +1,56 @@
+.card-pay-header-nav {
+  background-color: var(--boxel-dark);
+  color: var(--boxel-light);
+
+  /* Remove the below two lines after hamburger menu is implemented */
+  height: 3.75rem;
+  overflow: auto;
+}
+
+.card-pay-header-nav__list {
+  list-style-type: none;
+  height: 100%;
+  margin: 0;
+  padding: 0 var(--boxel-sp-xxxl);
+  display: flex;
+  flex-wrap: wrap;
+  white-space: nowrap;
+}
+
+.card-pay-header-nav__list-item {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.card-pay-header-nav__list-item--inactive {
+  opacity: 0.45;
+}
+
+.card-pay-header-nav__tab {
+  --icon-color: currentcolor;
+
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  margin: 0 auto;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) var(--boxel-sp);
+  border-bottom: 2px solid transparent;
+  color: var(--boxel-light);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+  transition: color var(--boxel-transition);
+}
+
+.card-pay-header-nav__tab.active {
+  --icon-color: var(--boxel-highlight);
+
+  border-color: var(--boxel-highlight);
+  color: var(--boxel-highlight);
+}
+
+.card-pay-header-nav__tab svg {
+  margin-right: var(--boxel-sp-xs);
+  flex-shrink: 0;
+}

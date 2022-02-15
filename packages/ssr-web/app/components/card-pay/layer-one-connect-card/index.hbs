@@ -1,0 +1,107 @@
+<ActionCardContainer
+  @suppressHeader={{@suppressHeader}}
+  @header={{concat "Wallet - " (network-display-info "layer1" "fullName")}}
+  @isComplete={{@isComplete}}
+  class="layer-one-connect-card"
+  data-test-mainnnet-connection-action-container
+  {{did-insert this.layer1Network.refreshBalances}}
+  ...attributes
+>
+  {{#if (eq this.cardState 'memorialized')}}
+    <Listener
+      @emitter={{this.layer1Network}}
+      @event="disconnect"
+      @action={{this.onDisconnect}}
+    />
+    <ActionCardContainer::Section
+      class="layer-one-connect-card__body"
+      @title={{this.connectedWalletProvider.name}}
+      @imgUrl={{this.connectedWalletProvider.logo}}
+      @dataTestId="layer-one-connect"
+      data-test-layer-1-wallet-summary
+    >
+      <CardPay::FieldStack>
+        <Boxel::Field @label="Network">
+          {{network-display-info "layer1" "fullName"}}
+        </Boxel::Field>
+
+        {{#if this.isConnected}}
+          <Boxel::Field @label="Address">
+            <CardPay::AccountDisplay
+              @address={{this.layer1Network.walletInfo.firstAddress}}
+              @wrapped={{true}}
+            />
+          </Boxel::Field>
+          <Boxel::Field @label="Balance*" data-test-balance-container>
+            {{#if this.balancesToShow.length}}
+              <CardPay::BalancesList as |Balance|>
+                {{#each this.balancesToShow as |b|}}
+                  <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+                {{/each}}
+              </CardPay::BalancesList>
+            {{else}}
+              None
+            {{/if}}
+          </Boxel::Field>
+        {{/if}}
+
+        <Boxel::Field
+          @label="Status"
+          @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
+        >
+          {{if this.isConnected "Connected" "Disconnected"}}
+        </Boxel::Field>
+      </CardPay::FieldStack>
+
+      {{#if this.isConnected}}
+        <div class="layer-one-connect-card__disclaimer">
+          * This balance reflects some of the tokens that are accepted in the Card Pay network.
+            It may not reflect all the tokens in your wallet.
+        </div>
+      {{/if}}
+
+    </ActionCardContainer::Section>
+  {{else}}
+    <ActionCardContainer::Section
+      @title={{concat "Connect your " (network-display-info "layer1" "fullName") " wallet"}}
+      @dataTestId="layer-one-connect"
+    >
+      <CardPay::LayerOneWalletProviderSelection
+        @walletProviders={{this.walletProviders}}
+        @currentWalletProviderId={{this.radioWalletProviderId}}
+        @changeWalletProvider={{this.changeWalletProvider}}
+        @isConnecting={{this.isWaitingForConnection}}
+      />
+    </ActionCardContainer::Section>
+  {{/if}}
+
+  {{#if this.showActions}}
+    <Boxel::ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
+      <:default as |a|>
+        <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
+          Connect Wallet
+        </a.ActionButton>
+      </:default>
+      <:in-progress as |i|>
+        <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
+          this.radioWalletProviderId "-logo" }} style={{css-var status-icon-size="2.5rem" }}>
+          <Boxel::LoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
+          <div class="layer-one-connect-card__waiting-status">
+            Waiting for you to connect Card Pay with your {{network-display-info "layer1" "conversationalName"}} wallet...
+            <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
+              Cancel
+            </i.CancelButton>
+          </div>
+        </i.ActionStatusArea>
+        <i.InfoArea>
+          Only visible to you
+        </i.InfoArea>
+      </:in-progress>
+      <:memorialized as |m|>
+        <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
+          Disconnect Wallet
+        </m.ActionButton>
+      </:memorialized>
+    </Boxel::ActionChin>
+  {{/if}}
+</ActionCardContainer>

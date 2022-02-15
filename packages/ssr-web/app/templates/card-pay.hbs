@@ -1,0 +1,65 @@
+{{page-title "Card Pay" replace=true}}
+
+<Common::DegradedServiceBanner />
+
+<Boxel::Dashboard @darkTheme={{true}} class="card-pay" data-test-card-pay>
+  <:header>
+    <CardPay::Header
+      @title="Card Pay"
+      @logoURL={{this.cardPayLogo}}
+      @layer1ChainName={{network-display-info "layer1" "fullName"}}
+      @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
+      @layer2ChainName={{network-display-info "layer2" "fullName"}}
+      @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
+      @isLayer1Initializing={{this.layer1Network.isInitializing}}
+      @isLayer2Initializing={{this.layer2Network.isInitializing}}
+      @isLayer1Connected={{this.layer1Network.isConnected}}
+      @isLayer2Connected={{this.layer2Network.isConnected}}
+      @layer1Address={{this.layer1Network.walletInfo.firstAddress}}
+      @layer2Address={{this.layer2Network.walletInfo.firstAddress}}
+    />
+    <CardPay::HeaderNav
+      @tabs={{array
+        (hash title="Wallet" route="card-pay.wallet" icon="tab-icon-card")
+        (hash title="Business" route="card-pay.payments" icon="tab-icon-merchant")
+        (hash title="Rewards" route="card-pay.reward" icon="tab-icon-rewards" inactive=true)
+        (hash title="Deposit & Withdrawal" route="card-pay.deposit-withdrawal" icon="tab-icon-token")
+      }}
+    />
+  </:header>
+
+  <:body>
+    <div class="card-pay__body-content">
+      {{outlet}}
+      <Common::Footer class="card-pay__footer" />
+    </div>
+  </:body>
+</Boxel::Dashboard>
+
+<CardPay::LayerConnectModal
+  @name="layer1"
+  @isOpen={{this.isShowingLayer1ConnectModal}}
+  @onClose={{set this 'isShowingLayer1ConnectModal' false}}
+  @isLayerConnected={{this.layer1Network.isConnected}}
+/>
+
+<CardPay::LayerConnectModal
+  @name="layer2"
+  @isOpen={{this.isShowingLayer2ConnectModal}}
+  @onClose={{set this 'isShowingLayer2ConnectModal' false}}
+  @isLayerConnected={{this.layer2Network.isConnected}}
+/>
+
+{{#if this.networkProblemModalOptions}}
+  <CardPay::NetworkProblemModal
+    @isOpen={{true}}
+    @title={{this.networkProblemModalOptions.title}}
+    @body={{this.networkProblemModalOptions.body}}
+    @actionText={{this.networkProblemModalOptions.actionText}}
+    @action={{this.networkProblemModalOptions.action}}
+    @onClose={{this.networkProblemModalOptions.onClose}}
+    @dismissable={{this.networkProblemModalOptions.dismissable}}
+  />
+{{/if}}
+
+<FromElsewhere @name="workflow-tracker-dropdown-target" />

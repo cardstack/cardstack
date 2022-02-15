@@ -1,0 +1,7 @@
+.card-space-category-field__other-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  position: relative;
+  gap: 0 var(--boxel-sp);
+}
