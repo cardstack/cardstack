@@ -7,6 +7,7 @@
     conda activate cardpay-reward-programs
     pip install .
     pip install ".[explore]"
+    pip install ".[dev]"
     python -m cardpay_reward_programs.main
     
 
