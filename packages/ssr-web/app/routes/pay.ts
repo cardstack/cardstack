@@ -5,7 +5,6 @@ import SafeViewer from '@cardstack/ssr-web/services/safe-viewer';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
-import { Layer2NetworkSymbol } from '../utils/web3-strategies/types';
 
 interface PayRouteModel {
   network: string;
@@ -70,7 +69,7 @@ export default class PayRoute extends Route {
       );
     }
 
-    let data = (await this.safeViewer.view(network, address)).safe;
+    let data = (await this.safeViewer.view(network as any, address)).safe; // FIXME
 
     if (!data || data.type !== 'merchant')
       throw new Error(
@@ -83,6 +82,6 @@ export default class PayRoute extends Route {
 
 function isLayer2Network(
   maybeNetwork: string
-): maybeNetwork is Layer2NetworkSymbol {
+): maybeNetwork is 'sokol' | 'xdai' {
   return maybeNetwork === 'xdai' || maybeNetwork === 'sokol';
 }

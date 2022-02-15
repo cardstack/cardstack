@@ -7,15 +7,6 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function () {
-  this.route('card-pay', function () {
-    this.route('wallet');
-    this.route('payments');
-    this.route('reward');
-    this.route('deposit-withdrawal');
-  });
-  this.route('card-space', function () {
-    this.route('profile-card-temp');
-  });
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });
