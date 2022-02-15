@@ -586,7 +586,7 @@ if (process.env.COMPILER) {
             if (this._cachedSlowName0 !== undefined) {
               return this._cachedSlowName0;
             } else {
-              throw new NotReady("slowName", "computeSlowName", "_cachedSlowName0");
+              throw new NotReady("slowName", "computeSlowName", "_cachedSlowName0", "Person");
             }
           }
         `);

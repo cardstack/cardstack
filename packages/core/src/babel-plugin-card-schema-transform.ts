@@ -13,6 +13,7 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
+  cardName: string | undefined;
   opts: {
     fields: CompiledCard['fields'];
     meta: PluginMeta;
@@ -74,6 +75,7 @@ export default function main(babel: typeof Babel) {
 
       Class: {
         enter(path: NodePath<t.Class>, state: State) {
+          state.cardName = path.node.id?.name;
           state.getRawFieldIdentifier = unusedClassMember(path, 'getRawField', t);
           let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
           // you can't upgrade a primitive card to a composite card--you are
@@ -183,7 +185,7 @@ function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: Sta
           if (this.%%cachedName%% !== undefined) {
             return this.%%cachedName%%;
           } else {
-            throw new %%NotReady%%(%%fieldName%%, %%computeVia%%, %%cachedNameMember%%);
+            throw new %%NotReady%%(%%fieldName%%, %%computeVia%%, %%cachedNameMember%%, %%cardName%%);
           }
         `)({
           cachedName: t.identifier(cachedName),
@@ -191,6 +193,7 @@ function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: Sta
           NotReady: state.importUtil.import(path, '@cardstack/core/src/utils/errors', 'NotReady'),
           fieldName: t.stringLiteral(fieldName),
           computeVia: t.stringLiteral(computeVia),
+          cardName: t.stringLiteral(state.cardName ?? '<unknown>'), // this param is for a nice error message if we ever see this in the wild
         }) as t.Statement,
       ])
     )
