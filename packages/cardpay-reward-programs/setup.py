@@ -28,7 +28,7 @@ setup(
             "streamlit",
             "altair",
         ],
-        "dev": ["black", "isort"],
+        "dev": ["black", "isort", "pytest"],
     },
     entry_points={
         "console_scripts": ["run_reward_program=cardpay_reward_programs.main:cli"],
