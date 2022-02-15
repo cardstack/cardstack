@@ -28,11 +28,6 @@ export default function main(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
-        exit(path: NodePath<t.Program>, _state: State) {
-          if (Object.keys(_state.opts.fields).length > 0) {
-            _state.importUtil.import(path, '@cardstack/core/src/field-getter', 'default', 'FieldGetter');
-          }
-        },
       },
 
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
