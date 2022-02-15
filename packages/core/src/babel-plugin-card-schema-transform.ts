@@ -2,7 +2,7 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
-import { error, ImportDetails, unusedClassMember } from './utils/babel';
+import { error, unusedClassMember } from './utils/babel';
 import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-schema-analyze';
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
@@ -29,18 +29,8 @@ export default function main(babel: typeof Babel) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
-          let neededImports: ImportDetails = new Map();
           if (Object.keys(state.opts.fields).length > 0) {
-            neededImports.set('FieldGetter', {
-              moduleSpecifier: '@cardstack/core/src/field-getter',
-              exportedName: 'default',
-            });
-          }
-
-          if (neededImports.size > 0) {
-            for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
-              state.importUtil.import(path, moduleSpecifier, exportedName, localName);
-            }
+            state.importUtil.import(path, '@cardstack/core/src/field-getter', 'default', 'FieldGetter');
           }
         },
       },

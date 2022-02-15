@@ -11,7 +11,7 @@ import { ImportUtil } from 'babel-import-util';
 
 import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
 
-import { getObjectKey, error, ImportDetails } from './utils/babel';
+import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
@@ -30,9 +30,6 @@ interface State {
   opts: CardComponentPluginOptions;
   insideExportDefault: boolean;
   importUtil: ImportUtil;
-
-  // keys are local names in this module that we have chosen.
-  neededImports: ImportDetails;
 }
 
 export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
@@ -58,12 +55,8 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
-          state.neededImports = new Map();
         },
         exit(path: NodePath<t.Program>, state: State) {
-          for (let [localName, { moduleSpecifier, exportedName }] of state.neededImports) {
-            state.importUtil.import(path, moduleSpecifier, exportedName, localName);
-          }
           addGetCardModelOptions(path, state, babel);
         },
       },

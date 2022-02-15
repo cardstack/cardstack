@@ -30,8 +30,6 @@ export function error(path: NodePath<any>, message: string) {
   return path.buildCodeFrameError(message, CompilerError);
 }
 
-export type ImportDetails = Map<string, { moduleSpecifier: string; exportedName: string }>;
-
 export function unusedClassMember(path: NodePath<t.Class>, nameLike: string, t: typeof Babel.types): string {
   let i = 0;
   let classMemberNames = path
