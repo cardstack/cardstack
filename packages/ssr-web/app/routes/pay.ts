@@ -28,9 +28,9 @@ export default class PayRoute extends Route {
         params.merchant_safe_id
       )) as MerchantSafe;
 
-      let merchantInfo: MerchantInfo | undefined;
-      if (merchantSafe?.infoDID)
-        merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID);
+      // we're intentionally ignoring the infoDID being possibly undefined.
+      // and letting the merchant info try to fetch and get into an errored state
+      let merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID!);
 
       return {
         network: params.network,
