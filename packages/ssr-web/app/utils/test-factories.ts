@@ -2,17 +2,9 @@ import { MerchantSafe } from '@cardstack/cardpay-sdk';
 
 import { Resolver } from 'did-resolver';
 import { getResolver } from '@cardstack/did-resolver';
-import Web3 from 'web3';
 
 // created at date affects sorting of safes, making it a constant makes it so safes are by default ordered by the order they're provided
 export const DEFAULT_CREATED_AT_DATE = 0;
-
-// The address generation is not for production use. web3 notes the following:
-// This package has NOT been audited and might potentially be unsafe.
-// Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
-let web3Instance = new Web3();
-export const generateMockAddress = () =>
-  web3Instance.eth.accounts.create().address;
 
 export const getFilenameFromDid = async (did: string) => {
   let resolver = new Resolver({ ...getResolver() });
@@ -52,7 +44,7 @@ export const createMerchantSafe = (
   ...defaultMerchantSafe,
   createdAt: DEFAULT_CREATED_AT_DATE,
   ...opts,
-  address: opts.address || generateMockAddress(),
-  owners: opts.owners || [generateMockAddress()],
-  merchant: opts.merchant || generateMockAddress(),
+  address: opts.address!,
+  owners: opts.owners!,
+  merchant: opts.merchant!,
 });
