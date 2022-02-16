@@ -5,10 +5,13 @@ import SafeViewer from '@cardstack/ssr-web/services/safe-viewer';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
+import { getOwner } from '@ember/application';
+import { MerchantInfo } from '../resources/merchant-info';
 
 interface PayRouteModel {
   network: string;
   merchantSafe: MerchantSafe;
+  merchantInfo: MerchantInfo | undefined;
   exchangeRates: any;
 }
 
@@ -20,12 +23,19 @@ export default class PayRoute extends Route {
     merchant_safe_id: string;
   }): Promise<PayRouteModel> {
     try {
+      const merchantSafe = (await this.fetchMerchantSafe(
+        params.network,
+        params.merchant_safe_id
+      )) as MerchantSafe;
+
+      let merchantInfo: MerchantInfo | undefined;
+      if (merchantSafe?.infoDID)
+        merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID);
+
       return {
         network: params.network,
-        merchantSafe: (await this.fetchMerchantSafe(
-          params.network,
-          params.merchant_safe_id
-        )) as MerchantSafe,
+        merchantSafe,
+        merchantInfo,
         exchangeRates: this.shouldFetchExchangeRates
           ? await this.fetchExchangeRates()
           : undefined,
@@ -77,6 +87,20 @@ export default class PayRoute extends Route {
       );
 
     return data;
+  }
+
+  async fetchMerchantInfo(infoDID: string) {
+    // use a resource in a blocking manner
+    // see https://github.com/NullVoxPopuli/ember-resources/issues/316
+    let merchantInfo = new MerchantInfo(getOwner(this), {
+      named: {
+        infoDID,
+        waitForInfo: false,
+      },
+    });
+    await merchantInfo.run();
+
+    return merchantInfo;
   }
 }
 

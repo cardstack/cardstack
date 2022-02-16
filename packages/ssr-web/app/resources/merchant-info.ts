@@ -37,10 +37,9 @@ export class MerchantInfo
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
-    this.run();
   }
 
-  private async run() {
+  async run() {
     try {
       await this.fetchMerchantInfo(
         this.args.named.infoDID,

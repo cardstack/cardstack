@@ -10,8 +10,6 @@ import { tracked } from '@glimmer/tracking';
 import { convertToSpend } from '@cardstack/cardpay-sdk';
 import { inject as service } from '@ember/service';
 import IsIOS from '../services/is-ios';
-import { useResource } from 'ember-resources';
-import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/ssr-web/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
 
@@ -22,9 +20,6 @@ export default class PayController extends Controller {
   queryParams = ['amount', 'currency'];
   @tracked amount: number = 0;
   @tracked currency: string = 'SPD';
-  merchantInfo = useResource(this, MerchantInfo, () => ({
-    infoDID: this.model.merchantSafe.infoDID,
-  }));
 
   get canDeepLink() {
     return this.isIOSService.isIOS();
@@ -108,6 +103,10 @@ export default class PayController extends Controller {
 
   get isValidAmount() {
     return !isNaN(this.amount) && this.amount > 0 && this.amount !== Infinity;
+  }
+
+  get merchantInfo() {
+    return this.model.merchantInfo;
   }
 
   // This is necessary because iOS respects users' decisions to visit your site
