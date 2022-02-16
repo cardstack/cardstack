@@ -1,6 +1,6 @@
-# web-client
+# ssr-web
 
-This README outlines the details of collaborating on this Ember application.
+This renders Card Pay merchant payment requests on the server.
 
 ## Prerequisites
 
@@ -15,31 +15,20 @@ You will need the following things properly installed on your computer.
 ## Installation
 
 * `git clone <repository-url>` this repository
-* `cd web-client`
+* `cd packages/ssr-web`
 * `yarn install`
 
 ## Running / Development
 
-* `ember serve`
+* `ember serve -prod` (must be production [for now](https://github.com/embroider-build/embroider/issues/1049#issuecomment-1034079882))
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
-Note that you will have to run the hub for some functionality of this app, see [the hub README](../hub/README.md#running).
-
-To develop the Card Space user page locally, you should:
-1. Add `app.card.space.test` to your `/etc/hosts` as an alias of localhost
-2. Visit `app.card.space.test:4200?card-space-id=${cardSpaceId}` to simulate visiting a card space with that id
+Note that you will have to run the hub for exchange rates, see [the hub README](../hub/README.md#running).
 
 ### Required environment variables
-Connecting to the Kovan Testnet with WalletConnect requires an Infura project id. This should be specified in a `.env` file in this package's root as:
-```
-INFURA_ID=<your infura project id here>
-```
 
 Deployed versions will use a "HUB_URL" env var, which is processed at the time ember-cl-deploy runs.
-
-### Thread animation interval environment variable
-As a convenience for development, you can set the `THREAD_ANIMATION_INTERVAL` environment variable to control how quickly messages in workflows are shown. 
 
 ### Code Generators
 
@@ -63,7 +52,7 @@ Make use of the many generators for code, try `ember help generate` for more det
 
 ### Deploying
 
-This app is deployed using ember-cli-deploy. CI automatically deploys passing builds of the main branch to staging.
+TBD
 
 ## Further Reading / Useful Links
 
