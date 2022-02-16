@@ -180,6 +180,7 @@
     "json-rpc-random-id": "^1.0.1",
     "macro-decorators": "^0.1.2",
     "markdown-it": "^12.2.0",
+    "node-fetch": "^2.6.7",
     "short-uuid": "^4.2.0",
     "typescript": "^4.2.3",
     "ua-parser-js": "^0.7.28",
