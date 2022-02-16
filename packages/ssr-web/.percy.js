@@ -3,10 +3,10 @@ module.exports = {
   snapshot: {
     widths: [1280],
     percyCSS: `
-    /* Hide frequently-changing element */
-    .styled-qr-code {
-      visibility: hidden !important;
-    }
-  `,
+      /* Hide frequently-changing element */
+      .styled-qr-code {
+        visibility: hidden !important;
+      }
+    `,
   },
 };
