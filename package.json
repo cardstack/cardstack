@@ -75,7 +75,8 @@
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
-    "axe-core": "4.1.4"
+    "axe-core": "4.1.4",
+    "node-fetch": "^2.6.7"
   },
   "workspaces": {
     "packages": [
