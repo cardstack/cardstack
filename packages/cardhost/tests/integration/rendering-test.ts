@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
@@ -82,5 +82,45 @@ module('Integration | Card Rendering', function (hooks) {
     assert.dom('p').containsText('Bob likes pizza');
   });
 
-  skip('Can render an async computed field');
+  test('Can render an async computed field', async function (assert) {
+    createCard({
+      id: 'bob',
+      realm: localRealmURL,
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      data: {
+        firstName: 'Bob',
+      },
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+
+          export default class Hello {
+            @contains(string)
+            firstName;
+
+            @contains(string, { computeVia: "computeFoodPref" }) foodPref;
+            async computeFoodPref() {
+              await new Promise(resolve => setTimeout(resolve, 10));
+              return this.firstName + " likes pizza";
+            }
+
+            @contains(string)
+            get loudFoodPref() {
+              return this.foodPref + "!";
+            }
+          }
+        `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<h1><@fields.firstName /></h1><p><@fields.loudFoodPref /></p>`
+        ),
+      },
+    });
+
+    await renderCard({ id: 'bob' });
+
+    assert.dom('h1').containsText('Bob');
+    assert.dom('p').containsText('Bob likes pizza!');
+  });
 });

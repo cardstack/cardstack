@@ -15,9 +15,10 @@ import { getOwner } from '@cardstack/di';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
-import { BadRequest, isNotReadyError } from '@cardstack/core/src/utils/errors';
+import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
 import { service } from '@cardstack/hub/services';
+import { getFieldValue } from '@cardstack/core/src/utils/fields';
 
 export interface NewCardParams {
   realm: string;
@@ -73,6 +74,7 @@ export default class CardModelForHub implements CardModel {
   async getField(name: string): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
+    //   TODO need to deserialize value
     //   return get(this.data, name);
     // }
 
@@ -81,10 +83,8 @@ export default class CardModelForHub implements CardModel {
     let SchemaClass = this.fileCache.loadModule(this.state.schemaModule).default;
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
 
-    await loadField(schemaInstance, name);
-
     // TODO need to deserialize value
-    return schemaInstance[name];
+    return await getFieldValue(schemaInstance, name);
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
@@ -243,25 +243,6 @@ export default class CardModelForHub implements CardModel {
       deserialized: false,
     };
   }
-}
-
-async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
-  let result;
-  let isLoaded = false;
-  do {
-    try {
-      result = schemaInstance[fieldName];
-      isLoaded = true;
-    } catch (e: any) {
-      if (!isNotReadyError(e)) {
-        throw e;
-      }
-
-      let { computeVia, cacheFieldName } = e;
-      schemaInstance[cacheFieldName] = await schemaInstance[computeVia]();
-    }
-  } while (!isLoaded);
-  return result;
 }
 
 function assertNever(value: never) {

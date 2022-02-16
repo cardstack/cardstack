@@ -1,5 +1,6 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
+import { isNotReadyError } from './errors';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -89,4 +90,39 @@ function buildDeserializerMapForField(map: any, field: Field, usedPath: string):
 
     map[field.card.serializer].push(usedPath);
   }
+}
+
+export async function getFieldValue(schemaInstance: any, fieldName: string): Promise<any> {
+  // If the path is deeply nested, we need to recurse the down
+  // the schema instances until we get to a field getter
+  async function getGetter(schema: any, path: string): Promise<any> {
+    let [key, ...tail] = path.split('.');
+    await loadField(schema, key);
+    let getter = schema[key];
+    if (tail && tail.length) {
+      return getGetter(getter, tail.join('.'));
+    }
+    return getter;
+  }
+
+  return await getGetter(schemaInstance, fieldName);
+}
+
+async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
+  let result;
+  let isLoaded = false;
+  do {
+    try {
+      result = schemaInstance[fieldName];
+      isLoaded = true;
+    } catch (e: any) {
+      if (!isNotReadyError(e)) {
+        throw e;
+      }
+
+      let { computeVia, cacheFieldName } = e;
+      schemaInstance[cacheFieldName] = await schemaInstance[computeVia]();
+    }
+  } while (!isLoaded);
+  return result;
 }
