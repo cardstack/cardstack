@@ -17,6 +17,7 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
             export default class Person {
               @contains(string) name;
+              @contains(string) lname;
             }
           `,
         },
@@ -114,7 +115,7 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import person from "../person";
-            export default class Post {
+            export default class Book {
               @contains(person) author;
             }
           `,
@@ -129,6 +130,7 @@ if (process.env.COMPILER) {
         data: {
           author: {
             name: 'Sue',
+            lname: 'F',
           },
         },
       });
@@ -139,7 +141,8 @@ if (process.env.COMPILER) {
         adoptsFrom: '../book',
         data: {
           author: {
-            name: 'Ed',
+            name: 'Beste',
+            lname: 'N',
           },
         },
       });
@@ -151,6 +154,7 @@ if (process.env.COMPILER) {
         data: {
           author: {
             name: 'Burcu',
+            lname: 'N',
           },
         },
       });
@@ -161,51 +165,9 @@ if (process.env.COMPILER) {
         adoptsFrom: '../book',
         data: {
           author: {
-            name: 'Xavier',
+            name: 'Ed',
+            lname: 'F',
           },
-        },
-      });
-
-      // different example. remove these
-      await cards.create({
-        realm: realmURL,
-        id: 'member',
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-            export default class Member {
-              @contains(string) name;
-            }
-          `,
-        },
-      });
-
-      await cards.create({
-        realm: realmURL,
-        id: 'member0',
-        adoptsFrom: '../member',
-        data: {
-          name: 'Sue',
-        },
-      });
-
-      await cards.create({
-        realm: realmURL,
-        id: 'member1',
-        adoptsFrom: '../member',
-        data: {
-          name: 'Ed',
-        },
-      });
-
-      await cards.create({
-        realm: realmURL,
-        id: 'member2',
-        adoptsFrom: '../member',
-        data: {
-          name: 'Burcu',
         },
       });
     });
@@ -236,6 +198,104 @@ if (process.env.COMPILER) {
     });
 
     describe('.query()', function () {
+      // tests for query.sort:
+      // string field: ordering alphabetically, ie. ordering by author.name
+      // integer field: ascending, descending
+      // date field: similar to filter.gt above but a different SQL expression
+
+      it.only(`can sort by string data (ascending)`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: 'author.name',
+            on: `${realmURL}book`,
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book1`, // Beste
+          `${realmURL}book2`, // Burcu
+          `${realmURL}book3`, // Ed
+          `${realmURL}book0`, // Sue
+        ]);
+      });
+
+      it.only(`can sort by string data (descending)`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: 'author.name',
+            on: `${realmURL}book`,
+            direction: 'desc',
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // Sue
+          `${realmURL}book3`, // Ed
+          `${realmURL}book2`, // Burcu
+          `${realmURL}book1`, // Beste
+        ]);
+      });
+
+      it.only(`can sort by multiple string field conditions`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: ['author.lname', 'author.name'],
+            on: `${realmURL}book`,
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book3`, // Ed F
+          `${realmURL}book0`, // Sue F
+          `${realmURL}book1`, // Beste N
+          `${realmURL}book2`, // Burcu N
+        ]);
+      });
+
+      it.only(`can sort by multiple string field conditions in given directions`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: ['author.lname', 'author.name'],
+            on: `${realmURL}book`,
+            direction: ['asc', 'desc'],
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // Sue F
+          `${realmURL}book3`, // Ed F
+          `${realmURL}book2`, // Burcu N
+          `${realmURL}book1`, // Beste N
+        ]);
+      });
+
+      it.only(`can sort by multiple string field conditions (single direction given)`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: ['author.lname', 'author.name'],
+            on: `${realmURL}book`,
+            direction: ['desc'],
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book1`, // Beste N
+          `${realmURL}book2`, // Burcu N
+          `${realmURL}book3`, // Ed F
+          `${realmURL}book0`, // Sue F
+        ]);
+      });
+
       it(`can filter by card type`, async function () {
         let matching = await cards.query('embedded', {
           filter: { type: `${realmURL}post` },
@@ -321,42 +381,6 @@ if (process.env.COMPILER) {
           },
         });
         expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post0`, `${realmURL}book0`]);
-      });
-
-      // tests for query.sort:
-      // string field: ordering alphabetically, ie. ordering by author.name
-      // integer field: ascending, descending
-      // date field: similar to filter.gt above but a different SQL expression
-
-      it(`can sort by string field (ascending)`, async function () {
-        let matching = await cards.query('embedded', {
-          sort: {
-            by: 'author.name',
-            on: `${realmURL}book`,
-          },
-        });
-        expect(matching.map((m) => m.url)).to.deep.equal([
-          `${realmURL}book2`,
-          `${realmURL}book1`,
-          `${realmURL}book0`,
-          `${realmURL}book3`,
-        ]);
-      });
-
-      it(`can sort by string field (descending)`, async function () {
-        let matching = await cards.query('embedded', {
-          sort: {
-            by: 'author.name',
-            on: `${realmURL}book`,
-            direction: 'desc',
-          },
-        });
-        expect(matching.map((m) => m.url)).to.deep.equal([
-          `${realmURL}book3`,
-          `${realmURL}book0`,
-          `${realmURL}book1`,
-          `${realmURL}book2`,
-        ]);
       });
     });
 

@@ -119,7 +119,7 @@ export class CardService {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       if (query.sort) {
-        expression = [...expression, ...sortToExpression(query.sort)];
+        expression = [...expression, 'order by', sortToExpression(query.sort)];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       let res = await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
@@ -224,28 +224,46 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   throw unimpl('unknown');
 }
 
-function sortToExpression(sort: Sort): CardExpression {
+function sortToExpression(sort: Sort): string {
   let { by, on, direction } = sort;
 
-  let directionExp = direction?.toLowerCase() === 'desc' ? 'desc' : 'asc';
+  /*
+    sort: {
+      by: 'author.name',
+      on: 'https://cardstack.local/book',
+      direction: 'desc',
+    },
 
-  let sortBy = by
-    .split('.')
-    .map((part) => `'${part}'`)
-    .join(' -> ');
-  // another option for `where`, something like: `${columnName('searchData')} -> '${on}' -> 'author' ? 'name'`
-
-  if (!on) {
-    return [`order by ${columnName('searchData')} -> ${sortBy}`, directionExp];
+    returns:
+    `"searchData" #>> '{https://cardstack.local/book,author,name}' DESC`;
+  */
+  if (typeof by === 'string') {
+    let byExp = by.split('.').join(',');
+    let directionExp = direction === 'desc' ? 'DESC' : 'ASC';
+    return `${columnName('searchData')} #>> '{${on},${byExp}}' ${directionExp}`;
   }
 
-  return [
-    'where',
-    param(on),
-    '= ANY (ancestors)',
-    `order by ${columnName('searchData')} -> '${on}' -> ${sortBy}`,
-    directionExp,
-  ];
+  /*
+    sort: {
+      by: ['author.lname', 'author.fname'],
+      on: 'https://cardstack.local/book',
+      direction: ['asc', 'desc'],
+    }
+
+    returns:
+      `"searchData" #>> '{https://cardstack.local/book,author,lname}' ASC,
+       "searchData" #>> '{https://cardstack.local/book,author,fname}' DESC`
+  */
+  let expressions: string[] = [];
+  if (by.length > 0) {
+    expressions = by.map(
+      (e, i) =>
+        `${columnName('searchData')} #>> '{${on},${e.split('.').join(',')}}' ${
+          direction && direction[i] === 'desc' ? 'DESC' : 'ASC'
+        }`
+    );
+  }
+  return expressions.join(',');
 }
 
 const pgComparisons: { [operator: string]: string } = {

@@ -18,10 +18,12 @@ export interface TypedFilter {
   on?: CardURL;
 }
 
+type SortDirection = 'asc' | 'desc';
+
 export interface Sort {
-  by: string;
-  on?: CardURL;
-  direction?: 'asc' | 'desc';
+  by: string | string[];
+  on: CardURL;
+  direction?: SortDirection | SortDirection[];
 }
 
 // The CardTypeFilter is used when you solely want to filter for all cards that
