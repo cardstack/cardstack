@@ -21,12 +21,11 @@ base: &base
             max_value: 18446744073709551615
             type: uint64
             validity_column: timestamp_uint64_valid
-      partition_column: block_number
       partition_sizes:
         - 524288
         - 32768
         - 1024
-  version: 0.0.1
+  version: 0.0.2
 
 staging:
   <<: *base
