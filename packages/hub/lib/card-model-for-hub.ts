@@ -15,7 +15,7 @@ import { getOwner } from '@cardstack/di';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
-import { BadRequest } from '@cardstack/core/src/utils/errors';
+import { BadRequest, isNotReadyError } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
 import { service } from '@cardstack/hub/services';
 
@@ -81,8 +81,10 @@ export default class CardModelForHub implements CardModel {
     let SchemaClass = this.fileCache.loadModule(this.state.schemaModule).default;
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
 
+    await loadField(schemaInstance, name);
+
     // TODO need to deserialize value
-    return await schemaInstance[name];
+    return schemaInstance[name];
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
@@ -241,6 +243,25 @@ export default class CardModelForHub implements CardModel {
       deserialized: false,
     };
   }
+}
+
+async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
+  let result;
+  let isLoaded = false;
+  do {
+    try {
+      result = schemaInstance[fieldName];
+      isLoaded = true;
+    } catch (e: any) {
+      if (!isNotReadyError(e)) {
+        throw e;
+      }
+
+      let { computeVia, cacheFieldName } = e;
+      schemaInstance[cacheFieldName] = await schemaInstance[computeVia]();
+    }
+  } while (!isLoaded);
+  return result;
 }
 
 function assertNever(value: never) {
