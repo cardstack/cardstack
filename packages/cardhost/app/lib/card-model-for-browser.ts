@@ -305,11 +305,11 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get serializerMap(): ComponentInfo['serializerMap'] {
-    return this.state.componentModule.ComponentMeta.serializerMap;
+    return this.state.componentModule.serializerMap;
   }
 
   get usedFields(): ComponentInfo['usedFields'] {
-    return this.state.componentModule.ComponentMeta.usedFields;
+    return this.state.componentModule.usedFields;
   }
 
   async save(): Promise<void> {

@@ -80,18 +80,21 @@ if (process.env.COMPILER) {
       );
 
       expect(embedded.usedFields).to.deep.equal(['name', 'birthdate']);
-
       expect(embedded.serializerMap).to.deep.equal({
         date: ['birthdate'],
       });
-      expect(getFileCache().getModule(embedded.metaModule.global, 'browser')).to.containsSource(`
-        export const ComponentMeta = {
-          serializerMap: {
-            date: ["birthdate"]
-          },
-          computedFields: [],
-          usedFields: ["name", "birthdate"]
-        };
+
+      let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
+      expect(metaModuleSource).to.containsSource(`
+        export const serializerMap = {
+          date: ["birthdate"]
+        }
+      `);
+      expect(metaModuleSource).to.containsSource(`
+        export const computedFields = [];
+      `);
+      expect(metaModuleSource).to.containsSource(`
+        export const usedFields = ["name", "birthdate"];
       `);
     });
 

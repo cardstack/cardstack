@@ -215,17 +215,14 @@ export interface CardSchemaModule {
 }
 
 export interface CardComponentMetaModule {
-  ComponentMeta: {
-    serializerMap: SerializerMap;
-    computedFields: string[];
-    usedFields: string[];
-  };
+  serializerMap: SerializerMap;
+  computedFields: string[];
+  usedFields: string[];
 }
 
-export interface CardComponentModule {
+export type CardComponentModule = {
   default: unknown;
-  ComponentMeta: CardComponentMetaModule['ComponentMeta'];
-}
+} & CardComponentMetaModule;
 
 export interface RealmConfig {
   url: string;

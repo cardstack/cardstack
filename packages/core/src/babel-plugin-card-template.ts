@@ -58,7 +58,7 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         },
         exit(path: NodePath<t.Program>, state: State) {
           path.node.body.push(
-            babel.template(`export { ComponentMeta } from %%metaModulePath%%;`)({
+            babel.template(`export * from %%metaModulePath%%;`)({
               metaModulePath: state.opts.metaModulePath,
             }) as t.Statement
           );
