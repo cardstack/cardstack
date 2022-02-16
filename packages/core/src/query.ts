@@ -6,7 +6,7 @@ import qs from 'qs';
 
 export interface Query {
   filter?: Filter;
-  sort?: string | string[];
+  sort?: Sort;
   page?: { size?: number | string; cursor?: string };
   queryString?: string;
 }
@@ -16,6 +16,12 @@ export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilte
 
 export interface TypedFilter {
   on?: CardURL;
+}
+
+export interface Sort {
+  by: string;
+  on?: CardURL;
+  direction?: 'asc' | 'desc';
 }
 
 // The CardTypeFilter is used when you solely want to filter for all cards that

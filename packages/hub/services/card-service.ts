@@ -1,6 +1,6 @@
 import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
 import {
   field,
@@ -118,8 +118,12 @@ export class CardService {
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
+      if (query.sort) {
+        expression = [...expression, ...sortToExpression(query.sort)];
+      }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
+      let res = await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
+      return res;
     } finally {
       client.release();
     }
@@ -218,6 +222,30 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   }
 
   throw unimpl('unknown');
+}
+
+function sortToExpression(sort: Sort): CardExpression {
+  let { by, on, direction } = sort;
+
+  let directionExp = direction?.toLowerCase() === 'desc' ? 'desc' : 'asc';
+
+  let sortBy = by
+    .split('.')
+    .map((part) => `'${part}'`)
+    .join(' -> ');
+  // another option for `where`, something like: `${columnName('searchData')} -> '${on}' -> 'author' ? 'name'`
+
+  if (!on) {
+    return [`order by ${columnName('searchData')} -> ${sortBy}`, directionExp];
+  }
+
+  return [
+    'where',
+    param(on),
+    '= ANY (ancestors)',
+    `order by ${columnName('searchData')} -> '${on}' -> ${sortBy}`,
+    directionExp,
+  ];
 }
 
 const pgComparisons: { [operator: string]: string } = {
