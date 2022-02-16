@@ -6,25 +6,9 @@ const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
 const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME =
   'wallet-staging.stack.cards';
 
-const infuraIdsByTarget = {
-  staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
-  production: '5d6efa6b750b45459184cd11dd2c8697', // this infura id is specific to https://app.cardstack.com/
-};
-
 const universalLinkHostnamesByTarget = {
   staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-};
-
-const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.space.test';
-const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
-const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
-const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
-
-const cardSpaceHostnameSuffixesByTarget = {
-  production: CARD_SPACE_HOSTNAME_SUFFIX,
-  staging: CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
-  test: CARD_SPACE_HOSTNAME_TEST_SUFFIX,
 };
 
 const pkg = require('../package.json');
@@ -40,9 +24,6 @@ module.exports = function (environment) {
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    cardSpaceHostnameSuffix:
-      cardSpaceHostnameSuffixesByTarget[process.env.DEPLOY_TARGET] ??
-      CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
@@ -79,17 +60,6 @@ module.exports = function (environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-    chains: {
-      layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
-      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
-    },
-    features: {
-      createMerchant: true,
-      enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
-      enableCardPay: true,
-    },
-    infuraId:
-      infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {
       about: 'https://cardstack.com/cardpay',
       appStoreLink:
@@ -111,7 +81,6 @@ module.exports = function (environment) {
           : 'https://app-staging.stack.cards') + v
       );
     }),
-    threadAnimationInterval: 1000,
     'ember-cli-mirage': {
       enabled: false,
     },
@@ -124,15 +93,11 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
     ENV.hubURL = ENV.hubURL ?? 'http://localhost:3000';
-    ENV.threadAnimationInterval =
-      process.env.THREAD_ANIMATION_INTERVAL ?? ENV.threadAnimationInterval;
   }
 
   if (environment === 'test') {
     // Testem prefers this...
     ENV.locationType = 'none';
-    ENV.chains.layer1 = 'test';
-    ENV.chains.layer2 = 'test';
 
     // thread animation interval > 0 means we might have to wait for css animations in tests
     ENV.threadAnimationInterval = 0;
