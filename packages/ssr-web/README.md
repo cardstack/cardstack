@@ -21,8 +21,8 @@ You will need the following things properly installed on your computer.
 ## Running / Development
 
 * `ember serve -prod` (must be production [for now](https://github.com/embroider-build/embroider/issues/1049#issuecomment-1034079882))
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-* Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+* Visit your app at [http://localhost:4210](http://localhost:4210).
+* Visit your tests at [http://localhost:4210/tests](http://localhost:4210/tests).
 
 Note that you will have to run the hub for exchange rates, see [the hub README](../hub/README.md#running).
 
