@@ -37,10 +37,7 @@
       ],
       "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
       "@cardstack/ssr-web/mirage/*": ["mirage/*"],
-      "web3-provider-engine": ["../../types/web3-provider-engine"],
-      "fetch": [
-        "../../node_modules/ember-fetch"
-      ]
+      "web3-provider-engine": ["../../types/web3-provider-engine"]
     }
   },
   "include": [
