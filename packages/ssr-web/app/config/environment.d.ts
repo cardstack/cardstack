@@ -1,16 +1,5 @@
 export default config;
 
-interface ChainsOptions {
-  layer1: string;
-  layer2: string;
-}
-
-interface FeaturesOptions {
-  createMerchant: boolean;
-  enableCardSpace: boolean;
-  enableCardPay: boolean;
-}
-
 interface UrlsOptions {
   about: string;
   appStoreLink: string;
@@ -32,13 +21,8 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   universalLinkDomain: string;
-  cardSpaceHostnameSuffix: string;
-  chains: ChainsOptions;
-  features: FeaturesOptions;
   version: string;
-  infuraId: string;
   urls: UrlsOptions;
   walletConnectIcons: string[];
   APP: Record<string, unknown>;
-  threadAnimationInterval: number;
 };
