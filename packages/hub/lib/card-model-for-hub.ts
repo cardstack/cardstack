@@ -18,6 +18,7 @@ import { cardURL } from '@cardstack/core/src/utils';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
 import { service } from '@cardstack/hub/services';
+import { getFieldValue } from '@cardstack/core/src/utils/fields';
 
 export interface NewCardParams {
   realm: string;
@@ -73,6 +74,7 @@ export default class CardModelForHub implements CardModel {
   async getField(name: string): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
+    //   TODO need to deserialize value
     //   return get(this.data, name);
     // }
 
@@ -82,7 +84,7 @@ export default class CardModelForHub implements CardModel {
     let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
 
     // TODO need to deserialize value
-    return await schemaInstance[name];
+    return await getFieldValue(schemaInstance, name);
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
