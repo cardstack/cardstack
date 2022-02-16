@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 module.exports = function (/* environment */) {
   return {
     buildSandboxGlobals(defaultGlobals) {
@@ -5,6 +7,7 @@ module.exports = function (/* environment */) {
         btoa: function (str) {
           return Buffer.from(str).toString('base64');
         },
+        fetch,
       });
     },
   };

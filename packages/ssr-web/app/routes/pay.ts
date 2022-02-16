@@ -1,7 +1,6 @@
 import Route from '@ember/routing/route';
 import '../css/pay.css';
 import { inject as service } from '@ember/service';
-import fetch from 'fetch';
 import SafeViewer from '@cardstack/ssr-web/services/safe-viewer';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
