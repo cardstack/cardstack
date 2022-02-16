@@ -43,35 +43,43 @@ export function babelPluginComponentMeta(babel: typeof Babel) {
     visitor: {
       Program: {
         exit(path: NodePath<t.Program>, state: State) {
-          addComponentMetaExport(path, state, babel);
+          path.node.body.push(exportSerializerMap(state, babel));
+          path.node.body.push(exportComputedFields(state, babel));
+          path.node.body.push(exportUsedFields(state, babel));
         },
       },
     },
   };
 }
 
-function addComponentMetaExport(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+function exportSerializerMap(state: State, babel: typeof Babel): t.Statement {
   let t = babel.types;
   let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
   state.opts.serializerMap = serializerMap;
 
-  path.node.body.push(
-    babel.template(`
-      export const ComponentMeta = {
-          serializerMap: %%serializerMap%%,
-          computedFields: %%computedFields%%,
-          usedFields: %%usedFields%%
-        };
-      `)({
-      serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
-      computedFields: t.arrayExpression(
-        Object.values(state.opts.fields)
-          .filter((field) => field.computed)
-          .map((field) => t.stringLiteral(field.name))
-      ),
-      usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
-    }) as t.Statement
-  );
+  return babel.template(`export const serializerMap = %%serializerMap%%;`)({
+    serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
+  }) as t.Statement;
+}
+
+function exportComputedFields(state: State, babel: typeof Babel): t.Statement {
+  let t = babel.types;
+
+  return babel.template(`export const computedFields = %%computedFields%%;`)({
+    computedFields: t.arrayExpression(
+      Object.values(state.opts.fields)
+        .filter((field) => field.computed)
+        .map((field) => t.stringLiteral(field.name))
+    ),
+  }) as t.Statement;
+}
+
+function exportUsedFields(state: State, babel: typeof Babel): t.Statement {
+  let t = babel.types;
+
+  return babel.template(`export const usedFields = %%usedFields%%;`)({
+    usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
+  }) as t.Statement;
 }
 
 function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {

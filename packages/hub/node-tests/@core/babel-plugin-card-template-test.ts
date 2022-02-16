@@ -80,7 +80,7 @@ if (process.env.COMPILER) {
 
     it('exports ComponentMeta', async function () {
       expect(code).to.containsSource(`
-        export { ComponentMeta } from "${options.metaModulePath}";
+        export * from "${options.metaModulePath}";
       `);
     });
   });
