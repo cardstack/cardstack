@@ -10,7 +10,7 @@ on:
       - 'packages/wc-provider/**'
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
-      - '.github/workflows/pr-web-client.yml'
+      - '.github/workflows/pr-ssr-web.yml'
       - 'package.json'
       - 'yarn.lock'
 
