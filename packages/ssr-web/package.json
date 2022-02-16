@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/ssr-web",
   "version": "0.28.17",
-  "description": "The cardstack web front-end app",
+  "description": "An Ember Fastboot application for SSR payment requests",
   "repository": "",
   "license": "MIT",
   "author": "",
