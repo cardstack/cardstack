@@ -235,12 +235,12 @@ function sortToExpression(sort: Sort): string {
     },
 
     returns:
-    `"searchData" #>> '{https://cardstack.local/book,author,name}' DESC`;
+    `"searchData" #> '{https://cardstack.local/book,author,name}' DESC`;
   */
   if (typeof by === 'string') {
     let byExp = by.split('.').join(',');
     let directionExp = direction === 'desc' ? 'DESC' : 'ASC';
-    return `${columnName('searchData')} #>> '{${on},${byExp}}' ${directionExp}`;
+    return `${columnName('searchData')} #> '{${on},${byExp}}' ${directionExp}`;
   }
 
   /*
@@ -251,14 +251,14 @@ function sortToExpression(sort: Sort): string {
     }
 
     returns:
-      `"searchData" #>> '{https://cardstack.local/book,author,lname}' ASC,
-       "searchData" #>> '{https://cardstack.local/book,author,fname}' DESC`
+      `"searchData" #> '{https://cardstack.local/book,author,lname}' ASC,
+       "searchData" #> '{https://cardstack.local/book,author,fname}' DESC`
   */
   let expressions: string[] = [];
   if (by.length > 0) {
     expressions = by.map(
       (e, i) =>
-        `${columnName('searchData')} #>> '{${on},${e.split('.').join(',')}}' ${
+        `${columnName('searchData')} #> '{${on},${e.split('.').join(',')}}' ${
           direction && direction[i] === 'desc' ? 'DESC' : 'ASC'
         }`
     );

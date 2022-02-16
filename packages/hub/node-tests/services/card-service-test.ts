@@ -115,8 +115,10 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import person from "../person";
+            import integer from "https://cardstack.com/base/integer";
             export default class Book {
               @contains(person) author;
+              @contains(integer) editions;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate('<@field.author.name />'),
@@ -132,6 +134,7 @@ if (process.env.COMPILER) {
             name: 'Sue',
             lname: 'F',
           },
+          editions: 4,
         },
       });
 
@@ -144,6 +147,7 @@ if (process.env.COMPILER) {
             name: 'Beste',
             lname: 'N',
           },
+          editions: 5,
         },
       });
 
@@ -156,6 +160,7 @@ if (process.env.COMPILER) {
             name: 'Burcu',
             lname: 'N',
           },
+          editions: 2,
         },
       });
 
@@ -168,6 +173,7 @@ if (process.env.COMPILER) {
             name: 'Ed',
             lname: 'F',
           },
+          editions: 3,
         },
       });
     });
@@ -197,13 +203,13 @@ if (process.env.COMPILER) {
       });
     });
 
-    describe('.query()', function () {
+    describe.only('.query()', function () {
       // tests for query.sort:
       // string field: ordering alphabetically, ie. ordering by author.name
       // integer field: ascending, descending
       // date field: similar to filter.gt above but a different SQL expression
 
-      it.only(`can sort by string data (ascending)`, async function () {
+      it(`can sort by string data (ascending)`, async function () {
         let matching = await cards.query('embedded', {
           sort: {
             by: 'author.name',
@@ -221,7 +227,7 @@ if (process.env.COMPILER) {
         ]);
       });
 
-      it.only(`can sort by string data (descending)`, async function () {
+      it(`can sort by string data (descending)`, async function () {
         let matching = await cards.query('embedded', {
           sort: {
             by: 'author.name',
@@ -240,7 +246,7 @@ if (process.env.COMPILER) {
         ]);
       });
 
-      it.only(`can sort by multiple string field conditions`, async function () {
+      it(`can sort by multiple string field conditions`, async function () {
         let matching = await cards.query('embedded', {
           sort: {
             by: ['author.lname', 'author.name'],
@@ -258,7 +264,7 @@ if (process.env.COMPILER) {
         ]);
       });
 
-      it.only(`can sort by multiple string field conditions in given directions`, async function () {
+      it(`can sort by multiple string field conditions in given directions`, async function () {
         let matching = await cards.query('embedded', {
           sort: {
             by: ['author.lname', 'author.name'],
@@ -277,10 +283,28 @@ if (process.env.COMPILER) {
         ]);
       });
 
-      it.only(`can sort by multiple string field conditions (single direction given)`, async function () {
+      it.only(`can sort by integer field`, async function () {
         let matching = await cards.query('embedded', {
           sort: {
-            by: ['author.lname', 'author.name'],
+            by: ['editions'],
+            on: `${realmURL}book`,
+          },
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book2`, // 2
+          `${realmURL}book3`, // 3
+          `${realmURL}book0`, // 4
+          `${realmURL}book1`, // 5
+        ]);
+      });
+
+      it.only(`can sort by mixed field types`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: {
+            by: ['author.lname', 'editions'],
             on: `${realmURL}book`,
             direction: ['desc'],
           },
@@ -289,10 +313,10 @@ if (process.env.COMPILER) {
           },
         });
         expect(matching.map((m) => m.url)).to.deep.equal([
-          `${realmURL}book1`, // Beste N
-          `${realmURL}book2`, // Burcu N
-          `${realmURL}book3`, // Ed F
-          `${realmURL}book0`, // Sue F
+          `${realmURL}book2`, // N 2
+          `${realmURL}book1`, // N 5
+          `${realmURL}book3`, // F 3
+          `${realmURL}book0`, // F 4
         ]);
       });
 
