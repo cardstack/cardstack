@@ -3,6 +3,18 @@
   gap: var(--boxel-sp-xs) 0;
 }
 
+.boxel-field--vertical {
+  grid-template-rows: auto 1fr;
+}
+
+.boxel-field--centered-display {
+  justify-items: center;
+}
+
+.boxel-field--centered-display > *:last-child {
+  order: -1;
+}
+
 .boxel-field--horizontal {
   --boxel-field-label-size: minmax(4rem, 25%);
 

@@ -4,6 +4,7 @@
   --input-icon-space: var(--boxel-sp-xs);
 
   position: relative;
+  width: 100%;
   font-family: var(--boxel-font-family);
   line-height: calc(27 / 20);
   letter-spacing: var(--boxel-lsp-xs);

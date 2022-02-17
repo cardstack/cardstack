@@ -6,6 +6,7 @@
       @fieldId={{this.id}}
       @vertical={{this.vertical}}
       @horizontalLabelSize={{this.horizontalLabelSize}}
+      @centeredDisplay={{this.centeredDisplay}}
       @icon={{this.icon}}
     >
       {{this.value}}
@@ -52,6 +53,13 @@
       @defaultValue="minmax(4rem, 25%)"
       @onInput={{fn (mut this.horizontalLabelSize)}}
       @value={{this.horizontalLabelSize}}
+    />
+    <Args.Bool
+      @name="centeredDisplay"
+      @description="Whether the field content should have a special centered display"
+      @defaultValue="false"
+      @onInput={{fn (mut this.centeredDisplay)}}
+      @value={{this.centeredDisplay}}
     />
     <Args.Yield
       @description="Yield value or form field"

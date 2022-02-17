@@ -1,8 +1,10 @@
 {{#let (element (or @tag "div")) as |Tag|}}
   <Tag
     class={{cn "boxel-field"
-      boxel-field--horizontal=(not @vertical)
+      boxel-field--vertical=(or @vertical @centeredDisplay)
+      boxel-field--horizontal=(not (or @vertical @centeredDisplay))
       boxel-field--small-label=(eq @horizontalLabelSize "small")
+      boxel-field--centered-display=@centeredDisplay
     }}
     data-test-boxel-field
     data-test-boxel-field-id={{@fieldId}}

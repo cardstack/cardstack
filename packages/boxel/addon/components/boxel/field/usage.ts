@@ -6,6 +6,7 @@ export default class extends Component {
   @tracked value = 'Gary Walker';
   @tracked id = 'sample-field';
   @tracked vertical = false;
+  @tracked centeredDisplay = false;
   @tracked horizontalLabelSize = 'default';
   @tracked icon = 'profile';
   @tracked tag = '';
