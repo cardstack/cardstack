@@ -5,7 +5,7 @@ export default class BoomRoute extends Route {
   setupController(controller: Controller, model: any, transition: any) {
     super.setupController(controller, model, transition);
 
-    //@ts-ignore intentional error
+    //@ts-expect-error
     raiseAnUnhandledExceptionOnPurpose();
   }
 }
