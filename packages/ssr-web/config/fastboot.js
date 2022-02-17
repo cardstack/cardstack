@@ -7,6 +7,9 @@ module.exports = function (/* environment */) {
         btoa: function (str) {
           return Buffer.from(str).toString('base64');
         },
+        // polyfill fetch globally for nodejs environment
+        // has to be done here instead of assigning global.fetch
+        // because the server runs the ember app within a sandbox
         fetch,
       });
     },
