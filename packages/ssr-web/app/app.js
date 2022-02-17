@@ -4,14 +4,7 @@ import loadInitializers from 'ember-load-initializers';
 import config from '@cardstack/ssr-web/config/environment';
 import { init as initSentry } from '@sentry/ember';
 
-initSentry({
-  beforeSend(event, hint) {
-    if (hint?.originalException?.toString() === 'Error: USER_REJECTION') {
-      return null;
-    }
-    return event;
-  },
-});
+initSentry();
 
 export default class App extends Application {
   modulePrefix = config.modulePrefix;
