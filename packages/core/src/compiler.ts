@@ -31,7 +31,7 @@ import { hashCardFields } from './utils/fields';
 export const baseCardURL = 'https://cardstack.com/base/base';
 
 function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined)[] {
-  let paths: string[] = [];
+  let paths: (string | undefined)[] = [];
   for (const feature of FEATURE_NAMES) {
     paths.push(sourceCard[feature]);
   }
@@ -41,10 +41,12 @@ function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
+  private modules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
+    this.modules = {};
   }
 
   get dependencies(): Set<string> {
@@ -53,14 +55,13 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let options = {};
-    let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let { cardSource } = this;
-    let schemaModule: ModuleRef | undefined = this.analyzeSchema(cardSource, options, modules);
+    let schemaModule: ModuleRef | undefined = this.analyzeSchema(options);
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
 
-    this.defineAssets(cardSource, modules);
+    this.defineAssets();
 
     let parentCard;
     let serializer = cardSource.deserializer;
@@ -68,7 +69,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     if (isBaseCard(cardSource)) {
       schemaModule = { global: 'todo' };
     } else {
-      parentCard = await this.getParentCard(cardSource, meta);
+      parentCard = await this.getParentCard(meta);
 
       if (!parentCard) {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
@@ -84,7 +85,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
 
       if (schemaModule) {
-        this.prepareSchema(schemaModule, meta, fields, parentCard, modules);
+        this.prepareSchema(schemaModule, meta, fields, parentCard);
       } else {
         schemaModule = parentCard.schemaModule;
       }
@@ -115,25 +116,27 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       schemaModule,
       fields,
       adoptsFrom: parentCard,
-      componentInfos: await this.prepareComponents(cardSource, fields, parentCard, modules),
-      modules,
+      componentInfos: await this.prepareComponents(fields, parentCard),
+      modules: this.modules,
       deps: [...this.dependencies],
     };
   }
 
-  private defineAssets(sourceCard: RawCard<Unsaved> | RawCard, modules: CompiledCard['modules']) {
-    if (!sourceCard.files) {
+  private defineAssets() {
+    let { cardSource, modules } = this;
+
+    if (!cardSource.files) {
       return;
     }
 
-    let assetPaths = difference(Object.keys(sourceCard.files), getNonAssetFilePaths(sourceCard));
+    let assetPaths = difference(Object.keys(cardSource.files), getNonAssetFilePaths(cardSource));
 
     for (const localModule of assetPaths) {
       if (!localModule) {
         continue;
       }
 
-      let source = this.getFile(sourceCard, localModule);
+      let source = this.getFile(cardSource, localModule);
       modules[localModule] = {
         type: getFileType(localModule),
         source,
@@ -141,15 +144,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private getCardParentPath(cardSource: RawCard<Unsaved>, meta: PluginMeta): string | undefined {
+  private getCardParentPath(meta: PluginMeta): string | undefined {
     let parentPath;
-    let { adoptsFrom, realm, id } = cardSource;
+    let { adoptsFrom, realm, id } = this.cardSource;
 
     if (adoptsFrom) {
       if (id != null && `${realm}${id}` === adoptsFrom) {
         throw new Error(`BUG: ${realm}${id} provides itself as its parent. That should not happen.`);
       }
-      parentPath = cardSource.adoptsFrom;
+      parentPath = adoptsFrom;
     }
 
     if (meta.parent && meta.parent.cardURL) {
@@ -162,8 +165,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return parentPath;
   }
 
-  private async getParentCard(cardSource: RawCard<Unsaved>, meta: PluginMeta): Promise<CompiledCard> {
-    let parentCardPath = this.getCardParentPath(cardSource, meta);
+  private async getParentCard(meta: PluginMeta): Promise<CompiledCard> {
+    let { cardSource } = this;
+    let parentCardPath = this.getCardParentPath(meta);
     let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
     try {
       return await this.builder.getCompiledCard(url);
@@ -188,11 +192,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private analyzeSchema(
-    cardSource: RawCard<Unsaved>,
-    options: any,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ): LocalRef | undefined {
+  private analyzeSchema(options: any): LocalRef | undefined {
+    let { cardSource, modules } = this;
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -216,9 +217,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     schemaModule: LocalRef,
     meta: PluginMeta,
     fields: CompiledCard['fields'],
-    parent: CompiledCard,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    parent: CompiledCard
   ) {
+    let { modules } = this;
     let { source, ast } = modules[schemaModule.local];
     if (!ast) {
       throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
@@ -279,25 +280,22 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private async prepareComponents(
-    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard | undefined,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    parentCard: CompiledCard | undefined
   ): Promise<CompiledCard<Unsaved, ModuleRef>['componentInfos']> {
     return {
-      isolated: await this.prepareComponent(cardSource, fields, parentCard, 'isolated', modules),
-      embedded: await this.prepareComponent(cardSource, fields, parentCard, 'embedded', modules),
-      edit: await this.prepareComponent(cardSource, fields, parentCard, 'edit', modules),
+      isolated: await this.prepareComponent(fields, parentCard, 'isolated'),
+      embedded: await this.prepareComponent(fields, parentCard, 'embedded'),
+      edit: await this.prepareComponent(fields, parentCard, 'edit'),
     };
   }
 
   private async prepareComponent(
-    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
-    which: Format,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    which: Format
   ): Promise<ComponentInfo<ModuleRef>> {
+    let { cardSource, modules } = this;
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
