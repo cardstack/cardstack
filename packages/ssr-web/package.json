@@ -20,7 +20,7 @@
     "lint:css:fix": "stylelint app/**/*.css --fix",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:fix": "eslint . --fix",
-    "start": "ember serve",
+    "start": "ember serve -prod",
     "t": "ember test -s --no-launch",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test"
