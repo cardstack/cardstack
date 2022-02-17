@@ -33,7 +33,7 @@ module.exports = function (environment) {
         enabled: !!process.env.DEPLOY_TARGET,
         environment: process.env.DEPLOY_TARGET || 'development',
         release:
-          `web-client${
+          `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
           }@` + pkg.version,
         // Set tracesSampleRate to 1.0 to capture 100%
