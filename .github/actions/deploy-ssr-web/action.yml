@@ -25,10 +25,9 @@ runs:
     - run: yarn --prefer-offline
       shell: bash
 
-    - name: Ember build
-      run: ember build --environment=production
+    - name: Build
+      run: yarn build:ssr-web:${{ inputs.environment }}
       shell: bash
-      working-directory: packages/ssr-web
 
     - name: Deploy dist
       run: mv dist deployment/
