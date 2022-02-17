@@ -5,11 +5,13 @@ import { transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
+import { ImportUtil } from 'babel-import-util';
 
-import { CompiledCard, SerializerName, SerializerMap } from './interfaces';
+import { CompiledCard, SerializerMap, Field } from './interfaces';
 
-import { buildSerializerMapFromUsedFields } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
+import { getFieldForPath } from './utils/fields';
+import { capitalize } from 'lodash';
 
 export interface CardComponentMetaPluginOptions {
   debugPath: string;
@@ -20,6 +22,7 @@ export interface CardComponentMetaPluginOptions {
 }
 
 interface State {
+  importUtil: ImportUtil;
   opts: CardComponentMetaPluginOptions;
 }
 
@@ -42,8 +45,11 @@ export function babelPluginComponentMeta(babel: typeof Babel) {
   return {
     visitor: {
       Program: {
+        enter(path: NodePath<t.Program>, state: State) {
+          state.importUtil = new ImportUtil(babel.types, path);
+        },
         exit(path: NodePath<t.Program>, state: State) {
-          path.node.body.push(exportSerializerMap(state, babel));
+          path.node.body.push(exportSerializerMap(path, state, babel));
           path.node.body.push(exportComputedFields(state, babel));
           path.node.body.push(exportUsedFields(state, babel));
         },
@@ -52,13 +58,24 @@ export function babelPluginComponentMeta(babel: typeof Babel) {
   };
 }
 
-function exportSerializerMap(state: State, babel: typeof Babel): t.Statement {
+function exportSerializerMap(path: NodePath<t.Program>, state: State, babel: typeof Babel): t.Statement {
   let t = babel.types;
-  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
-  state.opts.serializerMap = serializerMap;
+  let { fields, usedFields } = state.opts;
+
+  let map: SerializerModuleMap = {};
+
+  for (const fieldPath of usedFields) {
+    let field = getFieldForPath(fields, fieldPath);
+
+    if (!field) {
+      continue;
+    }
+
+    addFieldToSerializerMap(map, field, fieldPath, path, state);
+  }
 
   return babel.template(`export const serializerMap = %%serializerMap%%;`)({
-    serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
+    serializerMap: t.objectExpression(buildSerializerMapProp(map, t)),
   }) as t.Statement;
 }
 
@@ -82,21 +99,50 @@ function exportUsedFields(state: State, babel: typeof Babel): t.Statement {
   }) as t.Statement;
 }
 
-function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {
+// TODO: Where
+type SerializerModuleMap = Record<string, t.Identifier>;
+
+function buildSerializerMapProp(
+  serializerMap: SerializerModuleMap,
+  t: typeof Babel.types
+): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
 
-  for (let serializer in serializerMap) {
-    let fieldList = serializerMap[serializer as SerializerName];
-    if (!fieldList) {
+  for (let fieldPath in serializerMap) {
+    let modulePath = serializerMap[fieldPath];
+    if (!modulePath) {
       continue;
     }
 
-    let fieldListElements: t.ArrayExpression['elements'] = [];
-    for (let field of fieldList) {
-      fieldListElements.push(t.stringLiteral(field));
-    }
-    props.push(t.objectProperty(t.identifier(serializer), t.arrayExpression(fieldListElements)));
+    props.push(t.objectProperty(t.stringLiteral(fieldPath), modulePath));
   }
 
   return props;
+}
+
+function addFieldToSerializerMap(
+  map: SerializerModuleMap,
+  field: Field,
+  usedPath: string,
+  path: NodePath<t.Program>,
+  state: State
+): void {
+  if (Object.keys(field.card.fields).length) {
+    let { fields } = field.card;
+    for (const name in fields) {
+      addFieldToSerializerMap(map, fields[name], `${usedPath}.${name}`, path, state);
+    }
+  } else {
+    if (!field.card.serializerModule) {
+      return;
+    }
+    // TEMP: Would be nice to have the Proper CardID on the compiled card
+    let cardId = field.card.url.split('/')[field.card.url.split('/').length - 1];
+    map[usedPath] = state.importUtil.import(
+      path,
+      field.card.serializerModule.global,
+      'default',
+      `${capitalize(cardId)}Serializer`
+    );
+  }
 }

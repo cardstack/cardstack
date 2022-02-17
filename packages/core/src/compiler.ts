@@ -176,7 +176,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private getFile(cardSource: RawCard<Unsaved>, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`);
+      throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`, { status: 422 });
     }
     return fileSrc;
   }

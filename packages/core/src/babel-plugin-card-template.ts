@@ -9,7 +9,7 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
 
-import { CompiledCard, Format } from './interfaces';
+import { CompiledCard, ComponentInfo, Format } from './interfaces';
 
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
@@ -22,7 +22,7 @@ export interface CardComponentPluginOptions {
   defaultFieldFormat: Format;
   metaModulePath: string;
   // these are for gathering output
-  usedFields: string[];
+  usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
 }
 

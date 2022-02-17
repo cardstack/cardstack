@@ -147,8 +147,6 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  serializerMap: SerializerMap;
-
   // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;
 

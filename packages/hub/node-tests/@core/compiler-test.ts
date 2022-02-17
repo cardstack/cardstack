@@ -30,7 +30,7 @@ const PERSON_CARD: RawCard = {
 };
 
 if (process.env.COMPILER) {
-  describe.only('Compiler', function () {
+  describe('Compiler', function () {
     let { cards, getFileCache } = configureHubWithCompiler(this);
 
     it('string card', async function () {
@@ -53,6 +53,7 @@ if (process.env.COMPILER) {
 
     it('CompiledCard embedded view', async function () {
       await cards.create(PERSON_CARD);
+      let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
       let { compiled } = await cards.load(cardURL(PERSON_CARD));
       let { embedded } = compiled.componentInfos;
 
@@ -71,13 +72,12 @@ if (process.env.COMPILER) {
 
       let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
       expect(metaModuleSource).to.containsSource(`
-        import { DateSerializer } from "@cardstack/core/src/serializers";
+        import DateSerializer from "${dateCompiled.serializerModule?.global}";
       `);
       expect(metaModuleSource).to.containsSource(`
         export const serializerMap = {
-          "birthdate": DateSerializer,
-          "address.settlementDate": DateSerializer
-        }
+          "birthdate": DateSerializer
+        };
       `);
       expect(metaModuleSource).to.containsSource(`
         export const computedFields = [];
@@ -321,7 +321,7 @@ if (process.env.COMPILER) {
       }
     });
 
-    describe.only('Custom Serializers', function () {
+    describe('Custom Serializers', function () {
       it('date card', async function () {
         let { compiled } = await cards.load('https://cardstack.com/base/date');
         expect(compiled.serializerModule?.global, 'Date card has date serializer').to.be.ok;
@@ -357,7 +357,7 @@ if (process.env.COMPILER) {
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
           expect(err.message).to.include(`card refers to serializer.js in its card.json but that file does not exist`);
-          expect(err.status).to.eq(400);
+          expect(err.status).to.eq(422);
         }
       });
 
