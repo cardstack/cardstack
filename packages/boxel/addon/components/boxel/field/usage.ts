@@ -9,4 +9,8 @@ export default class extends Component {
   @tracked horizontalLabelSize = 'default';
   @tracked icon = 'profile';
   @tracked tag = '';
+
+  @tracked vertical2 = false;
+  @tracked horizontalLabelSize2 = 'default';
+  @tracked icon2 = '';
 }

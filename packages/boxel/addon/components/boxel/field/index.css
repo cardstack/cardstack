@@ -30,3 +30,7 @@
   height: var(--boxel-icon-sm);
   margin-right: var(--boxel-sp-xxs);
 }
+
+.boxel-field__yield--with-icon {
+  width: 100%;
+}
