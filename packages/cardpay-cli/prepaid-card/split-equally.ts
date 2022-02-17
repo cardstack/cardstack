@@ -1,8 +1,9 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { FROM_OPTION, getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { formatPrepaidCards, inventoryInfo } from './utils';
+import { ContractOptions } from 'web3-eth-contract';
 
 export default {
   command: 'split-equally <prepaidCard> <faceValue> <quantity>',
@@ -21,15 +22,17 @@ export default {
         type: 'number',
         description: 'The amount of prepaid cards to create',
       })
+      .option('from', FROM_OPTION)
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, quantity, faceValue } = args as unknown as {
+    let { network, mnemonic, prepaidCard, quantity, faceValue, from } = args as unknown as {
       network: string;
       prepaidCard: string;
       faceValue: number;
       quantity: number;
       mnemonic?: string;
+      from?: string;
     };
     let web3 = await getWeb3(network, mnemonic);
 
@@ -53,10 +56,22 @@ export default {
         );
         let currentNumberOfCards = Math.min(cardsLeft, 10);
         let faceValues = Array(currentNumberOfCards).fill(faceValue);
+        let contractOptions = {} as ContractOptions;
+        if (from) {
+          contractOptions.from = from;
+        }
+
         let prepaidCards;
-        ({ prepaidCards, sku } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
-          onTxnHash: (txnHash) => console.log(`  Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-        }));
+        ({ prepaidCards, sku } = await prepaidCardAPI.split(
+          prepaidCard,
+          faceValues,
+          undefined,
+          customizationDID,
+          {
+            onTxnHash: (txnHash) => console.log(`  Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+          },
+          contractOptions
+        ));
         allCards.push(...prepaidCards.map((p) => p.address));
 
         cardsLeft -= currentNumberOfCards;

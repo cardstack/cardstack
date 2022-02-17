@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
+import { ContractOptions } from 'web3-eth-contract';
 
 export default {
   command: 'create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>',
@@ -29,18 +30,24 @@ export default {
         description: 'Force the prepaid card to be created even when the DAI rate is not snapped to USD',
         default: false,
       })
+      .option('from', {
+        type: 'string',
+        description: 'The signing EOA. Defaults to the first derived EOA of the specified mnemonic',
+      })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, safeAddress, tokenAddress, customizationDID, force, faceValues } = args as unknown as {
-      network: string;
-      safeAddress: string;
-      faceValues: number[];
-      tokenAddress: string;
-      force: boolean;
-      customizationDID?: string;
-      mnemonic?: string;
-    };
+    let { network, mnemonic, safeAddress, tokenAddress, customizationDID, force, faceValues, from } =
+      args as unknown as {
+        network: string;
+        safeAddress: string;
+        faceValues: number[];
+        tokenAddress: string;
+        force: boolean;
+        customizationDID?: string;
+        mnemonic?: string;
+        from?: string;
+      };
     let web3 = await getWeb3(network, mnemonic);
 
     let prepaidCard = await getSDK('PrepaidCard', web3);
@@ -57,6 +64,10 @@ export default {
     );
     let onTxnHash = (txnHash: string) =>
       console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
+    let contractOptions = {} as ContractOptions;
+    if (from) {
+      contractOptions.from = from;
+    }
     let {
       prepaidCards: [newCard],
     } = await prepaidCard.create(
@@ -66,7 +77,7 @@ export default {
       undefined,
       customizationDID,
       { onTxnHash },
-      {},
+      contractOptions,
       force
     );
     console.log(`created card ${newCard.address}`);

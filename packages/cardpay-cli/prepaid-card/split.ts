@@ -1,8 +1,9 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { FROM_OPTION, getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { formatPrepaidCards, inventoryInfo } from './utils';
+import { ContractOptions } from 'web3-eth-contract';
 
 export default {
   command: 'split <prepaidCard> <customizationDID> <faceValues..>',
@@ -21,15 +22,17 @@ export default {
         type: 'number',
         description: 'A list of face values (separated by spaces) in units of § SPEND to create',
       })
+      .option('from', FROM_OPTION)
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, customizationDID, faceValues } = args as unknown as {
+    let { network, mnemonic, prepaidCard, customizationDID, faceValues, from } = args as unknown as {
       network: string;
       prepaidCard: string;
       faceValues: number[];
       customizationDID: string;
       mnemonic?: string;
+      from?: string;
     };
     let web3 = await getWeb3(network, mnemonic);
     let prepaidCardAPI = await getSDK('PrepaidCard', web3);
@@ -39,9 +42,20 @@ export default {
         ' SPEND, §'
       )} SPEND with customizationDID ${customizationDID} and placing into the default market...`
     );
-    let { prepaidCards, sku } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
-      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
+    let contractOptions = {} as ContractOptions;
+    if (from) {
+      contractOptions.from = from;
+    }
+    let { prepaidCards, sku } = await prepaidCardAPI.split(
+      prepaidCard,
+      faceValues,
+      undefined,
+      customizationDID,
+      {
+        onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      },
+      contractOptions
+    );
 
     await inventoryInfo(web3, sku);
 

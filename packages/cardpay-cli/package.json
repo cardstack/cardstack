@@ -40,6 +40,7 @@
     "ts-node": "^10.3.0",
     "web3": "1.5.2",
     "web3-core": "1.5.2",
+    "web3-eth-contract": "1.5.2",
     "web3-utils": "1.5.2",
     "yargs": "^17.0.0"
   },
