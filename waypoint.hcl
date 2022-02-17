@@ -232,3 +232,45 @@ app "cardpay-subg-ext" {
         }
     }
 }
+
+app "ssr-web" {
+    path = "./packages/ssr-web/deployment"
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "ssr-web-staging"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "ssr-web-staging"
+            count = 1
+            // subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+            task_role_name = "ssr-web-staging-ssr-web_ecr_task"
+            alb {
+                // listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
+            }
+        }
+
+        hook {
+            // when    = "before"
+            // command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
+        }
+
+        hook {
+            // when    = "after"
+            // command = ["node", "./scripts/fix-listener.mjs", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+    }
+}
