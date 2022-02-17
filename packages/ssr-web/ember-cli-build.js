@@ -34,8 +34,6 @@ module.exports = function (defaults) {
     },
   });
 
-  app.import('node_modules/broadcastchannel-polyfill/index.js');
-
   // Use `app.import` to add additional libraries to the generated
   // output files.
   //
