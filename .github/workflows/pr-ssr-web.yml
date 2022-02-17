@@ -7,8 +7,6 @@ on:
       - 'packages/boxel/**'
       - 'packages/cardpay-sdk/**'
       - 'packages/did-resolver/**'
-      - 'packages/wc-provider/**'
-      - 'packages/test-support/**'
       - 'packages/eslint-config/**'
       - '.github/workflows/pr-ssr-web.yml'
       - 'package.json'
