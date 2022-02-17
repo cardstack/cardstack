@@ -1,0 +1,10 @@
+{
+  "name": "deployment",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fastboot-app-server": "^3.2.0",
+    "node-fetch": "^2.6.7"
+  }
+}
