@@ -11,7 +11,7 @@ const componentFormats = {
   edit: '',
 };
 export type Format = keyof typeof componentFormats;
-export const FORMATS = Object.keys(componentFormats) as Format[];
+export const FORMATS = keys(componentFormats);
 
 export function isFormat(s: any): s is Format {
   return s && s in componentFormats;
@@ -21,7 +21,7 @@ const featureNamesMap = {
   schema: '',
 };
 export type FeatureFile = keyof typeof featureNamesMap & Format;
-export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(FORMATS) as FeatureFile[];
+export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
 const serializerTypes = {
   date: '',

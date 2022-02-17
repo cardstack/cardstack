@@ -1,4 +1,4 @@
-import { assertValidRawCard, CompiledCard, Field, RawCard } from '../interfaces';
+import { assertValidRawCard, CompiledCard, FEATURE_NAMES, Field, RawCard } from '../interfaces';
 import { findIncluded } from './index';
 
 export class RawCardDeserializer {
@@ -23,17 +23,8 @@ export class RawCardDeserializer {
       id: resource.id.slice(attrs.realm.length),
     };
 
-    let fields: (keyof RawCard)[] = [
-      'schema',
-      'isolated',
-      'embedded',
-      'edit',
-      'deserializer',
-      'adoptsFrom',
-      'files',
-      'data',
-    ];
-    for (let field of fields) {
+    let rawCardKeys: (keyof RawCard)[] = ['adoptsFrom', 'data', 'files', ...FEATURE_NAMES];
+    for (let field of rawCardKeys) {
       if (attrs[field] != null) {
         raw[field] = attrs[field];
       }
