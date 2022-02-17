@@ -1,7 +1,8 @@
+import type { SuccessfulTransactionReceipt } from './successful-transaction-receipt';
+
 import Web3 from 'web3';
 import { networks } from '../constants';
 import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
-import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import { query as gqlQuery } from './graphql';
 
@@ -41,18 +42,19 @@ export function waitUntilTransactionMined(
   web3: Web3,
   txnHash: string,
   duration = 60 * 10 * 1000
-): Promise<TransactionReceipt> {
+): Promise<SuccessfulTransactionReceipt> {
   let endTime = Number(new Date()) + duration;
 
   let transactionReceiptAsync = async function (
     txnHash: string,
-    resolve: (value: TransactionReceipt | Promise<TransactionReceipt>) => void,
+    resolve: (value: SuccessfulTransactionReceipt | Promise<SuccessfulTransactionReceipt>) => void,
     reject: (reason?: any) => void
   ) {
     try {
       let receipt = await web3.eth.getTransactionReceipt(txnHash);
       if (receipt) {
-        resolve(receipt);
+        if (receipt.status === true) resolve(receipt as SuccessfulTransactionReceipt);
+        else throw new Error(`Transaction with hash "${txnHash}" was reverted`);
       } else if (Number(new Date()) > endTime) {
         throw new Error(
           `Transaction took too long to complete, waited ${duration / 1000} seconds. txn hash: ${txnHash}`
@@ -174,7 +176,7 @@ export async function waitForSubgraphIndexWithTxnReceipt(
   web3: Web3,
   txnHash: string,
   duration = 60 * 10 * 1000
-): Promise<TransactionReceipt> {
+): Promise<SuccessfulTransactionReceipt> {
   let txnReceipt = await waitUntilTransactionMined(web3, txnHash, duration);
   await waitForSubgraphIndex(txnHash, web3, duration);
   return txnReceipt;
