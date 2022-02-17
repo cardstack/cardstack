@@ -70,17 +70,6 @@ module.exports = function (environment) {
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
     },
-    // basically our favicons for now
-    walletConnectIcons: [
-      '/images/icon-apple-256x256.png',
-      '/images/icon-favicon-32x32.png',
-    ].map((v) => {
-      return (
-        (process.env.DEPLOY_TARGET === 'production'
-          ? 'https://app.cardstack.com'
-          : 'https://app-staging.stack.cards') + v
-      );
-    }),
     'ember-cli-mirage': {
       enabled: false,
     },
