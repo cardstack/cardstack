@@ -64,7 +64,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     this.defineAssets();
 
     let parentCard;
-    let serializer = cardSource.deserializer;
 
     if (isBaseCard(cardSource)) {
       schemaModule = { global: 'todo' };
@@ -91,15 +90,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
 
       fields = this.adoptFields(fields, parentCard);
-
-      if (parentCard.serializer) {
-        if (serializer && parentCard.serializer !== serializer) {
-          throw new CardstackError(
-            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
-          );
-        }
-        serializer = parentCard.serializer;
-      }
     }
 
     if (cardSource.data) {
@@ -109,17 +99,19 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
-    return {
+    let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
-      serializer,
       schemaModule,
+      serializerModule: await this.getSerializer(parentCard),
       fields,
       adoptsFrom: parentCard,
       componentInfos: await this.prepareComponents(fields, parentCard),
       modules: this.modules,
       deps: [...this.dependencies],
     };
+
+    return compiledCard;
   }
 
   private defineAssets() {
@@ -402,10 +394,32 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
-      serializerMap: metaOptions.serializerMap,
     };
 
     return componentInfo;
+  }
+
+  private async getSerializer(parentCard: CompiledCard | undefined): Promise<ModuleRef | undefined> {
+    let serializerRef: ModuleRef | undefined;
+    let { serializer } = this.cardSource;
+
+    if (parentCard?.serializerModule) {
+      if (serializer) {
+        throw new CardstackError(
+          `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializerModule.global}`
+        );
+      }
+      serializerRef = parentCard.serializerModule;
+    } else if (serializer) {
+      serializerRef = { local: serializer };
+      let source = await this.getFile(this.cardSource, serializer);
+      this.modules[serializer] = {
+        type: JS_TYPE,
+        source,
+      };
+    }
+
+    return serializerRef;
   }
 }
 
@@ -446,8 +460,14 @@ export function makeGloballyAddressable(
   let localToGlobal = new Map<string, string>();
 
   for (let [localPath, { type, source, ast }] of Object.entries(card.modules)) {
-    let globalRef = define(localPath, type, source, ast);
-    localToGlobal.set(localPath, globalRef);
+    try {
+      let globalRef = define(localPath, type, source, ast);
+      localToGlobal.set(localPath, globalRef);
+    } catch (error: any) {
+      let newError = new CardstackError(`Failed to globally define module for path: ${localPath}`);
+      newError.additionalErrors = [error];
+      throw newError;
+    }
   }
 
   function ensureGlobal(ref: ModuleRef): GlobalRef {
@@ -468,7 +488,6 @@ export function makeGloballyAddressable(
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
-      serializerMap: info.serializerMap,
     };
   }
 
@@ -478,7 +497,7 @@ export function makeGloballyAddressable(
     adoptsFrom: card.adoptsFrom,
     fields: card.fields,
     schemaModule: ensureGlobal(card.schemaModule),
-    serializer: card.serializer,
+    serializerModule: card.serializerModule ? ensureGlobal(card.serializerModule) : undefined,
     componentInfos: {
       isolated: ensureGlobalComponentInfo(card.componentInfos.isolated),
       embedded: ensureGlobalComponentInfo(card.componentInfos.embedded),

@@ -30,7 +30,7 @@ const PERSON_CARD: RawCard = {
 };
 
 if (process.env.COMPILER) {
-  describe('Compiler', function () {
+  describe.only('Compiler', function () {
     let { cards, getFileCache } = configureHubWithCompiler(this);
 
     it('string card', async function () {
@@ -38,22 +38,7 @@ if (process.env.COMPILER) {
       expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
       expect(compiled.componentInfos.embedded.inlineHBS).to.equal('{{@model}}');
       expect(compiled.componentInfos.embedded.usedFields).to.deep.equal([]);
-      expect(!compiled.serializer, 'String card has no deserializer').to.be.ok;
-    });
-
-    it('date card', async function () {
-      let { compiled } = await cards.load('https://cardstack.com/base/date');
-      expect(compiled.serializer, 'Date card has date serializer').to.equal('date');
-    });
-
-    it('deserializer is inherited', async function () {
-      await cards.create({
-        realm,
-        id: 'fancy-date',
-        adoptsFrom: 'https://cardstack.com/base/date',
-      });
-      let { compiled } = await cards.load(`${realm}fancy-date`);
-      expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
+      expect(!compiled.serializerModule, 'String card has no deserializer').to.be.ok;
     });
 
     it('CompiledCard fields', async function () {
@@ -80,14 +65,18 @@ if (process.env.COMPILER) {
       );
 
       expect(embedded.usedFields).to.deep.equal(['name', 'birthdate']);
-      expect(embedded.serializerMap).to.deep.equal({
-        date: ['birthdate'],
-      });
+      // expect(embedded.serializerMap).to.deep.equal({
+      //   date: ['birthdate'],
+      // });
 
       let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
       expect(metaModuleSource).to.containsSource(`
+        import { DateSerializer } from "@cardstack/core/src/serializers";
+      `);
+      expect(metaModuleSource).to.containsSource(`
         export const serializerMap = {
-          date: ["birthdate"]
+          "birthdate": DateSerializer,
+          "address.settlementDate": DateSerializer
         }
       `);
       expect(metaModuleSource).to.containsSource(`
@@ -330,6 +319,66 @@ if (process.env.COMPILER) {
         expect(err.message).to.include(`computed fields should not be static`);
         expect(err.status).to.eq(400);
       }
+    });
+
+    describe.only('Custom Serializers', function () {
+      it('date card', async function () {
+        let { compiled } = await cards.load('https://cardstack.com/base/date');
+        expect(compiled.serializerModule?.global, 'Date card has date serializer').to.be.ok;
+        let serializer = getFileCache().getModule(compiled.serializerModule?.global!, 'browser');
+        expect(serializer).to.containsSource(`export function serialize(d) {`);
+      });
+
+      it('serializers are inherited', async function () {
+        await cards.create({
+          realm,
+          id: 'fancy-date',
+          adoptsFrom: 'https://cardstack.com/base/date',
+        });
+        let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
+        let { compiled } = await cards.load(`${realm}fancy-date`);
+        expect(
+          compiled.serializerModule?.global,
+          'FancyDate card has date serializer inherited from its parent'
+        ).to.equal(dateCompiled.serializerModule?.global);
+      });
+
+      it('Errors when the serializer is declared but the file doesnt exist', async function () {
+        try {
+          await cards.create({
+            realm,
+            id: 'primitive',
+            serializer: 'serializer.js',
+            embedded: 'embedded.js',
+            files: {
+              'embedded.js': templateOnlyComponentTemplate('<@field.author.name />'),
+            },
+          });
+          throw new Error('failed to throw expected exception');
+        } catch (err: any) {
+          expect(err.message).to.include(`card refers to serializer.js in its card.json but that file does not exist`);
+          expect(err.status).to.eq(400);
+        }
+      });
+
+      it.skip('Errors when the serializer is malformed', async function () {
+        try {
+          await cards.create({
+            realm,
+            id: 'primitive-with-bad-serializer',
+            serializer: 'serializer.js',
+            files: {
+              'serializer.js': `
+                export function serialize() {}
+              `,
+            },
+          });
+          throw new Error('failed to throw expected exception');
+        } catch (err: any) {
+          expect(err.message).to.include(`card serializer is malformed. It must have export a deserialize method`);
+          expect(err.status).to.eq(400);
+        }
+      });
     });
 
     describe('@fields iterating', function () {

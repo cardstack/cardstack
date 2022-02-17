@@ -454,7 +454,7 @@ function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): Co
     adoptsFrom: compiled,
     fields: compiled.fields,
     schemaModule: compiled.schemaModule,
-    serializer: compiled.serializer,
+    serializerModule: compiled.serializerModule,
     componentInfos: compiled.componentInfos,
     modules: compiled.modules,
     deps: [...compiled.deps, compiled.url],

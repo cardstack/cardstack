@@ -17,41 +17,6 @@ import {
 export { RawCardDeserializer } from './raw-card-deserializer';
 export { RawCardSerializer } from './raw-card-serializer';
 
-export interface PrimitiveSerializer {
-  serialize(val: any): any;
-  deserialize(val: any): any;
-}
-
-const DateTimeSerializer: PrimitiveSerializer = {
-  serialize(d: Date): string {
-    // If the model hasn't been deserialized yet it will still be a string
-    if (typeof d === 'string') {
-      return d;
-    }
-    return d.toISOString();
-  },
-  deserialize(d: string): Date {
-    return parseISO(d);
-  },
-};
-
-const DateSerializer: PrimitiveSerializer = {
-  serialize(d: Date): string {
-    // If the model hasn't been deserialized yet it will still be a string
-    if (typeof d === 'string') {
-      return d;
-    }
-    return format(d, 'yyyy-MM-dd');
-  },
-  deserialize(d: string): Date {
-    return parse(d, 'yyyy-MM-dd', new Date());
-  },
-};
-
-export const SERIALIZERS = {
-  datetime: DateTimeSerializer,
-  date: DateSerializer,
-};
 
 export function deserializeAttributes(attrs: { [name: string]: any } | undefined, serializerMap: SerializerMap) {
   return _serializeAttributes(cloneDeep(attrs), 'deserialize', serializerMap);

@@ -54,7 +54,7 @@ export class RawCardDeserializer {
       url: resource.id,
       realm: attrs?.realm,
       schemaModule: attrs?.schemaModule,
-      serializer: attrs?.serializer,
+      serializerModule: attrs?.serializerModule,
       componentInfos: attrs?.componentInfos,
       fields: {},
       modules: attrs?.modules,
