@@ -79,7 +79,7 @@ export default class PayRoute extends Route {
       );
     }
 
-    let data = (await this.safeViewer.view(network as any, address)).safe;
+    let data = (await this.safeViewer.view(network, address)).safe;
 
     if (!data || data.type !== 'merchant')
       throw new Error(
