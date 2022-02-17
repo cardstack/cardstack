@@ -1,0 +1,118 @@
+base: &base
+  name: rewards
+  tables:
+    merkle_root_submission:
+      column_mappings:
+        block_number:
+          block_number_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: block_number_uint64_valid
+        payment_cycle:
+          payment_cycle_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: payment_cycle_uint64_valid
+        timestamp:
+          timestamp_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: timestamp_uint64_valid
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+    reward_program:
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+    reward_safe:
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+    reward_tokens_add:
+      column_mappings:
+        amount:
+          amount_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: amount_uint64_valid
+        block_number:
+          block_number_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: block_number_uint64_valid
+        timestamp:
+          timestamp_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: timestamp_uint64_valid
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+    rewardee_claim:
+      column_mappings:
+        amount:
+          amount_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: amount_uint64_valid
+        block_number:
+          block_number_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: block_number_uint64_valid
+        timestamp:
+          timestamp_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: timestamp_uint64_valid
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+    rewardee_registration_payment:
+      column_mappings:
+        block_number:
+          block_number_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: block_number_uint64_valid
+        created_at:
+          created_at_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: created_at_uint64_valid
+      partition_sizes:
+        - 524288
+        - 131072
+        - 16384
+        - 1024
+  version: 0.0.1
+
+staging:
+  <<: *base
+  subgraph: habdelra/cardpay-sokol
+
+production:
+  <<: *base
+  subgraph: habdelra/cardpay-xdai

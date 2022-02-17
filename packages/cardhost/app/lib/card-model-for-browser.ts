@@ -32,6 +32,7 @@ import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
+import { getFieldValue } from '@cardstack/core/src/utils/fields';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -210,19 +211,7 @@ export default class CardModelForBrowser implements CardModel {
       this._schemaInstance = new klass(this.getRawField.bind(this)) as any;
     }
 
-    // If the path is deeply nested, we need to recurse the down
-    // the schema instances until we get to a field getter
-    function getGetter(schema: any, path: string): any {
-      let [key, ...tail] = path.split('.');
-      let getter = schema[key];
-      if (tail && tail.length) {
-        return getGetter(getter, tail.join('.'));
-      }
-      return getter;
-    }
-
-    let getter = getGetter(this._schemaInstance, fieldPath);
-    return await getter;
+    return await getFieldValue(this._schemaInstance, fieldPath);
   }
 
   get rawData(): any {

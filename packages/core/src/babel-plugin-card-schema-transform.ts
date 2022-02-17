@@ -13,6 +13,7 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
+  cardName: string | undefined;
   opts: {
     fields: CompiledCard['fields'];
     meta: PluginMeta;
@@ -74,6 +75,7 @@ export default function main(babel: typeof Babel) {
 
       Class: {
         enter(path: NodePath<t.Class>, state: State) {
+          state.cardName = path.node.id?.name;
           state.getRawFieldIdentifier = unusedClassMember(path, 'getRawField', t);
           let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
           // you can't upgrade a primitive card to a composite card--you are
@@ -122,7 +124,7 @@ export default function main(babel: typeof Babel) {
           // that you need to hook into.
           for (let bodyItem of path.get('body').get('body')) {
             if (t.isClassProperty(bodyItem.node)) {
-              handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, t);
+              handleClassProperty(bodyItem as NodePath<t.ClassProperty>, state, babel);
             }
           }
         },
@@ -131,22 +133,71 @@ export default function main(babel: typeof Babel) {
   };
 }
 
-function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, t: typeof Babel.types) {
+function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, babel: typeof Babel) {
+  let t = babel.types;
   forEachValidFieldDecorator(path, t, (p) => {
     let path = p as NodePath<t.ClassProperty>;
     if (!t.isIdentifier(path.node.key)) {
       return;
     }
-    let type = cardTypeByFieldName(path.node.key.name, state);
+    let fieldName = path.node.key.name;
+    let type = cardTypeByFieldName(fieldName, state);
     if (!type) {
       throw error(path.get('key'), `cannot find field in card`);
     }
-    if (type === 'primitive') {
+
+    let meta = state.opts.meta.fields[fieldName];
+    if (meta.computed && meta.computeVia) {
+      transformAsyncComputedField(path, state, babel);
+    } else if (type === 'primitive') {
       transformPrimitiveField(path, state, t);
     } else {
       transformCompositeField(path, state, t);
     }
   });
+}
+
+function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  if (!t.isIdentifier(path.node.key)) {
+    return;
+  }
+  let classPath = path.parentPath.parentPath as NodePath<t.Class>;
+  let fieldName = path.node.key.name;
+  let cachedName = unusedClassMember(classPath, `_${camelCase('cached-' + fieldName)}`, t);
+  let fieldMeta = state.opts.meta.fields[fieldName];
+  let computeVia = fieldMeta.computeVia;
+  if (!computeVia) {
+    throw error(path, `missing computeVia for async computed field ${fieldName}`);
+  }
+
+  path.insertBefore(t.classProperty(t.identifier(cachedName), null));
+
+  path.replaceWith(
+    t.classMethod(
+      'get',
+      t.identifier(fieldName),
+      [],
+      t.blockStatement([
+        // this.cachedName is a 3 state variable, where undefined means
+        // we haven't cached it and null means it has no value
+        babel.template(`
+          if (this.%%cachedName%% !== undefined) {
+            return this.%%cachedName%%;
+          } else {
+            throw new %%NotReady%%(%%fieldName%%, %%computeVia%%, %%cachedNameMember%%, %%cardName%%);
+          }
+        `)({
+          cachedName: t.identifier(cachedName),
+          cachedNameMember: t.stringLiteral(cachedName),
+          NotReady: state.importUtil.import(path, '@cardstack/core/src/utils/errors', 'NotReady'),
+          fieldName: t.stringLiteral(fieldName),
+          computeVia: t.stringLiteral(computeVia),
+          cardName: t.stringLiteral(state.cardName ?? '<unknown>'), // this param is for a nice error message if we ever see this in the wild
+        }) as t.Statement,
+      ])
+    )
+  );
 }
 
 function forEachValidFieldDecorator(

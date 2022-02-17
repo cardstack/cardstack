@@ -490,6 +490,14 @@ if (process.env.COMPILER) {
               get fullName() {
                 return "Mr or Mrs " + this.lastName;
               }
+
+              @contains(string, { computeVia: "computeSlowName" }) slowName;
+              async slowName() {
+                await new Promise(resolve => setTimeout(resolve, 10));
+                return this.fullName;
+              }
+
+              _cachedSlowName = "don't collide!";
             }
           `,
         },
@@ -583,7 +591,25 @@ if (process.env.COMPILER) {
         `);
       });
 
-      it('can compile async computed field in schema.js module');
+      it('can compile async computed field in schema.js module', async function () {
+        let { compiled } = await cards.load(`${realm}person`);
+        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+        expect(source).to.not.containsSource(`@contains`);
+        expect(source).to.containsSource(`
+          import { NotReady } from "@cardstack/core/src/utils/errors";
+        `);
+        expect(source).to.containsSource(`
+          _cachedSlowName0;
+
+          get slowName() {
+            if (this._cachedSlowName0 !== undefined) {
+              return this._cachedSlowName0;
+            } else {
+              throw new NotReady("slowName", "computeSlowName", "_cachedSlowName0", "Person");
+            }
+          }
+        `);
+      });
 
       it('can compile a schema.js that adopts from a composite card has no additional fields', async function () {
         let { compiled } = await cards.load(`${realm}fancy-person`);

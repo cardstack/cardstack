@@ -296,8 +296,7 @@ module('@core | compiler-adoption', function (hooks) {
         await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
-          /@adopts decorator accepts exactly one argument/.test(err.message),
-          err.message
+          /@adopts decorator can only have 1 argument/.test(err.message)
         );
       }
     });

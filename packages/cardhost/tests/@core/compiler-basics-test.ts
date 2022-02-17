@@ -465,7 +465,7 @@ module('@core | compiler-basics', function (hooks) {
             import string from "https://cardstack.com/base/string";
 
             class X {
-              @contains(string, 1)
+              @contains(string, {}, 1)
               title;
             }
           `,
@@ -478,7 +478,9 @@ module('@core | compiler-basics', function (hooks) {
         await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
-          /contains decorator accepts exactly one argument/.test(err.message),
+          /contains decorator can only have between 1 and 2 arguments/.test(
+            err.message
+          ),
           err.message
         );
       }

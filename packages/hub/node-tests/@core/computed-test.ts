@@ -52,6 +52,17 @@ if (process.env.COMPILER) {
               get summary() {
                 return this.fullName + " is a person. Their story is: " + this.aboutMe.short;
               }
+
+              @contains(string, { computeVia: "computeSlowSummary" }) slowSummary;
+              async computeSlowSummary() {
+                await new Promise(resolve => setTimeout(resolve, 10));
+                return this.summary;
+              }
+
+              @contains(string)
+              get loudSummary() {
+                return this.slowSummary + "!";
+              }
             }
           `,
           // firstName, lastName, summary, and bio.short should be considered as used
@@ -75,21 +86,31 @@ if (process.env.COMPILER) {
       });
     });
 
-    it(`can access a one-level-deep computed field`, async function () {
+    it(`can access a synchronous computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Arthur Faulkner');
     });
 
-    it(`can access a two-level-deep computed field`, async function () {
+    it(`can access a two-level-deep synchronous computed field`, async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
-    it('can access a synchronous composite field', async function () {
+    it('can access a composite field', async function () {
       let card = await cards.loadData(`${realm}arthur`, 'isolated');
       let aboutMe = await card.getField('aboutMe');
       expect(aboutMe.short).to.equal('son of Ed');
       expect(aboutMe.favoriteColor).to.equal('blue');
+    });
+
+    it('can access an asynchronous computed field', async function () {
+      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      expect(await card.getField('slowSummary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
+    });
+
+    it('can indirectly access an asynchronous computed field', async function () {
+      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      expect(await card.getField('loudSummary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed!');
     });
 
     it('can access a synchronous computed field defined in parent card', async function () {
@@ -123,9 +144,38 @@ if (process.env.COMPILER) {
       expect(await card.getField('seriesName')).to.equal('Overlord');
     });
 
-    it('can access an asynchronous field via a contained card');
-    it('can access an asynchronous computed field');
-    it('can access an asynchronous computed field defined in parent card');
+    it('can access an asynchronous computed field defined in parent card', async function () {
+      await cards.create({
+        realm,
+        id: 'ains',
+        adoptsFrom: '../person',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { adopts, contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import person from "../person";
+            export default @adopts(person) class Isekai {
+              @contains(string) seriesName;
+            }
+          `,
+        },
+        data: {
+          firstName: 'Ains Ooal',
+          lastName: 'Gown',
+          seriesName: 'Overlord',
+          aboutMe: {
+            short: 'Supreme overlord of darkness',
+            favoriteColor: 'black',
+          },
+        },
+      });
+      let card = await cards.loadData(`${realm}ains`, 'isolated');
+      expect(await card.getField('fullName')).to.equal('Ains Ooal Gown');
+      expect(await card.getField('loudSummary')).to.equal(
+        'Ains Ooal Gown is a person. Their story is: Supreme overlord of darkness!'
+      );
+    });
 
     it('can access a field that requires deserialization');
     it('can have a field that is the same card as itself');

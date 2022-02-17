@@ -36,8 +36,8 @@ if (process.env.COMPILER) {
                 @contains(address) address;
 
                 @contains(string)
-                async fullName() {
-                  return await 'Mr. ' + await this.name;
+                get fullName() {
+                  return 'Mr. ' + this.name;
                 }
               }
             `,

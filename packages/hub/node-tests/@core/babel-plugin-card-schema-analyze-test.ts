@@ -57,7 +57,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    it('adds computed info to fieldMeta', async function () {
+    it('adds synchronous computed info to fieldMeta', async function () {
       let options = {};
       let source = `
   	    import { contains } from "@cardstack/types";
@@ -68,8 +68,8 @@ if (process.env.COMPILER) {
   	      @contains(string) street;
 
   	      @contains(string)
-					async home() {
-						return (await this.street()) + " is home";
+					get home() {
+						return this.street + " is home";
 					};
   	    }
   	  `;
@@ -88,6 +88,41 @@ if (process.env.COMPILER) {
         type: 'contains',
         typeDecoratorLocalName: 'string',
         computed: true,
+      });
+    });
+
+    it('adds async computed info to fieldMeta', async function () {
+      let options = {};
+      let source = `
+  	    import { contains } from "@cardstack/types";
+  	    import string from "https://cardstack.com/base/string";
+  	    import date from "https://cardstack.com/base/date";
+
+  	    export default class Address {
+  	      @contains(string) street;
+
+  	      @contains(string, { computeVia: "computeHome" }) home
+					async computeHome() {
+						return (await this.street) + " is home";
+					};
+  	    }
+  	  `;
+      cardSchemaAnalyze(source, options);
+      let meta = getMeta(options);
+
+      expect(meta.fields).to.deep.property('street', {
+        cardURL: 'https://cardstack.com/base/string',
+        type: 'contains',
+        typeDecoratorLocalName: 'string',
+        computed: false,
+      });
+
+      expect(meta.fields).to.deep.property('home', {
+        cardURL: 'https://cardstack.com/base/string',
+        type: 'contains',
+        typeDecoratorLocalName: 'string',
+        computed: true,
+        computeVia: 'computeHome',
       });
     });
   });

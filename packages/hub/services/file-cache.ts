@@ -16,6 +16,7 @@ import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { Client } from 'pg';
 import vm from 'vm';
+import fetch from 'node-fetch';
 
 declare global {
   const __non_webpack_require__: any;
@@ -160,6 +161,10 @@ export default class FileCache {
       let context = {
         exports: {},
         require: (specifier: string) => this.loadModule(specifier),
+
+        // we have to white list globals that we want available to our cards
+        setTimeout,
+        fetch,
       };
       vm.createContext(context);
       vm.runInContext(code, context, { filename: this.resolveModule(moduleIdentifier) });
