@@ -605,6 +605,8 @@ export default class PrepaidCard {
     );
   }
 
+  // allow TransactionReceipt as argument
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private async getSkuFromTxnReceipt(txnReceipt: TransactionReceipt): Promise<string> {
     // this assumes the default prepaid card market address, once we have
     // multiple prepaid card markets we should refactor this
