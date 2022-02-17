@@ -1,0 +1,31 @@
+<div class="hamburger-menu" ...attributes>
+  <button
+    type="button"
+    class="hamburger-menu__trigger"
+    disabled={{@open}}
+    {{on "click" (optional @onOpen)}}
+  >
+    {{svg-jar "hamburger-menu" class="hamburger-menu__trigger-icon" width="20" height="14"}}
+  </button>
+
+  {{#if @open}}
+    <nav class="hamburger-menu__wrapping-nav">
+      <Boxel::OrgHeader
+        @iconURL={{@headerIconURL}}
+        @title={{@headerTitle}}
+        style={{css-var
+          boxel-org-header-logo-size="var(--hamburger-menu-logo-size)"
+          boxel-org-header-logo-position="var(--hamburger-menu-logo-position)"
+          boxel-org-header-padding="var(--hamburger-menu-padding)"
+        }}
+      >
+        <button type="button" class="hamburger-menu__trigger hamburger-menu__trigger--close" {{on "click" (optional @onClose)}}>
+          {{svg-jar "close-thick" class="hamburger-menu__trigger-icon" width="14" height="14"}}
+        </button>
+      </Boxel::OrgHeader>
+      <ul class="hamburger-menu__list">
+        {{yield (component "card-pay/hamburger-menu/item") to="body"}}
+      </ul>
+    </nav>
+  {{/if}}
+</div>

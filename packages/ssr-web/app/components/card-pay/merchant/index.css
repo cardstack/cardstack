@@ -1,0 +1,42 @@
+.merchant {
+  display: flex;
+  align-items: center;
+}
+
+.merchant--vertical {
+  flex-flow: column;
+  text-align: center;
+}
+
+.merchant--vertical .merchant__logo {
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: var(--boxel-sp-xxxs);
+}
+
+.merchant__name {
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+  max-width: 20rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.merchant__name--lg {
+  font: 700 var(--boxel-font-lg);
+  letter-spacing: 0;
+}
+
+.merchant__address {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-size)/calc(22 / 16) var(--boxel-monospace-font-family);
+  letter-spacing: var(--boxel-lsp-sm);
+  max-width: 22ch;
+  word-break: break-all;
+}
+
+.merchant__text {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+}
