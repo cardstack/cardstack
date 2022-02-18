@@ -33,7 +33,7 @@ def run_all():
     )
     # Default to one minute
     frequency = os.getenv("SUBMIT_FREQUENCY", 60)
-    schedule.every(os.getenv("REWARD_PROGRAM_OUTPUT")).minutes.do(
+    schedule.every(frequency).seconds.do(
         submitter.submit_all_roots
     )
     schedule.run_all()
