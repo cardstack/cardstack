@@ -1,10 +1,3 @@
-.merchant-customization .merchant-customization__name {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 0;
-}
-
 .merchant-customization__enter-name {
   color: var(--boxel-light-600);
 }

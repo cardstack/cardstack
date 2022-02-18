@@ -1,13 +1,12 @@
 <ActionCardContainer
-  class="merchant-customization"
   @header="Business Account"
   @isComplete={{@isComplete}}
   data-test-merchant-customization-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a name and ID for the business">
     <Boxel::Field
-      class="merchant-customization__name"
       @label={{if @isComplete "Business Name" "Preview"}}
+      @centeredDisplay={{true}}
       data-test-merchant-customization-merchant-preview
     >
       <CardPay::Merchant

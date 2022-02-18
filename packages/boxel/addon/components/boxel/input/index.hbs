@@ -19,7 +19,7 @@
       ...attributes
     />
     {{#if shouldShowErrorMessage}}
-      <div id={{concat "error-message-" helperId}} class="boxel-input__error-message" data-test-boxel-input-error-message>{{@errorMessage}}</div>
+      <div id={{concat "error-message-" helperId}} class="boxel-input__error-message" aria-live="polite" data-test-boxel-input-error-message>{{@errorMessage}}</div>
     {{/if}}
     {{#if @helperText}}
       <div id={{concat "helper-text-" helperId}} class="boxel-input__helper-text" data-test-boxel-input-helper-text>{{@helperText}}</div>
