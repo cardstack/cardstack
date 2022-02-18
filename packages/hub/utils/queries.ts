@@ -1,6 +1,4 @@
 import { pickBy } from 'lodash';
-import { Client } from 'pg';
-import crypto from 'crypto';
 
 const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
@@ -37,17 +35,4 @@ export function buildConditions(params: any, tableName?: string) {
     where: nonNullconditions.concat(nullConditions).flat().join(' AND '),
     values: Object.values(nonNullParams),
   };
-}
-
-export async function inTransaction(db: Client, cb: any) {
-  let transactionId = crypto.randomBytes(20).toString('hex');
-
-  try {
-    await db.query(`SAVEPOINT ${transactionId}`);
-    await cb();
-    await db.query(`RELEASE SAVEPOINT ${transactionId}`);
-  } catch (e) {
-    await db.query(`ROLLBACK TO SAVEPOINT ${transactionId}`);
-    throw e;
-  }
 }

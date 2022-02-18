@@ -7,7 +7,6 @@ import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import { MerchantInfoQueriesFilter } from '../services/queries/merchant-info';
 import { CardSpace } from './card-spaces';
-import { inTransaction } from '../utils/queries';
 
 export interface MerchantInfo {
   id: string;
@@ -98,7 +97,7 @@ export default class MerchantInfosRoute {
     let db = await this.databaseManager.getClient();
     let merchantInfoId, cardSpaceId;
 
-    await inTransaction(db, async () => {
+    await this.databaseManager.performTransaction(db, async () => {
       merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
       cardSpaceId = (
         await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db)
