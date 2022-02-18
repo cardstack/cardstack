@@ -4,6 +4,8 @@ from reward_root_submitter.utils import get_all_reward_outputs, get_root_from_fi
 from eth_utils import denoms
 from hexbytes import HexBytes
 from cloudpathlib import AnyPath
+from cloudpathlib.local.implementations.s3 import LocalS3Client
+
 
 from web3 import EthereumTesterProvider, Web3
 
@@ -228,6 +230,21 @@ def test_can_find_all_payment_cycles():
     assert {
         "file": AnyPath(
             "tests/resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24000000/results.parquet"
+        ),
+        "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
+        "payment_cycle": 24000000,
+    } in all_cycles
+
+
+def test_can_find_all_payment_cycles_on_s3():
+    s3_client = LocalS3Client(local_storage_dir="tests")
+    all_cycles = list(
+        get_all_reward_outputs(s3_client.S3Path("s3://resources/reward_output/"))
+    )
+    assert len(all_cycles) == 7
+    assert {
+        "file": s3_client.S3Path(
+            "s3://resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24000000/results.parquet"
         ),
         "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
         "payment_cycle": 24000000,

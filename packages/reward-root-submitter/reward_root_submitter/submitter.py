@@ -99,6 +99,9 @@ class RootSubmitter:
             payment_cycle = reward_output["payment_cycle"]
             reward_program_id = reward_output["reward_program_id"]
             if payment_cycle not in self.submitted_payment_cycles[reward_program_id]:
+                logging.info(
+                    "Submitting root for reward program {reward_program_id} payment cycle {payment_cycle}"
+                )
                 root = get_root_from_file(reward_output["file"])
                 if root is not None:
                     self.submit_root(reward_program_id, payment_cycle, root)

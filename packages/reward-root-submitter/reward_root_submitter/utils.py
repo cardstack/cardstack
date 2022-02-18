@@ -5,14 +5,19 @@ from hexbytes import HexBytes
 
 
 def get_all_reward_outputs(root: AnyPath):
-    for file in root.glob("rewardProgramID=*/paymentCycle=*/results.parquet"):
-        reward_program_id = re.search(r"rewardProgramID=([^/]*)", str(file)).group(1)
-        payment_cycle = re.search(r"paymentCycle=(\d*)", str(file)).group(1)
-        yield {
-            "file": file,
-            "reward_program_id": reward_program_id,
-            "payment_cycle": int(payment_cycle),
-        }
+    for reward_program_folder in root.iterdir():
+        reward_program_id = re.search(
+            r"rewardProgramID=([^/]*)", str(reward_program_folder)
+        ).group(1)
+        for payment_cycle_folder in reward_program_folder.iterdir():
+            payment_cycle = re.search(
+                r"paymentCycle=(\d*)", str(payment_cycle_folder)
+            ).group(1)
+            yield {
+                "file": payment_cycle_folder / "results.parquet",
+                "reward_program_id": reward_program_id,
+                "payment_cycle": int(payment_cycle),
+            }
 
 
 def get_root_from_file(file: AnyPath):
