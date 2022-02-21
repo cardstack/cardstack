@@ -43,7 +43,7 @@ module('Integration | Modifier | tippy', function (hooks) {
     let tippyBoxData = (find('[data-tippy-root] .tippy-box') as HTMLElement)
       .dataset;
     assert.equal(tippyBoxData.state, 'visible');
-    assert.equal(tippyBoxData.placement, 'bottom');
+    assert.equal(tippyBoxData.placement, 'bottom-start');
     assert.equal(
       (find('[data-tippy-root] .tippy-box .tippy-content') as HTMLElement)
         .dataset.state,
