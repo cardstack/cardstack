@@ -12,9 +12,10 @@ import 'tippy.js/themes/light-border.css';
 
 const baseTippyOptions = {
   theme: 'light-border',
-  placement: 'bottom',
+  placement: 'bottom-start',
   arrow: false,
   maxWidth: 280,
+  offset: [0, 0],
 };
 
 type ModifierOptions = Partial<TippyOptions>;
