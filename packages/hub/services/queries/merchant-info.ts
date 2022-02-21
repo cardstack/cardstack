@@ -1,5 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { Client } from 'pg';
 import { MerchantInfo } from '../../routes/merchant-infos';
 import { buildConditions } from '../../utils/queries';
 
@@ -40,13 +41,17 @@ export default class MerchantInfoQueries {
     });
   }
 
-  async insert(model: MerchantInfo) {
-    let db = await this.databaseManager.getClient();
+  async insert(model: MerchantInfo, db?: Client): Promise<MerchantInfo> {
+    if (!db) db = await this.databaseManager.getClient();
 
-    await db.query(
-      'INSERT INTO merchant_infos (id, name, slug, color, text_color, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
+    let {
+      rows: [{ id }],
+    } = await db.query(
+      'INSERT INTO merchant_infos (id, name, slug, color, text_color, owner_address) VALUES($1, $2, $3, $4, $5, $6) RETURNING *',
       [model.id, model.name, model.slug, model.color, model.textColor, model.ownerAddress]
     );
+
+    return { id } as MerchantInfo;
   }
 }
 

@@ -6,6 +6,7 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import { MerchantInfoQueriesFilter } from '../services/queries/merchant-info';
+import { CardSpace } from './card-spaces';
 
 export interface MerchantInfo {
   id: string;
@@ -24,6 +25,9 @@ export default class MerchantInfosRoute {
   });
   merchantInfoQueries = inject('merchant-info-queries', {
     as: 'merchantInfoQueries',
+  });
+  cardSpaceQueries = inject('card-space-queries', {
+    as: 'cardSpaceQueries',
   });
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
@@ -90,10 +94,22 @@ export default class MerchantInfosRoute {
       ownerAddress: ctx.state.userAddress,
     };
 
-    await this.merchantInfoQueries.insert(merchantInfo);
+    let db = await this.databaseManager.getClient();
+    let merchantInfoId, cardSpaceId;
+
+    await this.databaseManager.performTransaction(db, async () => {
+      merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
+      cardSpaceId = (
+        await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db)
+      ).id;
+    });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
-      id: merchantInfo.id,
+      id: merchantInfoId,
+    });
+
+    await this.workerClient.addJob('persist-off-chain-card-space', {
+      id: cardSpaceId,
     });
 
     let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);

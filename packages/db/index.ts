@@ -1,6 +1,7 @@
 import config from 'config';
 import { Client, Pool, PoolClient } from 'pg';
 import { URL } from 'url';
+import crypto from 'crypto';
 
 export default class DatabaseManager {
   private client: Client | undefined;
@@ -32,6 +33,19 @@ export default class DatabaseManager {
     }
 
     return await this.pool.connect();
+  }
+
+  async performTransaction(db: Client, cb: any) {
+    let transactionId = `tx_${crypto.randomBytes(20).toString('hex')}`;
+
+    try {
+      await db.query(`SAVEPOINT ${transactionId}`);
+      await cb();
+      await db.query(`RELEASE SAVEPOINT ${transactionId}`);
+    } catch (e) {
+      await db.query(`ROLLBACK TO SAVEPOINT ${transactionId}`);
+      throw e;
+    }
   }
 
   async teardown() {

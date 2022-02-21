@@ -21,13 +21,13 @@ class StubAuthenticationUtils {
   }
 }
 
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
+let jobIdentifiers: string[] = [];
+let jobPayloads: any[] = [];
 
 class StubWorkerClient {
   async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
+    jobIdentifiers.push(identifier);
+    jobPayloads.push(payload);
     return Promise.resolve({} as Job);
   }
 }
@@ -44,11 +44,11 @@ describe('POST /api/merchant-infos', function () {
     registry(this).register('worker-client', StubWorkerClient);
   });
 
-  let { request } = setupHub(this);
+  let { request, getContainer } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    jobIdentifiers = [];
+    jobPayloads = [];
   });
 
   it('persists merchant info', async function () {
@@ -98,8 +98,11 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-merchant-info');
-    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId });
+    let cardSpaceQueries = await getContainer().lookup('card-space-queries');
+    let cardSpace = (await cardSpaceQueries.query({ merchantId: String(resourceId) }))[0];
+
+    expect(jobIdentifiers).to.deep.equal(['persist-off-chain-merchant-info', 'persist-off-chain-card-space']);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId }, { id: cardSpace.id }]);
   });
 
   it('returns 401 without bearer token', async function () {
@@ -298,8 +301,8 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
   let { request } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    jobIdentifiers = [];
+    jobPayloads = [];
   });
 
   it('returns 401 without bearer token', async function () {

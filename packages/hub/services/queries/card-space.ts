@@ -1,26 +1,25 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { Client } from 'pg';
 import { CardSpace } from '../../routes/card-spaces';
 import { buildConditions } from '../../utils/queries';
 
-interface CardSpaceSlugFilter {
-  merchantSlug: string;
+interface CardSpaceQueriesFilter {
+  id?: string;
+  merchantSlug?: string;
+  merchantId?: string;
 }
-
-interface CardSpaceIdFilter {
-  id: string;
-}
-
-type CardSpaceQueriesFilter = CardSpaceSlugFilter | CardSpaceIdFilter;
 
 export default class CardSpaceQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async insert(model: CardSpace) {
-    let db = await this.databaseManager.getClient();
+  async insert(model: CardSpace, db?: Client): Promise<CardSpace> {
+    if (!db) db = await this.databaseManager.getClient();
 
-    await db.query(
-      'INSERT INTO card_spaces (id, merchant_id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+    let {
+      rows: [{ id }],
+    } = await db.query(
+      'INSERT INTO card_spaces (id, merchant_id, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
       [
         model.id,
         model.merchantId,
@@ -32,6 +31,8 @@ export default class CardSpaceQueries {
         model.profileCategory,
       ]
     );
+
+    return { id } as CardSpace;
   }
 
   async update(model: CardSpace) {
@@ -81,7 +82,7 @@ export default class CardSpaceQueries {
 
     let conditions;
 
-    if (filterIsSlug(filter)) {
+    if (filter.merchantSlug != null) {
       conditions = buildConditions({ slug: filter.merchantSlug }, 'merchant_infos');
     } else {
       conditions = buildConditions(filter, 'card_spaces');
@@ -114,10 +115,6 @@ export default class CardSpaceQueries {
       };
     });
   }
-}
-
-function filterIsSlug(filter: CardSpaceQueriesFilter): filter is CardSpaceSlugFilter {
-  return (filter as CardSpaceSlugFilter).merchantSlug !== undefined;
 }
 
 declare module '@cardstack/di' {
