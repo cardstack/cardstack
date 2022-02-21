@@ -198,11 +198,11 @@ export default class FileCache {
   }
 
   teardown(): void {
-    log.debug('Cleaning Cache dir: ' + this.dir);
-    for (let subDir of ENVIRONMENTS) {
-      removeSync(join(this.dir, subDir));
-    }
-    removeSync(join(this.dir, 'assets'));
+    // log.debug('Cleaning Cache dir: ' + this.dir);
+    // for (let subDir of ENVIRONMENTS) {
+    //   removeSync(join(this.dir, subDir));
+    // }
+    // removeSync(join(this.dir, 'assets'));
   }
 }
 

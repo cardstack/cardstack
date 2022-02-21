@@ -11,8 +11,10 @@ import { BASE_REALM_CONFIG } from '../../services/realms-config';
 
 tmp.setGracefulCleanup();
 
+let fileCacheTmpDir = tmp.dirSync();
+
 export class TestFileCacheConfig extends FileCacheConfig {
-  tmp = tmp.dirSync();
+  tmp = fileCacheTmpDir;
 
   get root() {
     return this.tmp.name;
