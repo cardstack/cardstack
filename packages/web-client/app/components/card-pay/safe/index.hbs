@@ -75,7 +75,7 @@
     <section class="card-pay-safe__footer">
       <div>
         <div>Business ID</div>
-        <div class="card-pay-safe__footer-value" title={{this.data.info.id}} data-test-safe-footer-business-id>{{this.data.info.id}}</div>
+        <div class="card-pay-safe__footer-value" {{tippy this.data.info.id}} data-test-safe-footer-business-id>{{this.data.info.id}}</div>
       </div>
       <div data-test-safe-footer-managers>
         <span class="card-pay-safe__footer-value">{{@safe.owners.length}}</span>
