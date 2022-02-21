@@ -22,6 +22,11 @@ declare global {
   const __non_webpack_require__: any;
 }
 
+// TEMP: Until I figure out dynamic module importing in VM context
+import parse from 'date-fns/parse';
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
+
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
   exports: {
@@ -160,7 +165,19 @@ export default class FileCache {
       }
       let context = {
         exports: {},
-        require: (specifier: string) => this.loadModule(specifier),
+        require: (specifier: string) => {
+          // TODO: We need to figure out a pattern for importing npm code
+          switch (specifier) {
+            case 'date-fns/parse':
+              return parse;
+            case 'date-fns/parseISO':
+              return parseISO;
+            case 'date-fns/format':
+              return format;
+            default:
+              return this.loadModule(specifier);
+          }
+        },
 
         // we have to white list globals that we want available to our cards
         setTimeout,

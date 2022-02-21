@@ -1,4 +1,4 @@
-import { parseISO } from 'date-fns';
+import parseISO from 'date-fns/parseISO';
 
 export function serialize(d) {
   // If the model hasn't been deserialized yet it will still be a string
@@ -11,3 +11,5 @@ export function serialize(d) {
 export function deserialize(d) {
   return parseISO(d);
 }
+
+export default { serialize, deserialize };
