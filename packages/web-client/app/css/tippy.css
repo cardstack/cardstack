@@ -4,7 +4,6 @@
   word-wrap: break-word;
   max-width: calc(22ch + 9px * 2);
   font-family: var(--boxel-monospace-font-family);
-  font-size: var(--address-font-size);
   line-height: var(--address-line-height);
   letter-spacing: var(--boxel-lsp-sm);
   word-break: break-all;
