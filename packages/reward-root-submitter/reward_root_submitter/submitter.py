@@ -1,10 +1,12 @@
 import json
 import logging
-from hexbytes import HexBytes
 from collections import defaultdict
-from eth_utils import to_wei
+
 import requests
 from cloudpathlib import AnyPath
+from eth_utils import to_wei
+from hexbytes import HexBytes
+
 from .utils import get_all_reward_outputs, get_root_from_file
 
 
@@ -52,7 +54,7 @@ class RootSubmitter:
         # Safety check it hasn't been submitted already
         if payment_cycle in self.submitted_payment_cycles[reward_program_id]:
             logging.info(
-                "Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}, skipping"
+                f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}, skipping"
             )
             return
         existing_root = self.reward_contract.caller.payeeRoots(
@@ -65,7 +67,7 @@ class RootSubmitter:
             # If it exists, and it's the same as before, it's safe and expected to just skip on
             if existing_root == root:
                 logging.info(
-                    "Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}"
+                    f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}"
                 )
                 return
         # Now submit the root
@@ -100,12 +102,12 @@ class RootSubmitter:
             reward_program_id = reward_output["reward_program_id"]
             if payment_cycle not in self.submitted_payment_cycles[reward_program_id]:
                 logging.info(
-                    "Submitting root for reward program {reward_program_id} payment cycle {payment_cycle}"
+                    f"Submitting root for reward program {reward_program_id} payment cycle {payment_cycle}"
                 )
                 root = get_root_from_file(reward_output["file"])
                 if root is not None:
                     self.submit_root(reward_program_id, payment_cycle, root)
                 else:
                     logging.info(
-                        "No root found for reward program {reward_program_id} payment cycle {payment_cycle}"
+                        f"No root found for reward program {reward_program_id} payment cycle {payment_cycle}"
                     )

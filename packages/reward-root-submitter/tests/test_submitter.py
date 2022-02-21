@@ -1,15 +1,13 @@
+import json
+
 import pytest
-from reward_root_submitter.submitter import RootSubmitter
-from reward_root_submitter.utils import get_all_reward_outputs, get_root_from_file
-from eth_utils import denoms
-from hexbytes import HexBytes
 from cloudpathlib import AnyPath
 from cloudpathlib.local.implementations.s3 import LocalS3Client
-
-
+from eth_utils import denoms
+from hexbytes import HexBytes
+from reward_root_submitter.submitter import RootSubmitter
+from reward_root_submitter.utils import get_all_reward_outputs, get_root_from_file
 from web3 import EthereumTesterProvider, Web3
-
-import json
 
 
 @pytest.fixture(autouse=True)

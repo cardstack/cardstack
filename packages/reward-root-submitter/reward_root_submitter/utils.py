@@ -1,6 +1,7 @@
-from cloudpathlib import AnyPath
 import re
+
 import pyarrow.parquet as pq
+from cloudpathlib import AnyPath
 from hexbytes import HexBytes
 
 

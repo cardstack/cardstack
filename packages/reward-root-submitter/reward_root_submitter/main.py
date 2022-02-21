@@ -1,15 +1,17 @@
-from .submitter import RootSubmitter
-from web3 import Web3
+import logging
 import os
-
-import click
 import time
 
 import schedule
-
 from dotenv import load_dotenv
+from web3 import Web3
+
+from .submitter import RootSubmitter
 
 load_dotenv()  # take environment variables from .env
+
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
+logging.basicConfig(level=LOGLEVEL)
 
 
 def run_all():
@@ -33,9 +35,7 @@ def run_all():
     )
     # Default to one minute
     frequency = os.getenv("SUBMIT_FREQUENCY", 60)
-    schedule.every(frequency).seconds.do(
-        submitter.submit_all_roots
-    )
+    schedule.every(frequency).seconds.do(submitter.submit_all_roots)
     schedule.run_all()
     # Go into an infinite loop
     while True:

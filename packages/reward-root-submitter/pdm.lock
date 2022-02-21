@@ -568,6 +568,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "schedule"
+version = "1.1.0"
+requires_python = ">=3.6"
+summary = "Job scheduling for humans."
+
+[[package]]
 name = "semantic-version"
 version = "2.9.0"
 requires_python = ">=2.7"
@@ -684,7 +690,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:c762b37fb61b8e92c0ca4d9681136509293b915614d9c0e1b3647efbe0c13d26"
+content_hash = "sha256:44e3db4597fe6b5d347967723b1534716e6041f84226c9f4c82d61f76b165871"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -815,6 +821,7 @@ content_hash = "sha256:c762b37fb61b8e92c0ca4d9681136509293b915614d9c0e1b3647efbe
 ]
 "botocore 1.24.2" = [
     {file = "botocore-1.24.2-py3-none-any.whl", hash = "sha256:d1547d0bd8428df2dc1ad95b227e271914bb01f8edbd16a45766465c2090bc9b"},
+    {file = "botocore-1.24.2.tar.gz", hash = "sha256:c017dd174285a07db4e1b844750c43550c1f51e8256e722f1e69030c4f6c78f1"},
 ]
 "cached-property 1.5.2" = [
     {file = "cached_property-1.5.2-py2.py3-none-any.whl", hash = "sha256:df4f613cf7ad9a588cc381aaf4a512d26265ecebd5eb9e1ba12f1319eb85a6a0"},
@@ -1286,6 +1293,10 @@ content_hash = "sha256:c762b37fb61b8e92c0ca4d9681136509293b915614d9c0e1b3647efbe
 "s3transfer 0.5.1" = [
     {file = "s3transfer-0.5.1-py3-none-any.whl", hash = "sha256:25c140f5c66aa79e1ac60be50dcd45ddc59e83895f062a3aab263b870102911f"},
     {file = "s3transfer-0.5.1.tar.gz", hash = "sha256:69d264d3e760e569b78aaa0f22c97e955891cd22e32b10c51f784eeda4d9d10a"},
+]
+"schedule 1.1.0" = [
+    {file = "schedule-1.1.0-py2.py3-none-any.whl", hash = "sha256:617adce8b4bf38c360b781297d59918fbebfb2878f1671d189f4f4af5d0567a4"},
+    {file = "schedule-1.1.0.tar.gz", hash = "sha256:e6ca13585e62c810e13a08682e0a6a8ad245372e376ba2b8679294f377dfc8e4"},
 ]
 "semantic-version 2.9.0" = [
     {file = "semantic_version-2.9.0-py2.py3-none-any.whl", hash = "sha256:db2504ab37902dd2c9876ece53567aa43a5b2a417fbe188097b2048fff46da3d"},
