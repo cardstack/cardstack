@@ -9,6 +9,7 @@ import tippy, { Instance as TippyInstance } from 'tippy.js';
 import type { Props as TippyOptions } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
+import '@cardstack/web-client/css/tippy.css';
 
 const baseTippyOptions = {
   theme: 'light-border',
