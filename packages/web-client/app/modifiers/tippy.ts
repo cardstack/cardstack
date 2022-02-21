@@ -14,6 +14,7 @@ const baseTippyOptions = {
   theme: 'light-border',
   placement: 'bottom',
   arrow: false,
+  maxWidth: 280,
 };
 
 type ModifierOptions = Partial<TippyOptions>;
