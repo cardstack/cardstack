@@ -256,21 +256,21 @@ app "ssr-web" {
             memory = "512"
             cluster = "ssr-web-staging"
             count = 1
-            // subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-            task_role_name = "ssr-web-staging-ssr-web_ecr_task"
+            subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+            task_role_name = "ssr-web-staging-ssr_web_ecr_task"
             alb {
-                // listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/6ac46ddbf5b72dfa/ea02efa09592755f"
             }
         }
 
-        hook {
-            // when    = "before"
-            // command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
-        }
+        // hook {
+        //     when    = "before"
+        //     command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
+        // }
 
-        hook {
-            // when    = "after"
-            // command = ["node", "./scripts/fix-listener.mjs", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-        }
+        // hook {
+        //     when    = "after"
+        //     command = ["node", "./scripts/fix-listener.mjs", "ssr-web-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        // }
     }
 }
