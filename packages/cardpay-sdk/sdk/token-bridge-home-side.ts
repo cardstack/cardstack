@@ -232,7 +232,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
         `Timed out waiting for tokens to be bridged to layer 2 for safe owned by ${recipientAddress} after block ${fromBlock}`
       );
     }
-    // TODO: can this use waitForSubgraphIndex?
+
     let {
       transaction: { id: txnHash },
     } = receivedBridgedTokens[0];
