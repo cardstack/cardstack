@@ -77,9 +77,10 @@
   font-size: 1.625rem;
   font-weight: 600;
   letter-spacing: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .card-pay-safe__logo {
