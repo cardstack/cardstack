@@ -1,13 +1,12 @@
 from os import stat
-from typing import Any
-import duckdb
 from pathlib import PosixPath
-from cloudpathlib import AnyPath, S3Client, CloudPath
-import yaml
-
 from time import time
+from typing import Any
 
+import duckdb
+import yaml
 from boto3.session import Session
+from cloudpathlib import AnyPath, CloudPath, S3Client
 
 cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
 cached_client.set_as_default_client()
@@ -64,9 +63,11 @@ def get_partition_files(config_location, table, min_partition, max_partition):
             f"end_partition={end_partition}",
             "data.parquet",
         )
-        print(partition_size, file_location)
+        # print(partition_size, file_location)
+        # print("+++++++++++++++++++")
+        # print(exists(file_location))
         while exists(file_location):
-            print("Exists!")
+            # print("Exists!")
             files.append(file_location)
             start_partition = end_partition
             end_partition += partition_size
@@ -82,7 +83,5 @@ def get_partition_files(config_location, table, min_partition, max_partition):
 
 
 def get_files(config_location, table, min_partition, max_partition):
-    file_list = get_partition_files(
-        AnyPath(config_location), table, min_partition, max_partition
-    )
+    file_list = get_partition_files(AnyPath(config_location), table, min_partition, max_partition)
     return list(map(get_local_file, file_list))

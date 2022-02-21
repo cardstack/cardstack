@@ -18,6 +18,11 @@ class Program:
 
 
 class UsageRewardProgram(Program):
+    def __init__(self, config_location, reward_program_id, payment_cycle_length):
+        super(UsageRewardProgram, self).__init__(
+            config_location, reward_program_id, payment_cycle_length
+        )
+
     def set_parameters(
         self,
         token: str,
@@ -111,3 +116,12 @@ class UsageRewardProgram(Program):
             max_block,
             payment_cycle,
         )
+
+    def run_n(self, start_payment_cycle: int, end_payment_cycle: int):
+        payments = []
+        min_block = start_payment_cycle
+        max_block = end_payment_cycle
+        for i in range(min_block, max_block, self.payment_cycle_length):
+            df = self.run(i)
+            payments.append({"block": i, "amount": df["amount"].sum()})
+        return payments
