@@ -21,10 +21,6 @@ export class TestFileCacheConfig extends FileCacheConfig {
   get cacheDirectory() {
     return join(this.root, 'node_modules', this.packageName);
   }
-
-  cleanup() {
-    this.tmp.removeCallback();
-  }
 }
 
 export function resolveCard(root: string, modulePath: string): string {
