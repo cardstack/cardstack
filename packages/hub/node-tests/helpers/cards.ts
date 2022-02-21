@@ -7,7 +7,7 @@ import { CardService, INSECURE_CONTEXT } from '../../services/card-service';
 import FileCache from '../../services/file-cache';
 import { TEST_REALM } from '@cardstack/core/tests/helpers';
 import { RealmConfig } from '@cardstack/core/src/interfaces';
-import { BASE_REALM_CONFIG, DEMO_REALM_CONFIG } from '../../services/realms-config';
+import { BASE_REALM_CONFIG } from '../../services/realms-config';
 
 tmp.setGracefulCleanup();
 
@@ -62,7 +62,7 @@ export function configureCompiler(mochaContext: Mocha.Suite) {
       reg.register(
         'realmsConfig',
         class TestRealmsConfig {
-          realms: RealmConfig[] = [BASE_REALM_CONFIG, DEMO_REALM_CONFIG, { url: TEST_REALM, directory: testRealmDir }];
+          realms: RealmConfig[] = [BASE_REALM_CONFIG, { url: TEST_REALM, directory: testRealmDir }];
         },
         { type: 'service' }
       );
