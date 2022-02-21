@@ -256,7 +256,7 @@ app "ssr-web" {
             region = "us-east-1"
             memory = "512"
             cluster = "ssr-web-staging"
-            count = 1
+            count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "ssr-web-staging-ssr_web_ecr_task"
 
@@ -270,9 +270,9 @@ app "ssr-web" {
         //     command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
         // }
 
-        // hook {
-        //     when    = "after"
-        //     command = ["node", "./scripts/fix-listener.mjs", "ssr-web-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-        // }
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/fix-listener.mjs", "ssr-wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
     }
 }
