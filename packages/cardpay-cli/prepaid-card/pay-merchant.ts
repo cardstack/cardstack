@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
+import { ContractOptions } from 'web3-eth-contract';
 
 export default {
   command: 'pay-merchant <merchantSafe> <prepaidCard> <spendAmount>',
@@ -20,15 +21,20 @@ export default {
         type: 'number',
         description: 'The amount to send to the merchant in units of SPEND',
       })
+      .option('from', {
+        type: 'string',
+        description: 'The signing EOA. Defaults to the first derived EOA of the specified mnemonic',
+      })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, merchantSafe, prepaidCard, spendAmount } = args as unknown as {
+    let { network, mnemonic, merchantSafe, prepaidCard, spendAmount, from } = args as unknown as {
       network: string;
       merchantSafe: string;
       prepaidCard: string;
       spendAmount: number;
       mnemonic?: string;
+      from?: string;
     };
     let web3 = await getWeb3(network, mnemonic);
     let prepaidCardSdk = await getSDK('PrepaidCard', web3);
@@ -37,9 +43,19 @@ export default {
     console.log(
       `Paying merchant safe address ${merchantSafe} the amount §${spendAmount} SPEND from prepaid card address ${prepaidCard}...`
     );
-    await prepaidCardSdk.payMerchant(merchantSafe, prepaidCard, spendAmount, {
-      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
+    let contractOptions = {} as ContractOptions;
+    if (from) {
+      contractOptions.from = from;
+    }
+    await prepaidCardSdk.payMerchant(
+      merchantSafe,
+      prepaidCard,
+      spendAmount,
+      {
+        onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      },
+      contractOptions
+    );
     console.log('done');
   },
 } as CommandModule;

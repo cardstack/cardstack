@@ -1,7 +1,8 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { FROM_OPTION, getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
+import { ContractOptions } from 'web3-eth-contract';
 
 export default {
   command: 'transfer <prepaidCard> <newOwner>',
@@ -16,14 +17,16 @@ export default {
         type: 'string',
         description: 'The address of the new owner',
       })
+      .option('from', FROM_OPTION)
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, newOwner } = args as unknown as {
+    let { network, mnemonic, prepaidCard, newOwner, from } = args as unknown as {
       network: string;
       prepaidCard: string;
       newOwner: string;
       mnemonic?: string;
+      from?: string;
     };
     let web3 = await getWeb3(network, mnemonic);
 
@@ -31,9 +34,18 @@ export default {
     let blockExplorer = await getConstant('blockExplorer', web3);
 
     console.log(`Transferring prepaid card ${prepaidCard} to new owner ${newOwner}...`);
-    await prepaidCardAPI.transfer(prepaidCard, newOwner, {
-      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
+    let contractOptions = {} as ContractOptions;
+    if (from) {
+      contractOptions.from = from;
+    }
+    await prepaidCardAPI.transfer(
+      prepaidCard,
+      newOwner,
+      {
+        onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      },
+      contractOptions
+    );
     console.log('done');
   },
 } as CommandModule;
