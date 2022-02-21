@@ -72,7 +72,7 @@ if (process.env.COMPILER) {
 
       let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
       expect(metaModuleSource).to.containsSource(`
-        import DateSerializer from "${dateCompiled.serializerModule?.global}";
+        import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
       `);
       expect(metaModuleSource).to.containsSource(`
         export const serializerMap = {
@@ -361,7 +361,7 @@ if (process.env.COMPILER) {
         }
       });
 
-      it.skip('Errors when the serializer is malformed', async function () {
+      it('Errors when the serializer is malformed', async function () {
         try {
           await cards.create({
             realm,
@@ -375,7 +375,7 @@ if (process.env.COMPILER) {
           });
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
-          expect(err.message).to.include(`card serializer is malformed. It must have export a deserialize method`);
+          expect(err.message).to.include(`Serializer is malformed. It is missing the following exports: deserialize`);
           expect(err.status).to.eq(400);
         }
       });

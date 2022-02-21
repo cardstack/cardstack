@@ -12,5 +12,3 @@ export function serialize(d) {
 export function deserialize(d) {
   return parse(d, 'yyyy-MM-dd', new Date());
 }
-
-export default { serialize, deserialize };

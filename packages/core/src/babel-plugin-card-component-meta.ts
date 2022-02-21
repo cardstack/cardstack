@@ -141,7 +141,7 @@ function addFieldToSerializerMap(
     map[usedPath] = state.importUtil.import(
       path,
       field.card.serializerModule.global,
-      'default',
+      '*',
       `${capitalize(cardId)}Serializer`
     );
   }

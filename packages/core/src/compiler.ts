@@ -27,6 +27,7 @@ import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 import { hashCardFields } from './utils/fields';
+import babelPluginCardSerializerAnalyze from './babel-plugin-card-serializer-analyze';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -413,6 +414,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } else if (serializer) {
       serializerRef = { local: serializer };
       let source = await this.getFile(this.cardSource, serializer);
+
+      babelPluginCardSerializerAnalyze(source);
       this.modules[serializer] = {
         type: JS_TYPE,
         source,

@@ -11,5 +11,3 @@ export function serialize(d) {
 export function deserialize(d) {
   return parseISO(d);
 }
-
-export default { serialize, deserialize };
