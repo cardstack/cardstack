@@ -22,30 +22,17 @@ range_summaries = [
     [{"block": 24150016, "amount": 48}],
 ]
 
-
-def compute_summary(df):
-    "aggregates columns of df"
-    return {
-        "reward_sum": df["amount"].sum(),
-        "unique_payee": len(df["payee"].unique()),
-        "total_transactions": df["transactions"].sum(),
-        "total_spent": df["total_spent"].sum(),
-    }
-
-
 payment_cycle_length_ls = [1024, 1024 * 32, 1024 * 512]
 spend_factor_ls = [2.0]
 transaction_factor_ls = [2.0]
 
-
-params_ls = itertools.product(payment_cycle_length_ls, spend_factor_ls, transaction_factor_ls)
-
 ans_ls = zip(df_hashes, summaries)
-
 range_ans_ls = zip(range_summaries)
 
 
-def create_program(payment_cycle_length, spend_factor, transaction_factor):
+@pytest.fixture
+def program(request):
+    payment_cycle_length, spend_factor, transaction_factor = request.param
     config = "tests/data/cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1"
     reward_program_id = "test_reward"
     token = "test_token"
@@ -59,29 +46,46 @@ def create_program(payment_cycle_length, spend_factor, transaction_factor):
 class TestBlockRangeUsage:
     "multiple payment cycle ranges"
 
-    @pytest.mark.parametrize("params,ans", zip(params_ls, range_ans_ls))
-    def test_run(self, params, ans):
-        reward_program = create_program(*params)
+    @pytest.mark.parametrize(
+        "program,ans",
+        zip(
+            itertools.product(payment_cycle_length_ls, spend_factor_ls, transaction_factor_ls),
+            range_ans_ls,
+        ),
+        indirect=["program"],
+    )
+    def test_run(self, program, ans):
         (range_summary,) = ans
         start_payment_cycle = 24150016
         end_payment_cycle = start_payment_cycle + 1024
-        payments = reward_program.run_n(start_payment_cycle, end_payment_cycle)
+        payments = program.run_n(start_payment_cycle, end_payment_cycle)
         assert payments[0]["amount"] == range_summary[0]["amount"]
         assert payments[0]["block"] == range_summary[0]["block"]
 
 
 class TestSingleBlockUsage:
-    "fix payment cycle. varying factor"
-
     @pytest.mark.parametrize(
-        "params,ans",
-        zip(params_ls, ans_ls),
+        "program, ans",
+        zip(
+            itertools.product(payment_cycle_length_ls, spend_factor_ls, transaction_factor_ls),
+            ans_ls,
+        ),
+        indirect=["program"],
     )
-    def test_run(self, params, ans):
+    def test_run(self, program, ans):
         df_hash, summary = ans
         payment_cycle = 24150016
-        reward_program = create_program(*params)
-        df = reward_program.run(payment_cycle)
+        df = program.run(payment_cycle)
         h = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
-        assert summary == compute_summary(df)
+        assert summary == self.compute_summary(df)
         assert h == df_hash
+
+    @staticmethod
+    def compute_summary(df):
+        "aggregates columns of df"
+        return {
+            "reward_sum": df["amount"].sum(),
+            "unique_payee": len(df["payee"].unique()),
+            "total_transactions": df["transactions"].sum(),
+            "total_spent": df["total_spent"].sum(),
+        }
