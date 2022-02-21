@@ -22,7 +22,7 @@ import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHa
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { MerchantSafe, Safe } from '../safes';
 
 const { fromWei } = Web3.utils;
@@ -95,21 +95,21 @@ export default class RevenuePool {
     return gasInToken(estimate).toString();
   }
 
-  async claim(txnHash: string): Promise<TransactionReceipt>;
+  async claim(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claim(
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async claim(
     merchantSafeAddressOrTxnHash: string,
     tokenAddress?: string,
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(merchantSafeAddressOrTxnHash)) {
       let txnHash = merchantSafeAddressOrTxnHash;
       return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -175,19 +175,21 @@ export default class RevenuePool {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async registerMerchant(txnHash: string): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
+  async registerMerchant(
+    txnHash: string
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: SuccessfulTransactionReceipt }>;
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: SuccessfulTransactionReceipt }>;
   async registerMerchant(
     prepaidCardAddressOrTxnHash: string,
     infoDID?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: SuccessfulTransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);

@@ -247,6 +247,8 @@ export async function executeSend(
   return response.json();
 }
 
+// allow TransactionReceipt as argument
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
   let eventParams = txnReceipt.logs
     .filter((log) => isEventMatch(log, eventAbi.topic, address))
