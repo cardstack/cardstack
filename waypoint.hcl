@@ -252,12 +252,14 @@ app "ssr-web" {
 
     deploy {
         use "aws-ecs" {
+            service_port = 4000
             region = "us-east-1"
             memory = "512"
             cluster = "ssr-web-staging"
             count = 1
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "ssr-web-staging-ssr_web_ecr_task"
+
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/3eb5e804fa425fef/2ff381a203f7069d"
             }
