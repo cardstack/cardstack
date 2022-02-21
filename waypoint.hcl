@@ -194,7 +194,7 @@ app "cardie" {
 
 # This name has been chosen to be much shorter than 32 characters
 # If the name comes close to 32 characters there are unreliable
-# deployments. See 
+# deployments. See
 #  https://github.com/hashicorp/waypoint/issues/2957
 # for more details
 app "cardpay-subg-ext" {
@@ -259,7 +259,7 @@ app "ssr-web" {
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "ssr-web-staging-ssr_web_ecr_task"
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/6ac46ddbf5b72dfa/ea02efa09592755f"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/3eb5e804fa425fef/2ff381a203f7069d"
             }
         }
 
