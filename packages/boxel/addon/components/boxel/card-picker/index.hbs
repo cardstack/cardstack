@@ -1,0 +1,30 @@
+<div ...attributes>
+  {{#let (component (or @cardComponent "boxel/card-picker/card-option")) as |CardComponent|}}
+    <PowerSelect
+      class={{cn "card-picker-dropdown" card-picker-dropdown--selected=@selectedCard}}
+      @options={{@options}}
+      @selected={{@selectedCard}}
+      @selectedItemComponent="boxel/card-picker/selected-item"
+      @placeholder="Select card"
+      @onChange={{@chooseCard}}
+      @renderInPlace={{true}}
+      @eventType="click"
+      @verticalPosition="below"
+      data-test-card-picker-dropdown
+    as |option|>
+      <div
+        class={{cn
+          "card-picker-dropdown__option"
+          card-picker-dropdown__option--selected=(eq option.title @selectedCard.title)
+          card-picker-dropdown__option--disabled=(eq option.disabled true)
+        }}
+        data-test-card-picker-option={{option.title}}
+      >
+        <CardComponent @card={{option}} />
+      </div>
+    </PowerSelect>
+    {{#if @selectedCard}}
+      <CardComponent @card={{@selectedCard}} />
+    {{/if}}
+  {{/let}}
+</div>

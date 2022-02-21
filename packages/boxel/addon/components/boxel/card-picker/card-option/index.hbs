@@ -1,0 +1,7 @@
+<Boxel::CardContainer @displayBoundaries={{true}} class="card-picker-option">
+  {{#each-in @card as |key val|}}
+    <Boxel::Field @label={{key}} @horizontalLabelSize="small">
+      {{val}}
+    </Boxel::Field>
+  {{/each-in}}
+</Boxel::CardContainer>
