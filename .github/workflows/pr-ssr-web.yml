@@ -86,13 +86,12 @@ jobs:
           message: |
             :checkered_flag: **ssr-web** [main] has been successfully deployed to *staging*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      # FIXME commenting out during iteration, it has worked once now
-      # - name: Send failure notification to Discord
-      #   if: ${{ failure() }}
-      #   uses: ./.github/actions/discord-message
-      #   with:
-      #     token: ${{ secrets.DISCORD_TOKEN }}
-      #     channel: ${{ secrets.DISCORD_CHANNEL }}
-      #     message: |
-      #       :warning: **ssr-web** [main] has failed to deploy to *staging*
-      #       :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **ssr-web** [main] has failed to deploy to *staging*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
