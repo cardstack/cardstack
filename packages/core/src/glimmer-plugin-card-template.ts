@@ -130,7 +130,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               field,
               importAndChooseName,
               modelArgument: `${MODEL}.${fieldFullPath}`,
-              format: fieldFormat,
+              format: field.computed ? 'embedded' : fieldFormat,
               state,
             });
           }
@@ -160,7 +160,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
-                format: fieldFormat,
+                format: val.field.computed ? 'embedded' : fieldFormat,
                 state,
               });
             default:
