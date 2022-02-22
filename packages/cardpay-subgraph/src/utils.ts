@@ -20,7 +20,7 @@ import {
   MerchantRevenueEvent,
   SafeOwner,
 } from '../generated/schema';
-import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
+import { GnosisSafe } from '../generated/Gnosis_v1_3/GnosisSafe';
 import { StaticToken } from './static-tokens';
 import { addresses } from './generated/addresses';
 import { dayMonthYearFromEventTimestamp } from './dates';

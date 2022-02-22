@@ -10,7 +10,7 @@ import {
   setSafeType,
 } from '../utils';
 import { log, BigInt, Address } from '@graphprotocol/graph-ts';
-import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
+import { GnosisSafe } from '../../generated/Gnosis_v1_3/GnosisSafe';
 
 export function handleCreateDepot(event: SupplierSafeCreated): void {
   let supplier = toChecksumAddress(event.params.supplier);

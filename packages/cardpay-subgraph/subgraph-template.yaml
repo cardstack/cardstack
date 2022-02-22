@@ -416,11 +416,11 @@ dataSources:
       file: ./src/mappings/depot.ts
 
   - kind: ethereum/contract
-    name: Gnosis
+    name: Gnosis_v1_2
     network: {NETWORK}
     source:
-      address: "{GNOSIS_SAFE_PROXY_FACTORY}"
-      abi: GnosisProxyFactory
+      address: "{GNOSIS_SAFE_PROXY_FACTORY_v1_2}"
+      abi: GnosisProxyFactory_v1_2
       startBlock: {SAFE_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
@@ -431,8 +431,8 @@ dataSources:
         - Account
         - SafeOwner
       abis:
-        - name: GnosisProxyFactory
-          file: ./abis/GnosisProxyFactory.json
+        - name: GnosisProxyFactory_v1_2
+          file: ./abis/GnosisProxyFactory_v1_2.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
         - name: ERC20
@@ -441,12 +441,41 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: GnosisSafe
-          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: ProxyCreation(address)
           handler: handleProxyCreation
-      file: ./src/mappings/gnosis-proxy-factory.ts
+      file: ./src/mappings/gnosis-proxy-factory_v1_2.ts
+
+  - kind: ethereum/contract
+    name: Gnosis_v1_3
+    network: {NETWORK}
+    source:
+      address: "{GNOSIS_SAFE_PROXY_FACTORY_v1_3}"
+      abi: GnosisProxyFactory_v1_3
+      startBlock: {SAFE_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Account
+        - SafeOwner
+      abis:
+        - name: GnosisProxyFactory_v1_3
+          file: ./abis/GnosisProxyFactory_v1_3.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: ProxyCreation(address,address)
+          handler: handleProxyCreation
+      file: ./src/mappings/gnosis-proxy-factory_v1_3.ts
 
   - kind: ethereum/contract
     name: UniswapFactory

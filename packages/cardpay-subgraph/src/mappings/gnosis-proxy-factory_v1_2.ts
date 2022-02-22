@@ -1,5 +1,5 @@
-import { ProxyCreation } from '../../generated/Gnosis/GnosisProxyFactory';
-import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
+import { ProxyCreation } from '../../generated/Gnosis_v1_2/GnosisProxyFactory_v1_2';
+import { GnosisSafe } from '../../generated/Gnosis_v1_2/GnosisSafe';
 import { GnosisSafe as GnosisSafeTemplate } from '../../generated/templates';
 import { Safe, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress, makeAccount } from '../utils';
@@ -26,7 +26,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.save();
   }
   safeEntity.save();
-  log.debug('created safe entity {}', [safeAddress]);
+  log.debug('created gnosis 1.2 safe entity {}', [safeAddress]);
 
   GnosisSafeTemplate.create(event.params.proxy);
 }
