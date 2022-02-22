@@ -116,6 +116,7 @@ jobs:
       web_client: ${{ steps.filter.outputs.web_client }}
       boxel: ${{ steps.filter.outputs.boxel }}
       cardie: ${{ steps.filter.outputs.cardie }}
+      ssr_web: ${{ steps.filter.outputs.ssr_web }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -151,6 +152,14 @@ jobs:
               - '.github/workflows/push-main.yml'
               - 'yarn.lock'
               - 'waypoint.hcl'
+            ssr_web:
+              - 'packages/ssr-web/**'
+              - 'packages/boxel/**'
+              - 'packages/cardpay-sdk/**'
+              - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-ssr-web/**'
+              - 'yarn.lock'
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
