@@ -190,7 +190,21 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(
+        `meta[name='twitter:title'][content='Pay Business: ${merchantName}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
         `meta[property='og:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:url'][content$='${expectedPath}']`,
         document.documentElement
       )
       .exists();
