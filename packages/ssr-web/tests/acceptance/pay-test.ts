@@ -190,7 +190,41 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(
+        `meta[name='twitter:title'][content='Pay Business: ${merchantName}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
         `meta[property='og:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
+
+    let amountInUSD = convertAmountToNativeDisplay(
+      spendToUsd(roundedSpendAmount)!,
+      'USD'
+    );
+    let description = `Pay ${amountInUSD} with Card Wallet`;
+
+    assert
+      .dom(
+        `meta[property='og:description'][content$='${description}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:description'][content$='${description}']`,
         document.documentElement
       )
       .exists();
