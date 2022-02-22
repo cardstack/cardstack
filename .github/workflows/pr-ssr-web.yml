@@ -64,13 +64,7 @@ jobs:
       - name: Deploy ssr-web
         uses: ./.github/actions/deploy-ssr-web
         env:
-          # EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          # EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
-          # FIXME are the AWS ones needed?
-          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           # SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
