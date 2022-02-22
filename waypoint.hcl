@@ -258,7 +258,7 @@ app "ssr-web" {
             cluster = "ssr-web-staging"
             count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-            task_role_name = "ssr-web-staging-ssr_web_ecr_task"
+            task_role_name = "ssr-web-staging-ecr-task"
 
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/4fb24826d0bb45b3"
