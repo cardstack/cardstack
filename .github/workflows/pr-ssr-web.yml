@@ -49,8 +49,8 @@ jobs:
   # FIXME this should be in push-main, here for testing
   deploy-ssr-web-staging:
     name: Deploy ssr-web
-    needs: change_check
-    if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
+    # needs: change_check
+    # if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
