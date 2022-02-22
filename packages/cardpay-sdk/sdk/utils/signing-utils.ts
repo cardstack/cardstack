@@ -2,10 +2,15 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { Estimate, SendPayload, Operation } from './safe-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
+import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
+
+import { networkName } from './general-utils';
+import { networkIds } from '../constants';
+import { gte } from 'semver';
 
 export interface Signature {
   v: number;
@@ -84,7 +89,7 @@ export async function signSafeTxAsRSV(
   owner: string,
   gnosisSafeAddress: string
 ): Promise<Signature[]> {
-  const typedData = safeTransactionTypedData(
+  const typedData = await safeTransactionTypedData(
     to,
     value,
     data,
@@ -95,7 +100,8 @@ export async function signSafeTxAsRSV(
     txGasToken,
     refundReceiver,
     nonce,
-    gnosisSafeAddress
+    gnosisSafeAddress,
+    web3
   );
   const signatureRSV = [];
   const sig = await signTypedData(web3, owner, typedData);
@@ -119,7 +125,7 @@ export async function signSafeTxAsBytes(
   owner: string,
   gnosisSafeAddress: string
 ): Promise<string[]> {
-  const typedData = safeTransactionTypedData(
+  const typedData = await safeTransactionTypedData(
     to,
     value,
     data,
@@ -130,7 +136,8 @@ export async function signSafeTxAsBytes(
     txGasToken,
     refundReceiver,
     nonce,
-    gnosisSafeAddress
+    gnosisSafeAddress,
+    web3
   );
   return [await signTypedData(web3, owner, typedData)];
 }
@@ -184,7 +191,7 @@ export async function signSafeTxWithEIP1271AsBytes(
   return sortedSignatures[0] + sortedSignatures[1].replace('0x', '') + verifyingData;
 }
 
-function safeTransactionTypedData(
+async function safeTransactionTypedData(
   to: string,
   value: number,
   data: any,
@@ -195,9 +202,13 @@ function safeTransactionTypedData(
   txGasToken: string,
   refundReceiver: string,
   nonce: any,
-  gnosisSafeAddress: string
+  gnosisSafeAddress: string,
+  web3: Web3
 ) {
-  return {
+  let domain: { verifyingContract: string; chainId?: number } = {
+    verifyingContract: gnosisSafeAddress,
+  };
+  let typedData = {
     types: {
       EIP712Domain: [{ type: 'address', name: 'verifyingContract' }],
       // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
@@ -214,9 +225,7 @@ function safeTransactionTypedData(
         { type: 'uint256', name: 'nonce' },
       ],
     },
-    domain: {
-      verifyingContract: gnosisSafeAddress,
-    },
+    domain,
     primaryType: 'SafeTx',
     message: {
       to: to,
@@ -231,6 +240,20 @@ function safeTransactionTypedData(
       nonce: nonce.toNumber(),
     },
   };
+
+  let safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], gnosisSafeAddress);
+  let safeVersion = await safe.methods.VERSION().call();
+
+  if (gte(safeVersion, '1.3.0')) {
+    let name = await networkName(web3);
+    typedData.types.EIP712Domain.unshift({
+      type: 'uint256',
+      name: 'chainId',
+    });
+    typedData.domain.chainId = networkIds[name];
+  }
+
+  return typedData;
 }
 
 export async function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
