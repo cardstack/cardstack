@@ -183,14 +183,14 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(
-        `meta[property='og:title'][content='Pay Business: ${merchantName}']`,
+        `meta[property='og:title'][content='${merchantName} requests payment']`,
         document.documentElement
       )
       .exists();
 
     assert
       .dom(
-        `meta[name='twitter:title'][content='Pay Business: ${merchantName}']`,
+        `meta[name='twitter:title'][content='${merchantName} requests payment']`,
         document.documentElement
       )
       .exists();
@@ -213,7 +213,7 @@ module('Acceptance | pay', function (hooks) {
       spendToUsd(roundedSpendAmount)!,
       'USD'
     );
-    let description = `Pay ${amountInUSD} with Card Wallet`;
+    let description = `Pay ${amountInUSD}`;
 
     assert
       .dom(
