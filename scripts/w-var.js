@@ -5,7 +5,7 @@ const variablesToGet = process.argv.slice(2).map((v) => v.toLowerCase());
 
 /**
  * Get waypoint variables and print them neatly.
- * Has very rough fuzzy search.
+ * Has very rough string matching.
  */
 exec('waypoint config get -json', (error, stdout, stderr) => {
   if (stderr) console.error(stderr);
