@@ -208,6 +208,26 @@ module('Acceptance | pay', function (hooks) {
         document.documentElement
       )
       .exists();
+
+    let amountInUSD = convertAmountToNativeDisplay(
+      spendToUsd(roundedSpendAmount)!,
+      'USD'
+    );
+    let description = `Pay ${amountInUSD} with Card Wallet`;
+
+    assert
+      .dom(
+        `meta[property='og:description'][content$='${description}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:description'][content$='${description}']`,
+        document.documentElement
+      )
+      .exists();
   });
 
   test('it rounds floating point SPEND amounts', async function (assert) {
