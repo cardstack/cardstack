@@ -265,10 +265,10 @@ app "ssr-web" {
             }
         }
 
-        // hook {
-        //     when    = "before"
-        //     command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
-        // }
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
+        }
 
         hook {
             when    = "after"
