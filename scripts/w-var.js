@@ -1,7 +1,7 @@
 /* eslint-disable node/no-unpublished-require */
 const exec = require('child_process').exec;
 const Table = require('cli-table3');
-const variablesToGet = process.argv.slice(2);
+const variablesToGet = process.argv.slice(2).map((v) => v.toLowerCase());
 
 /**
  * Get waypoint variables and print them neatly.
@@ -18,7 +18,7 @@ exec('waypoint config get -json', (error, stdout, stderr) => {
   if (variablesToGet.length) {
     const result = {};
     for (let key in data) {
-      if (variablesToGet.some((str) => key.includes(str))) {
+      if (variablesToGet.some((str) => key.toLowerCase().includes(str))) {
         result[key] = data[key];
       }
     }
