@@ -101,8 +101,7 @@
     "web3": "1.5.2",
     "web3-core": "1.5.2",
     "web3.storage": "^3.3.4",
-    "yargs": "^17.0.0",
-    "date-fns": "^2.22.1"
+    "yargs": "^17.0.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.28.17",
@@ -122,6 +121,7 @@
     "@types/yargs": "^17.0.2",
     "chai": "^4.3.4",
     "copy-webpack-plugin": "^10.0.0",
+    "fixturify-project": "^4.0.2",
     "ignore-loader": "^0.1.2",
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",

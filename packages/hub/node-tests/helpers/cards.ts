@@ -1,6 +1,6 @@
 import Mocha from 'mocha';
 import tmp from 'tmp';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import FileCacheConfig from '../../services/file-cache-config';
 import { contextFor, registry, setupHub } from './server';
 import { CardService, INSECURE_CONTEXT } from '../../services/card-service';
@@ -8,16 +8,18 @@ import FileCache from '../../services/file-cache';
 import { TEST_REALM } from '@cardstack/core/tests/helpers';
 import { RealmConfig } from '@cardstack/core/src/interfaces';
 import { BASE_REALM_CONFIG } from '../../services/realms-config';
+import { Project } from 'fixturify-project';
 
 tmp.setGracefulCleanup();
-
 let fileCacheTmpDir = tmp.dirSync();
 
-export class TestFileCacheConfig extends FileCacheConfig {
-  tmp = fileCacheTmpDir;
+let project = Project.fromDir(dirname(require.resolve('@cardstack/compiled/package.json')), { linkDeps: true });
+project.baseDir = join(fileCacheTmpDir.name, 'node_modules', '@cardstack/compiled');
+project.writeSync();
 
+export class TestFileCacheConfig extends FileCacheConfig {
   get root() {
-    return this.tmp.name;
+    return fileCacheTmpDir.name;
   }
 
   get cacheDirectory() {
