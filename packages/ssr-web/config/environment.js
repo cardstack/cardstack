@@ -29,6 +29,7 @@ module.exports = function (environment) {
     '@sentry/ember': {
       sentry: {
         dsn: process.env.SENTRY_DSN,
+        debug: true,
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
         enabled: !!process.env.DEPLOY_TARGET,
         environment: process.env.DEPLOY_TARGET || 'development',
