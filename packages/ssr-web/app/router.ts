@@ -14,4 +14,5 @@ Router.map(function () {
     path: '/pay/:*',
   });
   this.route('boom');
+  this.route('boom-client');
 });
