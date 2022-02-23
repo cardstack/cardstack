@@ -270,6 +270,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
         with:
           environment: staging
       - name: Send success notification to Discord
