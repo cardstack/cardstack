@@ -5,22 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run",
+      "name": "Run Executable",
       "type": "python",
       "request": "launch",
       "module": "cardpay_reward_programs.main",
     },
     {
-        "name": "Explore using Streamlit",
-        "type": "python",
-        "request": "launch",
-        "module": "streamlit",
-        "args": [
-            "run",
-            "${workspaceFolder}/cardpay_reward_programs/explore.py",
-            "--server.port",
-            "8501"            
-        ]
+      "name": "Explore using Streamlit",
+      "type": "python",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "${workspaceFolder}/cardpay_reward_programs/explore.py",
+        "--server.port",
+        "8501"
+      ]
     }
   ]
 }
