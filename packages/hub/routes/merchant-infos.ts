@@ -71,6 +71,17 @@ export default class MerchantInfosRoute {
       return;
     }
 
+    if (ctx.request.body.data.attributes['name'].length > 50) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let slug = ctx.request.body.data.attributes['slug'].toLowerCase();
     let validationResult = await this.validateSlug(slug);
 

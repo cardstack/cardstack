@@ -181,6 +181,35 @@ describe('POST /api/merchant-infos', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('validates name for length', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'a'.repeat(51),
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('validates slug for forbidden words', async function () {
     let requestWithSlug: any = (slug: string) => {
       let payload = {

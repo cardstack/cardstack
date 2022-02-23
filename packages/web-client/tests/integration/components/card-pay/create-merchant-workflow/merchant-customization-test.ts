@@ -35,6 +35,10 @@ const MERCHANT_NAME_INVALID_INPUTS = [
     value: '   ',
     errorMessage: 'This field is required',
   },
+  {
+    value: 'a'.repeat(51),
+    errorMessage: 'Cannot exceed 50 characters',
+  },
 ];
 const VALID_ID = 'abc123';
 const MERCHANT_ID_INVALID_INPUTS = [
