@@ -31,8 +31,8 @@ module.exports = function (environment) {
         dsn: process.env.SENTRY_DSN,
         debug: true,
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
-        enabled: !!process.env.DEPLOY_TARGET,
-        environment: process.env.DEPLOY_TARGET || 'development',
+        enabled: true, // FIXME and the next line
+        environment: 'production',
         release:
           `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
