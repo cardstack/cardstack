@@ -52,7 +52,6 @@ import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoService from './services/merchant-info';
-import MerchantInfoQueries from './services/queries/merchant-info';
 import CardSpaceQueries from './services/queries/card-space';
 import CardSpaceSerializer from './services/serializers/card-space-serializer';
 import CardSpaceValidator from './services/validators/card-space';
@@ -97,6 +96,7 @@ import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
+import { registerQueries } from './queries';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -134,7 +134,6 @@ export function createRegistry(): Registry {
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
-  registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
@@ -194,6 +193,7 @@ export function createRegistry(): Registry {
 
   registerServices(registry);
   registerRoutes(registry);
+  registerQueries(registry);
 
   return registry;
 }

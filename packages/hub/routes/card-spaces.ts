@@ -10,7 +10,7 @@ import CardSpaceQueries from '../services/queries/card-space';
 import CardSpaceValidator from '../services/validators/card-space';
 import { serializeErrors } from './utils/error';
 import { validateRequiredFields } from './utils/validation';
-import MerchantInfoQueries from '../services/queries/merchant-info';
+import { query } from '../queries';
 
 export interface CardSpace {
   id: string;
@@ -48,7 +48,7 @@ export default class CardSpacesRoute {
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+  merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
