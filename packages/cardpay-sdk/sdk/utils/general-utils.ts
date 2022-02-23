@@ -54,6 +54,7 @@ export function waitUntilTransactionMined(
   ) {
     if (receiptCache.has(txnHash)) {
       resolve(receiptCache.get(txnHash)!);
+      return;
     }
 
     try {
