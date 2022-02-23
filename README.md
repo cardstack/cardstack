@@ -19,6 +19,8 @@ Set up `app.cardstack.test` and `app-assets.cardstack.test` to resolve to localh
 
 See the [README in the hub package](./packages/hub/README.md) for environment variables that you'll need to setup.
 
+### Fetching waypoint config
+
 To retrieve environment variables for waypoint in a more readable way as an alternative to `waypoint config get`, you can use the convenience script `yarn w-var`. 
 
 ```
