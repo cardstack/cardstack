@@ -10,14 +10,14 @@ import pandas as pd
 from ..utils import get_files
 
 
-class Program:
+class Module:
     def __init__(self, config_location, reward_program_id: str, payment_cycle_length: int):
         self.config_location = config_location
         self.reward_program_id = reward_program_id
         self.payment_cycle_length = payment_cycle_length
 
 
-class UsageRewardProgram(Program):
+class UsageRewardProgram(Module):
     def __init__(self, config_location, reward_program_id, payment_cycle_length):
         super(UsageRewardProgram, self).__init__(
             config_location, reward_program_id, payment_cycle_length
