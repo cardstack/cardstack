@@ -8,6 +8,8 @@ import { query as gqlQuery } from './graphql';
 
 const POLL_INTERVAL = 500;
 
+const receiptCache = new Map<string, SuccessfulTransactionReceipt>();
+
 export interface TransactionOptions {
   nonce?: BN;
   onNonce?: (nonce: BN) => void;
@@ -50,11 +52,18 @@ export function waitUntilTransactionMined(
     resolve: (value: SuccessfulTransactionReceipt | Promise<SuccessfulTransactionReceipt>) => void,
     reject: (reason?: any) => void
   ) {
+    if (receiptCache.has(txnHash)) {
+      resolve(receiptCache.get(txnHash)!);
+    }
+
     try {
       let receipt = await web3.eth.getTransactionReceipt(txnHash);
-      if (receipt) {
-        if (receipt.status === true) resolve(receipt as SuccessfulTransactionReceipt);
-        else throw new Error(`Transaction with hash "${txnHash}" was reverted`);
+      if (receipt?.status) {
+        let successfulReceipt = receipt as SuccessfulTransactionReceipt;
+        receiptCache.set(txnHash, successfulReceipt);
+        resolve(successfulReceipt);
+      } else if (receipt?.status === false) {
+        throw new Error(`Transaction with hash "${txnHash}" was reverted`);
       } else if (Number(new Date()) > endTime) {
         throw new Error(
           `Transaction took too long to complete, waited ${duration / 1000} seconds. txn hash: ${txnHash}`
