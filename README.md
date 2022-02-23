@@ -19,6 +19,15 @@ Set up `app.cardstack.test` and `app-assets.cardstack.test` to resolve to localh
 
 See the [README in the hub package](./packages/hub/README.md) for environment variables that you'll need to setup.
 
+To retrieve environment variables for waypoint in a more readable way as an alternative to `waypoint config get`, you can use the convenience script `yarn w-var`. 
+
+```
+// prints a table of variables, with values truncated for readability
+yarn w-var
+// prints JSON of variables that contain any of the strings provided (case-insensitive), full values
+yarn w-var VAR_NAME1 VAR_NAME2
+```
+
 ### Javascript dependencies & Typescript compilation
 
 We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
