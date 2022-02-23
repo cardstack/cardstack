@@ -78,7 +78,7 @@
     "status:subgraph-sokol-blue": "yarn --cwd packages/cardpay-subgraph sokol-blue-status",
     "status:subgraph-xdai-green": "yarn --cwd packages/cardpay-subgraph xdai-green-status",
     "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
-    "w-var": "node ./scripts/w-var.js"
+    "waypoint-var": "node ./scripts/waypoint-var.js"
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",

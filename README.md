@@ -21,13 +21,13 @@ See the [README in the hub package](./packages/hub/README.md) for environment va
 
 ### Fetching waypoint config
 
-To retrieve environment variables for waypoint in a more readable way as an alternative to `waypoint config get`, you can use the convenience script `yarn w-var`. 
+To retrieve environment variables for waypoint in a more readable way as an alternative to `waypoint config get`, you can use the convenience script `yarn waypoint-var`. 
 
 ```
 // prints a table of variables, with values truncated for readability
-yarn w-var
+yarn waypoint-var
 // prints JSON of variables that contain any of the strings provided (case-insensitive), full values
-yarn w-var VAR_NAME1 VAR_NAME2
+yarn waypoint-var VAR_NAME1 VAR_NAME2
 ```
 
 ### Javascript dependencies & Typescript compilation
