@@ -71,7 +71,7 @@ module.exports = function (defaults) {
           },
         },
         output: {
-          assetModuleFilename: '[path][name]-[contenthash].[ext]',
+          assetModuleFilename: '[path][name]-[contenthash][ext]',
         },
         module: {
           rules: [
