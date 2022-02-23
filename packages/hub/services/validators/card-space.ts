@@ -1,8 +1,8 @@
 import { CardSpace } from '../../routes/card-spaces';
-import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
 import { NestedAttributeError, RelationshipError } from '../../routes/utils/error';
+import { query } from '@cardstack/hub/queries';
 
 export type CardSpaceAttribute =
   | 'profileName'
@@ -42,9 +42,7 @@ function isValidUrl(url: string): boolean {
 }
 
 export default class CardSpaceValidator {
-  cardSpaceQueries: CardSpaceQueries = inject('card-space-queries', {
-    as: 'cardSpaceQueries',
-  });
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
 
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',

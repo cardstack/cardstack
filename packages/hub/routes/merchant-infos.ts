@@ -28,9 +28,7 @@ export default class MerchantInfosRoute {
   merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
-  cardSpaceQueries = inject('card-space-queries', {
-    as: 'cardSpaceQueries',
-  });
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
   });

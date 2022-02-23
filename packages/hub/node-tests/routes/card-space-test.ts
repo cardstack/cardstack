@@ -69,7 +69,7 @@ describe('GET /api/card-spaces/:slug', function () {
       merchantId,
     };
 
-    await (await getContainer().lookup('card-space-queries')).insert(cardSpace);
+    await (await getContainer().lookup('card-space', { type: 'query' })).insert(cardSpace);
 
     await request()
       .get('/api/card-spaces/satoshi')

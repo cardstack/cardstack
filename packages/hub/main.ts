@@ -52,7 +52,6 @@ import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoService from './services/merchant-info';
-import CardSpaceQueries from './services/queries/card-space';
 import CardSpaceSerializer from './services/serializers/card-space-serializer';
 import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
@@ -151,7 +150,6 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('card-space-serializer', CardSpaceSerializer);
   registry.register('card-space-validator', CardSpaceValidator);
-  registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
