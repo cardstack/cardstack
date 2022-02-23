@@ -28,7 +28,8 @@
     "lerna": "4.0.0",
     "prettier": "^2.3.2",
     "start-server-and-test": "^1.12.0",
-    "typescript": "4.2.3"
+    "typescript": "4.2.3",
+    "cli-table3": "^0.6.1"
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
@@ -76,7 +77,8 @@
     "status:subgraph-sokol-green": "yarn --cwd packages/cardpay-subgraph sokol-green-status",
     "status:subgraph-sokol-blue": "yarn --cwd packages/cardpay-subgraph sokol-blue-status",
     "status:subgraph-xdai-green": "yarn --cwd packages/cardpay-subgraph xdai-green-status",
-    "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status"
+    "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
+    "waypoint-vars": "node ./scripts/waypoint-vars.js"
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
