@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
 const FastBootAppServer = require('fastboot-app-server');
 const fetch = require('node-fetch');
+const Sentry = require('@sentry/node');
+
+Sentry.init({ dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN });
 
 let server = new FastBootAppServer({
   distPath: 'dist',
@@ -18,6 +21,14 @@ let server = new FastBootAppServer({
   },
   // This should be false for Twitter/Linkedin according to https://github.com/ember-fastboot/ember-cli-fastboot/tree/master/packages/fastboot-app-server#twitter-and-linkedin
   chunkedResponse: false, // Optional - Opt-in to chunked transfer encoding, transferring the head, body and potential shoeboxes in separate chunks. Chunked transfer encoding should have a positive effect in particular when the app transfers a lot of data in the shoebox.
+
+  beforeMiddleware: function (app) {
+    app.use(Sentry.Handlers.requestHandler());
+  },
+
+  afterMiddleware: function (app) {
+    app.use(Sentry.Handlers.errorHandler());
+  },
 });
 
 server.start();
