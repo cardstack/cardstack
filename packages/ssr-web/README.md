@@ -1,6 +1,6 @@
 # ssr-web
 
-This renders Card Pay merchant payment requests on the server!
+This renders Card Pay merchant payment requests on the server.
 
 ## Prerequisites
 
