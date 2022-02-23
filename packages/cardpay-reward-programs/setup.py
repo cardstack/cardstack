@@ -24,10 +24,7 @@ setup(
         "pyarrow",
     ],
     extras_require={
-        "explore": [
-            "streamlit",
-            "altair",
-        ],
+        "explore": ["streamlit", "altair", "parquet-tools"],
         "dev": ["black", "isort", "pytest"],
     },
     entry_points={
