@@ -1,6 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { NotificationType } from '../../routes/notification-preferences';
+import { NotificationType } from '../routes/notification-preferences';
 
 export default class NotificationTypeQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -22,8 +22,8 @@ export default class NotificationTypeQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'notification-type-queries': NotificationTypeQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'notification-type': NotificationTypeQueries;
   }
 }

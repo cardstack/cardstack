@@ -1,7 +1,7 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { PushNotificationData, PushNotificationsIdentifiers } from '../../tasks/send-notifications';
-import { buildConditions } from '../../utils/queries';
+import { PushNotificationData, PushNotificationsIdentifiers } from '../tasks/send-notifications';
+import { buildConditions } from '../utils/queries';
 
 type SentPushNotificationsFilter = PushNotificationsIdentifiers;
 
@@ -40,8 +40,8 @@ export default class SentPushNotificationsQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'sent-push-notifications-queries': SentPushNotificationsQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'sent-push-notifications': SentPushNotificationsQueries;
   }
 }

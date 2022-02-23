@@ -1,7 +1,7 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { Upload } from '../../routes/upload';
-import { buildConditions } from '../../utils/queries';
+import { Upload } from '../routes/upload';
+import { buildConditions } from '../utils/queries';
 
 interface UploadQueriesFilter {
   url: string;
@@ -50,9 +50,8 @@ export default class UploadQueries {
     return queryResult.rows[0]['count'] >= 10;
   }
 }
-
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'upload-queries': UploadQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    upload: UploadQueries;
   }
 }

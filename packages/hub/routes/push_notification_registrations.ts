@@ -6,8 +6,8 @@ import { inject } from '@cardstack/di';
 import { ensureLoggedIn } from './utils/auth';
 
 import PushNotificationRegistrationSerializer from '../services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationQueries from '../services/queries/push-notification-registration';
 import shortUuid from 'short-uuid';
+import { query } from '@cardstack/hub/queries';
 
 export interface PushNotificationRegistration {
   id: string;
@@ -24,12 +24,9 @@ export default class PushNotificationRegistrationsRoute {
       as: 'pushNotificationRegistrationSerialier',
     }
   );
-  pushNotificationRegistrationQueries: PushNotificationRegistrationQueries = inject(
-    'push-notification-registration-queries',
-    {
-      as: 'pushNotificationRegistrationQueries',
-    }
-  );
+  pushNotificationRegistrationQueries = query('push-notification-registration', {
+    as: 'pushNotificationRegistrationQueries',
+  });
 
   constructor() {
     autoBind(this);
