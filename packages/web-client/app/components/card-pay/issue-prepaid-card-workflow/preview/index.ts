@@ -179,6 +179,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
       this.args.onComplete();
     } catch (e) {
+      this.args.workflowSession.delete('txnHash');
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
       );

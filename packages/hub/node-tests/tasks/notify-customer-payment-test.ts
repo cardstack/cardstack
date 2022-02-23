@@ -157,14 +157,14 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'Mandello received a payment of §2324',
+        notificationBody: 'Mandello has a new payment',
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
         notificationData: mockNotificationData,
       },
       {
-        notificationBody: 'Mandello received a payment of §2324',
+        notificationBody: 'Mandello has a new payment',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',
@@ -258,14 +258,14 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'You received a payment of §2324',
+        notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
         notificationData: mockNotificationData,
       },
       {
-        notificationBody: 'You received a payment of §2324',
+        notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',
@@ -355,14 +355,14 @@ describe('NotifyCustomerPaymentTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'You received a payment of §2324',
+        notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::123::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '123',
         notificationData: mockNotificationData,
       },
       {
-        notificationBody: 'You received a payment of §2324',
+        notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::456::eoa-address',
         notificationType: 'customer_payment',
         pushClientId: '456',

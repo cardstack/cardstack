@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 import { ContractOptions, EventData } from 'web3-eth-contract';
 import ERC677ABI from '../contracts/abi/erc-677';
 import HomeAMBABI from '../contracts/abi/home-amb';
@@ -10,14 +10,19 @@ import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } 
 import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTx } from './utils/signing-utils';
 import { query } from './utils/graphql';
-import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from './utils/general-utils';
+import {
+  TransactionOptions,
+  waitForSubgraphIndexWithTxnReceipt,
+  isTransactionHash,
+  waitUntilTransactionMined,
+} from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
 export interface ITokenBridgeHomeSide {
-  waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
+  waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<SuccessfulTransactionReceipt>;
 }
 
 export interface BridgeValidationResult {
@@ -59,7 +64,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     return { min: min.toString(), max: max.toString() };
   }
 
-  async relayTokens(txnHash: string): Promise<TransactionReceipt>;
+  async relayTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async relayTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -67,7 +72,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async relayTokens(
     safeAddressOrTxnHash: string,
     tokenAddress?: string,
@@ -75,7 +80,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
@@ -212,7 +217,10 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   // We use the subgraph to act as our indicator that bridging has completed, as
   // this is the same mechanism that is populating the card wallet's
   // displayed token balances
-  async waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt> {
+  async waitForBridgingToLayer2Completed(
+    recipientAddress: string,
+    fromBlock: string
+  ): Promise<SuccessfulTransactionReceipt> {
     let start = Date.now();
     let queryResults: GraphQLBridgeResult | undefined;
     let receivedBridgedTokens: GraphQLBridgeResult['data']['account']['depots'][0]['receivedBridgedTokens'];
@@ -229,11 +237,11 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
         `Timed out waiting for tokens to be bridged to layer 2 for safe owned by ${recipientAddress} after block ${fromBlock}`
       );
     }
+
     let {
       transaction: { id: txnHash },
     } = receivedBridgedTokens[0];
-    let receipt = await this.layer2Web3.eth.getTransactionReceipt(txnHash);
-    return receipt;
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 }
 

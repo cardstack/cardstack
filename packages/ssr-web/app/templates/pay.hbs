@@ -1,6 +1,6 @@
 {{#let
-  (concat 'Pay Business: ' (or this.merchantInfo.name @model.merchantSafe.address))
-  (concat 'Pay ' this.cleanedAmounts.displayed.amount ' with Card Wallet')
+  (concat (or this.merchantInfo.name @model.merchantSafe.address) ' requests payment')
+  (concat 'Pay ' this.cleanedAmounts.displayed.amount)
   as |title description|
 }}
   {{page-title title replace=true}}

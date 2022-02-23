@@ -28,6 +28,7 @@ module(
     let layer2Service: Layer2TestWeb3Strategy;
     let prepaidCardAddress: string;
     let prepaidCardAddress2: string;
+    let workflowSession: WorkflowSession;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -59,7 +60,7 @@ module(
 
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      let workflowSession = new WorkflowSession();
+      workflowSession = new WorkflowSession();
       workflowSession.setValue({
         merchantName: 'Mandello',
         merchantId: 'mandello1',
@@ -380,6 +381,20 @@ module(
         assert
           .dom('[data-test-prepaid-card-choice-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
+      });
+
+      test('it clears the txnHash stored if there is an error', async function (assert) {
+        workflowSession.setValue('txnHash', 'any string');
+
+        sinon
+          .stub(layer2Service, 'resumeRegisterMerchantTransaction')
+          .throws(new Error("The actual error doesn't matter"));
+
+        await selectPrepaidCard(prepaidCardAddress);
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-prepaid-card-choice-error-message]');
+
+        assert.notOk(workflowSession.getValue('txnHash'));
       });
     });
 

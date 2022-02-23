@@ -6,6 +6,7 @@
       @fieldId={{this.id}}
       @vertical={{this.vertical}}
       @horizontalLabelSize={{this.horizontalLabelSize}}
+      @centeredDisplay={{this.centeredDisplay}}
       @icon={{this.icon}}
     >
       {{this.value}}
@@ -53,13 +54,20 @@
       @onInput={{fn (mut this.horizontalLabelSize)}}
       @value={{this.horizontalLabelSize}}
     />
+    <Args.Bool
+      @name="centeredDisplay"
+      @description="Whether the field content should have a special centered display"
+      @defaultValue="false"
+      @onInput={{fn (mut this.centeredDisplay)}}
+      @value={{this.centeredDisplay}}
+    />
     <Args.Yield
       @description="Yield value or form field"
     />
   </:api>
 </Freestyle::Usage>
 
-<Freestyle::Usage @description="Usage with input or textarea">
+<Freestyle::Usage @description="Usage with Boxel::Input">
   <:example>
     <Boxel::Field
       @tag="label"
@@ -68,4 +76,46 @@
       <Boxel::Input />
     </Boxel::Field>
   </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Usage with Boxel::Input::ValidationState (invalid state)">
+  <:example>
+    <Boxel::Field
+      @tag="label"
+      @label="Name"
+      @vertical={{this.vertical2}}
+      @horizontalLabelSize={{this.horizontalLabelSize2}}
+      @icon={{this.icon2}}
+    >
+      <Boxel::Input::ValidationState
+        @state="invalid"
+        @value=""
+        @errorMessage="This is a required field"
+        @helperText="Please enter a value"
+      />
+    </Boxel::Field>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="icon"
+      @description="icon name"
+      @value={{this.icon2}}
+      @onInput={{fn (mut this.icon2)}}
+    />
+    <Args.Bool
+      @name="vertical"
+      @description="Whether the field should be displayed vertically"
+      @defaultValue="false"
+      @onInput={{fn (mut this.vertical2)}}
+      @value={{this.vertical2}}
+    />
+    <Args.String
+      @name="horizontalLabelSize"
+      @description="Width of the label column (only applies to horizontal layout)"
+      @options={{array "small" "default"}}
+      @defaultValue="minmax(4rem, 25%)"
+      @onInput={{fn (mut this.horizontalLabelSize2)}}
+      @value={{this.horizontalLabelSize2}}
+    />
+  </:api>
 </Freestyle::Usage>

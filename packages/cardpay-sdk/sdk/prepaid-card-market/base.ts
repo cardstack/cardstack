@@ -4,7 +4,7 @@ import { AbiItem } from 'web3-utils';
 import PrepaidCardMarketABI from '../../contracts/abi/v0.8.7/prepaid-card-market';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { ContractOptions } from 'web3-eth-contract';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import {
@@ -75,21 +75,21 @@ export default class PrepaidCardMarket {
     };
   }
 
-  async addToInventory(txnHash: string): Promise<TransactionReceipt>;
+  async addToInventory(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addToInventory(
     fundingPrepaidCard: string,
     prepaidCardToAdd: string,
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async addToInventory(
     fundingPrepaidCardOrTxnHash: string,
     prepaidCardToAdd?: string,
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(fundingPrepaidCardOrTxnHash)) {
       let txnHash = fundingPrepaidCardOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -167,21 +167,21 @@ export default class PrepaidCardMarket {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async removeFromInventory(txnHash: string): Promise<TransactionReceipt>;
+  async removeFromInventory(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async removeFromInventory(
     fundingPrepaidCard: string,
     prepaidCardAddresses: string[],
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async removeFromInventory(
     fundingPrepaidCardOrTxnHash: string,
     prepaidCardAddresses?: string[],
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(fundingPrepaidCardOrTxnHash)) {
       let txnHash = fundingPrepaidCardOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -234,7 +234,7 @@ export default class PrepaidCardMarket {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async setAsk(txnHash: string): Promise<TransactionReceipt>;
+  async setAsk(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async setAsk(
     prepaidCard: string,
     sku: string,
@@ -242,7 +242,7 @@ export default class PrepaidCardMarket {
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async setAsk(
     prepaidCardOrTxnHash: string,
     sku?: string,
@@ -250,7 +250,7 @@ export default class PrepaidCardMarket {
     marketAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardOrTxnHash)) {
       let txnHash = prepaidCardOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
