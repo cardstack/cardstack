@@ -57,6 +57,7 @@ package-lock.json
 /packages/cardpay-sdk/generated/
 # Let's keep this though!
 !/packages/cardpay-sdk/bin/*.js
+!/packages/test-support/ci-xml-reporting.js
 
 /packages/cardpay-cli/**/*.d.ts
 /packages/cardpay-cli/**/*.js

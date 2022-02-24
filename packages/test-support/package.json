@@ -19,7 +19,9 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "glob": "^7.1.7",
-    "require-uncached": "^1.0.3"
+    "require-uncached": "^1.0.3",
+    "testem": "^3.6.0",
+    "testem-multi-reporter": "^1.2.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.28.18",
@@ -35,8 +37,7 @@
     "node": ">= 12"
   },
   "volta": {
-    "node": "12.13.1",
-    "yarn": "1.22.0"
+    "extends": "../../package.json"
   },
   "config": {
     "access": "public"
