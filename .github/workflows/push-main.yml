@@ -114,7 +114,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'web-client test results'
+          check_name: 'ssr-web test results'
           files: ci-xml-test-results/ssr-web.xml
 
   change_check:
