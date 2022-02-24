@@ -20,10 +20,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Set env var for message
-        shell: bash
-        run: |
-          echo "Workspace after checkout: $GITHUB_WORKSPACE"
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
         uses: actions/cache@v2
@@ -48,4 +44,4 @@ jobs:
         if: always()
         with:
           check_name: 'ssr-web test results'
-          files: test-results/**/*.xml
+          files: ci-xml-test-results/ssr-web.xml

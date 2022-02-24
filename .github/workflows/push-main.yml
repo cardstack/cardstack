@@ -104,12 +104,18 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
         run: yarn test:ssr-web:percy
-      - name: Publish test results
+      - name: Publish web-client test results
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
           check_name: 'web-client test results'
-          files: test-results/**/*.xml
+          files: ci-xml-test-results/web-client.xml
+      - name: Publish ssr-web test results
+        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        if: always()
+        with:
+          check_name: 'web-client test results'
+          files: ci-xml-test-results/ssr-web.xml
 
   change_check:
     name: Check which packages changed
