@@ -21,6 +21,7 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   universalLinkDomain: string;
+  cardSpaceHostnameSuffix: string;
   version: string;
   urls: UrlsOptions;
   walletConnectIcons: string[];
