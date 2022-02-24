@@ -27,6 +27,9 @@ dev = [
     "isort>=5.10.1",
     "web3[tester]>=5.28.0",
 ]
+[tool.pdm.scripts]
+fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"
+fork_sokol = "ganache-cli  --fork https://sokol-archive.blockscout.com/"
 
 [build-system]
 requires = ["pdm-pep517"]
