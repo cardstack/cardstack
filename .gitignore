@@ -12,6 +12,7 @@
 /packages/compiled/browser
 /packages/compiled/assets
 /packages/*/.env
+/ci-xml-test-results/*.xml
 .eslintcache
 .vagrant
 .nvmrc
