@@ -18,21 +18,24 @@ import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 import { hbs } from 'ember-cli-htmlbars';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import merge from 'lodash/merge';
+import set from 'lodash/set';
+import get from 'lodash/get';
 import { tracked as _tracked } from '@glimmer/tracking';
 import {
   inversedSerializerMap,
   serializeResource,
   SERIALIZERS,
 } from '@cardstack/core/src/serializers';
-import set from 'lodash/set';
-import get from 'lodash/get';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import { restartableTask } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -49,13 +52,14 @@ export interface CreatedState {
   componentModule: CardComponentModule;
   schemaModuleId: string;
   format: Format;
+  rawData: ResourceObject<Unsaved>;
 }
 
 export interface LoadedState {
   type: 'loaded';
   format: Format;
   url: string;
-  rawServerResponse: ResourceObject<Saved>;
+  rawData: ResourceObject<Saved>;
   componentModule: CardComponentModule;
   schemaModuleId: string;
   deserialized: boolean;
@@ -65,6 +69,7 @@ export interface LoadedState {
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
   private declare _data: any;
+  // private _data = new TrackedObject({});
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
   private _schemaInstance: any | undefined;
@@ -121,6 +126,7 @@ export default class CardModelForBrowser implements CardModel {
         componentModule: this.state.componentModule,
         schemaModuleId: this.state.schemaModuleId,
         format: this.state.format,
+        rawData: { id: undefined, type: 'card', attributes: {} },
       },
       localRealm
     );
@@ -158,7 +164,7 @@ export default class CardModelForBrowser implements CardModel {
 
     // TODO: This is temp until we figure out the async data issue
     // Without this .data is not populated
-    await editable.computeData();
+    this._data = await editable.computeData();
 
     (editable.state as LoadedState).original = this;
     return editable;
@@ -171,12 +177,12 @@ export default class CardModelForBrowser implements CardModel {
     return this._data;
   }
 
-  async computeData() {
+  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
-      set(syncData, field, await this.getField(field));
+      set(syncData, field, await this.getField(field, schemaInstance));
     }
-    this._data = syncData;
+    return syncData;
   }
 
   async component(): Promise<unknown> {
@@ -184,7 +190,7 @@ export default class CardModelForBrowser implements CardModel {
       let innerComponent = this.state.componentModule.default;
       let self = this;
 
-      await this.computeData();
+      this._data = await this.computeData();
 
       this.wrapperComponent = setComponentTemplate(
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
@@ -199,28 +205,29 @@ export default class CardModelForBrowser implements CardModel {
     return this.wrapperComponent;
   }
 
-  async getField(fieldPath: string): Promise<any> {
+  async getField(fieldPath: string, schemaInstance?: any): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
     //   return get(this.data, name);
     // }
 
-    if (!this._schemaInstance) {
-      let klass = await this.schemaClass();
-      // We can't await the instance creation in a separate, as it's thenable and confuses async methods
-      this._schemaInstance = new klass(this.getRawField.bind(this)) as any;
+    schemaInstance = schemaInstance ?? this._schemaInstance;
+
+    if (!schemaInstance) {
+      schemaInstance = this._schemaInstance = await this.createSchemaInstance();
     }
 
-    return await getFieldValue(this._schemaInstance, fieldPath);
+    return await getFieldValue(schemaInstance, fieldPath);
   }
 
   get rawData(): any {
-    if (this.state.type === 'loaded') {
-      return this.state.rawServerResponse.attributes;
-    }
+    return this.state.rawData.attributes;
+  }
 
-    // TODO: not sure
-    return {};
+  private async createSchemaInstance() {
+    let klass = await this.schemaClass();
+    // We can't await the instance creation in a separate, as it's thenable and confuses async methods
+    return new klass(this.getRawField.bind(this)) as any;
   }
 
   private getRawField(fieldPath: string): any {
@@ -263,7 +270,7 @@ export default class CardModelForBrowser implements CardModel {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this._data = data;
+      taskFor(this.rerenderData).perform(data);
     };
     (s as any).setters = new Proxy(
       {},
@@ -279,6 +286,17 @@ export default class CardModelForBrowser implements CardModel {
     );
 
     return s;
+  }
+
+  @restartableTask async rerenderData(
+    data: Record<string, any>
+  ): Promise<void> {
+    this.state.rawData = merge({}, this.state.rawData, {
+      attributes: data,
+    });
+    let newSchemaInstance = await this.createSchemaInstance();
+    this._data = await this.computeData(newSchemaInstance);
+    this._schemaInstance = newSchemaInstance;
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -349,7 +367,7 @@ export default class CardModelForBrowser implements CardModel {
       type: 'loaded',
       format: this.format,
       url: data.id,
-      rawServerResponse: cloneDeep(data),
+      rawData: cloneDeep(data),
       deserialized: false,
       original,
       componentModule: this.state.componentModule,

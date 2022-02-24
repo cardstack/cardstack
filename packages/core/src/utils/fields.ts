@@ -120,8 +120,8 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
         throw e;
       }
 
-      let { computeVia, cacheFieldName } = e;
-      schemaInstance[cacheFieldName] = await schemaInstance[computeVia]();
+      let { schemaInstance: instance, computeVia, cacheFieldName } = e;
+      instance[cacheFieldName] = await instance[computeVia]();
     }
   } while (!isLoaded);
   return result;

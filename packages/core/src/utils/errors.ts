@@ -109,6 +109,7 @@ export function serializableError(err: any): any {
 export class NotReady extends Error {
   isNotReadyError: true = true;
   constructor(
+    readonly schemaInstance: any,
     readonly fieldName: string,
     readonly computeVia: string,
     readonly cacheFieldName: string,

@@ -29,7 +29,9 @@ export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      return await builder.loadData(url, format);
+      let model = await builder.loadData(url, format);
+      await model.component();
+      return model;
     }
     let serverResponse = await fetchJSON<JSONAPIDocument>(
       this.buildCardURL({ url, query: { format } })
@@ -102,7 +104,7 @@ export default class Cards extends Service {
     let model = new CardModelForBrowser(this, {
       type: 'loaded',
       url: cardResponse.id,
-      rawServerResponse: cloneDeep(cardResponse),
+      rawData: cloneDeep(cardResponse),
       componentModule,
       format,
       schemaModuleId,
