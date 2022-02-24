@@ -1,9 +1,5 @@
 'use strict';
-
-const MultiReporter = require('testem-multi-reporter');
-const TapReporter = require('testem/lib/reporters/tap_reporter');
-const XunitReporter = require('testem/lib/reporters/xunit_reporter');
-const fs = require('fs');
+const ciXmlReporting = require('../test-support/ci-xml-reporting');
 
 const config = {
   test_page: 'tests/index.html?hidepassed',
@@ -27,27 +23,5 @@ const config = {
   },
 };
 
-if (process.env.CI) {
-  fs.mkdirSync('../../test-results');
-
-  const reporters = [
-    {
-      ReporterClass: TapReporter,
-      args: [false, null, { get: () => false }],
-    },
-    {
-      ReporterClass: XunitReporter,
-      args: [
-        false,
-        fs.createWriteStream('../../test-results/web-client.xml'),
-        { get: () => false },
-      ],
-    },
-  ];
-
-  const multiReporter = new MultiReporter({ reporters });
-
-  config.reporter = multiReporter;
-}
-
+ciXmlReporting(config, 'ssr-web.xml');
 module.exports = config;
