@@ -8,62 +8,15 @@ import {
   ensureSymlinkSync,
   removeSync,
   pathExistsSync,
-  ensureDirSync,
-  outputJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
-import isEqual from 'lodash/isEqual';
 import { Client } from 'pg';
 import vm from 'vm';
 import fetch from 'node-fetch';
 
 declare global {
   const __non_webpack_require__: any;
-}
-
-export const MINIMAL_PACKAGE = {
-  name: '@cardstack/compiled',
-  exports: {
-    './package.json': {
-      default: './package.json',
-    },
-    '.': {
-      browser: './browser',
-      default: './node',
-    },
-    './*': {
-      browser: './browser/*',
-      default: './node/*',
-    },
-  },
-};
-
-export function createMinimalPackageJSON(cardCacheDir: string): void {
-  outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
-}
-const EXPORTS_PATHS = ['.', './*'];
-const EXPORTS_ENVIRONMENTS = ['browser', 'default'];
-function hasValidExports(pkg: any): boolean {
-  return EXPORTS_PATHS.every((key) => {
-    return pkg[key] && isEqual(Object.keys(pkg[key]), EXPORTS_ENVIRONMENTS);
-  });
-}
-
-function setupCacheDir(cardCacheDir: string): void {
-  ensureDirSync(cardCacheDir);
-
-  let pkg;
-  try {
-    pkg = __non_webpack_require__(`${cardCacheDir}/package.json`);
-  } catch (error) {
-    createMinimalPackageJSON(cardCacheDir);
-    pkg = MINIMAL_PACKAGE;
-  }
-
-  if (!hasValidExports(pkg.exports)) {
-    throw new Error('package.json of cardCacheDir does not have properly configured exports');
-  }
 }
 
 import logger from '@cardstack/logger';
@@ -85,7 +38,6 @@ export default class FileCache {
 
   async ready() {
     await injectionReady(this, 'file-cache-config');
-    setupCacheDir(this.dir);
     await injectionReady(this, 'database-manager');
     this.client = await this.databaseManager.getClient();
   }
@@ -160,7 +112,9 @@ export default class FileCache {
       }
       let context = {
         exports: {},
-        require: (specifier: string) => this.loadModule(specifier),
+        require: (specifier: string) => {
+          return this.loadModule(specifier);
+        },
 
         // we have to white list globals that we want available to our cards
         setTimeout,
@@ -176,13 +130,15 @@ export default class FileCache {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(`@cardstack/core/src/utils/${moduleIdentifier}`);
     }
+
     if (moduleIdentifier.startsWith('@cardstack/core/')) {
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(`@cardstack/core/src/${moduleIdentifier}`);
     }
 
-    throw new Error(`don't know how to loadModule ${moduleIdentifier}`);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return __non_webpack_require__(__non_webpack_require__.resolve(moduleIdentifier, { paths: [this.dir] }));
   }
 
   deleteCardModules(cardURL: string): void {
@@ -195,14 +151,6 @@ export default class FileCache {
       log.trace(`deleting`, loc);
       removeSync(loc);
     }
-  }
-
-  teardown(): void {
-    log.debug('Cleaning Cache dir: ' + this.dir);
-    for (let subDir of ENVIRONMENTS) {
-      removeSync(join(this.dir, subDir));
-    }
-    removeSync(join(this.dir, 'assets'));
   }
 }
 

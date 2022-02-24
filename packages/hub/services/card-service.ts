@@ -35,6 +35,7 @@ export default class CardServiceFactory {
 
 export class CardService {
   private realmManager = service('realm-manager', { as: 'realmManager' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private builder = service('card-builder', { as: 'builder' });
   private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
@@ -127,6 +128,10 @@ export class CardService {
 
   private async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
+
+    let componentMetaModule = result.componentInfos[format].metaModule.global;
+    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+
     return await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: cardId.id,
@@ -134,9 +139,8 @@ export class CardService {
       format,
       rawData: result.data ?? {},
       schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      serializerMap: result.componentInfos[format].serializerMap,
+      componentModule: result.componentInfos[format].componentModule.global,
+      componentMeta,
     });
   }
 

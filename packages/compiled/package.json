@@ -25,7 +25,8 @@
     "@cardstack/boxel": "0.28.19",
     "@cardstack/core": "0.28.19",
     "@embroider/addon-shim": "*",
-    "@glimmer/component": "^1.0.3"
+    "@glimmer/component": "^1.0.3",
+    "date-fns": "^2.22.1"
   },
   "ember-addon": {
     "version": 2,
