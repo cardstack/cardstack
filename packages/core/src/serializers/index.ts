@@ -31,6 +31,9 @@ const DateTimeSerializer: PrimitiveSerializer = {
     return d.toISOString();
   },
   deserialize(d: string): Date {
+    if ((d as any) instanceof Date) {
+      return d as unknown as Date;
+    }
     return parseISO(d);
   },
 };
@@ -44,6 +47,9 @@ const DateSerializer: PrimitiveSerializer = {
     return format(d, 'yyyy-MM-dd');
   },
   deserialize(d: string): Date {
+    if ((d as any) instanceof Date) {
+      return d as unknown as Date;
+    }
     return parse(d, 'yyyy-MM-dd', new Date());
   },
 };
