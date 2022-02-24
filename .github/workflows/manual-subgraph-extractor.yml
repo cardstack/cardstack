@@ -1,0 +1,59 @@
+name: Manual Deploy [subgraph extractor]
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: false
+        default: production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up env
+        env:
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_ADDR=${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+            cp waypoint.prod.hcl waypoint.hcl
+          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+          else
+            echo "unrecognized environment"
+            exit 1;
+          fi
+
+      - name: Deploy hub
+        uses: ./.github/actions/deploy-subgraph-extractor
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+
+      - name: Send success notification to Discord
+        if: ${{ success() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :checkered_flag: **subgraph extractor** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **subgraph extractor** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
