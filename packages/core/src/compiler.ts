@@ -12,6 +12,7 @@ import transformCardComponent, {
 } from './babel-plugin-card-template';
 import {
   Builder,
+  CardId,
   CompiledCard,
   ComponentInfo,
   FEATURE_NAMES,
@@ -27,7 +28,7 @@ import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 import { hashCardFields } from './utils/fields';
-import babelPluginCardSerializerAnalyze from './babel-plugin-card-serializer-analyze';
+import babelPluginCardSerializerAnalyze from './babel-plugin-card-file-analyze';
 
 const BASE_CARD_ID: CardId = {
   realm: 'https://cardstack.com/base/',
@@ -61,6 +62,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let options = {};
     let { cardSource } = this;
+
+    this.analyzeFiles();
+
     let schemaModule: ModuleRef | undefined = this.analyzeSchema(options);
     let meta = getMeta(options);
 
@@ -117,6 +121,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     return compiledCard;
+  }
+
+  private analyzeFiles() {
+    let { cardSource, modules } = this;
+    for (const localPath in cardSource.files) {
+      // TODO: IF not JS, define asset
+      // ELSE: Analyze file and create this.module entry
+    }
   }
 
   private defineAssets() {
@@ -419,7 +431,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       serializerRef = { local: serializer };
       let source = await this.getFile(this.cardSource, serializer);
 
-      babelPluginCardSerializerAnalyze(source);
+      // TODO: Validate serializer
+      // babelPluginCardSerializerAnalyze(source);
       this.modules[serializer] = {
         type: JS_TYPE,
         source,

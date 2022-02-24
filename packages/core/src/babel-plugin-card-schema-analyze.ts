@@ -61,13 +61,7 @@ export function getMeta(obj: State['opts']): PluginMeta {
   return meta;
 }
 
-const metas = new WeakMap<
-  State['opts'],
-  {
-    parent?: ParentMeta;
-    fields: FieldsMeta;
-  }
->();
+const metas = new WeakMap<State['opts'], PluginMeta>();
 
 export default function (
   schemaSrc: string,
