@@ -3,7 +3,10 @@ const FastBootAppServer = require('fastboot-app-server');
 const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
-Sentry.init({ dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN });
+Sentry.init({
+  dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
+  environment: process.env.SSR_WEB_ENVIRONMENT,
+});
 
 let server = new FastBootAppServer({
   distPath: 'dist',
