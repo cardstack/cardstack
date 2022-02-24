@@ -160,6 +160,7 @@ jobs:
               - '.github/workflows/push-main.yml'
               - '.github/actions/deploy-ssr-web/**'
               - 'yarn.lock'
+              - 'waypoint.hcl'
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
