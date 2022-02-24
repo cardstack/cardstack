@@ -99,7 +99,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
   it('returns overriden preference when EOA/device pair has a preference saved', async function () {
     let pushClientId = '1234567';
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
+    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
     await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId,
@@ -205,7 +205,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
         },
       });
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
+    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
@@ -250,7 +250,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
   });
 
   it('updates a preference', async function () {
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
+    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
     await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
@@ -481,7 +481,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200);
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference-queries');
+    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',

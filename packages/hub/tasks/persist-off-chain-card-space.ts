@@ -3,15 +3,13 @@ import CardSpaceSerializer from '../services/serializers/card-space-serializer';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
-import CardSpaceQueries from '../services/queries/card-space';
+import { query } from '@cardstack/hub/queries';
 
 export default class PersistOffChainCardSpace {
   cardSpaceSerializer: CardSpaceSerializer = inject('card-space-serializer', {
     as: 'cardSpaceSerializer',
   });
-  cardSpaceQueries: CardSpaceQueries = inject('card-space-queries', {
-    as: 'cardSpaceQueries',
-  });
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
 
   async perform(payload: any, helpers: Helpers) {
     const { id } = payload;

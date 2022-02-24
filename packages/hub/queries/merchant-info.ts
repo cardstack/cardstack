@@ -1,8 +1,8 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { Client } from 'pg';
-import { MerchantInfo } from '../../routes/merchant-infos';
-import { buildConditions } from '../../utils/queries';
+import { MerchantInfo } from '../routes/merchant-infos';
+import { buildConditions } from '../utils/queries';
 
 export interface MerchantInfoQueriesFilter {
   id?: string;
@@ -55,8 +55,8 @@ export default class MerchantInfoQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'merchant-info-queries': MerchantInfoQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'merchant-info': MerchantInfoQueries;
   }
 }

@@ -1,8 +1,8 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { Client } from 'pg';
-import { CardSpace } from '../../routes/card-spaces';
-import { buildConditions } from '../../utils/queries';
+import { CardSpace } from '../routes/card-spaces';
+import { buildConditions } from '../utils/queries';
 
 interface CardSpaceQueriesFilter {
   id?: string;
@@ -117,8 +117,8 @@ export default class CardSpaceQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'card-space-queries': CardSpaceQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'card-space': CardSpaceQueries;
   }
 }

@@ -7,6 +7,7 @@ import { unlink } from 'fs';
 import * as Sentry from '@sentry/node';
 import { ensureLoggedIn } from './utils/auth';
 import { handleError } from './utils/error';
+import { query } from '@cardstack/hub/queries';
 
 export interface Upload {
   id: string;
@@ -20,9 +21,7 @@ export interface Upload {
 }
 
 export default class UploadRouter {
-  uploadQueries = inject('upload-queries', {
-    as: 'uploadQueries',
-  });
+  uploadQueries = query('upload', { as: 'uploadQueries' });
 
   web3Storage = inject('web3-storage', {
     as: 'web3Storage',

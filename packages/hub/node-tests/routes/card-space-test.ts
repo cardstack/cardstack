@@ -47,7 +47,7 @@ describe('GET /api/card-spaces/:slug', function () {
   it('fetches a card space', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -69,7 +69,7 @@ describe('GET /api/card-spaces/:slug', function () {
       merchantId,
     };
 
-    await (await getContainer().lookup('card-space-queries')).insert(cardSpace);
+    await (await getContainer().lookup('card-space', { type: 'query' })).insert(cardSpace);
 
     await request()
       .get('/api/card-spaces/satoshi')
@@ -151,7 +151,7 @@ describe('POST /api/card-spaces', function () {
   it('persists card space', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -250,7 +250,7 @@ describe('POST /api/card-spaces', function () {
   it('returns 403 when the related merchant has a different owner', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: '0xmystery',
@@ -338,7 +338,7 @@ describe('POST /api/card-spaces', function () {
   it('returns 422 when the merchant doesn’t exist', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -584,7 +584,7 @@ describe('PUT /api/card-spaces', function () {
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: '0x1234',
@@ -634,7 +634,7 @@ describe('PUT /api/card-spaces', function () {
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -725,7 +725,7 @@ describe('PUT /api/card-spaces', function () {
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info-queries')
+      await getContainer().lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
