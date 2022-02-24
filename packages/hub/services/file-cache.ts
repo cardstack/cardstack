@@ -138,7 +138,7 @@ export default class FileCache {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require(require.resolve(moduleIdentifier, { paths: [this.dir] }));
+    return __non_webpack_require__(__non_webpack_require__.resolve(moduleIdentifier, { paths: [this.dir] }));
   }
 
   deleteCardModules(cardURL: string): void {
