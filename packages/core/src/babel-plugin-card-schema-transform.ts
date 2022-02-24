@@ -7,7 +7,7 @@ import { FieldMeta, PluginMeta, VALID_FIELD_DECORATORS } from './babel-plugin-ca
 import { CompiledCard } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
-import { baseCardURL } from './compiler';
+import { BASE_CARD_URL } from './compiler';
 
 interface State {
   importUtil: ImportUtil;
@@ -77,7 +77,7 @@ export default function main(babel: typeof Babel) {
         enter(path: NodePath<t.Class>, state: State) {
           state.cardName = path.node.id?.name;
           state.getRawFieldIdentifier = unusedClassMember(path, 'getRawField', t);
-          let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? baseCardURL, state);
+          let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? BASE_CARD_URL, state);
           // you can't upgrade a primitive card to a composite card--you are
           // either a primitive card or a composite card. so if we adopt from a
           // card that is primitive, then we ourselves must be primitive as well.
@@ -238,8 +238,8 @@ function forEachValidFieldDecorator(
 
 // we consider a primitive card any card that has no fields
 function cardTypeByURL(url: string, state: State): 'primitive' | 'composite' | undefined {
-  let isParentMeta = (state.opts.meta.parent?.cardURL ?? baseCardURL) === url;
-  if (isParentMeta && baseCardURL === url) {
+  let isParentMeta = (state.opts.meta.parent?.cardURL ?? BASE_CARD_URL) === url;
+  if (isParentMeta && BASE_CARD_URL === url) {
     return 'composite'; // a base card, while having no fields is actually the stem for all composite cards
   } else if (isParentMeta) {
     return Object.keys(state.opts.parent.fields).length === 0 ? 'primitive' : 'composite';

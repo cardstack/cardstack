@@ -23,13 +23,17 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
+import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 import { hashCardFields } from './utils/fields';
 import babelPluginCardSerializerAnalyze from './babel-plugin-card-serializer-analyze';
 
-export const baseCardURL = 'https://cardstack.com/base/base';
+const BASE_CARD_ID: CardId = {
+  realm: 'https://cardstack.com/base/',
+  id: 'base',
+};
+export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
 
 function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined)[] {
   let paths: (string | undefined)[] = [];
@@ -75,7 +79,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
       }
 
-      if (parentCard.url !== baseCardURL) {
+      if (parentCard.url !== BASE_CARD_URL) {
         let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
         if (isParentPrimitive && schemaModule) {
           throw new CardstackError(
@@ -161,7 +165,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private async getParentCard(meta: PluginMeta): Promise<CompiledCard> {
     let { cardSource } = this;
     let parentCardPath = this.getCardParentPath(meta);
-    let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
+    let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : BASE_CARD_URL;
     try {
       return await this.builder.getCompiledCard(url);
     } catch (err: any) {
@@ -432,7 +436,7 @@ function appendToFilename(filename: string, toAppend: string): string {
 }
 
 function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
-  return cardSource.id === 'base' && cardSource.realm === 'https://cardstack.com/base/';
+  return cardSource.id === BASE_CARD_ID.id && cardSource.realm === BASE_CARD_ID.realm;
 }
 
 // we expect this to expand when we add edit format

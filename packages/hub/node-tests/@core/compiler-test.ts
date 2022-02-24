@@ -1,5 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { baseCardURL } from '@cardstack/core/src/compiler';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { RawCard } from '@cardstack/core/src/interfaces';
@@ -35,7 +35,7 @@ if (process.env.COMPILER) {
 
     it('string card', async function () {
       let { compiled } = await cards.load('https://cardstack.com/base/string');
-      expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
+      expect(compiled.adoptsFrom?.url).to.equal(BASE_CARD_URL);
       expect(compiled.componentInfos.embedded.inlineHBS).to.equal('{{@model}}');
       expect(compiled.componentInfos.embedded.usedFields).to.deep.equal([]);
       expect(!compiled.serializerModule, 'String card has no deserializer').to.be.ok;
