@@ -33,7 +33,7 @@ jobs:
             exit 1;
           fi
 
-      - name: Deploy hub
+      - name: Deploy subgraph extractor
         uses: ./.github/actions/deploy-subgraph-extractor
         env:
           AWS_DEFAULT_REGION: us-east-1
