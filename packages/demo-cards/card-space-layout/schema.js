@@ -4,6 +4,7 @@ import Bio from 'https://demo.com/bio';
 import Links from 'https://demo.com/links';
 import Donations from 'https://demo.com/donations';
 import Background from 'https://demo.com/background';
+import string from 'https://cardstack.com/base/string';
 
 export default class CardSpaceLayout {
   @contains(Background)
@@ -20,4 +21,10 @@ export default class CardSpaceLayout {
 
   @contains(Donations)
   donations;
+
+  @contains(string, { computeVia: 'computeFoo' }) foo;
+  async computeFoo() {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    return 'bar ' + this.bio.name;
+  }
 }
