@@ -1,27 +1,25 @@
-"""
-# Reward Usage
-
-This is designed to reward users using any part of the cardpay network
-"""
+from abc import ABC, abstractmethod
 
 import duckdb
 import pandas as pd
+from cardpay_reward_programs.rule import Rule
+from cardpay_reward_programs.utils import get_files
 
-from ..utils import get_files
-
-
-class Rule:
-    def __init__(self, config_location, reward_program_id: str, payment_cycle_length: int):
-        self.config_location = config_location
-        self.reward_program_id = reward_program_id
-        self.payment_cycle_length = payment_cycle_length
+# type(Module()).__name__
 
 
 class UsageRewardProgram(Rule):
-    def __init__(self, config_location, reward_program_id, payment_cycle_length):
-        super(UsageRewardProgram, self).__init__(
-            config_location, reward_program_id, payment_cycle_length
-        )
+    """
+    This is designed to reward users using any part of the cardpay network
+    """
+
+    def __init__(self, **kwargs):
+        super(UsageRewardProgram, self).__init__(kwargs)
+
+
+class UsageRewardProgram2(Rule):
+    def __init__(self, config_location, payment_cycle_length):
+        super(UsageRewardProgram2, self).__init__(config_location, payment_cycle_length)
 
     def set_parameters(
         self,
@@ -52,6 +50,8 @@ class UsageRewardProgram(Rule):
         valid_from = max_partition
         valid_to = max_partition + self.valid_duration
         con = duckdb.connect(database=":memory:", read_only=False)
+
+        # this is probably what is causing the empty dfs
         if table_query == "parquet_scan([])":
             print("Warning: no parquet files were found")
             column_names = [
@@ -96,7 +96,6 @@ class UsageRewardProgram(Rule):
                     self.base_reward,
                     self.spend_factor,
                     self.transaction_factor,
-                    self.reward_program_id,
                     payment_cycle,
                     self.token,
                     valid_from,
@@ -125,3 +124,59 @@ class UsageRewardProgram(Rule):
             df = self.run(i)
             payments.append({"block": i, "amount": df["amount"].sum()})
         return payments
+
+    def test_run_query(
+        self,
+        table_query: str,
+        min_partition: int,
+        max_partition: int,
+        payment_cycle: int,
+    ):
+        valid_from = max_partition
+        valid_to = max_partition + self.valid_duration
+        con = duckdb.connect(database=":memory:", read_only=False)
+        dat = self.test_get_data()
+        dat2 = self.test_reward_data()
+        return dat
+
+    def test_run(self, payment_cycle: int):
+        min_block = payment_cycle - self.payment_cycle_length
+        max_block = payment_cycle
+        return self.test_run_query(
+            self._get_table_query(min_block, max_block),
+            min_block,
+            max_block,
+            payment_cycle,
+        )
+
+    def test_get_data(self):
+        con = duckdb.connect(database=":memory:", read_only=False)
+        sql_cols = f"""select *
+        from parquet_scan(['mycache/cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/data/subgraph=QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt/table=prepaid_card_payment/partition_size=524288/start_partition=24117248/end_partition=24641536/data.parquet'])"""
+        return con.execute(sql_cols).fetch_df()
+
+    def test_reward_data(self):
+        con = duckdb.connect(database=":memory:", read_only=False)
+        sql = f"""select 
+            prepaid_card_owner as payee,
+            count(*) as transactions,
+            sum(spend_amount_uint64) as total_spent
+
+
+         from parquet_scan(['mycache/cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/data/subgraph=QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt/table=prepaid_card_payment/partition_size=524288/start_partition=24117248/end_partition=24641536/data.parquet'])
+         group by payee
+         order by transactions desc
+         """
+
+        sql = f"""select
+           spend_amount_uint64,
+           prepaid_card_owner,
+           sum(spend_amount_uint64) over (partition by prepaid_card_owner) as total_spend,
+           percent_rank() over (partition by prepaid_card_owner order by spend_amount_uint64)
+
+         from parquet_scan(['mycache/cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/data/subgraph=QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt/table=prepaid_card_payment/partition_size=524288/start_partition=24117248/end_partition=24641536/data.parquet'])
+         """
+        return con.execute(
+            sql
+            # sql, [self.base_reward, self.spend_factor, self.transaction_factor]
+        ).fetch_df()

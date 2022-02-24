@@ -1,0 +1,41 @@
+{
+    "core": {
+        "name": "Usage",
+        "docker_image": "reward_programs",
+        "parameters": {
+            "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
+            "payment_cycle_length": 32768,
+            "valid_from": 24000000,
+            "valid_to": 26000000,
+            "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+        }
+    },
+    "rules": [
+        {
+            "name": "WeightedUsage",
+            "parameters": {
+                "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
+                "token": "0xcd7ABhic678Bc0b90dD6f870B8F214c10A943FC67",
+                "valid_from": 24000000,
+                "valid_to": 26000000
+            },
+            "rule_parameters": {
+                "base_reward": 10,
+                "transaction_factor": 1.5,
+                "spend_factor": 2
+            }
+        },
+        {
+            "name": "MinMerchantsPaid",
+            "parameters": {
+                "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/rewards/0.0.3/",
+                "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+                "valid_from": 24000000,
+                "valid_to": 26000000
+            },
+            "rule_parameters": {
+                "minimum_n_merchants": 5
+            }
+        }
+    ]
+}

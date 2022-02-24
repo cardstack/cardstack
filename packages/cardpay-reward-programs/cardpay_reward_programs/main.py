@@ -32,7 +32,6 @@ def run_reward_program(
     if reward_program_type == "usage":
         program = UsageRewardProgram(
             core_parameters["subgraph_config_location"],
-            core_parameters["reward_program_id"],
             core_parameters["payment_cycle_length"],
         )
     else:

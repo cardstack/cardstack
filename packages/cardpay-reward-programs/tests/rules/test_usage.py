@@ -38,7 +38,7 @@ def program(request):
     token = "test_token"
     valid_duration = 100000
     base_reward = 5
-    program = UsageRewardProgram(config, reward_program_id, payment_cycle_length)
+    program = UsageRewardProgram(config, payment_cycle_length)
     program.set_parameters(token, base_reward, transaction_factor, spend_factor, valid_duration)
     return program
 
