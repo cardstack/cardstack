@@ -16,7 +16,6 @@ jobs:
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
@@ -48,6 +47,7 @@ jobs:
         uses: ./.github/actions/deploy-ssr-web
         env:
           AWS_DEFAULT_REGION: us-east-1
+          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
         with:
           environment: ${{ github.event.inputs.environment }}
 
