@@ -38,6 +38,8 @@
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",
     "build:hub": "yarn --cwd packages/hub build",
+    "build:ssr-web:staging": "cd packages/ssr-web && ember build --environment=production",
+    "build:ssr-web:production": "cd packages/ssr-web && ember build --environment=production",
     "build:subgraph": "yarn --cwd packages/cardpay-subgraph build",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "yarn --cwd packages/cardhost lint",
