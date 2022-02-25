@@ -1,0 +1,32 @@
+<div class="card-space-user-page">
+  <CardPay::Merchant
+    @name={{@model.name}}
+    @logoBackground={{@model.backgroundColor}}
+    @logoTextColor={{@model.textColor}}
+    @vertical={{true}}
+    @size="large"
+    @text={{@model.id}}
+  />
+  <div class="card-space-user-page__payment">
+    <div class="card-space-user-page__payment-text">
+      Scan this code to pay {{@model.name}}
+    </div>
+    <div class="card-space-user-page__qr-code">
+      {{!-- TODO: make mobile-aware QR code a standalone component --}}
+      {{!-- deep linking seems important --}}
+      {{@model.paymentURL}}
+      <StyledQrCode
+        @data={{@model.paymentURL}}
+        {{!-- @image={{thibs.image}} --}}
+        @size={{340}}
+        @margin={{15}}
+        @backgroundColor="#ffffff"
+        @dotType="dots"
+        @dotColor="#000"
+        @cornerDotType="dot"
+        @cornerSquareType="extra-rounded"
+        @imageMargin={{5}}
+      />
+    </div>
+  </div>
+</div>
