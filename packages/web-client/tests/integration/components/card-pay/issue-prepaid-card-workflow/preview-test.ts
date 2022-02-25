@@ -1,6 +1,12 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, render, waitFor, waitUntil } from '@ember/test-helpers';
+import {
+  click,
+  render,
+  settled,
+  waitFor,
+  waitUntil,
+} from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
@@ -15,7 +21,12 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { createMerchantSafe } from '@cardstack/web-client/utils/test-factories';
 import BN from 'bn.js';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
-import { MerchantSafe } from '@cardstack/cardpay-sdk';
+import {
+  MerchantSafe,
+  PrepaidCardSafe,
+  TransactionOptions,
+} from '@cardstack/cardpay-sdk';
+import { defer } from 'rsvp';
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -33,6 +44,7 @@ module(
     let layer2Service: Layer2TestWeb3Strategy;
     let cardCustomizationService: CardCustomization;
     let merchantSafe: MerchantSafe;
+    let workflowSession: WorkflowSession;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -63,7 +75,7 @@ module(
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      let workflowSession = new WorkflowSession();
+      workflowSession = new WorkflowSession();
       workflowSession.setValue({
         spendFaceValue: 100000,
         prepaidFundingSafeAddress: merchantSafe.address,
@@ -197,6 +209,31 @@ module(
         assert
           .dom('[data-test-issue-prepaid-card-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
+      });
+
+      test('it clears the transaction hash if the transaction is reverted', async function (assert) {
+        let receipt = defer<PrepaidCardSafe>();
+        sinon
+          .stub(layer2Service, 'issuePrepaidCard')
+          .callsFake(function (
+            _safeAddress: string,
+            _faceValue: number,
+            _customizationDID: string,
+            { onTxnHash }: TransactionOptions
+          ) {
+            onTxnHash?.('test hash');
+            return receipt.promise;
+          });
+
+        await click('[data-test-issue-prepaid-card-button]');
+        await waitUntil(() => !!workflowSession.getValue('txnHash'));
+
+        assert.equal(workflowSession.getValue('txnHash'), 'test hash');
+
+        receipt.reject(new Error('Test reverted transaction'));
+        await settled();
+
+        assert.notOk(workflowSession.getValue('txnHash'));
       });
 
       test('it allow canceling and retrying after a while', async function (assert) {

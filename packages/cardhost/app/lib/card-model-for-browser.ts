@@ -8,25 +8,22 @@ import {
   CardModel,
   RawCardData,
   Format,
-  ComponentInfo,
   CardComponentModule,
   CardSchemaModule,
-  SerializerName,
 } from '@cardstack/core/src/interfaces';
 // import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 import { hbs } from 'ember-cli-htmlbars';
-import { cloneDeep } from 'lodash';
 import { tracked as _tracked } from '@glimmer/tracking';
 import {
-  inversedSerializerMap,
-  serializeResource,
-  SERIALIZERS,
+  serializeField,
+  serializeCardAsResource,
 } from '@cardstack/core/src/serializers';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -70,8 +67,6 @@ export default class CardModelForBrowser implements CardModel {
   private _schemaInstance: any | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
 
-  private inversedSerializerMap: Record<string, SerializerName>;
-
   constructor(
     private cards: Cards,
     state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>,
@@ -86,9 +81,6 @@ export default class CardModelForBrowser implements CardModel {
         original: undefined,
       };
     }
-
-    // TEMP: needed until serializerMap restructure
-    this.inversedSerializerMap = inversedSerializerMap(this.serializerMap);
 
     this.setters = this.makeSetter();
     let prop = tracked(this, '_data', {
@@ -164,10 +156,7 @@ export default class CardModelForBrowser implements CardModel {
     return editable;
   }
 
-  // TODO: Consolidate this into getField work
-  // It cant happen until the syncData we generate
-  // in component is the same data we use elsewhere
-  get data(): any {
+  get data(): object {
     return this._data;
   }
 
@@ -225,12 +214,7 @@ export default class CardModelForBrowser implements CardModel {
 
   private getRawField(fieldPath: string): any {
     let value = get(this.rawData, fieldPath);
-    return serializeField(
-      this.inversedSerializerMap,
-      fieldPath,
-      value,
-      'deserialize'
-    );
+    return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
   }
 
   async schemaClass() {
@@ -289,27 +273,15 @@ export default class CardModelForBrowser implements CardModel {
       url = cardURL({ realm: this.state.realm, id: this.state.id });
     }
 
-    let attributes = cloneDeep(this.data);
-    let map = this.inversedSerializerMap;
-    for (let field of Object.keys(map)) {
-      let value = serializeField(
-        this.inversedSerializerMap,
-        field,
-        get(attributes, field),
-        'serialize'
-      );
-      set(attributes, field, value);
-    }
-
-    return serializeResource('card', url, attributes);
+    return serializeCardAsResource(url, this.data, this.serializerMap);
   }
 
-  get serializerMap(): ComponentInfo['serializerMap'] {
-    return this.state.componentModule.getCardModelOptions().serializerMap;
+  get serializerMap(): CardComponentModule['serializerMap'] {
+    return this.state.componentModule.serializerMap;
   }
 
-  get usedFields(): ComponentInfo['usedFields'] {
-    return this.state.componentModule.getCardModelOptions().usedFields;
+  get usedFields(): CardComponentModule['usedFields'] {
+    return this.state.componentModule.usedFields;
   }
 
   async save(): Promise<void> {
@@ -409,22 +381,4 @@ function tracked(
 
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
-}
-
-function serializeField(
-  serializerMap: Record<string, SerializerName>,
-  fieldPath: string,
-  value: any,
-  action: 'serialize' | 'deserialize'
-) {
-  if (!value) {
-    return;
-  }
-  let serializerName = get(serializerMap, fieldPath);
-  if (serializerName) {
-    let serializer = SERIALIZERS[serializerName];
-    return serializer[action](value);
-  }
-
-  return value;
 }

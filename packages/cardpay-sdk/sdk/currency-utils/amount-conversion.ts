@@ -5,10 +5,11 @@
 
 import BigNumber from 'bignumber.js';
 import { isNil } from 'lodash';
-import { multiply } from './arithmetic';
+import { multiply, divide } from './arithmetic';
 import { isZero } from './comparison';
 import { roundAmountToNativeCurrencyDecimals } from './rounding-and-approximation';
 import { BigNumberish } from './types';
+import { convertStringToNumber } from './type-conversion';
 
 /**
  * Converts a human-readable amount to an amount friendly for specifying on-chain transactions.
@@ -84,5 +85,9 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
  * @returns integer spend amount
  */
 export const convertToSpend = (amount: number, currency: string, usdRate: number) => {
-  return Math.ceil(Number(roundAmountToNativeCurrencyDecimals(amount, currency)) / usdRate / SPEND_TO_USD_RATE);
+  return Math.ceil(
+    convertStringToNumber(
+      divide(divide(roundAmountToNativeCurrencyDecimals(amount, currency), usdRate), SPEND_TO_USD_RATE)
+    )
+  );
 };

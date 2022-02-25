@@ -1,7 +1,7 @@
 import * as JSON from 'json-typescript';
-import difference from 'lodash/difference';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
+import { keys } from './utils';
 
 export { Query } from './query';
 
@@ -11,7 +11,7 @@ const componentFormats = {
   edit: '',
 };
 export type Format = keyof typeof componentFormats;
-export const FORMATS = Object.keys(componentFormats) as Format[];
+export const FORMATS = keys(componentFormats);
 
 export function isFormat(s: any): s is Format {
   return s && s in componentFormats;
@@ -19,24 +19,15 @@ export function isFormat(s: any): s is Format {
 
 const featureNamesMap = {
   schema: '',
+  serializer: '',
 };
 export type FeatureFile = keyof typeof featureNamesMap & Format;
-export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(FORMATS) as FeatureFile[];
+export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
-const serializerTypes = {
-  date: '',
-  datetime: '',
-};
-export type SerializerName = keyof typeof serializerTypes;
-export const SERIALIZER_NAMES = Object.keys(serializerTypes) as SerializerName[];
-export type SerializerMap = { [key in SerializerName]?: string[] };
-
-export function assertValidSerializerMap(map: any): asserts map is SerializerMap {
-  let keys = Object.keys(map);
-  let diff = difference(keys, SERIALIZER_NAMES);
-  if (diff.length > 0) {
-    throw new CardstackError(`Unexpected serializer: ${diff.join(',')}`);
-  }
+export type SerializerMap = Record<string, PrimitiveSerializer>;
+export interface PrimitiveSerializer {
+  serialize(val: any): any;
+  deserialize(val: any): any;
 }
 
 export type CardData = Record<string, any>;
@@ -49,7 +40,6 @@ export interface CardId {
 }
 
 export type RawCardData = Record<string, any>;
-
 // RawCard represents the card "as authored". Nothing is preprocessed or
 // compiled, no other dependent data is included, no derived state is present.
 export interface RawCard<Identity extends Unsaved = Saved> {
@@ -61,8 +51,7 @@ export interface RawCard<Identity extends Unsaved = Saved> {
   isolated?: string;
   embedded?: string;
   edit?: string;
-
-  deserializer?: SerializerName;
+  serializer?: string;
 
   // url to the card we adopted from
   adoptsFrom?: string;
@@ -137,7 +126,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
     [key: string]: Field;
   };
   schemaModule: Ref;
-  serializer?: SerializerName;
+  serializerModule?: Ref;
 
   componentInfos: Record<Format, ComponentInfo<Ref>>;
 
@@ -154,10 +143,9 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 }
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
-  moduleName: Ref;
+  componentModule: Ref;
+  metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
-
-  serializerMap: SerializerMap;
 
   // optional optimization when this card can be inlined into cards that use it
   inlineHBS?: string;
@@ -213,14 +201,15 @@ export interface CardSchemaModule {
   };
 }
 
-export interface CardComponentModule {
-  default: unknown;
-  getCardModelOptions(): {
-    serializerMap: SerializerMap;
-    computedFields: string[];
-    usedFields: string[];
-  };
+export interface CardComponentMetaModule {
+  serializerMap: SerializerMap;
+  computedFields: string[];
+  usedFields: string[];
 }
+
+export type CardComponentModule = {
+  default: unknown;
+} & CardComponentMetaModule;
 
 export interface RealmConfig {
   url: string;

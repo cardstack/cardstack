@@ -210,6 +210,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
       this.args.onComplete();
     } catch (e) {
+      workflowSession.delete('txnHash');
       let insufficientFunds = e.message.startsWith(
         'Prepaid card does not have enough balance to register a merchant.'
       );

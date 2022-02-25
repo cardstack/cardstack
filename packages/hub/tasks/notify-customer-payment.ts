@@ -116,14 +116,14 @@ export default class NotifyCustomerPayment {
       return;
     }
 
-    let merchantName = 'You';
+    let notificationBody = 'You have a new payment';
 
     try {
       if (result.merchantSafe?.infoDid) {
         let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
 
         if (merchantInfo?.name) {
-          merchantName = merchantInfo.name;
+          notificationBody = `${merchantInfo.name} has a new payment`;
         }
       }
     } catch (e) {
@@ -134,8 +134,6 @@ export default class NotifyCustomerPayment {
       });
     }
 
-    let spendAmount = result.spendAmount;
-    let notificationBody = `${merchantName} received a payment of §${spendAmount}`;
     let notificationData = {
       notificationType: 'customer_payment',
       transactionInformation: JSON.stringify(omit(result, 'merchant')),

@@ -34,6 +34,23 @@ export default class DatabaseManager {
     return await this.pool.connect();
   }
 
+  async performTransaction(db: Client, cb: any) {
+    let isTestEnv = process.env.NODE_ENV === 'test';
+
+    if (isTestEnv) {
+      await cb(); // Don't commit any data to the test db
+    } else {
+      try {
+        await db.query('BEGIN');
+        await cb();
+        await db.query('COMMIT');
+      } catch (e) {
+        await db.query('ROLLBACK');
+        throw e;
+      }
+    }
+  }
+
   async teardown() {
     if (this.dbConfig.useTransactionalRollbacks) {
       await this.client?.query('ROLLBACK');

@@ -1,3 +1,5 @@
+import type { MerchantInfoQueriesFilter } from '../queries/merchant-info';
+
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
@@ -5,7 +7,8 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
-import { MerchantInfoQueriesFilter } from '../services/queries/merchant-info';
+import { CardSpace } from './card-spaces';
+import { query } from '@cardstack/hub/queries';
 
 export interface MerchantInfo {
   id: string;
@@ -22,9 +25,10 @@ export default class MerchantInfosRoute {
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries = inject('merchant-info-queries', {
+  merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
   });
@@ -67,6 +71,17 @@ export default class MerchantInfosRoute {
       return;
     }
 
+    if (ctx.request.body.data.attributes['name'].length > 50) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let slug = ctx.request.body.data.attributes['slug'].toLowerCase();
     let validationResult = await this.validateSlug(slug);
 
@@ -90,10 +105,22 @@ export default class MerchantInfosRoute {
       ownerAddress: ctx.state.userAddress,
     };
 
-    await this.merchantInfoQueries.insert(merchantInfo);
+    let db = await this.databaseManager.getClient();
+    let merchantInfoId, cardSpaceId;
+
+    await this.databaseManager.performTransaction(db, async () => {
+      merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
+      cardSpaceId = (
+        await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db)
+      ).id;
+    });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
-      id: merchantInfo.id,
+      id: merchantInfoId,
+    });
+
+    await this.workerClient.addJob('persist-off-chain-card-space', {
+      id: cardSpaceId,
     });
 
     let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);

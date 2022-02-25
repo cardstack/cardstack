@@ -100,12 +100,22 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
         run: yarn test:web-client:percy
-      - name: Publish test results
+      - name: Run ssr-web tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
+        run: yarn test:ssr-web:percy
+      - name: Publish web-client test results
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
           check_name: 'web-client test results'
-          files: test-results/**/*.xml
+          files: ci-xml-test-results/web-client.xml
+      - name: Publish ssr-web test results
+        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        if: always()
+        with:
+          check_name: 'ssr-web test results'
+          files: ci-xml-test-results/ssr-web.xml
 
   change_check:
     name: Check which packages changed
@@ -116,6 +126,7 @@ jobs:
       web_client: ${{ steps.filter.outputs.web_client }}
       boxel: ${{ steps.filter.outputs.boxel }}
       cardie: ${{ steps.filter.outputs.cardie }}
+      ssr_web: ${{ steps.filter.outputs.ssr_web }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -149,6 +160,15 @@ jobs:
             cardie:
               - 'packages/cardie/**'
               - '.github/workflows/push-main.yml'
+              - 'yarn.lock'
+              - 'waypoint.hcl'
+            ssr_web:
+              - 'packages/ssr-web/**'
+              - 'packages/boxel/**'
+              - 'packages/cardpay-sdk/**'
+              - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-ssr-web/**'
               - 'yarn.lock'
               - 'waypoint.hcl'
 
@@ -236,6 +256,51 @@ jobs:
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
             :warning: **web-client** [main] has failed to deploy to *staging*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  deploy-ssr-web-staging:
+    name: Deploy ssr-web
+    needs: change_check
+    if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Deploy ssr-web
+        uses: ./.github/actions/deploy-ssr-web
+        env:
+          HUB_URL: https://hub-staging.stack.cards
+          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
+        with:
+          environment: staging
+      - name: Send success notification to Discord
+        if: ${{ success() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :checkered_flag: **ssr-web** [main] has been successfully deployed to *staging*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **ssr-web** [main] has failed to deploy to *staging*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   deploy-boxel:

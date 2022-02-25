@@ -1,0 +1,42 @@
+name: Deploy SSR web
+description: Deploy a FastBoot server serving a stripped down web-client
+
+inputs:
+  waypoint_version:
+    description: Waypoint version to use
+    required: false
+    default: '0.4.0'
+  environment:
+    description: Deployment environment
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install apt packages including waypoint
+      shell: bash
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
+
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Build
+      run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}
+      shell: bash
+
+    - name: Deploy dist
+      run: mv dist deployment/
+      shell: bash
+      working-directory: packages/ssr-web
+
+    - name: Deploy FastBoot server
+      run: waypoint up --app=ssr-web -plain
+      shell: bash
+      env:
+        WAYPOINT_SERVER_TLS: '1'
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'

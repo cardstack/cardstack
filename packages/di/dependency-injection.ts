@@ -22,7 +22,8 @@ export class Container implements ContainerInterface {
   }
 
   private _lookup(name: string, type: string): CacheEntry {
-    let cached = this.cache.get(name);
+    let cacheKey = `${type}:${name}`;
+    let cached = this.cache.get(cacheKey);
     if (cached) {
       return cached;
     }
@@ -39,7 +40,7 @@ export class Container implements ContainerInterface {
           return instance;
         },
       },
-      name
+      cacheKey
     );
   }
 

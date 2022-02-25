@@ -105,7 +105,8 @@ for (let [name, abi] of Object.entries(abis)) {
 
 let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
-  .replace(/{GNOSIS_SAFE_PROXY_FACTORY}/g, getAddress('gnosisProxyFactory', cleanNetwork))
+  .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_2}/g, getAddress('gnosisProxyFactory_v1_2', cleanNetwork))
+  .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_3}/g, getAddress('gnosisProxyFactory_v1_3', cleanNetwork))
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
   .replace(/{PREPAID_CARD_MARKET_ADDRESS}/g, getAddress('prepaidCardMarket', cleanNetwork))
   .replace(/{UNISWAP_V2_FACTORY_ADDRESS}/g, getAddress('uniswapV2Factory', cleanNetwork))

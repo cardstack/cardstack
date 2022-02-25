@@ -209,6 +209,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       }
       session.setValue('unlockTxnReceipt', transactionReceipt);
     } catch (e) {
+      session.delete('unlockTxnHash');
       console.error(e);
       this.errorMessage =
         'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
@@ -220,8 +221,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   @task *newDeposit(): TaskGenerator<void> {
+    let session = this.args.workflowSession;
     try {
-      let session = this.args.workflowSession;
       let layer2BlockHeightBeforeBridging =
         yield this.layer2Network.getBlockHeight();
       let layer2Address = this.layer2Network.walletInfo.firstAddress!;
@@ -249,6 +250,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       session.setValue('relayTokensTxnReceipt', transactionReceipt);
       this.args.onComplete?.();
     } catch (e) {
+      session.delete('relayTokensTxnHash');
       if (didCancel(e)) {
         return;
       }

@@ -1,0 +1,35 @@
+{{#let
+  (concat (or this.merchantInfo.name @model.merchantSafe.address) ' requests payment')
+  (concat 'Pay ' this.cleanedAmounts.displayed.amount)
+  as |title description|
+}}
+  {{page-title title replace=true}}
+
+  <InHead>
+    {{!-- template-lint-disable no-forbidden-elements --}}
+    <meta property='og:title' content={{title}} />
+    <meta property='og:type' content='website' />
+    <meta property='og:url' content={{this.paymentURL}} />
+    <meta property='og:description' content={{description}} />
+    <meta name='twitter:title' content={{title}} />
+    <meta name='twitter:card' content='summary' />
+    <meta name='twitter:description' content={{description}} />
+    <meta name='twitter:url' content={{this.paymentURL}} />
+    {{!-- template-lint-disable no-potential-path-strings --}}
+    <meta name='twitter:site' content='@cardstack' />
+  </InHead>
+{{/let}}
+
+<div class="merchant-payment-request-page">
+  <CardPay::MerchantPaymentRequestHeader/>
+  <CardPay::MerchantPaymentRequestCard
+    @amount={{this.cleanedAmounts.displayed.amount}}
+    @secondaryAmount={{this.cleanedAmounts.displayed.secondaryAmount}}
+    @merchant={{this.merchantInfo}}
+    @merchantAddress={{@model.merchantSafe.address}}
+    @paymentURL={{this.paymentURL}}
+    @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
+    @canDeepLink={{this.canDeepLink}}
+  />
+  <Common::Footer />
+</div>

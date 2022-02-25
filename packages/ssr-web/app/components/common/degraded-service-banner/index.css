@@ -1,0 +1,46 @@
+.degraded-service-banner {
+  --degraded-service-banner-text-color: var(--boxel-dark);
+  --degraded-service-banner-background-color: var(--boxel-yellow);
+  --icon-background-color: var(--degraded-service-banner-text-color);
+  --icon-color: var(--degraded-service-banner-background-color);
+
+  width: 100%;
+  min-height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--boxel-sp-xxs);
+  font: 600 var(--boxel-font-sm);
+  background: var(--degraded-service-banner-background-color);
+  color: var(--degraded-service-banner-text-color);
+}
+
+.degraded-service-banner__container {
+  max-width: calc(var(--degraded-service-banner-icon-area-width) + 80ch);
+  display: flex;
+}
+
+.degraded-service-banner__icon-area {
+  --degraded-service-banner-icon-area-width: 1.7rem;
+
+  display: flex;
+  align-items: center;
+  width: var(--degraded-service-banner-icon-area-width);
+}
+
+.degraded-service-banner__container a {
+  text-decoration: underline;
+}
+
+.degraded-service-banner__container a:hover {
+  color: inherit;
+}
+
+.degraded-service-banner.degraded-service-banner--severe {
+  --degraded-service-banner-text-color: var(--boxel-light);
+  --degraded-service-banner-background-color: var(--boxel-red);
+}
+
+.degraded-service-banner__icon {
+  margin-right: var(--boxel-sp-xxs);
+}

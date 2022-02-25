@@ -139,9 +139,13 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   }
 
   @action validateMerchantName() {
-    this.merchantNameValidationMessage = this.trimmedMerchantName
-      ? ''
-      : 'This field is required';
+    let message: string = '';
+    if (!this.trimmedMerchantName.length) {
+      message = 'This field is required';
+    } else if (this.trimmedMerchantName.length > 50) {
+      message = 'Cannot exceed 50 characters';
+    }
+    this.merchantNameValidationMessage = message;
   }
 
   @action async validateMerchantId() {

@@ -6,7 +6,7 @@ import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation, g
 import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from './utils/general-utils';
 const { fromWei } = Web3.utils;
 
@@ -16,7 +16,7 @@ export interface ISafes {
   view(owner?: string): Promise<ViewSafesResult>;
   view(owner?: string, options?: Partial<Options>): Promise<ViewSafesResult>;
   sendTokensGasEstimate(safeAddress: string, tokenAddress: string, recipient: string, amount: string): Promise<string>;
-  sendTokens(txnHash: string): Promise<TransactionReceipt>;
+  sendTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   sendTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -24,7 +24,7 @@ export interface ISafes {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
 }
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
@@ -299,7 +299,7 @@ export default class Safes implements ISafes {
     return gasInToken(estimate).toString();
   }
 
-  async sendTokens(txnHash: string): Promise<TransactionReceipt>;
+  async sendTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async sendTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -307,7 +307,7 @@ export default class Safes implements ISafes {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async sendTokens(
     safeAddressOrTxnHash: string,
     tokenAddress?: string,
@@ -315,7 +315,7 @@ export default class Safes implements ISafes {
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);

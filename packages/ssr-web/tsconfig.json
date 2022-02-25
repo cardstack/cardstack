@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noEmitOnError": true,
+    "noEmit": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "baseUrl": ".",
+    "module": "es2020",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@cardstack/ssr-web/tests/*": [
+        "tests/*"
+      ],
+      "@cardstack/ssr-web/*": [
+        "app/*"
+      ],
+      "*": [
+        "types/*"
+      ],
+      "@glimmer/tracking": [
+        "../../node_modules/ember-cached-decorator-polyfill",
+        "../../node_modules/@glimmer/tracking/dist/types"
+      ],
+      "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
+      "@cardstack/ssr-web/mirage/*": ["mirage/*"],
+      "web3-provider-engine": ["../../types/web3-provider-engine"]
+    }
+  },
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "types/**/*",
+    "mirage"
+  ]
+}

@@ -19,11 +19,11 @@
     <div>
       <div>Issued by</div>
       {{#let (or @issuerName "Enter name") as |name|}}
-        <div class="prepaid-card__name" title={{name}} data-test-prepaid-card-issuer-name>
+        <div class="prepaid-card__name" data-test-prepaid-card-issuer-name {{tippy (if @error "Failed to load card customization details" name)}}>
           {{name}}
           {{#if @error}}
             <span data-test-prepaid-card-load-warning>
-              {{svg-jar "failure-bordered" height="10" width="10" title="Failed to load card customization details"}}
+              {{svg-jar "failure-bordered" height="10" width="10"}}
             </span>
           {{/if}}
         </div>
@@ -31,7 +31,7 @@
     </div>
     <div class="prepaid-card__meta">
       <div class="prepaid-card__type">PREPAID CARD</div>
-      <div class="prepaid-card__address">{{truncate-middle @address}}</div>
+      <div class="prepaid-card__address" {{tippy @address theme="light-border address"}}>{{truncate-middle @address}}</div>
       <div class="prepaid-card__network">on {{@network}}</div>
     </div>
   </header>

@@ -1,6 +1,9 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import fillIn from '@ember/test-helpers/dom/fill-in';
+import find from '@ember/test-helpers/dom/find';
+import waitUntil from '@ember/test-helpers/wait-until';
 
 module('Integration | Card Rendering', function (hooks) {
   let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);
@@ -122,5 +125,58 @@ module('Integration | Card Rendering', function (hooks) {
 
     assert.dom('h1').containsText('Bob');
     assert.dom('p').containsText('Bob likes pizza!');
+  });
+
+  skip('Can rerender a computed field when edited', async function (assert) {
+    createCard({
+      id: 'bob',
+      realm: localRealmURL,
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      edit: 'edit.js',
+      data: {
+        firstName: 'Bob',
+      },
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+
+          export default class Hello {
+            @contains(string)
+            firstName;
+
+            @contains(string, { computeVia: "computeFoodPref" }) foodPref;
+            async computeFoodPref() {
+              await new Promise(resolve => setTimeout(resolve, 10));
+              return this.firstName + " likes pizza";
+            }
+
+            @contains(string)
+            get loudFoodPref() {
+              return this.foodPref + "!";
+            }
+          }
+        `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<h1><@fields.firstName data-test-field-name /></h1><p><@fields.loudFoodPref /></p>`
+        ),
+        'edit.js': templateOnlyComponentTemplate(
+          `<div>Name: <@fields.firstName /></div><div data-test-field="loudFoodPref"><@fields.loudFoodPref /></div>`
+        ),
+      },
+    });
+
+    await renderCard({ id: 'bob' }, 'edit');
+    await fillIn('[data-test-field-name]', 'Kirito');
+    await waitUntil(() =>
+      find('[data-test-field=loudFoodPref]')!.textContent?.includes(
+        'Kirito likes pizza!'
+      )
+    );
+
+    assert
+      .dom('[data-test-field=loudFoodPref]')
+      .containsText('Kirito likes pizza!');
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.28.17",
+  "version": "0.28.19",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -19,10 +19,12 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "glob": "^7.1.7",
-    "require-uncached": "^1.0.3"
+    "require-uncached": "^1.0.3",
+    "testem": "^3.6.0",
+    "testem-multi-reporter": "^1.2.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.28.17",
+    "@cardstack/eslint-config": "0.28.19",
     "jsonapi-typescript": "^0.1.3"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -35,8 +37,7 @@
     "node": ">= 12"
   },
   "volta": {
-    "node": "12.13.1",
-    "yarn": "1.22.0"
+    "extends": "../../package.json"
   },
   "config": {
     "access": "public"

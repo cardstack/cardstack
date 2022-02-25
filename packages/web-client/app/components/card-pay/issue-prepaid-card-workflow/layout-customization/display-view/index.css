@@ -9,8 +9,7 @@
 }
 
 .layout-display-view__card {
-  grid-row: 1/2;
-  transform: scale(0.63);
+  transform: scale(0.6);
   transform-origin: top left;
   max-width: var(--preview-card-width);
   max-height: var(--preview-card-height);

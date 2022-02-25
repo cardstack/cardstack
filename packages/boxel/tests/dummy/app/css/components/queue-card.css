@@ -79,7 +79,7 @@
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp);
-  display: box;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;

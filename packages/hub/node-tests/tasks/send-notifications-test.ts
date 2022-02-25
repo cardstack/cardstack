@@ -3,7 +3,7 @@ import { registry, setupHub } from '../helpers/server';
 import SendNotifications, { PushNotificationData } from '../../tasks/send-notifications';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import SentPushNotificationsQueries from '../../services/queries/sent-push-notifications';
+import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
 import waitFor from '../utils/wait-for';
 import * as Sentry from '@sentry/node';
 import sentryTestkit from 'sentry-testkit';
@@ -81,9 +81,9 @@ describe('SendNotificationsTask', function () {
     let db = await dbManager.getClient();
     await db.query(`DELETE FROM sent_push_notifications`);
 
-    sentPushNotificationsQueries = (await getContainer().lookup(
-      'sent-push-notifications-queries'
-    )) as SentPushNotificationsQueries;
+    sentPushNotificationsQueries = (await getContainer().lookup('sent-push-notifications', {
+      type: 'query',
+    })) as SentPushNotificationsQueries;
     sentPushNotificationsQueries.insert({
       ...existingNotification,
       messageId: 'existing-message-id',
@@ -137,7 +137,7 @@ describe('SendNotificationsTask deduplication errors', async function () {
     testkit.reset();
 
     registry(this).register(
-      'sent-push-notifications-queries',
+      'sent-push-notifications',
       class ErroredSentPushNotificationsQueries {
         async insert() {
           throw new Error('insert fails');
@@ -146,7 +146,8 @@ describe('SendNotificationsTask deduplication errors', async function () {
         async exists() {
           return false;
         }
-      }
+      },
+      { type: 'query' }
     );
     lastSentData = undefined;
     notificationSent = false;

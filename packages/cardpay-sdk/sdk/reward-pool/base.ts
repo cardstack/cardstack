@@ -13,7 +13,7 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
 export interface Proof {
@@ -179,7 +179,7 @@ export default class RewardPool {
     return this.addTokenSymbol(aggregateBalance(tokenBalances));
   }
 
-  async addRewardTokens(txnHash: string): Promise<TransactionReceipt>;
+  async addRewardTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addRewardTokens(
     safeAddress: string,
     rewardProgramId: string,
@@ -187,7 +187,7 @@ export default class RewardPool {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async addRewardTokens(
     safeAddressOrTxnHash: string,
     rewardProgramId?: string,
@@ -195,7 +195,7 @@ export default class RewardPool {
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -263,7 +263,7 @@ export default class RewardPool {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
-  async claim(txnHash: string): Promise<TransactionReceipt>;
+  async claim(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claim(
     safeAddress: string,
     leaf: string,
@@ -271,7 +271,7 @@ export default class RewardPool {
     acceptPartialClaim?: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async claim(
     safeAddressOrTxnHash: string,
     leaf?: string,
@@ -279,7 +279,7 @@ export default class RewardPool {
     acceptPartialClaim?: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -423,7 +423,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
-  async recoverTokens(txnHash: string): Promise<TransactionReceipt>;
+  async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
     safeAddress: string,
     rewardProgramId: string,
@@ -431,7 +431,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
     safeAddressOrTxnHash: string,
     rewardProgramId?: string,
@@ -439,7 +439,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);

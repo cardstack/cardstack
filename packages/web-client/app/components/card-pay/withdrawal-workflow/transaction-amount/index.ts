@@ -206,6 +206,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       );
       this.args.onComplete?.();
     } catch (e) {
+      this.args.workflowSession.delete('relayTokensTxnHash');
       this.isConfirmed = false;
 
       if (

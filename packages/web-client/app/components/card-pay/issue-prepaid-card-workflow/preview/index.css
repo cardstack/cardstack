@@ -10,17 +10,8 @@
   flex-direction: column;
 }
 
-.preview__content .preview__card-preview-field {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--boxel-sp-xs);
-}
-
 .preview__card {
-  grid-row: 1/2;
-  transform: scale(0.63);
+  transform: scale(0.6);
   transform-origin: top left;
   max-width: var(--preview-card-width);
   max-height: var(--preview-card-height);
