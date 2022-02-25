@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import fillIn from '@ember/test-helpers/dom/fill-in';
