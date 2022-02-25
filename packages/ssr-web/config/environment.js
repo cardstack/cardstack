@@ -22,9 +22,8 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
-      universalLinkHostnamesByTarget[
-        process.env.DEPLOY_TARGET || process.env.SSR_WEB_ENVIRONMENT // front-end uses DEPLOY_TARGET, fastboot uses SSR_WEB_ENVIRONMENT
-      ] ?? MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+      universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
+      MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
