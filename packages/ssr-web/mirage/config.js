@@ -4,6 +4,14 @@ import config from '@cardstack/ssr-web/config/environment';
 export default function () {
   this.namespace = 'api';
 
+  // FIXME ugh!! should not need a host
+  this.get(
+    'http://localhost:3000/api/card-spaces/:slug',
+    (schema, { params: { slug } }) => {
+      return schema.cardSpaces.where({ slug }).models[0];
+    }
+  );
+
   this.get('/exchange-rates', function () {
     return {
       data: {

@@ -24,7 +24,9 @@ export default class UserSpaceRoute extends Route {
           included: any[];
         } = await (
           await fetch(
-            `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
+            `${config.hubURL || 'http://localhost:3000'}/api/card-spaces/${
+              this.appContext.cardSpaceId
+            }?include=merchant-info&FIXMEonlyhereforMirage`,
             {
               method: 'GET',
               headers: {
@@ -54,13 +56,13 @@ export default class UserSpaceRoute extends Route {
             did: merchant.attributes.did,
           }
         );
-        let address = queryResult.data.merchantSafes[0].id;
+        let address = queryResult?.data?.merchantSafes[0]?.id;
 
-        if (!address) {
-          // TODO: replace with proper 404 somehow
-          // this 404 is for card space
-          throw new Error('No such route!');
-        }
+        // if (!address) {
+        //   // TODO: replace with proper 404 somehow
+        //   // this 404 is for card space
+        //   throw new Error('No such route!');
+        // }
 
         return {
           id: merchant.attributes['slug'],
