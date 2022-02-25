@@ -65,7 +65,6 @@ export interface LoadedState {
 
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
-  // private _data: any;
   @tracked private _schemaInstance: any | undefined;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
@@ -153,8 +152,6 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get data(): object {
-    // This will help us to deprecate the legacy use of this._data, and reflects
-    // the idea that the schema instance _is_ the data
     return this._schemaInstance;
   }
 
