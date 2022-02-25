@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl, gqlQuery } from '@cardstack/cardpay-sdk';
+import Fastboot from 'ember-cli-fastboot/services/fastboot';
 
 interface UserSpaceRouteModel {
   id: string;
@@ -16,6 +17,7 @@ interface UserSpaceRouteModel {
 
 export default class UserSpaceRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
+  @service declare fastboot: Fastboot;
 
   async model(): Promise<UserSpaceRouteModel> {
     if (this.appContext.currentApp === 'card-space') {
@@ -36,13 +38,20 @@ export default class UserSpaceRoute extends Route {
             }
           )
         ).json();
-        let merchant = cardSpaceResult.included.find(
+        let merchant = cardSpaceResult.included?.find(
           (v) => v.type === 'merchant-infos'
         );
         if (!merchant) {
           // TODO: replace with proper 404 somehow
           // this 404 is for card space
-          throw new Error('No such route!');
+
+          if (this.fastboot.isFastBoot) {
+            this.fastboot.response.statusCode = 404;
+          }
+
+          throw new Error(
+            `404: Card Space not found for ${this.appContext.cardSpaceId}`
+          );
         }
 
         let queryResult = await gqlQuery(

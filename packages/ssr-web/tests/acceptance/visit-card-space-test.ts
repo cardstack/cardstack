@@ -34,6 +34,14 @@ module('Acceptance | visit card space', function (hooks) {
     await percySnapshot(assert);
   });
 
+  test('renders an error for a missing slug', async function (this: MirageTestContext, assert) {
+    await visit('/');
+
+    assert
+      .dom('[data-test-error]')
+      .includesText('404: Card Space not found for slug');
+  });
+
   /*
   test('redirects from other links', async function (assert) {
     await visit('/card-pay/wallet');
