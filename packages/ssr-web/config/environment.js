@@ -22,7 +22,7 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
-      universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
+      universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,

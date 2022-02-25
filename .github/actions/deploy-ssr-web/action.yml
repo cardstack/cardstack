@@ -26,7 +26,7 @@ runs:
       shell: bash
 
     - name: Build
-      run: SENTRY_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}
+      run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}
       shell: bash
 
     - name: Deploy dist
