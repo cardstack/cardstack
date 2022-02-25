@@ -277,7 +277,7 @@ export default class CardModelForBrowser implements CardModel {
     await taskFor(this.rerenderData).last;
   }
 
-  reifyData() {
+  private reifyData() {
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
       set(syncData, field, get(this._schemaInstance, field));
