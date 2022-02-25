@@ -1,22 +1,16 @@
-import { inject } from '@cardstack/di';
+import { query } from '@cardstack/hub/queries';
 import { NotificationPreference } from '../../routes/notification-preferences';
-import NotificationPreferenceQueries from '../queries/notification-preference';
-import NotificationTypeQueries from '../queries/notification-type';
-import PushNotificationRegistrationQueries from '../queries/push-notification-registration';
 
 export default class NotificationPreferenceService {
-  notificationTypeQueries: NotificationTypeQueries = inject('notification-type-queries', {
+  notificationTypeQueries = query('notification-type', {
     as: 'notificationTypeQueries',
   });
-  notificationPreferenceQueries: NotificationPreferenceQueries = inject('notification-preference-queries', {
+  notificationPreferenceQueries = query('notification-preference', {
     as: 'notificationPreferenceQueries',
   });
-  pushNotificationRegistrationQueries: PushNotificationRegistrationQueries = inject(
-    'push-notification-registration-queries',
-    {
-      as: 'pushNotificationRegistrationQueries',
-    }
-  );
+  pushNotificationRegistrationQueries = query('push-notification-registration', {
+    as: 'pushNotificationRegistrationQueries',
+  });
 
   async getPreferences(ownerAddress: string, pushClientId?: string): Promise<NotificationPreference[]> {
     let notificationTypes = await this.notificationTypeQueries.query();

@@ -22,7 +22,7 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
-      universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
+      universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
@@ -30,8 +30,9 @@ module.exports = function (environment) {
       sentry: {
         dsn: process.env.SENTRY_DSN,
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
-        enabled: !!process.env.DEPLOY_TARGET,
-        environment: process.env.DEPLOY_TARGET || 'development',
+        enabled:
+          environment === 'production' && process.env.SENTRY_DSN !== undefined,
+        environment: process.env.SENTRY_ENVIRONMENT || 'staging',
         release:
           `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''

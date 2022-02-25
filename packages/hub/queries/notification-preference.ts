@@ -1,7 +1,7 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { NotificationPreference } from '../../routes/notification-preferences';
-import { buildConditions } from '../../utils/queries';
+import { NotificationPreference } from '../routes/notification-preferences';
+import { buildConditions } from '../utils/queries';
 import pgFormat from 'pg-format';
 
 interface NotificationPreferenceQueriesFilter {
@@ -61,8 +61,8 @@ export default class NotificationPreferenceQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'notification-preference-queries': NotificationPreferenceQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'notification-preference': NotificationPreferenceQueries;
   }
 }

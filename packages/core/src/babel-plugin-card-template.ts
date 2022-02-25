@@ -9,21 +9,21 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
 
-import { CompiledCard, SerializerName, Format, SerializerMap } from './interfaces';
+import { CompiledCard, ComponentInfo, Format } from './interfaces';
 
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
+import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
+  metaModulePath: string;
   // these are for gathering output
-  usedFields: string[];
+  usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
-  serializerMap: SerializerMap;
 }
 
 interface State {
@@ -57,7 +57,11 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
           state.insideExportDefault = false;
         },
         exit(path: NodePath<t.Program>, state: State) {
-          addGetCardModelOptions(path, state, babel);
+          path.node.body.push(
+            babel.template(`export * from %%metaModulePath%%;`)({
+              metaModulePath: state.opts.metaModulePath,
+            }) as t.Statement
+          );
         },
       },
 
@@ -77,57 +81,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
       },
     },
   };
-}
-
-function addGetCardModelOptions(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
-  let t = babel.types;
-  let serializerMap = buildSerializerMapFromUsedFields(state.opts.fields, state.opts.usedFields);
-  state.opts.serializerMap = serializerMap;
-
-  path.node.body.push(
-    t.exportNamedDeclaration(
-      t.functionDeclaration(
-        t.identifier('getCardModelOptions'),
-        [],
-        t.blockStatement([
-          babel.template(`
-            return {
-              serializerMap: %%serializerMap%%,
-              computedFields: %%computedFields%%,
-              usedFields: %%usedFields%%
-            };
-          `)({
-            serializerMap: t.objectExpression(buildSerializerMapProp(serializerMap, t)),
-            computedFields: t.arrayExpression(
-              Object.values(state.opts.fields)
-                .filter((field) => field.computed)
-                .map((field) => t.stringLiteral(field.name))
-            ),
-            usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
-          }) as t.Statement,
-        ])
-      )
-    )
-  );
-}
-
-function buildSerializerMapProp(serializerMap: SerializerMap, t: typeof Babel.types): t.ObjectExpression['properties'] {
-  let props: t.ObjectExpression['properties'] = [];
-
-  for (let serializer in serializerMap) {
-    let fieldList = serializerMap[serializer as SerializerName];
-    if (!fieldList) {
-      continue;
-    }
-
-    let fieldListElements: t.ArrayExpression['elements'] = [];
-    for (let field of fieldList) {
-      fieldListElements.push(t.stringLiteral(field));
-    }
-    props.push(t.objectProperty(t.identifier(serializer), t.arrayExpression(fieldListElements)));
-  }
-
-  return props;
 }
 
 function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {

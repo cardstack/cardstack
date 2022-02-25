@@ -41,8 +41,8 @@ export default class LatestEventBlockQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'latest-event-block-queries': LatestEventBlockQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'latest-event-block': LatestEventBlockQueries;
   }
 }

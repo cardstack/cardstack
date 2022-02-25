@@ -1,3 +1,5 @@
+import type { MerchantInfoQueriesFilter } from '../queries/merchant-info';
+
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
@@ -5,8 +7,8 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
-import { MerchantInfoQueriesFilter } from '../services/queries/merchant-info';
 import { CardSpace } from './card-spaces';
+import { query } from '@cardstack/hub/queries';
 
 export interface MerchantInfo {
   id: string;
@@ -23,12 +25,10 @@ export default class MerchantInfosRoute {
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries = inject('merchant-info-queries', {
+  merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
-  cardSpaceQueries = inject('card-space-queries', {
-    as: 'cardSpaceQueries',
-  });
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
   });

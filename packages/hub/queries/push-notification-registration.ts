@@ -1,7 +1,7 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { PushNotificationRegistration } from '../../routes/push_notification_registrations';
-import { buildConditions } from '../../utils/queries';
+import { PushNotificationRegistration } from '../routes/push_notification_registrations';
+import { buildConditions } from '../utils/queries';
 
 interface PushNotificationRegistrationQueriesFilter {
   ownerAddress: string;
@@ -62,8 +62,8 @@ export default class PushNotificationRegistrationQueries {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'push-notification-registration-queries': PushNotificationRegistrationQueries;
+declare module '@cardstack/hub/queries' {
+  interface KnownQueries {
+    'push-notification-registration': PushNotificationRegistrationQueries;
   }
 }

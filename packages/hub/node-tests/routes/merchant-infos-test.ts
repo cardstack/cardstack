@@ -98,7 +98,7 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let cardSpaceQueries = await getContainer().lookup('card-space-queries');
+    let cardSpaceQueries = await getContainer().lookup('card-space', { type: 'query' });
     let cardSpace = (await cardSpaceQueries.query({ merchantId: String(resourceId) }))[0];
 
     expect(jobIdentifiers).to.deep.equal(['persist-off-chain-merchant-info', 'persist-off-chain-card-space']);
@@ -460,8 +460,8 @@ describe('GET /api/merchant-infos', function () {
   let { request, getContainer } = setupHub(this);
 
   it('fetches merchant infos available for association to a new card space', async function () {
-    let cardSpaceQueries = await getContainer().lookup('card-space-queries');
-    let merchantInfoQueries = await getContainer().lookup('merchant-info-queries');
+    let cardSpaceQueries = await getContainer().lookup('card-space', { type: 'query' });
+    let merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
 
     // 3 merchants (jerry, kramer, george) belonging to first user
     let merchantInfoId = 'c5cd6479-ec74-4ecd-9aa6-96bdb02d255e';

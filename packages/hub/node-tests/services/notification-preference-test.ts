@@ -16,8 +16,8 @@ describe('NotificationPreferenceService', function () {
       'customer_payment',
       'enabled',
     ]);
-    let registrationQueries = await getContainer().lookup('push-notification-registration-queries');
-    let preferenceQueries = await getContainer().lookup('notification-preference-queries');
+    let registrationQueries = await getContainer().lookup('push-notification-registration', { type: 'query' });
+    let preferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
 
     // 1st device
     await registrationQueries.upsert({
