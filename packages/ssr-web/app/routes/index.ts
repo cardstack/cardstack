@@ -3,7 +3,7 @@ import '../css/pay.css';
 import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
-import config from '../config/environment';
+import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl, gqlQuery } from '@cardstack/cardpay-sdk';
 
 interface UserSpaceRouteModel {
@@ -24,9 +24,7 @@ export default class UserSpaceRoute extends Route {
           included: any[];
         } = await (
           await fetch(
-            `${config.hubURL ?? 'http://localhost:3000'}/api/card-spaces/${
-              this.appContext.cardSpaceId
-            }`,
+            `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
             {
               method: 'GET',
               headers: {

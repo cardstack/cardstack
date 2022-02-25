@@ -27,7 +27,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
-    hubURL: process.env.HUB_URL,
+    hubURL: process.env.HUB_URL || 'http://localhost:3000',
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
