@@ -7,7 +7,6 @@ import './isolated.css';
 export default setComponentTemplate(
   precompileTemplate(
     `<article class="card-space-layout">
-      <div>foo: <@fields.foo/></div>
       <div class="card-space-layout__cover-photo"><@fields.background/></div>
       <section class="card-space-layout__modules card-space-layout__modules--xs">
         <BoxelCardContainer @displayBoundaries={{true}}>

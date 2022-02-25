@@ -83,9 +83,6 @@ module('Acceptance | Card Creation', function (hooks) {
       encodeURIComponent(LOCAL_REALM),
       'the card URL is in the local realm'
     );
-
-    // TODO there seems to be something async happening after the test is done,
-    // probably related to the async rerender for setting a card field
   });
 
   test('Creating a card with an ID', async function (assert) {

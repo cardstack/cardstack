@@ -13,7 +13,6 @@ import {
   CardSchemaModule,
   SerializerName,
 } from '@cardstack/core/src/interfaces';
-// import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
@@ -22,7 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import set from 'lodash/set';
 import get from 'lodash/get';
-import { tracked as _tracked } from '@glimmer/tracking';
+import { tracked } from '@glimmer/tracking';
 import {
   inversedSerializerMap,
   serializeResource,
@@ -36,6 +35,7 @@ import { cardURL } from '@cardstack/core/src/utils';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
 import { restartableTask } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
+import { registerDestructor } from '@ember/destroyable';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -68,8 +68,7 @@ export interface LoadedState {
 
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
-  private declare _data: any;
-  // private _data = new TrackedObject({});
+  @tracked private _data: any;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
   private _schemaInstance: any | undefined;
@@ -96,14 +95,7 @@ export default class CardModelForBrowser implements CardModel {
     this.inversedSerializerMap = inversedSerializerMap(this.serializerMap);
 
     this.setters = this.makeSetter();
-    let prop = tracked(this, '_data', {
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
-    if (prop) {
-      Object.defineProperty(this, '_data', prop);
-    }
+    registerDestructor(this, this.rerenderFinished.bind(this));
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
@@ -196,9 +188,10 @@ export default class CardModelForBrowser implements CardModel {
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
         class extends Component {
           component = innerComponent;
-          // TODO: Ed mentioned something about this needing to be full separate. Should we clone?
-          data = self.data;
           set = self.setters;
+          get data() {
+            return self.data;
+          }
         }
       );
     }
@@ -297,6 +290,10 @@ export default class CardModelForBrowser implements CardModel {
     let newSchemaInstance = await this.createSchemaInstance();
     this._data = await this.computeData(newSchemaInstance);
     this._schemaInstance = newSchemaInstance;
+  }
+
+  async rerenderFinished() {
+    await taskFor(this.rerenderData).last;
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -414,15 +411,6 @@ function buildNewURL(realm: string, parentCardURL: string): string {
 
 function buildCardURL(url: string): string {
   return `${cardServer}cards/${encodeURIComponent(url)}`;
-}
-
-function tracked(
-  target: CardModel,
-  prop: string,
-  desc: PropertyDescriptor
-): PropertyDescriptor | void {
-  //@ts-ignore the types for glimmer tracked don't seem to be lining
-  return _tracked(target, prop, desc);
 }
 
 function assertNever(value: never) {
