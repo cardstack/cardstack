@@ -233,7 +233,7 @@ export default class CardModelForBrowser implements CardModel {
         return;
       }
 
-      let data = this.reifyData();
+      let data = this.dataAsUsedFieldsShape();
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -280,7 +280,7 @@ export default class CardModelForBrowser implements CardModel {
   // we have a few places that are very sensitive to the shape of the data, and
   // won't be able to deal with a schema instance that has additional properties
   // and methods beyond just the data itself, so this method is for those places
-  private reifyData() {
+  private dataAsUsedFieldsShape() {
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
       set(syncData, field, get(this._schemaInstance, field));
@@ -296,7 +296,11 @@ export default class CardModelForBrowser implements CardModel {
       url = cardURL({ realm: this.state.realm, id: this.state.id });
     }
 
-    return serializeCardAsResource(url, this.reifyData(), this.serializerMap);
+    return serializeCardAsResource(
+      url,
+      this.dataAsUsedFieldsShape(),
+      this.serializerMap
+    );
   }
 
   get serializerMap(): CardComponentModule['serializerMap'] {
