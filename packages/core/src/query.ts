@@ -22,7 +22,7 @@ type SortDirection = 'asc' | 'desc';
 
 export interface Sort {
   by: string | string[];
-  on: CardURL;
+  on: CardURL | CardURL[];
   direction?: SortDirection | SortDirection[];
 }
 

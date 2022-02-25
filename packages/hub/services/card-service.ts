@@ -229,10 +229,10 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
 }
 
 function sortToExpression(sort: Sort): CardExpression {
-  let { on } = sort;
-
   let by: string[];
   let direction: string[];
+  let on: string[];
+
   if (typeof sort.by === 'string') {
     by = [sort.by];
   } else {
@@ -243,9 +243,14 @@ function sortToExpression(sort: Sort): CardExpression {
   } else {
     direction = sort.direction ?? [];
   }
+  if (typeof sort.on === 'string') {
+    on = [sort.on];
+  } else {
+    on = sort.on;
+  }
 
   let expressions: CardExpression[] = by.map((e, i) => [
-    field([columnName('searchData')], on, e),
+    field([columnName('searchData')], on[i], e),
     direction[i] === 'desc' ? 'DESC' : 'ASC',
   ]);
 
