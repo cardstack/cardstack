@@ -277,6 +277,9 @@ export default class CardModelForBrowser implements CardModel {
     await taskFor(this.rerenderData).last;
   }
 
+  // we have a few places that are very sensitive to the shape of the data, and
+  // won't be able to deal with a schema instance that has additional properties
+  // and methods beyond just the data itself, so this method is for those places
   private reifyData() {
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
