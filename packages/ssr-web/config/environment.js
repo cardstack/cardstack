@@ -10,6 +10,13 @@ const universalLinkHostnamesByTarget = {
   staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
+const hostWhitelistByTarget = {
+  staging: [
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+    '/.+\\.pouty\\.pizza$/',
+  ],
+  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, '/.+\\.card\\.xyz$/'],
+};
 
 const pkg = require('../package.json');
 
@@ -73,6 +80,11 @@ module.exports = function (environment) {
     },
     'ember-cli-mirage': {
       enabled: false,
+    },
+    fastboot: {
+      hostWhitelist: hostWhitelistByTarget[process.env.DEPLOY_TARGET] ?? [
+        '/^localhost:\\d+$/',
+      ],
     },
   };
 
