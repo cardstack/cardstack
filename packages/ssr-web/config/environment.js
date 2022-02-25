@@ -82,16 +82,20 @@ module.exports = function (environment) {
       enabled: false,
     },
     fastboot: {
-      hostWhitelist: hostWhitelistByTarget[process.env.DEPLOY_TARGET] ?? [
+      hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
         '/^localhost:\\d+$/',
       ],
     },
     chains: {
-      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
+      layer2:
+        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'xdai' : 'sokol',
     },
   };
 
-  if (environment === 'development') {
+  if (
+    process.env.SSR_WEB_ENVIRONMENT !== 'production' &&
+    process.env.SSR_WEB_ENVIRONMENT !== 'staging'
+  ) {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
