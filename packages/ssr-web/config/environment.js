@@ -86,6 +86,9 @@ module.exports = function (environment) {
         '/^localhost:\\d+$/',
       ],
     },
+    chains: {
+      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
+    },
   };
 
   if (environment === 'development') {
