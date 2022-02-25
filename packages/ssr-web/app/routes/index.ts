@@ -26,7 +26,7 @@ export default class UserSpaceRoute extends Route {
           await fetch(
             `${config.hubURL || 'http://localhost:3000'}/api/card-spaces/${
               this.appContext.cardSpaceId
-            }?include=merchant-info&FIXMEonlyhereforMirage`,
+            }`,
             {
               method: 'GET',
               headers: {
