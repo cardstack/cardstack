@@ -39,6 +39,12 @@ export default class UserSpaceRoute extends Route {
         let merchant = cardSpaceResult.included.find(
           (v) => v.type === 'merchant-infos'
         );
+        if (!merchant) {
+          // TODO: replace with proper 404 somehow
+          // this 404 is for card space
+          throw new Error('No such route!');
+        }
+
         let queryResult = await gqlQuery(
           config.chains.layer2,
           `query($did: String!) {
@@ -52,7 +58,7 @@ export default class UserSpaceRoute extends Route {
         );
         let address = queryResult.data.merchantSafes[0].id;
 
-        if (!merchant || !address) {
+        if (!address) {
           // TODO: replace with proper 404 somehow
           // this 404 is for card space
           throw new Error('No such route!');
