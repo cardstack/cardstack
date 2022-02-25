@@ -14,6 +14,7 @@ import {
   resolveNestedPath,
   expressionToSql,
   Expression,
+  separatedByCommas,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
@@ -120,7 +121,7 @@ export class CardService {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       if (query.sort) {
-        expression = [...expression, 'order by', sortToExpression(query.sort)];
+        expression = [...expression, 'order by', ...sortToExpression(query.sort)];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
@@ -227,51 +228,28 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   throw unimpl('unknown');
 }
 
-function sortToExpression(sort: Sort): string {
-  let { by, on, direction } = sort;
+function sortToExpression(sort: Sort): CardExpression {
+  let { on } = sort;
 
-  if (typeof by === 'string') {
-    let byExp = by.split('.').join(',');
-    let directionExp = direction === 'desc' ? 'DESC' : 'ASC';
-    return `${columnName('searchData')} #> '{${on},${byExp}}' ${directionExp}`;
+  let by: string[];
+  let direction: string[];
+  if (typeof sort.by === 'string') {
+    by = [sort.by];
+  } else {
+    by = sort.by;
+  }
+  if (typeof sort.direction === 'string') {
+    direction = [sort.direction];
+  } else {
+    direction = sort.direction ?? [];
   }
 
-  let expressions: string[] = [];
-  if (by.length > 0) {
-    expressions = by.map(
-      (e, i) =>
-        `${columnName('searchData')} #> '{${on},${e.split('.').join(',')}}' ${
-          direction && direction[i] === 'desc' ? 'DESC' : 'ASC'
-        }`
-    );
-  }
+  let expressions: CardExpression[] = by.map((e, i) => [
+    field([columnName('searchData')], on, e),
+    direction[i] === 'desc' ? 'DESC' : 'ASC',
+  ]);
 
-  return expressions.join(',');
-
-  /*
-    sort: {
-      by: 'author.name',
-      on: 'https://cardstack.local/book',
-      direction: 'desc',
-    },
-
-    returns:
-    `"searchData" #> '{https://cardstack.local/book,author,name}' DESC`;
-  */
-
-  /*
-    sort: {
-      by: ['author.lname', 'author.fname'],
-      on: 'https://cardstack.local/book',
-      direction: ['asc', 'desc'],
-    }
-
-    returns:
-      `"searchData" #> '{https://cardstack.local/book,author,lname}' ASC,
-       "searchData" #> '{https://cardstack.local/book,author,fname}' DESC`
-  */
-
-  // TODO: other types of sort expressions?
+  return separatedByCommas(expressions);
 }
 
 const pgComparisons: { [operator: string]: string } = {
