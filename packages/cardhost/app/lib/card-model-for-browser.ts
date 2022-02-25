@@ -65,10 +65,10 @@ export interface LoadedState {
 
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
-  @tracked private _data: any;
+  // private _data: any;
+  @tracked private _schemaInstance: any | undefined;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
-  private _schemaInstance: any | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
 
   constructor(
@@ -146,16 +146,16 @@ export default class CardModelForBrowser implements CardModel {
       'edit'
     )) as CardModelForBrowser;
 
-    // TODO: This is temp until we figure out the async data issue
-    // Without this .data is not populated
-    this._data = await editable.computeData();
+    await editable.computeData();
 
     (editable.state as LoadedState).original = this;
     return editable;
   }
 
   get data(): object {
-    return this._data;
+    // This will help us to deprecate the legacy use of this._data, and reflects
+    // the idea that the schema instance _is_ the data
+    return this._schemaInstance;
   }
 
   async computeData(schemaInstance?: any): Promise<Record<string, any>> {
@@ -171,7 +171,7 @@ export default class CardModelForBrowser implements CardModel {
       let innerComponent = this.state.componentModule.default;
       let self = this;
 
-      this._data = await this.computeData();
+      await this.computeData();
 
       this.wrapperComponent = setComponentTemplate(
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
@@ -233,10 +233,10 @@ export default class CardModelForBrowser implements CardModel {
       let innerSegments = segments.slice();
       let lastSegment = innerSegments.pop();
       if (!lastSegment) {
-        this._data = value;
         return;
       }
-      let data = this._data || {};
+
+      let data = this.reifyData();
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -272,12 +272,20 @@ export default class CardModelForBrowser implements CardModel {
       attributes: data,
     });
     let newSchemaInstance = await this.createSchemaInstance();
-    this._data = await this.computeData(newSchemaInstance);
+    await this.computeData(newSchemaInstance);
     this._schemaInstance = newSchemaInstance;
   }
 
   async rerenderFinished() {
     await taskFor(this.rerenderData).last;
+  }
+
+  reifyData() {
+    let syncData: Record<string, any> = {};
+    for (let field of this.usedFields) {
+      set(syncData, field, get(this._schemaInstance, field));
+    }
+    return syncData;
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -288,7 +296,7 @@ export default class CardModelForBrowser implements CardModel {
       url = cardURL({ realm: this.state.realm, id: this.state.id });
     }
 
-    return serializeCardAsResource(url, this.data, this.serializerMap);
+    return serializeCardAsResource(url, this.reifyData(), this.serializerMap);
   }
 
   get serializerMap(): CardComponentModule['serializerMap'] {
