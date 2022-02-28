@@ -38,6 +38,7 @@ module('Integration | Component | common/payment-link', function (hooks) {
         @image={{this.image}}
         @paymentURL={{this.paymentURL}}
         @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
+        @cta={{this.cta}}
       />
     `);
   });
@@ -54,7 +55,10 @@ module('Integration | Component | common/payment-link', function (hooks) {
     assert.dom(QR).doesNotExist();
     assert.dom(URL).containsText(deepLink);
     assert.dom(TOGGLE).isEnabled().containsText('Show as QR Code');
-    assert.dom(LINK).hasAttribute('href', deepLink);
+    assert
+      .dom(LINK)
+      .hasAttribute('href', deepLink)
+      .containsText('Pay Business');
   });
   test('it allows toggling to qr and back in the mobile state', async function (assert) {
     this.set('mode', 'link');
@@ -65,5 +69,13 @@ module('Integration | Component | common/payment-link', function (hooks) {
     assert.dom(URL).containsText(link);
     assert.dom(TOGGLE).isEnabled().containsText('Show Payment Link');
     assert.dom(LINK).doesNotExist();
+  });
+  test('it allows a custom cta for the payment link', async function (assert) {
+    this.set('mode', 'link');
+    this.set('cta', 'Please pay 10 dollars');
+    assert
+      .dom(LINK)
+      .hasAttribute('href', deepLink)
+      .containsText('Please pay 10 dollars');
   });
 });

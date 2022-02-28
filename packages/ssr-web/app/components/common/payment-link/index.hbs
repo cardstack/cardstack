@@ -23,7 +23,7 @@
       href={{@deepLinkPaymentURL}}
       data-test-payment-link-deep-link
     >
-      Pay Business
+      {{or @cta "Pay Business"}}
     </Boxel::Button>
   {{/if}}
 
