@@ -56,11 +56,11 @@ export class CardService {
     };
   }
 
-  async loadData(cardURL: string, format: Format): Promise<CardModel> {
+  async loadData(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return await this.makeCardModelFromDatabase(format, result);
+    return await this.makeCardModelFromDatabase(format, result, allFields);
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -126,7 +126,11 @@ export class CardService {
     }
   }
 
-  private async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
+  private async makeCardModelFromDatabase(
+    format: Format,
+    result: Record<string, any>,
+    allFields = false
+  ): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
 
     let componentMetaModule = result.componentInfos[format].metaModule.global;
@@ -141,6 +145,7 @@ export class CardService {
       schemaModule: result.schemaModule,
       componentModule: result.componentInfos[format].componentModule.global,
       componentMeta,
+      allFields,
     });
   }
 

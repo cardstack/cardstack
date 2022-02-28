@@ -3,8 +3,8 @@ import { configureHubWithCompiler } from '../../helpers/cards';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<card-id>', function () {
-    function getCard(cardURL: string) {
-      return request().get(`/cards/${encodeURIComponent(cardURL)}`);
+    function getCard(cardURL: string, allFields = false) {
+      return request().get(`/cards/${encodeURIComponent(cardURL)}${allFields ? '?allFields' : ''}`);
     }
 
     let { realmURL, request, cards, resolveCard } = configureHubWithCompiler(this);
@@ -59,6 +59,7 @@ if (process.env.COMPILER) {
               @contains(datetime) createdAt;
               @contains(string) extra;
               @contains(person) author;
+              @contains(string) favoriteColor;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
@@ -74,6 +75,7 @@ if (process.env.COMPILER) {
         data: {
           title: 'Hello World',
           body: 'First post.',
+          favoriteColor: 'blue',
           author: {
             name: 'Emily',
             bestFriend: {
@@ -90,8 +92,8 @@ if (process.env.COMPILER) {
     });
 
     it("can load a simple isolated card's data", async function () {
-      let response = await getCard(`${realmURL}post0`); // .expect(200);
-      // console.log(JSON.stringify(response.body, null, 2));
+      let response = await getCard(`${realmURL}post0`);
+      expect(response).to.hasStatus(200);
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.have.keys('type', 'id', 'meta', 'attributes');
@@ -110,6 +112,25 @@ if (process.env.COMPILER) {
       let componentModule = response.body.data?.meta.componentModule;
       expect(componentModule, 'should have componentModule').to.not.be.undefined;
       expect(resolveCard(componentModule), 'component module is resolvable').to.not.be.undefined;
+    });
+
+    it('can load all the fields for a card', async function () {
+      let response = await getCard(`${realmURL}post0`, true);
+      expect(response).to.hasStatus(200);
+
+      expect(response.body).to.have.all.keys('data');
+      expect(response.body.data).to.have.keys('type', 'id', 'meta', 'attributes');
+      expect(response.body.data?.attributes).to.deep.equal({
+        title: 'Hello World',
+        body: 'First post.',
+        favoriteColor: 'blue',
+        author: {
+          name: 'Emily',
+          bestFriend: {
+            species: 'dog',
+          },
+        },
+      });
     });
   });
 }
