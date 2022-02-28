@@ -40,7 +40,7 @@ The fastboot server differentiates which app is being served via host. We follow
 **IMPORTANT: This does not work on Safari, only Firefox and Chrome. Instructions for Safari setup below.**
 
 If you want to develop Card Space on Safari with the behaviour described above, you should:
-1. Add `card.space.localhost` to your `/etc/hosts` as an alias of localhost
+1. Add `card.space.localhost` to your `/etc/hosts` as an alias of `127.0.0.1`
 2. Install `dnsmasq` with Homebrew. Wildcard DNS support does not come by default, so the entry in step 1 will only match `card.space.localhost`, not `${spaceId}.card.space.localhost`. `dnsmasq` fixes this.
 3. Make a directory for `dnsmasq` config to live: `sudo mkdir -p $(brew --prefix)/etc/dnsmasq.d`
 4. Make sure that the `dnsmasq` config points to your new directory:
