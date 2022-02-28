@@ -190,7 +190,6 @@ module('Acceptance | pay', function (hooks) {
       `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
     );
     await waitFor(MERCHANT);
-
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
@@ -198,21 +197,53 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: roundedSpendAmount,
     });
-
     let expectedPath = expectedUrl.substring(
       expectedUrl.indexOf(universalLinkDomain) + universalLinkDomain.length
     );
 
     assert
       .dom(
-        `meta[property='og:title'][content='Pay Business: ${merchantName}']`,
+        `meta[property='og:title'][content='${merchantName} requests payment']`,
         document.documentElement
       )
       .exists();
 
     assert
       .dom(
+        `meta[name='twitter:title'][content='${merchantName} requests payment']`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
         `meta[property='og:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:url'][content$='${expectedPath}']`,
+        document.documentElement
+      )
+      .exists();
+
+    let amountInUSD = convertAmountToNativeDisplay(
+      spendToUsd(roundedSpendAmount)!,
+      'USD'
+    );
+    let description = `Pay ${amountInUSD}`;
+
+    assert
+      .dom(
+        `meta[property='og:description'][content$='${description}']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:description'][content$='${description}']`,
         document.documentElement
       )
       .exists();
