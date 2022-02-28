@@ -9,5 +9,8 @@ export function serialize(d) {
 }
 
 export function deserialize(d) {
+  if (d instanceof Date) {
+    return d;
+  }
   return parseISO(d);
 }

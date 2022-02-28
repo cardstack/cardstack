@@ -185,9 +185,10 @@ function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: Sta
           if (this.%%cachedName%% !== undefined) {
             return this.%%cachedName%%;
           } else {
-            throw new %%NotReady%%(%%fieldName%%, %%computeVia%%, %%cachedNameMember%%, %%cardName%%);
+            throw new %%NotReady%%(%%schemaInstance%%, %%fieldName%%, %%computeVia%%, %%cachedNameMember%%, %%cardName%%);
           }
         `)({
+          schemaInstance: t.thisExpression(),
           cachedName: t.identifier(cachedName),
           cachedNameMember: t.stringLiteral(cachedName),
           NotReady: state.importUtil.import(path, '@cardstack/core/src/utils/errors', 'NotReady'),

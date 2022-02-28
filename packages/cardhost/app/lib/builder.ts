@@ -108,7 +108,7 @@ export default class LocalRealm implements Builder {
       {
         type: 'loaded',
         url,
-        rawServerResponse,
+        rawData: rawServerResponse,
         componentModule,
         schemaModuleId: compiled.schemaModule.global,
         format,
