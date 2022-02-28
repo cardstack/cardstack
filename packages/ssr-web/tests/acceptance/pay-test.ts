@@ -33,8 +33,8 @@ const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-styled-qr-code]';
-const DEEP_LINK = '[data-test-payment-request-deep-link]';
-const PAYMENT_URL = '[data-test-payment-request-url]';
+const DEEP_LINK = '[data-test-payment-link-deep-link]';
+const PAYMENT_URL = '[data-test-payment-link-url]';
 
 // fixed data
 const mirageConversionRate = 2; // mirage is hardcoded to provide 1:2 conversion from USD to any other currency
@@ -534,7 +534,6 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(PAYMENT_URL).containsText(
       generateMerchantPaymentUrl({
-        domain: universalLinkDomain,
         network,
         merchantSafeID: merchantSafe.address,
         currency: spendSymbol,
@@ -574,7 +573,6 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(PAYMENT_URL).containsText(
       generateMerchantPaymentUrl({
-        domain: universalLinkDomain,
         network,
         merchantSafeID: merchantSafe.address,
         currency: spendSymbol,

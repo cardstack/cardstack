@@ -1,0 +1,45 @@
+/* TODO: remove when pay route is removed from web client */
+.payment-link {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.payment-link__deep-link {
+  width: 100%;
+  max-width: 40ch;
+  margin: var(--action-element-margin);
+}
+
+.payment-link__qr-container {
+  text-align: center;
+  margin: var(--action-element-margin);
+}
+
+.payment-link__url {
+  max-width: 18.75rem;
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+  letter-spacing: var(--boxel-lsp-xs);
+  word-break: break-all;
+}
+
+.payment-link__link-view-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--boxel-sp-xs);
+  border-radius: 100px; /* same as Boxel button border radius */
+  gap: var(--boxel-sp-xs);
+  font: 600 var(--boxel-font-sm);
+  border: none;
+  background-color: transparent;
+}
+
+.payment-link__link-view-toggle:hover,
+.payment-link__link-view-toggle:active {
+  background-color: rgb(0 0 0 / 10%);
+}
