@@ -1,0 +1,47 @@
+<div class="payment-link" ...attributes>
+  {{#if this.showingQR}}
+    <div class="payment-link__qr-container">
+      <StyledQrCode
+        @data={{@paymentURL}}
+        @image={{@image}}
+        @size={{340}}
+        @margin={{15}}
+        @backgroundColor="#ffffff"
+        @dotType="dots"
+        @dotColor="#000"
+        @cornerDotType="dot"
+        @cornerSquareType="extra-rounded"
+        @imageMargin={{5}}
+      />
+    </div>
+  {{else}}
+    <Boxel::Button
+      class="payment-link__deep-link"
+      @as="anchor"
+      @kind="primary"
+      @size="touch"
+      href={{@deepLinkPaymentURL}}
+      data-test-payment-link-deep-link
+    >
+      Pay Business
+    </Boxel::Button>
+  {{/if}}
+
+  <span class="payment-link__url" data-test-payment-link-url>
+    {{@paymentURL}}
+  </span>
+  {{#if this.nextMode}}
+    <button
+      class="payment-link__link-view-toggle"
+      type="button"
+      {{on "click" (fn @switchMode this.nextMode)}}
+      data-test-payment-link-link-view-toggle
+    >
+      {{#if this.showingQR}}
+        Show Payment Link
+      {{else}}
+        Show as QR Code {{svg-jar "qr-code" width="20" height="20"}}
+      {{/if}}
+    </button>
+  {{/if}}
+</div>

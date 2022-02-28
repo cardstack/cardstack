@@ -15,9 +15,9 @@ const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-styled-qr-code]';
-const DEEP_LINK = '[data-test-payment-request-deep-link]';
-const LINK_VIEW_TOGGLE = '[data-test-payment-request-link-view-toggle]';
-const PAYMENT_URL = '[data-test-payment-request-url]';
+const DEEP_LINK = '[data-test-payment-link-deep-link]';
+const LINK_VIEW_TOGGLE = '[data-test-payment-link-link-view-toggle]';
+const PAYMENT_URL = '[data-test-payment-link-url]';
 const LOADING_INDICATOR = '[data-test-merchant-loading-indicator]';
 
 // fixed data

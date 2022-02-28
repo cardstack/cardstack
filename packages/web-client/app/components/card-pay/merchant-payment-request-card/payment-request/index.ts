@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { PaymentLinkMode } from '@cardstack/web-client/components/common/payment-link';
 
 interface PaymentRequestArgs {
   merchantAddress: string;
@@ -17,7 +18,9 @@ interface PaymentRequestArgs {
 }
 
 export default class PaymentRequest extends Component<PaymentRequestArgs> {
-  @tracked showAsQR = false;
+  @tracked paymentLinkMode: PaymentLinkMode = this.args.canDeepLink
+    ? 'link'
+    : 'qr-non-mobile';
 
   get addressSegments() {
     let addressLength = 42;

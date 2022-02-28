@@ -3,7 +3,7 @@
   ...attributes
 >
   <div class="payment-request__explanation" data-test-payment-request-explanation>
-    {{#if (and @canDeepLink (not this.showAsQR))}}
+    {{#if (and @canDeepLink (eq this.paymentLinkMode "link"))}}
       Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment
     {{else}}
       Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment
@@ -47,69 +47,12 @@
       </div>
     {{/if}}
 
-    {{#if @canDeepLink}}
-      {{!-- this is necessary in case card wallet needs to be used on a separate device --}}
-      {{#if this.showAsQR}}
-        <div class="payment-request__qr-container">
-          <StyledQrCode
-            @data={{@paymentURL}}
-            @image={{@image}}
-            @size={{340}}
-            @margin={{15}}
-            @backgroundColor="#ffffff"
-            @dotType="dots"
-            @dotColor="#000"
-            @cornerDotType="dot"
-            @cornerSquareType="extra-rounded"
-            @imageMargin={{5}}
-          />
-        </div>
-      {{else}}
-        <Boxel::Button
-          class="payment-request__deep-link"
-          @as="anchor"
-          @kind="primary"
-          @size="touch"
-          href={{@deepLinkPaymentURL}}
-          data-test-payment-request-deep-link
-        >
-          Pay Business
-        </Boxel::Button>
-      {{/if}}
-      <span class="payment-request__url" data-test-payment-request-url>
-        {{@paymentURL}}
-      </span>
-
-      <button
-        class="payment-request__link-view-toggle"
-        type="button"
-        {{on "click" (set this "showAsQR" (not this.showAsQR))}}
-        data-test-payment-request-link-view-toggle
-      >
-        {{#if this.showAsQR}}
-          Show Payment Link
-        {{else}}
-          Show as QR Code {{svg-jar "qr-code" width="20" height="20"}}
-        {{/if}}
-      </button>
-    {{else}}
-      <div class="payment-request__qr-container">
-        <StyledQrCode
-          @data={{@paymentURL}}
-          @image={{@image}}
-          @size={{340}}
-          @margin={{15}}
-          @backgroundColor="#ffffff"
-          @dotType="dots"
-          @dotColor="#000"
-          @cornerDotType="dot"
-          @cornerSquareType="extra-rounded"
-          @imageMargin={{5}}
-        />
-      </div>
-      <span class="payment-request__url" data-test-payment-request-url>
-        {{@paymentURL}}
-      </span>
-    {{/if}}
+    <Common::PaymentLink
+      @mode={{this.paymentLinkMode}}
+      @switchMode={{fn (set this "paymentLinkMode")}}
+      @image={{@image}}
+      @paymentURL={{@paymentURL}}
+      @deepLinkPaymentURL={{@deepLinkPaymentURL}}
+    />
   </Boxel::CardContainer>
 </div>
