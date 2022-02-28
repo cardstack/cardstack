@@ -2,9 +2,9 @@
 
 // Note that the SDK (which holds these constants) is a TS lib, so we can't
 // require it in this CJS file.
-const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'ssr-wallet.cardstack.com';
+const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
 const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME =
-  'ssr-wallet-staging.stack.cards';
+  'wallet-staging.stack.cards';
 
 const universalLinkHostnamesByTarget = {
   staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
@@ -22,7 +22,7 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
-      universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
+      universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,

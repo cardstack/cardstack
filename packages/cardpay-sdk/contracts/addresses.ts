@@ -5,18 +5,18 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.8.7/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.8.7/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.8.7/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.8.7/split-prepaid-card-handler';
-import SpendABI from './abi/v0.8.7/spend';
-import MerchantManagerABI from './abi/v0.8.7/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.7/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.7/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.7/register-rewardee-handler';
-import SupplierManagerABI from './abi/v0.8.7/supplier-manager';
+import PayMerchantHandlerABI from './abi/v0.9.0/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.9.0/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.9.0/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.9.0/split-prepaid-card-handler';
+import SpendABI from './abi/v0.9.0/spend';
+import MerchantManagerABI from './abi/v0.9.0/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.9.0/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.9.0/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.9.0/register-rewardee-handler';
+import SupplierManagerABI from './abi/v0.9.0/supplier-manager';
 
-export const protocolVersions = ['v0.8.7'];
+export const protocolVersions = ['v0.9.0', 'v0.8.7'];
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);

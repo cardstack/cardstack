@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import fillIn from '@ember/test-helpers/dom/fill-in';
@@ -127,7 +127,7 @@ module('Integration | Card Rendering', function (hooks) {
     assert.dom('p').containsText('Bob likes pizza!');
   });
 
-  skip('Can rerender a computed field when edited', async function (assert) {
+  test('Can rerender a computed field when edited', async function (assert) {
     createCard({
       id: 'bob',
       realm: localRealmURL,
@@ -162,17 +162,18 @@ module('Integration | Card Rendering', function (hooks) {
           `<h1><@fields.firstName data-test-field-name /></h1><p><@fields.loudFoodPref /></p>`
         ),
         'edit.js': templateOnlyComponentTemplate(
-          `<div>Name: <@fields.firstName /></div><div data-test-field="loudFoodPref"><@fields.loudFoodPref /></div>`
+          `<div>Name: <@fields.firstName /></div><div data-test-field="loudFoodPref"><@fields.loudFoodPref /><div data-test-dep-field>{{@model.firstName}}</div></div>`
         ),
       },
     });
 
     await renderCard({ id: 'bob' }, 'edit');
     await fillIn('[data-test-field-name]', 'Kirito');
+
+    // We want to ensure data consistency, so that when the template rerenders,
+    // the template is always showing consistent field values
     await waitUntil(() =>
-      find('[data-test-field=loudFoodPref]')?.textContent?.includes(
-        'Kirito likes pizza!'
-      )
+      find('[data-test-dep-field]')?.textContent?.includes('Kirito')
     );
 
     assert

@@ -6,7 +6,7 @@ import qs from 'qs';
 
 export interface Query {
   filter?: Filter;
-  sort?: string | string[];
+  sort?: Sort;
   page?: { size?: number | string; cursor?: string };
   queryString?: string;
 }
@@ -17,6 +17,14 @@ export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilte
 export interface TypedFilter {
   on?: CardURL;
 }
+
+interface SortExpression {
+  by: string;
+  on: CardURL;
+  direction?: 'asc' | 'desc';
+}
+
+export type Sort = SortExpression[];
 
 // The CardTypeFilter is used when you solely want to filter for all cards that
 // adopt from some particular card type--no other predicates are included in
