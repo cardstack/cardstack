@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .payment-link__deep-link {
@@ -12,7 +13,6 @@
 }
 
 .payment-link__qr-container {
-  text-align: center;
   margin: var(--action-element-margin);
 }
 
