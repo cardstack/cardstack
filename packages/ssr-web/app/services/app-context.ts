@@ -1,13 +1,13 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import config from '../config/environment';
 
 export interface AppContextService {
   currentApp: 'card-space' | 'wallet';
   cardSpaceId: string;
 }
 
-// TODO: string manipulation with knowledge of card space suffixes from config
 export default class AppContext extends Service implements AppContextService {
   @service declare fastboot: Fastboot;
 
@@ -19,14 +19,14 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   get currentApp(): 'card-space' | 'wallet' {
-    return this.host.endsWith('card.space.localhost:4210')
+    return this.host.endsWith(config.cardSpaceHostnameSuffix)
       ? 'card-space'
       : 'wallet';
   }
 
   get cardSpaceId() {
     if (this.currentApp === 'card-space') {
-      let id = this.host.split('.')[0] ?? '';
+      let id = this.host.replace(config.cardSpaceHostnameSuffix, '') ?? '';
       return id;
     } else return '';
   }

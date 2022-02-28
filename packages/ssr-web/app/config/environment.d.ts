@@ -25,6 +25,7 @@ declare const config: {
   urls: UrlsOptions;
   walletConnectIcons: string[];
   APP: Record<string, unknown>;
+  cardSpaceHostnameSuffix: string;
   chains: {
     layer2: 'sokol' | 'xdai';
   };

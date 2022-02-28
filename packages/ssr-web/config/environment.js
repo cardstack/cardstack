@@ -10,6 +10,15 @@ const universalLinkHostnamesByTarget = {
   staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
+
+const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.space.localhost:4210';
+const CARD_SPACE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
+const CARD_SPACE_HOSTNAME_SUFFIX = '.card.xyz';
+
+const cardSpaceHostnameSuffixByTarget = {
+  staging: CARD_SPACE_STAGING_HOSTNAME_SUFFIX,
+  production: CARD_SPACE_HOSTNAME_SUFFIX,
+};
 const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
@@ -86,6 +95,9 @@ module.exports = function (environment) {
         '/.+.card.space.localhost:\\d+$/',
       ],
     },
+    cardSpaceHostnameSuffix:
+      cardSpaceHostnameSuffixByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
+      CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX,
     chains: {
       layer2:
         process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'xdai' : 'sokol',
