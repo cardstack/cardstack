@@ -26,9 +26,7 @@ export default class UserSpaceRoute extends Route {
           included: any[];
         } = await (
           await fetch(
-            `${config.hubURL || 'http://localhost:3000'}/api/card-spaces/${
-              this.appContext.cardSpaceId
-            }`,
+            `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
             {
               method: 'GET',
               headers: {

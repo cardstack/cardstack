@@ -27,7 +27,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
-    hubURL: process.env.HUB_URL || 'http://localhost:3000',
+    hubURL: process.env.HUB_URL,
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
@@ -94,7 +94,8 @@ module.exports = function (environment) {
 
   if (
     process.env.SSR_WEB_ENVIRONMENT !== 'production' &&
-    process.env.SSR_WEB_ENVIRONMENT !== 'staging'
+    process.env.SSR_WEB_ENVIRONMENT !== 'staging' &&
+    environment !== 'test'
   ) {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
