@@ -1,6 +1,6 @@
 import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
 import {
   field,
@@ -14,6 +14,7 @@ import {
   resolveNestedPath,
   expressionToSql,
   Expression,
+  separatedByCommas,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
@@ -119,6 +120,9 @@ export class CardService {
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
+      if (query.sort) {
+        expression = [...expression, 'order by', ...sortToExpression(query.sort)];
+      }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
     } finally {
@@ -222,6 +226,15 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   }
 
   throw unimpl('unknown');
+}
+
+function sortToExpression(sort: Sort): CardExpression {
+  let expressions: CardExpression[] = sort.map((s) => [
+    field([columnName('searchData')], s.on, s.by),
+    s.direction === 'desc' ? 'DESC' : 'ASC',
+  ]);
+
+  return separatedByCommas(expressions);
 }
 
 const pgComparisons: { [operator: string]: string } = {
