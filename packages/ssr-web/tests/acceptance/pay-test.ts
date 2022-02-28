@@ -117,8 +117,30 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('It displays merchant info correctly on iOS', async function (assert) {
-    let isIOSService = this.owner.lookup('service:is-ios');
-    sinon.stub(isIOSService, 'isIOS').returns(true);
+    let UAService = this.owner.lookup('service:ua');
+    sinon.stub(UAService, 'isIOS').returns(true);
+
+    await visit(`/pay/${network}/${merchantSafe.address}`);
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      )
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+
+    await percySnapshot(assert);
+  });
+
+  test('It displays merchant info correctly on Android', async function (assert) {
+    let UAService = this.owner.lookup('service:ua');
+    sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(`/pay/${network}/${merchantSafe.address}`);
     await waitFor(MERCHANT);
@@ -183,14 +205,7 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(
-        `meta[property='og:title'][content='${merchantName} requests payment']`,
-        document.documentElement
-      )
-      .exists();
-
-    assert
-      .dom(
-        `meta[name='twitter:title'][content='${merchantName} requests payment']`,
+        `meta[property='og:title'][content='Pay Business: ${merchantName}']`,
         document.documentElement
       )
       .exists();
@@ -198,33 +213,6 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(
         `meta[property='og:url'][content$='${expectedPath}']`,
-        document.documentElement
-      )
-      .exists();
-
-    assert
-      .dom(
-        `meta[name='twitter:url'][content$='${expectedPath}']`,
-        document.documentElement
-      )
-      .exists();
-
-    let amountInUSD = convertAmountToNativeDisplay(
-      spendToUsd(roundedSpendAmount)!,
-      'USD'
-    );
-    let description = `Pay ${amountInUSD}`;
-
-    assert
-      .dom(
-        `meta[property='og:description'][content$='${description}']`,
-        document.documentElement
-      )
-      .exists();
-
-    assert
-      .dom(
-        `meta[name='twitter:description'][content$='${description}']`,
         document.documentElement
       )
       .exists();
@@ -485,8 +473,48 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders the clickable link by default when in an iOS browser', async function (assert) {
-    let isIOSService = this.owner.lookup('service:is-ios');
-    sinon.stub(isIOSService, 'isIOS').returns(true);
+    let UAService = this.owner.lookup('service:ua');
+    sinon.stub(UAService, 'isIOS').returns(true);
+
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
+    );
+
+    assert
+      .dom(AMOUNT)
+      .containsText(
+        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
+      );
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
+
+    // assert that the deep link view is rendered
+    assert.dom(QR_CODE).doesNotExist();
+    assert
+      .dom(DEEP_LINK)
+      .containsText('Pay Business')
+      .hasAttribute(
+        'href',
+        generateMerchantPaymentUrl({
+          network,
+          merchantSafeID: merchantSafe.address,
+          currency: spendSymbol,
+          amount: spendAmount,
+        })
+      );
+    assert.dom(PAYMENT_URL).containsText(
+      generateMerchantPaymentUrl({
+        domain: universalLinkDomain,
+        network,
+        merchantSafeID: merchantSafe.address,
+        currency: spendSymbol,
+        amount: spendAmount,
+      })
+    );
+  });
+
+  test('it renders the clickable link by default when in an Android browser', async function (assert) {
+    let UAService = this.owner.lookup('service:ua');
+    sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`

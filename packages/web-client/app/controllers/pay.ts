@@ -9,7 +9,7 @@ import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { convertToSpend } from '@cardstack/cardpay-sdk';
 import { inject as service } from '@ember/service';
-import IsIOS from '../services/is-ios';
+import UA from '../services/ua';
 import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/web-client/config/environment';
@@ -18,7 +18,7 @@ import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYME
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 
 export default class PayController extends Controller {
-  @service('is-ios') declare isIOSService: IsIOS;
+  @service('ua') declare UAService: UA;
   queryParams = ['amount', 'currency'];
   @tracked amount: number = 0;
   @tracked currency: string = 'SPD';
@@ -27,7 +27,7 @@ export default class PayController extends Controller {
   }));
 
   get canDeepLink() {
-    return this.isIOSService.isIOS();
+    return this.UAService.isIOS() || this.UAService.isAndroid();
   }
   get cleanedAmounts() {
     if (!this.isValidAmount) {
