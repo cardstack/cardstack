@@ -261,7 +261,7 @@ app "ssr-web" {
             task_role_name = "ssr-web-staging-ecr-task"
 
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/4fb24826d0bb45b3"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/496043d250eb05f7"
             }
         }
 
@@ -272,7 +272,7 @@ app "ssr-web" {
 
         hook {
             when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "ssr-wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }
