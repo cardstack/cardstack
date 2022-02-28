@@ -34,7 +34,7 @@ export default class UserSpaceRoute extends Route {
         );
 
         if (response.status === 404) {
-          this.to404(
+          throw new Error(
             `404: Card Space not found for ${this.appContext.cardSpaceId}`
           );
         }
@@ -47,10 +47,7 @@ export default class UserSpaceRoute extends Route {
           (v) => v.type === 'merchant-infos'
         );
         if (!merchant) {
-          // TODO: replace with proper 404 somehow
-          // this 404 is for card space
-
-          this.to404(
+          throw new Error(
             `404: Card Space not found for ${this.appContext.cardSpaceId}`
           );
         }
@@ -90,17 +87,7 @@ export default class UserSpaceRoute extends Route {
         throw e;
       }
     } else {
-      // TODO: replace with proper 404 somehow
-      // this 404 is for wallet.
-      throw new Error('No such route!');
+      throw new Error("Oops! We couldn't find the page you were looking for");
     }
-  }
-
-  to404(message: string) {
-    if (this.fastboot.isFastBoot) {
-      this.fastboot.response.statusCode = 404;
-    }
-
-    throw new Error(message);
   }
 }
