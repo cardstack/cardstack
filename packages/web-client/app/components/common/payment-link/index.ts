@@ -1,3 +1,4 @@
+// TODO: remove when pay route is removed from web client
 import Component from '@glimmer/component';
 
 /**
