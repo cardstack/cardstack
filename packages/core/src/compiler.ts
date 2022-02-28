@@ -3,7 +3,10 @@ import { BabelFileResult, transformFromAstSync } from '@babel/core';
 import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
+import differenceWith from 'lodash/differenceWith';
 
+import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
 import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
 import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
 import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
@@ -13,11 +16,14 @@ import transformCardComponent, {
 import {
   Builder,
   CardId,
+  CardModule,
   CompiledCard,
   ComponentInfo,
+  FeatureFile,
   FEATURE_NAMES,
   Format,
   GlobalRef,
+  isFormat,
   LocalRef,
   ModuleRef,
   RawCard,
@@ -28,21 +34,12 @@ import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 import { hashCardFields } from './utils/fields';
-import babelPluginCardSerializerAnalyze from './babel-plugin-card-file-analyze';
 
 const BASE_CARD_ID: CardId = {
   realm: 'https://cardstack.com/base/',
   id: 'base',
 };
 export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
-
-function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined)[] {
-  let paths: (string | undefined)[] = [];
-  for (const feature of FEATURE_NAMES) {
-    paths.push(sourceCard[feature]);
-  }
-  return paths.filter(Boolean);
-}
 
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
@@ -69,8 +66,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
-
-    this.defineAssets();
 
     let parentCard;
 
@@ -124,33 +119,53 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private analyzeFiles() {
-    let { cardSource, modules } = this;
+    let { cardSource } = this;
     for (const localPath in cardSource.files) {
-      // TODO: IF not JS, define asset
-      // ELSE: Analyze file and create this.module entry
+      this.analyzeFile(localPath);
     }
   }
 
-  private defineAssets() {
-    let { cardSource, modules } = this;
+  private analyzeFile(localPath: string) {
+    let { cardSource } = this;
+    let source = this.getFile(cardSource, localPath);
+    let feature = this.getFeatureForFilePath(localPath);
 
-    if (!cardSource.files) {
+    // Skipping components so as to only defined hashed names
+    if (isFormat(feature)) {
       return;
     }
 
-    let assetPaths = difference(Object.keys(cardSource.files), getNonAssetFilePaths(cardSource));
-
-    for (const localModule of assetPaths) {
-      if (!localModule) {
-        continue;
-      }
-
-      let source = this.getFile(cardSource, localModule);
-      modules[localModule] = {
-        type: getFileType(localModule),
-        source,
-      };
+    if (feature === 'asset') {
+      this.defineAsset(localPath, source);
+      return;
     }
+
+    let options = {};
+    // TODO: Move schema analyze plugin into this one
+    let { code, ast, meta } = analyzeFileBabelPlugin(source, options);
+
+    this.modules[localPath] = {
+      type: JS_TYPE,
+      source: code!,
+      ast: ast!,
+      meta,
+    };
+  }
+
+  private defineAsset(localPath: string, source: string): void {
+    this.modules[localPath] = {
+      type: getFileType(localPath),
+      source,
+    };
+  }
+
+  private getFeatureForFilePath(localPath: string): FeatureFile {
+    for (const feature of FEATURE_NAMES) {
+      if (this.cardSource[feature] === localPath) {
+        return feature;
+      }
+    }
+    return 'asset';
   }
 
   private getCardParentPath(meta: PluginMeta): string | undefined {
@@ -196,6 +211,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`, { status: 422 });
     }
     return fileSrc;
+  }
+
+  private getModule(localPath: string): CardModule {
+    let module = this.modules[localPath];
+    if (!module) {
+      throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
+        status: 422,
+      });
+    }
+    return module;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
@@ -428,18 +453,27 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
       serializerRef = parentCard.serializerModule;
     } else if (serializer) {
-      serializerRef = { local: serializer };
-      let source = await this.getFile(this.cardSource, serializer);
+      let serializerModule = this.getModule(serializer);
+      this.validateSerializer(serializerModule.meta);
 
-      // TODO: Validate serializer
-      // babelPluginCardSerializerAnalyze(source);
-      this.modules[serializer] = {
-        type: JS_TYPE,
-        source,
-      };
+      serializerRef = { local: serializer };
     }
 
     return serializerRef;
+  }
+
+  private validateSerializer(meta?: FileMeta) {
+    const EXPECTED_EXPORTS: ExportMeta[] = [
+      { name: 'serialize', type: 'FunctionDeclaration' },
+      { name: 'deserialize', type: 'FunctionDeclaration' },
+    ];
+    let diff = differenceWith(EXPECTED_EXPORTS, meta?.exports || [], isEqual);
+    if (diff.length) {
+      throw new CardstackError(
+        `Serializer is malformed. It is missing the following exports: ${diff.map((d) => d.name).join(', ')}`,
+        { status: 422 }
+      );
+    }
   }
 }
 

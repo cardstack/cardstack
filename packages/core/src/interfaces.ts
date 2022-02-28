@@ -2,6 +2,7 @@ import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { keys } from './utils';
+import { FileMeta } from './babel-plugin-card-file-analyze';
 
 export { Query } from './query';
 
@@ -21,7 +22,7 @@ const featureNamesMap = {
   schema: '',
   serializer: '',
 };
-export type FeatureFile = keyof typeof featureNamesMap & Format;
+export type FeatureFile = keyof typeof featureNamesMap | Format | 'asset';
 export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
 export type SerializerMap = Record<string, PrimitiveSerializer>;
@@ -117,13 +118,14 @@ export type Unsaved = string | undefined;
 
 export type CardModules = Record<
   string, // local module path
-  {
-    feature: FeatureFile | 'asset';
-    type: string;
-    source: string;
-    ast?: t.File;
-  }
+  CardModule
 >;
+export interface CardModule {
+  type: string;
+  source: string;
+  ast?: t.File;
+  meta?: FileMeta;
+}
 
 // CompiledCard is everything you need when operating at the level of code &
 // schema changes. It should not be needed just to render and edit data of

@@ -356,7 +356,7 @@ if (process.env.COMPILER) {
           });
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
-          expect(err.message).to.include(`card refers to serializer.js in its card.json but that file does not exist`);
+          expect(err.message).to.include(`card requested a module at 'serializer.js' but it was not found`);
           expect(err.status).to.eq(422);
         }
       });
@@ -376,7 +376,7 @@ if (process.env.COMPILER) {
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
           expect(err.message).to.include(`Serializer is malformed. It is missing the following exports: deserialize`);
-          expect(err.status).to.eq(400);
+          expect(err.status).to.eq(422);
         }
       });
     });

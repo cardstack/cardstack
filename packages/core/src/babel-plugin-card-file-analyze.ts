@@ -5,6 +5,11 @@ import { NodePath } from '@babel/traverse';
 import { name } from './utils/babel';
 import { augmentBadRequest } from './utils/errors';
 
+// @ts-ignore
+import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
+// @ts-ignore
+import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
+
 interface State {
   opts: any;
 }
@@ -36,7 +41,11 @@ export default function (
   try {
     out = transformSync(source, {
       ast: true,
-      plugins: [[babelPluginCardFileAnalyze, options]],
+      plugins: [
+        [babelPluginCardFileAnalyze, options],
+        [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
+        classPropertiesSyntaxPlugin,
+      ],
     })!;
   } catch (error: any) {
     throw augmentBadRequest(error);
