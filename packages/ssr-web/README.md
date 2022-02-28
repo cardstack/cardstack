@@ -35,7 +35,7 @@ This app is actually two apps in one:
 1. Wallet (Universal Link): An app that hosts a page for folks to request payments from others (wallet.cardstack.com), and acts as a fallback for the universal link.
 2. Card Space: An app to view profiles of businesses.
 
-The fastboot server differentiates which app is being served via host. We follow this behaviour in local development, matching the `.card.space.localhost:4210` suffix to recognize a request's intention to visit card space. When developing locally, you can view a user's Card Space at `${businessId}.card.space.localhost:4210`. 
+The fastboot server differentiates which app is being served via host. We follow this behaviour in local development, matching the `.card.space.localhost:4210` suffix to recognize a request's intention to visit card space. When developing locally, you can view a user's Card Space at `${businessId}.card.space.localhost:4210`.  Requests that do not match this pattern will be treated as intending to visit the wallet domain.
 
 **IMPORTANT: This does not work on Safari, only Firefox and Chrome. Instructions for Safari setup below.**
 
