@@ -69,12 +69,13 @@
   padding: var(--boxel-sp) var(--boxel-sp-xxxl);
   background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
   background-repeat: no-repeat;
-  background-position: left var(--boxel-sp) top var(--boxel-sp-xxl);
+  background-position: left var(--boxel-sp) center;
   background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
 }
 
 .card-picker-dropdown__option--selected {
   background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
+  background-color: var(--boxel-purple-100);
 }
 
 .ember-power-select-selected-item .card-picker-dropdown__option--selected {

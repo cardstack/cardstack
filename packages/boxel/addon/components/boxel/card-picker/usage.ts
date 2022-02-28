@@ -1,6 +1,7 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { A } from '@ember/array';
 
 const CARDS = [
   {
@@ -24,7 +25,7 @@ const CARDS = [
 ];
 
 export default class extends Component {
-  cards = CARDS;
+  @tracked cards = A(CARDS);
   @tracked selectedCard: Record<string, unknown> | null = null;
 
   @action chooseCard(c: Record<string, unknown> | null): void {
