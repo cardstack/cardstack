@@ -170,7 +170,7 @@ module('Integration | Card Rendering', function (hooks) {
     await renderCard({ id: 'bob' }, 'edit');
     await fillIn('[data-test-field-name]', 'Kirito');
     await waitUntil(() =>
-      find('[data-test-field=loudFoodPref]')!.textContent?.includes(
+      find('[data-test-field=loudFoodPref]')?.textContent?.includes(
         'Kirito likes pizza!'
       )
     );
