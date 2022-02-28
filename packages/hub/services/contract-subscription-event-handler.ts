@@ -3,6 +3,7 @@ import { AddressKeys } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 
 import logger from '@cardstack/logger';
+import { query } from '@cardstack/hub/queries';
 const log = logger('hub/contract-subscription-event-handler');
 
 export const HISTORIC_BLOCKS_AVAILABLE = 10000;
@@ -26,9 +27,7 @@ export class ContractSubscriptionEventHandler {
   contracts = inject('contracts', { as: 'contracts' });
   web3 = inject('web3-socket', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
-  latestEventBlockQueries = inject('latest-event-block-queries', {
-    as: 'latestEventBlockQueries',
-  });
+  latestEventBlockQueries = query('latest-event-block', { as: 'latestEventBlockQueries' });
 
   async setupContractEventSubscriptions() {
     let web3Instance = this.web3.getInstance();

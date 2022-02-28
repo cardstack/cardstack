@@ -1033,5 +1033,43 @@
         "${config:cardCli.mnemonic}"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Resolve DID",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "did",
+        "resolve",
+        "did:cardstack:1pwbxree12ndgdW5BzyzjZUJ42157a9ad8301f6d",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Resolve DID alsoKnownAs",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "did",
+        "resolve-aka",
+        "did:cardstack:1pwbxree12ndgdW5BzyzjZUJ42157a9ad8301f6d",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
   ]
 }

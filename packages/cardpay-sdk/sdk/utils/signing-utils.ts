@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { Estimate, SendPayload, Operation } from './safe-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 

@@ -1,15 +1,14 @@
 import { Helpers } from 'graphile-worker';
-import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
-import MerchantInfoQueries from '../services/queries/merchant-info';
+import { query } from '../queries';
 
 export default class PersistOffChainMerchantInfo {
-  merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
+  merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+  merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
 

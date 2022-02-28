@@ -89,7 +89,7 @@ export default class LocalRealm implements Builder {
     let { compiled, raw } = await this.load(url);
 
     let componentModule = await this.cards.loadModule<CardComponentModule>(
-      compiled.componentInfos[format].moduleName.global
+      compiled.componentInfos[format].componentModule.global
     );
 
     // TODO we can optimize this structure in our CardModelForBrowser now that
@@ -100,7 +100,7 @@ export default class LocalRealm implements Builder {
       attributes: raw.data,
       meta: {
         schemaModule: compiled.schemaModule.global,
-        componentModule: compiled.componentInfos[format].moduleName.global,
+        componentModule: compiled.componentInfos[format].componentModule.global,
       },
     };
     let model = new CardModelForBrowser(
@@ -108,7 +108,7 @@ export default class LocalRealm implements Builder {
       {
         type: 'loaded',
         url,
-        rawServerResponse,
+        rawData: rawServerResponse,
         componentModule,
         schemaModuleId: compiled.schemaModule.global,
         format,

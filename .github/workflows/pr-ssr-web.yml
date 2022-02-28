@@ -44,4 +44,4 @@ jobs:
         if: always()
         with:
           check_name: 'ssr-web test results'
-          files: test-results/**/*.xml
+          files: ci-xml-test-results/ssr-web.xml

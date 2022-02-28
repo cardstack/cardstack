@@ -3,11 +3,10 @@ import { BabelFileResult, transformFromAstSync } from '@babel/core';
 import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
-import reduce from 'lodash/reduce';
-import md5 from 'md5';
 
 import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
 import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
+import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
@@ -27,11 +26,13 @@ import {
 import { ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
+import { hashCardFields } from './utils/fields';
+import babelPluginCardSerializerAnalyze from './babel-plugin-card-serializer-analyze';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
 function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined)[] {
-  let paths: string[] = [];
+  let paths: (string | undefined)[] = [];
   for (const feature of FEATURE_NAMES) {
     paths.push(sourceCard[feature]);
   }
@@ -41,10 +42,12 @@ function getNonAssetFilePaths(sourceCard: RawCard<Unsaved>): (string | undefined
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
+  private modules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
+    this.modules = {};
   }
 
   get dependencies(): Set<string> {
@@ -53,22 +56,20 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let options = {};
-    let modules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
     let { cardSource } = this;
-    let schemaModule: ModuleRef | undefined = this.analyzeSchema(cardSource, options, modules);
+    let schemaModule: ModuleRef | undefined = this.analyzeSchema(options);
     let meta = getMeta(options);
 
     let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
 
-    this.defineAssets(cardSource, modules);
+    this.defineAssets();
 
     let parentCard;
-    let serializer = cardSource.deserializer;
 
     if (isBaseCard(cardSource)) {
       schemaModule = { global: 'todo' };
     } else {
-      parentCard = await this.getParentCard(cardSource, meta);
+      parentCard = await this.getParentCard(meta);
 
       if (!parentCard) {
         throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
@@ -84,21 +85,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
 
       if (schemaModule) {
-        this.prepareSchema(schemaModule, meta, fields, parentCard, modules);
+        this.prepareSchema(schemaModule, meta, fields, parentCard);
       } else {
         schemaModule = parentCard.schemaModule;
       }
 
       fields = this.adoptFields(fields, parentCard);
-
-      if (parentCard.serializer) {
-        if (serializer && parentCard.serializer !== serializer) {
-          throw new CardstackError(
-            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
-          );
-        }
-        serializer = parentCard.serializer;
-      }
     }
 
     if (cardSource.data) {
@@ -108,32 +100,36 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
-    return {
+    let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
-      serializer,
       schemaModule,
+      serializerModule: await this.getSerializer(parentCard),
       fields,
       adoptsFrom: parentCard,
-      componentInfos: await this.prepareComponents(cardSource, fields, parentCard, modules),
-      modules,
+      componentInfos: await this.prepareComponents(fields, parentCard),
+      modules: this.modules,
       deps: [...this.dependencies],
     };
+
+    return compiledCard;
   }
 
-  private defineAssets(sourceCard: RawCard<Unsaved> | RawCard, modules: CompiledCard['modules']) {
-    if (!sourceCard.files) {
+  private defineAssets() {
+    let { cardSource, modules } = this;
+
+    if (!cardSource.files) {
       return;
     }
 
-    let assetPaths = difference(Object.keys(sourceCard.files), getNonAssetFilePaths(sourceCard));
+    let assetPaths = difference(Object.keys(cardSource.files), getNonAssetFilePaths(cardSource));
 
     for (const localModule of assetPaths) {
       if (!localModule) {
         continue;
       }
 
-      let source = this.getFile(sourceCard, localModule);
+      let source = this.getFile(cardSource, localModule);
       modules[localModule] = {
         type: getFileType(localModule),
         source,
@@ -141,15 +137,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private getCardParentPath(cardSource: RawCard<Unsaved>, meta: PluginMeta): string | undefined {
+  private getCardParentPath(meta: PluginMeta): string | undefined {
     let parentPath;
-    let { adoptsFrom, realm, id } = cardSource;
+    let { adoptsFrom, realm, id } = this.cardSource;
 
     if (adoptsFrom) {
       if (id != null && `${realm}${id}` === adoptsFrom) {
         throw new Error(`BUG: ${realm}${id} provides itself as its parent. That should not happen.`);
       }
-      parentPath = cardSource.adoptsFrom;
+      parentPath = adoptsFrom;
     }
 
     if (meta.parent && meta.parent.cardURL) {
@@ -162,8 +158,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return parentPath;
   }
 
-  private async getParentCard(cardSource: RawCard<Unsaved>, meta: PluginMeta): Promise<CompiledCard> {
-    let parentCardPath = this.getCardParentPath(cardSource, meta);
+  private async getParentCard(meta: PluginMeta): Promise<CompiledCard> {
+    let { cardSource } = this;
+    let parentCardPath = this.getCardParentPath(meta);
     let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : baseCardURL;
     try {
       return await this.builder.getCompiledCard(url);
@@ -180,7 +177,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private getFile(cardSource: RawCard<Unsaved>, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`);
+      throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`, { status: 422 });
     }
     return fileSrc;
   }
@@ -188,11 +185,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private analyzeSchema(
-    cardSource: RawCard<Unsaved>,
-    options: any,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
-  ): LocalRef | undefined {
+  private analyzeSchema(options: any): LocalRef | undefined {
+    let { cardSource, modules } = this;
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -216,9 +210,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     schemaModule: LocalRef,
     meta: PluginMeta,
     fields: CompiledCard['fields'],
-    parent: CompiledCard,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    parent: CompiledCard
   ) {
+    let { modules } = this;
     let { source, ast } = modules[schemaModule.local];
     if (!ast) {
       throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
@@ -279,25 +273,22 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private async prepareComponents(
-    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard | undefined,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    parentCard: CompiledCard | undefined
   ): Promise<CompiledCard<Unsaved, ModuleRef>['componentInfos']> {
     return {
-      isolated: await this.prepareComponent(cardSource, fields, parentCard, 'isolated', modules),
-      embedded: await this.prepareComponent(cardSource, fields, parentCard, 'embedded', modules),
-      edit: await this.prepareComponent(cardSource, fields, parentCard, 'edit', modules),
+      isolated: await this.prepareComponent(fields, parentCard, 'isolated'),
+      embedded: await this.prepareComponent(fields, parentCard, 'embedded'),
+      edit: await this.prepareComponent(fields, parentCard, 'edit'),
     };
   }
 
   private async prepareComponent(
-    cardSource: RawCard<Unsaved>,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
-    which: Format,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    which: Format
   ): Promise<ComponentInfo<ModuleRef>> {
+    let { cardSource, modules } = this;
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
@@ -366,45 +357,78 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     format: Format,
     modules: CompiledCard<Unsaved, LocalRef>['modules']
   ): Promise<ComponentInfo<LocalRef>> {
+    let fieldsHash = hashCardFields(fields);
+    let componentModule = appendToFilename(localFile, '-' + fieldsHash);
+    let metaModuleFileName = appendToFilename(componentModule, '__meta');
+
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
+      metaModulePath: './' + metaModuleFileName,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
-      serializerMap: {},
     };
 
-    let { source, ast } = transformCardComponent(templateSource, options);
-    let moduleName = hashFilenameFromFields(localFile, fields);
-    modules[moduleName] = {
+    let componentTransformResult = transformCardComponent(templateSource, options);
+    modules[componentModule] = {
       type: JS_TYPE,
-      source,
-      ast,
+      source: componentTransformResult.source,
+      ast: componentTransformResult.ast,
     };
+
+    let metaOptions: CardComponentMetaPluginOptions = {
+      debugPath: debugPath + '__meta',
+      fields: options.fields,
+      usedFields: options.usedFields,
+      serializerMap: {},
+    };
+    let componentMetaResult = generateComponentMeta(metaOptions);
+    modules[metaModuleFileName] = {
+      type: JS_TYPE,
+      source: componentMetaResult.source,
+      ast: componentMetaResult.ast,
+    };
+
     let componentInfo: ComponentInfo<LocalRef> = {
-      moduleName: { local: moduleName },
+      componentModule: { local: componentModule },
+      metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
-      serializerMap: options.serializerMap,
     };
 
     return componentInfo;
   }
+
+  private async getSerializer(parentCard: CompiledCard | undefined): Promise<ModuleRef | undefined> {
+    let serializerRef: ModuleRef | undefined;
+    let { serializer } = this.cardSource;
+
+    if (parentCard?.serializerModule) {
+      if (serializer) {
+        throw new CardstackError(
+          `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializerModule.global}`
+        );
+      }
+      serializerRef = parentCard.serializerModule;
+    } else if (serializer) {
+      serializerRef = { local: serializer };
+      let source = await this.getFile(this.cardSource, serializer);
+
+      babelPluginCardSerializerAnalyze(source);
+      this.modules[serializer] = {
+        type: JS_TYPE,
+        source,
+      };
+    }
+
+    return serializerRef;
+  }
 }
 
-function hashFilenameFromFields(localFile: string, fields: CompiledCard['fields']): string {
-  let { basename, extension } = getBasenameAndExtension(localFile);
-  let hash = md5(
-    reduce(
-      fields,
-      (result, f, name) => {
-        return (result += name + f.card.url);
-      },
-      ''
-    )
-  );
-  return `${basename}-${hash}${extension}`;
+function appendToFilename(filename: string, toAppend: string): string {
+  let { basename, extension } = getBasenameAndExtension(filename);
+  return `${basename}${toAppend}${extension}`;
 }
 
 function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
@@ -439,8 +463,14 @@ export function makeGloballyAddressable(
   let localToGlobal = new Map<string, string>();
 
   for (let [localPath, { type, source, ast }] of Object.entries(card.modules)) {
-    let globalRef = define(localPath, type, source, ast);
-    localToGlobal.set(localPath, globalRef);
+    try {
+      let globalRef = define(localPath, type, source, ast);
+      localToGlobal.set(localPath, globalRef);
+    } catch (error: any) {
+      let newError = new CardstackError(`Failed to globally define module for path: ${localPath}`);
+      newError.additionalErrors = [error];
+      throw newError;
+    }
   }
 
   function ensureGlobal(ref: ModuleRef): GlobalRef {
@@ -456,11 +486,11 @@ export function makeGloballyAddressable(
 
   function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
     return {
-      moduleName: ensureGlobal(info.moduleName),
+      componentModule: ensureGlobal(info.componentModule),
+      metaModule: ensureGlobal(info.metaModule),
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,
-      serializerMap: info.serializerMap,
     };
   }
 
@@ -470,7 +500,7 @@ export function makeGloballyAddressable(
     adoptsFrom: card.adoptsFrom,
     fields: card.fields,
     schemaModule: ensureGlobal(card.schemaModule),
-    serializer: card.serializer,
+    serializerModule: card.serializerModule ? ensureGlobal(card.serializerModule) : undefined,
     componentInfos: {
       isolated: ensureGlobalComponentInfo(card.componentInfos.isolated),
       embedded: ensureGlobalComponentInfo(card.componentInfos.embedded),

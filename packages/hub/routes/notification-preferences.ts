@@ -2,11 +2,10 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import { ensureLoggedIn } from './utils/auth';
-import NotificationTypeQueries from '../services/queries/notification-type';
-import NotificationPreferenceQueries from '../services/queries/notification-preference';
 import NotificationPreferenceSerializer from '../services/serializers/notification-preference-serializer';
 import { serializeErrors } from './utils/error';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
+import { query } from '@cardstack/hub/queries';
 
 export interface NotificationType {
   id: string;
@@ -23,12 +22,8 @@ export interface NotificationPreference {
 
 export default class NotificationPreferencesRoute {
   authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  notificationTypeQueries: NotificationTypeQueries = inject('notification-type-queries', {
-    as: 'notificationTypeQueries',
-  });
-  notificationPreferenceQueries: NotificationPreferenceQueries = inject('notification-preference-queries', {
-    as: 'notificationPreferenceQueries',
-  });
+  notificationTypeQueries = query('notification-type', { as: 'notificationTypeQueries' });
+  notificationPreferenceQueries = query('notification-preference', { as: 'notificationPreferenceQueries' });
   notificationPreferenceSerializer: NotificationPreferenceSerializer = inject('notification-preference-serializer', {
     as: 'notificationPreferenceSerializer',
   });

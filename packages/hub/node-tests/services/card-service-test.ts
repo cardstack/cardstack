@@ -17,6 +17,7 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
             export default class Person {
               @contains(string) name;
+              @contains(string) lname;
             }
           `,
         },
@@ -102,6 +103,9 @@ if (process.env.COMPILER) {
           body: 'second post.',
           createdAt: new Date(2020, 0, 1),
           views: 5,
+          author: {
+            name: 'Ed',
+          },
         },
       });
 
@@ -114,8 +118,12 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import person from "../person";
-            export default class Post {
+            import integer from "https://cardstack.com/base/integer";
+            import date from "https://cardstack.com/base/date";
+            export default class Book {
               @contains(person) author;
+              @contains(integer) editions;
+              @contains(date) publishedAt;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate('<@field.author.name />'),
@@ -129,7 +137,52 @@ if (process.env.COMPILER) {
         data: {
           author: {
             name: 'Sue',
+            lname: 'F',
           },
+          editions: 4,
+          publishedAt: new Date(2018, 4, 30),
+        },
+      });
+
+      await cards.create({
+        realm: realmURL,
+        id: 'book1',
+        adoptsFrom: '../book',
+        data: {
+          author: {
+            name: 'Beste',
+            lname: 'N',
+          },
+          editions: 3,
+          publishedAt: new Date(2021, 12, 31),
+        },
+      });
+
+      await cards.create({
+        realm: realmURL,
+        id: 'book2',
+        adoptsFrom: '../book',
+        data: {
+          author: {
+            name: 'Burcu',
+            lname: 'N',
+          },
+          editions: 2,
+          publishedAt: new Date(2022, 1, 1),
+        },
+      });
+
+      await cards.create({
+        realm: realmURL,
+        id: 'book3',
+        adoptsFrom: '../book0',
+        data: {
+          author: {
+            name: 'Ed',
+            lname: 'F',
+          },
+          editions: 4,
+          publishedAt: new Date(2020, 5, 15),
         },
       });
     });
@@ -245,6 +298,226 @@ if (process.env.COMPILER) {
           },
         });
         expect(matching.map((m) => m.url)).to.have.members([`${realmURL}post0`, `${realmURL}book0`]);
+      });
+
+      it(`can sort in alphabetical order`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book1`, // Beste
+          `${realmURL}book2`, // Burcu
+          `${realmURL}book3`, // Ed
+          `${realmURL}book0`, // Sue
+        ]);
+      });
+
+      it(`can sort in reverse alphabetical order`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // Sue
+          `${realmURL}book3`, // Ed
+          `${realmURL}book2`, // Burcu
+          `${realmURL}book1`, // Beste
+        ]);
+      });
+
+      it(`can sort by multiple string field conditions`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book3`, // Ed F
+          `${realmURL}book0`, // Sue F
+          `${realmURL}book1`, // Beste N
+          `${realmURL}book2`, // Burcu N
+        ]);
+      });
+
+      it(`can sort by multiple string field conditions in given directions`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+              direction: 'asc',
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // Sue F
+          `${realmURL}book3`, // Ed F
+          `${realmURL}book2`, // Burcu N
+          `${realmURL}book1`, // Beste N
+        ]);
+      });
+
+      it(`can sort by integer value`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'createdAt',
+              on: `${realmURL}post`,
+            },
+          ],
+          filter: {
+            type: `${realmURL}post`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}post0`, // 10
+          `${realmURL}post1`, // 5
+        ]);
+      });
+
+      it(`can sort by date`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'publishedAt',
+              on: `${realmURL}book`,
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // 2020-04-30
+          `${realmURL}book3`, // 2020-05-15
+          `${realmURL}book1`, // 2021-12-31
+          `${realmURL}book2`, // 2022-01-01
+        ]);
+      });
+
+      it(`can sort by mixed field types`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+            {
+              by: 'editions',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'publishedAt',
+              on: `${realmURL}book`,
+            },
+          ],
+          filter: {
+            type: `${realmURL}book`,
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book2`, // N 2 2022
+          `${realmURL}book1`, // N 3 2021
+          `${realmURL}book0`, // F 4 2020-04-30
+          `${realmURL}book3`, // F 4 2020-05-15
+        ]);
+      });
+
+      it(`can sort on multiple paths in combination with 'any' filter`, async function () {
+        let matching = await cards.query('embedded', {
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}post`,
+            },
+          ],
+          filter: {
+            any: [{ type: `${realmURL}book` }, { type: `${realmURL}post` }],
+          },
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book1`, // Beste
+          `${realmURL}book2`, // Burcu
+          `${realmURL}book3`, // Ed
+          `${realmURL}book0`, // Sue
+          `${realmURL}post1`, // Ed
+          `${realmURL}post0`, // Sue
+        ]);
+      });
+
+      it(`can sort on multiple paths in combination with 'every' filter`, async function () {
+        let matching = await cards.query('embedded', {
+          filter: {
+            every: [
+              {
+                type: `${realmURL}book`,
+              },
+              {
+                on: `${realmURL}book`,
+                not: {
+                  eq: {
+                    'author.name': 'Burcu',
+                  },
+                },
+              },
+            ],
+          },
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book0`,
+              direction: 'desc',
+            },
+          ],
+        });
+        expect(matching.map((m) => m.url)).to.deep.equal([
+          `${realmURL}book0`, // F Sue
+          `${realmURL}book3`, // F Ed
+          `${realmURL}book1`, // N null
+        ]);
       });
     });
 

@@ -164,7 +164,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   private async storeMeta(): Promise<void> {
-    log.trace('Storing meta');
+    log.trace('IndexerRun: Storing meta', this.realmURL);
     await this.db.query(
       expressionToSql(
         upsert('realm_metas', 'realm_metas_pkey', { realm: param(this.realmURL), meta: param(this.newMeta) })
@@ -173,6 +173,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   async finalize() {
+    log.trace('IndexerRun: Finalize', this.realmURL);
     await this.possiblyInvalidatedCards(async (cardURL: string, deps: string[], raw: RawCard) => {
       if (!this.isValid(cardURL, deps)) {
         log.trace(`reindexing %s because %s`, cardURL, deps);
@@ -254,6 +255,10 @@ class IndexerRun implements IndexerHandle {
       this.define(cardURL(rawCard), local, type, src, ast)
     );
     let format: Format = 'isolated';
+
+    let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
+    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+
     let cardModel = await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: rawCard.id,
@@ -261,9 +266,8 @@ class IndexerRun implements IndexerHandle {
       format,
       rawData: rawCard.data ?? {},
       schemaModule: definedCard.schemaModule.global,
-      usedFields: definedCard.componentInfos[format].usedFields,
-      componentModule: definedCard.componentInfos[format].moduleName.global,
-      serializerMap: definedCard.componentInfos[format].serializerMap,
+      componentModule: definedCard.componentInfos[format].componentModule.global,
+      componentMeta,
     });
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
@@ -454,7 +458,7 @@ function wrapCompiledCard(compiled: CompiledCard, raw: RawCard, url: string): Co
     adoptsFrom: compiled,
     fields: compiled.fields,
     schemaModule: compiled.schemaModule,
-    serializer: compiled.serializer,
+    serializerModule: compiled.serializerModule,
     componentInfos: compiled.componentInfos,
     modules: compiled.modules,
     deps: [...compiled.deps, compiled.url],

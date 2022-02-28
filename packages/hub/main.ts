@@ -52,15 +52,12 @@ import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoService from './services/merchant-info';
-import MerchantInfoQueries from './services/queries/merchant-info';
-import CardSpaceQueries from './services/queries/card-space';
 import CardSpaceSerializer from './services/serializers/card-space-serializer';
 import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
 import Upload from './routes/upload';
-import UploadQueries from './services/queries/upload';
 import NonceTracker from './services/nonce-tracker';
 import ReservedWords from './services/reserved-words';
 import CardpaySDKService from './services/cardpay-sdk';
@@ -77,17 +74,12 @@ import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationQueries from './services/queries/push-notification-registration';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
 import Contracts from './services/contracts';
-import LatestEventBlockQueries from './services/queries/latest-event-block';
-import NotificationTypeQueries from './services/queries/notification-type';
-import NotificationPreferenceQueries from './services/queries/notification-preference';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
 import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
-import SentPushNotificationsQueries from './services/queries/sent-push-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import WyreTransferTask from './tasks/wyre-transfer';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
@@ -97,6 +89,7 @@ import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
+import { registerQueries } from './queries';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -125,16 +118,13 @@ export function createRegistry(): Registry {
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('upload-router', UploadRouter);
   registry.register('upload', Upload);
-  registry.register('upload-queries', UploadQueries);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
-  registry.register('latest-event-block-queries', LatestEventBlockQueries);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
-  registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
@@ -152,15 +142,11 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('card-space-serializer', CardSpaceSerializer);
   registry.register('card-space-validator', CardSpaceValidator);
-  registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
-  registry.register('push-notification-registration-queries', PushNotificationRegistrationQueries);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
-  registry.register('notification-type-queries', NotificationTypeQueries);
   registry.register('notification-preferences-route', NotificationPreferencesRoute);
-  registry.register('notification-preference-queries', NotificationPreferenceQueries);
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
@@ -168,7 +154,6 @@ export function createRegistry(): Registry {
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
-  registry.register('sent-push-notifications-queries', SentPushNotificationsQueries);
   registry.register('subgraph', SubgraphService);
   registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
@@ -194,6 +179,7 @@ export function createRegistry(): Registry {
 
   registerServices(registry);
   registerRoutes(registry);
+  registerQueries(registry);
 
   return registry;
 }

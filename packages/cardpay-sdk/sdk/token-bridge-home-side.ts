@@ -10,7 +10,12 @@ import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } 
 import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTx } from './utils/signing-utils';
 import { query } from './utils/graphql';
-import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from './utils/general-utils';
+import {
+  TransactionOptions,
+  waitForSubgraphIndexWithTxnReceipt,
+  isTransactionHash,
+  waitUntilTransactionMined,
+} from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -236,12 +241,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     let {
       transaction: { id: txnHash },
     } = receivedBridgedTokens[0];
-    let receipt = await this.layer2Web3.eth.getTransactionReceipt(txnHash);
-    if (receipt.status === true) {
-      return receipt as SuccessfulTransactionReceipt;
-    } else {
-      throw new Error(`Transaction with hash "${txnHash}" was reverted`);
-    }
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 }
 

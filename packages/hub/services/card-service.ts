@@ -1,6 +1,6 @@
 import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
 import {
   field,
@@ -14,6 +14,7 @@ import {
   resolveNestedPath,
   expressionToSql,
   Expression,
+  separatedByCommas,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
@@ -35,6 +36,7 @@ export default class CardServiceFactory {
 
 export class CardService {
   private realmManager = service('realm-manager', { as: 'realmManager' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private builder = service('card-builder', { as: 'builder' });
   private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
@@ -118,6 +120,9 @@ export class CardService {
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
+      if (query.sort) {
+        expression = [...expression, 'order by', ...sortToExpression(query.sort)];
+      }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
       return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
     } finally {
@@ -127,6 +132,10 @@ export class CardService {
 
   private async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
     let cardId = this.realmManager.parseCardURL(result.url);
+
+    let componentMetaModule = result.componentInfos[format].metaModule.global;
+    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+
     return await getOwner(this).instantiate(CardModelForHub, {
       type: 'loaded',
       id: cardId.id,
@@ -134,9 +143,8 @@ export class CardService {
       format,
       rawData: result.data ?? {},
       schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      serializerMap: result.componentInfos[format].serializerMap,
+      componentModule: result.componentInfos[format].componentModule.global,
+      componentMeta,
     });
   }
 
@@ -218,6 +226,15 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   }
 
   throw unimpl('unknown');
+}
+
+function sortToExpression(sort: Sort): CardExpression {
+  let expressions: CardExpression[] = sort.map((s) => [
+    field([columnName('searchData')], s.on, s.by),
+    s.direction === 'desc' ? 'DESC' : 'ASC',
+  ]);
+
+  return separatedByCommas(expressions);
 }
 
 const pgComparisons: { [operator: string]: string } = {
