@@ -302,10 +302,12 @@ if (process.env.COMPILER) {
 
       it(`can sort in alphabetical order`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: 'author.name',
-            on: `${realmURL}book`,
-          },
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -320,11 +322,13 @@ if (process.env.COMPILER) {
 
       it(`can sort in reverse alphabetical order`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: 'author.name',
-            on: `${realmURL}book`,
-            direction: 'desc',
-          },
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -339,10 +343,16 @@ if (process.env.COMPILER) {
 
       it(`can sort by multiple string field conditions`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: ['author.lname', 'author.name'],
-            on: [`${realmURL}book`, `${realmURL}book`],
-          },
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -357,11 +367,18 @@ if (process.env.COMPILER) {
 
       it(`can sort by multiple string field conditions in given directions`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: ['author.lname', 'author.name'],
-            on: [`${realmURL}book`, `${realmURL}book`],
-            direction: ['asc', 'desc'],
-          },
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+              direction: 'asc',
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -376,10 +393,12 @@ if (process.env.COMPILER) {
 
       it(`can sort by integer value`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: 'createdAt',
-            on: `${realmURL}post`,
-          },
+          sort: [
+            {
+              by: 'createdAt',
+              on: `${realmURL}post`,
+            },
+          ],
           filter: {
             type: `${realmURL}post`,
           },
@@ -392,10 +411,12 @@ if (process.env.COMPILER) {
 
       it(`can sort by date`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: 'publishedAt',
-            on: `${realmURL}book`,
-          },
+          sort: [
+            {
+              by: 'publishedAt',
+              on: `${realmURL}book`,
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -410,11 +431,21 @@ if (process.env.COMPILER) {
 
       it(`can sort by mixed field types`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: ['author.lname', 'editions', 'publishedAt'],
-            on: [`${realmURL}book`, `${realmURL}book`, `${realmURL}book`],
-            direction: ['desc'],
-          },
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+              direction: 'desc',
+            },
+            {
+              by: 'editions',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'publishedAt',
+              on: `${realmURL}book`,
+            },
+          ],
           filter: {
             type: `${realmURL}book`,
           },
@@ -429,10 +460,16 @@ if (process.env.COMPILER) {
 
       it(`can sort on multiple paths in combination with 'any' filter`, async function () {
         let matching = await cards.query('embedded', {
-          sort: {
-            by: ['author.name', 'author.name'],
-            on: [`${realmURL}book`, `${realmURL}post`],
-          },
+          sort: [
+            {
+              by: 'author.name',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}post`,
+            },
+          ],
           filter: {
             any: [{ type: `${realmURL}book` }, { type: `${realmURL}post` }],
           },
@@ -464,11 +501,17 @@ if (process.env.COMPILER) {
               },
             ],
           },
-          sort: {
-            by: ['author.lname', 'author.name'],
-            on: [`${realmURL}book`, `${realmURL}book0`],
-            direction: ['asc', 'desc'],
-          },
+          sort: [
+            {
+              by: 'author.lname',
+              on: `${realmURL}book`,
+            },
+            {
+              by: 'author.name',
+              on: `${realmURL}book0`,
+              direction: 'desc',
+            },
+          ],
         });
         expect(matching.map((m) => m.url)).to.deep.equal([
           `${realmURL}book0`, // F Sue

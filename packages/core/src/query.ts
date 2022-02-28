@@ -18,13 +18,13 @@ export interface TypedFilter {
   on?: CardURL;
 }
 
-type SortDirection = 'asc' | 'desc';
-
-export interface Sort {
-  by: string | string[];
-  on: CardURL | CardURL[];
-  direction?: SortDirection | SortDirection[];
+interface SortExpression {
+  by: string;
+  on: CardURL;
+  direction?: 'asc' | 'desc';
 }
+
+export type Sort = SortExpression[];
 
 // The CardTypeFilter is used when you solely want to filter for all cards that
 // adopt from some particular card type--no other predicates are included in
