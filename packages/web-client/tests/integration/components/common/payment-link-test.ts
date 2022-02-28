@@ -52,7 +52,7 @@ module('Integration | Component | common/payment-link', function (hooks) {
   test('it can render the mobile state', async function (assert) {
     this.set('mode', 'link');
     assert.dom(QR).doesNotExist();
-    assert.dom(URL).containsText(link);
+    assert.dom(URL).containsText(deepLink);
     assert.dom(TOGGLE).isEnabled().containsText('Show as QR Code');
     assert.dom(LINK).hasAttribute('href', deepLink);
   });

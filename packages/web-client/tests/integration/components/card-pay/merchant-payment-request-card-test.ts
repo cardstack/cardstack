@@ -122,7 +122,7 @@ module(
         .dom(DEEP_LINK)
         .containsText('Pay Business')
         .hasAttribute('href', deepLinkPaymentURL);
-      assert.dom(PAYMENT_URL).containsText(paymentURL);
+      assert.dom(PAYMENT_URL).containsText(deepLinkPaymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show as QR Code');
 
       await click(LINK_VIEW_TOGGLE);

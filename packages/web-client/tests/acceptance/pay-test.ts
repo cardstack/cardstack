@@ -543,7 +543,6 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(PAYMENT_URL).containsText(
       generateMerchantPaymentUrl({
-        domain: universalLinkDomain,
         network,
         merchantSafeID: merchantSafe.address,
         currency: spendSymbol,

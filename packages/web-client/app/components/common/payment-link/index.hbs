@@ -28,7 +28,11 @@
   {{/if}}
 
   <span class="payment-link__url" data-test-payment-link-url>
-    {{@paymentURL}}
+    {{#if this.showingQR}}
+      {{@paymentURL}}
+    {{else}}
+      {{@deepLinkPaymentURL}}
+    {{/if}}
   </span>
   {{#if this.nextMode}}
     <button
