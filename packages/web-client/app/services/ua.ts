@@ -13,17 +13,21 @@ function isIPad13() {
   );
 }
 
-export default class IsIOS extends Service {
+export default class UA extends Service {
   uaParser = new UAParser();
 
   isIOS() {
     return this.uaParser.getOS().name === 'iOS' || isIPad13();
+  }
+
+  isAndroid() {
+    return this.uaParser.getOS().name === 'Android';
   }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
   interface Registry {
-    'is-ios': IsIOS;
+    ua: UA;
   }
 }

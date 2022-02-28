@@ -231,7 +231,7 @@ app "ssr-web" {
             task_role_name = "ssr-web-prod-ecr-task"
 
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/ssr-web-prod/f793ac7cf27c362b/575459688737d208"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/ssr-web-prod/f793ac7cf27c362b/86347f16c37c00b0"
             }
         }
 
@@ -242,7 +242,7 @@ app "ssr-web" {
 
         hook {
             when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "ssr-wallet.cardstack.com", "ssr-web-prod"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "wallet.cardstack.com", "ssr-web-prod"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }

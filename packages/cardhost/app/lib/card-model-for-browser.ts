@@ -11,25 +11,28 @@ import {
   CardComponentModule,
   CardSchemaModule,
 } from '@cardstack/core/src/interfaces';
-// import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 import { hbs } from 'ember-cli-htmlbars';
-import { tracked as _tracked } from '@glimmer/tracking';
+import cloneDeep from 'lodash/cloneDeep';
+import merge from 'lodash/merge';
+import set from 'lodash/set';
+import get from 'lodash/get';
+import { tracked } from '@glimmer/tracking';
 import {
   serializeField,
   serializeCardAsResource,
 } from '@cardstack/core/src/serializers';
-import set from 'lodash/set';
-import get from 'lodash/get';
-import cloneDeep from 'lodash/cloneDeep';
 import Cards from 'cardhost/services/cards';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import { restartableTask } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
+import { registerDestructor } from '@ember/destroyable';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -46,13 +49,14 @@ export interface CreatedState {
   componentModule: CardComponentModule;
   schemaModuleId: string;
   format: Format;
+  rawData: ResourceObject<Unsaved>;
 }
 
 export interface LoadedState {
   type: 'loaded';
   format: Format;
   url: string;
-  rawServerResponse: ResourceObject<Saved>;
+  rawData: ResourceObject<Saved>;
   componentModule: CardComponentModule;
   schemaModuleId: string;
   deserialized: boolean;
@@ -61,10 +65,9 @@ export interface LoadedState {
 
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
-  private declare _data: any;
+  @tracked private _schemaInstance: any | undefined;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
-  private _schemaInstance: any | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
 
   constructor(
@@ -83,14 +86,7 @@ export default class CardModelForBrowser implements CardModel {
     }
 
     this.setters = this.makeSetter();
-    let prop = tracked(this, '_data', {
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
-    if (prop) {
-      Object.defineProperty(this, '_data', prop);
-    }
+    registerDestructor(this, this.rerenderFinished.bind(this));
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
@@ -113,6 +109,7 @@ export default class CardModelForBrowser implements CardModel {
         componentModule: this.state.componentModule,
         schemaModuleId: this.state.schemaModuleId,
         format: this.state.format,
+        rawData: { id: undefined, type: 'card', attributes: {} },
       },
       localRealm
     );
@@ -148,8 +145,6 @@ export default class CardModelForBrowser implements CardModel {
       'edit'
     )) as CardModelForBrowser;
 
-    // TODO: This is temp until we figure out the async data issue
-    // Without this .data is not populated
     await editable.computeData();
 
     (editable.state as LoadedState).original = this;
@@ -157,15 +152,15 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get data(): object {
-    return this._data;
+    return this._schemaInstance;
   }
 
-  async computeData() {
+  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
-      set(syncData, field, await this.getField(field));
+      set(syncData, field, await this.getField(field, schemaInstance));
     }
-    this._data = syncData;
+    return syncData;
   }
 
   async component(): Promise<unknown> {
@@ -179,37 +174,39 @@ export default class CardModelForBrowser implements CardModel {
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
         class extends Component {
           component = innerComponent;
-          // TODO: Ed mentioned something about this needing to be full separate. Should we clone?
-          data = self.data;
           set = self.setters;
+          get data() {
+            return self.data;
+          }
         }
       );
     }
     return this.wrapperComponent;
   }
 
-  async getField(fieldPath: string): Promise<any> {
+  async getField(fieldPath: string, schemaInstance?: any): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
     //   return get(this.data, name);
     // }
 
-    if (!this._schemaInstance) {
-      let klass = await this.schemaClass();
-      // We can't await the instance creation in a separate, as it's thenable and confuses async methods
-      this._schemaInstance = new klass(this.getRawField.bind(this)) as any;
+    schemaInstance = schemaInstance ?? this._schemaInstance;
+
+    if (!schemaInstance) {
+      schemaInstance = this._schemaInstance = await this.createSchemaInstance();
     }
 
-    return await getFieldValue(this._schemaInstance, fieldPath);
+    return await getFieldValue(schemaInstance, fieldPath);
   }
 
   get rawData(): any {
-    if (this.state.type === 'loaded') {
-      return this.state.rawServerResponse.attributes;
-    }
+    return this.state.rawData.attributes;
+  }
 
-    // TODO: not sure
-    return {};
+  private async createSchemaInstance() {
+    let klass = await this.schemaClass();
+    // We can't await the instance creation in a separate, as it's thenable and confuses async methods
+    return new klass(this.getRawField.bind(this)) as any;
   }
 
   private getRawField(fieldPath: string): any {
@@ -233,10 +230,10 @@ export default class CardModelForBrowser implements CardModel {
       let innerSegments = segments.slice();
       let lastSegment = innerSegments.pop();
       if (!lastSegment) {
-        this._data = value;
         return;
       }
-      let data = this._data || {};
+
+      let data = this.dataAsUsedFieldsShape();
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -247,7 +244,7 @@ export default class CardModelForBrowser implements CardModel {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this._data = data;
+      taskFor(this.rerenderData).perform(data);
     };
     (s as any).setters = new Proxy(
       {},
@@ -265,6 +262,32 @@ export default class CardModelForBrowser implements CardModel {
     return s;
   }
 
+  @restartableTask async rerenderData(
+    data: Record<string, any>
+  ): Promise<void> {
+    this.state.rawData = merge({}, this.state.rawData, {
+      attributes: data,
+    });
+    let newSchemaInstance = await this.createSchemaInstance();
+    await this.computeData(newSchemaInstance);
+    this._schemaInstance = newSchemaInstance;
+  }
+
+  async rerenderFinished() {
+    await taskFor(this.rerenderData).last;
+  }
+
+  // we have a few places that are very sensitive to the shape of the data, and
+  // won't be able to deal with a schema instance that has additional properties
+  // and methods beyond just the data itself, so this method is for those places
+  private dataAsUsedFieldsShape() {
+    let syncData: Record<string, any> = {};
+    for (let field of this.usedFields) {
+      set(syncData, field, get(this._schemaInstance, field));
+    }
+    return syncData;
+  }
+
   serialize(): ResourceObject<Saved | Unsaved> {
     let url: string | undefined;
     if (this.state.type === 'loaded') {
@@ -273,7 +296,11 @@ export default class CardModelForBrowser implements CardModel {
       url = cardURL({ realm: this.state.realm, id: this.state.id });
     }
 
-    return serializeCardAsResource(url, this.data, this.serializerMap);
+    return serializeCardAsResource(
+      url,
+      this.dataAsUsedFieldsShape(),
+      this.serializerMap
+    );
   }
 
   get serializerMap(): CardComponentModule['serializerMap'] {
@@ -321,7 +348,7 @@ export default class CardModelForBrowser implements CardModel {
       type: 'loaded',
       format: this.format,
       url: data.id,
-      rawServerResponse: cloneDeep(data),
+      rawData: cloneDeep(data),
       deserialized: false,
       original,
       componentModule: this.state.componentModule,
@@ -368,15 +395,6 @@ function buildNewURL(realm: string, parentCardURL: string): string {
 
 function buildCardURL(url: string): string {
   return `${cardServer}cards/${encodeURIComponent(url)}`;
-}
-
-function tracked(
-  target: CardModel,
-  prop: string,
-  desc: PropertyDescriptor
-): PropertyDescriptor | void {
-  //@ts-ignore the types for glimmer tracked don't seem to be lining
-  return _tracked(target, prop, desc);
 }
 
 function assertNever(value: never) {

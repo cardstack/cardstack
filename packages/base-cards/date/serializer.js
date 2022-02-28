@@ -10,5 +10,8 @@ export function serialize(d) {
 }
 
 export function deserialize(d) {
+  if (d instanceof Date) {
+    return d;
+  }
   return parse(d, 'yyyy-MM-dd', new Date());
 }
