@@ -22,20 +22,27 @@ export default class UserSpaceRoute extends Route {
   async model(): Promise<UserSpaceRouteModel> {
     if (this.appContext.currentApp === 'card-space') {
       try {
+        const response = await fetch(
+          `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/vnd.api+json',
+              'Content-Type': 'application/vnd.api+json',
+            },
+          }
+        );
+
+        if (response.status === 404) {
+          this.to404(
+            `404: Card Space not found for ${this.appContext.cardSpaceId}`
+          );
+        }
+
         const cardSpaceResult: {
           included: any[];
-        } = await (
-          await fetch(
-            `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
-            {
-              method: 'GET',
-              headers: {
-                Accept: 'application/vnd.api+json',
-                'Content-Type': 'application/vnd.api+json',
-              },
-            }
-          )
-        ).json();
+        } = await response.json();
+
         let merchant = cardSpaceResult.included?.find(
           (v) => v.type === 'merchant-infos'
         );
@@ -43,11 +50,7 @@ export default class UserSpaceRoute extends Route {
           // TODO: replace with proper 404 somehow
           // this 404 is for card space
 
-          if (this.fastboot.isFastBoot) {
-            this.fastboot.response.statusCode = 404;
-          }
-
-          throw new Error(
+          this.to404(
             `404: Card Space not found for ${this.appContext.cardSpaceId}`
           );
         }
@@ -91,5 +94,13 @@ export default class UserSpaceRoute extends Route {
       // this 404 is for wallet.
       throw new Error('No such route!');
     }
+  }
+
+  to404(message: string) {
+    if (this.fastboot.isFastBoot) {
+      this.fastboot.response.statusCode = 404;
+    }
+
+    throw new Error(message);
   }
 }
