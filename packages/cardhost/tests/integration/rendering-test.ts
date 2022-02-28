@@ -162,7 +162,7 @@ module('Integration | Card Rendering', function (hooks) {
           `<h1><@fields.firstName data-test-field-name /></h1><p><@fields.loudFoodPref /></p>`
         ),
         'edit.js': templateOnlyComponentTemplate(
-          `<div>Name: <@fields.firstName /></div><div data-test-field="loudFoodPref"><@fields.loudFoodPref /><div data-test-dep-field>{{this.model.firstName}}</div></div>`
+          `<div>Name: <@fields.firstName /></div><div data-test-field="loudFoodPref"><@fields.loudFoodPref /><div data-test-dep-field>{{@model.firstName}}</div></div>`
         ),
       },
     });
