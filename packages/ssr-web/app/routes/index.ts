@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import config from '@cardstack/ssr-web/config/environment';
-import { generateMerchantPaymentUrl, gqlQuery } from '@cardstack/cardpay-sdk';
+import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import Subgraph from '../services/subgraph';
 
@@ -14,6 +14,7 @@ interface UserSpaceRouteModel {
   backgroundColor: string;
   textColor: string;
   paymentURL: string;
+  deepLinkPaymentURL: string;
 }
 
 export default class UserSpaceRoute extends Route {
@@ -67,12 +68,6 @@ export default class UserSpaceRoute extends Route {
         );
         let address = queryResult?.data?.merchantSafes[0]?.id;
 
-        // if (!address) {
-        //   // TODO: replace with proper 404 somehow
-        //   // this 404 is for card space
-        //   throw new Error('No such route!');
-        // }
-
         return {
           id: merchant.attributes['slug'],
           name: merchant.attributes['name'],
@@ -80,6 +75,10 @@ export default class UserSpaceRoute extends Route {
           textColor: merchant.attributes['text-color'],
           paymentURL: generateMerchantPaymentUrl({
             domain: config.universalLinkDomain,
+            merchantSafeID: address,
+            network: config.chains.layer2,
+          }),
+          deepLinkPaymentURL: generateMerchantPaymentUrl({
             merchantSafeID: address,
             network: config.chains.layer2,
           }),
