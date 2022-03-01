@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name="cardpay_reward_programs",
@@ -19,21 +19,17 @@ setup(
         "eth_utils",
         "eth_abi",
         "eth_typing",
-        "merklelib",
+        "merklelib @ git+https://git@github.com/cardstack/merklelib@master#egg=merklelib",
         "pysha3",
-        "pyarrow"
+        "pyarrow",
     ],
     extras_require={
-        "explore": [
-            "streamlit",
-            "altair",
-        ]
+        "explore": ["streamlit", "altair", "parquet-tools"],
+        "dev": ["black", "isort", "pytest"],
     },
     entry_points={
-        "console_scripts": [
-            "run_reward_program=cardpay_reward_programs.main:cli",
-        ],
+        "console_scripts": ["run_reward_program=cardpay_reward_programs.main:cli"],
     },
-    packages=["cardpay_reward_programs"],
+    packages=find_packages(),
     zip_safe=False,
 )
