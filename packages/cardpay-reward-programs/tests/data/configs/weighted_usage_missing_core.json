@@ -1,8 +1,0 @@
-{
-    "name": "usage",
-    "user_defined": {
-        "base_reward": 10,
-        "transaction_factor": 1.5,
-        "spend_factor": 2
-    }
-}
