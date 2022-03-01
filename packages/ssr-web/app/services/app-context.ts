@@ -6,6 +6,7 @@ import window from 'ember-window-mock';
 export interface AppContextService {
   currentApp: 'card-space' | 'wallet';
   cardSpaceId: string;
+  isCardSpace: boolean;
 }
 
 // escape dots for regexp

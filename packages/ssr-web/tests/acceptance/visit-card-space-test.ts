@@ -12,6 +12,7 @@ import config from '@cardstack/ssr-web/config/environment';
 class MockAppContext extends Service implements AppContextService {
   currentApp = 'card-space' as 'card-space'; // ?!
   cardSpaceId = 'slug';
+  isCardSpace = true;
 }
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
