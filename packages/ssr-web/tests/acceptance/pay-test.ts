@@ -70,9 +70,9 @@ module('Acceptance | pay', function (hooks) {
   setupMirage(hooks);
 
   hooks.beforeEach(async function (this: MirageTestContext) {
-    let safeViewer = this.owner.lookup('service:safe-viewer');
+    let subgraph = this.owner.lookup('service:subgraph');
     sinon
-      .stub(safeViewer, 'view')
+      .stub(subgraph, 'viewSafe')
       .callsFake(async function (
         _network: string,
         address: string
