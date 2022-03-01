@@ -6,7 +6,7 @@ export default class PayRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
 
   beforeModel() {
-    if (this.appContext.currentApp == 'card-space') {
+    if (this.appContext.isCardSpace) {
       this.transitionTo('index');
     } else {
       throw new Error('404: Not Found');
