@@ -25,9 +25,9 @@ export default class CardRoutes {
     let {
       params: { encodedCardURL: url },
     } = ctx;
-
+    let allFields = ctx.query.allFields !== undefined;
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format, allFields);
     ctx.body = { data: card.serialize() };
     ctx.status = 200;
   }

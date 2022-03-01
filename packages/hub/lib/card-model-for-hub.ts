@@ -47,6 +47,7 @@ interface LoadedState {
   componentMeta: CardComponentMetaModule;
   deserialized: boolean; // TODO: Is this really needed?
   original: CardModel | undefined;
+  allFields: boolean;
 }
 
 export default class CardModelForHub implements CardModel {
@@ -185,7 +186,12 @@ export default class CardModelForHub implements CardModel {
       return serializeCardAsResource(undefined, this.data, this.serializerMap);
     }
 
-    let resource = serializeCardAsResource(this.url, this.data, this.serializerMap, this.usedFields);
+    let resource = serializeCardAsResource(
+      this.url,
+      this.data,
+      this.serializerMap,
+      !this.state.allFields ? this.usedFields : undefined
+    );
     let { componentModule, schemaModule } = this.state;
     resource.meta = merge({ componentModule, schemaModule }, resource.meta);
 
@@ -234,6 +240,7 @@ export default class CardModelForHub implements CardModel {
       componentMeta: this.state.componentMeta,
       original: undefined,
       deserialized: false,
+      allFields: false,
     };
   }
 }
