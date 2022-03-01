@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
+import itertools
+from collections import defaultdict
 from copy import deepcopy
 from typing import Any, List, TypedDict
-
-from collections import defaultdict
 
 import pyarrow as pa
 import sha3
@@ -11,8 +11,6 @@ from eth_abi import encode_abi
 from eth_typing import ChecksumAddress
 from eth_utils import add_0x_prefix
 from merklelib import MerkleTree, beautify
-
-import itertools
 
 
 class Payment(TypedDict):
@@ -32,9 +30,9 @@ def group_by(data_array, callback):
 
 
 class PaymentTree:
-    def __init__(self, payment_list: List[Payment]) -> None:
+    def __init__(self, payment_list: List[Payment], payment_cycle:int) -> None:
         self.payment_nodes = self.aggregate_payments(payment_list)
-        self.data = list(map(self.encode_payment, self.payment_nodes))
+        self.data = [self.encode_payment(payment_node, payment_cycle) for payment_node in self.payment_nodes]
         self.tree = MerkleTree(self.data, hashfunc)
 
     def aggregate_payments(self, payments: Payment) -> List[Payment]:
@@ -47,7 +45,6 @@ class PaymentTree:
             payments,
             lambda p: (
                 p["rewardProgramID"],
-                p["paymentCycle"],
                 p["payee"],
                 p["validFrom"],
                 p["validTo"],
@@ -62,9 +59,9 @@ class PaymentTree:
         return aggregated
 
     @staticmethod
-    def encode_payment(payment: Payment) -> bytes:
+    def encode_payment(payment: Payment, payment_cycle:int) -> bytes:
         rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
-        paymentCycle: int = payment["paymentCycle"]
+        paymentCycle: int = payment_cycle 
         validFrom: int = payment["validFrom"]
         validTo: int = payment["validTo"]
         tokenType: int = 1
@@ -98,7 +95,7 @@ class PaymentTree:
     def verify_inclusion(self, leaf):
         return self.tree.verify_leaf_inclusion(leaf, self.tree.get_proof(leaf))
 
-    def as_arrow(self):
+    def as_arrow(self, payment_cycle:int):
         # Auto-detection of schemas risks invalid columns, so define manually
         schema = pa.schema([
             pa.field("rewardProgramID", pa.string()),
@@ -118,11 +115,12 @@ class PaymentTree:
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
-            extract_fields = ["rewardProgramID", "paymentCycle", "validFrom", "validTo", "payee"]
+            extract_fields = ["rewardProgramID", "validFrom", "validTo", "payee"]
             for payment, leaf in zip(self.payment_nodes, self.data):
                 for field in extract_fields:
                     columns[field].append(payment[field])
                 columns["tokenType"].append(1)
+                columns["paymentCycle"].append(payment_cycle)
                 columns["root"].append(root)
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
