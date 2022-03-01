@@ -2,18 +2,12 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { click, currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
-import { AppContextService } from '@cardstack/ssr-web/services/app-context';
-import Service from '@ember/service';
+import AppContext from '@cardstack/ssr-web/services/app-context';
 import percySnapshot from '@percy/ember';
 import type { SubgraphServiceOptionals } from '@cardstack/ssr-web/services/subgraph';
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/ssr-web/config/environment';
-
-class MockAppContext extends Service implements AppContextService {
-  currentApp = 'card-space' as 'card-space'; // ?!
-  cardSpaceId = 'slug';
-  isCardSpace = true;
-}
+import Service from '@ember/service';
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
   async query(
@@ -30,6 +24,16 @@ class MockSubgraph extends Service implements SubgraphServiceOptionals {
         ],
       },
     };
+  }
+}
+
+class MockAppContext extends AppContext {
+  get currentApp() {
+    return 'card-space' as 'card-space';
+  }
+
+  get cardSpaceId() {
+    return 'slug';
   }
 }
 
