@@ -37,6 +37,9 @@ export default class UserSpaceRoute extends Route {
         );
 
         if (response.status === 404) {
+          if (this.fastboot.isFastBoot) {
+            this.fastboot.response.statusCode = 404;
+          }
           throw new Error(
             `404: Card Space not found for ${this.appContext.cardSpaceId}`
           );
@@ -50,6 +53,9 @@ export default class UserSpaceRoute extends Route {
           (v) => v.type === 'merchant-infos'
         );
         if (!merchant) {
+          if (this.fastboot.isFastBoot) {
+            this.fastboot.response.statusCode = 404;
+          }
           throw new Error(
             `404: Card Space not found for ${this.appContext.cardSpaceId}`
           );
@@ -88,6 +94,9 @@ export default class UserSpaceRoute extends Route {
         throw e;
       }
     } else {
+      if (this.fastboot.isFastBoot) {
+        this.fastboot.response.statusCode = 404;
+      }
       throw new Error("Oops! We couldn't find the page you were looking for");
     }
   }
