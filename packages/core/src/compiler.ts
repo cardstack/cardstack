@@ -23,7 +23,6 @@ import {
   FEATURE_NAMES,
   Format,
   GlobalRef,
-  isFormat,
   LocalRef,
   ModuleRef,
   RawCard,
@@ -44,12 +43,15 @@ export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
-  private modules: CompiledCard<Unsaved, LocalRef>['modules'];
+
+  private sourceModules: CompiledCard<Unsaved, LocalRef>['modules'];
+  private globalModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
-    this.modules = {};
+    this.sourceModules = {};
+    this.globalModules = {};
   }
 
   get dependencies(): Set<string> {
@@ -111,7 +113,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       fields,
       adoptsFrom: parentCard,
       componentInfos: await this.prepareComponents(fields, parentCard),
-      modules: this.modules,
+      modules: this.globalModules,
       deps: [...this.dependencies],
     };
 
@@ -119,8 +121,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private analyzeFiles() {
-    let { cardSource } = this;
-    for (const localPath in cardSource.files) {
+    for (const localPath in this.cardSource.files) {
       this.analyzeFile(localPath);
     }
   }
@@ -129,11 +130,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let source = this.getFile(cardSource, localPath);
     let feature = this.getFeatureForFilePath(localPath);
-
-    // Skipping components so as to only defined hashed names
-    if (isFormat(feature)) {
-      return;
-    }
 
     if (feature === 'asset') {
       this.defineAsset(localPath, source);
@@ -144,7 +140,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     // TODO: Move schema analyze plugin into this one
     let { code, ast, meta } = analyzeFileBabelPlugin(source, options);
 
-    this.modules[localPath] = {
+    this.sourceModules[localPath] = {
       type: JS_TYPE,
       source: code!,
       ast: ast!,
@@ -153,7 +149,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private defineAsset(localPath: string, source: string): void {
-    this.modules[localPath] = {
+    this.globalModules[localPath] = {
       type: getFileType(localPath),
       source,
     };
@@ -214,7 +210,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private getModule(localPath: string): CardModule {
-    let module = this.modules[localPath];
+    let module = this.sourceModules[localPath];
     if (!module) {
       throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
         status: 422,
@@ -227,7 +223,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
   private analyzeSchema(options: any): LocalRef | undefined {
-    let { cardSource, modules } = this;
+    let { cardSource } = this;
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
@@ -239,7 +235,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
     let { code, ast } = analyzeSchemaBabelPlugin(schemaSrc, options);
 
-    modules[schemaLocalFilePath] = {
+    this.sourceModules[schemaLocalFilePath] = {
       type: JS_TYPE,
       source: code!,
       ast: ast!,
@@ -253,8 +249,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     parent: CompiledCard
   ) {
-    let { modules } = this;
-    let { source, ast } = modules[schemaModule.local];
+    let { source, ast } = this.getModule(schemaModule.local);
     if (!ast) {
       throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
     }
@@ -268,7 +263,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } catch (error: any) {
       throw augmentBadRequest(error);
     }
-    modules[schemaModule.local] = {
+    this.globalModules[schemaModule.local] = {
       type: JS_TYPE,
       source: out!.code!,
       ast: out!.ast!,
@@ -329,7 +324,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     parentCard: CompiledCard | undefined,
     which: Format
   ): Promise<ComponentInfo<ModuleRef>> {
-    let { cardSource, modules } = this;
+    let { cardSource } = this;
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
@@ -360,8 +355,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
           fields,
           `${originalRawCard.realm}${originalRawCard.id}/${srcLocalPath}`,
           srcLocalPath,
-          which,
-          modules
+          which
         );
         componentInfo.inheritedFrom = inheritedFrom;
         return componentInfo;
@@ -379,14 +373,13 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
-    let src = this.getFile(cardSource, localFilePath);
+    let { source } = this.getModule(localFilePath);
     return await this.compileComponent(
-      src,
+      source,
       fields,
       `${cardSource.realm}${cardSource.id ?? 'NEW_CARD'}/${localFilePath}`,
       localFilePath,
-      which,
-      modules
+      which
     );
   }
 
@@ -395,8 +388,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     debugPath: string,
     localFile: string,
-    format: Format,
-    modules: CompiledCard<Unsaved, LocalRef>['modules']
+    format: Format
   ): Promise<ComponentInfo<LocalRef>> {
     let fieldsHash = hashCardFields(fields);
     let componentModule = appendToFilename(localFile, '-' + fieldsHash);
@@ -412,7 +404,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let componentTransformResult = transformCardComponent(templateSource, options);
-    modules[componentModule] = {
+    this.globalModules[componentModule] = {
       type: JS_TYPE,
       source: componentTransformResult.source,
       ast: componentTransformResult.ast,
@@ -425,7 +417,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       serializerMap: {},
     };
     let componentMetaResult = generateComponentMeta(metaOptions);
-    modules[metaModuleFileName] = {
+    this.globalModules[metaModuleFileName] = {
       type: JS_TYPE,
       source: componentMetaResult.source,
       ast: componentMetaResult.ast,
@@ -455,6 +447,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } else if (serializer) {
       let serializerModule = this.getModule(serializer);
       this.validateSerializer(serializerModule.meta);
+      this.globalModules[serializer] = serializerModule;
 
       serializerRef = { local: serializer };
     }
