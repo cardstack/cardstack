@@ -154,7 +154,7 @@ module('Acceptance | visit card space', function (hooks) {
       .includesText('404: Card Space not found for slug');
   });
 
-  test('redirects from other links', async function (this: MirageTestContext, assert) {
+  test('redirects from wallet links', async function (this: MirageTestContext, assert) {
     let cardSpace = this.server.create('card-space', {
       slug: 'slug',
     });
@@ -162,6 +162,19 @@ module('Acceptance | visit card space', function (hooks) {
     cardSpace.createMerchantInfo({ name: 'merchant name' });
 
     await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
+
+    assert.equal(currentURL(), '/');
+    assert.dom('[data-test-merchant-name]').hasText('merchant name');
+  });
+
+  test('redirects from other links', async function (this: MirageTestContext, assert) {
+    let cardSpace = this.server.create('card-space', {
+      slug: 'slug',
+    });
+
+    cardSpace.createMerchantInfo({ name: 'merchant name' });
+
+    await visit('/nothing/nowhere');
 
     assert.equal(currentURL(), '/');
     assert.dom('[data-test-merchant-name]').hasText('merchant name');
