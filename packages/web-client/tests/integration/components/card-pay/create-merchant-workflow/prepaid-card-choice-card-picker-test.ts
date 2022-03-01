@@ -73,47 +73,48 @@ module(
     test('it preselects prepaid card if there is only one valid option', async function (assert) {
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
         )
         .exists();
 
-      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
-      await waitFor(
-        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
-      );
+      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await waitFor(`[data-test-boxel-card-picker-dropdown-option]`);
 
       assert
-        .dom(`[data-test-card-picker-dropdown-option]`)
+        .dom(`[data-test-boxel-card-picker-dropdown-option]`)
         .exists({ count: 2 });
       assert
         .dom(
-          `[data-test-card-picker-dropdown-option="${prepaidCardAddress2}"][data-test-card-picker-dropdown-option-disabled]`
+          `[data-test-boxel-card-picker-dropdown-option-disabled] [data-test-prepaid-card="${prepaidCardAddress2}"]`
         )
-        .hasClass('card-picker-dropdown__option--disabled');
+        .exists();
     });
 
     test('it disables and fades out cards with insufficient balance', async function (assert) {
-      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
       await waitFor(
-        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
       );
 
       assert
-        .dom(`[data-test-card-picker-dropdown-option]`)
+        .dom(`[data-test-boxel-card-picker-dropdown-option]`)
         .exists({ count: 2 });
       assert
-        .dom(`[data-test-card-picker-dropdown-option-disabled]`)
+        .dom(`[data-test-boxel-card-picker-dropdown-option-disabled]`)
         .exists({ count: 1 });
       assert
         .dom(
-          `[data-test-card-picker-dropdown] li:nth-of-type(2)[aria-disabled="true"]`
+          `[data-test-boxel-card-picker-dropdown] li:nth-of-type(2)[aria-disabled="true"]`
         )
         .exists();
       assert
+        .dom(`[data-test-boxel-card-picker-dropdown-option-disabled]`)
+        .hasClass('boxel-card-picker-dropdown__option--disabled');
+      assert
         .dom(
-          `[data-test-card-picker-dropdown-option="${prepaidCardAddress2}"][data-test-card-picker-dropdown-option-disabled]`
+          `[data-test-boxel-card-picker-dropdown-option-disabled] [data-test-prepaid-card="${prepaidCardAddress2}"]`
         )
-        .hasClass('card-picker-dropdown__option--disabled');
+        .exists();
     });
   }
 );

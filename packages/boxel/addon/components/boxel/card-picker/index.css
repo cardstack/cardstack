@@ -1,3 +1,124 @@
-@import './card-picker.css';
 @import './card-option/index.css';
 @import './selected-item/index.css';
+
+.boxel-card-picker {
+  position: relative;
+}
+
+.boxel-card-picker--change-card {
+  display: flex;
+}
+
+.boxel-card-picker--change-card .boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
+  left: -100%;
+}
+
+.boxel-card-picker__dropdown {
+  --default-field-height: 2.5rem;
+  --default-field-width: 24rem;
+  --options-menu-height: 33.2rem;
+
+  position: relative;
+  z-index: 10;
+  max-width: 100%;
+  margin-bottom: var(--boxel-sp-xxxs);
+  color: var(--boxel-dark);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
+  position: absolute;
+}
+
+.boxel-card-picker__dropdown > .ember-power-select-trigger {
+  min-height: var(--default-field-height);
+  width: var(--default-field-width);
+  padding: var(--boxel-sp-xs) var(--boxel-sp);
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") right 1.125rem center/auto 0.5rem no-repeat;
+  background-color: var(--boxel-light);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius);
+  transition: border-color var(--boxel-transition);
+}
+
+.boxel-card-picker__dropdown--selected > .ember-power-select-trigger {
+  width: 9rem;
+  background-size: 0.6rem auto;
+  border: none;
+}
+
+.boxel-card-picker__dropdown > .ember-power-select-trigger:hover {
+  border-color: var(--boxel-dark);
+  cursor: pointer;
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content {
+  position: relative;
+  max-width: 100%;
+  height: 500px;
+  width: var(--default-field-width);
+  max-height: var(--options-menu-height);
+  background-color: var(--boxel-light);
+  border: 1px solid rgb(0 0 0 / 15%);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
+  overflow-y: auto;
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.boxel-card-picker__dropdown-option {
+  padding: var(--boxel-sp) var(--boxel-sp-xxxl);
+  background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
+  background-repeat: no-repeat;
+  background-position: left var(--boxel-sp) center;
+  background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
+}
+
+.boxel-card-picker__dropdown-option--selected {
+  background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
+  background-color: var(--boxel-purple-100);
+}
+
+.ember-power-select-selected-item .boxel-card-picker__dropdown-option--selected {
+  background-image: unset;
+}
+
+.boxel-card-picker__dropdown-option:hover:not(.boxel-card-picker__dropdown-option--disabled) {
+  background-color: var(--boxel-purple-100);
+  cursor: pointer;
+}
+
+.ember-power-select-selected-item .boxel-card-picker__dropdown-option:hover {
+  background-color: initial;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option[aria-current="true"] {
+  background-color: var(--boxel-purple-100);
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option + .ember-power-select-option {
+  border-top: 1px solid var(--boxel-light-400);
+}
+
+.boxel-card-picker__dropdown-option--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.boxel-card-picker__selected-card {
+  margin-right: var(--boxel-sp-xxxs);
+}

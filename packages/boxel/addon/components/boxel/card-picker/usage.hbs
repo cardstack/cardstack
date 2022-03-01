@@ -10,14 +10,14 @@
     <Args.Array
       @name="cards"
       @type="Object"
-      @description="Array of card objects"
+      @description="Array of cards/objects"
       @items={{this.cards}}
       @onChange={{fn (mut this.cards)}}
       @jsonCollapseDepth={{0}}
     />
     <Args.Object
       @name="selectedCard"
-      @description="The card object that is currently selected"
+      @description="The card that is currently selected"
       @value={{this.selectedCard}}
       @jsonCollapseDepth={{0}}
       @defaultValue="null"

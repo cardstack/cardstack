@@ -1,3 +1,4 @@
-.card-picker-option {
+.boxel-card-picker-card-option {
+  min-width: var(--boxel-xxs-container);
   padding: var(--boxel-sp);
 }
