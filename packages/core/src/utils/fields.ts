@@ -102,3 +102,20 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
   } while (!isLoaded);
   return result;
 }
+
+// access a potentially-deep property path, stopping if a key is missing along
+// the way
+export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
+  let segments = path.split('.');
+  let current: any = obj;
+  let segment: string | undefined;
+  let completed: string[] = [];
+  while ((segment = segments.shift())) {
+    if (!(segment in current)) {
+      return { missing: [...completed, segment].join('.') };
+    }
+    current = current?.[segment];
+    completed.push(segment);
+  }
+  return { value: current };
+}

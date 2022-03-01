@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import fillIn from '@ember/test-helpers/dom/fill-in';
@@ -182,7 +182,7 @@ module('Integration | Card Rendering', function (hooks) {
       .containsText('Kirito likes pizza!');
   });
 
-  test('A computed field might access an unloaded field', async function (assert) {
+  skip('A computed field might access an unloaded field', async function (assert) {
     await renderCard({ realm: DEMO_REALM, id: 'test-computed' }, 'edit');
     await fillIn('[data-test-field-name="maritalStatus"]', 'married');
     await waitUntil(() =>

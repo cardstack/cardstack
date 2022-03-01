@@ -29,7 +29,10 @@ import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
 import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
-import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import {
+  getFieldValue,
+  keySensitiveGet,
+} from '@cardstack/core/src/utils/fields';
 import { restartableTask } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { registerDestructor } from '@ember/destroyable';
@@ -210,8 +213,17 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   private getRawField(fieldPath: string): any {
-    let value = get(this.rawData, fieldPath);
-    return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
+    let result = keySensitiveGet(this.rawData, fieldPath);
+    if ('missing' in result) {
+      throw new Error(`TODO: ${result.missing}`);
+    } else {
+      return serializeField(
+        this.serializerMap,
+        fieldPath,
+        result.value,
+        'deserialize'
+      );
+    }
   }
 
   async schemaClass() {
