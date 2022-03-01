@@ -6,6 +6,7 @@ import AppContextService from '@cardstack/ssr-web/services/app-context';
 import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl, gqlQuery } from '@cardstack/cardpay-sdk';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import Subgraph from '../services/subgraph';
 
 interface UserSpaceRouteModel {
   id: string;
@@ -18,6 +19,7 @@ interface UserSpaceRouteModel {
 export default class UserSpaceRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
   @service declare fastboot: Fastboot;
+  @service declare subgraph: Subgraph;
 
   async model(): Promise<UserSpaceRouteModel> {
     if (this.appContext.currentApp === 'card-space') {
@@ -52,7 +54,7 @@ export default class UserSpaceRoute extends Route {
           );
         }
 
-        let queryResult = await gqlQuery(
+        let queryResult = await this.subgraph.query(
           config.chains.layer2,
           `query($did: String!) {
           merchantSafes(where: { infoDid: $did }) {
