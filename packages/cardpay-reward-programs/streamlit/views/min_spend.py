@@ -1,0 +1,37 @@
+import streamlit as st
+from cardpay_reward_programs.rules import MinSpend
+
+from .utils import read_core_config, slider_partition
+
+
+def min_spend(core_parameters):
+    s = st.expander(label="User defined parameters", expanded=True)
+    min_spend = s.number_input("Min Spend", value=150, step=1, min_value=0, max_value=5000)
+    base_reward = s.number_input("Base reward", value=5, step=1, min_value=0, max_value=100)
+    user_defined_parameters = {"min_spend": min_spend, "base_reward": base_reward}
+    rule = MinSpend(core_parameters, user_defined_parameters)
+    read_core_config(rule)
+    return rule
+
+
+def view_multiple(core_parameters):
+    program = min_spend(core_parameters)
+    min_block, max_block = slider_partition(type="two_end")
+    progress = st.progress(0.0)
+    cached_df = []
+    for i in range(min_block, max_block, program.payment_cycle_length):
+        progress.progress((i - min_block) / (max_block - min_block))
+        df = program.run(i)
+        if not df.empty:
+            cached_df.append(df)
+    df = program.aggregate(cached_df)
+    payment_list = program.df_to_payment_list(df)
+    return payment_list, df, program.get_summary(payment_list)
+
+
+def view_single(core_parameters):
+    program = min_spend(core_parameters)
+    block = slider_partition(type="one_end")
+    df = program.run(block)
+    payment_list = program.df_to_payment_list(df)
+    return payment_list, df, program.get_summary(payment_list)
