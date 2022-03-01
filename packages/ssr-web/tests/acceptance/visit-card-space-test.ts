@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { click, visit } from '@ember/test-helpers';
+import { click, currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 import { AppContextService } from '@cardstack/ssr-web/services/app-context';
 import Service from '@ember/service';
@@ -147,5 +147,18 @@ module('Acceptance | visit card space', function (hooks) {
     assert
       .dom('[data-test-error]')
       .includesText('404: Card Space not found for slug');
+  });
+
+  test('redirects from other links', async function (this: MirageTestContext, assert) {
+    let cardSpace = this.server.create('card-space', {
+      slug: 'slug',
+    });
+
+    cardSpace.createMerchantInfo({ name: 'merchant name' });
+
+    await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
+
+    assert.equal(currentURL(), '/');
+    assert.dom('[data-test-merchant-name]').hasText('merchant name');
   });
 });
