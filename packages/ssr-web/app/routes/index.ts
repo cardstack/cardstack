@@ -23,7 +23,7 @@ export default class IndexRoute extends Route {
   @service declare subgraph: Subgraph;
 
   async model(): Promise<CardSpaceIndexRouteModel> {
-    if (this.appContext.currentApp === 'card-space') {
+    if (this.appContext.isCardSpace) {
       try {
         const response = await fetch(
           `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,

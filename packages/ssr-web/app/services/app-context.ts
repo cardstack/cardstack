@@ -39,8 +39,12 @@ export default class AppContext extends Service implements AppContextService {
     return this.hostSuffixPattern.test(this.host) ? 'card-space' : 'wallet';
   }
 
+  get isCardSpace() {
+    return this.currentApp === 'card-space';
+  }
+
   get cardSpaceId() {
-    if (this.currentApp === 'card-space') {
+    if (this.isCardSpace) {
       let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
       return id;
     } else return '';
