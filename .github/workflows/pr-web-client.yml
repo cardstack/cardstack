@@ -47,3 +47,108 @@ jobs:
         with:
           check_name: 'web-client test results'
           files: ci-xml-test-results/web-client.xml
+
+  check-if-requires-preview:
+    name: Check if a preview deploy is required
+    runs-on: ubuntu-latest
+    outputs:
+      web-client-files-changed: ${{ steps.web-client-files-that-changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get web client files that changed
+        id: web-client-files-that-changed
+        uses: tj-actions/changed-files@v1.1.2
+        with:
+          files: |
+            ^packages/web-client
+
+  deploy-web-client-preview:
+    name: Deploy a preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.web-client-files-changed == 'true'
+    needs: check-if-requires-preview
+    env:
+      # FIXME manually created buckets, not in Terraform
+      S3_PREVIEW_INDEX_BUCKET_NAME: web-client-preview.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_NAME: web-client-preview-assets.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/web-client-preview-assets.cardstack.com
+      S3_PREVIEW_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: yarn --prefer-offline
+      - name: Set PR branch name
+        run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+      # FIXME are Boxel tests running twice?
+      # - name: Test with percy
+      #   run: yarn test:boxel:percy
+      #   env:
+      #     PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
+      - name: Deploy preview
+        run: yarn deploy:web-client:preview
+        env:
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+
+  # FIXME add later
+  # comment-on-web-client-pr:
+  #   name: Comment on PR
+  #   runs-on: ubuntu-latest
+  #   # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+  #   # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+  #   if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
+  #   needs: deploy-web-client-preview
+  #   env:
+  #     S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: volta-cli/action@v1
+  #     - name: Set up yarn cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ~/.cache/yarn
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-
+  #     - name: Install dependencies
+  #       run: yarn --prefer-offline
+  #     - name: Find pull request number for branch
+  #       uses: ./.github/actions/find-pr-number
+  #       id: fpr
+  #       env:
+  #         BOXEL_PREVIEW_GITHUB_TOKEN: ${{ secrets.BOXEL_PREVIEW_GITHUB_TOKEN }}
+  #       with:
+  #         branch: ${{ github.head_ref }}
+
+  #     - name: Set env var for message
+  #       shell: bash
+  #       run: |
+  #         echo "COMMENT_TEXT=### :sparkles: Preview Boxel changes [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
+
+  #     # finding a comment in given PR that contains the identifier string
+  #     - name: Find comment that contains identifier
+  #       uses: peter-evans/find-comment@v1
+  #       id: fc
+  #       with:
+  #         body-includes: ${{ env.COMMENT_TEXT }}
+  #         issue-number: ${{ steps.fpr.outputs.pr-number }}
+
+  #     - name: Create new comment if none exists
+  #       uses: peter-evans/create-or-update-comment@v1
+  #       if: steps.fc.outputs.comment-id == ''
+  #       with:
+  #         issue-number: ${{ steps.fpr.outputs.pr-number }}
+  #         body: |
+  #           ${{ env.COMMENT_TEXT }}
