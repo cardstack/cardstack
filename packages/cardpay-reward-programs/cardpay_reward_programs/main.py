@@ -3,9 +3,14 @@ from pathlib import Path
 
 import pyarrow.parquet as pq
 import typer
+from boto3.session import Session
 from cardpay_reward_programs.rules import *
+from cloudpathlib import S3Client
 
 from .payment_tree import PaymentTree
+
+cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
+cached_client.set_as_default_client()
 
 
 def run_reward_program(
