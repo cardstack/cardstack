@@ -13,8 +13,11 @@
   "web3": {
     "network": "xdai"
   },
+  "checkly": {
+    "handleWebhookRequests": true
+  },
   "wyre": {
-    "url":"https://api.sendwyre.com",
+    "url": "https://api.sendwyre.com",
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
   },
   "cardDrop": {
