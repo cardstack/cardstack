@@ -300,7 +300,7 @@ class IndexerRun implements IndexerHandle {
       data: param(data),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
-      searchData: param(rawCard.data ? await searchOptimizedData(rawCard.data, compiledCard, cardModel) : null),
+      searchData: param(data ? searchOptimizedData(data, compiledCard) : null),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
       schemaModule: param(compiledCard.schemaModule.global),
@@ -351,7 +351,7 @@ class IndexerRun implements IndexerHandle {
             param(data),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
-            param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
+            param(data ? searchOptimizedData(data, compiled) : null),
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
@@ -370,7 +370,7 @@ class IndexerRun implements IndexerHandle {
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
-        param(rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null),
+        param(data ? searchOptimizedData(data, compiled) : null),
         'WHERE url =',
         param(url),
       ];
@@ -428,11 +428,7 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
 
 // TODO consider using the compiler to return a function that can be used to
 // generate these values for a card
-async function searchOptimizedData(
-  data: Record<string, any>,
-  compiled: CompiledCard,
-  cardModel: CardModel
-): Promise<Record<string, any>> {
+function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
   let result: Record<string, any> = {};
 
   for (let fieldName of Object.keys(compiled.fields)) {
@@ -442,11 +438,7 @@ async function searchOptimizedData(
       if (!entry) {
         entry = result[currentCard.url] = {};
       }
-      if (currentCard.fields[fieldName].computed) {
-        entry[fieldName] = await cardModel.getField(fieldName);
-      } else {
-        entry[fieldName] = data[fieldName];
-      }
+      entry[fieldName] = data[fieldName];
       currentCard = currentCard.adoptsFrom;
     } while (currentCard && currentCard.fields[fieldName]);
   }
