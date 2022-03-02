@@ -61,13 +61,17 @@ if (process.env.COMPILER) {
               @contains(person) author;
               @contains(string) favoriteColor;
               @contains(string)
+              get summary() {
+                return this.author.name + "'s best friend is " + this.author.bestFriend.species;
+              }
+              @contains(string)
               get about() {
                 return "Author " + this.author.name + " lives with their best friend, " + this.author.bestFriend.species;
               }
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/></article>'
+            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/><@fields.summary/></article>'
           ),
         },
       });
@@ -110,6 +114,7 @@ if (process.env.COMPILER) {
             species: 'dog',
           },
         },
+        summary: "Emily's best friend is dog",
       });
       expect(response.body.data?.meta.componentModule).to.not.be.undefined;
 
@@ -135,6 +140,7 @@ if (process.env.COMPILER) {
             species: 'dog',
           },
         },
+        summary: "Emily's best friend is dog",
       });
     });
   });
