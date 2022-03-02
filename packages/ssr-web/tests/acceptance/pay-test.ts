@@ -639,4 +639,10 @@ module('Acceptance | pay', function (hooks) {
         'Oops, no business found - please ask the business to confirm the payment link'
       );
   });
+
+  test('renders an error for an unknown page', async function (this: MirageTestContext, assert) {
+    await visit('/nowhere');
+
+    assert.dom('[data-test-error]').includesText('404: Not Found');
+  });
 });

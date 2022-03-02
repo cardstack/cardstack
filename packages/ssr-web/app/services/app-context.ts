@@ -6,6 +6,7 @@ import window from 'ember-window-mock';
 export interface AppContextService {
   currentApp: 'card-space' | 'wallet';
   cardSpaceId: string;
+  isCardSpace: boolean;
 }
 
 // escape dots for regexp
@@ -39,8 +40,12 @@ export default class AppContext extends Service implements AppContextService {
     return this.hostSuffixPattern.test(this.host) ? 'card-space' : 'wallet';
   }
 
+  get isCardSpace() {
+    return this.currentApp === 'card-space';
+  }
+
   get cardSpaceId() {
-    if (this.currentApp === 'card-space') {
+    if (this.isCardSpace) {
       let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
       return id;
     } else return '';

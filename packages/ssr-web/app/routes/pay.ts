@@ -7,6 +7,7 @@ import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
 import { getOwner } from '@ember/application';
 import { MerchantInfo } from '../resources/merchant-info';
+import AppContextService from '@cardstack/ssr-web/services/app-context';
 
 interface PayRouteModel {
   network: string;
@@ -17,6 +18,13 @@ interface PayRouteModel {
 
 export default class PayRoute extends Route {
   @service('subgraph') declare subgraph: Subgraph;
+  @service('app-context') declare appContext: AppContextService;
+
+  beforeModel() {
+    if (this.appContext.isCardSpace) {
+      this.transitionTo('index');
+    }
+  }
 
   async model(params: {
     network: string;
