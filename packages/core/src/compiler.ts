@@ -44,7 +44,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  private sourceModules: CompiledCard<Unsaved, LocalRef>['modules'];
+  private sourceModules: Record<
+    string,
+    CardModule & {
+      meta?: FileMeta;
+    }
+  >;
   private globalModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
@@ -209,7 +214,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return fileSrc;
   }
 
-  private getModule(localPath: string): CardModule {
+  private getSourceModule(localPath: string) {
     let module = this.sourceModules[localPath];
     if (!module) {
       throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
@@ -249,7 +254,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     parent: CompiledCard
   ) {
-    let { source, ast } = this.getModule(schemaModule.local);
+    let { source, ast } = this.getSourceModule(schemaModule.local);
     if (!ast) {
       throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
     }
@@ -373,7 +378,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
-    let { source } = this.getModule(localFilePath);
+    let { source } = this.getSourceModule(localFilePath);
     return await this.compileComponent(
       source,
       fields,
@@ -420,7 +425,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     this.globalModules[metaModuleFileName] = {
       type: JS_TYPE,
       source: componentMetaResult.source,
-      ast: componentMetaResult.ast,
     };
 
     let componentInfo: ComponentInfo<LocalRef> = {
@@ -445,7 +449,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
       serializerRef = parentCard.serializerModule;
     } else if (serializer) {
-      let serializerModule = this.getModule(serializer);
+      let serializerModule = this.getSourceModule(serializer);
       this.validateSerializer(serializerModule.meta);
       this.globalModules[serializer] = serializerModule;
 

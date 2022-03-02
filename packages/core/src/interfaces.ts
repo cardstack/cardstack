@@ -2,7 +2,6 @@ import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { keys } from './utils';
-import { FileMeta } from './babel-plugin-card-file-analyze';
 
 export { Query } from './query';
 
@@ -124,7 +123,6 @@ export interface CardModule {
   type: string;
   source: string;
   ast?: t.File;
-  meta?: FileMeta;
 }
 
 // CompiledCard is everything you need when operating at the level of code &
