@@ -2,7 +2,7 @@ import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 
-export default class PayRoute extends Route {
+export default class NotFoundRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
 
   beforeModel() {
