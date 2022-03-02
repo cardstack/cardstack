@@ -70,9 +70,9 @@ module('Acceptance | pay', function (hooks) {
   setupMirage(hooks);
 
   hooks.beforeEach(async function (this: MirageTestContext) {
-    let safeViewer = this.owner.lookup('service:safe-viewer');
+    let subgraph = this.owner.lookup('service:subgraph');
     sinon
-      .stub(safeViewer, 'view')
+      .stub(subgraph, 'viewSafe')
       .callsFake(async function (
         _network: string,
         address: string
@@ -638,5 +638,11 @@ module('Acceptance | pay', function (hooks) {
       .containsText(
         'Oops, no business found - please ask the business to confirm the payment link'
       );
+  });
+
+  test('renders an error for an unknown page', async function (this: MirageTestContext, assert) {
+    await visit('/nowhere');
+
+    assert.dom('[data-test-error]').includesText('404: Not Found');
   });
 });

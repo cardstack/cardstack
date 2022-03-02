@@ -11,6 +11,22 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
+const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.space.localhost';
+const CARD_SPACE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
+const CARD_SPACE_HOSTNAME_SUFFIX = '.card.xyz';
+
+const cardSpaceHostnameSuffixByTarget = {
+  staging: CARD_SPACE_STAGING_HOSTNAME_SUFFIX,
+  production: CARD_SPACE_HOSTNAME_SUFFIX,
+};
+const hostWhitelistByTarget = {
+  staging: [
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+    '/.+\\.pouty\\.pizza$/',
+  ],
+  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, '/.+\\.card\\.xyz$/'],
+};
+
 const pkg = require('../package.json');
 
 // eslint-disable-next-line no-undef
@@ -74,9 +90,26 @@ module.exports = function (environment) {
     'ember-cli-mirage': {
       enabled: false,
     },
+    fastboot: {
+      hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
+        '/.+.card.space.localhost:\\d+$/',
+        '/^localhost:\\d+$/',
+      ],
+    },
+    cardSpaceHostnameSuffix:
+      cardSpaceHostnameSuffixByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
+      CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX,
+    chains: {
+      layer2:
+        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'xdai' : 'sokol',
+    },
   };
 
-  if (environment === 'development') {
+  if (
+    process.env.SSR_WEB_ENVIRONMENT !== 'production' &&
+    process.env.SSR_WEB_ENVIRONMENT !== 'staging' &&
+    environment !== 'test'
+  ) {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;

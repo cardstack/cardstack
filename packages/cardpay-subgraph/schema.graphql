@@ -383,7 +383,6 @@ type SafeTransaction @entity {
   safe: Safe!
   to: String!
   value: BigInt!
-  data: Bytes!
   operation: BigInt!
   safeTxGas: BigInt!
   baseGas: BigInt!
