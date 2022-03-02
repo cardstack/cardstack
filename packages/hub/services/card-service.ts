@@ -6,6 +6,8 @@ import {
   Format,
   CardModel,
   CardService as CardServiceInterface,
+  ResourceObject,
+  Saved,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
@@ -29,7 +31,6 @@ import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
-import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -143,12 +144,19 @@ export class CardService implements CardServiceInterface {
     return Promise.resolve(this.fileCache.loadModule(moduleIdentifier));
   }
 
-  async createModel(_card: CardModel): Promise<JSONAPIDocument> {
-    throw new Error('unimplemented');
+  async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.create({
+      id: card.id,
+      realm: card.realm,
+      adoptsFrom: card.parentCardURL,
+      data: card.serialize().attributes,
+    });
+    return { type: 'cards', id: raw.id, attributes: raw.data };
   }
 
-  async updateModel(_card: CardModel): Promise<JSONAPIDocument> {
-    throw new Error('unimplemented');
+  async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
+    return { type: 'cards', id: raw.id, attributes: raw.data };
   }
 
   private async makeCardModelFromDatabase(

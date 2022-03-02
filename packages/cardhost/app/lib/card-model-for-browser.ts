@@ -1,5 +1,4 @@
 import {
-  JSONAPIDocument,
   Setter,
   Saved,
   Unsaved,
@@ -13,7 +12,6 @@ import {
   CardService,
   CompiledCard,
   CardModelArgs,
-  RawCard,
 } from '@cardstack/core/src/interfaces';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -48,7 +46,6 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
-  original: CardModel | undefined;
 }
 
 export default class CardModelForBrowser implements CardModel {
@@ -58,7 +55,7 @@ export default class CardModelForBrowser implements CardModel {
   private schemaModule: CompiledCard['schemaModule']['global'];
   private _format: Format;
   private componentModule: CardComponentModule;
-  private rawData: NonNullable<RawCard['data']>;
+  private rawData: RawCardData;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
@@ -77,14 +74,7 @@ export default class CardModelForBrowser implements CardModel {
     this._format = format;
     this.componentModule = componentModule;
     this.rawData = rawData;
-    if (state.type == 'created') {
-      this.state = state;
-    } else {
-      this.state = {
-        ...state,
-        original: undefined,
-      };
-    }
+    this.state = state;
 
     this.setters = this.makeSetter();
     registerDestructor(this, this.rerenderFinished.bind(this));
@@ -141,7 +131,9 @@ export default class CardModelForBrowser implements CardModel {
     if (this.state.type === 'created') {
       return this.state.parentCardURL;
     } else {
-      return this.rawData.attributes.adoptsFrom;
+      throw new Error(
+        `card ${this.url} in state ${this.state.type} does not support parentCardURL`
+      );
     }
   }
 
@@ -156,7 +148,6 @@ export default class CardModelForBrowser implements CardModel {
 
     await editable.computeData();
 
-    (editable.state as LoadedState).original = this;
     return editable;
   }
 
@@ -215,7 +206,7 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   private getRawField(fieldPath: string): any {
-    let value = get(this.rawData.attributes, fieldPath);
+    let value = get(this.rawData, fieldPath);
     return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
   }
 
@@ -270,9 +261,7 @@ export default class CardModelForBrowser implements CardModel {
   @restartableTask async rerenderData(
     data: Record<string, any>
   ): Promise<void> {
-    this.rawData = merge({}, this.rawData, {
-      attributes: data,
-    });
+    this.rawData = merge({}, this.rawData, data);
     let newSchemaInstance = await this.createSchemaInstance();
     await this.computeData(newSchemaInstance);
     this._schemaInstance = newSchemaInstance;
@@ -317,29 +306,24 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   async save(): Promise<void> {
-    let response: JSONAPIDocument<Saved>;
-    let original: CardModel | undefined;
-
+    let data: ResourceObject<Saved>;
     switch (this.state.type) {
       case 'created':
-        response = await this.cards.createModel(this);
+        data = await this.cards.createModel(this);
         break;
       case 'loaded':
-        original = this.state.original;
-        response = await this.cards.updateModel(this);
+        data = await this.cards.updateModel(this);
         break;
       default:
         throw assertNever(this.state);
     }
 
-    let { data } = response;
     assertDocumentDataIsResource(data);
 
-    this.rawData = cloneDeep(data);
+    this.rawData = cloneDeep(data.attributes ?? {});
     this.state = {
       type: 'loaded',
       url: data.id,
-      original,
     };
   }
 }

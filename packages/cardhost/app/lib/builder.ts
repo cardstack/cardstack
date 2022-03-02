@@ -7,10 +7,8 @@ import {
   CardModel,
   CardComponentModule,
   Card,
-  JSONAPIDocument,
   assertDocumentDataIsResource,
   ResourceObject,
-  Unsaved,
   Saved,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
@@ -92,17 +90,6 @@ export default class LocalRealm implements Builder {
       compiled.componentInfos[format].componentModule.global
     );
 
-    // TODO we can optimize this structure in our CardModelForBrowser now that
-    // we are not grabbing the literal JSONAPI response from the server
-    let rawServerResponse = {
-      type: 'card',
-      id: url,
-      attributes: raw.data,
-      meta: {
-        schemaModule: compiled.schemaModule.global,
-        componentModule: compiled.componentInfos[format].componentModule.global,
-      },
-    };
     let model = new CardModelForBrowser(
       this.cards,
       {
@@ -112,7 +99,7 @@ export default class LocalRealm implements Builder {
       {
         format,
         realm: this.realmURL,
-        rawData: rawServerResponse,
+        rawData: raw.data ?? {},
         schemaModule: compiled.schemaModule.global,
         componentModule,
       }
@@ -211,11 +198,8 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  // TODO this should take a CardModel as a param
-  async create(
-    parentCardURL: string,
-    resource: ResourceObject<Unsaved>
-  ): Promise<JSONAPIDocument> {
+  async create(card: CardModel): Promise<ResourceObject<Saved>> {
+    let resource = card.serialize();
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
     let id = resource.id
@@ -225,28 +209,24 @@ export default class LocalRealm implements Builder {
       realm: this.realmURL,
       id,
       data,
-      adoptsFrom: parentCardURL,
+      adoptsFrom: card.parentCardURL,
     });
     let url = cardURL({ realm: this.realmURL, id });
     let { raw } = await this.load(url);
     return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-      },
+      type: 'card',
+      id: url,
+      attributes: raw.data,
     };
   }
 
-  // TODO this should take a CardModel as a param
-  async update(
-    url: string,
-    resource: ResourceObject<Saved>
-  ): Promise<JSONAPIDocument> {
+  async update(card: CardModel): Promise<ResourceObject<Saved>> {
+    let { url } = card;
     let cardId = this.parseOwnRealmURL(url);
     if (!cardId) {
       throw new Error(`${url} is not in the local realm`);
     }
+    let resource = card.serialize();
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
     let existingRawCard = await this.getRawCard(url);
@@ -259,11 +239,9 @@ export default class LocalRealm implements Builder {
     existingRawCard.data = data;
     let { raw } = await this.load(url);
     return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-      },
+      type: 'card',
+      id: url,
+      attributes: raw.data,
     };
   }
 

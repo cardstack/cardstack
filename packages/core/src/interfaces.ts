@@ -216,8 +216,8 @@ export interface CardService {
 
   // it would be great if we could merge these with create and update--but we
   // have a need to pass the CardModel thru this...
-  createModel(card: CardModel): Promise<JSONAPIDocument>; // TODO refactor to not use JSONAPIDocument
-  updateModel(card: CardModel): Promise<JSONAPIDocument>; // TODO refactor to not use JSONAPIDocument
+  createModel(card: CardModel): Promise<ResourceObject<Saved>>;
+  updateModel(card: CardModel): Promise<ResourceObject<Saved>>;
 }
 
 export interface CardSchemaModule {

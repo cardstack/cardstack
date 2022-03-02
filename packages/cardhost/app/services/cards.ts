@@ -35,11 +35,11 @@ export default class Cards extends Service implements CardService {
     throw new Error('unimplemented');
   }
 
-  async loadData(
-    url: string,
-    format: Format,
-    allFields = false
-  ): Promise<CardModel> {
+  // we don't support the allFields flag in the browser because the browser
+  // already does serialize with all the fields it knows about--it's only on the
+  // hub that the card knows specifically what the used fields are. on the
+  // browser the used fields are assumed to be whatever the server gave you
+  async loadData(url: string, format: Format): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
       let model = await builder.loadData(url, format);
@@ -108,29 +108,26 @@ export default class Cards extends Service implements CardService {
     throw new Error('unimplemented');
   }
 
-  async createModel(card: CardModel): Promise<JSONAPIDocument> {
-    let response: JSONAPIDocument;
+  async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let data: ResourceObject<Saved>;
     if (this.inLocalRealm(card.realm)) {
       let builder = await this.builder();
-      response = await builder.create(card.parentCardURL, card.serialize());
+      data = await builder.create(card);
     } else {
-      response = await this.createRemote(card);
+      data = await this.createRemote(card);
     }
-    return response;
+    return data;
   }
 
-  async updateModel(card: CardModel): Promise<JSONAPIDocument> {
-    let response: JSONAPIDocument;
+  async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let data: ResourceObject<Saved>;
     if (this.inLocalRealm(card.realm)) {
       let builder = await this.builder();
-      response = await builder.update(
-        card.url,
-        card.serialize() as ResourceObject<Saved> // loaded state is always saved
-      );
+      data = await builder.update(card);
     } else {
-      response = await this.updateRemote(card);
+      data = await this.updateRemote(card);
     }
-    return response;
+    return data;
   }
 
   private async makeCardModelFromResponse(
@@ -165,7 +162,7 @@ export default class Cards extends Service implements CardService {
         format,
         realm: realm as string,
         schemaModule,
-        rawData: cloneDeep(cardResponse),
+        rawData: cloneDeep(cardResponse.attributes ?? {}),
         componentModule,
       }
     );
@@ -174,21 +171,25 @@ export default class Cards extends Service implements CardService {
     return model;
   }
 
-  private async createRemote(card: CardModel): Promise<JSONAPIDocument> {
-    return await fetchJSON<JSONAPIDocument>(
-      buildNewURL(card.realm, card.parentCardURL),
-      {
-        method: 'POST',
-        body: JSON.stringify({ data: card.serialize() }),
-      }
-    );
+  private async createRemote(card: CardModel): Promise<ResourceObject<Saved>> {
+    return (
+      await fetchJSON<JSONAPIDocument>(
+        buildNewURL(card.realm, card.parentCardURL),
+        {
+          method: 'POST',
+          body: JSON.stringify({ data: card.serialize() }),
+        }
+      )
+    ).data as ResourceObject<Saved>;
   }
 
-  private async updateRemote(card: CardModel): Promise<JSONAPIDocument> {
-    return await fetchJSON<JSONAPIDocument>(buildCardURL(card.url), {
-      method: 'PATCH',
-      body: JSON.stringify({ data: card.serialize() }),
-    });
+  private async updateRemote(card: CardModel): Promise<ResourceObject<Saved>> {
+    return (
+      await fetchJSON<JSONAPIDocument>(buildCardURL(card.url), {
+        method: 'PATCH',
+        body: JSON.stringify({ data: card.serialize() }),
+      })
+    ).data as ResourceObject<Saved>;
   }
 
   private inLocalRealm(cardURL: string): boolean {

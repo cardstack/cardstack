@@ -2,7 +2,6 @@ import {
   CardModel,
   SerializerMap,
   CompiledCard,
-  RawCard,
   Format,
   ResourceObject,
   Saved,
@@ -44,18 +43,17 @@ interface LoadedState {
 
 export default class CardModelForHub implements CardModel {
   private fileCache = service('file-cache', { as: 'fileCache' });
-  private realmManager = service('realm-manager', { as: 'realmManager' });
   private searchIndex = service('searchIndex');
-  private deserialized: boolean; // TODO is this really needed?
+  private hasDeserialized: boolean;
 
   setters: undefined;
-  private _data: any;
+  private deserializedData: Record<string, any> | undefined;
   private state: CreatedState | LoadedState;
   private _realm: string;
   private schemaModule: CompiledCard['schemaModule']['global'];
   private componentMeta: CardComponentMetaModule;
   private _format: Format;
-  private rawData: NonNullable<RawCard['data']>;
+  private rawData: RawCardData;
 
   constructor(
     private cards: CardService,
@@ -67,7 +65,7 @@ export default class CardModelForHub implements CardModel {
     this._realm = realm;
     this._format = format;
     this.schemaModule = schemaModule;
-    this.deserialized = deserialized;
+    this.hasDeserialized = deserialized;
     this.componentMeta = componentMeta;
     this.rawData = rawData;
     if (state.type == 'created') {
@@ -152,7 +150,7 @@ export default class CardModelForHub implements CardModel {
     if (this.state.type === 'created') {
       return this.state.parentCardURL;
     } else {
-      return this.rawData.attributes.adoptsFrom;
+      throw new Error(`card ${this.url} in state ${this.state.type} does not support parentCardURL`);
     }
   }
 
@@ -164,10 +162,7 @@ export default class CardModelForHub implements CardModel {
     throw new Error('Hub does not have use of editable');
   }
 
-  // TODO I think we might have a bug here because we are not setting the
-  // this.state.rawData--how will computeds work if we are not setting this? We
-  // should use the CardModelForBrowser's setters to set the data
-  setData(data: RawCardData, deserialized = true): void {
+  setData(data: RawCardData): void {
     let nonExistentFields = this.assertFieldsExists(data);
     if (nonExistentFields.length) {
       throw new BadRequest(
@@ -176,8 +171,8 @@ export default class CardModelForHub implements CardModel {
         } in format '${this.format}'`
       );
     }
-    this._data = data;
-    this.deserialized = deserialized;
+    this.rawData = serializeAttributes(merge({}, this.rawData, data), this.serializerMap);
+    this.hasDeserialized = false;
   }
 
   // TODO: we need to really use a validation mechanism which will use code from
@@ -198,11 +193,11 @@ export default class CardModelForHub implements CardModel {
   // TODO: This will likely need to go to a field level deserialization so that
   // you know from a field-by-field perspective if a field has been deserialized
   get data(): any {
-    if (!this.deserialized && this.state.type === 'loaded') {
-      this._data = deserializeAttributes(this.rawData, this.serializerMap);
-      this.deserialized = true;
+    if (!this.hasDeserialized) {
+      this.deserializedData = deserializeAttributes(this.rawData, this.serializerMap);
+      this.hasDeserialized = true;
     }
-    return this._data;
+    return this.deserializedData;
   }
 
   async component(): Promise<unknown> {
@@ -211,12 +206,12 @@ export default class CardModelForHub implements CardModel {
 
   serialize(): ResourceObject<Saved | Unsaved> {
     if (this.state.type === 'created') {
-      return serializeCardAsResource(undefined, this.data, this.serializerMap);
+      return serializeCardAsResource(undefined, this.rawData, this.serializerMap);
     }
 
     let resource = serializeCardAsResource(
       this.url,
-      this.data,
+      this.rawData,
       this.serializerMap,
       !this.state.allFields ? this.usedFields : undefined
     );
@@ -227,43 +222,32 @@ export default class CardModelForHub implements CardModel {
   }
 
   async save(): Promise<void> {
-    let raw: RawCard, compiled: CompiledCard;
+    let data: ResourceObject<Saved>, compiled: CompiledCard;
+    let { realm } = this;
     switch (this.state.type) {
       case 'created':
-        // TODO move this into CardService
-        raw = await this.realmManager.create({
-          id: this.state.id,
-          realm: this.realm,
-          adoptsFrom: this.state.parentCardURL,
-          data: serializeAttributes(this._data, this.serializerMap),
-        });
-        compiled = await this.searchIndex.indexData(raw, this);
+        data = await this.cards.createModel(this);
+        let { id } = data;
+        compiled = await this.searchIndex.indexData(
+          { id, realm, adoptsFrom: this.parentCardURL, data: data.attributes },
+          this
+        );
         break;
       case 'loaded':
         {
-          let updatedRawCard = merge(
-            {
-              id: this.state.id,
-              realm: this.realm,
-            },
-            { data: this.rawData }, // the original data
-            { data: this.data }
-          );
-
-          // TODO move this into CardService
-          updatedRawCard.data = serializeAttributes(updatedRawCard.data, this.serializerMap);
-          raw = await this.realmManager.update(updatedRawCard);
-          compiled = await this.searchIndex.indexData(raw, this);
+          data = await this.cards.updateModel(this);
+          let { id } = data;
+          compiled = await this.searchIndex.indexData({ id, realm, data: data.attributes }, this);
         }
         break;
       default:
         throw assertNever(this.state);
     }
-    this.deserialized = false;
-    this.rawData = raw.data ?? {};
+    this.hasDeserialized = false;
+    this.rawData = data.attributes ?? {};
     this.state = {
       type: 'loaded',
-      id: raw.id,
+      id: data.id,
       componentModule: compiled.componentInfos['isolated'].componentModule.global,
       original: undefined,
       allFields: false,
