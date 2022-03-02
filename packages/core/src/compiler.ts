@@ -7,7 +7,6 @@ import isEqual from 'lodash/isEqual';
 import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
-import analyzeSchemaBabelPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema-analyze';
 import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
 import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
 import transformCardComponent, {
@@ -19,8 +18,6 @@ import {
   CardModule,
   CompiledCard,
   ComponentInfo,
-  FeatureFile,
-  FEATURE_NAMES,
   Format,
   GlobalRef,
   LocalRef,
@@ -40,16 +37,17 @@ const BASE_CARD_ID: CardId = {
 };
 export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
 
+type SourceCardModule = Required<CardModule> & {
+  meta: FileMeta;
+  localPath: string;
+};
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  private originalModules: Record<
-    string,
-    CardModule & {
-      meta?: FileMeta;
-    }
-  >;
+  private schemaSourceModule: SourceCardModule | undefined;
+
+  private originalModules: Record<string, SourceCardModule>;
   private outputModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
@@ -64,40 +62,28 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
-    let options = {};
     let { cardSource } = this;
 
-    this.analyzeFiles();
+    for (const localPath in this.cardSource.files) {
+      this.analyzeFile(localPath);
+    }
 
-    let schemaModule: ModuleRef | undefined = this.analyzeSchema(options);
-    let meta = getMeta(options);
+    let parentCard: CompiledCard | undefined;
+    let fields: CompiledCard['fields'] = {};
+    let schemaModuleRef: ModuleRef | undefined;
 
-    let fields = await this.lookupFieldsForCard(meta.fields, cardSource.realm);
-
-    let parentCard;
+    this.schemaSourceModule = this.getLocalSchema();
 
     if (isBaseCard(cardSource)) {
-      schemaModule = { global: 'todo' };
+      schemaModuleRef = { global: 'todo' };
     } else {
-      parentCard = await this.getParentCard(meta);
+      parentCard = await this.getParentCard();
 
-      if (!parentCard) {
-        throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
-      }
-
-      if (parentCard.url !== BASE_CARD_URL) {
-        let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
-        if (isParentPrimitive && schemaModule) {
-          throw new CardstackError(
-            `Card ${cardSource.realm}${cardSource.id} adopting from primitive parent ${parentCard.url} must be of primitive type itself and should not have a schema.js file.`
-          );
-        }
-      }
-
-      if (schemaModule) {
-        this.prepareSchema(schemaModule, meta, fields, parentCard);
+      if (this.schemaSourceModule) {
+        fields = await this.lookupFieldsForCard();
+        schemaModuleRef = this.prepareSchema(this.schemaSourceModule, fields, parentCard);
       } else {
-        schemaModule = parentCard.schemaModule;
+        schemaModuleRef = parentCard.schemaModule;
       }
 
       fields = this.adoptFields(fields, parentCard);
@@ -113,7 +99,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
-      schemaModule,
+      schemaModule: schemaModuleRef,
       serializerModule: await this.getSerializer(parentCard),
       fields,
       adoptsFrom: parentCard,
@@ -125,24 +111,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return compiledCard;
   }
 
-  private analyzeFiles() {
-    for (const localPath in this.cardSource.files) {
-      this.analyzeFile(localPath);
-    }
-  }
-
   private analyzeFile(localPath: string) {
     let { cardSource } = this;
-    let source = this.getFile(cardSource, localPath);
-    let feature = this.getFeatureForFilePath(localPath);
+    let source = this.getSourceFile(cardSource, localPath);
 
-    if (feature === 'asset') {
+    if (!localPath.endsWith('.js')) {
       this.defineAsset(localPath, source);
       return;
     }
 
     let options = {};
-    // TODO: Move schema analyze plugin into this one
     let { code, ast, meta } = analyzeFileBabelPlugin(source, options);
 
     this.originalModules[localPath] = {
@@ -150,6 +128,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       source: code!,
       ast: ast!,
       meta,
+      localPath,
     };
   }
 
@@ -160,18 +139,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
   }
 
-  private getFeatureForFilePath(localPath: string): FeatureFile {
-    for (const feature of FEATURE_NAMES) {
-      if (this.cardSource[feature] === localPath) {
-        return feature;
-      }
-    }
-    return 'asset';
-  }
-
-  private getCardParentPath(meta: PluginMeta): string | undefined {
+  private getCardParentURL(): string {
     let parentPath;
     let { adoptsFrom, realm, id } = this.cardSource;
+    let parentMeta = this.schemaSourceModule?.meta.parent;
 
     if (adoptsFrom) {
       if (id != null && `${realm}${id}` === adoptsFrom) {
@@ -180,22 +151,25 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       parentPath = adoptsFrom;
     }
 
-    if (meta.parent && meta.parent.cardURL) {
-      if (parentPath && parentPath !== meta.parent.cardURL) {
+    if (parentMeta && parentMeta.cardURL) {
+      if (parentPath && parentPath !== parentMeta.cardURL) {
         throw new Error(`card provides conflicting parent URLs in card.json and schema.js`);
       }
-      parentPath = meta.parent.cardURL;
+      parentPath = parentMeta.cardURL;
     }
 
-    return parentPath;
+    if (parentPath) {
+      return resolveCard(parentPath, realm);
+    } else {
+      return BASE_CARD_URL;
+    }
   }
 
-  private async getParentCard(meta: PluginMeta): Promise<CompiledCard> {
-    let { cardSource } = this;
-    let parentCardPath = this.getCardParentPath(meta);
-    let url = parentCardPath ? resolveCard(parentCardPath, cardSource.realm) : BASE_CARD_URL;
+  private async getParentCard(): Promise<CompiledCard> {
+    let url = this.getCardParentURL();
+    let parentCard: CompiledCard;
     try {
-      return await this.builder.getCompiledCard(url);
+      parentCard = await this.builder.getCompiledCard(url);
     } catch (err: any) {
       if (!err.isCardstackError || err.status !== 404) {
         throw err;
@@ -204,9 +178,24 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
       throw newErr;
     }
+
+    if (!parentCard) {
+      throw new CardstackError(`Failed to find a parent card. This is wrong and should not happen.`);
+    }
+
+    if (parentCard.url !== BASE_CARD_URL) {
+      let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
+      if (isParentPrimitive && this.schemaSourceModule) {
+        throw new CardstackError(
+          `Card ${this.cardSource.realm}${this.cardSource.id} adopting from primitive parent ${parentCard.url} must be of primitive type itself and should not have a schema.js file.`
+        );
+      }
+    }
+
+    return parentCard;
   }
 
-  private getFile(cardSource: RawCard<Unsaved>, path: string): string {
+  private getSourceFile(cardSource: RawCard<Unsaved>, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
       throw new CardstackError(`card refers to ${path} in its card.json but that file does not exist`, { status: 422 });
@@ -224,39 +213,24 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return module;
   }
 
-  // returns the module name of our own compiled schema, if we have one. Does
-  // not recurse into parent, because we don't necessarily know our parent until
-  // after we've tried to compile our own
-  private analyzeSchema(options: any): LocalRef | undefined {
+  private getLocalSchema() {
     let { cardSource } = this;
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {
         console.warn(`You did not specify what is your schema file, but a schema.js file exists. Using schema.js.`);
+        return this.getSourceModule('schema.js');
       }
 
       return undefined;
     }
-    let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
-    let { code, ast } = analyzeSchemaBabelPlugin(schemaSrc, options);
-
-    this.originalModules[schemaLocalFilePath] = {
-      type: JS_TYPE,
-      source: code!,
-      ast: ast!,
-    };
-    return { local: schemaLocalFilePath };
+    return this.getSourceModule(schemaLocalFilePath);
   }
 
-  private prepareSchema(
-    schemaModule: LocalRef,
-    meta: PluginMeta,
-    fields: CompiledCard['fields'],
-    parent: CompiledCard
-  ) {
-    let { source, ast } = this.getSourceModule(schemaModule.local);
+  private prepareSchema(schemaModule: SourceCardModule, fields: CompiledCard['fields'], parent: CompiledCard) {
+    let { source, ast, meta, localPath } = schemaModule;
     if (!ast) {
-      throw new Error(`expecting an AST for ${schemaModule.local}, but none was generated`);
+      throw new Error(`expecting an AST for ${localPath}, but none was generated`);
     }
 
     let out: BabelFileResult;
@@ -268,14 +242,21 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } catch (error: any) {
       throw augmentBadRequest(error);
     }
-    this.outputModules[schemaModule.local] = {
+    this.outputModules[localPath] = {
       type: JS_TYPE,
       source: out!.code!,
       ast: out!.ast!,
     };
+    return { local: localPath };
   }
 
-  private async lookupFieldsForCard(metaFields: FieldsMeta, realm: string): Promise<CompiledCard['fields']> {
+  private async lookupFieldsForCard(): Promise<CompiledCard['fields']> {
+    let { realm } = this.cardSource;
+    let metaFields = this.schemaSourceModule?.meta.fields;
+
+    if (!metaFields) {
+      return {};
+    }
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
       let fieldURL = resolveCard(cardURL, realm);
@@ -354,7 +335,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
             `bug: ${parentCard.url} says it got ${which} from ${inheritedFrom}, but that card does not have a ${which} component`
           );
         }
-        let src = this.getFile(originalRawCard, srcLocalPath);
+        let src = this.getSourceFile(originalRawCard, srcLocalPath);
         let componentInfo = await this.compileComponent(
           src,
           fields,
