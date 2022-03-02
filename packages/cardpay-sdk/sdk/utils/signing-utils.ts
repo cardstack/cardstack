@@ -260,6 +260,9 @@ export async function signTypedData(web3: Web3, account: string, data: any): Pro
   let signature: string | undefined;
   let attempts = 0;
   do {
+    if (attempts > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
     signature = await new Promise((resolve, reject) => {
       let provider = web3.currentProvider;
       if (typeof provider === 'string') {
@@ -285,7 +288,7 @@ export async function signTypedData(web3: Web3, account: string, data: any): Pro
         }
       );
     });
-  } while (signature == null && attempts++ < 5);
+  } while (signature == null && attempts++ < 50);
   if (!signature) {
     throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
   }
