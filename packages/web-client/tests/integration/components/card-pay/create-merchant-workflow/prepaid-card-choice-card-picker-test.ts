@@ -109,7 +109,7 @@ module(
         .exists();
       assert
         .dom(`[data-test-boxel-card-picker-dropdown-option-disabled]`)
-        .hasClass('boxel-card-picker-dropdown__option--disabled');
+        .hasClass('boxel-card-picker__dropdown-option--disabled');
       assert
         .dom(
           `[data-test-boxel-card-picker-dropdown-option-disabled] [data-test-prepaid-card="${prepaidCardAddress2}"]`
