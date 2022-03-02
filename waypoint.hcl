@@ -266,10 +266,11 @@ app "reward-submit" {
             cluster = "reward-root-submitter"
             count = 1
             task_role_name = "reward-root-submitter-ecr-task"
+            execution_role_name = "reward-root-submitter-ecr-task-executor-role"
             disable_alb = true
             secrets = {
-                OWNER = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_REWARD_ROOT_SUBMITTER_ADDRESS-AI2RY6"
-                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_REWARD_ROOT_SUBMITTER_PRIVATE_KEY-47eL6P"
+                OWNER = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
+                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
             }
         }
     }
