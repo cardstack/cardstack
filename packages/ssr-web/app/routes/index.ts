@@ -8,7 +8,7 @@ import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import Subgraph from '../services/subgraph';
 
-interface UserSpaceRouteModel {
+interface CardSpaceIndexRouteModel {
   id: string;
   name: string;
   backgroundColor: string;
@@ -17,12 +17,12 @@ interface UserSpaceRouteModel {
   deepLinkPaymentURL: string;
 }
 
-export default class UserSpaceRoute extends Route {
+export default class IndexRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
   @service declare fastboot: Fastboot;
   @service declare subgraph: Subgraph;
 
-  async model(): Promise<UserSpaceRouteModel> {
+  async model(): Promise<CardSpaceIndexRouteModel> {
     if (this.appContext.currentApp === 'card-space') {
       try {
         const response = await fetch(
