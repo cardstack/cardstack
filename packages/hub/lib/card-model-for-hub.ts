@@ -226,18 +226,22 @@ export default class CardModelForHub implements CardModel {
     let { realm } = this;
     switch (this.state.type) {
       case 'created':
-        data = await this.cards.createModel(this);
-        let { id } = data;
-        compiled = await this.searchIndex.indexData(
-          { id, realm, adoptsFrom: this.parentCardURL, data: data.attributes },
-          this
-        );
+        {
+          data = await this.cards.createModel(this);
+          let { id } = data;
+          compiled = await this.searchIndex.indexData(
+            { id, realm, adoptsFrom: this.parentCardURL, data: data.attributes },
+            this
+          );
+        }
         break;
       case 'loaded':
         {
-          data = await this.cards.updateModel(this);
-          let { id } = data;
-          compiled = await this.searchIndex.indexData({ id, realm, data: data.attributes }, this);
+          {
+            data = await this.cards.updateModel(this);
+            let { id } = data;
+            compiled = await this.searchIndex.indexData({ id, realm, data: data.attributes }, this);
+          }
         }
         break;
       default:
