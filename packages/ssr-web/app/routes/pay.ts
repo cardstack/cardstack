@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import '../css/pay.css';
 import { inject as service } from '@ember/service';
-import SafeViewer from '@cardstack/ssr-web/services/safe-viewer';
+import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
@@ -16,7 +16,7 @@ interface PayRouteModel {
 }
 
 export default class PayRoute extends Route {
-  @service('safe-viewer') declare safeViewer: SafeViewer;
+  @service('subgraph') declare subgraph: Subgraph;
 
   async model(params: {
     network: string;
@@ -79,7 +79,7 @@ export default class PayRoute extends Route {
       );
     }
 
-    let data = (await this.safeViewer.view(network, address)).safe;
+    let data = (await this.subgraph.viewSafe(network, address)).safe;
 
     if (!data || data.type !== 'merchant')
       throw new Error(
