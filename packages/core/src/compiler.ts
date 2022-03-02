@@ -44,19 +44,19 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  private sourceModules: Record<
+  private originalModules: Record<
     string,
     CardModule & {
       meta?: FileMeta;
     }
   >;
-  private globalModules: CompiledCard<Unsaved, LocalRef>['modules'];
+  private outputModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
-    this.sourceModules = {};
-    this.globalModules = {};
+    this.originalModules = {};
+    this.outputModules = {};
   }
 
   get dependencies(): Set<string> {
@@ -118,7 +118,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       fields,
       adoptsFrom: parentCard,
       componentInfos: await this.prepareComponents(fields, parentCard),
-      modules: this.globalModules,
+      modules: this.outputModules,
       deps: [...this.dependencies],
     };
 
@@ -145,7 +145,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     // TODO: Move schema analyze plugin into this one
     let { code, ast, meta } = analyzeFileBabelPlugin(source, options);
 
-    this.sourceModules[localPath] = {
+    this.originalModules[localPath] = {
       type: JS_TYPE,
       source: code!,
       ast: ast!,
@@ -154,7 +154,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private defineAsset(localPath: string, source: string): void {
-    this.globalModules[localPath] = {
+    this.outputModules[localPath] = {
       type: getFileType(localPath),
       source,
     };
@@ -215,7 +215,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private getSourceModule(localPath: string) {
-    let module = this.sourceModules[localPath];
+    let module = this.originalModules[localPath];
     if (!module) {
       throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
         status: 422,
@@ -240,7 +240,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
     let { code, ast } = analyzeSchemaBabelPlugin(schemaSrc, options);
 
-    this.sourceModules[schemaLocalFilePath] = {
+    this.originalModules[schemaLocalFilePath] = {
       type: JS_TYPE,
       source: code!,
       ast: ast!,
@@ -268,7 +268,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } catch (error: any) {
       throw augmentBadRequest(error);
     }
-    this.globalModules[schemaModule.local] = {
+    this.outputModules[schemaModule.local] = {
       type: JS_TYPE,
       source: out!.code!,
       ast: out!.ast!,
@@ -409,7 +409,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let componentTransformResult = transformCardComponent(templateSource, options);
-    this.globalModules[componentModule] = {
+    this.outputModules[componentModule] = {
       type: JS_TYPE,
       source: componentTransformResult.source,
       ast: componentTransformResult.ast,
@@ -422,7 +422,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       serializerMap: {},
     };
     let componentMetaResult = generateComponentMeta(metaOptions);
-    this.globalModules[metaModuleFileName] = {
+    this.outputModules[metaModuleFileName] = {
       type: JS_TYPE,
       source: componentMetaResult.source,
     };
@@ -451,7 +451,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } else if (serializer) {
       let serializerModule = this.getSourceModule(serializer);
       this.validateSerializer(serializerModule.meta);
-      this.globalModules[serializer] = serializerModule;
+      this.outputModules[serializer] = serializerModule;
 
       serializerRef = { local: serializer };
     }
