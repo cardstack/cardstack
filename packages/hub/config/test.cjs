@@ -6,6 +6,9 @@ module.exports = {
     useTransactionalRollbacks: true,
   },
   serverSecret: '2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=',
+  checkly: {
+    handleWebhookRequests: true,
+  },
   compiler: {
     realmsConfig: [
       {
