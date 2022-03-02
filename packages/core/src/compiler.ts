@@ -442,15 +442,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private validateSerializer(meta?: FileMeta) {
     const EXPECTED_EXPORTS: ExportMeta[] = [
-      { name: 'serialize', type: 'FunctionDeclaration' },
-      { name: 'deserialize', type: 'FunctionDeclaration' },
+      { type: 'declaration', name: 'serialize', declarationType: 'FunctionDeclaration' },
+      { type: 'declaration', name: 'deserialize', declarationType: 'FunctionDeclaration' },
     ];
     let diff = differenceWith(EXPECTED_EXPORTS, meta?.exports || [], isEqual);
     if (diff.length) {
-      throw new CardstackError(
-        `Serializer is malformed. It is missing the following exports: ${diff.map((d) => d.name).join(', ')}`,
-        { status: 422 }
-      );
+      let names = diff.map((d) => (d.type === 'declaration' ? d.name : null)).filter(Boolean);
+      throw new CardstackError(`Serializer is malformed. It is missing the following exports: ${names.join(', ')}`, {
+        status: 422,
+      });
     }
   }
 }

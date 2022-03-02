@@ -1,4 +1,4 @@
-import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
+import cardAnalyze, { ExportMeta, ImportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
 
 if (process.env.COMPILER) {
   describe('BabelPluginCardAnalyze', function () {
@@ -17,6 +17,7 @@ if (process.env.COMPILER) {
         export function serializer() {}
         export default class FancyClass {}
         export const KEEP = 'ME AROUND';
+        export { templateOnlyComponent } from './a-file';
       `;
       let out = cardAnalyze(source, options);
       expect(out.code).to.containsSource(source);
@@ -24,9 +25,10 @@ if (process.env.COMPILER) {
       expect(out.meta).to.have.property('exports');
 
       let members: ExportMeta[] = [
-        { type: 'FunctionDeclaration', name: 'serializer' },
-        { type: 'VariableDeclaration', name: 'KEEP' },
-        { type: 'ClassDeclaration', name: 'default' },
+        { type: 'declaration', declarationType: 'FunctionDeclaration', name: 'serializer' },
+        { type: 'declaration', declarationType: 'VariableDeclaration', name: 'KEEP' },
+        { type: 'declaration', declarationType: 'ClassDeclaration', name: 'default' },
+        { type: 'reexport', locals: ['templateOnlyComponent'], source: './a-file' },
       ];
       expect(out.meta.exports).to.have.deep.members(members);
     });
@@ -152,6 +154,37 @@ if (process.env.COMPILER) {
         computed: true,
         computeVia: 'computeHome',
       });
+    });
+
+    it('responds gracefully component files', async function () {
+      let options = {};
+      let source = `
+        import { setComponentTemplate } from '@ember/component';
+        import { precompileTemplate } from '@ember/template-compilation';
+        import templateOnlyComponent from '@ember/component/template-only';
+
+        export default setComponentTemplate(
+          precompileTemplate(
+            \`<div class="user">
+              <strong class="user__name"><@fields.name/></strong>
+              <p><@fields.description/></p>
+            </div>\`,
+            {
+              strictMode: true,
+              scope: () => ({}),
+            }
+          ),
+          templateOnlyComponent()
+        );
+  	  `;
+      let { meta } = cardAnalyze(source, options);
+
+      let members: ImportMeta[] = [
+        { specifiers: ['setComponentTemplate'], source: '@ember/component' },
+        { specifiers: ['precompileTemplate'], source: '@ember/template-compilation' },
+        { specifiers: ['templateOnlyComponent'], source: '@ember/component/template-only' },
+      ];
+      expect(meta.imports).to.have.deep.members(members);
     });
   });
 }

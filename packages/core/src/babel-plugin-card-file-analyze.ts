@@ -40,16 +40,31 @@ export interface FieldMeta {
 export interface FieldsMeta {
   [name: string]: FieldMeta;
 }
+
 export interface ParentMeta {
   cardURL: string;
 }
-export interface ExportMeta {
-  name: 'default' | string;
-  type: t.Declaration['type'];
+
+export type ExportMeta =
+  | {
+      type: 'declaration';
+      name: 'default' | string;
+      declarationType: t.Declaration['type'];
+    }
+  | {
+      type: 'reexport';
+      locals: string[];
+      source: string;
+    };
+
+export interface ImportMeta {
+  specifiers: string[];
+  source: string;
 }
 
 export interface FileMeta {
   exports?: ExportMeta[];
+  imports?: ImportMeta[];
   fields?: FieldsMeta;
   parent?: ParentMeta;
 }
@@ -97,22 +112,45 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
         if (path.node.source.value === '@cardstack/types') {
           storeDecoratorMeta(state.opts, path, t);
           path.remove();
+          return;
         }
+
+        storeImportMeta(state.opts, {
+          specifiers: path.node.specifiers.map((s) => s.local.name),
+          source: path.node.source.value,
+        });
       },
       ExportNamedDeclaration(path: NodePath<t.ExportNamedDeclaration>, state: State) {
+        if (path.node.source) {
+          let locals = [];
+          for (const s of path.node.specifiers) {
+            if (s.type == 'ExportSpecifier') {
+              locals.push(s.local.name);
+            }
+          }
+
+          storeExportMeta(state.opts, {
+            type: 'reexport',
+            locals,
+            source: path.node.source.value,
+          });
+          return;
+        }
         switch (path.node.declaration?.type) {
           case 'FunctionDeclaration':
             storeExportMeta(state.opts, {
+              type: 'declaration',
               name: name(path.node.declaration.id!, t),
-              type: path.node.declaration.type,
+              declarationType: path.node.declaration.type,
             });
             break;
           case 'VariableDeclaration':
             for (const dec of path.node.declaration.declarations) {
               if (t.isIdentifier(dec.id)) {
                 storeExportMeta(state.opts, {
+                  type: 'declaration',
                   name: dec.id.name,
-                  type: path.node.declaration.type,
+                  declarationType: path.node.declaration.type,
                 });
               }
             }
@@ -123,8 +161,9 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
         // Not sure what to do with expressions
         if (!t.isExpression(path.node.declaration)) {
           storeExportMeta(state.opts, {
+            type: 'declaration',
             name: 'default',
-            type: path.node.declaration.type,
+            declarationType: path.node.declaration.type,
           });
         }
       },
@@ -139,6 +178,16 @@ function storeExportMeta(key: State['opts'], exportMeta: ExportMeta) {
   }
 
   meta.exports.push(exportMeta);
+  metas.set(key, meta);
+}
+
+function storeImportMeta(key: State['opts'], importMeta: ImportMeta) {
+  let meta = getMeta(key);
+  if (!meta.imports) {
+    meta.imports = [];
+  }
+
+  meta.imports.push(importMeta);
   metas.set(key, meta);
 }
 
