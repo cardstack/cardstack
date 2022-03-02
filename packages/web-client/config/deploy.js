@@ -135,6 +135,7 @@ module.exports = function (deployTarget) {
       allowOverwrite: true,
       prefix: process.env.PR_BRANCH_NAME,
     };
+    ENV.plugins = ['build', 'compress', 's3', 's3-index'];
   }
 
   // Note: if you need to build some configuration asynchronously, you can return
