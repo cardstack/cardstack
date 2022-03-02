@@ -65,7 +65,7 @@ module('Integration | Service | app-context', function (hooks) {
     });
   });
 
-  module('window', function (hooks) {
+  module('browser', function (hooks) {
     hooks.beforeEach(function () {
       class MockFastboot extends Service {
         isFastBoot = false;
