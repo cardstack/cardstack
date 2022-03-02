@@ -2,6 +2,7 @@ import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { keys } from './utils';
+import { Query } from './query';
 
 export { Query } from './query';
 
@@ -185,6 +186,7 @@ export interface CardModel {
   editable(): Promise<CardModel>;
   url: string;
   id: string | undefined;
+  realm: string;
   data: Record<string, any>;
   getField(name: string): Promise<any>;
   format: Format;
@@ -193,6 +195,29 @@ export interface CardModel {
   component(): Promise<unknown>;
   usedFields: ComponentInfo['usedFields'];
   save(): Promise<void>;
+  parentCardURL: string;
+}
+
+export interface CardModelArgs {
+  realm: string;
+  schemaModule: string;
+  format: Format;
+  rawData: NonNullable<RawCard['data']>;
+}
+
+export interface CardService {
+  load(cardURL: string): Promise<Card>;
+  loadData(cardURL: string, format: Format, allFields?: boolean): Promise<CardModel>;
+  create(raw: RawCard<Unsaved>): Promise<Card>;
+  update(partialRaw: RawCard): Promise<Card>;
+  delete(raw: RawCard): Promise<void>;
+  query(format: Format, query: Query): Promise<CardModel[]>;
+  loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
+
+  // it would be great if we could merge these with create and update--but we
+  // have a need to pass the CardModel thru this...
+  createModel(card: CardModel): Promise<JSONAPIDocument>; // TODO refactor to not use JSONAPIDocument
+  updateModel(card: CardModel): Promise<JSONAPIDocument>; // TODO refactor to not use JSONAPIDocument
 }
 
 export interface CardSchemaModule {

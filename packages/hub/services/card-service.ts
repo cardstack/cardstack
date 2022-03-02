@@ -1,4 +1,12 @@
-import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
+import {
+  Card,
+  CompiledCard,
+  Unsaved,
+  RawCard,
+  Format,
+  CardModel,
+  CardService as CardServiceInterface,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
@@ -21,6 +29,7 @@ import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
+import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -34,7 +43,7 @@ export default class CardServiceFactory {
   }
 }
 
-export class CardService {
+export class CardService implements CardServiceInterface {
   private realmManager = service('realm-manager', { as: 'realmManager' });
   private fileCache = service('file-cache', { as: 'fileCache' });
   private builder = service('card-builder', { as: 'builder' });
@@ -130,6 +139,18 @@ export class CardService {
     }
   }
 
+  loadModule(moduleIdentifier: string): Promise<any> {
+    return Promise.resolve(this.fileCache.loadModule(moduleIdentifier));
+  }
+
+  async createModel(_card: CardModel): Promise<JSONAPIDocument> {
+    throw new Error('unimplemented');
+  }
+
+  async updateModel(_card: CardModel): Promise<JSONAPIDocument> {
+    throw new Error('unimplemented');
+  }
+
   private async makeCardModelFromDatabase(
     format: Format,
     result: Record<string, any>,
@@ -138,19 +159,25 @@ export class CardService {
     let cardId = this.realmManager.parseCardURL(result.url);
 
     let componentMetaModule = result.componentInfos[format].metaModule.global;
-    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let componentMeta = await this.loadModule(componentMetaModule);
 
-    return await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: cardId.id,
-      realm: cardId.realm,
-      format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
-      componentModule: result.componentInfos[format].componentModule.global,
-      componentMeta,
-      allFields,
-    });
+    return await getOwner(this).instantiate(
+      CardModelForHub,
+      this,
+      {
+        type: 'loaded',
+        id: cardId.id,
+        componentModule: result.componentInfos[format].componentModule.global,
+        allFields,
+      },
+      {
+        format,
+        schemaModule: result.schemaModule,
+        realm: cardId.realm,
+        rawData: result.data ?? {},
+        componentMeta,
+      }
+    );
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {

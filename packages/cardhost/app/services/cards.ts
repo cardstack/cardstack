@@ -9,6 +9,11 @@ import {
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
   CardComponentModule,
+  CardService,
+  Card,
+  RawCard,
+  Unsaved,
+  Saved,
 } from '@cardstack/core/src/interfaces';
 import config from 'cardhost/config/environment';
 
@@ -22,11 +27,19 @@ import { cloneDeep } from 'lodash';
 
 const { cardServer } = config as any; // Environment types arent working
 
-export default class Cards extends Service {
+export default class Cards extends Service implements CardService {
   private localRealmURL = LOCAL_REALM;
   overrideRoutingCardWith: string | undefined;
 
-  async load(url: string, format: Format): Promise<CardModel> {
+  async load(_cardURL: string): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+
+  async loadData(
+    url: string,
+    format: Format,
+    allFields = false
+  ): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
       let model = await builder.loadData(url, format);
@@ -84,34 +97,98 @@ export default class Cards extends Service {
       })
     );
   }
+  async create(_raw: RawCard<Unsaved>): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+  async update(_partialRaw: RawCard): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+
+  async delete(_raw: RawCard): Promise<void> {
+    throw new Error('unimplemented');
+  }
+
+  async createModel(card: CardModel): Promise<JSONAPIDocument> {
+    let response: JSONAPIDocument;
+    if (this.inLocalRealm(card.realm)) {
+      let builder = await this.builder();
+      response = await builder.create(card.parentCardURL, card.serialize());
+    } else {
+      response = await this.createRemote(card);
+    }
+    return response;
+  }
+
+  async updateModel(card: CardModel): Promise<JSONAPIDocument> {
+    let response: JSONAPIDocument;
+    if (this.inLocalRealm(card.realm)) {
+      let builder = await this.builder();
+      response = await builder.update(
+        card.url,
+        card.serialize() as ResourceObject<Saved> // loaded state is always saved
+      );
+    } else {
+      response = await this.updateRemote(card);
+    }
+    return response;
+  }
 
   private async makeCardModelFromResponse(
     cardResponse: ResourceObject,
     componentModule: CardComponentModule,
     format: Format
   ): Promise<CardModel> {
-    let schemaModuleId = cardResponse.meta?.schemaModule;
-    if (!schemaModuleId) {
+    let schemaModule = cardResponse.meta?.schemaModule;
+    if (!schemaModule) {
       throw new Error(
         `card payload for ${cardResponse.id} has no meta.schemaModule`
       );
     }
-    if (typeof schemaModuleId !== 'string') {
+    if (typeof schemaModule !== 'string') {
       throw new Error(
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
     }
-    let model = new CardModelForBrowser(this, {
-      type: 'loaded',
-      url: cardResponse.id,
-      rawData: cloneDeep(cardResponse),
-      componentModule,
-      format,
-      schemaModuleId,
-    });
-    // TODO: We need to figure out what to do with async mode.data
+    let segments = cardResponse.id.split('/');
+    segments.pop(); // this is not ideal, maybe we can include the realm in our card payload?
+    let realm = segments.join('/');
+    if (!realm) {
+      throw new Error(`card payload for ${cardResponse.id} has no realm`);
+    }
+    let model = new CardModelForBrowser(
+      this,
+      {
+        type: 'loaded',
+        url: cardResponse.id,
+      },
+      {
+        format,
+        realm: realm as string,
+        schemaModule,
+        rawData: cloneDeep(cardResponse),
+        componentModule,
+      }
+    );
+
     await model.computeData();
     return model;
+  }
+
+  private async createRemote(card: CardModel): Promise<JSONAPIDocument> {
+    return await fetchJSON<JSONAPIDocument>(
+      buildNewURL(card.realm, card.parentCardURL),
+      {
+        method: 'POST',
+        body: JSON.stringify({ data: card.serialize() }),
+      }
+    );
+  }
+
+  private async updateRemote(card: CardModel): Promise<JSONAPIDocument> {
+    return await fetchJSON<JSONAPIDocument>(buildCardURL(card.url), {
+      method: 'PATCH',
+      body: JSON.stringify({ data: card.serialize() }),
+    });
   }
 
   private inLocalRealm(cardURL: string): boolean {
@@ -197,13 +274,26 @@ export default class Cards extends Service {
     ) {
       // module was built by our Builder, so ask Builder for it
       let builder = await this.builder();
-      return await builder.loadModule<T>(moduleIdentifier);
+      return await builder.loadModule(moduleIdentifier);
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`
       );
     }
   }
+}
+
+function buildNewURL(realm: string, parentCardURL: string): string {
+  return [
+    cardServer,
+    'cards/',
+    encodeURIComponent(realm) + '/',
+    encodeURIComponent(parentCardURL),
+  ].join('');
+}
+
+function buildCardURL(url: string): string {
+  return `${cardServer}cards/${encodeURIComponent(url)}`;
 }
 
 declare module '@ember/service' {

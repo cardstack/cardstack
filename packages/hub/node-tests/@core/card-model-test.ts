@@ -85,7 +85,7 @@ if (process.env.COMPILER) {
         model.url;
         throw new Error('did not throw expected error');
       } catch (e: any) {
-        expect(e.message).to.equal(`bug: card in state created does not have a url`);
+        expect(e.message).to.equal(`bug: card in state created does not have a url yet`);
       }
     });
 

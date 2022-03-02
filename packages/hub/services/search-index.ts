@@ -16,6 +16,7 @@ import { service } from '@cardstack/hub/services';
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
 import CardModelForHub from '../lib/card-model-for-hub';
+import { INSECURE_CONTEXT } from './card-service';
 
 const log = logger('hub/search-index');
 
@@ -142,6 +143,7 @@ export interface IndexerHandle {
 class IndexerRun implements IndexerHandle {
   private builder = service('card-builder', { as: 'builder' });
   private fileCache = service('file-cache', { as: 'fileCache' });
+  private cardService = service('card-service', { as: 'cardService' });
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
@@ -259,17 +261,23 @@ class IndexerRun implements IndexerHandle {
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
     let componentMeta = await this.fileCache.loadModule(componentMetaModule);
 
-    let cardModel = await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: rawCard.id,
-      realm: rawCard.realm,
-      format,
-      rawData: rawCard.data ?? {},
-      schemaModule: definedCard.schemaModule.global,
-      componentModule: definedCard.componentInfos[format].componentModule.global,
-      componentMeta,
-      allFields: false,
-    });
+    let cardModel = await getOwner(this).instantiate(
+      CardModelForHub,
+      await this.cardService.as(INSECURE_CONTEXT),
+      {
+        type: 'loaded',
+        id: rawCard.id,
+        componentModule: definedCard.componentInfos[format].componentModule.global,
+        allFields: false,
+      },
+      {
+        format,
+        realm: rawCard.realm,
+        rawData: rawCard.data ?? {},
+        schemaModule: definedCard.schemaModule.global,
+        componentMeta,
+      }
+    );
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 

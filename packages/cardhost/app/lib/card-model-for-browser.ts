@@ -10,6 +10,10 @@ import {
   Format,
   CardComponentModule,
   CardSchemaModule,
+  CardService,
+  CompiledCard,
+  CardModelArgs,
+  RawCard,
 } from '@cardstack/core/src/interfaces';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -24,17 +28,11 @@ import {
   serializeField,
   serializeCardAsResource,
 } from '@cardstack/core/src/serializers';
-import Cards from 'cardhost/services/cards';
-import { fetchJSON } from './jsonapi-fetch';
-import config from 'cardhost/config/environment';
-import LocalRealm, { LOCAL_REALM } from './builder';
 import { cardURL } from '@cardstack/core/src/utils';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
 import { restartableTask } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { registerDestructor } from '@ember/destroyable';
-
-const { cardServer } = config as any; // Environment types arent working
 
 export interface NewCardParams {
   realm: string;
@@ -44,43 +42,46 @@ export interface NewCardParams {
 export interface CreatedState {
   type: 'created';
   id?: string;
-  realm: string;
   parentCardURL: string;
-  componentModule: CardComponentModule;
-  schemaModuleId: string;
-  format: Format;
-  rawData: ResourceObject<Unsaved>;
 }
 
 export interface LoadedState {
   type: 'loaded';
-  format: Format;
   url: string;
-  rawData: ResourceObject<Saved>;
-  componentModule: CardComponentModule;
-  schemaModuleId: string;
-  deserialized: boolean;
   original: CardModel | undefined;
 }
 
 export default class CardModelForBrowser implements CardModel {
   setters: Setter;
   @tracked private _schemaInstance: any | undefined;
+  private _realm: string;
+  private schemaModule: CompiledCard['schemaModule']['global'];
+  private _format: Format;
+  private componentModule: CardComponentModule;
+  private rawData: NonNullable<RawCard['data']>;
   private state: CreatedState | LoadedState;
   private wrapperComponent: unknown | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
 
   constructor(
-    private cards: Cards,
+    private cards: CardService,
     state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>,
-    private localRealm?: LocalRealm
+    // TODO let's work on unifying these args with the CardModelForHub
+    args: CardModelArgs & {
+      componentModule: CardComponentModule;
+    }
   ) {
+    let { realm, schemaModule, format, componentModule, rawData } = args;
+    this._realm = realm;
+    this.schemaModule = schemaModule;
+    this._format = format;
+    this.componentModule = componentModule;
+    this.rawData = rawData;
     if (state.type == 'created') {
       this.state = state;
     } else {
       this.state = {
         ...state,
-        deserialized: false,
         original: undefined,
       };
     }
@@ -94,24 +95,20 @@ export default class CardModelForBrowser implements CardModel {
       throw new Error(`tried to adopt from an unsaved card`);
     }
 
-    let localRealm: LocalRealm | undefined;
-    if (realm === LOCAL_REALM) {
-      localRealm = this.localRealm ?? (await this.cards.builder());
-    }
-
     return new (this.constructor as typeof CardModelForBrowser)(
       this.cards,
       {
         type: 'created',
         id,
-        realm,
         parentCardURL: this.state.url,
-        componentModule: this.state.componentModule,
-        schemaModuleId: this.state.schemaModuleId,
-        format: this.state.format,
-        rawData: { id: undefined, type: 'card', attributes: {} },
       },
-      localRealm
+      {
+        realm,
+        format: this.format,
+        componentModule: this.componentModule,
+        schemaModule: this.schemaModule,
+        rawData: { id: undefined, type: 'card', attributes: {} },
+      }
     );
   }
 
@@ -121,6 +118,10 @@ export default class CardModelForBrowser implements CardModel {
 
   get id(): string {
     return this.url;
+  }
+
+  get realm(): string {
+    return this._realm;
   }
 
   get url(): string {
@@ -133,14 +134,22 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get format(): Format {
-    return this.state.format;
+    return this._format;
+  }
+
+  get parentCardURL(): string {
+    if (this.state.type === 'created') {
+      return this.state.parentCardURL;
+    } else {
+      return this.rawData.attributes.adoptsFrom;
+    }
   }
 
   async editable(): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);
     }
-    let editable = (await this.cards.load(
+    let editable = (await this.cards.loadData(
       this.state.url,
       'edit'
     )) as CardModelForBrowser;
@@ -165,7 +174,7 @@ export default class CardModelForBrowser implements CardModel {
 
   async component(): Promise<unknown> {
     if (!this.wrapperComponent) {
-      let innerComponent = this.state.componentModule.default;
+      let innerComponent = this.componentModule.default;
       let self = this;
 
       await this.computeData();
@@ -199,10 +208,6 @@ export default class CardModelForBrowser implements CardModel {
     return await getFieldValue(schemaInstance, fieldPath);
   }
 
-  get rawData(): any {
-    return this.state.rawData.attributes;
-  }
-
   private async createSchemaInstance() {
     let klass = await this.schemaClass();
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
@@ -210,7 +215,7 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   private getRawField(fieldPath: string): any {
-    let value = get(this.rawData, fieldPath);
+    let value = get(this.rawData.attributes, fieldPath);
     return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
   }
 
@@ -219,7 +224,7 @@ export default class CardModelForBrowser implements CardModel {
       return this._schemaClass;
     }
     this._schemaClass = (
-      await this.cards.loadModule<CardSchemaModule>(this.state.schemaModuleId)
+      await this.cards.loadModule<CardSchemaModule>(this.schemaModule)
     ).default;
 
     return this._schemaClass;
@@ -265,7 +270,7 @@ export default class CardModelForBrowser implements CardModel {
   @restartableTask async rerenderData(
     data: Record<string, any>
   ): Promise<void> {
-    this.state.rawData = merge({}, this.state.rawData, {
+    this.rawData = merge({}, this.rawData, {
       attributes: data,
     });
     let newSchemaInstance = await this.createSchemaInstance();
@@ -293,7 +298,7 @@ export default class CardModelForBrowser implements CardModel {
     if (this.state.type === 'loaded') {
       url = this.state.url;
     } else if (this.state.id != null) {
-      url = cardURL({ realm: this.state.realm, id: this.state.id });
+      url = cardURL({ realm: this.realm, id: this.state.id });
     }
 
     return serializeCardAsResource(
@@ -304,11 +309,11 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   get serializerMap(): CardComponentModule['serializerMap'] {
-    return this.state.componentModule.serializerMap;
+    return this.componentModule.serializerMap;
   }
 
   get usedFields(): CardComponentModule['usedFields'] {
-    return this.state.componentModule.usedFields;
+    return this.componentModule.usedFields;
   }
 
   async save(): Promise<void> {
@@ -317,25 +322,11 @@ export default class CardModelForBrowser implements CardModel {
 
     switch (this.state.type) {
       case 'created':
-        if (this.localRealm) {
-          response = await this.localRealm.create(
-            this.state.parentCardURL,
-            this.serialize()
-          );
-        } else {
-          response = await this.createRemote();
-        }
+        response = await this.cards.createModel(this);
         break;
       case 'loaded':
         original = this.state.original;
-        if (this.localRealm) {
-          response = await this.localRealm.update(
-            this.url,
-            this.serialize() as ResourceObject<Saved> // loaded state is always saved
-          );
-        } else {
-          response = await this.updateRemote();
-        }
+        response = await this.cards.updateModel(this);
         break;
       default:
         throw assertNever(this.state);
@@ -344,57 +335,13 @@ export default class CardModelForBrowser implements CardModel {
     let { data } = response;
     assertDocumentDataIsResource(data);
 
+    this.rawData = cloneDeep(data);
     this.state = {
       type: 'loaded',
-      format: this.format,
       url: data.id,
-      rawData: cloneDeep(data),
-      deserialized: false,
       original,
-      componentModule: this.state.componentModule,
-      schemaModuleId: this.state.schemaModuleId,
     };
   }
-
-  private async createRemote(): Promise<JSONAPIDocument> {
-    if (this.state.type !== 'created') {
-      throw new Error(
-        `cannot createRemote() for card model when state is "${this.state.type}"`
-      );
-    }
-    return await fetchJSON<JSONAPIDocument>(
-      buildNewURL(this.state.realm, this.state.parentCardURL),
-      {
-        method: 'POST',
-        body: JSON.stringify({ data: this.serialize() }),
-      }
-    );
-  }
-
-  private async updateRemote(): Promise<JSONAPIDocument> {
-    if (this.state.type !== 'loaded') {
-      throw new Error(
-        `cannot updateRemote() for card model when state is "${this.state.type}"`
-      );
-    }
-    return await fetchJSON<JSONAPIDocument>(buildCardURL(this.url), {
-      method: 'PATCH',
-      body: JSON.stringify({ data: this.serialize() }),
-    });
-  }
-}
-
-function buildNewURL(realm: string, parentCardURL: string): string {
-  return [
-    cardServer,
-    'cards/',
-    encodeURIComponent(realm) + '/',
-    encodeURIComponent(parentCardURL),
-  ].join('');
-}
-
-function buildCardURL(url: string): string {
-  return `${cardServer}cards/${encodeURIComponent(url)}`;
 }
 
 function assertNever(value: never) {

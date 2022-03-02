@@ -108,12 +108,14 @@ export default class LocalRealm implements Builder {
       {
         type: 'loaded',
         url,
-        rawData: rawServerResponse,
-        componentModule,
-        schemaModuleId: compiled.schemaModule.global,
-        format,
       },
-      this
+      {
+        format,
+        realm: this.realmURL,
+        rawData: rawServerResponse,
+        schemaModule: compiled.schemaModule.global,
+        componentModule,
+      }
     );
     await model.computeData();
     return model;
@@ -131,7 +133,7 @@ export default class LocalRealm implements Builder {
     if (!routableCardURL) {
       throw new Error(`Could not find routable card: ${routableCardURL}`);
     }
-    return await this.cards.load(routableCardURL, 'isolated');
+    return await this.cards.loadData(routableCardURL, 'isolated');
   }
 
   async createRawCard(rawCard: RawCard): Promise<void> {
@@ -209,6 +211,7 @@ export default class LocalRealm implements Builder {
     }
   }
 
+  // TODO this should take a CardModel as a param
   async create(
     parentCardURL: string,
     resource: ResourceObject<Unsaved>
@@ -235,6 +238,7 @@ export default class LocalRealm implements Builder {
     };
   }
 
+  // TODO this should take a CardModel as a param
   async update(
     url: string,
     resource: ResourceObject<Saved>

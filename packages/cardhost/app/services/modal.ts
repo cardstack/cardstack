@@ -62,7 +62,7 @@ export default class Modal extends Service {
     this.destroyCurrentCard();
     this.state = { name: 'loading' };
 
-    let loadedCard = await this.cards.load(url, format);
+    let loadedCard = await this.cards.loadData(url, format);
     associateDestroyableChild(this, loadedCard);
 
     this.state = {
