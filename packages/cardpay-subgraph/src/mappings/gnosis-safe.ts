@@ -109,7 +109,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.signatures = decoded[9].toBytes();
 
     log.debug(
-      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
+      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         txnHash,
         safeTxEntity.id,
