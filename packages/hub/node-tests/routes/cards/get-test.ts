@@ -60,10 +60,14 @@ if (process.env.COMPILER) {
               @contains(string) extra;
               @contains(person) author;
               @contains(string) favoriteColor;
+              @contains(string)
+              get about() {
+                return "Author " + this.author.name + " lives with their best friend, " + this.author.bestFriend.species;
+              }
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
+            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/></article>'
           ),
         },
       });
@@ -124,6 +128,7 @@ if (process.env.COMPILER) {
         title: 'Hello World',
         body: 'First post.',
         favoriteColor: 'blue',
+        about: 'Author Emily lives with their best friend, dog',
         author: {
           name: 'Emily',
           bestFriend: {
