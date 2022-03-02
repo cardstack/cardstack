@@ -3,8 +3,11 @@ import itertools
 
 import pandas as pd
 import pytest
+from boto3.session import Session
 from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
+
+from .fixture import indexed_data
 
 df_hashes = [
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -13,8 +16,8 @@ df_hashes = [
 ]
 summaries = [
     {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 0, "unique_payee": 0},
+    {"total_reward": 10, "unique_payee": 1},
+    {"total_reward": 30, "unique_payee": 3},
 ]
 
 
@@ -27,7 +30,12 @@ ans_ls = zip(df_hashes, summaries)
 @pytest.fixture
 def rule(request):
     payment_cycle_length, min_other_merchants = request.param
-    core_config = {**default_core_config, **{"payment_cycle_length": payment_cycle_length}}
+    core_config = {
+        **default_core_config,
+        **{
+            "payment_cycle_length": payment_cycle_length,
+        },
+    }
     user_config = {
         "base_reward": 10,
         "min_other_merchants": min_other_merchants,
@@ -44,7 +52,7 @@ class TestMinOtherMerchantsPaidSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
         payment_cycle = 24150016
         df = rule.run(payment_cycle)
@@ -63,8 +71,8 @@ multiple_df_hashes = [
 ]
 multiple_summaries = [
     {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 0, "unique_payee": 0},
+    {"total_reward": 10, "unique_payee": 1},
+    {"total_reward": 30, "unique_payee": 3},
 ]
 multiple_ans_ls = zip(multiple_df_hashes, multiple_summaries)
 
@@ -78,7 +86,7 @@ class TestMinOtherMerchantsPaidMultiple:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         (df_hash, summary) = ans
         start_payment_cycle = 24150016
         end_payment_cycle = start_payment_cycle + 1024 * 32

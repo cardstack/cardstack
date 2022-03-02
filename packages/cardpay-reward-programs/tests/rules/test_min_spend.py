@@ -6,6 +6,8 @@ import pytest
 from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import MinSpend
 
+from .fixture import indexed_data
+
 df_hashes = [
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "8f24ed673fb7cacc374a3d320249440b5c325628fae603eabb025dc8719edc4a",
@@ -44,7 +46,7 @@ class TestMinSpendSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
         payment_cycle = 24150016
         df = rule.run(payment_cycle)
@@ -58,8 +60,8 @@ class TestMinSpendSingle:
 
 multiple_df_hashes = [
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "1ec5a8a0869bb64d37cdb05218973a2a4ee05f8a1490324de0110aee3c2b98c8",
-    "857e1cfcacf87ebe94af84235b9145af2f5b70095c29dbd2e51dee2f8bb3555c",
+    "8f24ed673fb7cacc374a3d320249440b5c325628fae603eabb025dc8719edc4a",
+    "8abe4a6b017dddc6b803429dd3b3eea43c3ebfae0a31b871709d5a0569b7c459",
 ]
 multiple_summaries = [
     {"total_reward": 0, "unique_payee": 0},
@@ -78,7 +80,7 @@ class TestMinSpendMultiple:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         (df_hash, summary) = ans
         start_payment_cycle = 24150016
         end_payment_cycle = start_payment_cycle + 1024

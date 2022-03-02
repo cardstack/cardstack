@@ -1,15 +1,10 @@
 from os import stat
 from pathlib import PosixPath
-from time import time
-from typing import Any
 
-import duckdb
 import yaml
-from boto3.session import Session
-from cloudpathlib import AnyPath, CloudPath, S3Client
 
-cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
-cached_client.set_as_default_client()
+# from boto3.session import Session
+from cloudpathlib import AnyPath, CloudPath
 
 
 def exists(file_location):

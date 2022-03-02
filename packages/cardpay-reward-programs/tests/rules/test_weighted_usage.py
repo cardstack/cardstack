@@ -6,6 +6,8 @@ import pytest
 from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import WeightedUsage
 
+from .fixture import indexed_data
+
 df_hashes = [
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "c3fcafadd333c8cb2491ca39e8fa095a88ccadedd5f2563ed18428fba1157ca0",
@@ -46,7 +48,7 @@ class TestWeightedUsageSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
         payment_cycle = 24150016
         df = rule.run(payment_cycle)
@@ -75,7 +77,7 @@ class TestWeightedUsageMultiple:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans):
+    def test_run(self, rule, ans, indexed_data):
         (range_summary,) = ans
         start_payment_cycle = 24150016
         end_payment_cycle = start_payment_cycle + 1024

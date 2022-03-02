@@ -1,7 +1,12 @@
 import streamlit as st
+from boto3.session import Session
 from views import min_other_merchants_paid, min_spend, weighted_usage
 from views.core_parameters import core_parameters
 from views.utils import download_csv
+from cloudpathlib import S3Client
+
+cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
+cached_client.set_as_default_client()
 
 st.set_page_config(page_title="Rule Configurator", layout="wide")
 st.header("Rule Configurator")
