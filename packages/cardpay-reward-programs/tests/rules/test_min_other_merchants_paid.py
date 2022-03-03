@@ -3,7 +3,6 @@ import itertools
 
 import pandas as pd
 import pytest
-from boto3.session import Session
 from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 

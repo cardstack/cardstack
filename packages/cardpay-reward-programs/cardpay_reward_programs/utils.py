@@ -2,8 +2,6 @@ from os import stat
 from pathlib import PosixPath
 
 import yaml
-
-# from boto3.session import Session
 from cloudpathlib import AnyPath, CloudPath
 
 
