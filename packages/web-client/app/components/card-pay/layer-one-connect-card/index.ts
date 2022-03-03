@@ -35,8 +35,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
           }
         : { ...w, enabled: true, explanation: '' }
     )
-    // sort stuff so that the enabled options always appear first
-    .sort((a, b) => Number(b.enabled) - Number(a.enabled));
+    .sortBy('enabled:desc');
 
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.isConnected') declare isConnected: boolean;
