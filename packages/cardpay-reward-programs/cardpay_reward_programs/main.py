@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 import pyarrow.parquet as pq
@@ -6,10 +7,16 @@ import typer
 from boto3.session import Session
 from cardpay_reward_programs.rules import *
 from cloudpathlib import S3Client
+from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
 
-cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
+load_dotenv()
+
+cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session(
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+))
 cached_client.set_as_default_client()
 
 

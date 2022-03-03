@@ -22,6 +22,7 @@ setup(
         "merklelib @ git+https://git@github.com/cardstack/merklelib@master#egg=merklelib",
         "pysha3",
         "pyarrow",
+        "python-dotenv",
     ],
     extras_require={
         "explore": ["streamlit", "altair", "parquet-tools"],
