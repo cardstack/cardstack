@@ -180,6 +180,82 @@ if (process.env.COMPILER) {
       });
     });
 
+    it.only('handles complex component adoptions', async function () {
+      await cards.create({
+        realm,
+        id: 'person',
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Person {
+              @contains(string) name;
+            }`,
+          'isolated.js': templateOnlyComponentTemplate(
+            `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
+            { IsolatedStyles: './isolated.css', add: './add.js' }
+          ),
+          'isolated.css': `.person-isolated { background: green }`,
+          'add.js': `export default function add(one) { return one + 1; }`,
+        },
+      });
+
+      let fancyPerson = await cards.create({
+        realm,
+        id: 'fancy-person',
+        schema: 'schema.js',
+        embedded: 'embedded.js',
+        adoptsFrom: '../person',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class FancyPerson {
+              @contains(string) fancyTitle;
+            }`,
+          'embedded.js': templateOnlyComponentTemplate(
+            `<div class="person-embedded" data-test-person>Hi! I am <@fields.name/></div>`
+          ),
+        },
+      });
+
+      let {
+        embedded: {
+          componentModule: { global: embeddedGlobal },
+        },
+        edit: {
+          componentModule: { global: editGlobal },
+        },
+        isolated: {
+          componentModule: { global: isolatedGlobal },
+        },
+      } = fancyPerson.compiled.componentInfos;
+
+      expect(isolatedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/isolated.js');
+      expect(resolveCard(isolatedGlobal), 'isolated resolved location').to.match(
+        /cardstack.local-fancy-person\/isolated.js/
+      );
+      expect(editGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/edit.js');
+      expect(resolveCard(editGlobal), 'edit location is not in the base cards').to.match(
+        /cardstack.local-fancy-person\/edit.js/
+      );
+      expect(embeddedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/embedded.js');
+      expect(resolveCard(embeddedGlobal), 'embedded resolved location').to.match(
+        /cardstack.local-fancy-person\/embedded.js/
+      );
+
+      let isolatedTemplate = getFileCache().getModule(isolatedGlobal, 'browser');
+      // TODO: Update with paths from modules outputs from person
+      expect(isolatedTemplate, 'Relative js imports from parent card are rewritten').to.containsSource(
+        'import add from "@cardstack/compiled/https-cardstack.local-person/add.js"'
+      );
+      expect(isolatedTemplate, 'Relative css imports from parent card are rewritten').to.containsSource(
+        'import IsolatedStyles from "@cardstack/compiled/https-cardstack.local-person/isolated.css"'
+      );
+    });
+
     it('deeply nested cards', async function () {
       await cards.create({
         realm,
@@ -210,6 +286,7 @@ if (process.env.COMPILER) {
           'embedded.js': templateOnlyComponentTemplate(`<h2><@fields.title /> - <@fields.createdAt /></h2>`),
         },
       });
+
       await cards.create({
         realm,
         id: 'post-list',
