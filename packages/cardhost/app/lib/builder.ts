@@ -216,7 +216,8 @@ export default class LocalRealm implements Builder {
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
     let id = resource.id
-      ? this.parseOwnRealmURL(resource.id)!.id
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.parseOwnRealmURL(resource.id)!.id
       : this.generateId();
     this.createRawCard({
       realm: this.realmURL,

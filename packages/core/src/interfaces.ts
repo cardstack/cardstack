@@ -21,7 +21,7 @@ const featureNamesMap = {
   schema: '',
   serializer: '',
 };
-export type FeatureFile = keyof typeof featureNamesMap & Format;
+export type FeatureFile = keyof typeof featureNamesMap | Format | 'asset';
 export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
 export type SerializerMap = Record<string, PrimitiveSerializer>;
@@ -115,6 +115,16 @@ export type ModuleRef = LocalRef | GlobalRef;
 export type Saved = string;
 export type Unsaved = string | undefined;
 
+export type CardModules = Record<
+  string, // local module path
+  CardModule
+>;
+export interface CardModule {
+  type: string;
+  source: string;
+  ast?: t.File;
+}
+
 // CompiledCard is everything you need when operating at the level of code &
 // schema changes. It should not be needed just to render and edit data of
 // cards.
@@ -130,14 +140,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 
   componentInfos: Record<Format, ComponentInfo<Ref>>;
 
-  modules: Record<
-    string, // local module path
-    {
-      type: string;
-      source: string;
-      ast?: t.File;
-    }
-  >;
+  modules: CardModules;
 
   deps: string[];
 }

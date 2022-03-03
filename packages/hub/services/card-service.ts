@@ -21,6 +21,7 @@ import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -118,7 +119,7 @@ export class CardService {
     try {
       let expression: CardExpression = ['select url, data, "schemaModule", "componentInfos" from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
+        expression = [...expression, 'where', ...filterToExpression(query.filter, BASE_CARD_URL)];
       }
       if (query.sort) {
         expression = [...expression, 'order by', ...sortToExpression(query.sort)];
