@@ -251,6 +251,18 @@ module('Acceptance | pay', function (hooks) {
       .exists();
   });
 
+  test('it does not render the description if there is no amount param specified', async function (assert) {
+    await visit(`/pay/${network}/${merchantSafe.address}`);
+    await waitFor(MERCHANT);
+
+    assert
+      .dom(`meta[property='og:description']`, document.documentElement)
+      .doesNotExist();
+    assert
+      .dom(`meta[name='twitter:description']`, document.documentElement)
+      .doesNotExist();
+  });
+
   test('it rounds floating point SPEND amounts', async function (assert) {
     const floatingSpendAmount = 279.17;
     const roundedSpendAmount = Math.ceil(floatingSpendAmount);
