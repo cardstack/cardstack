@@ -16,7 +16,11 @@ const WALLET_SELECTION_SELECTOR = '[data-test-wallet-selection]';
 module('Integration | Component | layer-one-connect-card', function (hooks) {
   setupRenderingTest(hooks);
 
-  hooks.afterEach(function () {
+  hooks.beforeEach(function () {
+    window.ethereum = undefined;
+  });
+
+  hooks.after(function () {
     window.ethereum = undefined;
   });
 
