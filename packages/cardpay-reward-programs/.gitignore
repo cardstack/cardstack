@@ -5,3 +5,4 @@ tmp/
 dist/*
 mycache/*
 __pycache__
+.env
