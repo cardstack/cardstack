@@ -48,9 +48,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
        , otherwise focus leaves the page
      - selecting a radio makes the connect button enabled and focusable.
    */
-  // pick the first enabled option
-  @tracked radioWalletProviderId: WalletProvider['id'] =
-    this.walletProviders[0].id;
+  @tracked radioWalletProviderId: WalletProvider['id'] = 'wallet-connect';
 
   constructor(
     owner: unknown,
