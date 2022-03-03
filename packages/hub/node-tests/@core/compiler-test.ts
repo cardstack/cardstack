@@ -2,7 +2,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
-import { RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { cardURL } from '@cardstack/core/src/utils';
 
 const PERSON_CARD: RawCard = {
@@ -10,6 +10,7 @@ const PERSON_CARD: RawCard = {
   id: 'person',
   schema: 'schema.js',
   embedded: 'embedded.js',
+  isolated: 'isolated.js',
   files: {
     'schema.js': `
       import { contains } from "@cardstack/types";
@@ -22,6 +23,9 @@ const PERSON_CARD: RawCard = {
         @contains(date)
         birthdate;
       }`,
+    'isolated.js': templateOnlyComponentTemplate(
+      `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
+    ),
     'embedded.js': templateOnlyComponentTemplate(
       '<div class="person-embedded"><@fields.name/> was born on <@fields.birthdate/></div>'
     ),
@@ -30,7 +34,7 @@ const PERSON_CARD: RawCard = {
 };
 
 if (process.env.COMPILER) {
-  describe('Compiler', function () {
+  describe.only('Compiler', function () {
     let { cards, getFileCache } = configureHubWithCompiler(this);
 
     it('string card', async function () {
@@ -49,61 +53,6 @@ if (process.env.COMPILER) {
       expect(nameFieldMeta).to.have.property('name', 'name');
       expect(nameFieldMeta).to.have.property('type', 'contains');
       expect(nameFieldMeta).to.have.property('computed', false);
-    });
-
-    it('CompiledCard embedded view', async function () {
-      await cards.create(PERSON_CARD);
-      let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
-      let { compiled } = await cards.load(cardURL(PERSON_CARD));
-      let { embedded } = compiled.componentInfos;
-
-      expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
-        '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
-      );
-
-      expect(getFileCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
-        PERSON_CARD.files!['embedded.css']
-      );
-
-      expect(embedded.usedFields).to.deep.equal(['name', 'birthdate']);
-      // expect(embedded.serializerMap).to.deep.equal({
-      //   date: ['birthdate'],
-      // });
-
-      let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
-      expect(metaModuleSource).to.containsSource(`
-        import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const serializerMap = {
-          "birthdate": DateSerializer
-        };
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const computedFields = [];
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const usedFields = ["name", "birthdate"];
-      `);
-    });
-
-    it('CompiledCard edit view', async function () {
-      await cards.create(PERSON_CARD);
-      let { compiled } = await cards.load(cardURL(PERSON_CARD));
-
-      expect(compiled.componentInfos.edit.usedFields).to.deep.equal(['name', 'birthdate']);
-      expect(
-        getFileCache().getModule(compiled.componentInfos.edit.componentModule.global),
-        'Edit template is rendered for text'
-      ).to.containsSource(
-        '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
-      );
-      expect(
-        getFileCache().getModule(compiled.componentInfos.edit.componentModule.global),
-        'Edit template is rendered for date'
-      ).to.containsSource(
-        '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
-      );
     });
 
     it('nested cards', async function () {
@@ -143,6 +92,70 @@ if (process.env.COMPILER) {
       );
 
       expect(compiled.componentInfos.isolated.usedFields).to.deep.equal(['author']);
+    });
+
+    describe('Components compliation', function () {
+      let compiled: CompiledCard;
+
+      this.beforeEach(async function () {
+        let card = await cards.create(PERSON_CARD);
+        compiled = card.compiled;
+      });
+
+      it('generates a modules with meta information', async function () {
+        let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
+        let { embedded } = compiled.componentInfos;
+        let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
+
+        expect(metaModuleSource).to.containsSource(`
+          import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const serializerMap = {
+            "birthdate": DateSerializer
+          };
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const computedFields = [];
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const usedFields = ["name", "birthdate"];
+        `);
+      });
+
+      it('Recompiles glimmer templates', async function () {
+        let { embedded, edit } = compiled.componentInfos;
+        expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
+          '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
+        );
+
+        expect(
+          getFileCache().getModule(edit.componentModule.global),
+          'Edit template is rendered for text'
+        ).to.containsSource(
+          '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
+        );
+        expect(
+          getFileCache().getModule(edit.componentModule.global),
+          'Edit template is rendered for date'
+        ).to.containsSource(
+          '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
+        );
+      });
+
+      it('defines assets, such as css files', async function () {
+        expect(getFileCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
+          PERSON_CARD.files!['embedded.css']
+        );
+      });
+
+      it('Computes used fields', async function () {
+        let { isolated, embedded, edit } = compiled.componentInfos;
+
+        expect(isolated.usedFields, 'Isolated usedFields').to.deep.equal(['name']);
+        expect(embedded.usedFields, 'Embedded usedFields').to.deep.equal(['name', 'birthdate']);
+        expect(edit.usedFields, 'Edit Fields').to.deep.equal(['name', 'birthdate']);
+      });
     });
 
     it('deeply nested cards', async function () {
