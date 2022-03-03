@@ -51,7 +51,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let example = await cards.loadData(`${realmURL}example`, 'isolated');
+      let example = await cards.loadModel(`${realmURL}example`, 'isolated');
       expect(example.data.title).to.eq('Hello World');
     });
 
@@ -84,7 +84,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let grandChild = await cards.loadData(`${realmURL}grandchild`, 'isolated');
+      let grandChild = await cards.loadModel(`${realmURL}grandchild`, 'isolated');
       expect(grandChild.data.title).to.eq('Hello World');
     });
 
@@ -278,9 +278,9 @@ if (process.env.COMPILER) {
 
         // This child card gets created via adoptIntoRealm, which goes down the
         // code path that doesn't involve compiling cards
-        let cardModel = await cards.loadData(`${realmURL}greeting-card`, 'isolated');
+        let cardModel = await cards.loadModel(`${realmURL}greeting-card`, 'isolated');
         let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
-        sampleGreeting.setData({
+        await sampleGreeting.setData({
           name: 'Jackie',
         });
         await sampleGreeting.save();
@@ -311,8 +311,8 @@ if (process.env.COMPILER) {
       });
 
       it('Can search for card computed field for card after updating data', async function () {
-        let cardModel = await cards.loadData(`${realmURL}sample-greeting`, 'isolated');
-        cardModel.setData({
+        let cardModel = await cards.loadModel(`${realmURL}sample-greeting`, 'isolated');
+        await cardModel.setData({
           name: 'Woody',
         });
         await cardModel.save();

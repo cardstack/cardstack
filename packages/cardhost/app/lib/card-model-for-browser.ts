@@ -12,6 +12,7 @@ import {
   CardService,
   CompiledCard,
   CardModelArgs,
+  ComponentInfo,
 } from '@cardstack/core/src/interfaces';
 import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -46,34 +47,43 @@ export interface CreatedState {
 export interface LoadedState {
   type: 'loaded';
   url: string;
+  allFields: boolean;
 }
 
 export default class CardModelForBrowser implements CardModel {
-  setters: Setter;
   @tracked private _schemaInstance: any | undefined;
   private _realm: string;
   private schemaModule: CompiledCard['schemaModule']['global'];
   private _format: Format;
-  private componentModule: CardComponentModule;
+  private componentModuleRef: ComponentInfo['componentModule']['global'];
   private rawData: RawCardData;
+  private saveModel: CardModelArgs['saveModel'];
   private state: CreatedState | LoadedState;
-  private wrapperComponent: unknown | undefined;
   private _schemaClass: CardSchemaModule['default'] | undefined;
+
+  setters: Setter;
+  private wrapperComponent: unknown | undefined;
+  private _componentModule: CardComponentModule | undefined;
 
   constructor(
     private cards: CardService,
-    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>,
-    // TODO let's work on unifying these args with the CardModelForHub
-    args: CardModelArgs & {
-      componentModule: CardComponentModule;
-    }
+    state: CreatedState | LoadedState,
+    args: CardModelArgs
   ) {
-    let { realm, schemaModule, format, componentModule, rawData } = args;
+    let {
+      realm,
+      schemaModule,
+      format,
+      componentModuleRef,
+      rawData,
+      saveModel,
+    } = args;
     this._realm = realm;
     this.schemaModule = schemaModule;
     this._format = format;
-    this.componentModule = componentModule;
+    this.componentModuleRef = componentModuleRef;
     this.rawData = rawData;
+    this.saveModel = saveModel;
     this.state = state;
 
     this.setters = this.makeSetter();
@@ -95,9 +105,10 @@ export default class CardModelForBrowser implements CardModel {
       {
         realm,
         format: this.format,
-        componentModule: this.componentModule,
+        componentModuleRef: this.componentModuleRef,
         schemaModule: this.schemaModule,
         rawData: { id: undefined, type: 'card', attributes: {} },
+        saveModel: this.saveModel,
       }
     );
   }
@@ -141,7 +152,7 @@ export default class CardModelForBrowser implements CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);
     }
-    let editable = (await this.cards.loadData(
+    let editable = (await this.cards.loadModel(
       this.state.url,
       'edit'
     )) as CardModelForBrowser;
@@ -156,6 +167,8 @@ export default class CardModelForBrowser implements CardModel {
   }
 
   async computeData(schemaInstance?: any): Promise<Record<string, any>> {
+    // need to prime the component module since usedFields originates from there
+    await this.componentModule();
     let syncData: Record<string, any> = {};
     for (let field of this.usedFields) {
       set(syncData, field, await this.getField(field, schemaInstance));
@@ -163,9 +176,36 @@ export default class CardModelForBrowser implements CardModel {
     return syncData;
   }
 
+  private async componentModule() {
+    if (!this._componentModule) {
+      this._componentModule = await this.cards.loadModule<CardComponentModule>(
+        this.componentModuleRef
+      );
+    }
+    return this._componentModule;
+  }
+
+  get serializerMap(): CardComponentModule['serializerMap'] {
+    if (!this._componentModule) {
+      throw new Error(
+        `ComponentModule has not yet been loaded for card model ${this.url}`
+      );
+    }
+    return this._componentModule.serializerMap;
+  }
+
+  get usedFields(): CardComponentModule['usedFields'] {
+    if (!this._componentModule) {
+      throw new Error(
+        `ComponentModule has not yet been loaded for card model ${this.url}`
+      );
+    }
+    return this._componentModule.usedFields;
+  }
+
   async component(): Promise<unknown> {
     if (!this.wrapperComponent) {
-      let innerComponent = this.componentModule.default;
+      let innerComponent = (await this.componentModule()).default;
       let self = this;
 
       await this.computeData();
@@ -184,7 +224,7 @@ export default class CardModelForBrowser implements CardModel {
     return this.wrapperComponent;
   }
 
-  async getField(fieldPath: string, schemaInstance?: any): Promise<any> {
+  async getField(name: string, schemaInstance?: any): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
     //   return get(this.data, name);
@@ -196,7 +236,7 @@ export default class CardModelForBrowser implements CardModel {
       schemaInstance = this._schemaInstance = await this.createSchemaInstance();
     }
 
-    return await getFieldValue(schemaInstance, fieldPath);
+    return await getFieldValue(schemaInstance, name);
   }
 
   private async createSchemaInstance() {
@@ -297,22 +337,14 @@ export default class CardModelForBrowser implements CardModel {
     );
   }
 
-  get serializerMap(): CardComponentModule['serializerMap'] {
-    return this.componentModule.serializerMap;
-  }
-
-  get usedFields(): CardComponentModule['usedFields'] {
-    return this.componentModule.usedFields;
-  }
-
   async save(): Promise<void> {
     let data: ResourceObject<Saved>;
     switch (this.state.type) {
       case 'created':
-        data = await this.cards.createModel(this);
+        data = await this.saveModel(this, 'create');
         break;
       case 'loaded':
-        data = await this.cards.updateModel(this);
+        data = await this.saveModel(this, 'update');
         break;
       default:
         throw assertNever(this.state);
@@ -324,6 +356,7 @@ export default class CardModelForBrowser implements CardModel {
     this.state = {
       type: 'loaded',
       url: data.id,
+      allFields: false,
     };
   }
 }

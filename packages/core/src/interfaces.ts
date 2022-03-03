@@ -193,7 +193,6 @@ export interface CardModel {
   setData(data: RawCardData): void;
   serialize(): ResourceObject<Saved | Unsaved>;
   component(): Promise<unknown>;
-  usedFields: ComponentInfo['usedFields'];
   save(): Promise<void>;
   parentCardURL: string;
 }
@@ -203,21 +202,18 @@ export interface CardModelArgs {
   schemaModule: string;
   format: Format;
   rawData: NonNullable<RawCard['data']>;
+  componentModuleRef: ComponentInfo['componentModule']['global'];
+  saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
 }
 
 export interface CardService {
   load(cardURL: string): Promise<Card>;
-  loadData(cardURL: string, format: Format, allFields?: boolean): Promise<CardModel>;
+  loadModel(cardURL: string, format: Format, allFields?: boolean): Promise<CardModel>;
   create(raw: RawCard<Unsaved>): Promise<Card>;
   update(partialRaw: RawCard): Promise<Card>;
   delete(raw: RawCard): Promise<void>;
   query(format: Format, query: Query): Promise<CardModel[]>;
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
-
-  // it would be great if we could merge these with create and update--but we
-  // have a need to pass the CardModel thru this...
-  createModel(card: CardModel): Promise<ResourceObject<Saved>>;
-  updateModel(card: CardModel): Promise<ResourceObject<Saved>>;
 }
 
 export interface CardSchemaModule {

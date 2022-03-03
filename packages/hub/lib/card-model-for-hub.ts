@@ -11,15 +11,16 @@ import {
   ComponentInfo,
   CardService,
   CardModelArgs,
+  CardSchemaModule,
 } from '@cardstack/core/src/interfaces';
-import { deserializeAttributes, serializeAttributes, serializeCardAsResource } from '@cardstack/core/src/serializers';
+import { serializeAttributes, serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
 import { getOwner } from '@cardstack/di';
 import merge from 'lodash/merge';
 import isPlainObject from 'lodash/isPlainObject';
 import { cardURL } from '@cardstack/core/src/utils';
 import { BadRequest } from '@cardstack/core/src/utils/errors';
 import get from 'lodash/get';
-import { service } from '@cardstack/hub/services';
+import set from 'lodash/set';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
 
 export interface NewCardParams {
@@ -36,62 +37,74 @@ export interface CreatedState {
 interface LoadedState {
   type: 'loaded';
   id: string;
-  componentModule: ComponentInfo['componentModule']['global'];
-  original: CardModel | undefined;
   allFields: boolean;
 }
 
 export default class CardModelForHub implements CardModel {
-  private fileCache = service('file-cache', { as: 'fileCache' });
-  private searchIndex = service('searchIndex');
-  private hasDeserialized: boolean;
-
-  setters: undefined;
-  private deserializedData: Record<string, any> | undefined;
-  private state: CreatedState | LoadedState;
+  private _schemaInstance: any | undefined;
   private _realm: string;
   private schemaModule: CompiledCard['schemaModule']['global'];
-  private componentMeta: CardComponentMetaModule;
   private _format: Format;
+  private componentModuleRef: ComponentInfo['componentModule']['global'];
   private rawData: RawCardData;
+  private saveModel: CardModelArgs['saveModel'];
+  private state: CreatedState | LoadedState;
+  private _schemaClass: CardSchemaModule['default'] | undefined;
+
+  private componentMeta: CardComponentMetaModule;
+  setters: undefined;
 
   constructor(
     private cards: CardService,
-    state: CreatedState | Omit<LoadedState, 'deserialized' | 'original'>,
+    state: CreatedState | Omit<LoadedState, 'deserialized'>,
     // TODO let's work on unifying these args with the CardModelForBrowser
-    args: CardModelArgs & { componentMeta: CardComponentMetaModule; deserialized?: boolean }
+    args: CardModelArgs & { componentMeta: CardComponentMetaModule }
   ) {
-    let { rawData, realm, format, schemaModule, componentMeta, deserialized = false } = args;
+    let { rawData, realm, format, schemaModule, componentMeta, saveModel, componentModuleRef } = args;
     this._realm = realm;
     this._format = format;
     this.schemaModule = schemaModule;
-    this.hasDeserialized = deserialized;
+    this.componentModuleRef = componentModuleRef;
     this.componentMeta = componentMeta;
     this.rawData = rawData;
-    if (state.type == 'created') {
-      this.state = state;
-    } else {
-      this.state = {
-        ...state,
-        original: undefined,
-      };
-    }
+    this.saveModel = saveModel;
+    this.state = state;
   }
 
-  async getField(name: string): Promise<any> {
+  async getField(name: string, schemaInstance?: any): Promise<any> {
     // TODO: add isComputed somewhere in the metadata coming out of the compiler so we can do this optimization
     // if (this.isComputedField(name)) {
     //   TODO need to deserialize value
     //   return get(this.data, name);
     // }
 
-    // TODO we probably want to cache the schemaInstance. It should only be
-    // created the first time it's needed
-    let SchemaClass = this.fileCache.loadModule(this.schemaModule).default;
-    let schemaInstance = new SchemaClass((fieldPath: string) => get(this.data, fieldPath));
+    schemaInstance = schemaInstance ?? this._schemaInstance;
 
-    // TODO need to deserialize value
+    if (!schemaInstance) {
+      schemaInstance = this._schemaInstance = await this.createSchemaInstance();
+    }
+
     return await getFieldValue(schemaInstance, name);
+  }
+
+  private async createSchemaInstance() {
+    let klass = await this.schemaClass();
+    // We can't await the instance creation in a separate, as it's thenable and confuses async methods
+    return new klass(this.getRawField.bind(this)) as any;
+  }
+
+  private getRawField(fieldPath: string): any {
+    let value = get(this.rawData, fieldPath);
+    return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
+  }
+
+  async schemaClass() {
+    if (this._schemaClass) {
+      return this._schemaClass;
+    }
+    this._schemaClass = (await this.cards.loadModule<CardSchemaModule>(this.schemaModule)).default;
+
+    return this._schemaClass;
   }
 
   async adoptIntoRealm(realm: string, id?: string): Promise<CardModel> {
@@ -113,9 +126,10 @@ export default class CardModelForHub implements CardModel {
         realm,
         format: this.format,
         rawData: {},
+        saveModel: this.saveModel,
         schemaModule: this.schemaModule,
+        componentModuleRef: this.componentModuleRef,
         componentMeta: this.componentMeta,
-        deserialized: true,
       }
     );
   }
@@ -162,7 +176,8 @@ export default class CardModelForHub implements CardModel {
     throw new Error('Hub does not have use of editable');
   }
 
-  setData(data: RawCardData): void {
+  // TODO refactor to use CardModelForBrowser's setter
+  async setData(data: RawCardData): Promise<void> {
     let nonExistentFields = this.assertFieldsExists(data);
     if (nonExistentFields.length) {
       throw new BadRequest(
@@ -171,8 +186,12 @@ export default class CardModelForHub implements CardModel {
         } in format '${this.format}'`
       );
     }
+
+    // TODO need to write a test that proves data consistency
     this.rawData = serializeAttributes(merge({}, this.rawData, data), this.serializerMap);
-    this.hasDeserialized = false;
+    let newSchemaInstance = await this.createSchemaInstance();
+    await this.computeData(newSchemaInstance);
+    this._schemaInstance = newSchemaInstance;
   }
 
   // TODO: we need to really use a validation mechanism which will use code from
@@ -190,23 +209,36 @@ export default class CardModelForHub implements CardModel {
     return nonExistentFields;
   }
 
-  // TODO: This will likely need to go to a field level deserialization so that
-  // you know from a field-by-field perspective if a field has been deserialized
-  get data(): any {
-    if (!this.hasDeserialized) {
-      this.deserializedData = deserializeAttributes(this.rawData, this.serializerMap);
-      this.hasDeserialized = true;
+  get data(): object {
+    return this._schemaInstance;
+  }
+
+  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
+    let syncData: Record<string, any> = {};
+    for (let field of this.usedFields) {
+      set(syncData, field, await this.getField(field, schemaInstance));
     }
-    return this.deserializedData;
+    return syncData;
   }
 
   async component(): Promise<unknown> {
     throw new Error('Hub does not have use of component');
   }
 
+  // we have a few places that are very sensitive to the shape of the data, and
+  // won't be able to deal with a schema instance that has additional properties
+  // and methods beyond just the data itself, so this method is for those places
+  private dataAsUsedFieldsShape() {
+    let syncData: Record<string, any> = {};
+    for (let field of this.usedFields) {
+      set(syncData, field, get(this._schemaInstance, field));
+    }
+    return syncData;
+  }
+
   serialize(): ResourceObject<Saved | Unsaved> {
     if (this.state.type === 'created') {
-      return serializeCardAsResource(undefined, this.rawData, this.serializerMap);
+      return serializeCardAsResource(undefined, this.dataAsUsedFieldsShape(), this.serializerMap);
     }
 
     let resource = serializeCardAsResource(
@@ -215,45 +247,27 @@ export default class CardModelForHub implements CardModel {
       this.serializerMap,
       !this.state.allFields ? this.usedFields : undefined
     );
-    let { componentModule } = this.state;
-    resource.meta = merge({ componentModule, schemaModule: this.schemaModule }, resource.meta);
+    resource.meta = merge({ componentModule: this.componentModuleRef, schemaModule: this.schemaModule }, resource.meta);
 
     return resource;
   }
 
   async save(): Promise<void> {
-    let data: ResourceObject<Saved>, compiled: CompiledCard;
-    let { realm } = this;
+    let data: ResourceObject<Saved>;
     switch (this.state.type) {
       case 'created':
-        {
-          data = await this.cards.createModel(this);
-          let { id } = data;
-          compiled = await this.searchIndex.indexData(
-            { id, realm, adoptsFrom: this.parentCardURL, data: data.attributes },
-            this
-          );
-        }
+        data = await this.saveModel(this, 'create');
         break;
       case 'loaded':
-        {
-          {
-            data = await this.cards.updateModel(this);
-            let { id } = data;
-            compiled = await this.searchIndex.indexData({ id, realm, data: data.attributes }, this);
-          }
-        }
+        data = await this.saveModel(this, 'update');
         break;
       default:
         throw assertNever(this.state);
     }
-    this.hasDeserialized = false;
     this.rawData = data.attributes ?? {};
     this.state = {
       type: 'loaded',
       id: data.id,
-      componentModule: compiled.componentInfos['isolated'].componentModule.global,
-      original: undefined,
       allFields: false,
     };
   }

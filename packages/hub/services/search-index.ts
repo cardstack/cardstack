@@ -260,14 +260,14 @@ class IndexerRun implements IndexerHandle {
 
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
     let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
     let cardModel = await getOwner(this).instantiate(
       CardModelForHub,
-      await this.cardService.as(INSECURE_CONTEXT),
+      cardService,
       {
         type: 'loaded',
         id: rawCard.id,
-        componentModule: definedCard.componentInfos[format].componentModule.global,
         allFields: false,
       },
       {
@@ -275,7 +275,9 @@ class IndexerRun implements IndexerHandle {
         realm: rawCard.realm,
         rawData: rawCard.data ?? {},
         schemaModule: definedCard.schemaModule.global,
+        componentModuleRef: definedCard.componentInfos[format].componentModule.global,
         componentMeta,
+        saveModel: cardService.saveModel.bind(cardService),
       }
     );
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);

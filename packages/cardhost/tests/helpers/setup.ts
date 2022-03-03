@@ -55,7 +55,7 @@ export function setupCardTest(
     cardId: Partial<CardId> & { id: string },
     format: Format = 'isolated'
   ) {
-    let card = await cardService.loadData(testCardURL(cardId), format);
+    let card = await cardService.loadModel(testCardURL(cardId), format);
     (getContext() as TestContext).set('component', await card.component());
     await render(hbs`<this.component />`);
   }

@@ -80,7 +80,7 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.data', async function (assert) {
-    let model = await lookup(this, 'cards').loadData(
+    let model = await lookup(this, 'cards').loadModel(
       `${localRealmURL}bob`,
       'isolated'
     );
@@ -106,7 +106,7 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   skip('unused fields are not present', async function (assert) {
-    let model = await lookup(this, 'cards').loadData(
+    let model = await lookup(this, 'cards').loadModel(
       `${localRealmURL}bob`,
       'embedded'
     );
@@ -123,7 +123,7 @@ module('@core | card-model-for-browser', function (hooks) {
   });
 
   test('.serialize', async function (assert) {
-    let model = await lookup(this, 'cards').loadData(
+    let model = await lookup(this, 'cards').loadModel(
       `${localRealmURL}bob`,
       'isolated'
     );

@@ -8,7 +8,6 @@ import {
   CardModel,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
-  CardComponentModule,
   CardService,
   Card,
   RawCard,
@@ -35,14 +34,14 @@ export default class Cards extends Service implements CardService {
     throw new Error('unimplemented');
   }
 
-  // we don't support the allFields flag in the browser because the browser
-  // already does serialize with all the fields it knows about--it's only on the
-  // hub that the card knows specifically what the used fields are. on the
-  // browser the used fields are assumed to be whatever the server gave you
-  async loadData(url: string, format: Format): Promise<CardModel> {
+  async loadModel(
+    url: string,
+    format: Format,
+    allFields = false
+  ): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      let model = await builder.loadData(url, format);
+      let model = await builder.loadData(url, format, allFields);
       await model.component();
       return model;
     }
@@ -53,11 +52,7 @@ export default class Cards extends Service implements CardService {
     let { data } = serverResponse;
     assertDocumentDataIsResource(data);
 
-    return this.makeCardModelFromResponse(
-      data,
-      await this.codeForCard(data),
-      format
-    );
+    return this.makeCardModelFromResponse(data, format, allFields);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -69,11 +64,7 @@ export default class Cards extends Service implements CardService {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      return this.makeCardModelFromResponse(
-        data,
-        await this.codeForCard(data),
-        'isolated'
-      );
+      return this.makeCardModelFromResponse(data, 'isolated');
     }
   }
 
@@ -89,11 +80,7 @@ export default class Cards extends Service implements CardService {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        return this.makeCardModelFromResponse(
-          cardResponse,
-          await this.codeForCard(cardResponse),
-          format
-        );
+        return this.makeCardModelFromResponse(cardResponse, format);
       })
     );
   }
@@ -108,7 +95,18 @@ export default class Cards extends Service implements CardService {
     throw new Error('unimplemented');
   }
 
-  async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+  private async saveModel(
+    card: CardModel,
+    operation: 'create' | 'update'
+  ): Promise<ResourceObject<Saved>> {
+    if (operation === 'create') {
+      return await this.createModel(card);
+    } else {
+      return await this.updateModel(card);
+    }
+  }
+
+  private async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
     let data: ResourceObject<Saved>;
     if (this.inLocalRealm(card.realm)) {
       let builder = await this.builder();
@@ -119,7 +117,7 @@ export default class Cards extends Service implements CardService {
     return data;
   }
 
-  async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+  private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
     let data: ResourceObject<Saved>;
     if (this.inLocalRealm(card.realm)) {
       let builder = await this.builder();
@@ -132,8 +130,8 @@ export default class Cards extends Service implements CardService {
 
   private async makeCardModelFromResponse(
     cardResponse: ResourceObject,
-    componentModule: CardComponentModule,
-    format: Format
+    format: Format,
+    allFields = false
   ): Promise<CardModel> {
     let schemaModule = cardResponse.meta?.schemaModule;
     if (!schemaModule) {
@@ -146,6 +144,10 @@ export default class Cards extends Service implements CardService {
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
     }
+    let { componentModule: componentModuleRef } = cardResponse.meta || {};
+    if (!componentModuleRef || typeof componentModuleRef !== 'string') {
+      throw new Error('Cards component module must be present and a string');
+    }
     let segments = cardResponse.id.split('/');
     segments.pop(); // this is not ideal, maybe we can include the realm in our card payload?
     let realm = segments.join('/');
@@ -157,13 +159,15 @@ export default class Cards extends Service implements CardService {
       {
         type: 'loaded',
         url: cardResponse.id,
+        allFields,
       },
       {
         format,
         realm: realm as string,
         schemaModule,
         rawData: cloneDeep(cardResponse.attributes ?? {}),
-        componentModule,
+        componentModuleRef,
+        saveModel: this.saveModel.bind(this),
       }
     );
 
@@ -209,7 +213,11 @@ export default class Cards extends Service implements CardService {
     });
     try {
       let { default: Builder } = await import('../lib/builder');
-      let builder = new Builder(this.localRealmURL, this);
+      let builder = new Builder(
+        this.localRealmURL,
+        this,
+        this.saveModel.bind(this)
+      );
       resolve(builder);
       return builder;
     } catch (err) {
@@ -229,17 +237,6 @@ export default class Cards extends Service implements CardService {
       fullURL.push(buildQueryString(opts.query));
     }
     return fullURL.join('');
-  }
-
-  private async codeForCard(
-    card: ResourceObject
-  ): Promise<CardComponentModule> {
-    let { componentModule } = card.meta || {};
-    if (!componentModule || typeof componentModule !== 'string') {
-      throw new Error('Cards component module must be present and a string');
-    }
-
-    return await this.loadModule<CardComponentModule>(componentModule);
   }
 
   async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {

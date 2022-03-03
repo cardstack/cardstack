@@ -67,11 +67,13 @@ export class CardService implements CardServiceInterface {
     };
   }
 
-  async loadData(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
+  async loadModel(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return await this.makeCardModelFromDatabase(format, result, allFields);
+    let model = await this.makeCardModelFromDatabase(format, result, allFields);
+    await model.computeData();
+    return model;
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -144,26 +146,38 @@ export class CardService implements CardServiceInterface {
     return Promise.resolve(this.fileCache.loadModule(moduleIdentifier));
   }
 
-  async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+  async saveModel(card: CardModel, operation: 'create' | 'update'): Promise<ResourceObject<Saved>> {
+    if (operation === 'create') {
+      return await this.createModel(card);
+    } else {
+      return await this.updateModel(card);
+    }
+  }
+
+  private async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
     let raw = await this.realmManager.create({
       id: card.id,
       realm: card.realm,
       adoptsFrom: card.parentCardURL,
       data: card.serialize().attributes,
     });
-    return { type: 'cards', id: raw.id, attributes: raw.data };
+    let { id, realm, adoptsFrom, data } = raw;
+    await this.searchIndex.indexData({ id, realm, adoptsFrom, data }, card);
+    return { type: 'cards', id, attributes: data };
   }
 
-  async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+  private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
     let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
-    return { type: 'cards', id: raw.id, attributes: raw.data };
+    let { id, data, realm } = raw;
+    await this.searchIndex.indexData({ id, realm, data }, card);
+    return { type: 'cards', id, attributes: data };
   }
 
   private async makeCardModelFromDatabase(
     format: Format,
     result: Record<string, any>,
     allFields = false
-  ): Promise<CardModel> {
+  ): Promise<CardModelForHub> {
     let cardId = this.realmManager.parseCardURL(result.url);
 
     let componentMetaModule = result.componentInfos[format].metaModule.global;
@@ -175,7 +189,6 @@ export class CardService implements CardServiceInterface {
       {
         type: 'loaded',
         id: cardId.id,
-        componentModule: result.componentInfos[format].componentModule.global,
         allFields,
       },
       {
@@ -184,6 +197,8 @@ export class CardService implements CardServiceInterface {
         realm: cardId.realm,
         rawData: result.data ?? {},
         componentMeta,
+        componentModuleRef: result.componentInfos[format].componentModule.global,
+        saveModel: this.saveModel.bind(this),
       }
     );
   }
