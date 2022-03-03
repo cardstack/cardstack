@@ -16,6 +16,7 @@ import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];

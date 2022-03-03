@@ -34,8 +34,8 @@ const PERSON_CARD: RawCard = {
 };
 
 if (process.env.COMPILER) {
-  describe.only('Compiler', function () {
-    let { cards, getFileCache } = configureHubWithCompiler(this);
+  describe('Compiler', function () {
+    let { cards, getFileCache, resolveCard } = configureHubWithCompiler(this);
 
     it('string card', async function () {
       let { compiled } = await cards.load('https://cardstack.com/base/string');
@@ -123,22 +123,44 @@ if (process.env.COMPILER) {
         `);
       });
 
+      it('defines the component modules within the card itself', async function () {
+        let {
+          embedded: {
+            componentModule: { global: embeddedGlobal },
+          },
+          edit: {
+            componentModule: { global: editGlobal },
+          },
+          isolated: {
+            componentModule: { global: isolatedGlobal },
+          },
+        } = compiled.componentInfos;
+
+        expect(isolatedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/isolated.js');
+        expect(resolveCard(isolatedGlobal), 'isolated resolved location').to.match(
+          /cardstack.local-person\/isolated.js/
+        );
+        expect(editGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/edit.js');
+        expect(resolveCard(editGlobal), 'edit location is not in the base cards').to.match(
+          /cardstack.local-person\/edit.js/
+        );
+        expect(embeddedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/embedded.js');
+        expect(resolveCard(embeddedGlobal), 'embedded resolved location').to.match(
+          /cardstack.local-person\/embedded.js/
+        );
+      });
+
       it('Recompiles glimmer templates', async function () {
         let { embedded, edit } = compiled.componentInfos;
         expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
           '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
         );
 
-        expect(
-          getFileCache().getModule(edit.componentModule.global),
-          'Edit template is rendered for text'
-        ).to.containsSource(
+        let editSource = getFileCache().getModule(edit.componentModule.global);
+        expect(editSource, 'Edit template is rendered for text').to.containsSource(
           '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
         );
-        expect(
-          getFileCache().getModule(edit.componentModule.global),
-          'Edit template is rendered for date'
-        ).to.containsSource(
+        expect(editSource, 'Edit template is rendered for date').to.containsSource(
           '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
         );
       });

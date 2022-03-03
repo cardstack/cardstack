@@ -29,7 +29,6 @@ import {
 import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
-import { hashCardFields } from './utils/fields';
 
 const BASE_CARD_ID: CardId = {
   realm: 'https://cardstack.com/base/',
@@ -376,9 +375,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     localFile: string,
     format: Format
   ): Promise<ComponentInfo<LocalRef>> {
-    let fieldsHash = hashCardFields(fields);
-    let componentModule = appendToFilename(localFile, '-' + fieldsHash);
-    let metaModuleFileName = appendToFilename(componentModule, '__meta');
+    let metaModuleFileName = appendToFilename(localFile, '__meta');
 
     let options: CardComponentPluginOptions = {
       debugPath,
@@ -390,7 +387,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let componentTransformResult = transformCardComponent(templateSource, options);
-    this.outputModules[componentModule] = {
+    this.outputModules[localFile] = {
       type: JS_TYPE,
       source: componentTransformResult.source,
       ast: componentTransformResult.ast,
@@ -409,7 +406,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let componentInfo: ComponentInfo<LocalRef> = {
-      componentModule: { local: componentModule },
+      componentModule: { local: localFile },
       metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
