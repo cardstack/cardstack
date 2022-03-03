@@ -1,28 +1,29 @@
 {{#let
-  (concat (or this.merchantInfo.name @model.merchantSafe.address) ' requests payment')
-  (if this.cleanedAmounts.displayed.amount (concat 'Pay ' this.cleanedAmounts.displayed.amount))
-  as |title description|
+  (or this.merchantInfo.name @model.merchantSafe.address)
+  as |business|
 }}
-  {{page-title title replace=true}}
+  {{#let
+    (concat business ' requests payment')
+    (concat 'Use Card Wallet to pay ' (or this.cleanedAmounts.displayed.amount business))
+    as |title description|
+  }}
+    {{page-title title replace=true}}
 
-  <InHead>
-    {{!-- template-lint-disable no-forbidden-elements --}}
-    <meta property='og:title' content={{title}} />
-    <meta property='og:type' content='website' />
-    <meta property='og:url' content={{this.paymentURL}} />
-    {{#if description}}
+    <InHead>
+      {{!-- template-lint-disable no-forbidden-elements --}}
+      <meta property='og:title' content={{title}} />
+      <meta property='og:type' content='website' />
+      <meta property='og:url' content={{this.paymentURL}} />
       <meta property='og:description' content={{description}} />
-    {{/if}}
 
-    <meta name='twitter:title' content={{title}} />
-    <meta name='twitter:card' content='summary' />
-    {{#if description}}
+      <meta name='twitter:title' content={{title}} />
+      <meta name='twitter:card' content='summary' />
       <meta name='twitter:description' content={{description}} />
-    {{/if}}
-    <meta name='twitter:url' content={{this.paymentURL}} />
-    {{!-- template-lint-disable no-potential-path-strings --}}
-    <meta name='twitter:site' content='@cardstack' />
-  </InHead>
+      <meta name='twitter:url' content={{this.paymentURL}} />
+      {{!-- template-lint-disable no-potential-path-strings --}}
+      <meta name='twitter:site' content='@cardstack' />
+    </InHead>
+  {{/let}}
 {{/let}}
 
 <div class="merchant-payment-request-page">

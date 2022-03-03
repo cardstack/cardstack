@@ -234,7 +234,7 @@ module('Acceptance | pay', function (hooks) {
       spendToUsd(roundedSpendAmount)!,
       'USD'
     );
-    let description = `Pay ${amountInUSD}`;
+    let description = `Use Card Wallet to pay ${amountInUSD}`;
 
     assert
       .dom(
@@ -251,16 +251,23 @@ module('Acceptance | pay', function (hooks) {
       .exists();
   });
 
-  test('it does not render the description if there is no amount param specified', async function (assert) {
+  test('it has a fallback meta description if there is no amount param specified', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
     await waitFor(MERCHANT);
 
+    let description = `Use Card Wallet to pay ${merchantName}`;
     assert
-      .dom(`meta[property='og:description']`, document.documentElement)
-      .doesNotExist();
+      .dom(
+        `meta[property='og:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
     assert
-      .dom(`meta[name='twitter:description']`, document.documentElement)
-      .doesNotExist();
+      .dom(
+        `meta[name='twitter:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
   });
 
   test('it rounds floating point SPEND amounts', async function (assert) {
