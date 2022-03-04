@@ -32,7 +32,7 @@ const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
-const QR_CODE = '[data-test-styled-qr-code]';
+const QR_CODE = '[data-test-boxel-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-link-deep-link]';
 const PAYMENT_URL = '[data-test-payment-link-url]';
 
@@ -179,7 +179,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -270,7 +272,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: roundedSpendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -291,7 +295,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: minSpendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -315,7 +321,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -338,7 +346,9 @@ module('Acceptance | pay', function (hooks) {
       currency: usdSymbol,
       amount: usdAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -359,7 +369,9 @@ module('Acceptance | pay', function (hooks) {
       currency: usdSymbol,
       amount: minUsdAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -395,7 +407,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: Number(roundedJpyAmount),
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -431,7 +445,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: minJpyAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -458,7 +474,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: jpyAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -480,7 +498,9 @@ module('Acceptance | pay', function (hooks) {
       currency: invalidCurrencySymbol,
       amount: 300,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -499,7 +519,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: 0,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -610,7 +632,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
