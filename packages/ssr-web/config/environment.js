@@ -11,7 +11,7 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.space.localhost';
+const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.xyz.localhost';
 const CARD_SPACE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
 const CARD_SPACE_HOSTNAME_SUFFIX = '.card.xyz';
 
@@ -92,7 +92,7 @@ module.exports = function (environment) {
     },
     fastboot: {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
-        '/.+.card.space.localhost:\\d+$/',
+        '/.+.card.xyz.localhost:\\d+$/',
         '/^localhost:\\d+$/',
       ],
     },
