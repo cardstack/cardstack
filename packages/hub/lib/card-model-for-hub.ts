@@ -31,8 +31,4 @@ export default class CardModelForHub extends BaseCardModel implements CardModel 
     }
     return this.componentMeta.allFields;
   }
-
-  protected componentModule(): Promise<void> {
-    throw new Error('Hub does not have use of component');
-  }
 }

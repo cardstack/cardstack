@@ -121,7 +121,7 @@ export default class CardModelForBrowser
     return this._componentModule.usedFields;
   }
 
-  protected async componentModule() {
+  private async componentModule() {
     if (!this._componentModule) {
       this._componentModule = await this.cards.loadModule<CardComponentModule>(
         this.componentModuleRef

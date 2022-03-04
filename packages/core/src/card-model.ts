@@ -10,7 +10,6 @@ import {
   CardService,
   CardModelArgs,
   CardSchemaModule,
-  CardComponentModule,
   CardModel as CardModelInterface,
   Setter,
   SerializerMap,
@@ -73,7 +72,6 @@ export default abstract class CardModel implements CardModelInterface {
   protected abstract get serializerMap(): SerializerMap;
   protected abstract get usedFields(): string[];
   protected abstract get allFields(): string[];
-  protected abstract componentModule(): Promise<CardComponentModule | void>;
 
   adoptIntoRealm(realm: string, id?: string): CardModelInterface {
     if (this.state.type !== 'loaded') {
