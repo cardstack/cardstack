@@ -1,33 +1,31 @@
-<div class={{cn "boxel-card-picker" boxel-card-picker--change-card=@selectedCard}} data-test-boxel-card-picker ...attributes>
-  {{#let (component (or @cardComponent "boxel/card-picker/card-option")) as |CardComponent|}}
-    {{#if @selectedCard}}
-      <div class="boxel-card-picker__selected-card" data-test-boxel-card-picker-selected-card>
-        <CardComponent @card={{@selectedCard}} />
-      </div>
-    {{/if}}
-    <PowerSelect
-      class={{cn "boxel-card-picker__dropdown" boxel-card-picker__dropdown--selected=@selectedCard}}
-      @options={{@cards}}
-      @selected={{@selectedCard}}
-      @selectedItemComponent="boxel/card-picker/selected-item"
-      @placeholder="Select card"
-      @onChange={{@chooseCard}}
-      @renderInPlace={{true}}
-      @eventType="click"
-      @verticalPosition="below"
-      data-test-boxel-card-picker-dropdown
-    as |card|>
-      <div
-        class={{cn
-          "boxel-card-picker__dropdown-option"
-          boxel-card-picker__dropdown-option--selected=(eq card @selectedCard)
-          boxel-card-picker__dropdown-option--disabled=(eq card.disabled true)
-        }}
-        data-test-boxel-card-picker-dropdown-option
-        data-test-boxel-card-picker-dropdown-option-disabled={{card.disabled}}
-      >
-        <CardComponent @card={{card}} />
-      </div>
-    </PowerSelect>
-  {{/let}}
+<div class={{cn "boxel-card-picker" boxel-card-picker--change-card=@selectedItem}} data-test-boxel-card-picker ...attributes>
+  {{#if @selectedItem}}
+    <div class="boxel-card-picker__selected-card" data-test-boxel-card-picker-selected-card>
+      {{yield @selectedItem}}
+    </div>
+  {{/if}}
+  <PowerSelect
+    class={{cn "boxel-card-picker__dropdown" boxel-card-picker__dropdown--selected=@selectedItem}}
+    @options={{@items}}
+    @selected={{@selectedItem}}
+    @selectedItemComponent="boxel/card-picker/selected-item"
+    @placeholder="Select card"
+    @onChange={{@chooseItem}}
+    @renderInPlace={{true}}
+    @eventType="click"
+    @verticalPosition="below"
+    data-test-boxel-card-picker-dropdown
+  as |item|>
+    <div
+      class={{cn
+        "boxel-card-picker__dropdown-option"
+        boxel-card-picker__dropdown-option--selected=(eq item @selectedItem)
+        boxel-card-picker__dropdown-option--disabled=(eq item.disabled true)
+      }}
+      data-test-boxel-card-picker-dropdown-option
+      data-test-boxel-card-picker-dropdown-option-disabled={{item.disabled}}
+    >
+      {{yield item}}
+    </div>
+  </PowerSelect>
 </div>

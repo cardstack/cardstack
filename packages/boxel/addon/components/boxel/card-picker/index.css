@@ -1,51 +1,57 @@
-@import './card-option/index.css';
-@import './selected-item/index.css';
-
 .boxel-card-picker {
+  --boxel-card-picker-card-width: var(--boxel-xxs-container);
+
   position: relative;
 }
 
 .boxel-card-picker--change-card {
-  display: flex;
-}
-
-.boxel-card-picker--change-card .boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
-  left: -100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .boxel-card-picker__dropdown {
-  --default-field-height: 2.5rem;
-  --default-field-width: 24rem;
-  --options-menu-height: 33.2rem;
+  --boxel-card-picker-options-menu-height: 33.2rem;
+  --boxel-card-picker-field-height: 2.5rem;
+  --boxel-card-picker-padding-h: var(--boxel-sp-xxxl);
+  --boxel-card-picker-field-width: calc(var(--boxel-card-picker-card-width) + var(--boxel-card-picker-padding-h) * 2);
 
-  position: relative;
-  z-index: 10;
+  position: static;
   max-width: 100%;
-  margin-bottom: var(--boxel-sp-xxxs);
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
+  z-index: 10;
 }
 
 .boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
   position: absolute;
+  width: 100%;
+}
+
+.boxel-card-picker__dropdown--selected .ember-basic-dropdown-content-wormhole-origin {
+  right: 0;
 }
 
 .boxel-card-picker__dropdown > .ember-power-select-trigger {
-  min-height: var(--default-field-height);
-  width: var(--default-field-width);
-  padding: var(--boxel-sp-xs) var(--boxel-sp);
+  min-height: var(--boxel-card-picker-field-height);
+  width: min(var(--boxel-card-picker-field-width), 100%);
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xl) var(--boxel-sp-xs) var(--boxel-sp);
   background: url("/@cardstack/boxel/images/icons/caret-down.svg") right 1.125rem center/auto 0.5rem no-repeat;
-  background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius);
   transition: border-color var(--boxel-transition);
 }
 
 .boxel-card-picker__dropdown--selected > .ember-power-select-trigger {
-  width: 9rem;
+  width: max-content;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs) var(--boxel-sp-xs);
   background-size: 0.6rem auto;
+  background-position: right var(--boxel-sp-xxxs) center;
   border: none;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: right;
 }
 
 .boxel-card-picker__dropdown > .ember-power-select-trigger:hover {
@@ -56,14 +62,17 @@
 .boxel-card-picker__dropdown .ember-basic-dropdown-content {
   position: relative;
   max-width: 100%;
-  height: 500px;
-  width: var(--default-field-width);
-  max-height: var(--options-menu-height);
+  width: min(var(--boxel-card-picker-field-width), 100%);
+  max-height: var(--boxel-card-picker-options-menu-height);
   background-color: var(--boxel-light);
   border: 1px solid rgb(0 0 0 / 15%);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
   overflow-y: auto;
+}
+
+.boxel-card-picker__dropdown--selected .ember-basic-dropdown-content {
+  margin-left: auto;
 }
 
 .boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
@@ -75,6 +84,11 @@
 }
 
 .boxel-card-picker__dropdown .ember-power-select-options {
+  /* height and overflow-y is necessary to get around
+  ember-power-select's keyboard usage issue */
+  height: 100%;
+  overflow-y: scroll;
+
   list-style: none;
   margin: 0;
   padding: 0;
@@ -90,7 +104,6 @@
 
 .boxel-card-picker__dropdown-option--selected {
   background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
-  background-color: var(--boxel-purple-100);
 }
 
 .ember-power-select-selected-item .boxel-card-picker__dropdown-option--selected {
@@ -120,5 +133,5 @@
 }
 
 .boxel-card-picker__selected-card {
-  margin-right: var(--boxel-sp-xxxs);
+  width: var(--boxel-card-picker-card-width);
 }
