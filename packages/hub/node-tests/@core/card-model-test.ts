@@ -139,21 +139,17 @@ if (process.env.COMPILER) {
       }
     });
 
-    // note that we have route tests that also assert that setting values on
-    // non-existent fields should error
     it('setData of unused field', async function () {
       let model = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       try {
         await model.setData({
           name: 'Robert Barker',
           pizza: 'pepperoni', // non-existent field
-          address: { city: 'New York' }, // unused field
+          address: { city: 'New York' }, // unused field (which is ok to set)
         });
         throw new Error('did not throw expected error');
       } catch (e: any) {
-        expect(e.message).to.equal(
-          `the field(s) 'pizza', 'address.city' are not allowed to be set for the card ${realmURL}bob-barker in format 'embedded'`
-        );
+        expect(e.message).to.equal(`the field(s) 'pizza' are not allowed to be set for the card ${realmURL}bob-barker`);
       }
     });
 

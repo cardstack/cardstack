@@ -1,10 +1,8 @@
 import {
-  Setter,
   Saved,
   Unsaved,
   ResourceObject,
   CardModel,
-  RawCardData,
   CardService,
   CardModelArgs,
   SerializerMap,
@@ -18,9 +16,6 @@ import Component from '@glimmer/component';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 import { hbs } from 'ember-cli-htmlbars';
-import merge from 'lodash/merge';
-import { restartableTask } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 import { registerDestructor } from '@ember/destroyable';
 import { tracked as _tracked } from '@glimmer/tracking';
 
@@ -28,7 +23,6 @@ export default class CardModelForBrowser
   extends BaseCardModel
   implements CardModel
 {
-  setters: Setter;
   private wrapperComponent: unknown | undefined;
 
   constructor(
@@ -38,8 +32,7 @@ export default class CardModelForBrowser
   ) {
     super(cards, state, args);
 
-    this.setters = this.makeSetter();
-    registerDestructor(this, this.rerenderFinished.bind(this));
+    registerDestructor(this, this.flushUpdates.bind(this));
 
     let prop = tracked(this, '_schemaInstance', {
       enumerable: true,
@@ -59,14 +52,8 @@ export default class CardModelForBrowser
 
   serialize(): ResourceObject<Saved | Unsaved> {
     let response = super.serialize();
-
-    // no need to serialize the meta on the browser
-    delete response.meta;
+    delete response.meta; // no need to serialize the meta on the browser
     return response;
-  }
-
-  setData(_data: RawCardData) {
-    throw new Error('unimplemented');
   }
 
   async editable(): Promise<CardModel> {
@@ -102,19 +89,6 @@ export default class CardModelForBrowser
       );
     }
     return this.wrapperComponent;
-  }
-
-  @restartableTask async rerenderData(
-    data: Record<string, any>
-  ): Promise<void> {
-    this.rawData = merge({}, this.rawData, data);
-    let newSchemaInstance = await this.createSchemaInstance();
-    await this.computeData(newSchemaInstance);
-    this._schemaInstance = newSchemaInstance;
-  }
-
-  async rerenderFinished() {
-    await taskFor(this.rerenderData).last;
   }
 
   protected get serializerMap(): SerializerMap {
@@ -153,44 +127,6 @@ export default class CardModelForBrowser
       );
     }
     return this._componentModule;
-  }
-
-  // TODO move this into the base class so that the hub can share it
-  private makeSetter(segments: string[] = []): Setter {
-    let s = (value: any) => {
-      let innerSegments = segments.slice();
-      let lastSegment = innerSegments.pop();
-      if (!lastSegment) {
-        return;
-      }
-
-      let data = this.shapeData('all-fields');
-      let cursor: any = data;
-      for (let segment of innerSegments) {
-        let nextCursor = cursor[segment];
-        if (!nextCursor) {
-          nextCursor = {};
-          cursor[segment] = nextCursor;
-        }
-        cursor = nextCursor;
-      }
-      cursor[lastSegment] = value;
-      taskFor(this.rerenderData).perform(data);
-    };
-    (s as any).setters = new Proxy(
-      {},
-      {
-        get: (target: any, prop: string, receiver: unknown) => {
-          if (typeof prop === 'string') {
-            return this.makeSetter([...segments, prop]);
-          } else {
-            return Reflect.get(target, prop, receiver);
-          }
-        },
-      }
-    );
-
-    return s;
   }
 }
 

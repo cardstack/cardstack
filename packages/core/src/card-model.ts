@@ -16,13 +16,15 @@ import {
   SerializerMap,
   CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
-import { serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
+import { serializeAttributes, serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
+import isPlainObject from 'lodash/isPlainObject';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import { BadRequest } from './utils/errors';
 
 export interface CreatedState {
   type: 'created';
@@ -37,6 +39,8 @@ export interface LoadedState {
 }
 
 export default abstract class CardModel implements CardModelInterface {
+  setters: Setter;
+
   protected _schemaInstance: any | undefined;
   protected componentModuleRef: ComponentInfo['componentModule']['global'];
   protected rawData: RawCardData;
@@ -49,6 +53,8 @@ export default abstract class CardModel implements CardModelInterface {
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
   private _schemaClass: CardSchemaModule['default'] | undefined;
+  private updateQueue: Record<string, any>[] = [];
+  private updateQueuePromise: Promise<void> = Promise.resolve();
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
     let { realm, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
@@ -60,11 +66,10 @@ export default abstract class CardModel implements CardModelInterface {
     this.componentMeta = componentMeta;
     this.saveModel = saveModel;
     this.state = state;
+    this.setters = this.makeSetter();
   }
 
-  abstract setters: Setter | undefined;
   abstract editable(): Promise<CardModelInterface>;
-  abstract setData(data: RawCardData): void;
   abstract component(): Promise<unknown>;
   protected abstract get serializerMap(): SerializerMap;
   protected abstract get usedFields(): string[];
@@ -86,7 +91,7 @@ export default abstract class CardModel implements CardModelInterface {
       {
         realm,
         format: this.format,
-        rawData: { id: undefined, type: 'card', attributes: {} },
+        rawData: {},
         saveModel: this.saveModel,
         schemaModule: this.schemaModule,
         componentMeta: this.componentMeta,
@@ -193,6 +198,24 @@ export default abstract class CardModel implements CardModelInterface {
     };
   }
 
+  async setData(data: RawCardData): Promise<void> {
+    let nonExistentFields = this.assertFieldsExists(data);
+    if (nonExistentFields.length) {
+      throw new BadRequest(
+        `the field(s) ${nonExistentFields.map((f) => `'${f}'`).join(', ')} are not allowed to be set for the card ${
+          this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
+        }`
+      );
+    }
+
+    this.updateQueue.push(data);
+    await this.drainUpdateQueue();
+  }
+
+  async flushUpdates(): Promise<void> {
+    return await this.updateQueuePromise;
+  }
+
   // we have a few places that are very sensitive to the shape of the data, and
   // won't be able to deal with a schema instance that has additional properties
   // and methods beyond just the data itself, so this method is for those places
@@ -228,6 +251,76 @@ export default abstract class CardModel implements CardModelInterface {
     this._schemaClass = (await this.cards.loadModule<CardSchemaModule>(this.schemaModule)).default;
 
     return this._schemaClass;
+  }
+
+  private makeSetter(segments: string[] = []): Setter {
+    let s = (value: any) => {
+      let innerSegments = segments.slice();
+      let lastSegment = innerSegments.pop();
+      if (!lastSegment) {
+        return;
+      }
+
+      let data = this.shapeData('all-fields');
+      let cursor: any = data;
+      for (let segment of innerSegments) {
+        let nextCursor = cursor[segment];
+        if (!nextCursor) {
+          nextCursor = {};
+          cursor[segment] = nextCursor;
+        }
+        cursor = nextCursor;
+      }
+      cursor[lastSegment] = value;
+      this.updateQueue.push(data);
+      this.drainUpdateQueue();
+    };
+    (s as any).setters = new Proxy(
+      {},
+      {
+        get: (target: any, prop: string, receiver: unknown) => {
+          if (typeof prop === 'string') {
+            return this.makeSetter([...segments, prop]);
+          } else {
+            return Reflect.get(target, prop, receiver);
+          }
+        },
+      }
+    );
+
+    return s;
+  }
+
+  private async drainUpdateQueue() {
+    await this.updateQueuePromise;
+
+    let queueDrained: () => void;
+    this.updateQueuePromise = new Promise<void>((res) => (queueDrained = res));
+
+    while (this.updateQueue.length > 0) {
+      let data = this.updateQueue.shift()!;
+      let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
+      this.rawData = merge({}, this.rawData, serializedData);
+    }
+    let newSchemaInstance = await this.createSchemaInstance();
+    await this.computeData(newSchemaInstance);
+    this._schemaInstance = newSchemaInstance;
+    queueDrained!();
+  }
+
+  // TODO: we need to really use a validation mechanism which will use code from
+  // the schema.js module to validate the fields
+  private assertFieldsExists(data: RawCardData, path = ''): string[] {
+    let nonExistentFields: string[] = [];
+    for (let [field, value] of Object.entries(data)) {
+      let fieldPath = path ? `${path}.${field}` : field;
+      if (isPlainObject(value)) {
+        nonExistentFields = [...nonExistentFields, ...this.assertFieldsExists(value, fieldPath)];
+      } else if (!this.allFields.includes(fieldPath)) {
+        nonExistentFields.push(fieldPath);
+      }
+    }
+    return nonExistentFields;
   }
 }
 
