@@ -45,7 +45,6 @@ export default abstract class CardModel implements CardModelInterface {
   protected componentModuleRef: ComponentInfo['componentModule']['global'];
   protected rawData: RawCardData;
   protected state: CreatedState | LoadedState;
-  protected _componentModule: CardComponentModule | undefined;
   protected componentMeta: CardComponentMetaModule | undefined;
 
   private _realm: string;

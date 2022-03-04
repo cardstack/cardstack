@@ -23,6 +23,7 @@ export default class CardModelForBrowser
   extends BaseCardModel
   implements CardModel
 {
+  private _componentModule: CardComponentModule | undefined;
   private wrapperComponent: unknown | undefined;
 
   constructor(
