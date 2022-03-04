@@ -109,6 +109,20 @@ export default class PayController extends Controller {
     return this.model.merchantInfo;
   }
 
+  get meta() {
+    let title = this.merchantInfo.name
+      ? this.merchantInfo.name + ' requests payment'
+      : 'Payment Requested';
+    let paySubject =
+      this.cleanedAmounts.displayed.amount ||
+      this.merchantInfo.name ||
+      'Payment Request';
+    return {
+      title,
+      description: `Use Card Wallet to pay ${paySubject}`,
+    };
+  }
+
   // This is necessary because iOS respects users' decisions to visit your site
   // and will stay on the site if the link has the same domain
   // see https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/UniversalLinks.html
