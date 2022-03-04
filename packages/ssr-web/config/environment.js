@@ -22,9 +22,9 @@ const cardSpaceHostnameSuffixByTarget = {
 const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    '/.+\\.pouty\\.pizza$/',
+    /.+\.pouty\.pizza$/,
   ],
-  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, '/.+\\.card\\.xyz$/'],
+  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, /.+\.card\.xyz$/],
 };
 
 const pkg = require('../package.json');
@@ -92,8 +92,9 @@ module.exports = function (environment) {
     },
     fastboot: {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
-        '/.+.card.xyz.localhost:\\d+$/',
-        '/^localhost:\\d+$/',
+        // FIXME if these were strings before, did they work?
+        /.+.card.xyz.localhost:\\d+$/,
+        /^localhost:\\d+$/,
       ],
     },
     cardSpaceHostnameSuffix:
