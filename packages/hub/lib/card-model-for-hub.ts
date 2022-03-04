@@ -6,7 +6,6 @@ export default class CardModelForHub extends BaseCardModel implements CardModel 
     throw new Error('Hub does not have use of editable');
   }
 
-  // TODO in the future when we do SSR, we'll have a need for this
   async component(): Promise<unknown> {
     throw new Error('Hub does not have use of component');
   }
