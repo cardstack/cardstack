@@ -25,7 +25,7 @@ module.exports = {
     .boxel-date-divider__date,
     .boxel-thread-message__time,
     .workflow-thread__app-version,
-    .styled-qr-code {
+    .boxel-styled-qr-code {
       visibility: hidden !important;
     }
   `,

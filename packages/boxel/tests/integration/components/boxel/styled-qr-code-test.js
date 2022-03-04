@@ -14,7 +14,7 @@ module('Integration | Component | styled-qr-code', function (hooks) {
 
   test('it can render a visual loading state and moves out of it after', async function (assert) {
     await render(hbs`
-      <StyledQrCode @data={{this.data}} />
+      <Boxel::StyledQrCode @data={{this.data}} />
     `);
 
     assert.dom(`${QR} canvas`).doesNotExist();

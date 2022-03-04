@@ -1,4 +1,4 @@
-.styled-qr-code {
+.boxel-styled-qr-code {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,17 +17,17 @@
   aspect-ratio: 1;
 }
 
-.styled-qr-code__loading-indicator {
+.boxel-styled-qr-code__loading-indicator {
   width: 20%;
   height: 20%;
 }
 
 /* Hide this once the canvas is appended */
-.styled-qr-code__loading-indicator:not(:only-child) {
+.boxel-styled-qr-code__loading-indicator:not(:only-child) {
   display: none;
 }
 
-.styled-qr-code > canvas {
+.boxel-styled-qr-code > canvas {
   width: 100%;
   height: 100%;
   max-width: 100%;
