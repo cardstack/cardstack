@@ -7,6 +7,7 @@ import {
   CornerSquareType,
   DotType,
 } from 'qr-code-styling/lib/types';
+import './index.css';
 
 interface StyledQrCodeComponentArgs {
   size: number | undefined; // Size of canvas (default 300)
