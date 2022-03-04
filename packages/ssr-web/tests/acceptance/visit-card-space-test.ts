@@ -73,8 +73,8 @@ module('Acceptance | visit card space', function (hooks) {
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
       assert.dom('[data-test-merchant-text]').hasText('slug');
       assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
+        .dom('[data-test-boxel-styled-qr-code]')
+        .hasAttribute('data-test-boxel-styled-qr-code', link);
       assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
@@ -96,7 +96,7 @@ module('Acceptance | visit card space', function (hooks) {
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
       assert.dom('[data-test-merchant-text]').hasText('slug');
 
-      assert.dom('[data-test-styled-qr-code]').doesNotExist();
+      assert.dom('[data-test-boxel-styled-qr-code]').doesNotExist();
       assert.dom('[data-test-payment-link-url]').containsText(deepLink);
       assert
         .dom('[data-test-payment-link-deep-link]')
@@ -106,8 +106,8 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
       assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
+        .dom('[data-test-boxel-styled-qr-code]')
+        .hasAttribute('data-test-boxel-styled-qr-code', link);
       assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
@@ -129,7 +129,7 @@ module('Acceptance | visit card space', function (hooks) {
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
       assert.dom('[data-test-merchant-text]').hasText('slug');
 
-      assert.dom('[data-test-styled-qr-code]').doesNotExist();
+      assert.dom('[data-test-boxel-styled-qr-code]').doesNotExist();
       assert.dom('[data-test-payment-link-url]').containsText(deepLink);
       assert
         .dom('[data-test-payment-link-deep-link]')
@@ -139,8 +139,8 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
       assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
+        .dom('[data-test-boxel-styled-qr-code]')
+        .hasAttribute('data-test-boxel-styled-qr-code', link);
       assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
