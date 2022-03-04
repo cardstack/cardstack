@@ -67,11 +67,16 @@ export default abstract class CardModel implements CardModelInterface {
     this.setters = this.makeSetter();
   }
 
-  abstract editable(): Promise<CardModelInterface>;
-  abstract component(): Promise<unknown>;
   protected abstract get serializerMap(): SerializerMap;
   protected abstract get usedFields(): string[];
   protected abstract get allFields(): string[];
+
+  editable(): Promise<CardModelInterface> {
+    throw new Error('editable() is unsupported');
+  }
+  component(): Promise<unknown> {
+    throw new Error('component() is unsupported');
+  }
 
   adoptIntoRealm(realm: string, id?: string): CardModelInterface {
     if (this.state.type !== 'loaded') {
