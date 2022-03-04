@@ -279,7 +279,7 @@ if (process.env.COMPILER) {
         // This child card gets created via adoptIntoRealm, which goes down the
         // code path that doesn't involve compiling cards
         let cardModel = await cards.loadModel(`${realmURL}greeting-card`, 'isolated');
-        let sampleGreeting = await cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
+        let sampleGreeting = cardModel.adoptIntoRealm(realmURL, 'sample-greeting');
         await sampleGreeting.setData({
           name: 'Jackie',
         });

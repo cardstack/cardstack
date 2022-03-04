@@ -177,8 +177,6 @@ if (process.env.COMPILER) {
       );
     });
 
-    it('computes async computeds with data consistency');
-
     it('can access a field that requires deserialization');
     it('can have a field that is the same card as itself');
   });

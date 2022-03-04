@@ -80,7 +80,9 @@ export default class Cards extends Service implements CardService {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        return this.makeCardModelFromResponse(cardResponse, format);
+        let model = await this.makeCardModelFromResponse(cardResponse, format);
+        await model.computeData();
+        return model;
       })
     );
   }
@@ -132,7 +134,7 @@ export default class Cards extends Service implements CardService {
     cardResponse: ResourceObject,
     format: Format,
     allFields = false
-  ): Promise<CardModel> {
+  ): Promise<CardModelForBrowser> {
     let schemaModule = cardResponse.meta?.schemaModule;
     if (!schemaModule) {
       throw new Error(

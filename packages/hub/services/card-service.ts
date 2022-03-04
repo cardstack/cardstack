@@ -136,7 +136,13 @@ export class CardService implements CardServiceInterface {
         expression = [...expression, 'order by', ...sortToExpression(query.sort)];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
+      return await Promise.all(
+        result.rows.map(async (row) => {
+          let model = await this.makeCardModelFromDatabase(format, row);
+          await model.computeData();
+          return model;
+        })
+      );
     } finally {
       client.release();
     }
@@ -178,23 +184,20 @@ export class CardService implements CardServiceInterface {
     result: Record<string, any>,
     allFields = false
   ): Promise<CardModelForHub> {
-    let cardId = this.realmManager.parseCardURL(result.url);
-
+    let { realm } = this.realmManager.parseCardURL(result.url);
     let componentMetaModule = result.componentInfos[format].metaModule.global;
     let componentMeta = await this.loadModule(componentMetaModule);
-
-    return await getOwner(this).instantiate(
-      CardModelForHub,
+    return new CardModelForHub(
       this,
       {
         type: 'loaded',
-        id: cardId.id,
+        url: result.url,
         allFields,
       },
       {
         format,
+        realm,
         schemaModule: result.schemaModule,
-        realm: cardId.realm,
         rawData: result.data ?? {},
         componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,

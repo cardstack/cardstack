@@ -63,7 +63,7 @@ export default class CardRoutes {
       throw noParentError;
     }
 
-    let card = await parentCard.adoptIntoRealm(realmURL, cardId);
+    let card = parentCard.adoptIntoRealm(realmURL, cardId);
     await card.setData(data.attributes);
     await card.save();
     ctx.body = { data: card.serialize() };

@@ -7,7 +7,6 @@ import { configureHubWithCompiler } from '../helpers/cards';
 import merge from 'lodash/merge';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import cloneDeep from 'lodash/cloneDeep';
-import set from 'lodash/set';
 import { CardModel } from '@cardstack/core/src/interfaces';
 
 function p(dateString: string): Date {
@@ -64,18 +63,18 @@ if (process.env.COMPILER) {
 
     it('.url on new card throws error', async function () {
       let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL);
+      let model = parentCard.adoptIntoRealm(realmURL);
       try {
         model.url;
         throw new Error('did not throw expected error');
       } catch (e: any) {
-        expect(e.message).to.equal(`bug: card in state created does not have a url yet`);
+        expect(e.message).to.equal(`bug: card in state created does not have a url`);
       }
     });
 
     it('.save() created card', async function () {
       let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL);
+      let model = parentCard.adoptIntoRealm(realmURL);
       await model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
       expect(model.data.address.settlementDate instanceof Date).to.be.true;
       expect(isSameDay(model.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
@@ -131,7 +130,7 @@ if (process.env.COMPILER) {
     it('.save() on adopted card using pre-existing id', async function () {
       let id = 'bob-barker';
       let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL, id);
+      let model = parentCard.adoptIntoRealm(realmURL, id);
       try {
         await model.save();
         throw new Error('did not throw expected error');
@@ -166,9 +165,6 @@ if (process.env.COMPILER) {
       delete result.meta;
 
       let expectedAttributes = cloneDeep(attributes);
-      // TODO: We currently do not store enough info in the database
-      // to know this should be her
-      // set(expectedAttributes, 'address.zip', null);
 
       expect(result).to.deep.equal({
         id: `${realmURL}bob-barker`,
@@ -196,12 +192,11 @@ if (process.env.COMPILER) {
 
     it('.serialize card model in created state', async function () {
       let parent = await cards.loadModel(`${realmURL}person`, 'isolated');
-      let model = await parent.adoptIntoRealm(realmURL);
+      let model = parent.adoptIntoRealm(realmURL);
       await model.setData(attributes);
       let result = model.serialize();
 
       let expectedAttributes = cloneDeep(attributes);
-      set(expectedAttributes, 'address.zip', undefined);
 
       expect(result).to.deep.equal({
         id: undefined,

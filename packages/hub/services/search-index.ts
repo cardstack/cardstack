@@ -253,7 +253,8 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
+    let url = cardURL(rawCard);
+    let definedCard = makeGloballyAddressable(url, compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
     let format: Format = 'isolated';
@@ -262,12 +263,11 @@ class IndexerRun implements IndexerHandle {
     let componentMeta = await this.fileCache.loadModule(componentMetaModule);
     let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
-    let cardModel = await getOwner(this).instantiate(
-      CardModelForHub,
+    let cardModel = new CardModelForHub(
       cardService,
       {
         type: 'loaded',
-        id: rawCard.id,
+        url,
         allFields: false,
       },
       {

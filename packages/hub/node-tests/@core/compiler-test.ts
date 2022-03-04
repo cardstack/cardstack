@@ -85,6 +85,9 @@ if (process.env.COMPILER) {
       expect(metaModuleSource).to.containsSource(`
         export const usedFields = ["name", "birthdate"];
       `);
+      expect(metaModuleSource).to.containsSource(`
+        export const allFields = ["name", "birthdate"];
+      `);
     });
 
     it('CompiledCard edit view', async function () {

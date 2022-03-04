@@ -182,7 +182,7 @@ export interface Builder {
 
 export interface CardModel {
   setters: Setter | undefined;
-  adoptIntoRealm(realm: string, id?: string): Promise<CardModel>;
+  adoptIntoRealm(realm: string, id?: string): CardModel;
   editable(): Promise<CardModel>;
   url: string;
   id: string | undefined;
@@ -203,6 +203,7 @@ export interface CardModelArgs {
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];
+  componentMeta?: CardComponentMetaModule;
   saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
 }
 
@@ -226,6 +227,7 @@ export interface CardComponentMetaModule {
   serializerMap: SerializerMap;
   computedFields: string[];
   usedFields: string[];
+  allFields: string[];
 }
 
 export type CardComponentModule = {

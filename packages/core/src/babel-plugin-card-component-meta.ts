@@ -52,6 +52,7 @@ export function babelPluginComponentMeta(babel: typeof Babel) {
           path.node.body.push(exportSerializerMap(path, state, babel));
           path.node.body.push(exportComputedFields(state, babel));
           path.node.body.push(exportUsedFields(state, babel));
+          path.node.body.push(exportAllFields(state, babel));
         },
       },
     },
@@ -97,6 +98,26 @@ function exportUsedFields(state: State, babel: typeof Babel): t.Statement {
   return babel.template(`export const usedFields = %%usedFields%%;`)({
     usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
   }) as t.Statement;
+}
+
+function exportAllFields(state: State, babel: typeof Babel): t.Statement {
+  let t = babel.types;
+  let fieldList = fieldsAsList(state.opts.fields);
+  return babel.template(`export const allFields = %%allFields%%;`)({
+    allFields: t.arrayExpression(fieldList.map((field) => t.stringLiteral(field))),
+  }) as t.Statement;
+}
+
+function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): string[] {
+  let fieldList: string[] = [];
+  for (let [fieldName, field] of Object.entries(fields)) {
+    if (Object.keys(field.card.fields).length === 0) {
+      fieldList.push([...path, fieldName].join('.'));
+    } else {
+      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
+    }
+  }
+  return fieldList;
 }
 
 // TODO: Where
