@@ -16,8 +16,8 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.space.test';
-const CARD_SPACE_HOSTNAME_SUFFIX = 'card.space';
+const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.xyz.test';
+const CARD_SPACE_HOSTNAME_SUFFIX = 'card.xyz';
 const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
 const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
 
