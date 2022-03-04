@@ -17,6 +17,11 @@
   max-width: 100%;
 }
 
+.payment-link__error {
+  margin: var(--boxel-sp-sm);
+  color: var(--boxel-purple-500);
+}
+
 .payment-link__url {
   max-width: 18.75rem;
   font: var(--boxel-font-sm);
