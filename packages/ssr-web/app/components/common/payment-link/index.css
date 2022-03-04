@@ -14,6 +14,7 @@
 
 .payment-link__qr-container {
   margin: var(--action-element-margin);
+  max-width: 100%;
 }
 
 .payment-link__url {
