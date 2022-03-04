@@ -657,6 +657,37 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
+  test('it renders appropriate meta tags when merchant info is not fetched', async function (assert) {
+    await visit(`/pay/${network}/${merchantSafeWithoutInfo.address}`);
+
+    let title = 'Payment Requested';
+    let description = `Use Card Wallet to pay Payment Request`;
+    assert
+      .dom(
+        `meta[property='og:title'][content="${title}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[name='twitter:title'][content="${title}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[property='og:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[name='twitter:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
+  });
+
   test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
     await visit(
       `/pay/${network}/${nonexistentMerchantId}?amount=${spendAmount}&currency=${spendSymbol}`
