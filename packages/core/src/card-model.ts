@@ -216,7 +216,7 @@ export default abstract class CardModel implements CardModelInterface {
   // we have a few places that are very sensitive to the shape of the data, and
   // won't be able to deal with a schema instance that has additional properties
   // and methods beyond just the data itself, so this method is for those places
-  protected shapeData(shape: 'used-fields' | 'all-fields') {
+  private shapeData(shape: 'used-fields' | 'all-fields') {
     let syncData: Record<string, any> = {};
 
     let fields = shape === 'used-fields' ? this.usedFields : this.allFields;
@@ -230,7 +230,7 @@ export default abstract class CardModel implements CardModelInterface {
     return syncData;
   }
 
-  protected async createSchemaInstance() {
+  private async createSchemaInstance() {
     let klass = await this.schemaClass();
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
     return new klass(this.getRawField.bind(this)) as any;
