@@ -2,6 +2,7 @@ import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { keys } from './utils';
+import { Query } from './query';
 
 export { Query } from './query';
 
@@ -184,18 +185,39 @@ export interface Builder {
 
 export interface CardModel {
   setters: Setter | undefined;
-  adoptIntoRealm(realm: string, id?: string): Promise<CardModel>;
+  adoptIntoRealm(realm: string, id?: string): CardModel;
   editable(): Promise<CardModel>;
   url: string;
   id: string | undefined;
+  realm: string;
   data: Record<string, any>;
   getField(name: string): Promise<any>;
   format: Format;
   setData(data: RawCardData): void;
   serialize(): ResourceObject<Saved | Unsaved>;
   component(): Promise<unknown>;
-  usedFields: ComponentInfo['usedFields'];
   save(): Promise<void>;
+  parentCardURL: string;
+}
+
+export interface CardModelArgs {
+  realm: string;
+  schemaModule: string;
+  format: Format;
+  rawData: NonNullable<RawCard['data']>;
+  componentModuleRef: ComponentInfo['componentModule']['global'];
+  componentMeta?: CardComponentMetaModule;
+  saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
+}
+
+export interface CardService {
+  load(cardURL: string): Promise<Card>;
+  loadModel(cardURL: string, format: Format, allFields?: boolean): Promise<CardModel>;
+  create(raw: RawCard<Unsaved>): Promise<Card>;
+  update(partialRaw: RawCard): Promise<Card>;
+  delete(raw: RawCard): Promise<void>;
+  query(format: Format, query: Query): Promise<CardModel[]>;
+  loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
 export interface CardSchemaModule {
@@ -208,6 +230,7 @@ export interface CardComponentMetaModule {
   serializerMap: SerializerMap;
   computedFields: string[];
   usedFields: string[];
+  allFields: string[];
 }
 
 export type CardComponentModule = {

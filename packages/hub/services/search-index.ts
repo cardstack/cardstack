@@ -16,6 +16,7 @@ import { service } from '@cardstack/hub/services';
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
 import CardModelForHub from '../lib/card-model-for-hub';
+import { INSECURE_CONTEXT } from './card-service';
 
 const log = logger('hub/search-index');
 
@@ -142,6 +143,7 @@ export interface IndexerHandle {
 class IndexerRun implements IndexerHandle {
   private builder = service('card-builder', { as: 'builder' });
   private fileCache = service('file-cache', { as: 'fileCache' });
+  private cardService = service('card-service', { as: 'cardService' });
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
@@ -251,25 +253,33 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
+    let url = cardURL(rawCard);
+    let definedCard = makeGloballyAddressable(url, compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
     let format: Format = 'isolated';
 
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
     let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
-    let cardModel = await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: rawCard.id,
-      realm: rawCard.realm,
-      format,
-      rawData: rawCard.data ?? {},
-      schemaModule: definedCard.schemaModule.global,
-      componentModule: definedCard.componentInfos[format].componentModule.global,
-      componentMeta,
-      allFields: false,
-    });
+    let cardModel = new CardModelForHub(
+      cardService,
+      {
+        type: 'loaded',
+        url,
+        allFields: false,
+      },
+      {
+        format,
+        realm: rawCard.realm,
+        rawData: rawCard.data ?? {},
+        schemaModule: definedCard.schemaModule.global,
+        componentModuleRef: definedCard.componentInfos[format].componentModule.global,
+        componentMeta,
+        saveModel: cardService.saveModel.bind(cardService),
+      }
+    );
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 

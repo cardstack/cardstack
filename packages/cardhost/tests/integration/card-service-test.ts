@@ -60,7 +60,7 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load a card's isolated view and model`, async function (assert) {
-      let model = await cards.load(cardID, 'isolated');
+      let model = await cards.loadModel(cardID, 'isolated');
       assert.equal(model.url, cardID, '@model id is correct');
       assert.equal(
         model.data.title,
@@ -120,7 +120,10 @@ module('Integration | card-service', function (hooks) {
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('May 17, 2021');
 
-      let model = await cards.load(`${localRealmURL}post-list`, 'isolated');
+      let model = await cards.loadModel(
+        `${localRealmURL}post-list`,
+        'isolated'
+      );
       assert.ok(
         model.data.posts[0].createdAt instanceof Date,
         'CreatedAt is an instance of Date'

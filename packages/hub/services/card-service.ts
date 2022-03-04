@@ -1,4 +1,14 @@
-import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
+import {
+  Card,
+  CompiledCard,
+  Unsaved,
+  RawCard,
+  Format,
+  CardModel,
+  CardService as CardServiceInterface,
+  ResourceObject,
+  Saved,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
@@ -35,7 +45,7 @@ export default class CardServiceFactory {
   }
 }
 
-export class CardService {
+export class CardService implements CardServiceInterface {
   private realmManager = service('realm-manager', { as: 'realmManager' });
   private fileCache = service('file-cache', { as: 'fileCache' });
   private builder = service('card-builder', { as: 'builder' });
@@ -58,11 +68,13 @@ export class CardService {
     };
   }
 
-  async loadData(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
+  async loadModel(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return await this.makeCardModelFromDatabase(format, result, allFields);
+    let model = await this.makeCardModelFromDatabase(format, result, allFields);
+    await model.computeData();
+    return model;
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -125,33 +137,74 @@ export class CardService {
         expression = [...expression, 'order by', ...sortToExpression(query.sort)];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
+      return await Promise.all(
+        result.rows.map(async (row) => {
+          let model = await this.makeCardModelFromDatabase(format, row);
+          await model.computeData();
+          return model;
+        })
+      );
     } finally {
       client.release();
     }
+  }
+
+  loadModule(moduleIdentifier: string): Promise<any> {
+    return Promise.resolve(this.fileCache.loadModule(moduleIdentifier));
+  }
+
+  async saveModel(card: CardModel, operation: 'create' | 'update'): Promise<ResourceObject<Saved>> {
+    if (operation === 'create') {
+      return await this.createModel(card);
+    } else {
+      return await this.updateModel(card);
+    }
+  }
+
+  private async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.create({
+      id: card.id,
+      realm: card.realm,
+      adoptsFrom: card.parentCardURL,
+      data: card.serialize().attributes,
+    });
+    let { id, realm, adoptsFrom, data } = raw;
+    await this.searchIndex.indexData({ id, realm, adoptsFrom, data }, card);
+    return { type: 'cards', id, attributes: data };
+  }
+
+  private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
+    let { id, data, realm } = raw;
+    await this.searchIndex.indexData({ id, realm, data }, card);
+    return { type: 'cards', id, attributes: data };
   }
 
   private async makeCardModelFromDatabase(
     format: Format,
     result: Record<string, any>,
     allFields = false
-  ): Promise<CardModel> {
-    let cardId = this.realmManager.parseCardURL(result.url);
-
+  ): Promise<CardModelForHub> {
+    let { realm } = this.realmManager.parseCardURL(result.url);
     let componentMetaModule = result.componentInfos[format].metaModule.global;
-    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
-
-    return await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: cardId.id,
-      realm: cardId.realm,
-      format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
-      componentModule: result.componentInfos[format].componentModule.global,
-      componentMeta,
-      allFields,
-    });
+    let componentMeta = await this.loadModule(componentMetaModule);
+    return new CardModelForHub(
+      this,
+      {
+        type: 'loaded',
+        url: result.url,
+        allFields,
+      },
+      {
+        format,
+        realm,
+        schemaModule: result.schemaModule,
+        rawData: result.data ?? {},
+        componentMeta,
+        componentModuleRef: result.componentInfos[format].componentModule.global,
+        saveModel: this.saveModel.bind(this),
+      }
+    );
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
