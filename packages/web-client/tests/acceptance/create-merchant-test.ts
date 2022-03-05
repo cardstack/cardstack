@@ -44,12 +44,8 @@ function milestoneCompletedSel(milestoneIndex: number): string {
 
 async function selectPrepaidCard(cardAddress: string) {
   await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
-  await waitFor(
-    `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${cardAddress}"]`
-  );
-  await click(
-    `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${cardAddress}"]`
-  );
+  await waitFor(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
+  await click(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
 }
 
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -198,10 +194,10 @@ module('Acceptance | create merchant', function (hooks) {
       `${post} [data-test-boxel-card-picker-dropdown] > [role="button"]`
     );
     await waitFor(
-      `${post} [data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
+      `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
     );
     await click(
-      `${post} [data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
+      `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
     );
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`

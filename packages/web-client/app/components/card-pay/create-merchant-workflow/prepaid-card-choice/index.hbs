@@ -29,11 +29,16 @@
     <Boxel::Field @label="Pay Using Prepaid Card">
       {{#if (eq this.creationState "default")}}
         <Boxel::CardPicker
-          @cards={{this.prepaidCardsForDropdown}}
-          @chooseCard={{this.choosePrepaidCard}}
-          @selectedCard={{this.selectedPrepaidCard}}
-          @cardComponent="card-pay/card-picker-option"
-        />
+          @items={{this.prepaidCardsForDropdown}}
+          @chooseItem={{this.choosePrepaidCard}}
+          @selectedItem={{if this.selectedPrepaidCard (hash id=this.selectedPrepaidCard.address card=this.selectedPrepaidCard) false}}
+        as |item|>
+          <CardPay::CardPickerOption
+            @card={{item.card}}
+            data-test-card-picker-dropdown-option={{item.card.address}}
+            data-test-card-picker-dropdown-option-disabled={{item.disabled}}
+          />
+        </Boxel::CardPicker>
       {{else if this.selectedPrepaidCard}}
         <CardPay::CardPickerOption
           @card={{this.selectedPrepaidCard}}

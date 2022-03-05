@@ -78,14 +78,17 @@ module(
         .exists();
 
       await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
-      await waitFor(`[data-test-boxel-card-picker-dropdown-option]`);
-
+      await waitFor(
+        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+      );
       assert
-        .dom(`[data-test-boxel-card-picker-dropdown-option]`)
+        .dom(
+          `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option]`
+        )
         .exists({ count: 2 });
       assert
         .dom(
-          `[data-test-boxel-card-picker-dropdown-option-disabled] [data-test-prepaid-card="${prepaidCardAddress2}"]`
+          `[data-test-card-picker-dropdown-option="${prepaidCardAddress2}"][data-test-card-picker-dropdown-option-disabled]`
         )
         .exists();
     });
@@ -93,14 +96,16 @@ module(
     test('it disables and fades out cards with insufficient balance', async function (assert) {
       await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
       await waitFor(
-        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
+        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
 
       assert
-        .dom(`[data-test-boxel-card-picker-dropdown-option]`)
+        .dom(
+          `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option]`
+        )
         .exists({ count: 2 });
       assert
-        .dom(`[data-test-boxel-card-picker-dropdown-option-disabled]`)
+        .dom(`[data-test-card-picker-dropdown-option-disabled]`)
         .exists({ count: 1 });
       assert
         .dom(
@@ -108,11 +113,8 @@ module(
         )
         .exists();
       assert
-        .dom(`[data-test-boxel-card-picker-dropdown-option-disabled]`)
-        .hasClass('boxel-card-picker__dropdown-option--disabled');
-      assert
         .dom(
-          `[data-test-boxel-card-picker-dropdown-option-disabled] [data-test-prepaid-card="${prepaidCardAddress2}"]`
+          `[data-test-card-picker-dropdown-option="${prepaidCardAddress2}"][data-test-card-picker-dropdown-option-disabled]`
         )
         .exists();
     });

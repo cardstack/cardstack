@@ -92,10 +92,10 @@ module(
     async function selectPrepaidCard(cardAddress: string) {
       await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
       await waitFor(
-        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${cardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
       );
       await click(
-        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${cardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
       );
     }
 
@@ -123,19 +123,19 @@ module(
         .isDisabled();
       assert
         .dom(`[data-test-boxel-card-picker-dropdown]`)
-        .containsText('Select card');
+        .containsText('Select Card');
 
       await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
       await waitFor(
-        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
+        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
 
       assert
-        .dom(`[data-test-boxel-card-picker-dropdown-option]`)
+        .dom(`[data-test-card-picker-dropdown-option]`)
         .exists({ count: 2 });
 
       await click(
-        `[data-test-boxel-card-picker-dropdown-option] [data-test-prepaid-card="${prepaidCardAddress}"]`
+        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
 
       assert
@@ -145,7 +145,7 @@ module(
         .exists();
       assert
         .dom(`[data-test-boxel-card-picker-dropdown]`)
-        .containsText('Change card');
+        .containsText('Change Card');
       assert
         .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
         .isNotDisabled();
@@ -219,7 +219,7 @@ module(
       await click('[data-test-create-merchant-cancel-button]');
       assert
         .dom(`[data-test-boxel-card-picker-dropdown]`)
-        .containsText('Change card');
+        .containsText('Change Card');
       assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
 
       await click('[data-test-create-merchant-button]');

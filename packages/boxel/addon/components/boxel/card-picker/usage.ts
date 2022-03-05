@@ -5,14 +5,17 @@ import { A } from '@ember/array';
 
 const CARDS = [
   {
+    id: 'card-a',
     title: 'Card A',
     amount: 100,
   },
   {
+    id: 'card-b',
     title: 'Card B',
     amount: 1000,
   },
   {
+    id: 'card-c',
     title: 'Card C',
     amount: 10000,
   },
