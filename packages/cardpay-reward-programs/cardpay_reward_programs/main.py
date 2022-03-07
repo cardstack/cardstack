@@ -2,15 +2,14 @@ import json
 import os
 from pathlib import Path
 
-import pyarrow.parquet as pq
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rules import *
-from cloudpathlib import S3Client
+from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
-from .utils import get_parameters, to_camel_case
+from .utils import get_parameters, to_camel_case, write_parquet_file
 
 load_dotenv()
 
@@ -61,7 +60,7 @@ def run_reward_program(
     payment_list = rule.df_to_payment_list(results_df, reward_program_id)
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
-    pq.write_table(table, Path(output_location) / "results.parquet")
+    write_parquet_file(AnyPath(output_location), table)
 
 
 def cli():
