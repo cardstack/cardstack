@@ -10,16 +10,15 @@
         "start_payment_cycle": 24000000,
         "end_payment_cycle": 26000000,
         "subgraph_config_locations": {
-            "card_payments": []
+            "card_payments": [],
             "rewards": []
-        },
+        }
     },
     "user_defined": {
-        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
         "base_reward": 10,
         "transaction_factor": 1.5,
-        "spend_factor": 2
+        "spend_factor": 2,
         "duration": 43200
-    },
-
+    }
 }
