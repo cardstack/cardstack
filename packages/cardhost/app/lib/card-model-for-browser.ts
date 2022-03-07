@@ -33,7 +33,7 @@ export default class CardModelForBrowser
   ) {
     super(cards, state, args);
 
-    registerDestructor(this, this.flushUpdates.bind(this));
+    registerDestructor(this, this.didRecompute.bind(this));
 
     let prop = tracked(this, '_schemaInstance', {
       enumerable: true,
@@ -45,10 +45,9 @@ export default class CardModelForBrowser
     }
   }
 
-  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
+  protected async beginRecompute(): Promise<void> {
     // need to load component module since usedFields originates from there
     await this.componentModule();
-    return super.computeData(schemaInstance);
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -66,7 +65,7 @@ export default class CardModelForBrowser
       'edit'
     )) as CardModelForBrowser;
 
-    await editable.computeData();
+    await editable.recompute();
 
     return editable;
   }
@@ -76,7 +75,7 @@ export default class CardModelForBrowser
       let innerComponent = (await this.componentModule()).default;
       let self = this;
 
-      await this.computeData();
+      await this.recompute();
 
       this.wrapperComponent = setComponentTemplate(
         hbs`<this.component @model={{this.data}} @set={{this.set}} />`,

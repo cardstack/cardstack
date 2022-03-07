@@ -51,8 +51,7 @@ export default abstract class CardModel implements CardModelInterface {
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
   private _schemaClass: CardSchemaModule['default'] | undefined;
-  private updateQueue: Record<string, any>[] = [];
-  private updateQueuePromise: Promise<void> = Promise.resolve();
+  private recomputePromise: Promise<void> = Promise.resolve();
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
     let { realm, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
@@ -100,14 +99,6 @@ export default abstract class CardModel implements CardModelInterface {
         componentModuleRef: this.componentModuleRef,
       }
     );
-  }
-
-  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
-    let syncData: Record<string, any> = {};
-    for (let field of this.usedFields) {
-      set(syncData, field, await this.getField(field, schemaInstance));
-    }
-    return syncData;
   }
 
   async getField(name: string, schemaInstance?: any): Promise<any> {
@@ -210,12 +201,53 @@ export default abstract class CardModel implements CardModelInterface {
       );
     }
 
-    this.updateQueue.push(data);
-    await this.drainUpdateQueue();
+    let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
+    this.rawData = merge({}, this.rawData, serializedData);
+    await this.recompute();
   }
 
-  async flushUpdates(): Promise<void> {
-    return await this.updateQueuePromise;
+  async didRecompute(): Promise<void> {
+    return await this.recomputePromise;
+  }
+
+  async recompute(): Promise<void> {
+    // Note that after each async step we check to see if we are still the
+    // current promise, otherwise we bail
+
+    let done: () => void;
+    let recomputePromise = (this.recomputePromise = new Promise<void>((res) => (done = res)));
+
+    // wait a full micro task before we start - this is simple debounce
+    await Promise.resolve();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    await this.beginRecompute();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    let newSchemaInstance = await this.createSchemaInstance();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    for (let field of this.usedFields) {
+      // TODO userland code could throw here--need to be resiliant to that
+      await this.getField(field, newSchemaInstance);
+      if (this.recomputePromise !== recomputePromise) {
+        return;
+      }
+    }
+
+    this._schemaInstance = newSchemaInstance;
+    done!();
+  }
+
+  protected async beginRecompute(): Promise<void> {
+    // This is a hook for subclasses to override if there is initial async work
+    // to do before doing the recompute
   }
 
   // we have a few places that are very sensitive to the shape of the data, and
@@ -274,8 +306,9 @@ export default abstract class CardModel implements CardModelInterface {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this.updateQueue.push(data);
-      this.drainUpdateQueue();
+      let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
+      this.rawData = serializedData;
+      this.recompute();
     };
     (s as any).setters = new Proxy(
       {},
@@ -291,23 +324,6 @@ export default abstract class CardModel implements CardModelInterface {
     );
 
     return s;
-  }
-
-  private async drainUpdateQueue() {
-    await this.updateQueuePromise;
-
-    let queueDrained: () => void;
-    this.updateQueuePromise = new Promise<void>((res) => (queueDrained = res));
-
-    while (this.updateQueue.length > 0) {
-      let data = this.updateQueue.shift()!;
-      let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
-      this.rawData = merge({}, this.rawData, serializedData);
-    }
-    let newSchemaInstance = await this.createSchemaInstance();
-    await this.computeData(newSchemaInstance);
-    this._schemaInstance = newSchemaInstance;
-    queueDrained!();
   }
 
   // TODO: we need to really use a validation mechanism which will use code from
