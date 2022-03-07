@@ -201,8 +201,7 @@ export default abstract class CardModel implements CardModelInterface {
       );
     }
 
-    let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
-    this.rawData = merge({}, this.rawData, serializedData);
+    this.rawData = merge({}, this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
     await this.recompute();
   }
 
@@ -311,8 +310,7 @@ export default abstract class CardModel implements CardModelInterface {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      let serializedData = serializeAttributes(data, this.serializerMap, 'serialize');
-      this.rawData = serializedData;
+      this.rawData = serializeAttributes(data, this.serializerMap, 'serialize');
       this.recompute();
     };
     (s as any).setters = new Proxy(
