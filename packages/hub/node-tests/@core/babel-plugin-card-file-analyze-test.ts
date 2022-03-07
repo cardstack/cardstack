@@ -1,7 +1,36 @@
-import cardSchemaAnalyze, { getMeta } from '@cardstack/core/src/babel-plugin-card-schema-analyze';
+import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
 
 if (process.env.COMPILER) {
-  describe('BabelPluginCardSchemaAnalyze', function () {
+  describe('BabelPluginCardAnalyze', function () {
+    it('Returns empty meta information when there is nothing of note in the file', function () {
+      let options = {};
+      let source = `function serializer() {}`;
+      let out = cardAnalyze(source, options);
+      expect(out).to.have.property('ast');
+      expect(out.code).to.equal(source);
+      expect(out.meta).to.deep.equal({});
+    });
+
+    it('It captures meta information about exports in the file', function () {
+      let options = {};
+      let source = `
+        export function serializer() {}
+        export default class FancyClass {}
+        export const KEEP = 'ME AROUND';
+      `;
+      let out = cardAnalyze(source, options);
+      expect(out.code).to.containsSource(source);
+      expect(out).to.have.property('ast');
+      expect(out.meta).to.have.property('exports');
+
+      let members: ExportMeta[] = [
+        { type: 'FunctionDeclaration', name: 'serializer' },
+        { type: 'VariableDeclaration', name: 'KEEP' },
+        { type: 'ClassDeclaration', name: 'default' },
+      ];
+      expect(out.meta.exports).to.have.deep.members(members);
+    });
+
     it('produces meta about information about the schema', async function () {
       let options = {};
       let source = `
@@ -17,11 +46,12 @@ if (process.env.COMPILER) {
   	      @contains(date) settlementDate;
   	    }
   	  `;
-      let out = cardSchemaAnalyze(source, options);
+      let out = cardAnalyze(source, options);
       expect(out).to.have.property('ast');
       expect(out).to.have.property('code');
+      expect(out).to.have.property('meta');
 
-      let meta = getMeta(options);
+      let { meta } = out;
 
       expect(meta.parent).to.be.undefined;
 
@@ -73,8 +103,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      cardSchemaAnalyze(source, options);
-      let meta = getMeta(options);
+      let { meta } = cardAnalyze(source, options);
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',
@@ -107,8 +136,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      cardSchemaAnalyze(source, options);
-      let meta = getMeta(options);
+      let { meta } = cardAnalyze(source, options);
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',

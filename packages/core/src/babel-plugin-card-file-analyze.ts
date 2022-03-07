@@ -10,6 +10,10 @@ import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
 // @ts-ignore
 import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
 
+interface State {
+  opts: any;
+}
+
 export const VALID_FIELD_DECORATORS = {
   linksTo: true,
   contains: true,
@@ -39,46 +43,37 @@ export interface FieldsMeta {
 export interface ParentMeta {
   cardURL: string;
 }
+export interface ExportMeta {
+  name: 'default' | string;
+  type: t.Declaration['type'];
+}
 
-export interface PluginMeta {
-  fields: FieldsMeta;
+export interface FileMeta {
+  exports?: ExportMeta[];
+  fields?: FieldsMeta;
   parent?: ParentMeta;
 }
 
-interface State {
-  opts: any;
-}
+const metas = new WeakMap<State['opts'], FileMeta>();
 
-export function getMeta(obj: State['opts']): PluginMeta {
+function getMeta(obj: State['opts']): FileMeta {
   let meta = metas.get(obj);
   if (!meta) {
-    // throw new Error(
-    //   `tried to getMeta for something that was not passed as card-babel-plugin's options`
-    // );
-    // NOTE: Base cards, like string, don't have fields. Feels like it should not error
-    return { fields: {} };
+    return {};
   }
   return meta;
 }
 
-const metas = new WeakMap<
-  State['opts'],
-  {
-    parent?: ParentMeta;
-    fields: FieldsMeta;
-  }
->();
-
 export default function (
-  schemaSrc: string,
+  source: string,
   options: any
-): { code: BabelFileResult['code']; ast: BabelFileResult['ast'] } {
+): { code: BabelFileResult['code']; ast: BabelFileResult['ast']; meta: FileMeta } {
   let out: BabelFileResult;
   try {
-    out = transformSync(schemaSrc, {
+    out = transformSync(source, {
       ast: true,
       plugins: [
-        [babelPluginCardSchemaAnalyze, options],
+        [babelPluginCardFileAnalyze, options],
         [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
         classPropertiesSyntaxPlugin,
       ],
@@ -90,24 +85,64 @@ export default function (
   return {
     code: out!.code,
     ast: out!.ast,
+    meta: getMeta(options),
   };
 }
 
-export function babelPluginCardSchemaAnalyze(babel: typeof Babel) {
+export function babelPluginCardFileAnalyze(babel: typeof Babel) {
   let t = babel.types;
   return {
     visitor: {
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         if (path.node.source.value === '@cardstack/types') {
-          storeMeta(state.opts, path, t);
+          storeDecoratorMeta(state.opts, path, t);
           path.remove();
+        }
+      },
+      ExportNamedDeclaration(path: NodePath<t.ExportNamedDeclaration>, state: State) {
+        switch (path.node.declaration?.type) {
+          case 'FunctionDeclaration':
+            storeExportMeta(state.opts, {
+              name: name(path.node.declaration.id!, t),
+              type: path.node.declaration.type,
+            });
+            break;
+          case 'VariableDeclaration':
+            for (const dec of path.node.declaration.declarations) {
+              if (t.isIdentifier(dec.id)) {
+                storeExportMeta(state.opts, {
+                  name: dec.id.name,
+                  type: path.node.declaration.type,
+                });
+              }
+            }
+            break;
+        }
+      },
+      ExportDefaultDeclaration(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
+        // Not sure what to do with expressions
+        if (!t.isExpression(path.node.declaration)) {
+          storeExportMeta(state.opts, {
+            name: 'default',
+            type: path.node.declaration.type,
+          });
         }
       },
     },
   };
 }
 
-function storeMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: typeof Babel.types) {
+function storeExportMeta(key: State['opts'], exportMeta: ExportMeta) {
+  let meta = getMeta(key);
+  if (!meta.exports) {
+    meta.exports = [];
+  }
+
+  meta.exports.push(exportMeta);
+  metas.set(key, meta);
+}
+
+function storeDecoratorMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: typeof Babel.types) {
   let fields: FieldsMeta = {};
   let parent: ParentMeta | undefined;
   for (let specifier of path.node.specifiers) {
@@ -129,7 +164,10 @@ function storeMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: t
     }
   }
 
-  metas.set(key, { fields, parent });
+  let meta = getMeta(key);
+  meta.fields = fields;
+  meta.parent = parent;
+  metas.set(key, meta);
 }
 
 function validateUsageAndGetFieldMeta(

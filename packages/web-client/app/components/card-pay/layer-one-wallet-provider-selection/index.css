@@ -1,12 +1,7 @@
-.card-pay-layer-one-wallet-provider-selection-body {
-  padding: 0 var(--horizontal-padding);
-}
-
-.card-pay-layer-one-wallet-provider-selection-body-header {
-  padding: var(--boxel-sp-xl) 0;
-  max-height: 6rem;
-  font-size: 1.125rem;
-  font-weight: 600;
+.card-pay-layer-one-wallet-provider-selection__group .boxel-radio-option--disabled {
+  background: var(--boxel-purple-100);
+  filter:grayscale(0.8);
+  cursor: not-allowed;
 }
 
 .card-pay-layer-one-wallet-provider-selection__item {

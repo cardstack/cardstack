@@ -20,7 +20,7 @@ You will need the following things properly installed on your computer.
 
 ## Running / Development
 
-* `ember serve -prod` (must be production [for now](https://github.com/embroider-build/embroider/issues/1049#issuecomment-1034079882))
+* `ember serve`
 * Visit your app at [http://localhost:4210](http://localhost:4210).
 * Visit your tests at [http://localhost:4210/tests](http://localhost:4210/tests).
 

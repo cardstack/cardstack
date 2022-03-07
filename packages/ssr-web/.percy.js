@@ -4,7 +4,7 @@ module.exports = {
     widths: [375, 1280],
     percyCSS: `
       /* Hide frequently-changing element */
-      .styled-qr-code {
+      .boxel-styled-qr-code {
         visibility: hidden !important;
       }
     `,

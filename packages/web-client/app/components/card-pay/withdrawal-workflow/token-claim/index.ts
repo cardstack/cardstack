@@ -13,13 +13,10 @@ import {
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
-import walletProviders, {
-  WalletProvider,
-} from '@cardstack/web-client/utils/wallet-providers';
+import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCardComponentArgs> {
-  walletProviders = walletProviders;
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
 
