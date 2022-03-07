@@ -21,7 +21,7 @@ summaries = [
 
 
 payment_cycle_length_ls = [1024, 1024 * 32, 1024 * 512]
-min_spend_ls = [1]
+min_other_merchants_ls = [1]
 
 ans_ls = zip(df_hashes, summaries)
 
@@ -52,7 +52,7 @@ class TestMinOtherMerchantsPaidSingle:
     @pytest.mark.parametrize(
         "rule,ans",
         zip(
-            itertools.product(payment_cycle_length_ls, min_spend_ls),
+            itertools.product(payment_cycle_length_ls, min_other_merchants_ls),
             ans_ls,
         ),
         indirect=["rule"],
@@ -87,7 +87,7 @@ class TestMinOtherMerchantsPaidMultiple:
     @pytest.mark.parametrize(
         "rule,ans",
         zip(
-            itertools.product(payment_cycle_length_ls, min_spend_ls),
+            itertools.product(payment_cycle_length_ls, min_other_merchants_ls),
             multiple_ans_ls,
         ),
         indirect=["rule"],

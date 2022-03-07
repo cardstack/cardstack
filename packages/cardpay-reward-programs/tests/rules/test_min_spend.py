@@ -9,19 +9,19 @@ from cardpay_reward_programs.rules import MinSpend
 from .fixture import indexed_data
 
 df_hashes = [
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "8f24ed673fb7cacc374a3d320249440b5c325628fae603eabb025dc8719edc4a",
-    "ebf876092c147099624dc7c6b1317b5767f52b19ce611244be72ff360bd6c193",
+    "c6a7dfaf3fa6b0d22104d07ebe675558b117054f54662cbfee6b82bf15198364",
+    "c6a7dfaf3fa6b0d22104d07ebe675558b117054f54662cbfee6b82bf15198364",
+    "c6a7dfaf3fa6b0d22104d07ebe675558b117054f54662cbfee6b82bf15198364",
 ]
 summaries = [
-    {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 20, "unique_payee": 2},
-    {"total_reward": 70, "unique_payee": 7},
+    {"total_reward": 90, "unique_payee": 9},
+    {"total_reward": 90, "unique_payee": 9},
+    {"total_reward": 90, "unique_payee": 9},
 ]
 
 
 payment_cycle_length_ls = [1024, 1024 * 32, 1024 * 512]
-min_spend_ls = [2.0]
+min_spend_ls = [2]
 
 ans_ls = zip(df_hashes, summaries)
 
@@ -31,7 +31,10 @@ def rule(request):
     payment_cycle_length, min_spend = request.param
     core_config = {
         **default_core_config,
-        **{"docker_image": "min_spend", "payment_cycle_length": payment_cycle_length},
+        **{
+            "payment_cycle_length": payment_cycle_length,
+            "docker_image": "min_other_merchants_paid",
+        },
     }
     user_config = {
         "base_reward": 10,
@@ -56,25 +59,24 @@ class TestMinSpendSingle:
     )
     def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
-        payment_cycle = 24150016
-        df = rule.run(payment_cycle)
+        start_block = 24000000
+        end_block = 26000000
+        df = rule.run(start_block, end_block)
         payment_list = rule.df_to_payment_list(df)
-        h = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
         computed_summary = rule.get_summary(payment_list)
         assert computed_summary["total_reward"][0] == summary["total_reward"]
         assert computed_summary["unique_payee"][0] == summary["unique_payee"]
-        assert h == df_hash
 
 
 multiple_df_hashes = [
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "8f24ed673fb7cacc374a3d320249440b5c325628fae603eabb025dc8719edc4a",
-    "8abe4a6b017dddc6b803429dd3b3eea43c3ebfae0a31b871709d5a0569b7c459",
+    "016f5967731732f8879315395291cd9c95ad83e5c0364b11e41b0efa3980ace4",
+    "ab33d395cbf0ebb1d5baa21ae2d3b0af5093ddef6e5c0d93f42a5a7ca1ecb08d",
+    "c3f4c2d3c1978f2d1770e2d1c564951ff6ff028d2d68b2b442d77cf41351edf6",
 ]
 multiple_summaries = [
-    {"total_reward": 0, "unique_payee": 0},
     {"total_reward": 20, "unique_payee": 2},
-    {"total_reward": 70, "unique_payee": 7},
+    {"total_reward": 50, "unique_payee": 5},
+    {"total_reward": 90, "unique_payee": 9},
 ]
 multiple_ans_ls = zip(multiple_df_hashes, multiple_summaries)
 
@@ -90,13 +92,12 @@ class TestMinSpendMultiple:
     )
     def test_run(self, rule, ans, indexed_data):
         (df_hash, summary) = ans
-        start_payment_cycle = 24150016
-        end_payment_cycle = start_payment_cycle + 1024
-        min_block = start_payment_cycle
-        max_block = end_payment_cycle
+        start_block = 24000000
+        end_block = start_block + rule.payment_cycle_length * 10
         cached_df = []
-        for i in range(min_block, max_block, rule.payment_cycle_length):
-            cached_df.append(rule.run(i))
+        for i in range(start_block, end_block, rule.payment_cycle_length):
+            tail = min(end_block, i + rule.payment_cycle_length)
+            cached_df.append(rule.run(i, tail))
         aggregate_df = rule.aggregate(cached_df)
         payment_list = rule.df_to_payment_list(aggregate_df)
         computed_summary = rule.get_summary(payment_list)
