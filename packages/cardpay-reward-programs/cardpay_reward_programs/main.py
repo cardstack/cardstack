@@ -10,13 +10,17 @@ from cloudpathlib import S3Client
 from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
+from .utils import blob_to_rule
 
 load_dotenv()
 
-cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session(
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-))
+cached_client = S3Client(
+    local_cache_dir="mycache",
+    boto3_session=Session(
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    ),
+)
 cached_client.set_as_default_client()
 
 
@@ -33,31 +37,17 @@ def run_reward_program(
     """
     Run a reward program as defined in the parameters file
     """
-
     parameters = json.load(open(parameters_file))
-
     run_parameters = parameters["run"]
-    name, core_parameters, user_defined_parameters = get_parameters(parameters)
-    rule = select_rule(name, core_parameters, user_defined_parameters)
 
+    # TODO: query smart contract for blob
+
+    rule = blob_to_rule(parameters)
     results_df = rule.run(run_parameters["payment_cycle"])
     payment_list = rule.df_to_payment_list(results_df, reward_program_id)
     tree = PaymentTree(payment_list.to_dict("records"), payment_cycle)
     table = tree.as_arrow(payment_cycle)
     pq.write_table(table, Path(output_location) / "results.parquet")
-
-
-def get_parameters(parameters):
-    core_parameters = parameters.get("core")
-    user_defined_parameters = parameters.get("user_defined")
-    name = parameters.get("name")
-    return name, core_parameters, user_defined_parameters
-
-
-def select_rule(name, core_parameters, user_defined_parameters):
-    rule_constructor = globals()[name]
-    instance = rule_constructor(core_parameters, user_defined_parameters)
-    return instance
 
 
 def cli():
