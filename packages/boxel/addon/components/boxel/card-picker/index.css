@@ -29,19 +29,20 @@
 }
 
 .boxel-card-picker__dropdown > .ember-power-select-trigger {
-  width: max-content;
-  padding: var(--boxel-sp-xxs) var(--boxel-sp-lg);
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs) var(--boxel-sp);
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") right 1.125rem center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
-  border-radius: 100px;
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-lg);
+  border-radius: var(--boxel-border-radius);
   transition: border-color var(--boxel-transition);
 }
 
 .boxel-card-picker__dropdown--selected > .ember-power-select-trigger {
   padding: var(--boxel-sp-xxxs) var(--boxel-sp);
+  background-image: none;
+  border-radius: 100px;
   font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .boxel-card-picker__dropdown > .ember-power-select-trigger:hover {
