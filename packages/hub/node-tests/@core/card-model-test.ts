@@ -178,7 +178,7 @@ if (process.env.COMPILER) {
       let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
       let result = model.serialize();
 
-      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/isolated-');
+      expect(result.meta?.componentModule).to.eq('@cardstack/compiled/https-cardstack.local-person/isolated.js');
       delete result.meta;
 
       let expectedAttributes = cloneDeep(attributes);
@@ -197,7 +197,7 @@ if (process.env.COMPILER) {
       let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
       let result = model.serialize();
 
-      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/embedded-');
+      expect(result.meta?.componentModule).to.eq('@cardstack/compiled/https-cardstack.local-person/embedded.js');
       delete result.meta;
 
       let expectedAttributes = cloneDeep(attributes);

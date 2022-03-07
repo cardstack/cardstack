@@ -124,6 +124,7 @@ if (process.env.COMPILER) {
       });
 
       it('defines the component modules within the card itself', async function () {
+        // Because this card defines it's own schema
         let {
           embedded: {
             componentModule: { global: embeddedGlobal },
@@ -141,9 +142,7 @@ if (process.env.COMPILER) {
           /cardstack.local-person\/isolated.js/
         );
         expect(editGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/edit.js');
-        expect(resolveCard(editGlobal), 'edit location is not in the base cards').to.match(
-          /cardstack.local-person\/edit.js/
-        );
+        expect(resolveCard(editGlobal), 'edit resolved location').to.match(/cardstack.local-person\/edit.js/);
         expect(embeddedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/embedded.js');
         expect(resolveCard(embeddedGlobal), 'embedded resolved location').to.match(
           /cardstack.local-person\/embedded.js/
@@ -180,7 +179,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    it.only('handles complex component adoptions', async function () {
+    it('handles complex component adoptions', async function () {
       await cards.create({
         realm,
         id: 'person',
