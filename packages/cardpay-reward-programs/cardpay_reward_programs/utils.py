@@ -84,3 +84,10 @@ def get_parameters(parameters):
 
 def to_camel_case(snake_str):
     return "".join(word.title() for word in snake_str.split("_"))
+
+
+def get_payment_cycle(start_block, end_block, payment_cycle_length):
+    """
+    by default, the payment cycle is the tail of the compute range
+    """
+    return max(end_block, start_block + payment_cycle_length)

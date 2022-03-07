@@ -9,14 +9,14 @@ from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 from .fixture import indexed_data
 
 df_hashes = [
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "f45c509908a1eba5eab02d30112b3d5153a9939df3d0e58cb4a11fadb11272c8",
-    "c8fa9b5e0399ab2a986d4c8c82c4fead0581235557adcff6a09b14345a1dae95",
+    "82765c7d88fc9aedddadf1562ed065b8c1068c23e19a2225a0bb97a29718efef",
+    "82765c7d88fc9aedddadf1562ed065b8c1068c23e19a2225a0bb97a29718efef",
+    "82765c7d88fc9aedddadf1562ed065b8c1068c23e19a2225a0bb97a29718efef",
 ]
 summaries = [
-    {"total_reward": 0, "unique_payee": 0},
-    {"total_reward": 10, "unique_payee": 1},
-    {"total_reward": 30, "unique_payee": 3},
+    {"total_reward": 20, "unique_payee": 2},
+    {"total_reward": 20, "unique_payee": 2},
+    {"total_reward": 20, "unique_payee": 2},
 ]
 
 
@@ -59,8 +59,9 @@ class TestMinOtherMerchantsPaidSingle:
     )
     def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
-        payment_cycle = 24150016
-        df = rule.run(payment_cycle)
+        start_block = 24000000
+        end_block = 26000000
+        df = rule.run(start_block, end_block)
         payment_list = rule.df_to_payment_list(df)
         h = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
         computed_summary = rule.get_summary(payment_list)
@@ -72,12 +73,12 @@ class TestMinOtherMerchantsPaidSingle:
 multiple_df_hashes = [
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "f45c509908a1eba5eab02d30112b3d5153a9939df3d0e58cb4a11fadb11272c8",
-    "c8fa9b5e0399ab2a986d4c8c82c4fead0581235557adcff6a09b14345a1dae95",
+    "50bb631ce5832059f9d55de834af8aef712970adbcbe64696d261771967975c8",
 ]
 multiple_summaries = [
     {"total_reward": 0, "unique_payee": 0},
     {"total_reward": 10, "unique_payee": 1},
-    {"total_reward": 30, "unique_payee": 3},
+    {"total_reward": 20, "unique_payee": 2},
 ]
 multiple_ans_ls = zip(multiple_df_hashes, multiple_summaries)
 
@@ -93,13 +94,12 @@ class TestMinOtherMerchantsPaidMultiple:
     )
     def test_run(self, rule, ans, indexed_data):
         (df_hash, summary) = ans
-        start_payment_cycle = 24150016
-        end_payment_cycle = start_payment_cycle + 1024 * 32
-        min_block = start_payment_cycle
-        max_block = end_payment_cycle
+        start_block = 24000000
+        end_block = start_block + rule.payment_cycle_length * 10
         cached_df = []
-        for i in range(min_block, max_block, rule.payment_cycle_length):
-            cached_df.append(rule.run(i))
+        for i in range(start_block, end_block, rule.payment_cycle_length):
+            tail = min(end_block, i + rule.payment_cycle_length)
+            cached_df.append(rule.run(i, tail))
         aggregate_df = rule.aggregate(cached_df)
         payment_list = rule.df_to_payment_list(aggregate_df)
         computed_summary = rule.get_summary(payment_list)

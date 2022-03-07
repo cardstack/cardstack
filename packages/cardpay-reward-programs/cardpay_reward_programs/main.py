@@ -38,7 +38,6 @@ def blob_to_rule(parameters):
 
 def run_reward_program(
     reward_program_id: str,
-    payment_cycle: int,
     parameters_file: str = typer.Option(
         default="./input/parameters.json", help="The parameters file to use"
     ),
@@ -52,15 +51,17 @@ def run_reward_program(
     parameters = json.load(open(parameters_file))
 
     # TODO: query smart contract for blob
+    # TODO: the logic to select the payment cycle can be surfaced here
+    # TODO: write s3 rule config
 
     rule = blob_to_rule(parameters)
-    results_df = rule.run(payment_cycle)
+    start_block = rule.start_block
+    end_block = rule.end_block
+    results_df = rule.run(start_block, end_block)
     payment_list = rule.df_to_payment_list(results_df, reward_program_id)
-    tree = PaymentTree(payment_list.to_dict("records"), payment_cycle)
-    table = tree.as_arrow(payment_cycle)
+    tree = PaymentTree(payment_list.to_dict("records"))
+    table = tree.as_arrow()
     pq.write_table(table, Path(output_location) / "results.parquet")
-
-    # TODO: write s3 rule config
 
 
 def cli():

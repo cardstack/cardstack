@@ -28,7 +28,7 @@ class MinOtherMerchantsPaid(Rule):
         merchant
 
         from {table_query}
-        where block_number_uint64 >= ?::integer and block_number_uint64 < ?::integer and merchant != payee 
+        where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer and merchant != payee 
         """
 
     def df_to_payment_list(self, df, reward_program_id="0x"):
@@ -45,15 +45,16 @@ class MinOtherMerchantsPaid(Rule):
         new_df = new_df.drop(["merchant"], axis=1)
         return new_df[new_df["amount"] > 0]
 
-    def run(self, payment_cycle: int):
-        min_block = payment_cycle - self.payment_cycle_length
-        max_block = payment_cycle
-        vars = [min_block, max_block]
-        table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)
+    def run(self, start_block: int, end_block: int):
+        vars = [start_block, end_block]
+        table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
-            return pd.DataFrame(columns=["payee", "merchnat"])
+            return pd.DataFrame(columns=["payee", "merchant"])
         else:
             return self.run_query(table_query, vars)
 
     def aggregate(self, cached_df=[]):
-        return pd.concat(cached_df)
+        if len(cached_df) == 0:
+            return pd.DataFrame(columns=["payee", "merchant"])
+        else:
+            return pd.concat(cached_df)

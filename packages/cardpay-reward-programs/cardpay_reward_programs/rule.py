@@ -27,7 +27,7 @@ class Rule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def sql(self, min_block, max_block):
+    def sql(self, table_query):
         raise NotImplementedError
 
     def _get_table_query(self, table_name, min_partition: int, max_partition: int):
@@ -41,7 +41,7 @@ class Rule(ABC):
         return con.fetchdf()
 
     @abstractmethod
-    def run(self, payment_cycle: int):
+    def run(self, start_block: int, end_block: int):
         raise NotImplementedError
 
     @abstractmethod

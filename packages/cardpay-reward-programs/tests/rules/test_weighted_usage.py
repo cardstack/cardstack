@@ -1,5 +1,6 @@
 import hashlib
 import itertools
+from turtle import end_fill
 
 import pandas as pd
 import pytest
@@ -9,14 +10,14 @@ from cardpay_reward_programs.rules import WeightedUsage
 from .fixture import indexed_data
 
 df_hashes = [
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "c3fcafadd333c8cb2491ca39e8fa095a88ccadedd5f2563ed18428fba1157ca0",
-    "132b9b42c63057d3403bdec75a0ace765e5b2fd248316b7568481a7c8ec1126a",
+    "c19c992fc6c713d5bb6236e04bfbbda99785de534156dcaec81b8979b0c1f787",
+    "c19c992fc6c713d5bb6236e04bfbbda99785de534156dcaec81b8979b0c1f787",
+    "c19c992fc6c713d5bb6236e04bfbbda99785de534156dcaec81b8979b0c1f787",
 ]
 summaries = [
-    {"total_reward": 0, "unique_payee": 0, "total_transactions": 0, "total_spent": 0.0},
-    {"total_reward": 24, "unique_payee": 2, "total_transactions": 5, "total_spent": 300.0},
-    {"total_reward": 83, "unique_payee": 7, "total_transactions": 113, "total_spent": 12498.0},
+    {"total_reward": 106, "unique_payee": 9},
+    {"total_reward": 106, "unique_payee": 9},
+    {"total_reward": 106, "unique_payee": 9},
 ]
 
 
@@ -58,8 +59,9 @@ class TestWeightedUsageSingle:
     )
     def test_run(self, rule, ans, indexed_data):
         df_hash, summary = ans
-        payment_cycle = 24150016
-        df = rule.run(payment_cycle)
+        start_block = 24000000
+        end_block = 26000000
+        df = rule.run(start_block, end_block)
         payment_list = rule.df_to_payment_list(df)
         h = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
         computed_summary = rule.get_summary(payment_list)
@@ -69,9 +71,9 @@ class TestWeightedUsageSingle:
 
 
 range_summaries = [
-    [{"block": 24150016, "amount": 0}],
-    [{"block": 24150016, "amount": 24}],
-    [{"block": 24150016, "amount": 83}],
+    [{"block": 24001024, "amount": 0}],
+    [{"block": 24032768, "amount": 49}],
+    [{"block": 24524288, "amount": 60}],
 ]
 range_ans_ls = zip(range_summaries)
 
@@ -87,13 +89,12 @@ class TestWeightedUsageMultiple:
     )
     def test_run(self, rule, ans, indexed_data):
         (range_summary,) = ans
-        start_payment_cycle = 24150016
-        end_payment_cycle = start_payment_cycle + 1024
+        start_block = 24000000
+        end_block = start_block + rule.payment_cycle_length * 10
         payments = []
-        min_block = start_payment_cycle
-        max_block = end_payment_cycle
-        for i in range(min_block, max_block, rule.payment_cycle_length):
-            df = rule.run(i)
-            payments.append({"block": i, "amount": df["amount"].sum()})
+        for i in range(start_block, end_block, rule.payment_cycle_length):
+            tail = min(end_block, i + rule.payment_cycle_length)
+            df = rule.run(i, tail)
+            payments.append({"block": tail, "amount": df["amount"].sum()})
         assert payments[0]["amount"] == range_summary[0]["amount"]
         assert payments[0]["block"] == range_summary[0]["block"]

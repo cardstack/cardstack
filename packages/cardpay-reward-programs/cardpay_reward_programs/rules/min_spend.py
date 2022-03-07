@@ -24,7 +24,7 @@ class MinSpend(Rule):
         sum(spend_amount_uint64) as total_spent
 
         from {table_query}
-        where block_number_uint64 >= ?::integer and block_number_uint64 < ?::integer 
+        where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer 
         
         group by prepaid_card_owner
         having(total_spent) >= ?::integer
@@ -40,17 +40,18 @@ class MinSpend(Rule):
         new_df["token"] = self.token
         new_df["amount"] = np.where(new_df["total_spent"] > self.min_spend, self.base_reward, 0)
         new_df = new_df.drop(["total_spent"], axis=1)
-        return new_df[new_df["amount"] > 0]
+        return new_df[new_df["amount"] > 0].reset_index()
 
-    def run(self, payment_cycle: int):
-        min_block = payment_cycle - self.payment_cycle_length
-        max_block = payment_cycle
-        vars = [min_block, max_block, self.min_spend]
-        table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)
+    def run(self, start_block: int, end_block: int):
+        vars = [start_block, end_block, self.min_spend]
+        table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan[]":
             return pd.DataFrame(columns=["payee", "total_spent"])
         else:
             return self.run_query(table_query, vars)
 
     def aggregate(self, cached_df=[]):
-        return pd.concat(cached_df).groupby("payee").sum().reset_index()
+        if len(cached_df) == 0:
+            return pd.DataFrame(columns=["payee", "total_spent"])
+        else:
+            return pd.concat(cached_df).groupby("payee").sum().reset_index()
