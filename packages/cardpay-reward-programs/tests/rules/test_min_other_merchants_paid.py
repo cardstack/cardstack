@@ -33,15 +33,17 @@ def rule(request):
         **default_core_config,
         **{
             "payment_cycle_length": payment_cycle_length,
-            "docker_image": "min_other_merchants_paid"
+            "docker_image": "min_other_merchants_paid",
         },
     }
     user_config = {
         "base_reward": 10,
         "min_other_merchants": min_other_merchants,
+        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
         "subgraph_config_location": {
             "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
         },
+        "duration": 43200,
     }
     return MinOtherMerchantsPaid(core_config, user_config)
 

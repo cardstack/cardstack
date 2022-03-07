@@ -14,12 +14,11 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(self, docker_image, payment_cycle_length, valid_from, valid_to, token):
+    def set_core_parameters(self, docker_image, payment_cycle_length, start_block, end_block):
         self.docker_image = docker_image
         self.payment_cycle_length = payment_cycle_length
-        self.valid_from = valid_from
-        self.valid_to = valid_to
-        self.token = token
+        self.start_block = start_block
+        self.end_block = end_block
 
     @abstractmethod
     def set_user_defined_parameters(
@@ -36,9 +35,9 @@ class Rule(ABC):
         local_files = get_files(config_location, table_name, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 
-    def run_query(self, min_block, max_block, vars):
+    def run_query(self, table_query, vars):
         con = duckdb.connect(database=":memory:", read_only=False)
-        con.execute(self.sql(min_block, max_block), vars)
+        con.execute(self.sql(table_query), vars)
         return con.fetchdf()
 
     @abstractmethod

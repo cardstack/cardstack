@@ -10,7 +10,7 @@ from cloudpathlib import S3Client
 from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
-from .utils import blob_to_rule
+from .utils import get_parameters, to_camel_case
 
 load_dotenv()
 
@@ -22,6 +22,18 @@ cached_client = S3Client(
     ),
 )
 cached_client.set_as_default_client()
+
+
+def select_rule(name, core_parameters, user_defined_parameters):
+    rule_constructor = globals()[name]
+    instance = rule_constructor(core_parameters, user_defined_parameters)
+    return instance
+
+
+def blob_to_rule(parameters):
+    core_parameters, user_defined_parameters = get_parameters(parameters)
+    name = to_camel_case(core_parameters["docker_image"])
+    return select_rule(name, core_parameters, user_defined_parameters)
 
 
 def run_reward_program(

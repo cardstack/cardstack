@@ -73,19 +73,6 @@ def get_files(config_location, table, min_partition, max_partition):
     return list(map(get_local_file, file_list))
 
 
-def select_rule(name, core_parameters, user_defined_parameters):
-    assert name
-    rule_constructor = globals()[name]
-    instance = rule_constructor(core_parameters, user_defined_parameters)
-    return instance
-
-
-def blob_to_rule(parameters):
-    core_parameters, user_defined_parameters = get_parameters(parameters)
-    name = to_camel_case(core_parameters["docker_image"])
-    return select_rule(name, core_parameters, user_defined_parameters)
-
-
 def get_parameters(parameters):
     """
     TODO: take hex blob as input instead of parameters
@@ -96,7 +83,4 @@ def get_parameters(parameters):
 
 
 def to_camel_case(snake_str):
-    components = snake_str.split("_")
-    # We capitalize the first letter of each component except the first one
-    # with the 'title' method and join them together.
-    return components[0] + "".join(x.title() for x in components[1:])
+    return "".join(word.title() for word in snake_str.split("_"))
