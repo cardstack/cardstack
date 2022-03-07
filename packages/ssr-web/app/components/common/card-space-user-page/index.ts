@@ -46,6 +46,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
     this.addressFetchingError = null;
 
     let address;
+    let did = this.args.model.did;
 
     try {
       let queryResult = await this.subgraph.query(
@@ -56,7 +57,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
             }
           }`,
         {
-          did: this.args.model.did,
+          did,
         }
       );
 
@@ -70,6 +71,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
       this.address = address;
     } else {
       this.addressFetchingError = this.defaultAddressFetchingErrorMsg;
+      Sentry.captureException(`Unable to find merchant address for ${did}`);
     }
   }
 
