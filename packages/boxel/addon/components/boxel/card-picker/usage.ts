@@ -5,19 +5,36 @@ import { A } from '@ember/array';
 
 const CARDS = [
   {
-    id: 'card-a',
-    title: 'Card A',
-    amount: 100,
+    id: 'pia-midina',
+    type: 'participant',
+    name: 'Pia Midina',
+    description: 'Recording artist & lyricist',
   },
   {
-    id: 'card-b',
-    title: 'Card B',
-    amount: 1000,
+    id: 'jenny-sparks',
+    type: 'participant',
+    name: 'Jenny Sparks',
+    description: 'Background singer',
   },
   {
-    id: 'card-c',
-    title: 'Card C',
-    amount: 10000,
+    id: 'francesco-midina',
+    type: 'participant',
+    name: 'Francesco Midina',
+    description: 'Producer (Francesco Rocks)',
+    disabled: true,
+  },
+  {
+    id: 'joel-kaplan',
+    type: 'participant',
+    name: 'Joel Kaplan',
+    description: 'Mastering engineer',
+    disabled: true,
+  },
+  {
+    id: 'mariah-solis',
+    type: 'participant',
+    name: 'Mariah Solis',
+    description: 'Mixing engineer',
   },
 ];
 

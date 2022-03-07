@@ -6,9 +6,9 @@
       @selectedItem={{this.selectedItem}}
     as |item|>
       <Boxel::CardContainer @displayBoundaries={{true}}>
-        <Boxel::Header @header="Card" />
-        <div>{{item.title}}</div>
-        {{item.amount}} CARD
+        <Boxel::Header @header={{item.type}} />
+        <div>{{item.name}}</div>
+        {{item.description}}
       </Boxel::CardContainer>
     </Boxel::CardPicker>
   </:example>
