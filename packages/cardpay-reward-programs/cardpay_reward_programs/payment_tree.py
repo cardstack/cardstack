@@ -31,7 +31,7 @@ def group_by(data_array, callback):
 
 class PaymentTree:
     def __init__(self, payment_list: List[Payment]) -> None:
-        self.payment_nodes = self.aggregate_payments(payment_list)
+        self.payment_nodes = payment_list
         self.data = list(map(self.encode_payment, self.payment_nodes))
         self.tree = MerkleTree(self.data, hashfunc)
 
