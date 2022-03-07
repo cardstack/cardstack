@@ -1,5 +1,4 @@
 default_core_config = {
-    "subgraph_config_location": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/",
     "payment_cycle_length": 32768,
     "valid_from": 24000000,
     "valid_to": 26000000,

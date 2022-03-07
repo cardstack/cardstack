@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 import pandas as pd
 from cardpay_reward_programs.rule import Rule
@@ -9,9 +7,10 @@ class MinSpend(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(MinSpend, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(self, min_spend, base_reward):
+    def set_user_defined_parameters(self, min_spend, base_reward, subgraph_config_location):
         self.min_spend = min_spend
         self.base_reward = base_reward
+        self.subgraph_config_location = subgraph_config_location
 
     def sql(self, min_block, max_block):
         table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)

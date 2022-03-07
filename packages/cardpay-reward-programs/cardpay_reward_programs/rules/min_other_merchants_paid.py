@@ -13,6 +13,13 @@ class MinOtherMerchantsPaid(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(MinOtherMerchantsPaid, self).__init__(core_parameters, user_defined_parameters)
 
+    def set_user_defined_parameters(
+        self, min_other_merchants, base_reward, subgraph_config_location
+    ):
+        self.min_other_merchants = min_other_merchants
+        self.base_reward = base_reward
+        self.subgraph_config_location = subgraph_config_location
+
     def sql(self, min_block, max_block):
         table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)
         return f"""

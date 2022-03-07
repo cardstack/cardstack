@@ -1,4 +1,3 @@
-import json
 from abc import ABC, abstractmethod
 
 import duckdb
@@ -15,10 +14,8 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(
-        self, subgraph_config_location, payment_cycle_length, valid_from, valid_to, token
-    ):
-        self.subgraph_config_location = subgraph_config_location
+    def set_core_parameters(self, docker_image, payment_cycle_length, valid_from, valid_to, token):
+        self.docker_image = docker_image
         self.payment_cycle_length = payment_cycle_length
         self.valid_from = valid_from
         self.valid_to = valid_to
@@ -35,12 +32,8 @@ class Rule(ABC):
         raise NotImplementedError
 
     def _get_table_query(self, table_name, min_partition: int, max_partition: int):
-        """
-        note: have to create this bcos table names can't be passed as var to execute
-        """
-        local_files = get_files(
-            self.subgraph_config_location, table_name, min_partition, max_partition
-        )
+        config_location = self.subgraph_config_location[table_name]
+        local_files = get_files(config_location, table_name, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 
     def run_query(self, min_block, max_block, vars):

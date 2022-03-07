@@ -29,10 +29,16 @@ ans_ls = zip(df_hashes, summaries)
 @pytest.fixture
 def rule(request):
     payment_cycle_length, min_spend = request.param
-    core_config = {**default_core_config, **{"payment_cycle_length": payment_cycle_length}}
+    core_config = {
+        **default_core_config,
+        **{"docker_image": "min_spend", "payment_cycle_length": payment_cycle_length},
+    }
     user_config = {
         "base_reward": 10,
         "min_spend": min_spend,
+        "subgraph_config_location": {
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
+        },
     }
     return MinSpend(core_config, user_config)
 

@@ -9,11 +9,16 @@ class WeightedUsage(Rule):
         super(WeightedUsage, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(
-        self, base_reward: int, transaction_factor: int, spend_factor: int
+        self,
+        base_reward: int,
+        transaction_factor: int,
+        spend_factor: int,
+        subgraph_config_location: str,
     ):
         self.base_reward = base_reward
         self.transaction_factor = transaction_factor
         self.spend_factor = spend_factor
+        self.subgraph_config_location = subgraph_config_location
 
     def sql(self, min_block, max_block):
         table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)
