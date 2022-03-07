@@ -89,6 +89,7 @@ export default class FileCache {
   }
 
   setModule(env: Environment, cardURL: string, localFile: string, source: string) {
+    log.trace(`setModule(${cardURL}::${localFile})`);
     let fsLocation = this.getFileLocation(env, cardURL, localFile);
     this.writeFile(fsLocation, source);
     return this.moduleURL(cardURL, localFile);
