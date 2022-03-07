@@ -20,6 +20,7 @@
 .payment-link__error {
   margin: var(--boxel-sp-sm);
   color: var(--boxel-purple-500);
+  text-align: center;
 }
 
 .payment-link__url {

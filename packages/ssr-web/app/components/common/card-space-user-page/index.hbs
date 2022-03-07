@@ -10,11 +10,17 @@
     @size="large"
     @text={{@model.id}}
   />
-  <Common::PaymentLink
-    @mode={{this.paymentLinkMode}}
-    @switchMode={{this.setPaymentLinkMode}}
-    @paymentURL={{this.paymentURL}}
-    @addressFetchingError={{this.addressFetchingError}}
-    @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
-  />
+
+  {{#if this.addressFetchingError}}
+    <div class="payment-link__error" data-test-address-fetching-error>
+      {{this.addressFetchingError}}
+    </div>
+  {{else}}
+    <Common::PaymentLink
+      @mode={{this.paymentLinkMode}}
+      @switchMode={{this.setPaymentLinkMode}}
+      @paymentURL={{this.paymentURL}}
+      @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
+    />
+  {{/if}}
 </div>
