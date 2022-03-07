@@ -1,4 +1,3 @@
-import hashlib
 import json
 
 import pandas as pd
@@ -15,15 +14,6 @@ class WeightedUsage(Rule):
         self.base_reward = base_reward
         self.transaction_factor = transaction_factor
         self.spend_factor = spend_factor
-
-    def get_user_defined_hash(self):
-        user_defined_parameters = {
-            "base_reward": self.base_reward,
-            "transaction_factor": self.transaction_factor,
-            "spend_factor": self.spend_factor,
-        }
-        o = json.dumps(user_defined_parameters, sort_keys=True)
-        return hashlib.md5(o.encode("utf-8")).hexdigest()
 
     def sql(self, min_block, max_block):
         table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)

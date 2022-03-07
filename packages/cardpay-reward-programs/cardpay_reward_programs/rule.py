@@ -1,4 +1,3 @@
-import hashlib
 import json
 from abc import ABC, abstractmethod
 
@@ -25,25 +24,10 @@ class Rule(ABC):
         self.valid_to = valid_to
         self.token = token
 
-    def get_core_hash(self):
-        core_parameters = {
-            "subgraph_config_location": self.subgraph_config_location,
-            "payment_cycle_length": self.payment_cycle_length,
-            "valid_from": self.valid_from,
-            "valid_to": self.valid_to,
-            "token": self.token,
-        }
-        o = json.dumps(core_parameters, sort_keys=True)
-        return hashlib.md5(o.encode("utf-8")).hexdigest()
-
     @abstractmethod
     def set_user_defined_parameters(
         self,
     ):
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_user_defined_hash(self):
         raise NotImplementedError
 
     @abstractmethod
@@ -84,7 +68,3 @@ class Rule(ABC):
                 "unique_payee": [len(pd.unique(payment_list["payee"]))],
             }
         )
-
-    def get_rule_hash(self):
-        concat_str = self.get_core_hash() + self.get_user_defined_hash()
-        return hashlib.md5(concat_str.encode("utf-8")).hexdigest()

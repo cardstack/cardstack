@@ -1,4 +1,3 @@
-import hashlib
 import json
 
 import numpy as np
@@ -13,18 +12,6 @@ class MinOtherMerchantsPaid(Rule):
 
     def __init__(self, core_parameters, user_defined_parameters):
         super(MinOtherMerchantsPaid, self).__init__(core_parameters, user_defined_parameters)
-
-    def set_user_defined_parameters(self, min_other_merchants, base_reward):
-        self.min_other_merchants = min_other_merchants
-        self.base_reward = base_reward
-
-    def get_user_defined_hash(self):
-        user_defined_parameters = {
-            "base_reward": self.base_reward,
-            "min_other_merchants": self.min_other_merchants,
-        }
-        o = json.dumps(user_defined_parameters, sort_keys=True)
-        return hashlib.md5(o.encode("utf-8")).hexdigest()
 
     def sql(self, min_block, max_block):
         table_query = self._get_table_query("prepaid_card_payment", min_block, max_block)
