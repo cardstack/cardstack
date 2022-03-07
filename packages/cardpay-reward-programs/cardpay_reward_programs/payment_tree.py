@@ -3,7 +3,7 @@
 import itertools
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, List, TypedDict
+from typing import List, TypedDict
 
 import pyarrow as pa
 import sha3
