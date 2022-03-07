@@ -33,7 +33,8 @@ def view_multiple(core_parameters):
     cached_df = []
     for i in range(start_block, end_block, program.payment_cycle_length):
         progress.progress((i - start_block) / (end_block - start_block))
-        df = program.run(i)
+        tail = min(end_block, i + program.payment_cycle_length)
+        df = program.run(i, tail)
         if not df.empty:
             cached_df.append(df)
     df = program.aggregate(cached_df)
