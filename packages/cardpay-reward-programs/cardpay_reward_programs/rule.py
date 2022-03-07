@@ -12,10 +12,10 @@ class Rule(ABC):
     """
 
     def __init__(self, core_parameters, user_defined_parameters):
-        self.set_core_parmaters(**core_parameters)
+        self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parmaters(
+    def set_core_parameters(
         self, subgraph_config_location, payment_cycle_length, valid_from, valid_to, token
     ):
         self.subgraph_config_location = subgraph_config_location
