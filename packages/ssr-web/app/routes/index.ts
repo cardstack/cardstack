@@ -68,11 +68,13 @@ export default class IndexRoute extends Route {
         Sentry.captureException(e);
         throw e;
       }
-    } else {
-      if (this.fastboot.isFastBoot) {
-        this.fastboot.response.statusCode = 404;
-      }
-      throw new Error("Oops! We couldn't find the page you were looking for");
     }
+    // FIXME this is perhaps interfering with health checks
+    // else {
+    //   if (this.fastboot.isFastBoot) {
+    //     this.fastboot.response.statusCode = 404;
+    //   }
+    //   throw new Error("Oops! We couldn't find the page you were looking for");
+    // }
   }
 }
