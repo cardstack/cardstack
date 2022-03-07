@@ -3088,6 +3088,17 @@
     "@embroider/core" "0.49.0"
     babel-loader "8"
 
+"@embroider/babel-loader-8@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/babel-loader-8/-/babel-loader-8-1.3.0.tgz#70df26b8cefc3efcc19761281f130c3cb65b5ac4"
+  integrity sha512-Rfis8QNXzw/DC553cahF2VVftNdFGl5EBL+YeGRQJI3Eae9a2VqGx6MalwVKcxnYIHi5lH/BTcvBUQj3EdaLWA==
+  dependencies:
+    "@babel/core" "^7.14.5"
+    "@babel/plugin-proposal-nullish-coalescing-operator" "^7.14.5"
+    "@babel/plugin-proposal-optional-chaining" "^7.14.5"
+    "@embroider/core" "1.3.0"
+    babel-loader "8"
+
 "@embroider/compat@^0.49.0":
   version "0.49.0"
   resolved "https://registry.yarnpkg.com/@embroider/compat/-/compat-0.49.0.tgz#36febce2af757618907874a1bee5fa949fb68f3d"
@@ -3119,6 +3130,48 @@
     fs-extra "^9.1.0"
     fs-tree-diff "^2.0.1"
     heimdalljs "^0.2.6"
+    jsdom "^16.6.0"
+    lodash "^4.17.21"
+    pkg-up "^3.1.0"
+    resolve "^1.20.0"
+    resolve-package-path "^4.0.1"
+    semver "^7.3.5"
+    symlink-or-copy "^1.3.1"
+    tree-sync "^2.1.0"
+    typescript-memoize "^1.0.1"
+    walk-sync "^3.0.0"
+    yargs "^17.0.1"
+
+"@embroider/compat@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/compat/-/compat-1.3.0.tgz#cbc8de6e9c13862e1014442c362fbcfd0cf5f671"
+  integrity sha512-LYX3P2rFAKGMgbGU08qQkV3D6IKFLGTnXtGcrUBNQ5UdN1JgtpMqqZHB84qQHsHaYA/TlRC5McHJKrJ0pNNsDA==
+  dependencies:
+    "@babel/code-frame" "^7.14.5"
+    "@babel/core" "^7.14.5"
+    "@babel/plugin-syntax-dynamic-import" "^7.8.3"
+    "@babel/preset-env" "^7.14.5"
+    "@babel/traverse" "^7.14.5"
+    "@embroider/macros" "1.3.0"
+    "@embroider/shared-internals" "1.3.0"
+    "@types/babel__code-frame" "^7.0.2"
+    "@types/yargs" "^17.0.3"
+    assert-never "^1.1.0"
+    babel-plugin-syntax-dynamic-import "^6.18.0"
+    babylon "^6.18.0"
+    bind-decorator "^1.0.11"
+    broccoli "^3.5.2"
+    broccoli-concat "^4.2.5"
+    broccoli-file-creator "^2.1.1"
+    broccoli-funnel "^3.0.7"
+    broccoli-merge-trees "^4.2.0"
+    broccoli-persistent-filter "^3.1.2"
+    broccoli-plugin "^4.0.7"
+    broccoli-source "^3.0.1"
+    chalk "^4.1.1"
+    debug "^4.3.2"
+    fs-extra "^9.1.0"
+    fs-tree-diff "^2.0.1"
     jsdom "^16.6.0"
     lodash "^4.17.21"
     pkg-up "^3.1.0"
@@ -3246,10 +3299,52 @@
     walk-sync "^3.0.0"
     wrap-legacy-hbs-plugin-if-needed "^1.0.1"
 
+"@embroider/core@1.3.0", "@embroider/core@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/core/-/core-1.3.0.tgz#1850681df825346ae70a0eb6e4fcef918c4fa122"
+  integrity sha512-I8s43Pn0DmMpvPZ4h+6YuA4gJ0bvxIhg6rHloJG2HmEkaQ2ywyKw9zHFKuushXmY3gx/Y1SxIO8P+SwbRTtX4g==
+  dependencies:
+    "@babel/core" "^7.14.5"
+    "@babel/parser" "^7.14.5"
+    "@babel/plugin-syntax-dynamic-import" "^7.8.3"
+    "@babel/plugin-transform-runtime" "^7.14.5"
+    "@babel/runtime" "^7.14.5"
+    "@babel/traverse" "^7.14.5"
+    "@embroider/macros" "1.3.0"
+    "@embroider/shared-internals" "1.3.0"
+    assert-never "^1.2.1"
+    babel-import-util "^1.1.0"
+    babel-plugin-ember-template-compilation "^1.0.0"
+    broccoli-node-api "^1.7.0"
+    broccoli-persistent-filter "^3.1.2"
+    broccoli-plugin "^4.0.7"
+    broccoli-source "^3.0.1"
+    debug "^4.3.2"
+    escape-string-regexp "^4.0.0"
+    fast-sourcemap-concat "^1.4.0"
+    filesize "^5.0.0"
+    fs-extra "^9.1.0"
+    fs-tree-diff "^2.0.1"
+    handlebars "^4.7.7"
+    js-string-escape "^1.0.1"
+    jsdom "^16.6.0"
+    lodash "^4.17.21"
+    resolve "^1.20.0"
+    resolve-package-path "^4.0.1"
+    strip-bom "^4.0.0"
+    typescript-memoize "^1.0.1"
+    walk-sync "^3.0.0"
+    wrap-legacy-hbs-plugin-if-needed "^1.0.1"
+
 "@embroider/hbs-loader@0.49.0":
   version "0.49.0"
   resolved "https://registry.yarnpkg.com/@embroider/hbs-loader/-/hbs-loader-0.49.0.tgz#a3135570864f6984b43132ad07cd1c8b42ad5fee"
   integrity sha512-yrgoDlJsKH+sg3CGrsCoU8yNasRhQlJ0j/3D6rcmNqyRGaRKo7EUE0cDOd/LNOOb0aIBhVcUbocLYMq5jWw/ZQ==
+
+"@embroider/hbs-loader@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/hbs-loader/-/hbs-loader-1.3.0.tgz#cf8168b23b00d18f5bc5e952c337ef7916c42f67"
+  integrity sha512-bYDcs05fayDYluaPoQu/40TMUbApQXE4qVCCxIdl2myg6uH9DScthewjDMFT7za03b0pYBMkkCS71bMXLLvu9g==
 
 "@embroider/macros@0.33.0":
   version "0.33.0"
@@ -3313,6 +3408,20 @@
   dependencies:
     "@embroider/shared-internals" "0.49.0"
     assert-never "^1.2.1"
+    ember-cli-babel "^7.26.6"
+    find-up "^5.0.0"
+    lodash "^4.17.21"
+    resolve "^1.20.0"
+    semver "^7.3.2"
+
+"@embroider/macros@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/macros/-/macros-1.3.0.tgz#61f552ed5d177c12c55c2e1004db906a4ab5dbad"
+  integrity sha512-UyiP5N/bjWrv5Nf17VaTS9BVSA4MeROzo5kOvyzcNypXEOUu3u468p7542aoRFCUFQ3cpldrQkV51sLHy8duCA==
+  dependencies:
+    "@embroider/shared-internals" "1.3.0"
+    assert-never "^1.2.1"
+    babel-import-util "^1.1.0"
     ember-cli-babel "^7.26.6"
     find-up "^5.0.0"
     lodash "^4.17.21"
@@ -3409,6 +3518,19 @@
     semver "^7.3.5"
     typescript-memoize "^1.0.1"
 
+"@embroider/shared-internals@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-1.3.0.tgz#53d8d25f4774c66c641965e8db4f321b32669a80"
+  integrity sha512-psByCUBW2Hv5Y+QDWhaFJ8uQoZ0GCd0LpUeehRkBynbOQmgGDdYpd2SrKplt/o1C+z3bKrD7JyiwthU9Yn3yRw==
+  dependencies:
+    babel-import-util "^1.1.0"
+    ember-rfc176-data "^0.3.17"
+    fs-extra "^9.1.0"
+    lodash "^4.17.21"
+    resolve-package-path "^4.0.1"
+    semver "^7.3.5"
+    typescript-memoize "^1.0.1"
+
 "@embroider/shared-internals@^0.47.2":
   version "0.47.2"
   resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-0.47.2.tgz#24e9fa0dd9c529d5c996ee1325729ea08d1fa19f"
@@ -3479,6 +3601,35 @@
     jsdom "^16.6.0"
     lodash "^4.17.21"
     mini-css-extract-plugin "^1.6.0"
+    semver "^7.3.5"
+    source-map-url "^0.4.1"
+    style-loader "^2.0.0"
+    supports-color "^8.1.0"
+    terser "^5.7.0"
+    thread-loader "^3.0.4"
+
+"@embroider/webpack@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@embroider/webpack/-/webpack-1.3.0.tgz#dee6165bf9a550f8eeef8d67883f1b9967f715ee"
+  integrity sha512-NxTwV2OxrYsbf0nqpxDSDgbpd481hf4CQJZT9TIfwwN1XEBQ6VxouMyondgpX3goBgkmfy5APm8+Wt+YR8iZbA==
+  dependencies:
+    "@babel/core" "^7.14.5"
+    "@babel/plugin-proposal-nullish-coalescing-operator" "^7.14.5"
+    "@babel/plugin-proposal-optional-chaining" "^7.14.5"
+    "@embroider/babel-loader-8" "1.3.0"
+    "@embroider/hbs-loader" "1.3.0"
+    "@embroider/shared-internals" "1.3.0"
+    "@types/source-map" "^0.5.7"
+    "@types/supports-color" "^8.1.0"
+    babel-loader "^8.2.2"
+    babel-preset-env "^1.7.0"
+    css-loader "^5.2.6"
+    csso "^4.2.0"
+    debug "^4.3.2"
+    fs-extra "^9.1.0"
+    jsdom "^16.6.0"
+    lodash "^4.17.21"
+    mini-css-extract-plugin "^2.5.3"
     semver "^7.3.5"
     source-map-url "^0.4.1"
     style-loader "^2.0.0"
@@ -23172,6 +23323,13 @@ mini-css-extract-plugin@^1.6.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
     webpack-sources "^1.1.0"
+
+mini-css-extract-plugin@^2.5.3:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-2.6.0.tgz#578aebc7fc14d32c0ad304c2c34f08af44673f5e"
+  integrity sha512-ndG8nxCEnAemsg4FSgS+yNyHKgkTB4nPKqCOgh65j3/30qqC5RaSQQXMm++Y6sb6E1zRSxPkztj9fqxhS1Eo6w==
+  dependencies:
+    schema-utils "^4.0.0"
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
