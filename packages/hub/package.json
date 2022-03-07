@@ -34,6 +34,7 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
+    "@cardstack/base-cards": "0.28.21",
     "@cardstack/cardpay-sdk": "0.28.21",
     "@cardstack/compiled": "0.28.21",
     "@cardstack/core": "0.28.21",
