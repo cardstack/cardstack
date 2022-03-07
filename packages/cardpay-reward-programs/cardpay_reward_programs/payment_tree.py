@@ -35,30 +35,6 @@ class PaymentTree:
         self.data = list(map(self.encode_payment, self.payment_nodes))
         self.tree = MerkleTree(self.data, hashfunc)
 
-    def aggregate_payments(self, payments: Payment) -> List[Payment]:
-        """
-        Aggregate payments by their abi encoding, totalling their amounts.
-        This ensures there are no duplicate leaf nodes.
-        """
-        aggregated = []
-        for _, group in group_by(
-            payments,
-            lambda p: (
-                p["rewardProgramID"],
-                p["paymentCycle"],
-                p["payee"],
-                p["validFrom"],
-                p["validTo"],
-                p["token"],
-            ),
-        ):
-            grouped_payments = list(group)
-            total_amount = sum(payment["amount"] for payment in grouped_payments)
-            combined_payment = deepcopy(grouped_payments[0])
-            combined_payment["amount"] = total_amount
-            aggregated.append(combined_payment)
-        return aggregated
-
     @staticmethod
     def encode_payment(payment: Payment) -> bytes:
         rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
