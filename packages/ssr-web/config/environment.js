@@ -23,6 +23,7 @@ const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     /.+\.pouty\.pizza$/,
+    /^10.91.\d+.\d+:4000$/, // FIXME if this is needed, it’s in infra 🤔
   ],
   production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, /.+\.card\.xyz$/],
 };
