@@ -32,7 +32,7 @@ class MinSpend(Rule):
 
     def df_to_payment_list(self, df, reward_program_id="0x"):
         if df.empty:
-            return default_payment_list
+            return default_payment_list.copy()
         new_df = df.copy()
         new_df["rewardProgramID"] = reward_program_id
         new_df["validFrom"] = self.end_block
@@ -45,7 +45,7 @@ class MinSpend(Rule):
     def run(self, start_block: int, end_block: int):
         vars = [start_block, end_block, self.min_spend]
         table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
-        if table_query == "parquet_scan[]":
+        if table_query == "parquet_scan([])":
             return pd.DataFrame(columns=["payee", "total_spent"])
         else:
             return self.run_query(table_query, vars)
