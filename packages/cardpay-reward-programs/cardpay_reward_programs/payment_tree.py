@@ -30,9 +30,9 @@ def group_by(data_array, callback):
 
 
 class PaymentTree:
-    def __init__(self, payment_list: List[Payment], payment_cycle:int) -> None:
+    def __init__(self, payment_list: List[Payment]) -> None:
         self.payment_nodes = self.aggregate_payments(payment_list)
-        self.data = [self.encode_payment(payment_node, payment_cycle) for payment_node in self.payment_nodes]
+        self.data = list(map(self.encode_payment, self.payment_nodes))
         self.tree = MerkleTree(self.data, hashfunc)
 
     def aggregate_payments(self, payments: Payment) -> List[Payment]:
@@ -45,6 +45,7 @@ class PaymentTree:
             payments,
             lambda p: (
                 p["rewardProgramID"],
+                p["paymentCycle"],
                 p["payee"],
                 p["validFrom"],
                 p["validTo"],
@@ -59,9 +60,9 @@ class PaymentTree:
         return aggregated
 
     @staticmethod
-    def encode_payment(payment: Payment, payment_cycle:int) -> bytes:
+    def encode_payment(payment: Payment) -> bytes:
         rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
-        paymentCycle: int = payment_cycle 
+        paymentCycle: int = payment["paymentCycle"]
         validFrom: int = payment["validFrom"]
         validTo: int = payment["validTo"]
         tokenType: int = 1
@@ -95,36 +96,37 @@ class PaymentTree:
     def verify_inclusion(self, leaf):
         return self.tree.verify_leaf_inclusion(leaf, self.tree.get_proof(leaf))
 
-    def as_arrow(self, payment_cycle:int):
+    def as_arrow(self):
         # Auto-detection of schemas risks invalid columns, so define manually
-        schema = pa.schema([
-            pa.field("rewardProgramID", pa.string()),
-            pa.field("paymentCycle", pa.int32()),
-            pa.field("validFrom", pa.int32()),
-            pa.field("validTo", pa.int32()),
-            pa.field("tokenType", pa.int32()),
-            pa.field("payee", pa.string()),
-            pa.field("root", pa.string()),
-            pa.field("leaf", pa.string()),
-            pa.field("proof", pa.list_(pa.string())),
-
-        ])
+        schema = pa.schema(
+            [
+                pa.field("rewardProgramID", pa.string()),
+                pa.field("paymentCycle", pa.int32()),
+                pa.field("validFrom", pa.int32()),
+                pa.field("validTo", pa.int32()),
+                pa.field("tokenType", pa.int32()),
+                pa.field("payee", pa.string()),
+                pa.field("root", pa.string()),
+                pa.field("leaf", pa.string()),
+                pa.field("proof", pa.list_(pa.string())),
+            ]
+        )
         # Arrow tables are constructed by column
         # so we need to flip the data
 
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
-            extract_fields = ["rewardProgramID", "validFrom", "validTo", "payee"]
+            extract_fields = ["rewardProgramID", "paymentCycle", "validFrom", "validTo", "payee"]
             for payment, leaf in zip(self.payment_nodes, self.data):
                 for field in extract_fields:
                     columns[field].append(payment[field])
                 columns["tokenType"].append(1)
-                columns["paymentCycle"].append(payment_cycle)
                 columns["root"].append(root)
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
         return pa.table(data=columns, schema=schema)
+
 
 def hashfunc(value_in_bytes):
     return sha3.keccak_256(value_in_bytes).hexdigest()
