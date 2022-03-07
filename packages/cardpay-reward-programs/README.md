@@ -1,6 +1,6 @@
 # Cardpay reward program 
 
-This repository is the code for reward rules. A reward rule is a piece of code that a reward program uses to issue different types of rewards to it's rewardees. A single reward program can have multiple reward rules. The rules defined here may be shared across reward programs. 
+This repository is the code for reward rules. A reward rule is a piece of code that a reward program uses to issue different types of rewards to it's rewardees, e.g. cashback, airdrops. A single reward program can have multiple reward rules. The rules defined are shared across reward programs if the reward program wants to include it. 
 
 Reward rule defines:
 - the business logic of the reward, e.g. each merchant that receives minimum 100 spend will receive 10 card tokens 
