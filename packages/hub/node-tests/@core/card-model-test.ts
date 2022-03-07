@@ -202,5 +202,34 @@ if (process.env.COMPILER) {
 
       // do we want to also include the meta.componentModule in this state?
     });
+
+    it(`returns reasonable error when userland field code throws`, async function () {
+      await cards.create({
+        id: 'boom',
+        realm: realmURL,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Boom {
+              @contains(string)
+              get boom() {
+                throw new Error('boom');
+              }
+            }
+          `,
+        },
+      });
+      try {
+        await cards.loadModel(`${realmURL}boom`, 'isolated');
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`Could not load field 'boom' for card ${realmURL}boom`);
+        expect(err.status).to.eq(422);
+        let innerError = err.additionalErrors?.[0];
+        expect(innerError?.message).to.eq(`boom`);
+      }
+    });
   });
 }

@@ -23,7 +23,7 @@ import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
-import { BadRequest } from './utils/errors';
+import { BadRequest, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
   type: 'created';
@@ -234,8 +234,13 @@ export default abstract class CardModel implements CardModelInterface {
     }
 
     for (let field of this.usedFields) {
-      // TODO userland code could throw here--need to be resiliant to that
-      await this.getField(field, newSchemaInstance);
+      try {
+        await this.getField(field, newSchemaInstance);
+      } catch (err: any) {
+        let newError = new UnprocessableEntity(`Could not load field '${field}' for card ${this.url}`);
+        newError.additionalErrors = [err, ...(err.additionalErrors || [])];
+        throw newError;
+      }
       if (this.recomputePromise !== recomputePromise) {
         return;
       }
