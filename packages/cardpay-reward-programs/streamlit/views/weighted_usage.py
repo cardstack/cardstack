@@ -20,6 +20,11 @@ def weighted_usage(core_parameters):
         "base_reward": base_reward,
         "transaction_factor": transaction_factor,
         "spend_factor": spend_factor,
+        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+        "subgraph_config_location": {
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
+        },
+        "duration": 43200,
     }
     rule = WeightedUsage(core_parameters, user_defined_parameters)
     read_core_config(rule)
