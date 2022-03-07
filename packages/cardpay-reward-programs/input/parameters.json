@@ -1,5 +1,4 @@
 {
-    "name": "WeightedUsage",
     "run": {
         "reward_program_id": "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         "payment_cycle": 24000000
@@ -8,17 +7,16 @@
         "docker_image": "weighted_usage",
         "payment_cycle_length": 32768,
         "start_payment_cycle": 24000000,
-        "end_payment_cycle": 26000000,
-        "subgraph_config_locations": {
-            "card_payments": [],
-            "rewards": []
-        }
+        "end_payment_cycle": 26000000
     },
     "user_defined": {
         "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
         "base_reward": 10,
         "transaction_factor": 1.5,
         "spend_factor": 2,
-        "duration": 43200
+        "duration": 43200,
+        "subgraph_config_locations": {
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
+        }
     }
 }
