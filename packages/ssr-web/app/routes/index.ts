@@ -68,6 +68,14 @@ export default class IndexRoute extends Route {
         Sentry.captureException(e);
         throw e;
       }
+    } else {
+      return {
+        did: '',
+        id: '',
+        name: '',
+        backgroundColor: '',
+        textColor: '',
+      };
     }
     // FIXME this is perhaps interfering with health checks
     // else {
