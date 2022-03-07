@@ -33,12 +33,12 @@ def weighted_usage(core_parameters):
 
 def view_multiple(core_parameters):
     program = weighted_usage(core_parameters)
-    min_block, max_block = slider_partition(type="two_end")
+    start_block, end_block = slider_partition(type="two_end")
     progress = st.progress(0.0)
     payments = []
     cached_df = []
-    for i in range(min_block, max_block, program.payment_cycle_length):
-        progress.progress((i - min_block) / (max_block - min_block))
+    for i in range(start_block, end_block, program.payment_cycle_length):
+        progress.progress((i - start_block) / (end_block - start_block))
         df = program.run(i)
         payments.append({"block": i, "amount": df["amount"].sum()})
         if not df.empty:

@@ -9,19 +9,19 @@ def read_core_config(rule):
 
 
 def slider_partition(
-    min_block=24117248, max_block=25117248, default_block=24150016, type="two-end"
+    start_block=24117248, end_block=25117248, default_block=24150016, type="two-end"
 ):
     if type == "two_end":
         start, end = st.slider(
             "Start block - End block",
-            min_value=min_block,
-            max_value=max_block,
-            value=(min_block, 25000000),
+            min_value=start_block,
+            max_value=end_block,
+            value=(start_block, 25000000),
         )
         return (start, end)
     elif type == "one_end":
         block = st.slider(
-            "End block", min_value=min_block, max_value=max_block, value=default_block
+            "End block", min_value=start_block, max_value=end_block, value=default_block
         )
         return block
     else:

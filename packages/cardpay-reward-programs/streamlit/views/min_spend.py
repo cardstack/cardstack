@@ -24,11 +24,11 @@ def min_spend(core_parameters):
 
 def view_multiple(core_parameters):
     program = min_spend(core_parameters)
-    min_block, max_block = slider_partition(type="two_end")
+    start_block, end_block = slider_partition(type="two_end")
     progress = st.progress(0.0)
     cached_df = []
-    for i in range(min_block, max_block, program.payment_cycle_length):
-        progress.progress((i - min_block) / (max_block - min_block))
+    for i in range(start_block, end_block, program.payment_cycle_length):
+        progress.progress((i - start_block) / (end_block - start_block))
         df = program.run(i)
         if not df.empty:
             cached_df.append(df)
