@@ -1,0 +1,11 @@
+<div
+  {{did-insert this.generateQrCode}}
+  {{did-update this.updateQrCode @data}}
+  class="boxel-styled-qr-code"
+  data-test-boxel-styled-qr-code={{@data}}
+>
+  <Boxel::LoadingIndicator
+    class="boxel-styled-qr-code__loading-indicator"
+    data-test-boxel-styled-qr-code-loading-indicator
+  />
+</div>

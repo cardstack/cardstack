@@ -121,6 +121,9 @@ if (process.env.COMPILER) {
         expect(metaModuleSource).to.containsSource(`
           export const usedFields = ["name", "birthdate"];
         `);
+        expect(metaModuleSource).to.containsSource(`
+          export const allFields = ["name", "birthdate"];
+        `);
       });
 
       it('defines the component modules within the card itself', async function () {

@@ -14,7 +14,7 @@ const MERCHANT_INFO_MISSING_MESSAGE =
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
-const QR_CODE = '[data-test-styled-qr-code]';
+const QR_CODE = '[data-test-boxel-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-link-deep-link]';
 const LINK_VIEW_TOGGLE = '[data-test-payment-link-link-view-toggle]';
 const PAYMENT_URL = '[data-test-payment-link-url]';
@@ -81,7 +81,9 @@ module(
         );
       assert.dom(AMOUNT).containsText(`§300`);
       assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
-      assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
+      assert
+        .dom(QR_CODE)
+        .hasAttribute('data-test-boxel-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
 
@@ -128,7 +130,9 @@ module(
       await click(LINK_VIEW_TOGGLE);
 
       assert.dom(DEEP_LINK).doesNotExist();
-      assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
+      assert
+        .dom(QR_CODE)
+        .hasAttribute('data-test-boxel-styled-qr-code', paymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show Payment Link');
       assert
         .dom(EXPLANATION)
@@ -160,7 +164,9 @@ module(
         );
       assert.dom(AMOUNT).containsText(`§300`);
       assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
-      assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
+      assert
+        .dom(QR_CODE)
+        .hasAttribute('data-test-boxel-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
 
@@ -182,7 +188,9 @@ module(
       assert.dom(LOADING_INDICATOR).exists();
       assert.dom(AMOUNT).containsText(`§300`);
       assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
-      assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
+      assert
+        .dom(QR_CODE)
+        .hasAttribute('data-test-boxel-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
   }

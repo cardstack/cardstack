@@ -5,13 +5,11 @@ import {
   Builder,
   CardId,
   CardModel,
-  CardComponentModule,
   Card,
-  JSONAPIDocument,
   assertDocumentDataIsResource,
   ResourceObject,
-  Unsaved,
   Saved,
+  CardModelArgs,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
@@ -69,7 +67,11 @@ export default class LocalRealm implements Builder {
   private localModules = new Map<string, LocalModule>();
   private deserializer = new RawCardDeserializer();
 
-  constructor(private ownRealmURL: string, private cards: Cards) {
+  constructor(
+    private ownRealmURL: string,
+    private cards: Cards,
+    private saveModel: CardModelArgs['saveModel']
+  ) {
     if (!ownRealmURL.endsWith('/')) {
       throw new Error(`realm URLs must have trailing slash`);
     }
@@ -85,35 +87,29 @@ export default class LocalRealm implements Builder {
     return { compiled, raw };
   }
 
-  async loadData(url: string, format: Format): Promise<CardModel> {
+  async loadData(
+    url: string,
+    format: Format,
+    allFields = false
+  ): Promise<CardModel> {
     let { compiled, raw } = await this.load(url);
 
-    let componentModule = await this.cards.loadModule<CardComponentModule>(
-      compiled.componentInfos[format].componentModule.global
-    );
-
-    // TODO we can optimize this structure in our CardModelForBrowser now that
-    // we are not grabbing the literal JSONAPI response from the server
-    let rawServerResponse = {
-      type: 'card',
-      id: url,
-      attributes: raw.data,
-      meta: {
-        schemaModule: compiled.schemaModule.global,
-        componentModule: compiled.componentInfos[format].componentModule.global,
-      },
-    };
     let model = new CardModelForBrowser(
       this.cards,
       {
         type: 'loaded',
         url,
-        rawData: rawServerResponse,
-        componentModule,
-        schemaModuleId: compiled.schemaModule.global,
-        format,
+        allFields,
       },
-      this
+      {
+        format,
+        realm: this.realmURL,
+        rawData: raw.data ?? {},
+        schemaModule: compiled.schemaModule.global,
+        componentModuleRef:
+          compiled.componentInfos[format].componentModule.global,
+        saveModel: this.saveModel,
+      }
     );
     await model.computeData();
     return model;
@@ -131,7 +127,7 @@ export default class LocalRealm implements Builder {
     if (!routableCardURL) {
       throw new Error(`Could not find routable card: ${routableCardURL}`);
     }
-    return await this.cards.load(routableCardURL, 'isolated');
+    return await this.cards.loadModel(routableCardURL, 'isolated');
   }
 
   async createRawCard(rawCard: RawCard): Promise<void> {
@@ -209,10 +205,8 @@ export default class LocalRealm implements Builder {
     }
   }
 
-  async create(
-    parentCardURL: string,
-    resource: ResourceObject<Unsaved>
-  ): Promise<JSONAPIDocument> {
+  async create(card: CardModel): Promise<ResourceObject<Saved>> {
+    let resource = card.serialize();
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
     let id = resource.id
@@ -223,27 +217,24 @@ export default class LocalRealm implements Builder {
       realm: this.realmURL,
       id,
       data,
-      adoptsFrom: parentCardURL,
+      adoptsFrom: card.parentCardURL,
     });
     let url = cardURL({ realm: this.realmURL, id });
     let { raw } = await this.load(url);
     return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-      },
+      type: 'card',
+      id: url,
+      attributes: raw.data,
     };
   }
 
-  async update(
-    url: string,
-    resource: ResourceObject<Saved>
-  ): Promise<JSONAPIDocument> {
+  async update(card: CardModel): Promise<ResourceObject<Saved>> {
+    let { url } = card;
     let cardId = this.parseOwnRealmURL(url);
     if (!cardId) {
       throw new Error(`${url} is not in the local realm`);
     }
+    let resource = card.serialize();
     assertDocumentDataIsResource(resource);
     let data = resource.attributes;
     let existingRawCard = await this.getRawCard(url);
@@ -256,11 +247,9 @@ export default class LocalRealm implements Builder {
     existingRawCard.data = data;
     let { raw } = await this.load(url);
     return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes: raw.data,
-      },
+      type: 'card',
+      id: url,
+      attributes: raw.data,
     };
   }
 

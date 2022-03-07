@@ -87,29 +87,29 @@ if (process.env.COMPILER) {
     });
 
     it(`can access a synchronous computed field`, async function () {
-      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      let card = await cards.loadModel(`${realm}arthur`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Arthur Faulkner');
     });
 
     it(`can access a two-level-deep synchronous computed field`, async function () {
-      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      let card = await cards.loadModel(`${realm}arthur`, 'isolated');
       expect(await card.getField('summary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
     it('can access a composite field', async function () {
-      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      let card = await cards.loadModel(`${realm}arthur`, 'isolated');
       let aboutMe = await card.getField('aboutMe');
       expect(aboutMe.short).to.equal('son of Ed');
       expect(aboutMe.favoriteColor).to.equal('blue');
     });
 
     it('can access an asynchronous computed field', async function () {
-      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      let card = await cards.loadModel(`${realm}arthur`, 'isolated');
       expect(await card.getField('slowSummary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed');
     });
 
     it('can indirectly access an asynchronous computed field', async function () {
-      let card = await cards.loadData(`${realm}arthur`, 'isolated');
+      let card = await cards.loadModel(`${realm}arthur`, 'isolated');
       expect(await card.getField('loudSummary')).to.equal('Arthur Faulkner is a person. Their story is: son of Ed!');
     });
 
@@ -139,7 +139,7 @@ if (process.env.COMPILER) {
           },
         },
       });
-      let card = await cards.loadData(`${realm}ains`, 'isolated');
+      let card = await cards.loadModel(`${realm}ains`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Ains Ooal Gown');
       expect(await card.getField('seriesName')).to.equal('Overlord');
     });
@@ -170,7 +170,7 @@ if (process.env.COMPILER) {
           },
         },
       });
-      let card = await cards.loadData(`${realm}ains`, 'isolated');
+      let card = await cards.loadModel(`${realm}ains`, 'isolated');
       expect(await card.getField('fullName')).to.equal('Ains Ooal Gown');
       expect(await card.getField('loudSummary')).to.equal(
         'Ains Ooal Gown is a person. Their story is: Supreme overlord of darkness!'
