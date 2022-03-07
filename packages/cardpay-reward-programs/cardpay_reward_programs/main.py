@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 
 import typer
 from boto3.session import Session
@@ -29,7 +28,7 @@ def select_rule(name, core_parameters, user_defined_parameters):
     return instance
 
 
-def blob_to_rule(parameters):
+def to_rule(parameters):
     core_parameters, user_defined_parameters = get_parameters(parameters)
     name = to_camel_case(core_parameters["docker_image"])
     return select_rule(name, core_parameters, user_defined_parameters)
@@ -47,13 +46,9 @@ def run_reward_program(
     """
     Run a reward program as defined in the parameters file
     """
-    parameters = json.load(open(parameters_file))
-
-    # TODO: query smart contract for blob
-    # TODO: the logic to select the payment cycle can be surfaced here
-    # TODO: write s3 rule config
-
-    rule = blob_to_rule(parameters)
+    with open(AnyPath(parameters_file), "r") as stream:
+        parameters = json.load(stream)
+    rule = to_rule(parameters)
     start_block = rule.start_block
     end_block = rule.end_block
     results_df = rule.run(start_block, end_block)
