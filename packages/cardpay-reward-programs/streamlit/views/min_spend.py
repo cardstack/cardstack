@@ -40,6 +40,6 @@ def view_multiple(core_parameters):
 def view_single(core_parameters):
     program = min_spend(core_parameters)
     block = slider_partition(type="one_end")
-    df = program.run(block)
+    df = program.run(block, block + program.payment_cycle_length)
     payment_list = program.df_to_payment_list(df)
     return payment_list, df, program.get_summary(payment_list)
