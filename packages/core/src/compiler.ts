@@ -69,41 +69,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let { cardSource } = this;
-
     let originalModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(originalModules);
     let fields = await this.lookupFieldsForCard(originalModules, parentCard);
-
-    if (cardSource.data) {
-      let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
-      if (unexpectedFields.length) {
-        throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
-      }
-    }
-
-    for (let [localPath, mod] of Object.entries(originalModules)) {
-      if (mod.type === 'asset') {
-        this.outputModules[localPath] = {
-          type: mod.mimeType,
-          source: mod.source,
-        };
-        continue;
-      }
-
-      switch (localPath) {
-        case cardSource.schema:
-          this.outputModules[localPath] = await this.prepareSchema(mod, fields, parentCard);
-          break;
-        case cardSource.serializer:
-          this.outputModules[localPath] = await this.prepareSerializer(localPath, originalModules, parentCard);
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    let compiledCard = {
+    this.assertData(fields);
+    this.outputModules = await this.transformFiles(originalModules, fields, parentCard);
+    return {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
       schemaModule: this.getSchemaModuleRef(parentCard, cardSource.schema),
@@ -114,8 +85,58 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       modules: this.outputModules,
       deps: [...this.dependencies],
     };
+  }
 
-    return compiledCard;
+  private assertData(fields: CompiledCard['fields']) {
+    if (this.cardSource.data) {
+      let unexpectedFields = difference(Object.keys(this.cardSource.data), Object.keys(fields));
+      if (unexpectedFields.length) {
+        throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
+      }
+    }
+  }
+
+  private async transformFiles(
+    originalModules: OriginalModules,
+    fields: CompiledCard['fields'],
+    parentCard: CompiledCard | undefined
+  ) {
+    let outputModules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
+    for (let [localPath, mod] of Object.entries(originalModules)) {
+      outputModules[localPath] = await this.transformFile(localPath, mod, fields, parentCard, originalModules);
+    }
+    return outputModules;
+  }
+
+  private async transformFile(
+    localPath: string,
+    mod: JSSourceModule | AssetModule,
+    fields: CompiledCard['fields'],
+    parentCard: CompiledCard | undefined,
+    originalModules: OriginalModules
+  ) {
+    let { cardSource } = this;
+    if (mod.type === 'asset') {
+      return {
+        type: mod.mimeType,
+        source: mod.source,
+      };
+    }
+    switch (localPath) {
+      case cardSource.schema:
+        return await this.prepareSchema(mod, fields, parentCard);
+      case cardSource.serializer:
+        return await this.prepareSerializer(localPath, originalModules, parentCard);
+      case cardSource.isolated:
+      case cardSource.embedded:
+      case cardSource.edit:
+      default:
+        return {
+          type: JS_TYPE,
+          source: mod.source,
+          ast: mod.ast,
+        };
+    }
   }
 
   private analyzeFiles() {
