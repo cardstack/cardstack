@@ -52,7 +52,7 @@ interface AssetModule {
   source: string;
 }
 
-type OriginalModules = Record<string, JSSourceModule | AssetModule>;
+type InputModules = Record<string, JSSourceModule | AssetModule>;
 
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
@@ -72,13 +72,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let { cardSource } = this;
-    let originalModules = this.analyzeFiles();
-    let parentCard = await this.getParentCard(originalModules);
-    originalModules = await this.inheritComponents(parentCard, originalModules);
-    let fields = await this.lookupFieldsForCard(originalModules, parentCard);
+    let inputModules = this.analyzeFiles();
+    let parentCard = await this.getParentCard(inputModules);
+    let { modules, recompiledComponents, reusedComponents } = await this.inheritComponents(parentCard);
+    Object.assign(inputModules, modules);
+    let fields = await this.lookupFieldsForCard(inputModules, parentCard);
     this.assertData(fields);
-    let outputModules = await this.transformFiles(originalModules, fields, parentCard);
+    let outputModules = await this.transformFiles(inputModules, recompiledComponents, fields, parentCard);
     let { componentInfos } = this;
+    Object.assign(componentInfos, reusedComponents);
     assertAllComponentInfos(componentInfos);
     return {
       realm: cardSource.realm,
@@ -102,9 +104,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private async inheritComponents(parentCard: CompiledCard | undefined, modules: OriginalModules) {
+  private async inheritComponents(parentCard: CompiledCard | undefined) {
     let { cardSource } = this;
-    // handle component inheritance
+    let recompiledComponents: Partial<Record<Format, string>> = {};
+    let reusedComponents: Partial<CompiledCard['componentInfos']> = {};
+    let modules: InputModules = {};
+
     for (let format of FORMATS) {
       if (!cardSource[format]) {
         if (!parentCard) {
@@ -116,11 +121,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
           // stick it into input modules so it will be recompiled
           let mod = await this.inheritParentComponent(parentCard, format);
           let name = uniqueName(cardSource.files, mod.localPath);
-          modules = {
-            ...modules,
-            [name]: mod,
-          };
-          cardSource = this.cardSource = { ...cardSource, [format]: name };
+          modules[name] = mod;
+          recompiledComponents[format] = name;
         } else {
           // directly reuse existing parent component because we didn't extend
           // anything
@@ -131,28 +133,30 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
               inheritedFrom: parentCard.url,
             };
           }
-          this.componentInfos[format] = componentInfo;
+          reusedComponents[format] = componentInfo;
         }
       }
     }
-    return modules;
+    return { modules, recompiledComponents, reusedComponents };
   }
 
   private async transformFiles(
-    originalModules: OriginalModules,
+    inputModules: InputModules,
+    recompiledComponents: Record<string, string>,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined
   ) {
     return Object.assign(
       {},
-      ...Object.entries(originalModules).map(([localPath, mod]) =>
-        this.transformFile(localPath, mod, fields, parentCard)
+      ...Object.entries(inputModules).map(([localPath, mod]) =>
+        this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
       )
     );
   }
 
   private transformFile(
     localPath: string,
+    recompiledComponents: Record<string, string>,
     mod: JSSourceModule | AssetModule,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined
@@ -166,41 +170,47 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         },
       };
     }
-    switch (localPath) {
-      case cardSource.schema:
-        return {
-          [localPath]: this.prepareSchema(mod, fields, parentCard),
-        };
-      case cardSource.serializer:
-        return {
-          [localPath]: this.prepareSerializer(localPath, mod, parentCard),
-        };
-      case cardSource.isolated:
-      case cardSource.embedded:
-      case cardSource.edit: {
-        let format = FORMATS.find((f) => cardSource[f] === localPath)!;
-        let { componentInfo, modules } = this.compileComponent(mod, fields, format);
-        this.componentInfos[format] = componentInfo;
-        return modules;
-      }
-      default:
-        return {
-          [localPath]: {
-            type: JS_TYPE,
-            source: mod.source,
-            ast: mod.ast,
-          },
-        };
+    if (localPath === cardSource.schema) {
+      return {
+        [localPath]: this.prepareSchema(mod, fields, parentCard),
+      };
     }
+    if (localPath === cardSource.serializer) {
+      return {
+        [localPath]: this.prepareSerializer(localPath, mod, parentCard),
+      };
+    }
+    let format = this.isComponentFile(localPath, recompiledComponents);
+    if (format) {
+      let { componentInfo, modules } = this.compileComponent(mod, fields, format);
+      this.componentInfos[format] = componentInfo;
+      return modules;
+    }
+    return {
+      [localPath]: {
+        type: JS_TYPE,
+        source: mod.source,
+        ast: mod.ast,
+      },
+    };
+  }
+
+  private isComponentFile(localPath: string, recompiledComponents: Record<string, string>): Format | undefined {
+    for (let format of FORMATS) {
+      if (localPath === this.cardSource[format] || localPath === recompiledComponents[format]) {
+        return format;
+      }
+    }
+    return undefined;
   }
 
   private analyzeFiles() {
-    let originalModules: OriginalModules = {};
+    let inputModules: InputModules = {};
     let { cardSource } = this;
     for (const localPath in this.cardSource.files) {
-      originalModules[localPath] = this.analyzeFile(cardSource, localPath);
+      inputModules[localPath] = this.analyzeFile(cardSource, localPath);
     }
-    return originalModules;
+    return inputModules;
   }
 
   private analyzeFile(rawCard: RawCard<Saved | Unsaved>, localPath: string): JSSourceModule | AssetModule {
@@ -253,14 +263,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private async getParentCard(originalModules: OriginalModules): Promise<CompiledCard | undefined> {
+  private async getParentCard(inputModules: InputModules): Promise<CompiledCard | undefined> {
     if (isBaseCard(this.cardSource)) {
       return undefined;
     }
 
     let localSchema: JSSourceModule | undefined;
     if (this.cardSource.schema) {
-      localSchema = this.getSourceModule(originalModules, this.cardSource.schema);
+      localSchema = this.getSourceModule(inputModules, this.cardSource.schema);
     }
     let url = this.getCardParentURL(localSchema);
     let parentCard: CompiledCard;
@@ -299,8 +309,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return fileSrc;
   }
 
-  private getSourceModule(originalModules: OriginalModules, localPath: string): JSSourceModule {
-    let module = originalModules[localPath];
+  private getSourceModule(inputModules: InputModules, localPath: string): JSSourceModule {
+    let module = inputModules[localPath];
     if (!module) {
       throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
         status: 422,
@@ -338,13 +348,13 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private async lookupFieldsForCard(
-    originalModules: OriginalModules,
+    inputModules: InputModules,
     parentCard: CompiledCard | undefined
   ): Promise<CompiledCard['fields']> {
     let { realm, schema } = this.cardSource;
     let fields: CompiledCard['fields'] = {};
     if (schema) {
-      let metaFields = this.getSourceModule(originalModules, schema).meta.fields;
+      let metaFields = this.getSourceModule(inputModules, schema).meta.fields;
       for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
         let fieldURL = resolveCard(cardURL, realm);
         try {
