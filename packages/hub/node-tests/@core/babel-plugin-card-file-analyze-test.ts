@@ -7,7 +7,7 @@ if (process.env.COMPILER) {
       let out = cardAnalyze(source);
       expect(out).to.have.property('ast');
       expect(out.code).to.equal(source);
-      expect(out.meta).to.deep.equal({});
+      expect(out.meta).to.deep.equal({ fields: {} });
     });
 
     it('It captures meta information about exports in the file', function () {
