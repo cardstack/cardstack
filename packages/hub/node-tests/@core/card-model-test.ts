@@ -139,21 +139,17 @@ if (process.env.COMPILER) {
       }
     });
 
-    // note that we have route tests that also assert that setting values on
-    // non-existent fields should error
     it('setData of unused field', async function () {
       let model = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       try {
         await model.setData({
           name: 'Robert Barker',
           pizza: 'pepperoni', // non-existent field
-          address: { city: 'New York' }, // unused field
+          address: { city: 'New York' }, // unused field (which is ok to set)
         });
         throw new Error('did not throw expected error');
       } catch (e: any) {
-        expect(e.message).to.equal(
-          `the field(s) 'pizza', 'address.city' are not allowed to be set for the card ${realmURL}bob-barker in format 'embedded'`
-        );
+        expect(e.message).to.equal(`the field(s) 'pizza' are not allowed to be set for the card ${realmURL}bob-barker`);
       }
     });
 
@@ -205,6 +201,44 @@ if (process.env.COMPILER) {
       });
 
       // do we want to also include the meta.componentModule in this state?
+    });
+
+    it(`can recover from error in userland field code`, async function () {
+      await cards.create({
+        id: 'boom',
+        realm: realmURL,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Boom {
+              @contains(string) willBoom;
+              @contains(string)
+              get boom() {
+                if (this.willBoom === 'true') {
+                  throw new Error('boom');
+                } else {
+                  return 'no boom';
+                }
+              }
+            }
+          `,
+        },
+      });
+
+      let model = await cards.loadModel(`${realmURL}boom`, 'isolated');
+      try {
+        await model.setData({ willBoom: 'true' });
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`Could not load field 'boom' for card ${realmURL}boom`);
+        expect(err.status).to.eq(422);
+        let innerError = err.additionalErrors?.[0];
+        expect(innerError?.message).to.eq(`boom`);
+      }
+      await model.setData({ willBoom: 'false' });
+      expect(await model.getField('boom')).to.eq('no boom');
     });
   });
 }

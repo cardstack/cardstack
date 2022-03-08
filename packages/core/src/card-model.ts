@@ -10,19 +10,20 @@ import {
   CardService,
   CardModelArgs,
   CardSchemaModule,
-  CardComponentModule,
   CardModel as CardModelInterface,
   Setter,
   SerializerMap,
   CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
-import { serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
+import { serializeAttributes, serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
+import isPlainObject from 'lodash/isPlainObject';
 import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import { BadRequest, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
   type: 'created';
@@ -37,11 +38,12 @@ export interface LoadedState {
 }
 
 export default abstract class CardModel implements CardModelInterface {
+  setters: Setter;
+
   protected _schemaInstance: any | undefined;
   protected componentModuleRef: ComponentInfo['componentModule']['global'];
   protected rawData: RawCardData;
   protected state: CreatedState | LoadedState;
-  protected _componentModule: CardComponentModule | undefined;
   protected componentMeta: CardComponentMetaModule | undefined;
 
   private _realm: string;
@@ -49,6 +51,7 @@ export default abstract class CardModel implements CardModelInterface {
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
   private _schemaClass: CardSchemaModule['default'] | undefined;
+  private recomputePromise: Promise<void> = Promise.resolve();
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
     let { realm, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
@@ -60,16 +63,19 @@ export default abstract class CardModel implements CardModelInterface {
     this.componentMeta = componentMeta;
     this.saveModel = saveModel;
     this.state = state;
+    this.setters = this.makeSetter();
   }
 
-  abstract setters: Setter | undefined;
-  abstract editable(): Promise<CardModelInterface>;
-  abstract setData(data: RawCardData): void;
-  abstract component(): Promise<unknown>;
   protected abstract get serializerMap(): SerializerMap;
   protected abstract get usedFields(): string[];
   protected abstract get allFields(): string[];
-  protected abstract componentModule(): Promise<CardComponentModule | void>;
+
+  editable(): Promise<CardModelInterface> {
+    throw new Error('editable() is unsupported');
+  }
+  component(): Promise<unknown> {
+    throw new Error('component() is unsupported');
+  }
 
   adoptIntoRealm(realm: string, id?: string): CardModelInterface {
     if (this.state.type !== 'loaded') {
@@ -86,21 +92,13 @@ export default abstract class CardModel implements CardModelInterface {
       {
         realm,
         format: this.format,
-        rawData: { id: undefined, type: 'card', attributes: {} },
+        rawData: {},
         saveModel: this.saveModel,
         schemaModule: this.schemaModule,
         componentMeta: this.componentMeta,
         componentModuleRef: this.componentModuleRef,
       }
     );
-  }
-
-  async computeData(schemaInstance?: any): Promise<Record<string, any>> {
-    let syncData: Record<string, any> = {};
-    for (let field of this.usedFields) {
-      set(syncData, field, await this.getField(field, schemaInstance));
-    }
-    return syncData;
   }
 
   async getField(name: string, schemaInstance?: any): Promise<any> {
@@ -193,10 +191,73 @@ export default abstract class CardModel implements CardModelInterface {
     };
   }
 
+  async setData(data: RawCardData): Promise<void> {
+    let nonExistentFields = this.assertFieldsExists(data);
+    if (nonExistentFields.length) {
+      throw new BadRequest(
+        `the field(s) ${nonExistentFields.map((f) => `'${f}'`).join(', ')} are not allowed to be set for the card ${
+          this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
+        }`
+      );
+    }
+
+    this.rawData = merge({}, this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
+    await this.recompute();
+  }
+
+  async didRecompute(): Promise<void> {
+    return await this.recomputePromise;
+  }
+
+  async recompute(): Promise<void> {
+    // Note that after each async step we check to see if we are still the
+    // current promise, otherwise we bail
+
+    let done: () => void;
+    let recomputePromise = (this.recomputePromise = new Promise<void>((res) => (done = res)));
+
+    // wait a full micro task before we start - this is simple debounce
+    await Promise.resolve();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    await this.beginRecompute();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    let newSchemaInstance = await this.createSchemaInstance();
+    if (this.recomputePromise !== recomputePromise) {
+      return;
+    }
+
+    for (let field of this.usedFields) {
+      try {
+        await this.getField(field, newSchemaInstance);
+      } catch (err: any) {
+        let newError = new UnprocessableEntity(`Could not load field '${field}' for card ${this.url}`);
+        newError.additionalErrors = [err, ...(err.additionalErrors || [])];
+        throw newError;
+      }
+      if (this.recomputePromise !== recomputePromise) {
+        return;
+      }
+    }
+
+    this._schemaInstance = newSchemaInstance;
+    done!();
+  }
+
+  protected async beginRecompute(): Promise<void> {
+    // This is a hook for subclasses to override if there is initial async work
+    // to do before doing the recompute
+  }
+
   // we have a few places that are very sensitive to the shape of the data, and
   // won't be able to deal with a schema instance that has additional properties
   // and methods beyond just the data itself, so this method is for those places
-  protected shapeData(shape: 'used-fields' | 'all-fields') {
+  private shapeData(shape: 'used-fields' | 'all-fields') {
     let syncData: Record<string, any> = {};
 
     let fields = shape === 'used-fields' ? this.usedFields : this.allFields;
@@ -210,7 +271,7 @@ export default abstract class CardModel implements CardModelInterface {
     return syncData;
   }
 
-  protected async createSchemaInstance() {
+  private async createSchemaInstance() {
     let klass = await this.schemaClass();
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
     return new klass(this.getRawField.bind(this)) as any;
@@ -228,6 +289,59 @@ export default abstract class CardModel implements CardModelInterface {
     this._schemaClass = (await this.cards.loadModule<CardSchemaModule>(this.schemaModule)).default;
 
     return this._schemaClass;
+  }
+
+  private makeSetter(segments: string[] = []): Setter {
+    let s = (value: any) => {
+      let innerSegments = segments.slice();
+      let lastSegment = innerSegments.pop();
+      if (!lastSegment) {
+        return;
+      }
+
+      let data = this.shapeData('all-fields');
+      let cursor: any = data;
+      for (let segment of innerSegments) {
+        let nextCursor = cursor[segment];
+        if (!nextCursor) {
+          nextCursor = {};
+          cursor[segment] = nextCursor;
+        }
+        cursor = nextCursor;
+      }
+      cursor[lastSegment] = value;
+      this.rawData = serializeAttributes(data, this.serializerMap, 'serialize');
+      this.recompute();
+    };
+    (s as any).setters = new Proxy(
+      {},
+      {
+        get: (target: any, prop: string, receiver: unknown) => {
+          if (typeof prop === 'string') {
+            return this.makeSetter([...segments, prop]);
+          } else {
+            return Reflect.get(target, prop, receiver);
+          }
+        },
+      }
+    );
+
+    return s;
+  }
+
+  // TODO: we need to really use a validation mechanism which will use code from
+  // the schema.js module to validate the fields
+  private assertFieldsExists(data: RawCardData, path = ''): string[] {
+    let nonExistentFields: string[] = [];
+    for (let [field, value] of Object.entries(data)) {
+      let fieldPath = path ? `${path}.${field}` : field;
+      if (isPlainObject(value)) {
+        nonExistentFields = [...nonExistentFields, ...this.assertFieldsExists(value, fieldPath)];
+      } else if (!this.allFields.includes(fieldPath)) {
+        nonExistentFields.push(fieldPath);
+      }
+    }
+    return nonExistentFields;
   }
 }
 
