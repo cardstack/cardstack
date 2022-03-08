@@ -55,7 +55,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  private schemaSourceModule: JSSourceModule | undefined;
   private outputModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
@@ -76,16 +75,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let fields: CompiledCard['fields'] = {};
     let schemaModuleRef: ModuleRef | undefined;
 
-    this.schemaSourceModule = this.getLocalSchema(originalModules);
-
     if (isBaseCard(cardSource)) {
       schemaModuleRef = { global: 'todo' };
     } else {
-      parentCard = await this.getParentCard();
+      parentCard = await this.getParentCard(originalModules);
 
-      if (this.schemaSourceModule) {
-        fields = await this.lookupFieldsForCard();
-        schemaModuleRef = this.prepareSchema(this.schemaSourceModule, fields, parentCard);
+      if (this.cardSource.schema) {
+        let schemaSource = this.getSourceModule(originalModules, this.cardSource.schema);
+        fields = await this.lookupFieldsForCard(schemaSource);
+        this.outputModules[this.cardSource.schema] = this.prepareSchema(schemaSource, fields, parentCard);
+        schemaModuleRef = { local: this.cardSource.schema };
       } else {
         schemaModuleRef = parentCard.schemaModule;
       }
@@ -151,10 +150,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return originalModules;
   }
 
-  private getCardParentURL(): string {
+  private getCardParentURL(localSchema: JSSourceModule | undefined): string {
     let parentPath;
     let { adoptsFrom, realm, id } = this.cardSource;
-    let parentMeta = this.schemaSourceModule?.meta.parent;
+    let parentMeta = localSchema?.meta.parent;
 
     if (adoptsFrom) {
       if (id != null && `${realm}${id}` === adoptsFrom) {
@@ -177,8 +176,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private async getParentCard(): Promise<CompiledCard> {
-    let url = this.getCardParentURL();
+  private async getParentCard(originalModules: OriginalModules): Promise<CompiledCard> {
+    let localSchema: JSSourceModule | undefined;
+    if (this.cardSource.schema) {
+      localSchema = this.getSourceModule(originalModules, this.cardSource.schema);
+    }
+    let url = this.getCardParentURL(localSchema);
     let parentCard: CompiledCard;
     try {
       parentCard = await this.builder.getCompiledCard(url);
@@ -197,7 +200,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
     if (parentCard.url !== BASE_CARD_URL) {
       let isParentPrimitive = Object.keys(parentCard.fields).length === 0;
-      if (isParentPrimitive && this.schemaSourceModule) {
+      if (isParentPrimitive && localSchema) {
         throw new CardstackError(
           `Card ${this.cardSource.realm}${this.cardSource.id} adopting from primitive parent ${parentCard.url} must be of primitive type itself and should not have a schema.js file.`
         );
@@ -230,19 +233,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return module;
   }
 
-  private getLocalSchema(originalModules: OriginalModules): JSSourceModule | undefined {
-    if (this.cardSource.schema) {
-      return this.getSourceModule(originalModules, this.cardSource.schema);
-    }
-    return undefined;
-  }
-
   private prepareSchema(schemaModule: JSSourceModule, fields: CompiledCard['fields'], parent: CompiledCard) {
-    let { source, ast, meta, localPath } = schemaModule;
-    if (!ast) {
-      throw new Error(`expecting an AST for ${localPath}, but none was generated`);
-    }
-
+    let { source, ast, meta } = schemaModule;
     let out: BabelFileResult;
     try {
       out = transformFromAstSync(ast, source, {
@@ -252,17 +244,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } catch (error: any) {
       throw augmentBadRequest(error);
     }
-    this.outputModules[localPath] = {
+    return {
       type: JS_TYPE,
       source: out!.code!,
       ast: out!.ast!,
     };
-    return { local: localPath };
   }
 
-  private async lookupFieldsForCard(): Promise<CompiledCard['fields']> {
+  private async lookupFieldsForCard(localSchema: JSSourceModule): Promise<CompiledCard['fields']> {
     let { realm } = this.cardSource;
-    let metaFields = this.schemaSourceModule?.meta.fields;
+    let metaFields = localSchema.meta.fields;
 
     if (!metaFields) {
       return {};
