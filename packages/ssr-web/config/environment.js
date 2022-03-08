@@ -22,7 +22,7 @@ const cardSpaceHostnameSuffixByTarget = {
 const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    /.+\.pouty\.pizza$/,
+    '/.+\\.pouty\\.pizza$/',
   ],
   production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, /.+\.card\.xyz$/],
 };
