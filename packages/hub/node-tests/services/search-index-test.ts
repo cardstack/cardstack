@@ -24,6 +24,67 @@ if (process.env.COMPILER) {
       }
     });
 
+    it(`gives good error at load time when card encountered userland error during indexing`, async function () {
+      outputJSONSync(join(getRealmDir(), 'boom', 'card.json'), {
+        realm: realmURL,
+        schema: 'schema.js',
+        data: {
+          willBoom: 'true',
+        },
+      });
+      outputFileSync(
+        join(getRealmDir(), 'boom', 'schema.js'),
+        `
+        import { contains } from '@cardstack/types';
+        import string from 'https://cardstack.com/base/string';
+        export default class Boom {
+          @contains(string) willBoom;
+          @contains(string)
+          get boom() {
+            if (this.willBoom === 'true') {
+              throw new Error('boom');
+            } else {
+              return 'no boom';
+            }
+          }
+        }
+      `
+      );
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
+      await si.indexAllRealms();
+
+      try {
+        await cards.load(`${realmURL}boom`);
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`Could not load field 'boom' for card ${realmURL}boom`);
+        expect(err.status).to.eq(422);
+        let innerError = err.additionalErrors?.[0];
+        expect(innerError?.message).to.eq(`boom`);
+      }
+
+      let dbManager = await await getContainer().lookup('database-manager');
+      let db = await dbManager.getClient();
+      let {
+        rows: [result],
+      } = await db.query(`SELECT "compileErrors" FROM cards WHERE url = '${realmURL}boom'`);
+      expect(result.compileErrors).to.deep.eq({
+        detail: `Could not load field 'boom' for card ${realmURL}boom`,
+        isCardstackError: true,
+        status: 422,
+        title: 'Unprocessable Entity',
+        additionalErrors: [
+          {
+            additionalErrors: null,
+            detail: 'boom',
+            isCardstackError: true,
+            status: 500,
+            title: 'Internal Server Error',
+          },
+        ],
+      });
+    });
+
     it(`recovers automatically from a bad compile once the problem is addressed`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
         adoptsFrom: '../post',
