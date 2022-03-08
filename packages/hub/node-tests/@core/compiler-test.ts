@@ -470,7 +470,7 @@ if (process.env.COMPILER) {
           });
           throw new Error('failed to throw expected exception');
         } catch (err: any) {
-          expect(err.message).to.include(`card requested a module at 'serializer.js' but it was not found`);
+          expect(err.message).to.include(`card declared 'serializer.js' but there is no module to declare`);
           expect(err.status).to.eq(422);
         }
       });

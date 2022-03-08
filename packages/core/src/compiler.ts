@@ -105,6 +105,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
           type: mod.mimeType,
           source: mod.source,
         };
+        continue;
+      }
+
+      switch (localPath) {
+        case cardSource.serializer:
+          this.outputModules[localPath] = await this.prepareSerializer(localPath, originalModules, parentCard);
+          break;
+
+        default:
+          break;
       }
     }
 
@@ -112,7 +122,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
       schemaModule: schemaModuleRef,
-      serializerModule: await this.getSerializer(originalModules, parentCard),
+      serializerModule: this.getSerializerModuleRef(parentCard, cardSource.serializer),
       fields,
       adoptsFrom: parentCard,
       componentInfos: await this.prepareComponents(originalModules, fields, parentCard),
@@ -435,30 +445,38 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return componentInfo;
   }
 
-  private async getSerializer(
+  private async prepareSerializer(
+    serializerPath: string,
     originalModules: OriginalModules,
     parentCard: CompiledCard | undefined
-  ): Promise<ModuleRef | undefined> {
-    let serializerRef: ModuleRef | undefined;
-    let { serializer } = this.cardSource;
-
+  ) {
     if (parentCard?.serializerModule) {
-      if (serializer) {
+      if (serializerPath) {
         throw new CardstackError(
-          `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializer} Parent: ${parentCard.url}:${parentCard.serializerModule.global}`
+          `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${serializerPath} Parent: ${parentCard.url}:${parentCard.serializerModule.global}`
         );
       }
-      serializerRef = parentCard.serializerModule;
-    } else if (serializer) {
-      let serializerModule = this.getSourceModule(originalModules, serializer);
-      this.validateSerializer(serializerModule.meta);
-      this.outputModules[serializer] = {
-        type: JS_TYPE,
-        source: serializerModule.source,
-        ast: serializerModule.ast,
-      };
+    }
 
-      serializerRef = { local: serializer };
+    let serializerModule = this.getSourceModule(originalModules, serializerPath);
+    this.validateSerializer(serializerModule.meta);
+    return {
+      type: JS_TYPE,
+      source: serializerModule.source,
+      ast: serializerModule.ast,
+    };
+  }
+
+  private getSerializerModuleRef(
+    parentCard: CompiledCard | undefined,
+    serializerPath: string | undefined
+  ): ModuleRef | undefined {
+    let serializerRef: ModuleRef | undefined;
+
+    if (parentCard?.serializerModule) {
+      return parentCard.serializerModule;
+    } else if (serializerPath) {
+      return { local: serializerPath };
     }
 
     return serializerRef;
@@ -523,7 +541,7 @@ export function makeGloballyAddressable(
     }
     let globalRef = localToGlobal.get(ref.local);
     if (!globalRef) {
-      throw new Error(`bug: found to global ref for ${ref.local}`);
+      throw new CardstackError(`bug: card declared '${ref.local}' but there is no module to declare`, { status: 422 });
     }
     return { global: globalRef };
   }
