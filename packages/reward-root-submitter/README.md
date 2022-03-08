@@ -61,7 +61,18 @@ And run the image with
 
     docker run --network host -v $HOME/.aws/:/root/.aws -v `pwd`/.env:/project/.env --rm -it reward_root_submission
 
-### Releasing
+## Updating ABIs
+
+To update the ABIs used, run the helper script `update_abis.sh` with the location of the locally checked out contracts repository.
+
+    bash update_abis.sh ~/projects/card-pay-protocol
+
+This will switch to that repository, checkout the main branch and update, build the 
+
+If these steps do not work, each stage can be run manually to get the ABIs.
+You need to build and then copy from the subdirectory `artifacts` all of the non-debug jsons for the required contracts. 
+
+## Releasing
 
 You can release a new version on staging by running the following command in the root of the monorepo:
 
