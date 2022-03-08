@@ -73,7 +73,7 @@ export class CardService implements CardServiceInterface {
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
     let model = await this.makeCardModelFromDatabase(format, result, allFields);
-    await model.computeData();
+    await model.recompute();
     return model;
   }
 
@@ -140,7 +140,7 @@ export class CardService implements CardServiceInterface {
       return await Promise.all(
         result.rows.map(async (row) => {
           let model = await this.makeCardModelFromDatabase(format, row);
-          await model.computeData();
+          await model.recompute();
           return model;
         })
       );

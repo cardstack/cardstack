@@ -74,7 +74,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     this.schemaSourceModule = this.getLocalSchema();
 
     if (isBaseCard(cardSource)) {
-      schemaModuleRef = { global: 'todo' };
+      schemaModuleRef = { global: `${BASE_CARD_URL}/schema` };
     } else {
       parentCard = await this.getParentCard();
 

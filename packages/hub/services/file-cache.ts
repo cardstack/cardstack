@@ -21,6 +21,7 @@ declare global {
 
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 const log = logger('hub/file-cache');
 
 export default class FileCache {
@@ -136,6 +137,15 @@ export default class FileCache {
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require(`@cardstack/core/src/${moduleIdentifier}`);
+    }
+
+    // TODO this is currently focusing specifically on the schema.js module of
+    // the base card since it is compatible with node. Eventually we'll probably
+    // want to extend this to the template components too, as well as other
+    // cards from base...
+    if (moduleIdentifier === `${BASE_CARD_URL}/schema`) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require(`@cardstack/base-cards/base/schema`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports

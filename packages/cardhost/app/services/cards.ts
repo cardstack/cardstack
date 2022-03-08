@@ -81,7 +81,7 @@ export default class Cards extends Service implements CardService {
     return await Promise.all(
       data.map(async (cardResponse) => {
         let model = await this.makeCardModelFromResponse(cardResponse, format);
-        await model.computeData();
+        await model.recompute();
         return model;
       })
     );
@@ -173,7 +173,7 @@ export default class Cards extends Service implements CardService {
       }
     );
 
-    await model.computeData();
+    await model.recompute();
     return model;
   }
 

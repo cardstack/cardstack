@@ -111,7 +111,7 @@ export default class LocalRealm implements Builder {
         saveModel: this.saveModel,
       }
     );
-    await model.computeData();
+    await model.recompute();
     return model;
   }
 
