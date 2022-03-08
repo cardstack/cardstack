@@ -118,8 +118,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         continue;
       }
 
-      let options = {};
-      let { code, ast, meta } = analyzeFileBabelPlugin(source, options);
+      let { code, ast, meta } = analyzeFileBabelPlugin(source);
 
       originalModules[localPath] = {
         type: JS_TYPE,

@@ -64,16 +64,18 @@ function getMeta(obj: State['opts']): FileMeta {
   return meta;
 }
 
-export default function (
-  source: string,
-  options: any
-): { code: BabelFileResult['code']; ast: BabelFileResult['ast']; meta: FileMeta } {
+export default function (source: string): {
+  code: BabelFileResult['code'];
+  ast: BabelFileResult['ast'];
+  meta: FileMeta;
+} {
   let out: BabelFileResult;
+  let key = {};
   try {
     out = transformSync(source, {
       ast: true,
       plugins: [
-        [babelPluginCardFileAnalyze, options],
+        [babelPluginCardFileAnalyze, key],
         [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
         classPropertiesSyntaxPlugin,
       ],
@@ -85,7 +87,7 @@ export default function (
   return {
     code: out!.code,
     ast: out!.ast,
-    meta: getMeta(options),
+    meta: getMeta(key),
   };
 }
 

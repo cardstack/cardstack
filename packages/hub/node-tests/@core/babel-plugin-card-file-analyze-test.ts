@@ -3,22 +3,20 @@ import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-f
 if (process.env.COMPILER) {
   describe('BabelPluginCardAnalyze', function () {
     it('Returns empty meta information when there is nothing of note in the file', function () {
-      let options = {};
       let source = `function serializer() {}`;
-      let out = cardAnalyze(source, options);
+      let out = cardAnalyze(source);
       expect(out).to.have.property('ast');
       expect(out.code).to.equal(source);
       expect(out.meta).to.deep.equal({});
     });
 
     it('It captures meta information about exports in the file', function () {
-      let options = {};
       let source = `
         export function serializer() {}
         export default class FancyClass {}
         export const KEEP = 'ME AROUND';
       `;
-      let out = cardAnalyze(source, options);
+      let out = cardAnalyze(source);
       expect(out.code).to.containsSource(source);
       expect(out).to.have.property('ast');
       expect(out.meta).to.have.property('exports');
@@ -32,7 +30,6 @@ if (process.env.COMPILER) {
     });
 
     it('produces meta about information about the schema', async function () {
-      let options = {};
       let source = `
   	    import { contains } from "@cardstack/types";
   	    import string from "https://cardstack.com/base/string";
@@ -46,7 +43,7 @@ if (process.env.COMPILER) {
   	      @contains(date) settlementDate;
   	    }
   	  `;
-      let out = cardAnalyze(source, options);
+      let out = cardAnalyze(source);
       expect(out).to.have.property('ast');
       expect(out).to.have.property('code');
       expect(out).to.have.property('meta');
@@ -88,7 +85,6 @@ if (process.env.COMPILER) {
     });
 
     it('adds synchronous computed info to fieldMeta', async function () {
-      let options = {};
       let source = `
   	    import { contains } from "@cardstack/types";
   	    import string from "https://cardstack.com/base/string";
@@ -103,7 +99,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      let { meta } = cardAnalyze(source, options);
+      let { meta } = cardAnalyze(source);
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',
@@ -121,7 +117,6 @@ if (process.env.COMPILER) {
     });
 
     it('adds async computed info to fieldMeta', async function () {
-      let options = {};
       let source = `
   	    import { contains } from "@cardstack/types";
   	    import string from "https://cardstack.com/base/string";
@@ -136,7 +131,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      let { meta } = cardAnalyze(source, options);
+      let { meta } = cardAnalyze(source);
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',
