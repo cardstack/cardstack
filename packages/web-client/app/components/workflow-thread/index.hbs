@@ -1,7 +1,16 @@
+{{!--
+  It's important for the modal to have focus at the start of
+  its content. See examples at https://www.w3.org/TR/wai-aria-practices/examples/dialog-modal/dialog.html
+  Much of our content is gradually loaded and animated
+  so it doesn't seem good for us to delay focus till then,
+  hence the root of the workflow has tabindex=-1 to make it focusable
+  and we focus it when it's rendered. We don't want it to be focusable
+  after that.
+--}}
 <Boxel::Thread
   @autoscroll={{this.autoscroll}}
   class="workflow-thread workflow-thread-animated"
-  tabindex="0"
+  tabindex="-1"
   {{did-insert this.focus}}
   {{did-insert this.scrollToEnd}}
   data-test-workflow-thread
