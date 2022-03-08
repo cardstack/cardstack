@@ -19,12 +19,20 @@ const cardSpaceHostnameSuffixByTarget = {
   staging: CARD_SPACE_STAGING_HOSTNAME_SUFFIX,
   production: CARD_SPACE_HOSTNAME_SUFFIX,
 };
+
+function convertHostnameSuffixToRegex(suffix) {
+  return `/^.+\\${suffix}$/`;
+}
+
 const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    '/.+\\.pouty\\.pizza$/',
+    convertHostnameSuffixToRegex(CARD_SPACE_STAGING_HOSTNAME_SUFFIX),
   ],
-  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, '/.+\\.card\\.xyz$/'],
+  production: [
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+    convertHostnameSuffixToRegex(CARD_SPACE_HOSTNAME_SUFFIX),
+  ],
 };
 
 const pkg = require('../package.json');
