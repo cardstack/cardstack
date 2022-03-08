@@ -187,6 +187,7 @@ app "cardie" {
             cluster = "default"
             subnets = ["subnet-89968ba2"]
             task_role_name = "cardie-ecr-task"
+            execution_role_name = "cardie-ecr-task-executor-role"
             disable_alb = true
         }
     }
