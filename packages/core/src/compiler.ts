@@ -69,28 +69,18 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let { cardSource } = this;
-    let originalModules = this.analyzeFiles();
-
-    let parentCard: CompiledCard | undefined;
     let fields: CompiledCard['fields'] = {};
-    let schemaModuleRef: ModuleRef | undefined;
 
-    if (isBaseCard(cardSource)) {
-      schemaModuleRef = { global: 'todo' };
-    } else {
-      parentCard = await this.getParentCard(originalModules);
+    let originalModules = this.analyzeFiles();
+    let parentCard = await this.getParentCard(originalModules);
 
-      if (this.cardSource.schema) {
-        let schemaSource = this.getSourceModule(originalModules, this.cardSource.schema);
-        fields = await this.lookupFieldsForCard(schemaSource);
-        this.outputModules[this.cardSource.schema] = this.prepareSchema(schemaSource, fields, parentCard);
-        schemaModuleRef = { local: this.cardSource.schema };
-      } else {
-        schemaModuleRef = parentCard.schemaModule;
-      }
-
-      fields = this.adoptFields(fields, parentCard);
+    if (this.cardSource.schema) {
+      let schemaSource = this.getSourceModule(originalModules, this.cardSource.schema);
+      fields = await this.lookupFieldsForCard(schemaSource);
+      this.outputModules[this.cardSource.schema] = this.prepareSchema(schemaSource, fields, parentCard);
     }
+
+    fields = this.adoptFields(fields, parentCard);
 
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
@@ -121,7 +111,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
-      schemaModule: schemaModuleRef,
+      schemaModule: this.getSchemaModulePath(parentCard, cardSource.schema),
       serializerModule: this.getSerializerModuleRef(parentCard, cardSource.serializer),
       fields,
       adoptsFrom: parentCard,
@@ -467,19 +457,28 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
   }
 
+  private getSchemaModulePath(parentCard: CompiledCard | undefined, schemaPath: string | undefined): ModuleRef {
+    if (isBaseCard(this.cardSource)) {
+      return { global: 'todo' };
+    } else if (schemaPath) {
+      return { local: schemaPath };
+    } else if (parentCard?.schemaModule) {
+      return parentCard.schemaModule;
+    }
+    throw new CardstackError("Could not create a moduleRef for a card's schema");
+  }
+
   private getSerializerModuleRef(
     parentCard: CompiledCard | undefined,
     serializerPath: string | undefined
   ): ModuleRef | undefined {
-    let serializerRef: ModuleRef | undefined;
-
     if (parentCard?.serializerModule) {
       return parentCard.serializerModule;
     } else if (serializerPath) {
       return { local: serializerPath };
     }
 
-    return serializerRef;
+    return;
   }
 
   private validateSerializer(meta?: FileMeta) {
