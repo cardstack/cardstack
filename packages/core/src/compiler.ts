@@ -74,41 +74,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let originalModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(originalModules);
+    originalModules = await this.inheritComponents(parentCard, originalModules);
     let fields = await this.lookupFieldsForCard(originalModules, parentCard);
     this.assertData(fields);
-
-    // handle component inheritance
-    for (let format of FORMATS) {
-      if (!cardSource[format]) {
-        if (!parentCard) {
-          throw new CardstackError(`bug: base card has no ${format} component`);
-        }
-
-        // recompile parent component because we extend the schema
-        if (cardSource.schema) {
-          // stick it into input modules so it will be recompiled
-          let mod = await this.inheritParentComponent(parentCard, format);
-          let name = uniqueName(cardSource.files, mod.localPath);
-          originalModules = {
-            ...originalModules,
-            [name]: mod,
-          };
-          cardSource = this.cardSource = { ...cardSource, [format]: name };
-        } else {
-          // directly reuse existing parent component because we didn't extend
-          // anything
-          let componentInfo = parentCard.componentInfos[format];
-          if (!componentInfo.inheritedFrom) {
-            componentInfo = {
-              ...componentInfo,
-              inheritedFrom: parentCard.url,
-            };
-          }
-          this.componentInfos[format] = componentInfo;
-        }
-      }
-    }
-
     let outputModules = await this.transformFiles(originalModules, fields, parentCard);
     let { componentInfos } = this;
     assertAllComponentInfos(componentInfos);
@@ -132,6 +100,42 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
       }
     }
+  }
+
+  private async inheritComponents(parentCard: CompiledCard | undefined, modules: OriginalModules) {
+    let { cardSource } = this;
+    // handle component inheritance
+    for (let format of FORMATS) {
+      if (!cardSource[format]) {
+        if (!parentCard) {
+          throw new CardstackError(`bug: base card has no ${format} component`);
+        }
+
+        // recompile parent component because we extend the schema
+        if (cardSource.schema) {
+          // stick it into input modules so it will be recompiled
+          let mod = await this.inheritParentComponent(parentCard, format);
+          let name = uniqueName(cardSource.files, mod.localPath);
+          modules = {
+            ...modules,
+            [name]: mod,
+          };
+          cardSource = this.cardSource = { ...cardSource, [format]: name };
+        } else {
+          // directly reuse existing parent component because we didn't extend
+          // anything
+          let componentInfo = parentCard.componentInfos[format];
+          if (!componentInfo.inheritedFrom) {
+            componentInfo = {
+              ...componentInfo,
+              inheritedFrom: parentCard.url,
+            };
+          }
+          this.componentInfos[format] = componentInfo;
+        }
+      }
+    }
+    return modules;
   }
 
   private async transformFiles(
