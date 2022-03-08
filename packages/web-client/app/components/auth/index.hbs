@@ -1,0 +1,63 @@
+<div>
+  {{#if (eq this.currentStep this.AUTH_STEPS.WALLET_CONNECT)}}
+      <Auth::Step
+        @header="1. Connect your wallet"
+        @description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, suscipit!"
+        {{did-insert this.resetHubAuthState}}
+      >
+        <Boxel::StyledQrCode
+          @data={{this.walletConnectUri}}
+          {{!-- @image={{@logo}} --}}
+          @size={{340}}
+          @margin={{15}}
+          @backgroundColor="#ffffff"
+          @dotType="dots"
+          @dotColor="#000"
+          @cornerDotType="dot"
+          @cornerSquareType="extra-rounded"
+          @imageMargin={{5}}
+        />
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
+      <Auth::Step
+        @header="2. Authenticate with hub"
+        @description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, suscipit!"
+      >
+        <Boxel::Button
+          @kind="primary"
+          {{on "click" (perform this.authenticate)}}
+        >
+          Authenticate with Hub
+        </Boxel::Button>
+
+        {{#if (eq this.hubError "AUTH_TIMEOUT")}}
+          <span>
+            Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          </span>
+        {{else if this.hubError}}
+          Authentication failed or was canceled.
+        {{/if}}
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.DONE)}}
+      <Auth::Step
+        @header="You're authenticated!"
+        @description="We'll send you back to where you came from now."
+      >
+        You're done!
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.LOADING)}}
+      <Auth::Step
+        @header="Loading"
+        @description="Checking your current authentication status"
+      >
+        <Boxel::LoadingIndicator/>
+      </Auth::Step>
+    {{else}}
+      An error occurred.
+      <Boxel::Button
+        {{on "click" this.restart}}
+      >
+        Contact Support
+      </Boxel::Button>
+  {{/if}}
+</div>
