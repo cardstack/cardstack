@@ -69,7 +69,7 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
 
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         let { resolveImport } = state.opts;
-        if (resolveImport && path.node.source.value.startsWith('.')) {
+        if (resolveImport) {
           path.node.source.value = resolveImport(path.node.source.value);
         }
       },

@@ -397,8 +397,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     if (parentComponentRef) {
-      options.resolveImport = (relativePath: string): string => {
-        return resolveModule(relativePath, parentComponentRef.global);
+      options.resolveImport = (importPath: string): string => {
+        return resolveModule(importPath, parentComponentRef.global);
       };
     }
 

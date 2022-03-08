@@ -58,8 +58,12 @@ export function resolveCard(url: string, realm: string): string {
 
 const DUMMY_PREFIX = 'http://test/';
 export function resolveModule(path: string, base: string): string {
-  // This is a workaround to resolve module paths, ie: @cardstack/compiled/https....
-  return new URL(path, `${DUMMY_PREFIX}${base}`).href.replace(DUMMY_PREFIX, '');
+  if (path.startsWith('.')) {
+    // This is a workaround to resolve module paths, ie: @cardstack/compiled/https....
+    return new URL(path, `${DUMMY_PREFIX}${base}`).href.replace(DUMMY_PREFIX, '');
+  } else {
+    return path;
+  }
 }
 
 export function cardURL(card: CardId): string {
