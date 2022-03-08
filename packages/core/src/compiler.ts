@@ -15,7 +15,6 @@ import transformCardComponent, {
 import {
   Builder,
   CardId,
-  CardModule,
   CompiledCard,
   ComponentInfo,
   Format,
@@ -36,18 +35,27 @@ const BASE_CARD_ID: CardId = {
 };
 export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
 
-type SourceCardModule = Required<CardModule> & {
+interface JSSourceModule {
+  type: 'js';
+  source: string;
   meta: FileMeta;
+  ast: t.File;
   localPath: string;
-};
+}
 
-type OriginalModules = Record<string, SourceCardModule>;
+interface AssetModule {
+  type: 'asset';
+  mimeType: string;
+  source: string;
+}
+
+type OriginalModules = Record<string, JSSourceModule | AssetModule>;
 
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  private schemaSourceModule: SourceCardModule | undefined;
+  private schemaSourceModule: JSSourceModule | undefined;
   private outputModules: CompiledCard<Unsaved, LocalRef>['modules'];
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
@@ -92,6 +100,15 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
     }
 
+    for (let [localPath, mod] of Object.entries(originalModules)) {
+      if (mod.type === 'asset') {
+        this.outputModules[localPath] = {
+          type: mod.mimeType,
+          source: mod.source,
+        };
+      }
+    }
+
     let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
@@ -114,28 +131,24 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       let source = this.getSourceFile(cardSource, localPath);
 
       if (!localPath.endsWith('.js')) {
-        this.defineAsset(localPath, source);
-        continue;
+        originalModules[localPath] = {
+          type: 'asset',
+          mimeType: getFileType(localPath),
+          source,
+        };
+      } else {
+        let { code, ast, meta } = analyzeFileBabelPlugin(source);
+
+        originalModules[localPath] = {
+          type: 'js',
+          source: code!,
+          ast: ast!,
+          meta,
+          localPath,
+        };
       }
-
-      let { code, ast, meta } = analyzeFileBabelPlugin(source);
-
-      originalModules[localPath] = {
-        type: JS_TYPE,
-        source: code!,
-        ast: ast!,
-        meta,
-        localPath,
-      };
     }
     return originalModules;
-  }
-
-  private defineAsset(localPath: string, source: string): void {
-    this.outputModules[localPath] = {
-      type: getFileType(localPath),
-      source,
-    };
   }
 
   private getCardParentURL(): string {
@@ -202,31 +215,29 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return fileSrc;
   }
 
-  private getSourceModule(originalModules: OriginalModules, localPath: string) {
+  private getSourceModule(originalModules: OriginalModules, localPath: string): JSSourceModule {
     let module = originalModules[localPath];
     if (!module) {
       throw new CardstackError(`card requested a module at '${localPath}' but it was not found`, {
         status: 422,
       });
     }
+    if (module.type !== 'js') {
+      throw new CardstackError(
+        `card requested a javascript module at '${localPath}' but found type ${module.mimeType}`
+      );
+    }
     return module;
   }
 
-  private getLocalSchema(originalModules: OriginalModules) {
-    let { cardSource } = this;
-    let schemaLocalFilePath = cardSource.schema;
-    if (!schemaLocalFilePath) {
-      if (cardSource.files && cardSource.files['schema.js']) {
-        console.warn(`You did not specify what is your schema file, but a schema.js file exists. Using schema.js.`);
-        return this.getSourceModule(originalModules, 'schema.js');
-      }
-
-      return undefined;
+  private getLocalSchema(originalModules: OriginalModules): JSSourceModule | undefined {
+    if (this.cardSource.schema) {
+      return this.getSourceModule(originalModules, this.cardSource.schema);
     }
-    return this.getSourceModule(originalModules, schemaLocalFilePath);
+    return undefined;
   }
 
-  private prepareSchema(schemaModule: SourceCardModule, fields: CompiledCard['fields'], parent: CompiledCard) {
+  private prepareSchema(schemaModule: JSSourceModule, fields: CompiledCard['fields'], parent: CompiledCard) {
     let { source, ast, meta, localPath } = schemaModule;
     if (!ast) {
       throw new Error(`expecting an AST for ${localPath}, but none was generated`);
@@ -450,7 +461,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     } else if (serializer) {
       let serializerModule = this.getSourceModule(originalModules, serializer);
       this.validateSerializer(serializerModule.meta);
-      this.outputModules[serializer] = serializerModule;
+      this.outputModules[serializer] = {
+        type: JS_TYPE,
+        source: serializerModule.source,
+        ast: serializerModule.ast,
+      };
 
       serializerRef = { local: serializer };
     }
