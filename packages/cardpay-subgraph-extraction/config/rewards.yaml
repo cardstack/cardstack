@@ -107,7 +107,7 @@ base: &base
         - 131072
         - 16384
         - 1024
-  version: 0.0.1
+  version: 0.0.2
 
 staging:
   <<: *base

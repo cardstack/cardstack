@@ -1,7 +1,8 @@
 import flow from 'lodash/flow';
 import upperFirst from 'lodash/upperFirst';
 import camelCase from 'lodash/camelCase';
-import { CardId } from '../interfaces';
+import { CardId, CompiledCard, GlobalRef, Saved } from '../interfaces';
+import { CardstackError } from './errors';
 
 const SPECIAL_CHAR_REPLACEMENT = '-';
 
@@ -31,6 +32,38 @@ export function getBasenameAndExtension(filename: string): {
   let basename = filename.replace(extension, '');
 
   return { basename, extension };
+}
+
+export function getCardAncestor(
+  parentCard: CompiledCard<Saved, GlobalRef>,
+  url: string
+): CompiledCard<Saved, GlobalRef> {
+  if (parentCard.url === url) {
+    return parentCard;
+  } else if (parentCard.adoptsFrom) {
+    return getCardAncestor(parentCard.adoptsFrom, url);
+  }
+
+  throw new CardstackError(`Tried to find a card ancestory for ${url}, but could not`);
+}
+
+export function resolveCard(url: string, realm: string): string {
+  let base = ensureTrailingSlash(realm) + 'PLACEHOLDER/';
+  let resolved = new URL(url, base).href;
+  if (resolved.startsWith(base)) {
+    throw new CardstackError(`${url} resolves to a local file within a card, but it should resolve to a whole card`);
+  }
+  return resolved;
+}
+
+const DUMMY_PREFIX = 'http://test/';
+export function resolveModule(path: string, base: string): string {
+  if (path.startsWith('.')) {
+    // This is a workaround to resolve module paths, ie: @cardstack/compiled/https....
+    return new URL(path, `${DUMMY_PREFIX}${base}`).href.replace(DUMMY_PREFIX, '');
+  } else {
+    return path;
+  }
 }
 
 export function cardURL(card: CardId): string {

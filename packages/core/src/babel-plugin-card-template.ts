@@ -16,11 +16,13 @@ import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+
 export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
   metaModulePath: string;
+  resolveImport?: (relativePath: string) => string;
   // these are for gathering output
   usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
@@ -63,6 +65,13 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
             }) as t.Statement
           );
         },
+      },
+
+      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
+        let { resolveImport } = state.opts;
+        if (resolveImport) {
+          path.node.source.value = resolveImport(path.node.source.value);
+        }
       },
 
       ExportDefaultDeclaration: {

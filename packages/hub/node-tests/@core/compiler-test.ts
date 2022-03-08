@@ -2,7 +2,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
-import { RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { cardURL } from '@cardstack/core/src/utils';
 
 const PERSON_CARD: RawCard = {
@@ -10,6 +10,7 @@ const PERSON_CARD: RawCard = {
   id: 'person',
   schema: 'schema.js',
   embedded: 'embedded.js',
+  isolated: 'isolated.js',
   files: {
     'schema.js': `
       import { contains } from "@cardstack/types";
@@ -22,6 +23,9 @@ const PERSON_CARD: RawCard = {
         @contains(date)
         birthdate;
       }`,
+    'isolated.js': templateOnlyComponentTemplate(
+      `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
+    ),
     'embedded.js': templateOnlyComponentTemplate(
       '<div class="person-embedded"><@fields.name/> was born on <@fields.birthdate/></div>'
     ),
@@ -31,7 +35,7 @@ const PERSON_CARD: RawCard = {
 
 if (process.env.COMPILER) {
   describe('Compiler', function () {
-    let { cards, getFileCache } = configureHubWithCompiler(this);
+    let { cards, getFileCache, resolveCard } = configureHubWithCompiler(this);
 
     it('string card', async function () {
       let { compiled } = await cards.load('https://cardstack.com/base/string');
@@ -49,64 +53,6 @@ if (process.env.COMPILER) {
       expect(nameFieldMeta).to.have.property('name', 'name');
       expect(nameFieldMeta).to.have.property('type', 'contains');
       expect(nameFieldMeta).to.have.property('computed', false);
-    });
-
-    it('CompiledCard embedded view', async function () {
-      await cards.create(PERSON_CARD);
-      let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
-      let { compiled } = await cards.load(cardURL(PERSON_CARD));
-      let { embedded } = compiled.componentInfos;
-
-      expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
-        '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
-      );
-
-      expect(getFileCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
-        PERSON_CARD.files!['embedded.css']
-      );
-
-      expect(embedded.usedFields).to.deep.equal(['name', 'birthdate']);
-      // expect(embedded.serializerMap).to.deep.equal({
-      //   date: ['birthdate'],
-      // });
-
-      let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
-      expect(metaModuleSource).to.containsSource(`
-        import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const serializerMap = {
-          "birthdate": DateSerializer
-        };
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const computedFields = [];
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const usedFields = ["name", "birthdate"];
-      `);
-      expect(metaModuleSource).to.containsSource(`
-        export const allFields = ["name", "birthdate"];
-      `);
-    });
-
-    it('CompiledCard edit view', async function () {
-      await cards.create(PERSON_CARD);
-      let { compiled } = await cards.load(cardURL(PERSON_CARD));
-
-      expect(compiled.componentInfos.edit.usedFields).to.deep.equal(['name', 'birthdate']);
-      expect(
-        getFileCache().getModule(compiled.componentInfos.edit.componentModule.global),
-        'Edit template is rendered for text'
-      ).to.containsSource(
-        '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
-      );
-      expect(
-        getFileCache().getModule(compiled.componentInfos.edit.componentModule.global),
-        'Edit template is rendered for date'
-      ).to.containsSource(
-        '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
-      );
     });
 
     it('nested cards', async function () {
@@ -148,6 +94,170 @@ if (process.env.COMPILER) {
       expect(compiled.componentInfos.isolated.usedFields).to.deep.equal(['author']);
     });
 
+    describe('Components compliation', function () {
+      let compiled: CompiledCard;
+
+      this.beforeEach(async function () {
+        let card = await cards.create(PERSON_CARD);
+        compiled = card.compiled;
+      });
+
+      it('generates a modules with meta information', async function () {
+        let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
+        let { embedded } = compiled.componentInfos;
+        let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
+
+        expect(metaModuleSource).to.containsSource(`
+          import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const serializerMap = {
+            "birthdate": DateSerializer
+          };
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const computedFields = [];
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const usedFields = ["name", "birthdate"];
+        `);
+        expect(metaModuleSource).to.containsSource(`
+          export const allFields = ["name", "birthdate"];
+        `);
+      });
+
+      it('defines the component modules within the card itself', async function () {
+        // Because this card defines it's own schema
+        let {
+          embedded: {
+            componentModule: { global: embeddedGlobal },
+          },
+          edit: {
+            componentModule: { global: editGlobal },
+          },
+          isolated: {
+            componentModule: { global: isolatedGlobal },
+          },
+        } = compiled.componentInfos;
+
+        expect(isolatedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/isolated.js');
+        expect(resolveCard(isolatedGlobal), 'isolated resolved location').to.match(
+          /cardstack.local-person\/isolated.js/
+        );
+        expect(editGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/edit.js');
+        expect(resolveCard(editGlobal), 'edit resolved location').to.match(/cardstack.local-person\/edit.js/);
+        expect(embeddedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-person/embedded.js');
+        expect(resolveCard(embeddedGlobal), 'embedded resolved location').to.match(
+          /cardstack.local-person\/embedded.js/
+        );
+      });
+
+      it('Recompiles glimmer templates', async function () {
+        let { embedded, edit } = compiled.componentInfos;
+        expect(getFileCache().getModule(embedded.componentModule.global)).to.containsSource(
+          '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
+        );
+
+        let editSource = getFileCache().getModule(edit.componentModule.global);
+        expect(editSource, 'Edit template is rendered for text').to.containsSource(
+          '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
+        );
+        expect(editSource, 'Edit template is rendered for date').to.containsSource(
+          '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
+        );
+      });
+
+      it('defines assets, such as css files', async function () {
+        expect(getFileCache().getAsset(`${realm}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
+          PERSON_CARD.files!['embedded.css']
+        );
+      });
+
+      it('Computes used fields', async function () {
+        let { isolated, embedded, edit } = compiled.componentInfos;
+
+        expect(isolated.usedFields, 'Isolated usedFields').to.deep.equal(['name']);
+        expect(embedded.usedFields, 'Embedded usedFields').to.deep.equal(['name', 'birthdate']);
+        expect(edit.usedFields, 'Edit Fields').to.deep.equal(['name', 'birthdate']);
+      });
+    });
+
+    it('handles complex component adoptions', async function () {
+      await cards.create({
+        realm,
+        id: 'person',
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Person {
+              @contains(string) name;
+            }`,
+          'isolated.js': templateOnlyComponentTemplate(
+            `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
+            { IsolatedStyles: './isolated.css', add: './add.js' }
+          ),
+          'isolated.css': `.person-isolated { background: green }`,
+          'add.js': `export default function add(one) { return one + 1; }`,
+        },
+      });
+
+      let fancyPerson = await cards.create({
+        realm,
+        id: 'fancy-person',
+        schema: 'schema.js',
+        embedded: 'embedded.js',
+        adoptsFrom: '../person',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class FancyPerson {
+              @contains(string) fancyTitle;
+            }`,
+          'embedded.js': templateOnlyComponentTemplate(
+            `<div class="person-embedded" data-test-person>Hi! I am <@fields.name/></div>`
+          ),
+        },
+      });
+
+      let {
+        embedded: {
+          componentModule: { global: embeddedGlobal },
+        },
+        edit: {
+          componentModule: { global: editGlobal },
+        },
+        isolated: {
+          componentModule: { global: isolatedGlobal },
+        },
+      } = fancyPerson.compiled.componentInfos;
+
+      expect(isolatedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/isolated.js');
+      expect(resolveCard(isolatedGlobal), 'isolated resolved location').to.match(
+        /cardstack.local-fancy-person\/isolated.js/
+      );
+      expect(editGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/edit.js');
+      expect(resolveCard(editGlobal), 'edit location is not in the base cards').to.match(
+        /cardstack.local-fancy-person\/edit.js/
+      );
+      expect(embeddedGlobal).to.equal('@cardstack/compiled/https-cardstack.local-fancy-person/embedded.js');
+      expect(resolveCard(embeddedGlobal), 'embedded resolved location').to.match(
+        /cardstack.local-fancy-person\/embedded.js/
+      );
+
+      let isolatedTemplate = getFileCache().getModule(isolatedGlobal, 'browser');
+      // TODO: Update with paths from modules outputs from person
+      expect(isolatedTemplate, 'Relative js imports from parent card are rewritten').to.containsSource(
+        'import add from "@cardstack/compiled/https-cardstack.local-person/add.js"'
+      );
+      expect(isolatedTemplate, 'Relative css imports from parent card are rewritten').to.containsSource(
+        'import IsolatedStyles from "@cardstack/compiled/https-cardstack.local-person/isolated.css"'
+      );
+    });
+
     it('deeply nested cards', async function () {
       await cards.create({
         realm,
@@ -178,6 +288,7 @@ if (process.env.COMPILER) {
           'embedded.js': templateOnlyComponentTemplate(`<h2><@fields.title /> - <@fields.createdAt /></h2>`),
         },
       });
+
       await cards.create({
         realm,
         id: 'post-list',

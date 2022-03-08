@@ -26,10 +26,9 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { cardURL, ensureTrailingSlash, getBasenameAndExtension } from './utils';
+import { cardURL, getBasenameAndExtension, getCardAncestor, resolveCard, resolveModule } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
-import { hashCardFields } from './utils/fields';
 
 const BASE_CARD_ID: CardId = {
   realm: 'https://cardstack.com/base/',
@@ -313,60 +312,69 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let localFilePath = cardSource[which];
 
-    if (!localFilePath) {
-      // we don't have an implementation of our own
-      if (!parentCard) {
-        throw new CardstackError(`card doesn't have a ${which} component OR a parent card. This is not right.`);
-      }
-
-      let componentInfo = parentCard.componentInfos[which];
-      let inheritedFrom = componentInfo.inheritedFrom ?? parentCard.url;
-      componentInfo = {
-        ...componentInfo,
-        inheritedFrom,
-      };
-
-      if (cardSource.schema) {
-        // recompile parent component because we extend the schema
-        let originalRawCard = await this.builder.getRawCard(inheritedFrom);
-        let srcLocalPath = originalRawCard[which];
-        if (!srcLocalPath) {
-          throw new CardstackError(
-            `bug: ${parentCard.url} says it got ${which} from ${inheritedFrom}, but that card does not have a ${which} component`
-          );
-        }
-        let src = this.getSourceFile(originalRawCard, srcLocalPath);
-        let componentInfo = await this.compileComponent(
-          src,
-          fields,
-          `${originalRawCard.realm}${originalRawCard.id}/${srcLocalPath}`,
-          srcLocalPath,
-          which
-        );
-        componentInfo.inheritedFrom = inheritedFrom;
-        return componentInfo;
-      } else {
-        // directly reuse existing parent component because we didn't extend
-        // anything
-        let componentInfo = parentCard.componentInfos[which];
-        if (!componentInfo.inheritedFrom) {
-          componentInfo = {
-            ...componentInfo,
-            inheritedFrom: parentCard.url,
-          };
-        }
-        return componentInfo;
-      }
+    if (localFilePath) {
+      let { source } = this.getSourceModule(localFilePath);
+      return await this.compileComponent(
+        source,
+        fields,
+        `${cardSource.realm}${cardSource.id ?? 'NEW_CARD'}/${localFilePath}`,
+        localFilePath,
+        which
+      );
     }
 
-    let { source } = this.getSourceModule(localFilePath);
-    return await this.compileComponent(
-      source,
+    // we don't have an implementation of our own
+    if (!parentCard) {
+      throw new CardstackError(`card doesn't have a ${which} component OR a parent card. This is not right.`);
+    }
+
+    // recompile parent component because we extend the schema
+    if (cardSource.schema) {
+      return await this.recompileComponentFromParent(parentCard, which, fields);
+    } else {
+      // directly reuse existing parent component because we didn't extend
+      // anything
+      let componentInfo = parentCard.componentInfos[which];
+      if (!componentInfo.inheritedFrom) {
+        componentInfo = {
+          ...componentInfo,
+          inheritedFrom: parentCard.url,
+        };
+      }
+      return componentInfo;
+    }
+  }
+
+  private async recompileComponentFromParent(
+    parentCard: CompiledCard<string, GlobalRef>,
+    which: Format,
+    fields: CompiledCard['fields']
+  ): Promise<ComponentInfo<ModuleRef>> {
+    let inheritedFrom = parentCard.componentInfos[which].inheritedFrom ?? parentCard.url;
+
+    // TODO: Fetch inheritedFrom component format module ref
+    let originalRawCard = await this.builder.getRawCard(inheritedFrom);
+    let srcLocalPath = originalRawCard[which];
+    if (!srcLocalPath) {
+      throw new CardstackError(
+        `bug: ${parentCard.url} says ${inheritedFrom} should supply its '${which}' component, but that card does not have it`
+      );
+    }
+
+    let componentOwner = getCardAncestor(parentCard, inheritedFrom);
+
+    let src = this.getSourceFile(originalRawCard, srcLocalPath);
+    // Pass in inheritedFrom to module path to plugin and to the babel plugin
+    let componentInfo = await this.compileComponent(
+      src,
       fields,
-      `${cardSource.realm}${cardSource.id ?? 'NEW_CARD'}/${localFilePath}`,
-      localFilePath,
-      which
+      `${originalRawCard.realm}${originalRawCard.id}/${srcLocalPath}`,
+      srcLocalPath,
+      which,
+      componentOwner.componentInfos[which].componentModule
     );
+    componentInfo.inheritedFrom = inheritedFrom;
+    return componentInfo;
   }
 
   private async compileComponent(
@@ -374,11 +382,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     debugPath: string,
     localFile: string,
-    format: Format
+    format: Format,
+    parentComponentRef?: GlobalRef
   ): Promise<ComponentInfo<LocalRef>> {
-    let fieldsHash = hashCardFields(fields);
-    let componentModule = appendToFilename(localFile, '-' + fieldsHash);
-    let metaModuleFileName = appendToFilename(componentModule, '__meta');
+    let metaModuleFileName = appendToFilename(localFile, '__meta');
 
     let options: CardComponentPluginOptions = {
       debugPath,
@@ -389,8 +396,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       usedFields: [],
     };
 
+    if (parentComponentRef) {
+      options.resolveImport = (importPath: string): string => {
+        return resolveModule(importPath, parentComponentRef.global);
+      };
+    }
+
     let componentTransformResult = transformCardComponent(templateSource, options);
-    this.outputModules[componentModule] = {
+    this.outputModules[localFile] = {
       type: JS_TYPE,
       source: componentTransformResult.source,
       ast: componentTransformResult.ast,
@@ -409,7 +422,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
 
     let componentInfo: ComponentInfo<LocalRef> = {
-      componentModule: { local: componentModule },
+      componentModule: { local: localFile },
       metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
@@ -473,15 +486,6 @@ function defaultFieldFormat(format: Format): Format {
     case 'edit':
       return 'edit';
   }
-}
-
-export function resolveCard(url: string, realm: string): string {
-  let base = ensureTrailingSlash(realm) + 'PLACEHOLDER/';
-  let resolved = new URL(url, base).href;
-  if (resolved.startsWith(base)) {
-    throw new CardstackError(`${url} resolves to a local file within a card, but it should resolve to a whole card`);
-  }
-  return resolved;
 }
 
 export function makeGloballyAddressable(

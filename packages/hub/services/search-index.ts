@@ -284,6 +284,7 @@ class IndexerRun implements IndexerHandle {
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
+    log.trace('Defining module:', cardURL, localPath);
     switch (type) {
       case JS_TYPE:
         this.fileCache.setModule(BROWSER, cardURL, localPath, source);
