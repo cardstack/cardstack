@@ -16,7 +16,7 @@
         "spend_factor": 2,
         "duration": 43200,
         "subgraph_config_location": {
-            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/staging_rewards/0.0.1/"
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.2/"
         }
     }
 }
