@@ -30,7 +30,9 @@ class MinSpend(Rule):
         having(total_spent) >= ?::integer
         """
 
-    def df_to_payment_list(self, df, payment_cycle=1, reward_program_id="0x"):
+    def df_to_payment_list(
+        self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+    ):
         if df.empty:
             return default_payment_list.copy()
         new_df = df.copy()

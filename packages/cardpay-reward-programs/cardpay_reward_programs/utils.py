@@ -96,12 +96,10 @@ def get_payment_cycle(start_block, end_block, payment_cycle_length):
 def write_parquet_file(file_location, table):
     # Pyarrow can't take a file object so we have to write to a temp file
     # and upload directly
-    file_location.mkdir(parents=True, exist_ok=True)
     if isinstance(file_location, CloudPath):
         with tempfile.TemporaryDirectory() as temp_dir:
             pq_file_location = AnyPath(temp_dir).joinpath("data.parquet")
             pq.write_table(table, pq_file_location)
-            file_location.upload_from(pq_file_location)
+            file_location.joinpath("data.parquet").upload_from(pq_file_location)
     else:
-        file_location.mkdir(parents=True, exist_ok=True)
         pq.write_table(table, file_location / "results.parquet")

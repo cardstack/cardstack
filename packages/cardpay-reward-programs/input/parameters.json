@@ -1,13 +1,9 @@
 {
-    "run": {
-        "reward_program_id": "0x4767D0D74356433d54880Fcd7f083751d64388aF",
-        "payment_cycle": 24000000
-    },
     "core": {
         "docker_image": "weighted_usage",
         "payment_cycle_length": 32768,
         "start_block": 24000000,
-        "end_block": 26000000
+        "end_block": 24150016
     },
     "user_defined": {
         "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
