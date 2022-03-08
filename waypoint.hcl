@@ -189,6 +189,10 @@ app "cardie" {
             task_role_name = "cardie-ecr-task"
             execution_role_name = "cardie-ecr-task-executor-role"
             disable_alb = true
+            secrets = {
+                DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
+                GITHUB_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
+            }
         }
     }
 }
