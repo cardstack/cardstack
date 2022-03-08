@@ -20,7 +20,9 @@ const AUTH_STEPS = {
 
 const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60; //@*!
 
-export default class AuthComponent extends Component {
+export default class AuthComponent extends Component<{
+  onComplete: Function;
+}> {
   @service declare layer2Network: Layer2Network; //@*!
   @service('hub-authentication') declare hubAuthentication: HubAuthentication; //@*!
   @service('ua') declare UAService: UA; //@*!
@@ -79,5 +81,10 @@ export default class AuthComponent extends Component {
   @action resetHubAuthState() {
     this.hubError = '';
     this.authTaskRunningForAWhile = false;
+  }
+
+  @action onComplete() {
+    console.log('completed auth flow');
+    this.args.onComplete?.();
   }
 }

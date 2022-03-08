@@ -51,6 +51,7 @@
       <Auth::Step
         @header="You're authenticated!"
         @description="We'll send you back to where you came from now."
+        {{did-insert this.onComplete}}
       >
         You're done!
       </Auth::Step>
