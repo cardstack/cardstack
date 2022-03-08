@@ -6,7 +6,7 @@ import { TransactionReceipt, Log } from 'web3-core';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 
@@ -247,6 +247,8 @@ export async function executeSend(
   return response.json();
 }
 
+// allow TransactionReceipt as argument
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
   let eventParams = txnReceipt.logs
     .filter((log) => isEventMatch(log, eventAbi.topic, address))

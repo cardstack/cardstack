@@ -103,3 +103,29 @@ export function serializableError(err: any): any {
   result.additionalErrors = result.additionalErrors?.map((inner) => serializableError(inner)) ?? null;
   return result;
 }
+
+// This is a very special type of error that is used as a signal for us that
+// there is unfinished async work when loading card field values.
+export class NotReady extends Error {
+  isNotReadyError: true = true;
+  constructor(
+    readonly schemaInstance: any,
+    readonly fieldName: string,
+    readonly computeVia: string,
+    readonly cacheFieldName: string,
+    readonly cardName: string
+  ) {
+    super(`The field ${cardName}.${fieldName} is not ready`);
+  }
+}
+
+export function isNotReadyError(err: any): err is NotReady {
+  return (
+    err != null &&
+    typeof err === 'object' &&
+    err.isNotReadyError &&
+    'fieldName' in err &&
+    'computeVia' in err &&
+    'cacheFieldName' in err
+  );
+}

@@ -1,0 +1,58 @@
+<div
+  class="payment-request"
+  ...attributes
+>
+  <div class="payment-request__explanation" data-test-payment-request-explanation>
+    {{#if (and @canDeepLink (eq this.paymentLinkMode "link"))}}
+      Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment
+    {{else}}
+      Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment
+    {{/if}}
+  </div>
+
+  <Boxel::CardContainer
+    class="payment-request__body"
+  >
+  {{#if @merchant.loading}}
+    <Boxel::LoadingIndicator data-test-merchant-loading-indicator/>
+  {{else if @merchant.errored}}
+    <div class="payment-request__address-only" data-test-payment-request-merchant-address>
+      <span class="payment-request__merchant-address">
+        {{!-- this is intentional to prevent whitespace between the segments --}}
+        {{#each this.addressSegments as |segment|}}<span class={{cn payment-request__merchant-address-segment--bold=segment.bold}}>{{segment.text}}</span>{{/each}}
+      </span>
+      <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
+        {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon"}}
+        Unable to find business details for this address. Use caution when paying.
+      </span>
+    </div>
+  {{else}}
+    <CardPay::Merchant
+      @name={{@merchant.name}}
+      @logoBackground={{@merchant.backgroundColor}}
+      @logoTextColor={{@merchant.textColor}}
+      @size="large"
+      @vertical={{true}}
+    />
+  {{/if}}
+
+    {{#if @amount}}
+      <div class="payment-request__amount" data-test-payment-request-amount>
+        {{@amount}}
+      </div>
+    {{/if}}
+    {{#if (and @amount @secondaryAmount)}}
+      <div class="payment-request__secondary-amount" data-test-payment-request-secondary-amount>
+        {{@secondaryAmount}}
+      </div>
+    {{/if}}
+
+    <Common::PaymentLink
+      @mode={{this.paymentLinkMode}}
+      @switchMode={{fn (set this "paymentLinkMode")}}
+      @image={{@image}}
+      @paymentURL={{@paymentURL}}
+      @deepLinkPaymentURL={{@deepLinkPaymentURL}}
+    />
+  </Boxel::CardContainer>
+</div>

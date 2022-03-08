@@ -54,13 +54,15 @@ export function addExplicitParens<T extends Expression | CardExpression>(express
   }
 }
 
-export function separatedByCommas(expressions: Expression[]): Expression {
-  return expressions.reduce((accum, expression) => {
-    if (accum.length > 0) {
-      accum.push(',');
+export function separatedByCommas<T extends Expression | CardExpression>(expressions: T[]): T {
+  let result: T = [] as unknown as T;
+  for (let [index, expression] of expressions.entries()) {
+    if (index > 0) {
+      result.push(',');
     }
-    return accum.concat(expression);
-  }, []);
+    result = (result as any).concat(expression);
+  }
+  return result;
 }
 
 export function param(value: PgPrimitive): Param {

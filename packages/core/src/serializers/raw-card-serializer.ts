@@ -1,22 +1,15 @@
 import * as JSON from 'json-typescript';
-import { RawCard, CompiledCard, Field } from '../interfaces';
-import { serializeResource, findIncluded } from './index';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import { RawCard, CompiledCard, Field, ResourceObject, Unsaved, Saved, FEATURE_NAMES } from '../interfaces';
+import { findIncluded } from './index';
 
 export class RawCardSerializer {
   doc: any;
 
   serialize(card: RawCard, compiled?: CompiledCard): JSON.Object {
-    let resource = serializeResource('raw-cards', `${card.realm}${card.id}`, card, [
-      'schema',
-      'isolated',
-      'embedded',
-      'edit',
-      'deserializer',
-      'adoptsFrom',
-      'files',
-      'data',
-      'realm',
-    ]);
+    let rawCardKeys: (keyof RawCard)[] = ['id', 'realm', 'adoptsFrom', 'data', 'files', ...FEATURE_NAMES];
+    let resource = serializeResource('raw-cards', `${card.realm}${card.id}`, card, rawCardKeys);
 
     this.doc = { data: resource };
 
@@ -31,12 +24,8 @@ export class RawCardSerializer {
 
   private includeCompiledMeta(compiled: CompiledCard) {
     if (!findIncluded(this.doc, { type: 'compiled-metas', id: compiled.url })) {
-      let resource = serializeResource('compiled-metas', compiled.url, compiled, [
-        'schemaModule',
-        'serializer',
-        'deps',
-        'componentInfos',
-      ]);
+      let keysToSerialize: (keyof CompiledCard)[] = ['schemaModule', 'serializerModule', 'deps', 'componentInfos'];
+      let resource = serializeResource('compiled-metas', compiled.url, compiled, keysToSerialize);
 
       resource.relationships ||= {};
       if (compiled.adoptsFrom) {
@@ -66,4 +55,31 @@ export class RawCardSerializer {
     }
     return { type: 'fields', id };
   }
+}
+
+function serializeResource<Identity extends Saved | Unsaved>(
+  type: string,
+  id: Identity,
+  payload: any,
+  attributes?: (string | Record<string, string>)[]
+): ResourceObject<Identity> {
+  let resource: ResourceObject<Identity> = {
+    id,
+    type,
+  };
+  resource.attributes = {};
+
+  if (!attributes) {
+    attributes = Object.keys(payload);
+  }
+
+  for (const attr of attributes) {
+    if (typeof attr === 'object') {
+      let [aliasName, name] = Object.entries(attr)[0];
+      set(resource.attributes, aliasName, get(payload, name) ?? null);
+    } else {
+      set(resource.attributes, attr, get(payload, attr) ?? null);
+    }
+  }
+  return resource;
 }

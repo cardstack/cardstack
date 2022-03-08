@@ -88,7 +88,7 @@ describe('ContractSubscriptionEventHandler', function () {
     this.subject = await getContainer().lookup('contract-subscription-event-handler');
     this.contracts = (await getContainer().lookup('contracts')) as unknown as StubContracts;
     this.workerClient = (await getContainer().lookup('worker-client')) as unknown as StubWorkerClient;
-    this.latestEventBlockQueries = await getContainer().lookup('latest-event-block-queries');
+    this.latestEventBlockQueries = await getContainer().lookup('latest-event-block', { type: 'query' });
 
     web3BlockNumber = 1234;
 

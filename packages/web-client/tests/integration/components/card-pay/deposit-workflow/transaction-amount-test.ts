@@ -17,8 +17,12 @@ import BN from 'bn.js';
 import { toWei } from 'web3-utils';
 import sinon from 'sinon';
 import { TransactionReceipt } from 'web3-core';
-import { RelayTokensOptions } from '@cardstack/web-client/utils/web3-strategies/types';
-import RSVP, { defer } from 'rsvp';
+import {
+  ApproveOptions,
+  RelayTokensOptions,
+} from '@cardstack/web-client/utils/web3-strategies/types';
+import RSVP, { defer, Promise } from 'rsvp';
+import { BridgeableSymbol } from '@cardstack/web-client/utils/token';
 
 let layer1Service: Layer1TestWeb3Strategy;
 let session: WorkflowSession;
@@ -301,9 +305,42 @@ module(
         .containsText('Amount must be above 0.00 DAI');
     });
 
+    test('it clears the unlock transaction hash if the transaction is reverted', async function (assert) {
+      let approveStub = sinon.stub(layer1Service, 'approve');
+      let receipt: RSVP.Deferred<TransactionReceipt> = defer();
+
+      approveStub.callsFake(function (
+        _amount: BN,
+        _tokenSymbol: BridgeableSymbol,
+        { onTxnHash }: ApproveOptions
+      ) {
+        onTxnHash?.('test hash');
+        return receipt.promise;
+      });
+
+      await render(hbs`
+      <CardPay::DepositWorkflow::TransactionAmount
+        @workflowSession={{this.session}}
+        @onComplete={{noop}}
+        @onIncomplete={{noop}}
+      />
+    `);
+
+      await fillIn('input', '1');
+      await click('[data-test-unlock-button]');
+
+      assert.equal(session.getValue('unlockTxnHash'), 'test hash');
+
+      receipt.reject(new Error('Test reverted transaction'));
+      await settled();
+
+      assert.notOk(session.getValue('unlockTxnHash'));
+    });
+
     module('it can resolve retries correctly', function (hooks) {
       let attempt1: RSVP.Deferred<void>;
       let attempt2: RSVP.Deferred<void>;
+      let receipt: RSVP.Deferred<TransactionReceipt>;
       let isComplete = false;
       let onComplete: Function;
 
@@ -323,6 +360,7 @@ module(
         // "attempt 1 hash", and attempt2 with "attempt 2 hash"
         attempt1 = defer();
         attempt2 = defer();
+        receipt = defer();
 
         relayTokensStub.callsFake(async function (
           _token: string,
@@ -343,9 +381,7 @@ module(
 
           options.onTxnHash?.(hash!);
 
-          return {
-            blockNumber: 0,
-          } as TransactionReceipt;
+          return await receipt.promise;
         });
 
         await render(hbs`
@@ -380,6 +416,9 @@ module(
       test('it completes successfully if we reject the first attempt and resolve the second', async function (assert) {
         attempt1.reject();
         attempt2.resolve();
+        receipt.resolve({
+          blockNumber: 0,
+        } as TransactionReceipt);
 
         await settled();
 
@@ -394,6 +433,9 @@ module(
       test('it completes successfully if we resolve the first attempt and reject the second', async function (assert) {
         attempt1.resolve();
         attempt2.reject();
+        receipt.resolve({
+          blockNumber: 0,
+        } as TransactionReceipt);
 
         await settled();
 
@@ -408,6 +450,9 @@ module(
       test('it completes successfully if we resolve both attempts', async function (assert) {
         attempt1.resolve();
         attempt2.resolve();
+        receipt.resolve({
+          blockNumber: 0,
+        } as TransactionReceipt);
 
         await settled();
 
@@ -417,6 +462,18 @@ module(
             ?.getAttribute('href')
             ?.includes('attempt 1 hash')
         );
+      });
+
+      test('it clears the relay tokens transaction hash upon transaction revert', async function (assert) {
+        attempt1.resolve();
+        await settled();
+
+        assert.equal(session.getValue('relayTokensTxnHash'), 'attempt 1 hash');
+
+        receipt.reject(new Error('Test reverted transaction'));
+        await settled();
+
+        assert.notOk(session.getValue('relayTokensTxnHash'));
       });
     });
   }

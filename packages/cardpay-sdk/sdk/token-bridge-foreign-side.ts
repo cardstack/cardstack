@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { TransactionReceipt, TransactionConfig } from 'web3-core';
+import { TransactionConfig } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 import { ContractOptions } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import ERC20ABI from '../contracts/abi/erc-20';
@@ -19,29 +20,29 @@ import {
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
 export interface ITokenBridgeForeignSide {
-  unlockTokens(txnHash: string): Promise<TransactionReceipt>;
+  unlockTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   unlockTokens(
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
-  relayTokens(txnHash: string): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
+  relayTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   relayTokens(
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
-  claimBridgedTokens(txnHash: string): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
+  claimBridgedTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   claimBridgedTokens(
     messageId: string,
     encodedData: string,
     signatures: string[],
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
 }
 
 // Note that as we support new CPXD tokens, we'll need to measure the gas limit
@@ -55,19 +56,19 @@ const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
-  async unlockTokens(txnHash: string): Promise<TransactionReceipt>;
+  async unlockTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async unlockTokens(
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async unlockTokens(
     tokenAddressOrTxnHash: string,
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
       return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
@@ -117,21 +118,21 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
   }
 
-  async relayTokens(txnHash: string): Promise<TransactionReceipt>;
+  async relayTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async relayTokens(
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async relayTokens(
     tokenAddressOrTxnHash: string,
     recipientAddress?: string,
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
       return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
@@ -192,21 +193,21 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     return estimatedGasInWei.divRound(rounder).mul(rounder);
   }
 
-  async claimBridgedTokens(txnHash: string): Promise<TransactionReceipt>;
+  async claimBridgedTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claimBridgedTokens(
     messageId: string,
     encodedData: string,
     signatures: string[],
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async claimBridgedTokens(
     messageIdOrTxnHash: string,
     encodedData?: string,
     signatures?: string[],
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (!encodedData) {
       let txnHash = messageIdOrTxnHash;
       return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);

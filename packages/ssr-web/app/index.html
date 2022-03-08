@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{content-for "head"}}
+
+    <link integrity="" rel="stylesheet" href="{{rootURL}}assets/vendor.css">
+    <link integrity="" rel="stylesheet" href="{{rootURL}}assets/@cardstack/ssr-web.css">
+    <link integrity="" rel="stylesheet" href="{{rootURL}}assets/app-components.css" />
+    <link href="{{rootURL}}images/icon-apple-256x256.png" rel="apple-touch-icon">
+    <link href="{{rootURL}}images/icon-favicon-32x32.png" rel="shortcut icon" type="image/x-icon">
+    {{content-for "head-footer"}}
+  </head>
+  <body>
+    {{content-for "body"}}
+
+    <script src="{{rootURL}}assets/vendor.js"></script>
+    <script src="{{rootURL}}assets/@cardstack/ssr-web.js"></script>
+
+    {{content-for "body-footer"}}
+  </body>
+</html>

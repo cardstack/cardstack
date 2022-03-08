@@ -1,5 +1,8 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
+import { CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
+import reduce from 'lodash/reduce';
+import md5 from 'md5';
+import { isNotReadyError } from './errors';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -12,6 +15,18 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
   }
 
   return field;
+}
+
+export function hashCardFields(fields: CompiledCard['fields']): string {
+  return md5(
+    reduce(
+      fields,
+      (result, f, name) => {
+        return (result += name + f.card.url);
+      },
+      ''
+    )
+  );
 }
 
 export function buildUsedFieldsListFromUsageMeta(
@@ -53,40 +68,37 @@ function buildUsedFieldListFromComponents(
     }
   }
 }
-
-export function buildSerializerMapFromUsedFields(fields: CompiledCard['fields'], usedFields: string[]): SerializerMap {
-  let map: any = {};
-
-  for (const fieldPath of usedFields) {
-    let field = getFieldForPath(fields, fieldPath);
-
-    if (!field) {
-      continue;
+export async function getFieldValue(schemaInstance: any, fieldName: string): Promise<any> {
+  // If the path is deeply nested, we need to recurse the down
+  // the schema instances until we get to a field getter
+  async function getGetter(schema: any, path: string): Promise<any> {
+    let [key, ...tail] = path.split('.');
+    await loadField(schema, key);
+    let getter = schema[key];
+    if (tail && tail.length) {
+      return getGetter(getter, tail.join('.'));
     }
-
-    buildDeserializerMapForField(map, field, fieldPath);
+    return getter;
   }
 
-  assertValidSerializerMap(map);
-
-  return map;
+  return await getGetter(schemaInstance, fieldName);
 }
 
-function buildDeserializerMapForField(map: any, field: Field, usedPath: string): void {
-  if (Object.keys(field.card.fields).length) {
-    let { fields } = field.card;
-    for (const name in fields) {
-      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
-    }
-  } else {
-    if (!field.card.serializer) {
-      return;
-    }
+async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
+  let result;
+  let isLoaded = false;
+  do {
+    try {
+      result = schemaInstance[fieldName];
+      isLoaded = true;
+    } catch (e: any) {
+      if (!isNotReadyError(e)) {
+        throw e;
+      }
 
-    if (!map[field.card.serializer]) {
-      map[field.card.serializer] = [];
+      let { schemaInstance: instance, computeVia, cacheFieldName } = e;
+      instance[cacheFieldName] = await instance[computeVia]();
     }
-
-    map[field.card.serializer].push(usedPath);
-  }
+  } while (!isLoaded);
+  return result;
 }

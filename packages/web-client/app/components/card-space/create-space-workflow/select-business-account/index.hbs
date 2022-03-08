@@ -4,11 +4,11 @@
   {{did-insert this.setupBusinessAccountSelection}}
   data-test-card-space-select-business-account-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Select a business account" class="merchant-customization">
+  <ActionCardContainer::Section @title="Select a business account">
     {{#if @isComplete}}
       <Boxel::Field
-        class="merchant-customization__name"
         @label="Business Name"
+        @centeredDisplay={{true}}
       >
         <CardPay::Merchant
           @name={{this.merchantData.name}}

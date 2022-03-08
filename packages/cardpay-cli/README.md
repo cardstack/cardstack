@@ -48,6 +48,8 @@ yarn cardpay safe list --walletConnect
  - [`cardpay bridge to-l1 <safeAddress> <amount> <tokenAddress> <receiver>`](#cardpay-bridge-to-l1-safeaddress-amount-tokenaddress-receiver)
  - [`cardpay bridge to-l2 <amount> <tokenAddress> [receiver]`](#cardpay-bridge-to-l2-amount-tokenaddress-receiver)
  - [`cardpay bridge withdrawal-limits <token>`](#cardpay-bridge-withdrawal-limits-token)
+ - [`cardpay did resolve <did>`](#cardpay-did-resolve-did)
+ - [`cardpay did resolve-aka <did>`](#cardpay-did-resolve-aka-did)
  - [`cardpay hub auth <hubRootUrl>`](#cardpay-hub-auth-hubrooturl)
  - [`cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-merchantsafe-tokenaddress-amount)
  - [`cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-gas-estimate-merchantsafe-tokenaddress-amount)
@@ -197,6 +199,34 @@ Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay did resolve <did>`
+
+Decode the DID to a JSON DIDResult
+
+```
+Positionals:
+  did  The DID to decode  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --network  [required]
+```
+
+## `cardpay did resolve-aka <did>`
+
+Decode the DID to a JSON DIDResult and output the contents of the alsoKnownAs URL
+
+```
+Positionals:
+  did  The DID to decode  [string] [required]
+
+Options:
+  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --network  [required]
 ```
 
 ## `cardpay hub auth <hubRootUrl>`

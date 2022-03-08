@@ -1,6 +1,16 @@
-import { Card, CompiledCard, Unsaved, RawCard, Format, CardModel } from '@cardstack/core/src/interfaces';
+import {
+  Card,
+  CompiledCard,
+  Unsaved,
+  RawCard,
+  Format,
+  CardModel,
+  CardService as CardServiceInterface,
+  ResourceObject,
+  Saved,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
 import {
   field,
@@ -14,12 +24,14 @@ import {
   resolveNestedPath,
   expressionToSql,
   Expression,
+  separatedByCommas,
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
 import { merge } from 'lodash';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -33,8 +45,9 @@ export default class CardServiceFactory {
   }
 }
 
-export class CardService {
+export class CardService implements CardServiceInterface {
   private realmManager = service('realm-manager', { as: 'realmManager' });
+  private fileCache = service('file-cache', { as: 'fileCache' });
   private builder = service('card-builder', { as: 'builder' });
   private searchIndex = service('searchIndex');
   private db = inject('database-manager', { as: 'db' });
@@ -55,11 +68,13 @@ export class CardService {
     };
   }
 
-  async loadData(cardURL: string, format: Format): Promise<CardModel> {
+  async loadModel(cardURL: string, format: Format, allFields = false): Promise<CardModel> {
     log.trace('load', cardURL);
 
     let result = await this.loadCardFromDB(['url', 'data', 'schemaModule', 'componentInfos'], cardURL);
-    return await this.makeCardModelFromDatabase(format, result);
+    let model = await this.makeCardModelFromDatabase(format, result, allFields);
+    await model.computeData();
+    return model;
   }
 
   private async loadCardFromDB(columns: string[], cardURL: string): Promise<Record<string, any>> {
@@ -116,28 +131,80 @@ export class CardService {
     try {
       let expression: CardExpression = ['select url, data, "schemaModule", "componentInfos" from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
+        expression = [...expression, 'where', ...filterToExpression(query.filter, BASE_CARD_URL)];
+      }
+      if (query.sort) {
+        expression = [...expression, 'order by', ...sortToExpression(query.sort)];
       }
       let result = await client.query<{ compiled: any }>(expressionToSql(await this.prepareExpression(expression)));
-      return await Promise.all(result.rows.map((row) => this.makeCardModelFromDatabase(format, row)));
+      return await Promise.all(
+        result.rows.map(async (row) => {
+          let model = await this.makeCardModelFromDatabase(format, row);
+          await model.computeData();
+          return model;
+        })
+      );
     } finally {
       client.release();
     }
   }
 
-  private async makeCardModelFromDatabase(format: Format, result: Record<string, any>): Promise<CardModel> {
-    let cardId = this.realmManager.parseCardURL(result.url);
-    return await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: cardId.id,
-      realm: cardId.realm,
-      format,
-      rawData: result.data ?? {},
-      schemaModule: result.schemaModule,
-      usedFields: result.componentInfos[format].usedFields,
-      componentModule: result.componentInfos[format].moduleName.global,
-      serializerMap: result.componentInfos[format].serializerMap,
+  loadModule(moduleIdentifier: string): Promise<any> {
+    return Promise.resolve(this.fileCache.loadModule(moduleIdentifier));
+  }
+
+  async saveModel(card: CardModel, operation: 'create' | 'update'): Promise<ResourceObject<Saved>> {
+    if (operation === 'create') {
+      return await this.createModel(card);
+    } else {
+      return await this.updateModel(card);
+    }
+  }
+
+  private async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.create({
+      id: card.id,
+      realm: card.realm,
+      adoptsFrom: card.parentCardURL,
+      data: card.serialize().attributes,
     });
+    let { id, realm, adoptsFrom, data } = raw;
+    await this.searchIndex.indexData({ id, realm, adoptsFrom, data }, card);
+    return { type: 'cards', id, attributes: data };
+  }
+
+  private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
+    let { id, data, realm } = raw;
+    await this.searchIndex.indexData({ id, realm, data }, card);
+    return { type: 'cards', id, attributes: data };
+  }
+
+  private async makeCardModelFromDatabase(
+    format: Format,
+    result: Record<string, any>,
+    allFields = false
+  ): Promise<CardModelForHub> {
+    let { realm } = this.realmManager.parseCardURL(result.url);
+    let componentMetaModule = result.componentInfos[format].metaModule.global;
+    let componentMeta = await this.loadModule(componentMetaModule);
+    return new CardModelForHub(
+      this,
+      {
+        type: 'loaded',
+        url: result.url,
+        allFields,
+      },
+      {
+        format,
+        realm,
+        schemaModule: result.schemaModule,
+        rawData: result.data ?? {},
+        componentMeta,
+        componentModuleRef: result.componentInfos[format].componentModule.global,
+        saveModel: this.saveModel.bind(this),
+      }
+    );
   }
 
   private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
@@ -218,6 +285,15 @@ function filterToExpression(filter: Filter, parentType: string): CardExpression 
   }
 
   throw unimpl('unknown');
+}
+
+function sortToExpression(sort: Sort): CardExpression {
+  let expressions: CardExpression[] = sort.map((s) => [
+    field([columnName('searchData')], s.on, s.by),
+    s.direction === 'desc' ? 'DESC' : 'ASC',
+  ]);
+
+  return separatedByCommas(expressions);
 }
 
 const pgComparisons: { [operator: string]: string } = {

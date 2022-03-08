@@ -1,0 +1,96 @@
+.payment-request {
+  --action-element-margin: var(--boxel-sp-lg) auto var(--boxel-sp-sm) auto;
+  --explanation-font: var(--boxel-font-lg);
+  --amount-font-size: 2.5rem;
+  --gap: var(--boxel-sp-xl);
+  --body-padding: var(--boxel-sp-xl);
+  --merchant-address-font-size: var(--boxel-font-size-lg);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--gap);
+}
+
+@media only screen and (max-width: 480px) {
+  .payment-request {
+    --explanation-font: var(--boxel-font);
+    --amount-font-size: var(--boxel-font-size-xl);
+    --body-padding: var(--boxel-sp);
+    --gap: var(--boxel-sp-lg);
+    --merchant-address-font-size: 1.125rem;
+  }
+}
+
+.payment-request__explanation {
+  max-width: 45ch;
+  font: var(--explanation-font);
+  color: var(--boxel-purple-500);
+}
+
+.payment-request__body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--boxel-purple-100);
+  padding: var(--body-padding);
+}
+
+.payment-request__qr-container {
+  text-align: center;
+  margin: var(--action-element-margin);
+}
+
+.payment-request__address-only {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--boxel-sp-xxs);
+  gap: var(--boxel-sp-xs);
+}
+
+.payment-request__merchant-address {
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--merchant-address-font-size);
+  line-height: calc(22 / 16);
+  letter-spacing: var(--boxel-lsp-sm);
+  max-width: 22ch;
+  word-break: break-all;
+}
+
+.payment-request__merchant-address-segment--bold {
+  font-weight: 700;
+}
+
+.payment-request__missing-info-message {
+  display: flex;
+  align-items: center;
+  gap: var(--boxel-sp-xs);
+  max-width: 40ch;
+  text-align: left;
+  border-top: 1px solid var(--boxel-light-400);
+  padding-top: var(--boxel-sp-xs);
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+}
+
+.payment-request__missing-info-message-icon {
+  flex-shrink: 0;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
+
+.payment-request__amount {
+  margin-top: var(--boxel-sp);
+  font-weight: 700;
+  font-size: var(--amount-font-size);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.payment-request__secondary-amount {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
+}

@@ -59,3 +59,9 @@ export const NETWORK_OPTION_ANY = {
   description: 'The network to run this script on',
   choices: ['sokol', 'kovan', 'xdai', 'mainnet'],
 } as Options;
+
+export const FROM_OPTION = {
+  alias: 'f',
+  type: 'string',
+  description: 'The signing EOA. Defaults to the first derived EOA of the specified mnemonic',
+} as Options;

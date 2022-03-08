@@ -68,10 +68,11 @@ if (process.env.COMPILER) {
         schema: 'schema.js',
         embedded: null,
         edit: null,
-        deserializer: null,
+        serializer: null,
         adoptsFrom: null,
         data: null,
         realm: realmURL,
+        id: 'post',
       });
     });
 
@@ -86,10 +87,11 @@ if (process.env.COMPILER) {
         schema: null,
         embedded: null,
         edit: null,
-        deserializer: null,
+        serializer: null,
         adoptsFrom: '../post',
         data: { title: 'Hello World', body: 'First post.' },
         realm: realmURL,
+        id: 'post0',
       });
     });
 
@@ -109,12 +111,12 @@ if (process.env.COMPILER) {
         (ref: any) => ref.type === 'compiled-metas' && ref.id === `${realmURL}post0`
       );
 
-      expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializer', 'componentInfos', 'deps']);
+      expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializerModule', 'componentInfos', 'deps']);
       expect(compiledMeta?.attributes.componentInfos).to.have.all.keys(['isolated', 'embedded', 'edit']);
       expect(compiledMeta?.attributes.componentInfos.isolated).to.have.all.keys([
         'usedFields',
-        'serializerMap',
-        'moduleName',
+        'componentModule',
+        'metaModule',
         'inlineHBS',
         'inheritedFrom',
       ]);

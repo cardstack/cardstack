@@ -8,6 +8,7 @@ import { task } from 'ember-concurrency';
 import CardsService from './cards';
 import { Format, CardModel } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
+import { destroy, associateDestroyableChild } from '@ember/destroyable';
 
 type State =
   | {
@@ -51,10 +52,18 @@ export default class Modal extends Service {
     return taskFor(this.openCardTask).perform(card, format);
   }
 
+  private destroyCurrentCard() {
+    if (this.state.name === 'loaded') {
+      destroy(this.state.loadedCard);
+    }
+  }
+
   @task async openCardTask(url: string, format: Format): Promise<void> {
+    this.destroyCurrentCard();
     this.state = { name: 'loading' };
 
-    let loadedCard = await this.cards.load(url, format);
+    let loadedCard = await this.cards.loadModel(url, format);
+    associateDestroyableChild(this, loadedCard);
 
     this.state = {
       name: 'loaded',
@@ -68,6 +77,8 @@ export default class Modal extends Service {
     realm: string,
     withId: boolean
   ) {
+    this.destroyCurrentCard();
+
     // this is a contrived example for our tests meant to demonstrate that an ID
     // can be supplied to a new card
     let id = withId
@@ -85,6 +96,8 @@ export default class Modal extends Service {
   }
 
   @task async editCardTask(card: CardModel): Promise<void> {
+    this.destroyCurrentCard();
+
     this.state = { name: 'loading' };
     let loadedCard = await card.editable();
     this.state = {

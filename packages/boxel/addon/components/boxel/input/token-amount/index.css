@@ -6,6 +6,7 @@
   --input-symbol-space: var(--boxel-sp-sm);
 
   position: relative;
+  width: 100%;
   font-family: var(--boxel-font-family);
   font-size: 1.25rem;
   line-height: calc(27 / 20);

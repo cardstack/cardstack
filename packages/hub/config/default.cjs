@@ -39,6 +39,9 @@ module.exports = {
     enabled: false,
     environment: null,
   },
+  checkly: {
+    handleWebhookRequests: false,
+  },
   firebase: {
     projectId: null,
     clientEmail: null,

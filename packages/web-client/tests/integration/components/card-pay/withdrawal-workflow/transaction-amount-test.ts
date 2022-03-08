@@ -7,6 +7,7 @@ import {
   typeIn,
   waitFor,
   setupOnerror,
+  settled,
 } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
@@ -21,6 +22,9 @@ import {
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { TransactionReceipt } from 'web3-core';
+import { TransactionOptions } from '@cardstack/cardpay-sdk';
+import { defer } from 'rsvp';
 
 const startDaiAmountString = '100.1111111111111111';
 let startDaiAmount = toWei(startDaiAmountString);
@@ -318,6 +322,44 @@ module(
         .isVisible();
 
       assert.ok(resumeSpy.calledOnceWith('anystring'));
+    });
+
+    test('it clears the transaction hash if the transaction is reverted', async function (assert) {
+      setupOnerror(function () {
+        // Do nothing - Prevent test from crashing on error
+      });
+
+      let receipt = defer<TransactionReceipt>();
+      sinon
+        .stub(layer2Strategy, 'bridgeToLayer1')
+        .callsFake(function (
+          _safeAddress: string,
+          _receiverAddress: string,
+          _tokenSymbol: 'DAI.CPXD' | 'CARD.CPXD' | 'DAI' | 'CARD',
+          _amountInWei: string,
+          { onTxnHash }: TransactionOptions
+        ) {
+          onTxnHash?.('test hash');
+          return receipt.promise;
+        });
+
+      await render(hbs`
+        <CardPay::WithdrawalWorkflow::TransactionAmount
+          @workflowSession={{this.session}}
+          @isComplete={{this.isComplete}}
+          @onComplete={{this.onComplete}}
+          @onIncomplete={{noop}}
+        />
+      `);
+      await fillIn('input', '5');
+      await click('[data-test-withdrawal-transaction-amount] button');
+
+      assert.equal(session.getValue('relayTokensTxnHash'), 'test hash');
+
+      receipt.reject(new Error('Test reverted transaction'));
+      await settled();
+
+      assert.notOk(session.getValue('relayTokensTxnHash'));
     });
   }
 );

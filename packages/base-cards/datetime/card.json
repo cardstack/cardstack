@@ -1,6 +1,6 @@
 {
-    "schema": "schema.js",
-    "embedded": "embedded.js",
-    "edit": "edit.js",
-    "deserializer": "datetime"
+  "schema": "schema.js",
+  "embedded": "embedded.js",
+  "edit": "edit.js",
+  "serializer": "serializer.js"
 }

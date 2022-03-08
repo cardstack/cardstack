@@ -1,0 +1,30 @@
+{{page-title this.meta.title replace=true}}
+
+<InHead>
+  {{!-- template-lint-disable no-forbidden-elements --}}
+  <meta property='og:title' content={{this.meta.title}} />
+  <meta property='og:type' content='website' />
+  <meta property='og:url' content={{this.paymentURL}} />
+  <meta property='og:description' content={{this.meta.description}} />
+
+  <meta name='twitter:title' content={{this.meta.title}} />
+  <meta name='twitter:card' content='summary' />
+  <meta name='twitter:description' content={{this.meta.description}} />
+  <meta name='twitter:url' content={{this.paymentURL}} />
+  {{!-- template-lint-disable no-potential-path-strings --}}
+  <meta name='twitter:site' content='@cardstack' />
+</InHead>
+
+<div class="merchant-payment-request-page">
+  <CardPay::MerchantPaymentRequestHeader/>
+  <CardPay::MerchantPaymentRequestCard
+    @amount={{this.cleanedAmounts.displayed.amount}}
+    @secondaryAmount={{this.cleanedAmounts.displayed.secondaryAmount}}
+    @merchant={{this.merchantInfo}}
+    @merchantAddress={{@model.merchantSafe.address}}
+    @paymentURL={{this.paymentURL}}
+    @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
+    @canDeepLink={{this.canDeepLink}}
+  />
+  <Common::Footer />
+</div>

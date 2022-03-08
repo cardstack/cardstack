@@ -21,13 +21,13 @@ class StubAuthenticationUtils {
   }
 }
 
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
+let jobIdentifiers: string[] = [];
+let jobPayloads: any[] = [];
 
 class StubWorkerClient {
   async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
+    jobIdentifiers.push(identifier);
+    jobPayloads.push(payload);
     return Promise.resolve({} as Job);
   }
 }
@@ -44,11 +44,11 @@ describe('POST /api/merchant-infos', function () {
     registry(this).register('worker-client', StubWorkerClient);
   });
 
-  let { request } = setupHub(this);
+  let { request, getContainer } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    jobIdentifiers = [];
+    jobPayloads = [];
   });
 
   it('persists merchant info', async function () {
@@ -98,8 +98,11 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-merchant-info');
-    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId });
+    let cardSpaceQueries = await getContainer().lookup('card-space', { type: 'query' });
+    let cardSpace = (await cardSpaceQueries.query({ merchantId: String(resourceId) }))[0];
+
+    expect(jobIdentifiers).to.deep.equal(['persist-off-chain-merchant-info', 'persist-off-chain-card-space']);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId }, { id: cardSpace.id }]);
   });
 
   it('returns 401 without bearer token', async function () {
@@ -174,6 +177,35 @@ describe('POST /api/merchant-infos', function () {
         status: '422',
         title: 'Invalid merchant slug',
         detail: 'The Business ID cannot be more than 50 characters long. It is currently 51 characters long',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates name for length', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'a'.repeat(51),
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -298,8 +330,8 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
   let { request } = setupHub(this);
 
   this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
+    jobIdentifiers = [];
+    jobPayloads = [];
   });
 
   it('returns 401 without bearer token', async function () {
@@ -428,8 +460,8 @@ describe('GET /api/merchant-infos', function () {
   let { request, getContainer } = setupHub(this);
 
   it('fetches merchant infos available for association to a new card space', async function () {
-    let cardSpaceQueries = await getContainer().lookup('card-space-queries');
-    let merchantInfoQueries = await getContainer().lookup('merchant-info-queries');
+    let cardSpaceQueries = await getContainer().lookup('card-space', { type: 'query' });
+    let merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
 
     // 3 merchants (jerry, kramer, george) belonging to first user
     let merchantInfoId = 'c5cd6479-ec74-4ecd-9aa6-96bdb02d255e';

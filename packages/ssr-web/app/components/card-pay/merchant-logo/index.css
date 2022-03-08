@@ -1,0 +1,30 @@
+.merchant-logo {
+  --merchant-logo-background: var(--boxel-blue);
+  --merchant-logo-text-color: var(--boxel-light);
+  --merchant-margin-right: var(--boxel-sp-xxs);
+  --logo-size: var(--boxel-icon-sm);
+
+  background: var(--merchant-logo-background);
+  color: var(--merchant-logo-text-color);
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  letter-spacing: -1px;
+  line-height: var(--logo-size);
+  width: var(--logo-size);
+  height: var(--logo-size);
+  margin-right: var(--merchant-margin-right);
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.merchant-logo--lg {
+  --logo-size: var(--boxel-icon-xxl);
+
+  font-size: 2.8rem;
+  font-weight: 700;
+}

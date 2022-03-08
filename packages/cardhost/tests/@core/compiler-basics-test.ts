@@ -12,7 +12,7 @@ import type {
   CompiledCard,
   Builder,
 } from '@cardstack/core/src/interfaces';
-import { baseCardURL } from '@cardstack/core/src/compiler';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { cardURL } from '@cardstack/core/src/utils';
 
@@ -52,21 +52,21 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('can compile the base card', async function (assert) {
-    let compiled = await builder.getCompiledCard(baseCardURL);
+    let compiled = await builder.getCompiledCard(BASE_CARD_URL);
 
-    assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
+    assert.equal(compiled.url, BASE_CARD_URL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
       await cardService.loadModule(
-        compiled.componentInfos.isolated.moduleName.global
+        compiled.componentInfos.isolated.componentModule.global
       ),
       'Isolated module exists'
     );
     assert.ok(
       await cardService.loadModule(
-        compiled.componentInfos.embedded.moduleName.global
+        compiled.componentInfos.embedded.componentModule.global
       ),
       'Embedded module exists'
     );
@@ -281,7 +281,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('it inlines a simple field template', async function (assert) {
       assert.ok(
-        compiled.componentInfos.isolated.moduleName.global.includes(
+        compiled.componentInfos.isolated.componentModule.global.includes(
           `/isolated`
         ),
         'templateModule for "isolated" is full url'
@@ -294,7 +294,7 @@ module('@core | compiler-basics', function (hooks) {
       let compiled = await builder.getCompiledCard(cardURL(PERSON_RAW_CARD));
 
       let code = await cardService.loadModule<any>(
-        compiled.componentInfos.embedded.moduleName.global
+        compiled.componentInfos.embedded.componentModule.global
       );
 
       assert.equal(code.default.moduleName, '@glimmer/component/template-only');
@@ -465,7 +465,7 @@ module('@core | compiler-basics', function (hooks) {
             import string from "https://cardstack.com/base/string";
 
             class X {
-              @contains(string, 1)
+              @contains(string, {}, 1)
               title;
             }
           `,
@@ -478,7 +478,9 @@ module('@core | compiler-basics', function (hooks) {
         await builder.getCompiledCard(cardURL(card));
       } catch (err) {
         assert.ok(
-          /contains decorator accepts exactly one argument/.test(err.message),
+          /contains decorator can only have between 1 and 2 arguments/.test(
+            err.message
+          ),
           err.message
         );
       }

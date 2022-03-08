@@ -1,12 +1,12 @@
 import Web3 from 'web3';
-import RewardSafeDelegateABI from '../../contracts/abi/v0.8.7/reward-safe-delegate-implementation';
-import RewardManagerABI from '../../contracts/abi/v0.8.7/reward-manager';
+import RewardSafeDelegateABI from '../../contracts/abi/v0.9.0/reward-safe-delegate-implementation';
+import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import {
   EventABI,
   getParamsFromEvent,
@@ -54,19 +54,21 @@ export default class RewardManager {
 
   constructor(private layer2Web3: Web3) {}
 
-  async registerRewardProgram(txnHash: string): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
+  async registerRewardProgram(
+    txnHash: string
+  ): Promise<{ rewardProgramId: string; txReceipt: SuccessfulTransactionReceipt }>;
   async registerRewardProgram(
     prepaidCardAddress: string,
     admin: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
+  ): Promise<{ rewardProgramId: string; txReceipt: SuccessfulTransactionReceipt }>;
   async registerRewardProgram(
     prepaidCardAddressOrTxnHash: string,
     admin?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }> {
+  ): Promise<{ rewardProgramId: string; txReceipt: SuccessfulTransactionReceipt }> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardProgramId = await rewardManager.newRewardProgramId();
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
@@ -142,19 +144,19 @@ export default class RewardManager {
     };
   }
 
-  async registerRewardee(txnHash: string): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }>;
+  async registerRewardee(txnHash: string): Promise<{ rewardSafe: string; txReceipt: SuccessfulTransactionReceipt }>;
   async registerRewardee(
     prepaidCardAddress: string,
     rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }>;
+  ): Promise<{ rewardSafe: string; txReceipt: SuccessfulTransactionReceipt }>;
   async registerRewardee(
     prepaidCardAddressOrTxnHash: string,
     rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }> {
+  ): Promise<{ rewardSafe: string; txReceipt: SuccessfulTransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
@@ -208,19 +210,19 @@ export default class RewardManager {
     };
   }
 
-  async lockRewardProgram(txnHash: string): Promise<TransactionReceipt>;
+  async lockRewardProgram(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async lockRewardProgram(
     prepaidCardAddress: string,
     rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async lockRewardProgram(
     prepaidCardAddressOrTxnHash: string,
     rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -269,21 +271,21 @@ export default class RewardManager {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async updateRewardProgramAdmin(txnHash: string): Promise<TransactionReceipt>;
+  async updateRewardProgramAdmin(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async updateRewardProgramAdmin(
     prepaidCardAddress: string,
     rewardProgramId: string,
     newAdmin: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async updateRewardProgramAdmin(
     prepaidCardAddressOrTxnHash: string,
     rewardProgramId?: string,
     newAdmin?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -341,21 +343,21 @@ export default class RewardManager {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async addRewardRule(txnHash: string): Promise<TransactionReceipt>;
+  async addRewardRule(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addRewardRule(
     prepaidCardAddress: string,
     rewardProgramId: string,
     blob: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async addRewardRule(
     prepaidCardAddressOrTxnHash: string,
     rewardProgramId?: string,
     blob?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -407,7 +409,7 @@ export default class RewardManager {
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
-  async withdraw(txnHash: string): Promise<TransactionReceipt>;
+  async withdraw(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async withdraw(
     safeAddress: string,
     to: string,
@@ -415,7 +417,7 @@ export default class RewardManager {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async withdraw(
     safeAddressOrTxnHash: string,
     to?: string,
@@ -423,7 +425,7 @@ export default class RewardManager {
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -542,19 +544,19 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
-  async transfer(txnHash: string): Promise<TransactionReceipt>;
+  async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async transfer(
     safeAddress: string,
     newOwner: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async transfer(
     safeAddressOrTxnHash: string,
     newOwner?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);

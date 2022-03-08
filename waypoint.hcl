@@ -194,7 +194,7 @@ app "cardie" {
 
 # This name has been chosen to be much shorter than 32 characters
 # If the name comes close to 32 characters there are unreliable
-# deployments. See 
+# deployments. See
 #  https://github.com/hashicorp/waypoint/issues/2957
 # for more details
 app "cardpay-subg-ext" {
@@ -232,6 +232,51 @@ app "cardpay-subg-ext" {
         }
     }
 }
+
+app "ssr-web" {
+    path = "./packages/ssr-web/deployment"
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "ssr-web-staging"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            service_port = 4000
+            region = "us-east-1"
+            memory = "512"
+            cluster = "ssr-web-staging"
+            count = 2
+            subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+            task_role_name = "ssr-web-staging-ecr-task"
+
+            alb {
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/496043d250eb05f7"
+            }
+        }
+
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
+        }
+
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/fix-listener.mjs", "wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+    }
+}
+
 
 app "reward-submit" {
     path = "./packages/reward-root-submitter"

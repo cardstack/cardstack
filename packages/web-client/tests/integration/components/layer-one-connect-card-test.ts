@@ -16,6 +16,14 @@ const WALLET_SELECTION_SELECTOR = '[data-test-wallet-selection]';
 module('Integration | Component | layer-one-connect-card', function (hooks) {
   setupRenderingTest(hooks);
 
+  hooks.beforeEach(function () {
+    window.ethereum = undefined;
+  });
+
+  hooks.after(function () {
+    window.ethereum = undefined;
+  });
+
   test('It should show a selection UI if layer 1 is not connected', async function (assert) {
     await render(hbs`
         <CardPay::LayerOneConnectCard/>
@@ -25,7 +33,32 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       .dom(HEADER_SELECTOR)
       .containsText(`Connect your ${c.layer1.fullName} wallet`);
 
+    assert
+      .dom('[data-test-wallet-option="wallet-connect"] > input[type="radio"]')
+      .isEnabled();
+    assert.notOk(window.ethereum);
+    // MetaMask is disabled because window.ethereum is not available
+    assert
+      .dom('[data-test-wallet-option="metamask"] > input[type="radio"]')
+      .isDisabled();
+    assert
+      .dom('[data-test-wallet-option="metamask"]')
+      .containsText('MetaMask extension not detected');
+
     assert.dom(WALLET_SELECTION_SELECTOR).isVisible();
+  });
+
+  test('It should enable MetaMask if window.ethereum.isMetaMask is true', async function (assert) {
+    window.ethereum = {};
+    window.ethereum.isMetaMask = true;
+    await render(hbs`
+    <CardPay::LayerOneConnectCard/>
+  `);
+
+    assert.ok(window.ethereum?.isMetaMask);
+    assert
+      .dom('[data-test-wallet-option="metamask"] > input[type="radio"]')
+      .isEnabled();
   });
 
   test('It should show card summary if card is completed and user disconnects the wallet', async function (assert) {
@@ -106,10 +139,11 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     await render(hbs`
         <CardPay::LayerOneConnectCard/>
       `);
-    await click('[data-test-wallet-option="metamask"]');
+
+    await click('[data-test-wallet-option="wallet-connect"]');
     await click(CONNECT_BUTTON_SELECTOR);
 
-    // the card should not be assuming it is connected to metamask before connection is completed
+    // the card should not be assuming it is connected to wallet-connect before connection is completed
     assert
       .dom('[data-test-boxel-action-chin-action-status-area]')
       .containsText('Waiting for you to connect');
@@ -117,11 +151,11 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       .dom(HEADER_SELECTOR)
       .containsText(`Connect your ${c.layer1.fullName} wallet`);
 
-    layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
+    layer1Service.test__simulateAccountsChanged(['address'], 'wallet-connect');
     // waiting for the downstream effects of resolving a promise in test__simulateAccountsChanged
     await settled();
 
-    assert.dom(HEADER_SELECTOR).containsText('MetaMask');
+    assert.dom(HEADER_SELECTOR).containsText('WalletConnect');
     assert.dom(CONNECT_BUTTON_SELECTOR).doesNotExist();
     assert.dom(DISCONNECT_BUTTON_SELECTOR).isVisible();
 

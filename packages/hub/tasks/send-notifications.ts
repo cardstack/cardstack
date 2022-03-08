@@ -1,6 +1,7 @@
 import { inject } from '@cardstack/di';
 import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
+import { query } from '@cardstack/hub/queries';
 
 export interface PushNotificationData {
   /**
@@ -20,7 +21,7 @@ export interface PushNotificationsIdentifiers {
 }
 
 export default class SendNotificationsTask {
-  sentPushNotificationsQueries = inject('sent-push-notifications-queries', { as: 'sentPushNotificationsQueries' });
+  sentPushNotificationsQueries = query('sent-push-notifications', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
   async perform(payload: PushNotificationData, helpers: Helpers) {

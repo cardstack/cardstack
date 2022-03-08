@@ -33,8 +33,9 @@
         type="button"
         {{on 'click' this.showDeleteConfirmation}}
         data-test-delete-workflow-button
+        {{tippy "Abandon workflow"}}
       >
-        {{svg-jar 'trash' width="16" title="Abandon workflow"}}
+        {{svg-jar 'trash' width="16"}}
       </button>
     {{else}}
       <Boxel::ProgressIcon

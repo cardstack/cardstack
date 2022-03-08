@@ -8,7 +8,11 @@ import {
   CardModel,
   assertDocumentDataIsResource,
   assertDocumentDataIsCollection,
-  CardComponentModule,
+  CardService,
+  Card,
+  RawCard,
+  Unsaved,
+  Saved,
 } from '@cardstack/core/src/interfaces';
 import config from 'cardhost/config/environment';
 
@@ -22,14 +26,24 @@ import { cloneDeep } from 'lodash';
 
 const { cardServer } = config as any; // Environment types arent working
 
-export default class Cards extends Service {
+export default class Cards extends Service implements CardService {
   private localRealmURL = LOCAL_REALM;
   overrideRoutingCardWith: string | undefined;
 
-  async load(url: string, format: Format): Promise<CardModel> {
+  async load(_cardURL: string): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+
+  async loadModel(
+    url: string,
+    format: Format,
+    allFields = false
+  ): Promise<CardModel> {
     if (this.inLocalRealm(url)) {
       let builder = await this.builder();
-      return await builder.loadData(url, format);
+      let model = await builder.loadData(url, format, allFields);
+      await model.component();
+      return model;
     }
     let serverResponse = await fetchJSON<JSONAPIDocument>(
       this.buildCardURL({ url, query: { format } })
@@ -38,11 +52,7 @@ export default class Cards extends Service {
     let { data } = serverResponse;
     assertDocumentDataIsResource(data);
 
-    return this.makeCardModelFromResponse(
-      data,
-      await this.codeForCard(data),
-      format
-    );
+    return this.makeCardModelFromResponse(data, format, allFields);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
@@ -54,11 +64,7 @@ export default class Cards extends Service {
       let cardResponse = await fetchJSON<JSONAPIDocument>(url);
       let { data } = cardResponse;
       assertDocumentDataIsResource(data);
-      return this.makeCardModelFromResponse(
-        data,
-        await this.codeForCard(data),
-        'isolated'
-      );
+      return this.makeCardModelFromResponse(data, 'isolated');
     }
   }
 
@@ -74,42 +80,122 @@ export default class Cards extends Service {
 
     return await Promise.all(
       data.map(async (cardResponse) => {
-        return this.makeCardModelFromResponse(
-          cardResponse,
-          await this.codeForCard(cardResponse),
-          format
-        );
+        let model = await this.makeCardModelFromResponse(cardResponse, format);
+        await model.computeData();
+        return model;
       })
     );
+  }
+  async create(_raw: RawCard<Unsaved>): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+  async update(_partialRaw: RawCard): Promise<Card> {
+    throw new Error('unimplemented');
+  }
+
+  async delete(_raw: RawCard): Promise<void> {
+    throw new Error('unimplemented');
+  }
+
+  private async saveModel(
+    card: CardModel,
+    operation: 'create' | 'update'
+  ): Promise<ResourceObject<Saved>> {
+    if (operation === 'create') {
+      return await this.createModel(card);
+    } else {
+      return await this.updateModel(card);
+    }
+  }
+
+  private async createModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let data: ResourceObject<Saved>;
+    if (this.inLocalRealm(card.realm)) {
+      let builder = await this.builder();
+      data = await builder.create(card);
+    } else {
+      data = await this.createRemote(card);
+    }
+    return data;
+  }
+
+  private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
+    let data: ResourceObject<Saved>;
+    if (this.inLocalRealm(card.realm)) {
+      let builder = await this.builder();
+      data = await builder.update(card);
+    } else {
+      data = await this.updateRemote(card);
+    }
+    return data;
   }
 
   private async makeCardModelFromResponse(
     cardResponse: ResourceObject,
-    componentModule: CardComponentModule,
-    format: Format
-  ): Promise<CardModel> {
-    let schemaModuleId = cardResponse.meta?.schemaModule;
-    if (!schemaModuleId) {
+    format: Format,
+    allFields = false
+  ): Promise<CardModelForBrowser> {
+    let schemaModule = cardResponse.meta?.schemaModule;
+    if (!schemaModule) {
       throw new Error(
         `card payload for ${cardResponse.id} has no meta.schemaModule`
       );
     }
-    if (typeof schemaModuleId !== 'string') {
+    if (typeof schemaModule !== 'string') {
       throw new Error(
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
     }
-    let model = new CardModelForBrowser(this, {
-      type: 'loaded',
-      url: cardResponse.id,
-      rawServerResponse: cloneDeep(cardResponse),
-      componentModule,
-      format,
-      schemaModuleId,
-    });
-    // TODO: We need to figure out what to do with async mode.data
+    let { componentModule: componentModuleRef } = cardResponse.meta || {};
+    if (!componentModuleRef || typeof componentModuleRef !== 'string') {
+      throw new Error('Cards component module must be present and a string');
+    }
+    let segments = cardResponse.id.split('/');
+    segments.pop(); // this is not ideal, maybe we can include the realm in our card payload?
+    let realm = segments.join('/');
+    if (!realm) {
+      throw new Error(`card payload for ${cardResponse.id} has no realm`);
+    }
+    let model = new CardModelForBrowser(
+      this,
+      {
+        type: 'loaded',
+        url: cardResponse.id,
+        allFields,
+      },
+      {
+        format,
+        realm: realm as string,
+        schemaModule,
+        rawData: cloneDeep(cardResponse.attributes ?? {}),
+        componentModuleRef,
+        saveModel: this.saveModel.bind(this),
+      }
+    );
+
     await model.computeData();
     return model;
+  }
+
+  private async createRemote(card: CardModel): Promise<ResourceObject<Saved>> {
+    return (
+      await fetchJSON<JSONAPIDocument>(
+        buildNewURL(card.realm, card.parentCardURL),
+        {
+          method: 'POST',
+          body: JSON.stringify({ data: card.serialize() }),
+        }
+      )
+    ).data as ResourceObject<Saved>;
+  }
+
+  private async updateRemote(card: CardModel): Promise<ResourceObject<Saved>> {
+    return (
+      await fetchJSON<JSONAPIDocument>(buildCardURL(card.url), {
+        method: 'PATCH',
+        body: JSON.stringify({ data: card.serialize() }),
+      })
+    ).data as ResourceObject<Saved>;
   }
 
   private inLocalRealm(cardURL: string): boolean {
@@ -129,7 +215,11 @@ export default class Cards extends Service {
     });
     try {
       let { default: Builder } = await import('../lib/builder');
-      let builder = new Builder(this.localRealmURL, this);
+      let builder = new Builder(
+        this.localRealmURL,
+        this,
+        this.saveModel.bind(this)
+      );
       resolve(builder);
       return builder;
     } catch (err) {
@@ -149,17 +239,6 @@ export default class Cards extends Service {
       fullURL.push(buildQueryString(opts.query));
     }
     return fullURL.join('');
-  }
-
-  private async codeForCard(
-    card: ResourceObject
-  ): Promise<CardComponentModule> {
-    let { componentModule } = card.meta || {};
-    if (!componentModule || typeof componentModule !== 'string') {
-      throw new Error('Cards component module must be present and a string');
-    }
-
-    return await this.loadModule<CardComponentModule>(componentModule);
   }
 
   async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
@@ -195,13 +274,26 @@ export default class Cards extends Service {
     ) {
       // module was built by our Builder, so ask Builder for it
       let builder = await this.builder();
-      return await builder.loadModule<T>(moduleIdentifier);
+      return await builder.loadModule(moduleIdentifier);
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`
       );
     }
   }
+}
+
+function buildNewURL(realm: string, parentCardURL: string): string {
+  return [
+    cardServer,
+    'cards/',
+    encodeURIComponent(realm) + '/',
+    encodeURIComponent(parentCardURL),
+  ].join('');
+}
+
+function buildCardURL(url: string): string {
+  return `${cardServer}cards/${encodeURIComponent(url)}`;
 }
 
 declare module '@ember/service' {

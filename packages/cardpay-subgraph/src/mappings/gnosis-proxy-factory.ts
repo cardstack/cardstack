@@ -1,16 +1,15 @@
-import { ProxyCreation } from '../../generated/Gnosis/GnosisProxyFactory';
-import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
+import { GnosisSafe } from '../../generated/Gnosis_v1_3/GnosisSafe';
 import { GnosisSafe as GnosisSafeTemplate } from '../../generated/templates';
 import { Safe, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress, makeAccount } from '../utils';
-import { log } from '@graphprotocol/graph-ts';
+import { Address, ethereum, log } from '@graphprotocol/graph-ts';
 
-export function handleProxyCreation(event: ProxyCreation): void {
-  let safeAddress = toChecksumAddress(event.params.proxy);
+export function processGnosisProxyEvent(proxyAddress: Address, event: ethereum.Event, gnosisVer: string): void {
+  let safeAddress = toChecksumAddress(proxyAddress);
   let safeEntity = new Safe(safeAddress);
   safeEntity.createdAt = event.block.timestamp;
 
-  let safe = GnosisSafe.bind(event.params.proxy);
+  let safe = GnosisSafe.bind(proxyAddress);
   let owners = safe.getOwners();
 
   for (let i = 0; i < owners.length; i++) {
@@ -26,7 +25,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.save();
   }
   safeEntity.save();
-  log.debug('created safe entity {}', [safeAddress]);
+  log.debug('created gnosis v{} safe entity {}', [gnosisVer, safeAddress]);
 
-  GnosisSafeTemplate.create(event.params.proxy);
+  GnosisSafeTemplate.create(proxyAddress);
 }

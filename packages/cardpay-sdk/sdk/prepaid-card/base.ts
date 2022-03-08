@@ -4,8 +4,8 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.7/prepaid-card-manager';
-import DAIOracleABI from '../../contracts/abi/v0.8.7/chainlink-feed-adapter';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
+import DAIOracleABI from '../../contracts/abi/v0.9.0/chainlink-feed-adapter';
 import { getAddress, getOracle } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -27,8 +27,9 @@ import {
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
-import { TransactionReceipt } from 'web3-core';
+import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { itemSetEventABI } from '../prepaid-card-market/base';
+import { TransactionReceipt } from 'web3-core';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -88,21 +89,21 @@ export default class PrepaidCard {
     return { min: parseInt(min.toString()), max: MAXIMUM_PAYMENT_AMOUNT };
   }
 
-  async payMerchant(txnHash: string): Promise<TransactionReceipt>;
+  async payMerchant(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async payMerchant(
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async payMerchant(
     merchantSafeOrTxnHash: string,
     prepaidCardAddress?: string,
     spendAmount?: number,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(merchantSafeOrTxnHash)) {
       let txnHash = merchantSafeOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -165,19 +166,19 @@ export default class PrepaidCard {
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
-  async transfer(txnHash: string): Promise<TransactionReceipt>;
+  async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<SuccessfulTransactionReceipt>;
   async transfer(
     prepaidCardAddressOrTxnHash: string,
     newOwner?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -259,7 +260,7 @@ export default class PrepaidCard {
 
   async split(
     txnHash: string
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }>;
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: SuccessfulTransactionReceipt }>;
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
@@ -267,7 +268,7 @@ export default class PrepaidCard {
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }>;
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: SuccessfulTransactionReceipt }>;
   async split(
     prepaidCardAddressOrTxnHash: string,
     faceValues?: number[],
@@ -275,7 +276,7 @@ export default class PrepaidCard {
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: SuccessfulTransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       let txReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
@@ -378,7 +379,7 @@ export default class PrepaidCard {
     };
   }
 
-  async create(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
+  async create(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: SuccessfulTransactionReceipt }>;
   async create(
     safeAddress: string,
     tokenAddress: string,
@@ -388,7 +389,7 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions,
     force?: boolean // force a prepaid card to be created when DAI Oracle is not snapped to USD rate
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: SuccessfulTransactionReceipt }>;
   async create(
     safeAddressOrTxnHash: string,
     tokenAddress?: string,
@@ -398,7 +399,7 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions,
     force?: boolean // force a prepaid card to be created when DAI Oracle is not snapped to USD rate
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: SuccessfulTransactionReceipt }> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return {
@@ -604,6 +605,8 @@ export default class PrepaidCard {
     );
   }
 
+  // allow TransactionReceipt as argument
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private async getSkuFromTxnReceipt(txnReceipt: TransactionReceipt): Promise<string> {
     // this assumes the default prepaid card market address, once we have
     // multiple prepaid card markets we should refactor this
