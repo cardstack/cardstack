@@ -3,7 +3,7 @@
 import Component from '@glimmer/component';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
-// import UA from '@cardstack/web-client/services/ua';
+import UA from '@cardstack/web-client/services/ua';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -23,7 +23,7 @@ const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60; //@*!
 export default class AuthComponent extends Component {
   @service declare layer2Network: Layer2Network; //@*!
   @service('hub-authentication') declare hubAuthentication: HubAuthentication; //@*!
-  // @service declare ua: UA; //@*!
+  @service('ua') declare UAService: UA; //@*!
   @tracked hubError: '' | 'AUTH_TIMEOUT' | 'ERROR' = '';
 
   AUTH_STEPS = AUTH_STEPS;
@@ -42,6 +42,10 @@ export default class AuthComponent extends Component {
     } else {
       return this.AUTH_STEPS.DONE;
     }
+  }
+
+  get canDeepLink() {
+    return this.UAService.isIOS() || this.UAService.isAndroid();
   }
 
   get walletConnectUri() {

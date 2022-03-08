@@ -5,6 +5,14 @@
         @description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, suscipit!"
         {{did-insert this.resetHubAuthState}}
       >
+      {{#if this.canDeepLink}}
+        <Boxel::Button
+          @as="anchor"
+          @href={{concat "cardwallet://wc?uri=" this.walletConnectUri}}
+        >
+          Connect
+        </Boxel::Button>
+      {{else}}
         <Boxel::StyledQrCode
           @data={{this.walletConnectUri}}
           {{!-- @image={{@logo}} --}}
@@ -17,6 +25,7 @@
           @cornerSquareType="extra-rounded"
           @imageMargin={{5}}
         />
+      {{/if}}
       </Auth::Step>
     {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
       <Auth::Step
