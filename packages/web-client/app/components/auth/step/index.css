@@ -2,3 +2,12 @@
   color: black;
   text-align: center;
 }
+
+.auth-step__header {
+  font: var(--boxel-font-lg);
+  font-weight: 600;
+}
+
+.auth-step__description {
+  font: var(--boxel-font);
+}

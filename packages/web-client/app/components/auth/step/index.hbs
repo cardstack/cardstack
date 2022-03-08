@@ -2,12 +2,16 @@
   class="auth-step"
   ...attributes
 >
-  <header>
-    {{@header}}
-  </header>
-  <div>
-    {{@description}}
-  </div>
+  {{#if @header}}
+    <header class="auth-step__header">
+      {{@header}}
+    </header>
+  {{/if}}
+  {{#if @description}}
+    <div class="auth-step__description">
+      {{@description}}
+    </div>
+  {{/if}}
   <div>
     {{yield}}
   </div>
