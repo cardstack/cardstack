@@ -50,7 +50,7 @@ export interface ExportMeta {
 
 export interface FileMeta {
   exports?: ExportMeta[];
-  fields?: FieldsMeta;
+  fields: FieldsMeta;
   parent?: ParentMeta;
 }
 
@@ -59,7 +59,9 @@ const metas = new WeakMap<State['opts'], FileMeta>();
 function getMeta(obj: State['opts']): FileMeta {
   let meta = metas.get(obj);
   if (!meta) {
-    return {};
+    return {
+      fields: {},
+    };
   }
   return meta;
 }
@@ -167,7 +169,7 @@ function storeDecoratorMeta(key: State['opts'], path: NodePath<t.ImportDeclarati
   }
 
   let meta = getMeta(key);
-  meta.fields = fields;
+  meta.fields = { ...meta.fields, ...fields };
   meta.parent = parent;
   metas.set(key, meta);
 }

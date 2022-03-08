@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
-import cardSchemaTransformPlugin from './babel-plugin-card-schema-transform';
+import cardSchemaTransformPlugin, { Options } from './babel-plugin-card-schema-transform';
 import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
@@ -69,18 +69,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   async compile(): Promise<CompiledCard<Identity, ModuleRef>> {
     let { cardSource } = this;
-    let fields: CompiledCard['fields'] = {};
 
     let originalModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(originalModules);
-
-    if (this.cardSource.schema) {
-      let schemaSource = this.getSourceModule(originalModules, this.cardSource.schema);
-      fields = await this.lookupFieldsForCard(schemaSource);
-      this.outputModules[this.cardSource.schema] = this.prepareSchema(schemaSource, fields, parentCard);
-    }
-
-    fields = this.adoptFields(fields, parentCard);
+    let fields = await this.lookupFieldsForCard(originalModules, parentCard);
 
     if (cardSource.data) {
       let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
@@ -99,6 +91,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
 
       switch (localPath) {
+        case cardSource.schema:
+          this.outputModules[localPath] = await this.prepareSchema(mod, fields, parentCard);
+          break;
         case cardSource.serializer:
           this.outputModules[localPath] = await this.prepareSerializer(localPath, originalModules, parentCard);
           break;
@@ -111,7 +106,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
-      schemaModule: this.getSchemaModulePath(parentCard, cardSource.schema),
+      schemaModule: this.getSchemaModuleRef(parentCard, cardSource.schema),
       serializerModule: this.getSerializerModuleRef(parentCard, cardSource.serializer),
       fields,
       adoptsFrom: parentCard,
@@ -176,7 +171,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private async getParentCard(originalModules: OriginalModules): Promise<CompiledCard> {
+  private async getParentCard(originalModules: OriginalModules): Promise<CompiledCard | undefined> {
+    if (isBaseCard(this.cardSource)) {
+      return undefined;
+    }
+
     let localSchema: JSSourceModule | undefined;
     if (this.cardSource.schema) {
       localSchema = this.getSourceModule(originalModules, this.cardSource.schema);
@@ -233,13 +232,18 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return module;
   }
 
-  private prepareSchema(schemaModule: JSSourceModule, fields: CompiledCard['fields'], parent: CompiledCard) {
+  private prepareSchema(
+    schemaModule: JSSourceModule,
+    fields: CompiledCard['fields'],
+    parent: CompiledCard | undefined
+  ) {
     let { source, ast, meta } = schemaModule;
     let out: BabelFileResult;
+    let opts: Options = { meta, fields, parent };
     try {
       out = transformFromAstSync(ast, source, {
         ast: true,
-        plugins: [[cardSchemaTransformPlugin, { meta, fields, parent }]],
+        plugins: [[cardSchemaTransformPlugin, opts]],
       })!;
     } catch (error: any) {
       throw augmentBadRequest(error);
@@ -251,39 +255,42 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
   }
 
-  private async lookupFieldsForCard(localSchema: JSSourceModule): Promise<CompiledCard['fields']> {
-    let { realm } = this.cardSource;
-    let metaFields = localSchema.meta.fields;
-
-    if (!metaFields) {
-      return {};
-    }
+  private async lookupFieldsForCard(
+    originalModules: OriginalModules,
+    parentCard: CompiledCard | undefined
+  ): Promise<CompiledCard['fields']> {
+    let { realm, schema } = this.cardSource;
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
-      let fieldURL = resolveCard(cardURL, realm);
-      try {
-        fields[name] = {
-          card: await this.builder.getCompiledCard(fieldURL),
-          type,
-          name,
-          computed,
-        };
-      } catch (err: any) {
-        if (!err.isCardstackError || err.status !== 404) {
-          throw err;
+    if (schema) {
+      let metaFields = this.getSourceModule(originalModules, schema).meta.fields;
+      for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
+        let fieldURL = resolveCard(cardURL, realm);
+        try {
+          fields[name] = {
+            card: await this.builder.getCompiledCard(fieldURL),
+            type,
+            name,
+            computed,
+          };
+        } catch (err: any) {
+          if (!err.isCardstackError || err.status !== 404) {
+            throw err;
+          }
+          let newErr = new CardstackError(`tried to lookup field '${name}' but it failed to load`, {
+            status: 422,
+          });
+          newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
+          throw newErr;
         }
-        let newErr = new CardstackError(`tried to lookup field '${name}' but it failed to load`, {
-          status: 422,
-        });
-        newErr.additionalErrors = [err, ...(err.additionalErrors || [])];
-        throw newErr;
       }
     }
-
-    return fields;
+    return this.adoptFields(fields, parentCard);
   }
 
-  private adoptFields(fields: CompiledCard['fields'], parentCard: CompiledCard): CompiledCard['fields'] {
+  private adoptFields(fields: CompiledCard['fields'], parentCard: CompiledCard | undefined): CompiledCard['fields'] {
+    if (!parentCard) {
+      return fields;
+    }
     let cardFieldNames = Object.keys(fields);
     let parentFieldNames = Object.keys(parentCard.fields);
     let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
@@ -457,7 +464,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
   }
 
-  private getSchemaModulePath(parentCard: CompiledCard | undefined, schemaPath: string | undefined): ModuleRef {
+  private getSchemaModuleRef(parentCard: CompiledCard | undefined, schemaPath: string | undefined): ModuleRef {
     if (isBaseCard(this.cardSource)) {
       return { global: 'todo' };
     } else if (schemaPath) {
