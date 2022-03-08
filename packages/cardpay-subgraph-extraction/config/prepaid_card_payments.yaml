@@ -25,7 +25,7 @@ base: &base
         - 524288
         - 32768
         - 1024
-  version: 0.0.2
+  version: 0.0.3
 
 staging:
   <<: *base
