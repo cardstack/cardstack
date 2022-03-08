@@ -1,7 +1,7 @@
 <div>
   {{#if (eq this.currentStep this.AUTH_STEPS.WALLET_CONNECT)}}
       <Auth::Step
-        @header="1. Connect your wallet"
+        @header="Connect your wallet"
         @description="Use your unique blockchain address to verify your identity"
         {{did-insert this.resetHubAuthState}}
       >
@@ -29,7 +29,7 @@
       </Auth::Step>
     {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
       <Auth::Step
-        @header="2. Authenticate with hub"
+        @header="Authenticate with hub"
         @description="Authenticate to access and modify off-chain data for your account."
       >
         <Boxel::Button
@@ -57,8 +57,7 @@
       </Auth::Step>
     {{else if (eq this.currentStep this.AUTH_STEPS.LOADING)}}
       <Auth::Step
-        @header="Loading"
-        @description="Checking your current authentication status"
+        @header="Checking your authentication status"
       >
         <Boxel::LoadingIndicator/>
       </Auth::Step>
