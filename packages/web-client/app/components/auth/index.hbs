@@ -2,7 +2,7 @@
   {{#if (eq this.currentStep this.AUTH_STEPS.WALLET_CONNECT)}}
       <Auth::Step
         @header="1. Connect your wallet"
-        @description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, suscipit!"
+        @description="Use your unique blockchain address to verify your identity"
         {{did-insert this.resetHubAuthState}}
       >
       {{#if this.canDeepLink}}
@@ -30,7 +30,7 @@
     {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
       <Auth::Step
         @header="2. Authenticate with hub"
-        @description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, suscipit!"
+        @description="Authenticate to access and modify off-chain data for your account."
       >
         <Boxel::Button
           @kind="primary"
