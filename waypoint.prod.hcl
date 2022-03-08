@@ -284,8 +284,8 @@ app "reward-submit" {
             execution_role_name = "reward-root-submitter-ecr-task-executor-role"
             disable_alb = true
             secrets = {
-                OWNER = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
-                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
+                OWNER = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
+                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
             }
         }
     }
