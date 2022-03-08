@@ -46,7 +46,7 @@ def view_multiple(core_parameters):
             cached_df.append(df)
 
     df = program.aggregate(cached_df)
-    payment_list = program.df_to_payment_list(df)
+    payment_list = program.df_to_payment_list(df, end_block)
     multiple_df = pd.DataFrame(payments)
     amount_each_cycle = (
         alt.Chart(multiple_df)
@@ -74,8 +74,9 @@ def view_multiple(core_parameters):
 def view_single(core_parameters):
     program = weighted_usage(core_parameters)
     block = slider_partition(type="one_end")
-    df = program.run(block, block + program.payment_cycle_length)
-    payment_list = program.df_to_payment_list(df)
+    end_block = block + program.payment_cycle_length
+    df = program.run(block, end_block)
+    payment_list = program.df_to_payment_list(df, end_block)
 
     altair_chart = (
         alt.Chart(df)

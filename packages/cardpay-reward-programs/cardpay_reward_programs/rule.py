@@ -49,7 +49,7 @@ class Rule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def df_to_payment_list(self, df):
+    def df_to_payment_list(self, df, payment_cycle, reward_program_id):
         raise NotImplementedError
 
     @staticmethod

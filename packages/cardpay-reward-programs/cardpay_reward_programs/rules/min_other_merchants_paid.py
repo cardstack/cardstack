@@ -31,11 +31,12 @@ class MinOtherMerchantsPaid(Rule):
         where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer and merchant != payee 
         """
 
-    def df_to_payment_list(self, df, reward_program_id="0x"):
+    def df_to_payment_list(self, df, payment_cycle=1, reward_program_id="0x"):
         if df.empty:
             return default_payment_list
         new_df = df.copy().groupby("payee").agg({"merchant": "nunique"}).reset_index()
         new_df["rewardProgramID"] = reward_program_id
+        new_df["paymentCycle"] = payment_cycle
         new_df["validFrom"] = self.end_block
         new_df["validTo"] = self.end_block + self.duration
         new_df["token"] = self.token

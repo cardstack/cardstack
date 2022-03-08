@@ -38,14 +38,15 @@ def view_multiple(core_parameters):
         if not df.empty:
             cached_df.append(df)
     df = program.aggregate(cached_df)
-    payment_list = program.df_to_payment_list(df)
+    payment_list = program.df_to_payment_list(df, end_block)
     return payment_list, df, program.get_summary(payment_list)
 
 
 def view_single(core_parameters):
     program = min_other_merchants_paid(core_parameters)
     block = slider_partition(type="one_end")
-    df = program.run(block, block + program.payment_cycle_length)
-    payment_list = program.df_to_payment_list(df)
+    end_block = block + program.payment_cycle_length
+    df = program.run(block, end_block)
+    payment_list = program.df_to_payment_list(df, end_block)
 
     return payment_list, df, program.get_summary(payment_list)
