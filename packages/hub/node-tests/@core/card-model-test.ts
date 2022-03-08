@@ -203,7 +203,7 @@ if (process.env.COMPILER) {
       // do we want to also include the meta.componentModule in this state?
     });
 
-    it(`returns reasonable error when userland field code throws`, async function () {
+    it(`can recover from error in userland field code`, async function () {
       await cards.create({
         id: 'boom',
         realm: realmURL,
@@ -213,16 +213,23 @@ if (process.env.COMPILER) {
             import { contains } from '@cardstack/types';
             import string from 'https://cardstack.com/base/string';
             export default class Boom {
+              @contains(string) willBoom;
               @contains(string)
               get boom() {
-                throw new Error('boom');
+                if (this.willBoom === 'true') {
+                  throw new Error('boom');
+                } else {
+                  return 'no boom';
+                }
               }
             }
           `,
         },
       });
+
+      let model = await cards.loadModel(`${realmURL}boom`, 'isolated');
       try {
-        await cards.loadModel(`${realmURL}boom`, 'isolated');
+        await model.setData({ willBoom: 'true' });
         throw new Error('failed to throw expected exception');
       } catch (err: any) {
         expect(err.message).to.eq(`Could not load field 'boom' for card ${realmURL}boom`);
@@ -230,6 +237,8 @@ if (process.env.COMPILER) {
         let innerError = err.additionalErrors?.[0];
         expect(innerError?.message).to.eq(`boom`);
       }
+      await model.setData({ willBoom: 'false' });
+      expect(await model.getField('boom')).to.eq('no boom');
     });
   });
 }
