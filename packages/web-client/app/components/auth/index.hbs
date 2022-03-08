@@ -40,9 +40,7 @@
         </Boxel::Button>
 
         {{#if (eq this.hubError "AUTH_TIMEOUT")}}
-          <span>
-            Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
-          </span>
+          Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{else if this.hubError}}
           Authentication failed or was canceled.
         {{/if}}
