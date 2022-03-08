@@ -101,40 +101,49 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined
   ) {
-    let outputModules: CompiledCard<Unsaved, LocalRef>['modules'] = {};
-    for (let [localPath, mod] of Object.entries(originalModules)) {
-      outputModules[localPath] = await this.transformFile(localPath, mod, fields, parentCard, originalModules);
-    }
-    return outputModules;
+    return Object.assign(
+      {},
+      ...Object.entries(originalModules).map(([localPath, mod]) =>
+        this.transformFile(localPath, mod, fields, parentCard, originalModules)
+      )
+    );
   }
 
-  private async transformFile(
+  private transformFile(
     localPath: string,
     mod: JSSourceModule | AssetModule,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined,
     originalModules: OriginalModules
-  ) {
+  ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let { cardSource } = this;
     if (mod.type === 'asset') {
       return {
-        type: mod.mimeType,
-        source: mod.source,
+        [localPath]: {
+          type: mod.mimeType,
+          source: mod.source,
+        },
       };
     }
     switch (localPath) {
       case cardSource.schema:
-        return await this.prepareSchema(mod, fields, parentCard);
+        return {
+          [localPath]: this.prepareSchema(mod, fields, parentCard),
+        };
       case cardSource.serializer:
-        return await this.prepareSerializer(localPath, originalModules, parentCard);
+        return {
+          [localPath]: this.prepareSerializer(localPath, originalModules, parentCard),
+        };
       case cardSource.isolated:
       case cardSource.embedded:
       case cardSource.edit:
       default:
         return {
-          type: JS_TYPE,
-          source: mod.source,
-          ast: mod.ast,
+          [localPath]: {
+            type: JS_TYPE,
+            source: mod.source,
+            ast: mod.ast,
+          },
         };
     }
   }
@@ -463,7 +472,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return componentInfo;
   }
 
-  private async prepareSerializer(
+  private prepareSerializer(
     serializerPath: string,
     originalModules: OriginalModules,
     parentCard: CompiledCard | undefined
