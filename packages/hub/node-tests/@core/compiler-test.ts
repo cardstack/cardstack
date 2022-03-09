@@ -180,6 +180,23 @@ if (process.env.COMPILER) {
         expect(embedded.usedFields, 'Embedded usedFields').to.deep.equal(['name', 'birthdate']);
         expect(edit.usedFields, 'Edit Fields').to.deep.equal(['name', 'birthdate']);
       });
+
+      it('supports reusing the same component for different views', async function () {
+        let card = await cards.create({
+          realm,
+          adoptsFrom: '../person',
+          id: 'big-person',
+          embedded: 'isolated.js',
+          isolated: 'isolated.js',
+          files: {
+            'isolated.js': templateOnlyComponentTemplate(
+              `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
+            ),
+          },
+        });
+
+        expect(card.compiled.componentInfos.embedded).to.deep.equal(card.compiled.componentInfos.isolated);
+      });
     });
 
     it('handles complex component adoptions', async function () {

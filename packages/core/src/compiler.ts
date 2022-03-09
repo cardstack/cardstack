@@ -15,6 +15,7 @@ import transformCardComponent, {
 import {
   Builder,
   CardId,
+  CardModules,
   CompiledCard,
   ComponentInfo,
   Format,
@@ -79,9 +80,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let fields = await this.lookupFieldsForCard(inputModules, parentCard);
     this.assertData(fields);
     let outputModules = await this.transformFiles(inputModules, recompiledComponents, fields, parentCard);
-    let { componentInfos } = this;
-    Object.assign(componentInfos, reusedComponents);
-    assertAllComponentInfos(componentInfos);
+    let componentInfos = this.buildComponentInfos(reusedComponents);
+
     return {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
@@ -140,6 +140,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return { modules, recompiledComponents, reusedComponents };
   }
 
+  buildComponentInfos(reusedComponents: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<GlobalRef>>>) {
+    let { componentInfos } = this;
+    Object.assign(componentInfos, reusedComponents);
+    assertAllComponentInfos(componentInfos);
+
+    return componentInfos;
+  }
+
   private async transformFiles(
     inputModules: InputModules,
     recompiledComponents: Record<string, string>,
@@ -170,22 +178,31 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         },
       };
     }
+
     if (localPath === cardSource.schema) {
       return {
         [localPath]: this.prepareSchema(mod, fields, parentCard),
       };
     }
+
     if (localPath === cardSource.serializer) {
       return {
         [localPath]: this.prepareSerializer(localPath, mod, parentCard),
       };
     }
-    let format = this.isComponentFile(localPath, recompiledComponents);
-    if (format) {
-      let { componentInfo, modules } = this.compileComponent(mod, fields, format);
-      this.componentInfos[format] = componentInfo;
-      return modules;
+
+    let formats = this.isComponentFile(localPath, recompiledComponents);
+    if (formats) {
+      let formatsMod: CardModules[] = [];
+      // The same component file can be used for multiple views
+      for (const format of formats) {
+        let { componentInfo, modules } = this.compileComponent(mod, fields, format);
+        this.componentInfos[format] = componentInfo;
+        formatsMod.push(modules);
+      }
+      return Object.assign({}, ...formatsMod);
     }
+
     return {
       [localPath]: {
         type: JS_TYPE,
@@ -195,13 +212,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     };
   }
 
-  private isComponentFile(localPath: string, recompiledComponents: Record<string, string>): Format | undefined {
+  private isComponentFile(localPath: string, recompiledComponents: Record<string, string>): Format[] | undefined {
+    let formats: Format[] = [];
     for (let format of FORMATS) {
       if (localPath === this.cardSource[format] || localPath === recompiledComponents[format]) {
-        return format;
+        formats.push(format);
       }
     }
-    return undefined;
+    return formats.length ? formats : undefined;
   }
 
   private analyzeFiles() {
