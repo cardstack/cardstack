@@ -13,7 +13,7 @@ start_block=1
 end_block=10
 payment_cycle_length=2
 
-rule.run(1,3) #checking "which merchant receives > 100 spend" 1< block <=3 
+rule.run(1,3) #checking "which merchant receives > 100 spend" for 1< block <=3 
 rule.run(3,5) 
 rule.run(5,7)
 rule.run(7,9)
