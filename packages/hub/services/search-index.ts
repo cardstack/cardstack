@@ -312,13 +312,12 @@ class IndexerRun implements IndexerHandle {
       return compiledCard;
     }
     log.trace('Writing card to index', url);
-    let data = rawCard.data ? await dataWithComputeds(rawCard.data, compiledCard, cardModel) : null;
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
       realm: param(this.realmURL),
       generation: param(this.generation || null),
       ancestors: param(ancestorsOf(compiledCard)),
-      data: param(data),
+      data: param(rawCard.data ?? null),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
       searchData: param(searchData),
@@ -362,7 +361,6 @@ class IndexerRun implements IndexerHandle {
     }
 
     let expression: Expression;
-    let data = rawCard.data ? await dataWithComputeds(rawCard.data, compiled, cardModel) : null;
     if (isNew) {
       if (!deps) {
         throw new Error('This should never happen');
@@ -375,7 +373,7 @@ class IndexerRun implements IndexerHandle {
             param(this.realmURL),
             param(this.generation || null),
             param(ancestorsOf(compiled)),
-            param(data),
+            param(rawCard.data ?? null),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
             param(searchData),
@@ -393,7 +391,7 @@ class IndexerRun implements IndexerHandle {
         'UPDATE cards SET generation =',
         param(this.generation || null),
         ', data =',
-        param(data),
+        param(rawCard.data ?? null),
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
@@ -469,7 +467,11 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
 
 // TODO consider using the compiler to return a function that can be used to
 // generate these values for a card
-function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
+async function searchOptimizedData(
+  data: Record<string, any>,
+  compiled: CompiledCard,
+  cardModel: CardModel
+): Promise<Record<string, any>> {
   let result: Record<string, any> = {};
 
   for (let fieldName of Object.keys(compiled.fields)) {
@@ -494,22 +496,6 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
     } while (currentCard && currentCard.fields[fieldName]);
   }
 
-  return result;
-}
-
-async function dataWithComputeds(
-  data: Record<string, any>,
-  compiled: CompiledCard,
-  cardModel: CardModel
-): Promise<Record<string, any>> {
-  let result: Record<string, any> = {};
-  for (let fieldName of Object.keys(compiled.fields)) {
-    if (compiled.fields[fieldName].computed) {
-      result[fieldName] = await cardModel.getField(fieldName);
-    } else {
-      result[fieldName] = data[fieldName];
-    }
-  }
   return result;
 }
 
