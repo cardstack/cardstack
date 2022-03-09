@@ -124,6 +124,8 @@ if (process.env.COMPILER) {
         title: 'Hello World',
         body: 'First post.',
         favoriteColor: 'blue',
+        createdAt: null,
+        extra: null,
         author: {
           name: 'Emily',
           bestFriend: {

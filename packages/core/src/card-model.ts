@@ -22,7 +22,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
-import { getFieldValue } from '@cardstack/core/src/utils/fields';
+import { getFieldValue, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
 import { BadRequest, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
@@ -92,7 +92,7 @@ export default abstract class CardModel implements CardModelInterface {
       {
         realm,
         format: this.format,
-        rawData: {},
+        rawData: makeEmptyCardData(this.allFields),
         saveModel: this.saveModel,
         schemaModule: this.schemaModule,
         componentMeta: this.componentMeta,
@@ -154,7 +154,7 @@ export default abstract class CardModel implements CardModelInterface {
     }
 
     if (this.state.type === 'created') {
-      return serializeCardAsResource(url, this.shapeData('used-fields'), this.serializerMap);
+      return serializeCardAsResource(url, this.shapeData('all-fields'), this.serializerMap);
     }
 
     let resource = serializeCardAsResource(
@@ -201,7 +201,11 @@ export default abstract class CardModel implements CardModelInterface {
       );
     }
 
-    this.rawData = merge({}, this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
+    this.rawData = merge(
+      makeEmptyCardData(this.allFields),
+      this.rawData,
+      serializeAttributes(data, this.serializerMap, 'serialize')
+    );
     await this.recompute();
   }
 
@@ -236,7 +240,11 @@ export default abstract class CardModel implements CardModelInterface {
       try {
         await this.getField(field, newSchemaInstance);
       } catch (err: any) {
-        let newError = new UnprocessableEntity(`Could not load field '${field}' for card ${this.url}`);
+        let newError = new UnprocessableEntity(
+          `Could not load field '${field}' for ${
+            this.state.type === 'loaded' ? 'card ' + this.url : 'new card of type ' + this.parentCardURL
+          }`
+        );
         newError.additionalErrors = [err, ...(err.additionalErrors || [])];
         throw newError;
       }
@@ -278,8 +286,12 @@ export default abstract class CardModel implements CardModelInterface {
   }
 
   private getRawField(fieldPath: string): any {
-    let value = get(this.rawData, fieldPath);
-    return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
+    let result = keySensitiveGet(this.rawData, fieldPath);
+    if ('missing' in result) {
+      throw new Error(`TODO: ${result.missing}`);
+    } else {
+      return serializeField(this.serializerMap, fieldPath, result.value, 'deserialize');
+    }
   }
 
   private async schemaClass() {
@@ -343,6 +355,23 @@ export default abstract class CardModel implements CardModelInterface {
     }
     return nonExistentFields;
   }
+}
+
+// access a potentially-deep property path, stopping if a key is missing along
+// the way
+export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
+  let segments = path.split('.');
+  let current: any = obj;
+  let segment: string | undefined;
+  let completed: string[] = [];
+  while ((segment = segments.shift())) {
+    if (!(segment in current)) {
+      return { missing: [...completed, segment].join('.') };
+    }
+    current = current?.[segment];
+    completed.push(segment);
+  }
+  return { value: current };
 }
 
 function assertNever(value: never) {

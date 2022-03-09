@@ -16,8 +16,13 @@ export function serializeField(
   value: any,
   action: 'serialize' | 'deserialize'
 ) {
-  if (!value) {
+  // missing field
+  if (value === undefined) {
     return;
+  }
+  // empty field
+  if (value === null) {
+    return null;
   }
   let serializer = get(serializerMap, fieldPath);
   if (serializer) {

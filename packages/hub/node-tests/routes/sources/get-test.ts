@@ -70,7 +70,12 @@ if (process.env.COMPILER) {
         edit: null,
         serializer: null,
         adoptsFrom: null,
-        data: null,
+        data: {
+          body: null,
+          extra: null,
+          title: null,
+          createdAt: null,
+        },
         realm: realmURL,
         id: 'post',
       });
@@ -89,7 +94,12 @@ if (process.env.COMPILER) {
         edit: null,
         serializer: null,
         adoptsFrom: '../post',
-        data: { title: 'Hello World', body: 'First post.' },
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
+          createdAt: null,
+          extra: null,
+        },
         realm: realmURL,
         id: 'post0',
       });

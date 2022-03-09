@@ -12,6 +12,7 @@ import {
   CardModelArgs,
 } from '@cardstack/core/src/interfaces';
 import type { types as t } from '@babel/core';
+import merge from 'lodash/merge';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { fetchJSON } from './jsonapi-fetch';
 import config from 'cardhost/config/environment';
@@ -24,6 +25,10 @@ import dynamicCardTransform from './dynamic-card-transform';
 import { cardURL, encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 import CardModelForBrowser from './card-model-for-browser';
+import {
+  fieldsAsList,
+  makeEmptyCardData,
+} from '@cardstack/core/src/utils/fields';
 
 export const LOCAL_REALM = 'https://cardstack.local/';
 export const DEMO_REALM = 'https://demo.com/';
@@ -104,7 +109,10 @@ export default class LocalRealm implements Builder {
       {
         format,
         realm: this.realmURL,
-        rawData: raw.data ?? {},
+        rawData: merge(
+          makeEmptyCardData(fieldsAsList(compiled.fields)),
+          raw.data ?? {}
+        ),
         schemaModule: compiled.schemaModule.global,
         componentModuleRef:
           compiled.componentInfos[format].componentModule.global,

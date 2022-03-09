@@ -21,6 +21,7 @@ let attributes: Record<string, any> = {
     city: 'Los Angeles',
     state: 'CA',
     settlementDate: '1990-01-01',
+    zip: null,
   },
 };
 

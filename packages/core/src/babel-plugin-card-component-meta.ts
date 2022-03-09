@@ -10,7 +10,7 @@ import { ImportUtil } from 'babel-import-util';
 import { CompiledCard, SerializerMap, Field } from './interfaces';
 
 import { augmentBadRequest } from './utils/errors';
-import { getFieldForPath } from './utils/fields';
+import { fieldsAsList, getFieldForPath } from './utils/fields';
 import { capitalize } from 'lodash';
 
 export interface CardComponentMetaPluginOptions {
@@ -108,19 +108,6 @@ function exportAllFields(state: State, babel: typeof Babel): t.Statement {
   }) as t.Statement;
 }
 
-function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): string[] {
-  let fieldList: string[] = [];
-  for (let [fieldName, field] of Object.entries(fields)) {
-    if (Object.keys(field.card.fields).length === 0) {
-      fieldList.push([...path, fieldName].join('.'));
-    } else {
-      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
-    }
-  }
-  return fieldList;
-}
-
-// TODO: Where
 type SerializerModuleMap = Record<string, t.Identifier>;
 
 function buildSerializerMapProp(

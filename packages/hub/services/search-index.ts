@@ -1,5 +1,13 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import {
+  CardComponentMetaModule,
+  CardModel,
+  CompiledCard,
+  Format,
+  ModuleRef,
+  RawCard,
+  Unsaved,
+} from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -12,6 +20,7 @@ import {
 import { getOwner, inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
+import merge from 'lodash/merge';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
 import type { types as t } from '@babel/core';
@@ -22,6 +31,7 @@ import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { INSECURE_CONTEXT } from './card-service';
+import { makeEmptyCardData } from '@cardstack/core/src/utils/fields';
 
 const log = logger('hub/search-index');
 
@@ -265,7 +275,7 @@ class IndexerRun implements IndexerHandle {
     let format: Format = 'isolated';
 
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
-    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let componentMeta: CardComponentMetaModule = await this.fileCache.loadModule(componentMetaModule);
     let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
     let cardModel = new CardModelForHub(
@@ -278,7 +288,7 @@ class IndexerRun implements IndexerHandle {
       {
         format,
         realm: rawCard.realm,
-        rawData: rawCard.data ?? {},
+        rawData: merge(makeEmptyCardData(componentMeta.allFields), rawCard.data ?? {}),
         schemaModule: definedCard.schemaModule.global,
         componentModuleRef: definedCard.componentInfos[format].componentModule.global,
         componentMeta,

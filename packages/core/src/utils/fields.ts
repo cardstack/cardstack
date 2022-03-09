@@ -1,6 +1,7 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import { CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
+import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
 import { isNotReadyError } from './errors';
+import set from 'lodash/set';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -89,19 +90,22 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
   return result;
 }
 
-// access a potentially-deep property path, stopping if a key is missing along
-// the way
-export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
-  let segments = path.split('.');
-  let current: any = obj;
-  let segment: string | undefined;
-  let completed: string[] = [];
-  while ((segment = segments.shift())) {
-    if (!(segment in current)) {
-      return { missing: [...completed, segment].join('.') };
+export function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): string[] {
+  let fieldList: string[] = [];
+  for (let [fieldName, field] of Object.entries(fields)) {
+    if (Object.keys(field.card.fields).length === 0) {
+      fieldList.push([...path, fieldName].join('.'));
+    } else {
+      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
     }
-    current = current?.[segment];
-    completed.push(segment);
   }
-  return { value: current };
+  return fieldList;
+}
+
+export function makeEmptyCardData(allFields: string[]): RawCardData {
+  let data: RawCardData = {};
+  for (let field of allFields) {
+    set(data, field, null);
+  }
+  return data;
 }

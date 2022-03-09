@@ -8,6 +8,7 @@ import {
   CardService as CardServiceInterface,
   ResourceObject,
   Saved,
+  CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
@@ -28,10 +29,11 @@ import {
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
+import { fieldsAsList, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -107,7 +109,11 @@ export class CardService implements CardServiceInterface {
   async create(raw: RawCard<Unsaved>): Promise<Card> {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
-    let rawCard = await this.realmManager.create(raw);
+    let allFields = fieldsAsList(compiledCard.fields);
+    let { id, realm, adoptsFrom } = raw;
+    let rawCard = await this.realmManager.create(
+      merge({ id, realm, adoptsFrom, data: makeEmptyCardData(allFields) } as RawCard, raw)
+    );
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
     return { raw: rawCard, compiled };
   }
@@ -174,7 +180,8 @@ export class CardService implements CardServiceInterface {
   }
 
   private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
-    let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
+    let partialRaw = { id: card.id!, realm: card.realm, data: card.serialize().attributes };
+    let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
     let { id, data, realm } = raw;
     await this.searchIndex.indexData({ id, realm, data }, card);
     return { type: 'cards', id, attributes: data };
@@ -187,7 +194,7 @@ export class CardService implements CardServiceInterface {
   ): Promise<CardModelForHub> {
     let { realm } = this.realmManager.parseCardURL(result.url);
     let componentMetaModule = result.componentInfos[format].metaModule.global;
-    let componentMeta = await this.loadModule(componentMetaModule);
+    let componentMeta: CardComponentMetaModule = await this.loadModule(componentMetaModule);
     return new CardModelForHub(
       this,
       {
@@ -199,7 +206,7 @@ export class CardService implements CardServiceInterface {
         format,
         realm,
         schemaModule: result.schemaModule,
-        rawData: result.data ?? {},
+        rawData: merge(makeEmptyCardData(componentMeta.allFields), result.data ?? {}),
         componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,
         saveModel: this.saveModel.bind(this),
