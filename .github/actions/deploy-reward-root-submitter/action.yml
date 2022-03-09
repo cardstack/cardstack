@@ -20,11 +20,6 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
-    - uses: volta-cli/action@v1
-
-    - run: yarn --prefer-offline
-      shell: bash
-
     - name: Deploy reward submitter
       run: waypoint up -app=reward-submit -prune-retain=0 -plain
       shell: bash
