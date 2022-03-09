@@ -4,23 +4,19 @@ import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import config from '@cardstack/ssr-web/config/environment';
-import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
-import Subgraph from '../services/subgraph';
 
 interface CardSpaceIndexRouteModel {
+  did: string;
   id: string;
   name: string;
   backgroundColor: string;
   textColor: string;
-  paymentURL: string;
-  deepLinkPaymentURL: string;
 }
 
 export default class IndexRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
   @service declare fastboot: Fastboot;
-  @service declare subgraph: Subgraph;
 
   async model(): Promise<CardSpaceIndexRouteModel> {
     if (this.appContext.isCardSpace) {
@@ -61,33 +57,12 @@ export default class IndexRoute extends Route {
           );
         }
 
-        let queryResult = await this.subgraph.query(
-          config.chains.layer2,
-          `query($did: String!) {
-          merchantSafes(where: { infoDid: $did }) {
-            id
-          }
-        }`,
-          {
-            did: merchant.attributes.did,
-          }
-        );
-        let address = queryResult?.data?.merchantSafes[0]?.id;
-
         return {
+          did: merchant.attributes['did'],
           id: merchant.attributes['slug'],
           name: merchant.attributes['name'],
           backgroundColor: merchant.attributes['color'],
           textColor: merchant.attributes['text-color'],
-          paymentURL: generateMerchantPaymentUrl({
-            domain: config.universalLinkDomain,
-            merchantSafeID: address,
-            network: config.chains.layer2,
-          }),
-          deepLinkPaymentURL: generateMerchantPaymentUrl({
-            merchantSafeID: address,
-            network: config.chains.layer2,
-          }),
         };
       } catch (e) {
         Sentry.captureException(e);

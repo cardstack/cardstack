@@ -117,10 +117,10 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .containsText(merchantId);
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
         )
         .exists();
-      assert.dom('[data-test-card-picker-dropdown]').exists();
+      assert.dom('[data-test-boxel-card-picker-dropdown]').exists();
       assert.dom('[data-test-create-merchant-button]').isNotDisabled();
     });
 
@@ -159,6 +159,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-milestone-completed][data-test-milestone="2"]')
         .exists(); // Prepaid card choice
+      assert.dom('[data-test-prepaid-card-choice-selected-card]').exists();
+      assert.dom('[data-test-boxel-card-picker]').doesNotExist();
       assert
         .dom('[data-test-prepaid-card-choice-merchant-address]')
         .containsText(merchantAddress);

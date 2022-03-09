@@ -312,18 +312,18 @@ if (process.env.COMPILER) {
         isolated: 'isolated.js',
         files: {
           'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        import date from "https://cardstack.com/base/date";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import date from "https://cardstack.com/base/date";
 
-        export default class Hello {
-          @contains(string)
-          title;
+            export default class Hello {
+              @contains(string)
+              title;
 
-          @contains(date)
-          createdAt;
-        }
-      `,
+              @contains(date)
+              createdAt;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(`<h1><@fields.title /></h1><h2><@fields.createdAt /></h2>`),
           'embedded.js': templateOnlyComponentTemplate(`<h2><@fields.title /> - <@fields.createdAt /></h2>`),
         },
@@ -344,14 +344,14 @@ if (process.env.COMPILER) {
         },
         files: {
           'schema.js': `
-        import { containsMany } from "@cardstack/types";
-        import post from "https://cardstack.local/post";
+            import { containsMany } from "@cardstack/types";
+            import post from "https://cardstack.local/post";
 
-        export default class Hello {
-          @containsMany(post)
-          posts;
-        }
-      `,
+            export default class Hello {
+              @containsMany(post)
+              posts;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(template),
         },
       });

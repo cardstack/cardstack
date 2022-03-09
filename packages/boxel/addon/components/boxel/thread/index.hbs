@@ -4,6 +4,7 @@
   </div>
 
   <div class="boxel-thread__content-wrapper">
+    {{!-- Note that tabindex=0 is applied to ensure that this scroll context can be reached and operated by keyboard --}}
     <div class="boxel-thread__scroll-wrapper" tabindex="0" {{autoscroll enabled=@autoscroll}}>
       <div class="boxel-thread__sticky-container">
         {{yield to="taskbar"}}
@@ -13,6 +14,7 @@
       </section>
     </div>
 
+    {{!-- Note that tabindex=0 is applied to ensure that this scroll context can be reached and operated by keyboard --}}
     <div class="boxel-thread__scroll-wrapper" tabindex="0">
       <Boxel::Sidebar class="boxel-thread__sidebar" as |SidebarSection|>
         {{yield SidebarSection to="sidebar"}}

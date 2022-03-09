@@ -3,7 +3,12 @@ import { CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@c
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { isCardstackError, serializableError } from '@cardstack/core/src/utils/errors';
+import {
+  CardstackError,
+  isCardstackError,
+  serializableError,
+  UnprocessableEntity,
+} from '@cardstack/core/src/utils/errors';
 import { getOwner, inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
@@ -16,6 +21,7 @@ import { service } from '@cardstack/hub/services';
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
 import CardModelForHub from '../lib/card-model-for-hub';
+import { INSECURE_CONTEXT } from './card-service';
 
 const log = logger('hub/search-index');
 
@@ -142,6 +148,7 @@ export interface IndexerHandle {
 class IndexerRun implements IndexerHandle {
   private builder = service('card-builder', { as: 'builder' });
   private fileCache = service('file-cache', { as: 'fileCache' });
+  private cardService = service('card-service', { as: 'cardService' });
   private generation?: number;
   private touchCounter = 0;
   private touched = new Map<string, number>();
@@ -241,7 +248,7 @@ class IndexerRun implements IndexerHandle {
       await this.internalSave(card, compiledCard, compiler);
     } catch (err: any) {
       log.trace('Save: Error during compile', cardURL(card));
-      await this.saveErrorState(card, err, compiler);
+      await this.saveErrorState(card, err, compiler.dependencies);
     }
   }
 
@@ -251,29 +258,38 @@ class IndexerRun implements IndexerHandle {
     compiledCard: CompiledCard<Unsaved, ModuleRef>,
     compiler: Compiler<Unsaved>
   ): Promise<CompiledCard> {
-    let definedCard = makeGloballyAddressable(cardURL(rawCard), compiledCard, (local, type, src, ast) =>
+    let url = cardURL(rawCard);
+    let definedCard = makeGloballyAddressable(url, compiledCard, (local, type, src, ast) =>
       this.define(cardURL(rawCard), local, type, src, ast)
     );
     let format: Format = 'isolated';
 
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
     let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
-    let cardModel = await getOwner(this).instantiate(CardModelForHub, {
-      type: 'loaded',
-      id: rawCard.id,
-      realm: rawCard.realm,
-      format,
-      rawData: rawCard.data ?? {},
-      schemaModule: definedCard.schemaModule.global,
-      componentModule: definedCard.componentInfos[format].componentModule.global,
-      componentMeta,
-      allFields: false,
-    });
+    let cardModel = new CardModelForHub(
+      cardService,
+      {
+        type: 'loaded',
+        url,
+        allFields: false,
+      },
+      {
+        format,
+        realm: rawCard.realm,
+        rawData: rawCard.data ?? {},
+        schemaModule: definedCard.schemaModule.global,
+        componentModuleRef: definedCard.componentInfos[format].componentModule.global,
+        componentMeta,
+        saveModel: cardService.saveModel.bind(cardService),
+      }
+    );
     return await this.writeToIndex(rawCard, definedCard, compiler, cardModel);
   }
 
   private define(cardURL: string, localPath: string, type: string, source: string, ast: t.File | undefined): string {
+    log.trace('Defining module:', cardURL, localPath);
     switch (type) {
       case JS_TYPE:
         this.fileCache.setModule(BROWSER, cardURL, localPath, source);
@@ -290,6 +306,11 @@ class IndexerRun implements IndexerHandle {
     cardModel: CardModel
   ): Promise<CompiledCard> {
     let url = cardURL(rawCard);
+    let searchData = await this.getSearchData(rawCard, compiledCard, cardModel, compiler.dependencies);
+    if (searchData === undefined) {
+      // the error state has been written out already
+      return compiledCard;
+    }
     log.trace('Writing card to index', url);
     let data = rawCard.data ? await dataWithComputeds(rawCard.data, compiledCard, cardModel) : null;
     let expression = upsert('cards', 'cards_pkey', {
@@ -300,7 +321,7 @@ class IndexerRun implements IndexerHandle {
       data: param(data),
       raw: param(new RawCardSerializer().serialize(rawCard)),
       compiled: param(new RawCardSerializer().serialize(rawCard, compiledCard)),
-      searchData: param(data ? searchOptimizedData(data, compiledCard) : null),
+      searchData: param(searchData),
       compileErrors: param(null),
       deps: param([...compiler.dependencies]),
       schemaModule: param(compiledCard.schemaModule.global),
@@ -334,6 +355,12 @@ class IndexerRun implements IndexerHandle {
       deps = [...(result as string[]), rawCard.adoptsFrom];
     }
 
+    let searchData = await this.getSearchData(rawCard, compiled, cardModel, new Set(deps));
+    if (searchData === undefined) {
+      // the error state has been written out already
+      return compiled;
+    }
+
     let expression: Expression;
     let data = rawCard.data ? await dataWithComputeds(rawCard.data, compiled, cardModel) : null;
     if (isNew) {
@@ -351,7 +378,7 @@ class IndexerRun implements IndexerHandle {
             param(data),
             param(new RawCardSerializer().serialize(rawCard)),
             param(new RawCardSerializer().serialize(rawCard, compiled)),
-            param(data ? searchOptimizedData(data, compiled) : null),
+            param(searchData),
             param(null),
             param([deps]),
             param(compiled.schemaModule.global),
@@ -370,7 +397,7 @@ class IndexerRun implements IndexerHandle {
         ', raw =',
         param(new RawCardSerializer().serialize(rawCard)),
         ', "searchData" =',
-        param(data ? searchOptimizedData(data, compiled) : null),
+        param(searchData),
         'WHERE url =',
         param(url),
       ];
@@ -381,7 +408,21 @@ class IndexerRun implements IndexerHandle {
     return compiled;
   }
 
-  private async saveErrorState(card: RawCard, err: any, compiler: Compiler): Promise<void> {
+  private async getSearchData(
+    rawCard: RawCard,
+    compiled: CompiledCard,
+    cardModel: CardModel,
+    deps: Set<string>
+  ): Promise<Record<string, any> | null | undefined> {
+    try {
+      return rawCard.data ? await searchOptimizedData(rawCard.data, compiled, cardModel) : null;
+    } catch (err: any) {
+      await this.saveErrorState(rawCard, err, new Set(deps));
+    }
+    return undefined;
+  }
+
+  private async saveErrorState(card: RawCard, err: any, deps: Set<string>): Promise<void> {
     let url = cardURL(card);
     let expression = upsert('cards', 'cards_pkey', {
       url: param(url),
@@ -395,7 +436,7 @@ class IndexerRun implements IndexerHandle {
       compileErrors: param(serializableError(err)),
       schemaModule: param(null),
       componentInfos: param(null),
-      deps: param([...compiler.dependencies]),
+      deps: param([...deps]),
     });
     this.touched.set(url, this.touchCounter++);
     await this.db.query(expressionToSql(expression));
@@ -438,7 +479,17 @@ function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard):
       if (!entry) {
         entry = result[currentCard.url] = {};
       }
-      entry[fieldName] = data[fieldName];
+      if (cardModel && currentCard.fields[fieldName].computed) {
+        try {
+          entry[fieldName] = await cardModel.getField(fieldName);
+        } catch (err: any) {
+          let newError = new UnprocessableEntity(`Could not load field '${fieldName}' for card ${compiled.url}`);
+          newError.additionalErrors = [new CardstackError(err.message)];
+          throw newError;
+        }
+      } else {
+        entry[fieldName] = data[fieldName];
+      }
       currentCard = currentCard.adoptsFrom;
     } while (currentCard && currentCard.fields[fieldName]);
   }

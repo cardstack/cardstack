@@ -7,7 +7,6 @@ import { configureHubWithCompiler } from '../helpers/cards';
 import merge from 'lodash/merge';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import cloneDeep from 'lodash/cloneDeep';
-// import set from 'lodash/set';
 import { CardModel } from '@cardstack/core/src/interfaces';
 
 function p(dateString: string): Date {
@@ -27,13 +26,9 @@ let attributes: Record<string, any> = {
 
 if (process.env.COMPILER) {
   describe('CardModelForHub', function () {
-    let { getContainer, realmURL, cards } = configureHubWithCompiler(this);
-    let cardDBResult: Record<string, any>;
+    let { realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
-      let dbManager = await getContainer().lookup('database-manager');
-      let db = await dbManager.getClient();
-
       await cards.create(ADDRESS_RAW_CARD);
       await cards.create(
         merge({}, PERSON_RAW_CARD, {
@@ -56,22 +51,10 @@ if (process.env.COMPILER) {
         adoptsFrom: '../person',
         data: attributes,
       });
-
-      let {
-        rows: [result],
-      } = await db.query(
-        'SELECT url, data, "schemaModule", "componentInfos", "compileErrors", deps from cards where url = $1',
-        [`${realmURL}bob-barker`]
-      );
-      cardDBResult = result;
     });
 
     it('.data', async function () {
-      // TODO: I made makeCardModelFromDatabase private because it shouldn't be
-      // exposed. This test should be refactored to use public API, and the
-      // public API around data may be changing anyway to account for including
-      // computed fields
-      let model: CardModel = await (cards as any).makeCardModelFromDatabase('isolated', cardDBResult);
+      let model: CardModel = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
       expect(model.data.name).to.equal(attributes.name);
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
       expect(model.data.address.street).to.equal(attributes.address.street);
@@ -79,8 +62,8 @@ if (process.env.COMPILER) {
     });
 
     it('.url on new card throws error', async function () {
-      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL);
+      let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
+      let model = parentCard.adoptIntoRealm(realmURL);
       try {
         model.url;
         throw new Error('did not throw expected error');
@@ -90,29 +73,29 @@ if (process.env.COMPILER) {
     });
 
     it('.save() created card', async function () {
-      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL);
-      model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
+      let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
+      let model = parentCard.adoptIntoRealm(realmURL);
+      await model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
       expect(model.data.address.settlementDate instanceof Date).to.be.true;
       expect(isSameDay(model.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
       await model.save();
 
-      let kirito = await cards.loadData(model.url, 'isolated');
+      let kirito = await cards.loadModel(model.url, 'isolated');
       expect(kirito.data.name).to.equal('Kirito');
       expect(kirito.data.address.settlementDate instanceof Date).to.be.true;
       expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
     });
 
     it('.save() loaded card - isolated', async function () {
-      let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
-      model.setData({ name: 'Robert Barker' });
+      let model = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
+      await model.setData({ name: 'Robert Barker' });
       await model.save();
 
       expect(model.format).to.equal('isolated');
       expect(model.data.name).to.equal('Robert Barker');
       expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
 
-      model.setData({ birthdate: p('2022-02-22') });
+      await model.setData({ birthdate: p('2022-02-22') });
 
       expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
 
@@ -120,34 +103,34 @@ if (process.env.COMPILER) {
 
       expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
 
-      let savedModel = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      let savedModel = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
       expect(savedModel.data.name).to.equal('Robert Barker');
       expect(isSameDay(savedModel.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
       // fields that were not specified in setData should be unchanged
       expect(savedModel.data.address.city).to.equal('Los Angeles');
-      let embedded = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      let embedded = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       expect(embedded.data.name).to.equal('Robert Barker');
       expect(isSameDay(embedded.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
     });
 
     it('.save() loaded card - embedded', async function () {
-      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
-      model.setData({ name: 'Robert Barker' });
+      let model = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
+      await model.setData({ name: 'Robert Barker' });
       await model.save();
 
       expect(model.data.name).to.equal('Robert Barker');
       expect(model.format).to.equal('embedded');
 
-      let savedModel = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      let savedModel = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       expect(savedModel.data.name).to.equal('Robert Barker');
-      let isolated = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      let isolated = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
       expect(isolated.data.name).to.equal('Robert Barker');
     });
 
     it('.save() on adopted card using pre-existing id', async function () {
       let id = 'bob-barker';
-      let parentCard = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = await parentCard.adoptIntoRealm(realmURL, id);
+      let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
+      let model = parentCard.adoptIntoRealm(realmURL, id);
       try {
         await model.save();
         throw new Error('did not throw expected error');
@@ -156,35 +139,28 @@ if (process.env.COMPILER) {
       }
     });
 
-    // note that we have route tests that also assert that setting values on
-    // non-existent fields should error
     it('setData of unused field', async function () {
-      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      let model = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       try {
-        model.setData({
+        await model.setData({
           name: 'Robert Barker',
           pizza: 'pepperoni', // non-existent field
-          address: { city: 'New York' }, // unused field
+          address: { city: 'New York' }, // unused field (which is ok to set)
         });
         throw new Error('did not throw expected error');
       } catch (e: any) {
-        expect(e.message).to.equal(
-          `the field(s) 'pizza', 'address.city' are not allowed to be set for the card ${realmURL}bob-barker in format 'embedded'`
-        );
+        expect(e.message).to.equal(`the field(s) 'pizza' are not allowed to be set for the card ${realmURL}bob-barker`);
       }
     });
 
     it('.serialize isolated card', async function () {
-      let model = await cards.loadData(`${realmURL}bob-barker`, 'isolated');
+      let model = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
       let result = model.serialize();
 
-      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/isolated-');
+      expect(result.meta?.componentModule).to.eq('@cardstack/compiled/https-cardstack.local-person/isolated.js');
       delete result.meta;
 
       let expectedAttributes = cloneDeep(attributes);
-      // TODO: We currently do not store enough info in the database
-      // to know this should be her
-      // set(expectedAttributes, 'address.zip', null);
 
       expect(result).to.deep.equal({
         id: `${realmURL}bob-barker`,
@@ -194,10 +170,10 @@ if (process.env.COMPILER) {
     });
 
     it('.serialize embedded card', async function () {
-      let model = await cards.loadData(`${realmURL}bob-barker`, 'embedded');
+      let model = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
       let result = model.serialize();
 
-      expect(result.meta?.componentModule).to.include('@cardstack/compiled/https-cardstack.local-person/embedded-');
+      expect(result.meta?.componentModule).to.eq('@cardstack/compiled/https-cardstack.local-person/embedded.js');
       delete result.meta;
 
       let expectedAttributes = cloneDeep(attributes);
@@ -211,15 +187,12 @@ if (process.env.COMPILER) {
     });
 
     it('.serialize card model in created state', async function () {
-      let parent = await cards.loadData(`${realmURL}person`, 'isolated');
-      let model = await parent.adoptIntoRealm(realmURL);
-      model.setData(attributes);
+      let parent = await cards.loadModel(`${realmURL}person`, 'isolated');
+      let model = parent.adoptIntoRealm(realmURL);
+      await model.setData(attributes);
       let result = model.serialize();
 
       let expectedAttributes = cloneDeep(attributes);
-      // TODO: We currently do not store enough info in the database
-      // to know this should be her
-      // set(expectedAttributes, 'address.zip', null);
 
       expect(result).to.deep.equal({
         id: undefined,
@@ -228,6 +201,44 @@ if (process.env.COMPILER) {
       });
 
       // do we want to also include the meta.componentModule in this state?
+    });
+
+    it(`can recover from error in userland field code`, async function () {
+      await cards.create({
+        id: 'boom',
+        realm: realmURL,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from '@cardstack/types';
+            import string from 'https://cardstack.com/base/string';
+            export default class Boom {
+              @contains(string) willBoom;
+              @contains(string)
+              get boom() {
+                if (this.willBoom === 'true') {
+                  throw new Error('boom');
+                } else {
+                  return 'no boom';
+                }
+              }
+            }
+          `,
+        },
+      });
+
+      let model = await cards.loadModel(`${realmURL}boom`, 'isolated');
+      try {
+        await model.setData({ willBoom: 'true' });
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`Could not load field 'boom' for card ${realmURL}boom`);
+        expect(err.status).to.eq(422);
+        let innerError = err.additionalErrors?.[0];
+        expect(innerError?.message).to.eq(`boom`);
+      }
+      await model.setData({ willBoom: 'false' });
+      expect(await model.getField('boom')).to.eq('no boom');
     });
   });
 }

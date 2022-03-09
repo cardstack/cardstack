@@ -12,7 +12,7 @@ import type {
   CompiledCard,
   Builder,
 } from '@cardstack/core/src/interfaces';
-import { baseCardURL } from '@cardstack/core/src/compiler';
+import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { cardURL } from '@cardstack/core/src/utils';
 
@@ -52,9 +52,9 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('can compile the base card', async function (assert) {
-    let compiled = await builder.getCompiledCard(baseCardURL);
+    let compiled = await builder.getCompiledCard(BASE_CARD_URL);
 
-    assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
+    assert.equal(compiled.url, BASE_CARD_URL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');

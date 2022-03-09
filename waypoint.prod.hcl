@@ -246,3 +246,47 @@ app "ssr-web" {
         }
     }
 }
+
+
+app "reward-submit" {
+    path = "./packages/reward-root-submitter"
+
+    config {
+        env = {
+            ENVIRONMENT = "production"
+            ETHEREUM_NODE_URL = "https://xdai-archive.blockscout.com/"
+            REWARD_POOL_ADDRESS = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
+            REWARD_PROGRAM_OUTPUT="s3://tally-production-reward-programs/"
+        }
+    }
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "reward-root-submitter"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "reward-root-submitter"
+            count = 1
+            task_role_name = "reward-root-submitter-ecr-task"
+            execution_role_name = "reward-root-submitter-ecr-task-executor-role"
+            disable_alb = true
+            secrets = {
+                OWNER = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
+                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
+            }
+        }
+    }
+}
