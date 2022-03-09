@@ -1,7 +1,5 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
-import reduce from 'lodash/reduce';
-import md5 from 'md5';
 import { isNotReadyError } from './errors';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
@@ -15,18 +13,6 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
   }
 
   return field;
-}
-
-export function hashCardFields(fields: CompiledCard['fields']): string {
-  return md5(
-    reduce(
-      fields,
-      (result, f, name) => {
-        return (result += name + f.card.url);
-      },
-      ''
-    )
-  );
 }
 
 export function buildUsedFieldsListFromUsageMeta(

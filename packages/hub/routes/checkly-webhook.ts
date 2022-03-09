@@ -5,7 +5,9 @@ import StatuspageApi from '../services/statuspage-api';
 import crypto from 'crypto';
 import config from 'config';
 import { DEGRADED_THRESHOLD as degradedSubgraphThreshold } from '../routes/status';
+import Logger from '@cardstack/logger';
 
+let log = Logger('checkly-webhook');
 // Check names and component names should map to the names and components in Checkly
 type CheckName =
   | 'hub-prod subgraph / RPC node block number diff within threshold'
@@ -63,6 +65,12 @@ export default class ChecklyWebhookRoute {
   async post(ctx: Koa.Context) {
     let signature = ctx.headers['x-checkly-signature'] as string;
     let isTestEnv = process.env.NODE_ENV === 'test';
+
+    log.info('Received checkly request', ctx.request.body.check_name);
+    if (!config.get('checkly.handleWebhookRequests')) {
+      log.info('Skipping handling checkly request');
+      return;
+    }
 
     if (!isTestEnv && (!signature || !this.isVerifiedPayload(JSON.stringify(ctx.request.body), signature))) {
       ctx.status = 401;

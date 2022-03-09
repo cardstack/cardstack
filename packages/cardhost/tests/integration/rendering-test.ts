@@ -174,7 +174,7 @@ module('Integration | Card Rendering', function (hooks) {
     // We want to ensure data consistency, so that when the template rerenders,
     // the template is always showing consistent field values
     await waitUntil(() =>
-      find('[data-test-dep-field]')!.textContent?.includes('Kirito')
+      find('[data-test-dep-field]')?.textContent?.includes('Kirito')
     );
 
     assert

@@ -23,7 +23,19 @@ interface CardPayDepositWorkflowConnectLayer1ComponentArgs
 class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
   cardstackLogo = cardstackLogo;
   connectionSymbol = connectionSymbol;
-  walletProviders = walletProviders;
+  walletProviders = walletProviders
+    .map((w) =>
+      w.id === 'metamask'
+        ? {
+            ...w,
+            enabled: !!window.ethereum?.isMetaMask,
+            explanation: window.ethereum?.isMetaMask
+              ? ''
+              : 'MetaMask extension not detected',
+          }
+        : { ...w, enabled: true, explanation: '' }
+    )
+    .sortBy('enabled:desc');
 
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.isConnected') declare isConnected: boolean;
@@ -35,7 +47,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
        , otherwise focus leaves the page
      - selecting a radio makes the connect button enabled and focusable.
    */
-  @tracked radioWalletProviderId = 'metamask';
+  @tracked radioWalletProviderId: WalletProvider['id'] = 'wallet-connect';
 
   constructor(
     owner: unknown,
@@ -101,7 +113,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     ].filter((o) => !o.amount?.isZero());
   }
 
-  @action changeWalletProvider(id: string): void {
+  @action changeWalletProvider(id: WalletProvider['id']): void {
     this.radioWalletProviderId = id;
   }
 

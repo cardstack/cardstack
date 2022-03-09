@@ -99,7 +99,6 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     let decoded = decode(EXEC_TRANSACTION, bytes);
     safeTxEntity.to = toChecksumAddress(decoded[0].toAddress());
     safeTxEntity.value = decoded[1].toBigInt();
-    safeTxEntity.data = decoded[2].toBytes();
     safeTxEntity.operation = decoded[3].toBigInt();
     safeTxEntity.safeTxGas = decoded[4].toBigInt();
     safeTxEntity.baseGas = decoded[5].toBigInt();
@@ -110,7 +109,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.signatures = decoded[9].toBytes();
 
     log.debug(
-      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
+      'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, blockNumber {}, to: {}, value: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         txnHash,
         safeTxEntity.id,
@@ -119,7 +118,6 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
         safeTxEntity.blockNumber.toString(),
         safeTxEntity.to,
         safeTxEntity.value.toString(),
-        safeTxEntity.data.toHex(),
         safeTxEntity.operation.toString(),
         safeTxEntity.safeTxGas.toString(),
         safeTxEntity.baseGas.toString(),

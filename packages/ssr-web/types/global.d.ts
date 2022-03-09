@@ -29,7 +29,7 @@ declare module 'ember-cli-fastboot/services/fastboot' {
     public isFastBoot: boolean;
     public request: Request;
     public shoebox: Shoebox;
-    public response: unknown; // need types
+    public response: any; // need types
     public metadata: unknown; // need types
     public deferRendering(promise: Promise<unknown>): unknown;
   }
