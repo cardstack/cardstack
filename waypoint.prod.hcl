@@ -198,6 +198,11 @@ app "cardpay-subg-ext" {
             count = 1
             subnets = ["subnet-0544d680b5f494842","subnet-051e48e37cf15329c"]
             task_role_name = "cardpay-production-subgraph-extraction-ecr-task"
+            execution_role_name = "cardpay-production-subgraph-extraction-ecr-task-executor-role"
+            secrets = {
+                SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7",
+                SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_output_location-YDoQUt"
+            }
             disable_alb = true
         }
     }
