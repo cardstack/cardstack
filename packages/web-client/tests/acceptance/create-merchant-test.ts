@@ -43,7 +43,7 @@ function milestoneCompletedSel(milestoneIndex: number): string {
 }
 
 async function selectPrepaidCard(cardAddress: string) {
-  await click(`[data-test-card-picker-dropdown] > [role="button"]`);
+  await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
   await waitFor(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
   await click(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
 }
@@ -189,7 +189,10 @@ module('Acceptance | create merchant', function (hooks) {
     // prepaid-card-choice card
     post = postableSel(2, 2);
     await waitFor(post);
-    await click(`${post} [data-test-card-picker-dropdown] > [role="button"]`);
+
+    await click(
+      `${post} [data-test-boxel-card-picker-dropdown] > [role="button"]`
+    );
     await waitFor(
       `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
     );
@@ -211,7 +214,7 @@ module('Acceptance | create merchant', function (hooks) {
     );
 
     await waitFor('[data-test-prepaid-card-choice-is-complete]');
-    assert.dom(`[data-test-card-picker-dropdown]`).doesNotExist();
+    assert.dom(`[data-test-boxel-card-picker-dropdown]`).doesNotExist();
     assert
       .dom('[data-test-prepaid-card-choice-merchant-address]')
       .containsText(merchantAddress);

@@ -33,6 +33,7 @@ interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
 }
 
 interface DropdownOption {
+  id: string;
   card: PrepaidCardSafe;
   disabled: boolean;
 }
@@ -106,6 +107,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       this.prepaidCards.forEach((c) => {
         let isLowBal = c.spendFaceValue < this.merchantRegistrationFee;
         let option: DropdownOption = {
+          id: c.address,
           card: c,
           disabled: isLowBal,
         };

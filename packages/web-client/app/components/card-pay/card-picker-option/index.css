@@ -7,6 +7,7 @@
   --card-height: 14.375rem; /* 230px */
 
   color: var(--boxel-dark);
+  padding-bottom: var(--boxel-sp);
 }
 
 .card-picker-option__network-label {

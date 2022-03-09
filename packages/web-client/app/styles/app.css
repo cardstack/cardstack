@@ -68,5 +68,5 @@ ol {
 }
 
 .ember-power-select-option[aria-current="true"] {
-  background-color: #ccf0ef;
+  background-color: var(--boxel-purple-100);
 }
