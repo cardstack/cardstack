@@ -21,7 +21,8 @@ const cardSpaceHostnameSuffixByTarget = {
 };
 
 function convertHostnameSuffixToRegex(suffix) {
-  return `/^.+\\${suffix}$/`;
+  // .pouty.pizza → /^.+\.pouty\.pizza$/
+  return `/^.+${suffix.replace(/\./g, '\\.')}$/`;
 }
 
 const hostWhitelistByTarget = {
