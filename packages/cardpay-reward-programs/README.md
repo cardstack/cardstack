@@ -13,11 +13,11 @@ start_block=1
 end_block=10
 payment_cycle_length=2
 
-rule.run(1,3)
+rule.run(1,3) #checking how "which merchant receives > 100 spend" 1< block <=3 
 rule.run(3,5) 
 rule.run(5,7)
 rule.run(7,9)
-rule.run(9,10)
+rule.run(9,10) 
 ```
 
 ## Setup 
@@ -43,9 +43,6 @@ rule.run(9,10)
 
     streamlit run streamlit/explore.py
     
-You can optionally build streamlit in a docker container
- 
-    docker-compose up 
 
 ## Docker
 
