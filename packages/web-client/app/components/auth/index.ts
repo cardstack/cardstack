@@ -1,5 +1,3 @@
-// marked @*! - implementation may be different in ssr-web
-
 import Component from '@glimmer/component';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
@@ -18,14 +16,14 @@ const AUTH_STEPS = {
   LOADING: 'LOADING',
 };
 
-const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60; //@*!
+const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60;
 
 export default class AuthComponent extends Component<{
   onComplete: Function;
 }> {
-  @service declare layer2Network: Layer2Network; //@*!
-  @service('hub-authentication') declare hubAuthentication: HubAuthentication; //@*!
-  @service('ua') declare UAService: UA; //@*!
+  @service declare layer2Network: Layer2Network;
+  @service('hub-authentication') declare hubAuthentication: HubAuthentication;
+  @service('ua') declare UAService: UA;
   @tracked hubError: '' | 'AUTH_TIMEOUT' | 'ERROR' = '';
 
   AUTH_STEPS = AUTH_STEPS;

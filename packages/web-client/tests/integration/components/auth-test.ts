@@ -42,7 +42,6 @@ const WALLET_CONNECT_QR = '[data-test-boxel-styled-qr-code]';
 const WALLET_CONNECT_LINK = '[data-test-auth-connect-link]';
 const HUB_AUTH_BUTTON = '[data-test-hub-auth-button]';
 const HUB_AUTH_ERROR_MESSAGE = '[data-test-hub-auth-error]';
-// const DONE_MESSAGE = '';
 
 module('Integration | Component | auth', function (hooks) {
   setupRenderingTest(hooks);
