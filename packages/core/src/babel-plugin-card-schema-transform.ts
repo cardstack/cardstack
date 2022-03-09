@@ -15,11 +15,13 @@ interface State {
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
   cardName: string | undefined;
-  opts: {
-    fields: CompiledCard['fields'];
-    meta: FileMeta;
-    parent: CompiledCard;
-  };
+  opts: Options;
+}
+
+export interface Options {
+  fields: CompiledCard['fields'];
+  meta: FileMeta;
+  parent: CompiledCard | undefined;
 }
 
 export default function main(babel: typeof Babel) {
@@ -56,12 +58,12 @@ export default function main(babel: typeof Babel) {
       // maybe we use composition (and perhaps use a Proxy to project the
       // composed schema's field methods)?
       ClassDeclaration(path: NodePath<t.ClassDeclaration>, state: State) {
-        if (state.opts.meta.parent?.cardURL && state.opts.parent.schemaModule.global && state.parentLocalName) {
+        if (state.opts.meta.parent?.cardURL && state.opts.parent?.schemaModule.global && state.parentLocalName) {
           let superClass = path.get('superClass') as NodePath<t.Identifier>;
           superClass.replaceWith(
             state.importUtil.import(
               superClass,
-              state.opts.parent.schemaModule.global,
+              state.opts.parent?.schemaModule.global,
               'default',
               asClassName(state.parentLocalName)
             )
@@ -245,7 +247,8 @@ function cardTypeByURL(url: string, state: State): 'primitive' | 'composite' | u
   if (isParentMeta && BASE_CARD_URL === url) {
     return 'composite'; // a base card, while having no fields is actually the stem for all composite cards
   } else if (isParentMeta) {
-    return Object.keys(state.opts.parent.fields).length === 0 ? 'primitive' : 'composite';
+    // casting because the only falsy case is expected to be the base card
+    return Object.keys(state.opts.parent!.fields).length === 0 ? 'primitive' : 'composite';
   }
 
   let fieldMetas = fieldMetasForCardURL(url, state);
