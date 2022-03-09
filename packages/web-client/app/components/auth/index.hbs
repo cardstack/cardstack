@@ -8,7 +8,7 @@
       {{#if this.canDeepLink}}
         <Boxel::Button
           @as="anchor"
-          @href={{concat "https://wallet.cardstack.com/wc?uri=" this.walletConnectUri}}
+          @href={{concat "https://" this.universalLinkDomain "/wc?uri=" this.walletConnectUri}}
         >
           Connect
         </Boxel::Button>

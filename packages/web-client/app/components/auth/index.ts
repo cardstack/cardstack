@@ -31,6 +31,10 @@ export default class AuthComponent extends Component<{
   AUTH_STEPS = AUTH_STEPS;
   authTaskRunningForAWhile: boolean = false;
 
+  get universalLinkDomain() {
+    return config.universalLinkDomain;
+  }
+
   get currentStep(): typeof AUTH_STEPS[keyof typeof AUTH_STEPS] {
     if (
       this.layer2Network.isInitializing ||
