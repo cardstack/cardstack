@@ -1,14 +1,15 @@
 <Boxel::CardContainer
   class="auth-step"
+  data-test-auth-step
   ...attributes
 >
   {{#if @header}}
-    <header class="auth-step__header">
+    <header class="auth-step__header" data-test-auth-step-header>
       {{@header}}
     </header>
   {{/if}}
   {{#if @description}}
-    <div class="auth-step__description">
+    <div class="auth-step__description" data-test-auth-step-description>
       {{@description}}
     </div>
   {{/if}}
