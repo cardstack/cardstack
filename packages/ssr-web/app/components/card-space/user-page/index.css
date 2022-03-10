@@ -17,11 +17,23 @@
   min-height: 90vh;
   max-width: 90%;
   aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-space-user-page__header {
+  position: absolute;
+  top: calc(min(var(--boxel-sp-xl), 5vw) + 3rem);
 }
 
 @media only screen and (max-width: 992px) {
   .card-space-user-page {
     padding: 0;
+  }
+
+  .card-space-user-page__header {
+    top: min(var(--boxel-sp-xl), 5vw);
   }
 
   .card-space-user-page__wrapper {
