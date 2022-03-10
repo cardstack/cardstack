@@ -197,6 +197,48 @@ module('Acceptance | visit card space', function (hooks) {
     assert
       .dom('[data-test-error]')
       .includesText('404: Card Space not found for slug');
+
+    assert
+      .dom(
+        `meta[property='og:title'][content='Error']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:title'][content='Error']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[property='og:description'][content='404: Card Space not found for slug']`,
+        document.documentElement
+      )
+      .exists();
+
+    assert
+      .dom(
+        `meta[name='twitter:description'][content='404: Card Space not found for slug']`,
+        document.documentElement
+      )
+      .exists();
+
+    // assert
+    //   .dom(
+    //     `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+    //     document.documentElement
+    //   )
+    //   .exists();
+
+    // assert
+    //   .dom(
+    //     `meta[name='twitter:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+    //     document.documentElement
+    //   )
+    //   .exists();
   });
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {
