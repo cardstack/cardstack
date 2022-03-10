@@ -28,7 +28,7 @@
           {{or this.merchantBgColor "#0069F9"}}
         </div>
       </Boxel::Field>
-      <Boxel::Field @label="Owned By Wallet">
+      <Boxel::Field @label="Owned By">
         <CardPay::AccountDisplay
           @wrapped={{true}}
           @address={{this.layer2Network.walletInfo.firstAddress}}
@@ -85,7 +85,7 @@
             {{this.merchantBgColor}}
           </div>
         </Boxel::Field>
-        <Boxel::Field @label="Owned By Wallet">
+        <Boxel::Field @label="Owned By">
           <CardPay::AccountDisplay
             @wrapped={{true}}
             @address={{this.layer2Network.walletInfo.firstAddress}}
