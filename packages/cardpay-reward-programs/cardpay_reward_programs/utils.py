@@ -5,7 +5,6 @@ from pathlib import PosixPath
 import pyarrow.parquet as pq
 import yaml
 from cloudpathlib import AnyPath, CloudPath
-from web3 import Web3
 
 
 def exists(file_location):
