@@ -2,7 +2,7 @@ import streamlit as st
 from cardpay_reward_programs.config import default_core_config
 
 
-def core_parameters(rule):
+def core_parameters(rule_name):
     s = st.expander(label="Core parameters")
     payment_cycle_length = s.number_input(
         "Payment cycle length",
@@ -13,6 +13,6 @@ def core_parameters(rule):
     )
 
     core_parameters = default_core_config.copy()
-    core_parameters.update({"docker_image": rule})
+    core_parameters.update({"docker_image": rule_name})
     core_parameters.update({"payment_cycle_length": int(payment_cycle_length)})
     return core_parameters

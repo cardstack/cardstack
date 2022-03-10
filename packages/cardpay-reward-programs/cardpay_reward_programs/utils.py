@@ -1,9 +1,11 @@
+import os
 import tempfile
 from pathlib import PosixPath
 
 import pyarrow.parquet as pq
 import yaml
 from cloudpathlib import AnyPath, CloudPath
+from web3 import Web3
 
 
 def exists(file_location):
@@ -103,3 +105,21 @@ def write_parquet_file(file_location, table):
             file_location.joinpath("data.parquet").upload_from(pq_file_location)
     else:
         pq.write_table(table, file_location / "results.parquet")
+
+
+def bytes_to_int(b):
+    return int.from_bytes(b, byteorder="big", signed=False)
+
+
+def check_env():
+    for expected_env in [
+        "APP",
+        "ETHEREUM_NODE_URL",
+    ]:
+        if expected_env not in os.environ:
+            raise ValueError(f"Missing environment variable {expected_env}")
+
+
+def create_w3():
+    provider = Web3.HTTPProvider(os.environ.get("ETHEREUM_NODE_URL"))
+    return Web3(provider)
