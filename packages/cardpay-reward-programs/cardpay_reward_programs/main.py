@@ -38,6 +38,7 @@ def to_rule(parameters):
 
 def run_reward_program(
     reward_program_id: str,
+    payment_cycle: int,
     parameters_file: str = typer.Option(
         default="./input/parameters.json", help="The parameters file to use"
     ),
@@ -54,7 +55,7 @@ def run_reward_program(
     start_block = rule.start_block
     end_block = rule.end_block
     results_df = rule.run(start_block, end_block)
-    payment_list = rule.df_to_payment_list(results_df, reward_program_id)
+    payment_list = rule.df_to_payment_list(results_df, payment_cycle, reward_program_id)
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
