@@ -18,7 +18,7 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
     assert.dom('[data-test-profile-card-name]').containsText('Name');
     assert
       .dom('[data-test-profile-card-host]')
-      .containsText('blank.card.space.test');
+      .containsText('blank.card.xyz.test');
     assert.dom('[data-test-profile-card-category]').containsText('Category');
     assert
       .dom('[data-test-profile-card-description]')
@@ -38,7 +38,7 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
     await render(hbs`
       <CardSpace::ProfileCard
         @name='Amazing Emily'
-        @host='emily.card.space'
+        @host='emily.card.xyz'
         @category='Health'
         @description='Welcome to a healthy & happy life!'
         @buttonText='Visit this Creator'
@@ -63,9 +63,7 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
       .hasAttribute('src', '/images/logos/metamask-logo.svg');
 
     assert.dom('[data-test-profile-card-name]').containsText('Amazing Emily');
-    assert
-      .dom('[data-test-profile-card-host]')
-      .containsText('emily.card.space');
+    assert.dom('[data-test-profile-card-host]').containsText('emily.card.xyz');
     assert.dom('[data-test-profile-card-category]').containsText('Health');
     assert
       .dom('[data-test-profile-card-description]')

@@ -90,9 +90,13 @@ module(
     });
 
     async function selectPrepaidCard(cardAddress: string) {
-      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
-      await waitFor(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
-      await click(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
+      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await waitFor(
+        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
+      );
+      await click(
+        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
+      );
     }
 
     test('it shows the correct data in default state', async function (assert) {
@@ -118,10 +122,10 @@ module(
         .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
         .isDisabled();
       assert
-        .dom(`[data-test-card-picker-dropdown]`)
-        .containsText('Select card');
+        .dom(`[data-test-boxel-card-picker-dropdown]`)
+        .containsText('Select Card');
 
-      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
       await waitFor(
         `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
@@ -136,12 +140,12 @@ module(
 
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card]`
         )
         .exists();
       assert
-        .dom(`[data-test-card-picker-dropdown]`)
-        .containsText('Change card');
+        .dom(`[data-test-boxel-card-picker-dropdown]`)
+        .containsText('Change Card');
       assert
         .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
         .isNotDisabled();
@@ -152,28 +156,28 @@ module(
 
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
         )
         .exists();
       assert
-        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .dom(`[data-test-boxel-card-picker-selected-card]`)
         .containsText(prepaidCardAddress);
       assert
-        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .dom(`[data-test-boxel-card-picker-selected-card]`)
         .containsText('$23.24 USD');
 
       await selectPrepaidCard(prepaidCardAddress2);
 
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress2}"]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress2}"]`
         )
         .exists();
       assert
-        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .dom(`[data-test-boxel-card-picker-selected-card]`)
         .containsText(prepaidCardAddress2);
       assert
-        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .dom(`[data-test-boxel-card-picker-selected-card]`)
         .containsText('$5.00 USD');
     });
 
@@ -193,7 +197,7 @@ module(
       assert
         .dom('[data-test-prepaid-card-choice-merchant-id]')
         .containsText('mandello1');
-      assert.dom(`[data-test-card-picker-dropdown]`).doesNotExist();
+      assert.dom(`[data-test-boxel-card-picker-dropdown]`).doesNotExist();
     });
 
     test('it allows canceling and retrying after a while', async function (assert) {
@@ -214,8 +218,8 @@ module(
 
       await click('[data-test-create-merchant-cancel-button]');
       assert
-        .dom(`[data-test-card-picker-dropdown]`)
-        .containsText('Change card');
+        .dom(`[data-test-boxel-card-picker-dropdown]`)
+        .containsText('Change Card');
       assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
 
       await click('[data-test-create-merchant-button]');

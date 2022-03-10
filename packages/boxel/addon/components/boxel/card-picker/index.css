@@ -1,0 +1,140 @@
+.boxel-card-picker {
+  --boxel-card-picker-width: 24rem;
+  --boxel-card-picker-dropdown-menu-height: 33rem;
+
+  position: relative;
+  max-width: var(--boxel-card-picker-width);
+}
+
+.boxel-card-picker--change-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.boxel-card-picker__dropdown {
+  position: static;
+  max-width: 100%;
+  color: var(--boxel-dark);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+  z-index: 1;
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.boxel-card-picker__dropdown > .ember-power-select-trigger {
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs) var(--boxel-sp);
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") right var(--boxel-sp) center/auto 0.5rem no-repeat;
+  background-color: var(--boxel-light);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius);
+  transition: border-color var(--boxel-transition);
+}
+
+.boxel-card-picker__dropdown--selected > .ember-power-select-trigger {
+  padding: var(--boxel-sp-xxxs) var(--boxel-sp);
+  background-image: none;
+  border-radius: 100px;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.boxel-card-picker__dropdown > .ember-power-select-trigger:hover {
+  border-color: var(--boxel-dark);
+  cursor: pointer;
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content {
+  position: relative;
+  width: 100%;
+  background-color: var(--boxel-light);
+  border: 1px solid rgb(0 0 0 / 15%);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
+  z-index: 1;
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+
+.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  border-radius: inherit;
+  max-height: var(--boxel-card-picker-dropdown-menu-height);
+  overflow-y: auto;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option {
+  padding: var(--boxel-sp) var(--boxel-sp-xxxl);
+  background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
+  background-repeat: no-repeat;
+  background-position: left var(--boxel-sp) center;
+  background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option + .ember-power-select-option {
+  border-top: 1px solid var(--boxel-light-400);
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option[aria-selected="true"] {
+  background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
+  cursor: pointer;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option[aria-current="true"] {
+  background-color: var(--boxel-purple-100);
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.boxel-card-picker__dropdown .ember-power-select-option--no-matches-message {
+  background-image: none;
+}
+
+.boxel-card-picker__selected-card {
+  width: var(--boxel-xxs-container);
+}
+
+@keyframes drop-fade-below {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drop-fade-above {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

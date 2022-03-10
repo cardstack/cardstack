@@ -18,11 +18,6 @@
   font-weight: 700;
 }
 
-.prepaid-card-choice__change-card {
-  display: flex;
-  align-items: flex-start;
-}
-
 .prepaid-card-choice__loading-indicator {
   --icon-color: var(--boxel-light);
 

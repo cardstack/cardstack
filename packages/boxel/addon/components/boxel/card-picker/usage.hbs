@@ -1,0 +1,36 @@
+<Freestyle::Usage @name="CardPicker">
+  <:example>
+    <Boxel::CardPicker
+      @items={{this.cards}}
+      @chooseItem={{this.chooseItem}}
+      @selectedItem={{this.selectedItem}}
+    as |item|>
+      <Boxel::CardContainer @displayBoundaries={{true}}>
+        <Boxel::Header @header={{item.type}} />
+        <div>{{item.name}}</div>
+        {{item.description}}
+      </Boxel::CardContainer>
+    </Boxel::CardPicker>
+  </:example>
+  <:api as |Args|>
+    <Args.Array
+      @name="items"
+      @type="Object"
+      @description="Array of objects"
+      @items={{this.cards}}
+      @onChange={{fn (mut this.cards)}}
+      @jsonCollapseDepth={{0}}
+    />
+    <Args.Object
+      @name="selectedItem"
+      @description="The item that is currently selected"
+      @value={{this.selectedItem}}
+      @jsonCollapseDepth={{0}}
+      @defaultValue="null"
+    />
+    <Args.Action
+      @name="chooseItem"
+      @description="Function to call when an item is selected from the dropdown"
+    />
+  </:api>
+</Freestyle::Usage>
