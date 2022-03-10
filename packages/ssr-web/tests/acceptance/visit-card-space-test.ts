@@ -83,14 +83,14 @@ module('Acceptance | visit card space', function (hooks) {
           `meta[property='og:title'][content='merchant name Profile']`,
           document.documentElement
         )
-        .exists();
+        .hasAttribute('content', 'merchant name Profile');
 
       assert
         .dom(
           `meta[name='twitter:title'][content='merchant name Profile']`,
           document.documentElement
         )
-        .exists();
+        .hasAttribute('content', 'merchant name Profile');
 
       assert
         .dom(
