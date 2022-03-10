@@ -84,7 +84,7 @@ o = {
                 "token": main_config["xdai"]["token"],
             },
         },
-        "view": {"single": retro_airdrop.view_single},
+        "view": {"single": retro_airdrop.view_single, "multiple": retro_airdrop.view_multiple},
     },
 }
 rule_name = st.sidebar.selectbox(
