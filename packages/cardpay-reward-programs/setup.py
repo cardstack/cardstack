@@ -23,6 +23,7 @@ setup(
         "pysha3",
         "pyarrow",
         "python-dotenv",
+        "web3",
     ],
     extras_require={
         "explore": ["streamlit", "altair", "parquet-tools"],
