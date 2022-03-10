@@ -57,6 +57,9 @@ def view_single(core_parameters, config, view_config):
     end_block = block + program.payment_cycle_length
     df = program.run(block, end_block)
     payment_list = program.df_to_payment_list(df, end_block)
+    s = st.expander(label="summary stats", expanded=True)
+    s.write("reward per transaction = ", program.get_reward_per_transaction())
+    s.write(payment_list["amount"].describe())
     return payment_list, df, program.get_summary(payment_list)
 
 
@@ -87,8 +90,9 @@ def view_multiple(core_parameters, config, view_config):
             y="n_transactions",
         )
     )
-
     st.altair_chart(amounts, use_container_width=True)
-
     payment_list = program.df_to_payment_list(df, end_block)
+    s = st.expander(label="summary stats", expanded=True)
+    s.write("reward per transaction = ", program.get_reward_per_transaction())
+    s.write(payment_list["amount"].describe())
     return payment_list, df, program.get_summary(payment_list)

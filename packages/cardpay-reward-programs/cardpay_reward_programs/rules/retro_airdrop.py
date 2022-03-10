@@ -38,13 +38,20 @@ class RetroAirdrop(Rule):
         group by prepaid_card_owner
         """
 
+    def get_reward_per_transaction(self):
+        total_n_payments = self.count_rows(self.start_snapshot_block, self.end_snapshot_block)
+        reward_per_transaction = self.total_reward / total_n_payments
+        if total_n_payments == 0:
+            return 0
+        else:
+            return reward_per_transaction
+
     def df_to_payment_list(
         self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
     ):
-        total_n_payments = self.count_rows(self.start_snapshot_block, self.end_snapshot_block)
-        if total_n_payments == 0:
+        reward_per_transaction = self.get_reward_per_transaction()
+        if reward_per_transaction == 0:
             return default_payment_list
-        reward_per_transaction = self.total_reward / total_n_payments
         if df.empty:
             return default_payment_list.copy()
         new_df = df.copy()
