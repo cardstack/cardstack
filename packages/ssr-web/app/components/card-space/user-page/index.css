@@ -39,6 +39,10 @@
   fill: currentColor;
 }
 
+.card-space-user-page__header > a:hover {
+  color: currentColor;
+}
+
 .card-space-user-page__description {
   text-align: center;
 }
