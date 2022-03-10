@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { click, currentURL, visit } from '@ember/test-helpers';
+import { currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 import AppContext from '@cardstack/ssr-web/services/app-context';
 import percySnapshot from '@percy/ember';
@@ -72,11 +72,12 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').includesText('slug');
       assert
         .dom('[data-test-boxel-styled-qr-code]')
         .hasAttribute('data-test-boxel-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
+      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
+
       await percySnapshot(assert);
     });
 
@@ -95,21 +96,14 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').containsText('slug');
 
-      assert.dom('[data-test-boxel-styled-qr-code]').doesNotExist();
-      assert.dom('[data-test-payment-link-url]').containsText(deepLink);
+      assert.dom('[data-test-boxel-styled-qr-code]').exists();
+
       assert
         .dom('[data-test-payment-link-deep-link]')
         .hasAttribute('href', deepLink);
 
-      await click('[data-test-payment-link-link-view-toggle]');
-
-      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
-      assert
-        .dom('[data-test-boxel-styled-qr-code]')
-        .hasAttribute('data-test-boxel-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
 
@@ -128,21 +122,14 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').containsText('slug');
 
-      assert.dom('[data-test-boxel-styled-qr-code]').doesNotExist();
-      assert.dom('[data-test-payment-link-url]').containsText(deepLink);
+      assert.dom('[data-test-boxel-styled-qr-code]').exists();
+
       assert
         .dom('[data-test-payment-link-deep-link]')
         .hasAttribute('href', deepLink);
 
-      await click('[data-test-payment-link-link-view-toggle]');
-
-      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
-      assert
-        .dom('[data-test-boxel-styled-qr-code]')
-        .hasAttribute('data-test-boxel-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
 

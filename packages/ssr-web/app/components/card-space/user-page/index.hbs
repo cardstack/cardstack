@@ -12,7 +12,7 @@
       </a>
     </div>
 
-    <div class="card-space-user-page__title">
+    <div class="card-space-user-page__title" data-test-merchant-name>
       {{@model.name}}
     </div>
 
@@ -20,7 +20,7 @@
       Scan this code to pay
     </div>
 
-    <div class="card-space-user-page__url">
+    <div class="card-space-user-page__url" data-test-merchant-url>
       {{@model.id}}{{config 'cardSpaceHostnameSuffix'}}
     </div>
 
@@ -49,7 +49,7 @@
                 <div class="payment-link__qr-container__separator"></div>
                 <div class="payment-link__qr-container__separator-or">OR</div>
 
-                <Boxel::Button @kind="primary-dark" @as="anchor" @size="large" href={{this.deepLinkPaymentURL}}>
+                <Boxel::Button @kind="primary-dark" @as="anchor" @size="large" href={{this.deepLinkPaymentURL}} data-test-payment-link-deep-link>
                   Pay with Card Wallet
                   {{svg-jar "card-pay-logo" height=20}}
                 </Boxel::Button>
