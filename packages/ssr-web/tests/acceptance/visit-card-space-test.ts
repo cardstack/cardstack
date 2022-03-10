@@ -91,6 +91,7 @@ module('Acceptance | visit card space', function (hooks) {
           document.documentElement
         )
         .exists();
+
       assert
         .dom(
           `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
