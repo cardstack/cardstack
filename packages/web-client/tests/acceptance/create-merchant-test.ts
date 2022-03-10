@@ -92,7 +92,7 @@ module('Acceptance | create merchant', function (hooks) {
     let post = postableSel(0, 0);
     assert.dom(`${postableSel(0, 0)} img`).exists();
     assert.dom(postableSel(0, 0)).containsText('Hello, nice to see you!');
-    assert.dom(postableSel(0, 1)).containsText('create a business account');
+    assert.dom(postableSel(0, 1)).containsText('create your payment profile');
 
     assert
       .dom(postableSel(0, 2))
@@ -162,13 +162,15 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Let’s create a new business account.');
+      .containsText('Let’s create a new payment profile.');
 
     post = postableSel(1, 3);
 
     await waitFor(post);
 
-    assert.dom(post).containsText('Choose a name and ID for the business');
+    assert
+      .dom(post)
+      .containsText('Choose a name and ID for your payment profile');
 
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
@@ -184,7 +186,7 @@ module('Acceptance | create merchant', function (hooks) {
     await click(`[data-test-merchant-customization-save-details]`);
 
     await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText('Business details saved');
+    assert.dom(milestoneCompletedSel(1)).containsText('Profile details saved');
 
     // prepaid-card-choice card
     post = postableSel(2, 2);
@@ -222,11 +224,11 @@ module('Acceptance | create merchant', function (hooks) {
     await waitFor(milestoneCompletedSel(2));
     assert
       .dom(milestoneCompletedSel(2))
-      .containsText('Business account created');
+      .containsText('Payment profile created');
 
     assert
       .dom(epiloguePostableSel(0))
-      .containsText('You have created a business account.');
+      .containsText('You have created a payment profile.');
 
     await waitFor(epiloguePostableSel(1));
 
@@ -402,7 +404,7 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.`
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a payment profile, please start again by connecting your wallet.`
         );
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -471,7 +473,7 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          'It looks like you changed accounts in the middle of this workflow. If you still want to create a business account, please restart the workflow.'
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a payment profile, please restart the workflow.'
         );
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -517,7 +519,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -557,7 +559,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')

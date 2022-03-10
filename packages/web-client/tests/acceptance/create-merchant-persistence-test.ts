@@ -171,7 +171,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .hasText('View on Blockscout');
       assert
         .dom('[data-test-epilogue][data-test-postable="0"]')
-        .includesText('Congratulations! You have created a business account.');
+        .includesText('Congratulations! You have created a payment profile.');
 
       await click('[data-test-create-merchant-next-step="dashboard"]');
       assert.dom('[data-test-workflow-thread]').doesNotExist();
@@ -206,7 +206,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'It looks like your L2 test chain wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.'
+          'It looks like your L2 test chain wallet got disconnected. If you still want to create a payment profile, please start again by connecting your wallet.'
         );
 
       await waitFor(
