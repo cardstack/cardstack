@@ -52,6 +52,7 @@
   font-size: var(--boxel-font-size-xl);
   font-weight: 600;
   margin: var(--boxel-sp-xxl) auto;
+  word-break: break-all;
 }
 
 .card-space-user-page__url {
