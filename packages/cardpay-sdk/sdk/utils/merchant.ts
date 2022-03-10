@@ -9,10 +9,9 @@ import Url from 'url-parse';
 export function validateMerchantId(value: string) {
   const subdomainFriendlyLength = 50;
   if (!value.trim().length) return 'This field is required';
-  if (/[^a-z0-9]/.test(value))
-    return 'The Business ID can only contain lowercase letters or numbers, no special characters';
+  if (/[^a-z0-9]/.test(value)) return 'Unique ID can only contain lowercase letters or numbers, no special characters';
   else if (value.length > subdomainFriendlyLength)
-    return `The Business ID cannot be more than ${subdomainFriendlyLength} characters long. It is currently ${value.length} characters long`;
+    return `Unique ID cannot be more than ${subdomainFriendlyLength} characters long. It is currently ${value.length} characters long`;
   return '';
 }
 
