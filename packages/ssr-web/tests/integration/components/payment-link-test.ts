@@ -58,7 +58,7 @@ module('Integration | Component | common/payment-link', function (hooks) {
     assert
       .dom(LINK)
       .hasAttribute('href', deepLink)
-      .containsText('Pay Business');
+      .containsText('Pay with Card Wallet');
   });
   test('it allows toggling to qr and back in the mobile state', async function (assert) {
     this.set('mode', 'link');

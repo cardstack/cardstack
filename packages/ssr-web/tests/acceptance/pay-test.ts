@@ -563,7 +563,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay Business')
+      .containsText('Pay with Card Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -602,7 +602,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay Business')
+      .containsText('Pay with Card Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
