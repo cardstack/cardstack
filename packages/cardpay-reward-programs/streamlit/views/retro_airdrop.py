@@ -12,7 +12,7 @@ const_end_snapshot_block = 25165824
 def user_defined_parameters(config):
     s = st.expander(label="User defined parameters", expanded=True)
     total_reward = s.number_input(
-        "total reward", value=10000000, step=1000000, min_value=1000000, max_value=50000000
+        "total reward", value=6000000, step=1000000, min_value=1000000, max_value=50000000
     )
     start_snapshot_block = s.number_input(
         "start_snapshot_block",
