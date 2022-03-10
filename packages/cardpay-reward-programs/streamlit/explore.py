@@ -99,7 +99,7 @@ f = o[rule_name]["view"][v]
 config = o[rule_name]["config"][os.getenv("APP")]
 
 payment_list, df, summary = f(core, config, view_config)
-st.table(df)
+st.write(df)
 st.write(summary)
 st.write(payment_list)
 download_csv(payment_list)

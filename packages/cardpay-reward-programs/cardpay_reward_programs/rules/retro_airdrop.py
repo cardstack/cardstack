@@ -74,12 +74,12 @@ class RetroAirdrop(Rule):
         vars = [start_block, end_block]
         table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
-            return pd.DataFrame(columns=["payee", "total_spent"])
+            return pd.DataFrame(columns=["payee", "transactions"])
         else:
             return self.run_query(table_query, vars)
 
     def aggregate(self, cached_df=[]):
         if len(cached_df) == 0:
-            return pd.DataFrame(columns=["payee", "total_spent"])
+            return pd.DataFrame(columns=["payee", "transactions"])
         else:
             return pd.concat(cached_df).groupby("payee").sum().reset_index()

@@ -1,3 +1,5 @@
+import altair as alt
+import pandas as pd
 import streamlit as st
 from cardpay_reward_programs.rules import RetroAirdrop
 
@@ -68,12 +70,25 @@ def view_multiple(core_parameters, config, view_config):
     )
     progress = st.progress(0.0)
     cached_df = []
+    total_payments = []
     for i in range(start_block, end_block, program.payment_cycle_length):
         progress.progress((i - start_block) / (end_block - start_block))
         tail = min(end_block, i + program.payment_cycle_length)
         df = program.run(i, tail)
+        total_payments.append({"block": i, "n_transactions": df["transactions"].sum()})
         if not df.empty:
             cached_df.append(df)
     df = program.aggregate(cached_df)
+    amounts = (
+        alt.Chart(pd.DataFrame(total_payments))
+        .mark_bar()
+        .encode(
+            alt.X("block", bin=alt.Bin()),
+            y="n_transactions",
+        )
+    )
+
+    st.altair_chart(amounts, use_container_width=True)
+
     payment_list = program.df_to_payment_list(df, end_block)
     return payment_list, df, program.get_summary(payment_list)
