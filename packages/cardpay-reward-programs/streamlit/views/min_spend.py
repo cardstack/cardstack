@@ -27,11 +27,11 @@ def min_spend(core_parameters, config):
 
 def view_multiple(core_parameters, config, view_config):
     program = min_spend(core_parameters, config)
-    start_block, end_block = slider_partition(
-        view_config["start_block"],
-        view_config["end_block"],
-        view_config["default_block"],
-        type="two_end",
+    start_block, end_block = st.slider(
+        "Start block - End block",
+        min_value=view_config["start_block"],
+        max_value=view_config["end_block"],
+        value=(view_config["start_block"], view_config["default_block"]),
     )
     progress = st.progress(0.0)
     cached_df = []
@@ -48,11 +48,11 @@ def view_multiple(core_parameters, config, view_config):
 
 def view_single(core_parameters, config, view_config):
     program = min_spend(core_parameters, config)
-    block = slider_partition(
-        view_config["start_block"],
-        view_config["end_block"],
-        view_config["default_block"],
-        type="one_end",
+    block = st.slider(
+        "End block",
+        min_value=view_config["start_block"],
+        max_value=view_config["end_block"],
+        value=view_config["default_block"],
     )
     end_block = block + program.payment_cycle_length
     df = program.run(block, end_block)
