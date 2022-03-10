@@ -35,10 +35,14 @@ class Rule(ABC):
         local_files = get_files(config_location, table_name, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 
-    def run_query(self, table_query, vars):
+    def run_query(self, table_query, vars, sql=None):
         con = duckdb.connect(database=":memory:", read_only=False)
-        con.execute(self.sql(table_query), vars)
-        return con.fetchdf()
+        if sql is not None:
+            con.execute(sql, vars)
+            return con.fetchdf()
+        else:
+            con.execute(self.sql(table_query), vars)
+            return con.fetchdf()
 
     @abstractmethod
     def run(self, start_block: int, end_block: int):
