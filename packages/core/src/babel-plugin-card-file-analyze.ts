@@ -2,16 +2,19 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { BabelFileResult, transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import { name, error } from './utils/babel';
+import { name, error, getObjectKey } from './utils/babel';
 import { augmentBadRequest } from './utils/errors';
 
 // @ts-ignore
 import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
 // @ts-ignore
 import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
+import glimmerTemplateAnalyze from './glimmer-plugin-template-analyze';
+import { Format } from './interfaces';
 
 interface State {
   opts: any;
+  insideExportDefault: boolean;
 }
 
 export const VALID_FIELD_DECORATORS = {
@@ -37,21 +40,27 @@ export interface FieldMeta {
   computed: boolean;
   computeVia?: string;
 }
-export interface FieldsMeta {
-  [name: string]: FieldMeta;
-}
-export interface ParentMeta {
-  cardURL: string;
-}
 export interface ExportMeta {
   name: 'default' | string;
   type: t.Declaration['type'];
 }
-
+export interface TemplateUsageMeta {
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
+}
 export interface FileMeta {
   exports?: ExportMeta[];
-  fields: FieldsMeta;
-  parent?: ParentMeta;
+  fields: {
+    [name: string]: FieldMeta;
+  };
+  parent?: {
+    cardURL: string;
+  };
+  component:
+    | {
+        usageMeta: TemplateUsageMeta;
+      }
+    | undefined;
 }
 
 const metas = new WeakMap<State['opts'], FileMeta>();
@@ -61,6 +70,7 @@ function getMeta(obj: State['opts']): FileMeta {
   if (!meta) {
     return {
       fields: {},
+      component: undefined,
     };
   }
   return meta;
@@ -97,12 +107,18 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
   let t = babel.types;
   return {
     visitor: {
+      Program: {
+        enter(_path: NodePath<t.Program>, state: State) {
+          state.insideExportDefault = false;
+        },
+      },
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         if (path.node.source.value === '@cardstack/types') {
           storeDecoratorMeta(state.opts, path, t);
           path.remove();
         }
       },
+
       ExportNamedDeclaration(path: NodePath<t.ExportNamedDeclaration>, state: State) {
         switch (path.node.declaration?.type) {
           case 'FunctionDeclaration':
@@ -123,14 +139,29 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
             break;
         }
       },
-      ExportDefaultDeclaration(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
-        // Not sure what to do with expressions
-        if (!t.isExpression(path.node.declaration)) {
-          storeExportMeta(state.opts, {
-            name: 'default',
-            type: path.node.declaration.type,
-          });
-        }
+
+      ExportDefaultDeclaration: {
+        enter(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
+          state.insideExportDefault = true;
+          // Not sure what to do with expressions
+          if (!t.isExpression(path.node.declaration)) {
+            storeExportMeta(state.opts, {
+              name: 'default',
+              type: path.node.declaration.type,
+            });
+          }
+        },
+        exit(_path: NodePath, state: State) {
+          state.insideExportDefault = false;
+        },
+      },
+
+      CallExpression: {
+        enter(path: NodePath<t.CallExpression>, state: State) {
+          if (isComponentTemplateExpression(path, state)) {
+            analyzePrecompileTemplate(state.opts, path, t);
+          }
+        },
       },
     },
   };
@@ -147,8 +178,8 @@ function storeExportMeta(key: State['opts'], exportMeta: ExportMeta) {
 }
 
 function storeDecoratorMeta(key: State['opts'], path: NodePath<t.ImportDeclaration>, t: typeof Babel.types) {
-  let fields: FieldsMeta = {};
-  let parent: ParentMeta | undefined;
+  let fields: FileMeta['fields'] = {};
+  let parent: FileMeta['parent'] | undefined;
   for (let specifier of path.node.specifiers) {
     // all our field-defining decorators are named exports
     if (!t.isImportSpecifier(specifier)) {
@@ -176,7 +207,7 @@ function storeDecoratorMeta(key: State['opts'], path: NodePath<t.ImportDeclarati
 
 function validateUsageAndGetFieldMeta(
   path: NodePath<t.ImportDeclaration>,
-  fields: FieldsMeta,
+  fields: FileMeta['fields'],
   fieldTypeDecorator: Decorator,
   actualName: FieldType,
   t: typeof Babel.types
@@ -239,7 +270,7 @@ function validateUsageAndGetParentMeta(
   path: NodePath<t.ImportDeclaration>,
   fieldTypeDecorator: Decorator,
   t: typeof Babel.types
-): ParentMeta {
+): FileMeta['parent'] {
   let adoptsIdentifier = path.scope.bindings[fieldTypeDecorator].referencePaths[0];
 
   if (!t.isClassDeclaration(adoptsIdentifier.parentPath.parentPath.parent)) {
@@ -315,4 +346,61 @@ function extractDecoratorArguments(
   }
 
   return result;
+}
+
+function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: State): boolean {
+  return (
+    // Is this call expression inside of this files default export
+    state.insideExportDefault &&
+    path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
+  );
+}
+
+function analyzePrecompileTemplate(key: State['opts'], path: NodePath<t.CallExpression>, t: typeof Babel.types) {
+  let rawTemplate = getAndValidateTemplate(path, t);
+  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
+
+  glimmerTemplateAnalyze(rawTemplate, {
+    usageMeta,
+  });
+
+  let meta = getMeta(key);
+  meta.component = { usageMeta };
+  metas.set(key, meta);
+}
+
+function getAndValidateTemplate(path: NodePath<t.CallExpression>, t: typeof Babel.types): string {
+  let args = path.get('arguments');
+  if (args.length < 2) {
+    throw error(path, 'precompileTemplate needs two arguments');
+  }
+  let template = args[0];
+  let templateString: string;
+  if (template.isStringLiteral()) {
+    templateString = template.node.value;
+  } else if (template.isTemplateLiteral()) {
+    if (template.node.quasis.length > 1) {
+      throw error(template, 'must not contain expressions');
+    }
+    let str = template.node.quasis[0].value.cooked;
+    if (!str) {
+      throw error(template, 'bug: no cooked value');
+    }
+    templateString = str;
+  } else {
+    throw error(template, 'must be a sting literal or template literal');
+  }
+
+  let options = args[1];
+  if (!options.isObjectExpression()) {
+    throw error(options, 'must be an object expression');
+  }
+
+  let strictMode = getObjectKey(options, 'strictMode', t);
+
+  if (!strictMode?.isBooleanLiteral() || !strictMode.node.value) {
+    throw error(options as NodePath<any>, 'Card Template precompileOptions requires strictMode to be true');
+  }
+
+  return templateString;
 }

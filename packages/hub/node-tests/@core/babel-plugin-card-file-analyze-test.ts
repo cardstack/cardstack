@@ -1,4 +1,5 @@
 import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 if (process.env.COMPILER) {
   describe('BabelPluginCardAnalyze', function () {
@@ -7,7 +8,7 @@ if (process.env.COMPILER) {
       let out = cardAnalyze(source);
       expect(out).to.have.property('ast');
       expect(out.code).to.equal(source);
-      expect(out.meta).to.deep.equal({ fields: {} });
+      expect(out.meta).to.deep.equal({ fields: {}, component: undefined });
     });
 
     it('It captures meta information about exports in the file', function () {
@@ -146,6 +147,85 @@ if (process.env.COMPILER) {
         typeDecoratorLocalName: 'string',
         computed: true,
         computeVia: 'computeHome',
+      });
+    });
+
+    describe('templates', function () {
+      it('string-like', async function () {
+        let { meta } = cardAnalyze(templateOnlyComponentTemplate('{{@model}}'));
+
+        expect(meta.component?.usageMeta).to.deep.equal({ model: 'self', fields: new Map() });
+      });
+
+      it('date-like', async function () {
+        let { meta } = cardAnalyze(templateOnlyComponentTemplate('<FormatDate @date={{@model}} />'));
+
+        expect(meta.component?.usageMeta).to.deep.equal({ model: 'self', fields: new Map() });
+      });
+
+      it('simple embeds', async function () {
+        let { meta } = cardAnalyze(templateOnlyComponentTemplate('<@fields.title />'));
+
+        expect(meta.component?.usageMeta.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
+        expect(meta.component?.usageMeta.fields, 'The title field to be in fields').to.deep.equal(
+          new Map([['title', 'default']])
+        );
+      });
+
+      it('simple model usage', async function () {
+        let { meta } = cardAnalyze(templateOnlyComponentTemplate('{{helper @model.title}}'));
+
+        expect(meta.component?.usageMeta).to.deep.equal({ model: new Set(['title']), fields: new Map() });
+      });
+
+      it('Nested usage', async function () {
+        let { meta } = cardAnalyze(
+          templateOnlyComponentTemplate(
+            '{{@model.title}} - <@fields.post.createdAt /> - <@fields.post.author.birthdate />'
+          )
+        );
+
+        expect(meta.component?.usageMeta).to.deep.equal({
+          model: new Set(['title']),
+          fields: new Map([
+            ['post.createdAt', 'default'],
+            ['post.author.birthdate', 'default'],
+          ]),
+        });
+      });
+
+      it('Block usage for self', async function () {
+        let { meta } = cardAnalyze(
+          templateOnlyComponentTemplate(
+            '<Whatever @name={{name}} /> {{#each-in @fields as |name Field|}} <label>{{name}}</label> <Field /> {{/each-in}} <Whichever @field={{Field}} />'
+          )
+        );
+
+        expect(meta.component?.usageMeta).to.deep.equal({ model: new Set(), fields: 'self' });
+      });
+
+      it('Block usage for field', async function () {
+        let { meta } = cardAnalyze(
+          templateOnlyComponentTemplate(
+            '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
+          )
+        );
+
+        expect(meta.component?.usageMeta).to.deep.equal({
+          model: new Set(['plane']),
+          fields: new Map([['birthdays', 'default']]),
+        });
+      });
+
+      it('Block usage for fields field', async function () {
+        let { meta } = cardAnalyze(
+          templateOnlyComponentTemplate('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}')
+        );
+
+        expect(meta.component?.usageMeta).to.deep.equal({
+          model: new Set(),
+          fields: new Map([['birthdays.location', 'default']]),
+        });
       });
     });
   });
