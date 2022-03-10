@@ -21,7 +21,7 @@
                 <CardPay::AccountDisplay
                   @size="small"
                   @icon={{this.selectedSafe.type}}
-                  @name={{uppercase this.selectedSafe.type}}
+                  @name={{uppercase this.selectedSafeTypeCopy}}
                   @address={{truncate-middle this.selectedSafe.address}}
                 />
               {{else}}

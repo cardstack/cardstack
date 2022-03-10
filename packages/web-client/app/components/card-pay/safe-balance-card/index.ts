@@ -55,7 +55,7 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
     let safeType: string = this.safe.type;
 
     if (safeType === 'merchant') {
-      safeType = 'business';
+      safeType = 'Payment Profile';
     }
 
     return capitalize(safeType).replace(/-/g, ' ');
