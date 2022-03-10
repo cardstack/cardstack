@@ -78,6 +78,33 @@ module('Acceptance | visit card space', function (hooks) {
         .hasAttribute('data-test-boxel-styled-qr-code', link);
       assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
 
+      assert
+        .dom(
+          `meta[property='og:title'][content='merchant name Profile']`,
+          document.documentElement
+        )
+        .exists();
+
+      assert
+        .dom(
+          `meta[name='twitter:title'][content='merchant name Profile']`,
+          document.documentElement
+        )
+        .exists();
+      assert
+        .dom(
+          `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
+      assert
+        .dom(
+          `meta[name='twitter:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
       await percySnapshot(assert);
     });
 
