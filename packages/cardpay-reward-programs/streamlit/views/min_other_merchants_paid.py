@@ -13,7 +13,7 @@ def user_defined_parameters(config):
     user_defined_parameters = {
         "base_reward": base_reward,
         "min_other_merchants": min_other_merchants,
-        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+        "token": config["token"],
         "subgraph_config_location": {"prepaid_card_payment": config["config_location"]},
         "duration": 43200,
     }

@@ -17,7 +17,7 @@ def user_defined_parameters(config):
     )
     user_defined_parameters = {
         "total_reward": total_reward,
-        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+        "token": config["token"],
         "subgraph_config_location": {"prepaid_card_payment": config["config_location"]},
         "duration": 43200,
         "start_snapshot_block": start_snapshot_block,
