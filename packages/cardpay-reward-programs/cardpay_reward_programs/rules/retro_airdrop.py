@@ -5,7 +5,8 @@ from cardpay_reward_programs.rule import Rule
 
 class RetroAirdrop(Rule):
     """
-    total number of payments of range / total number of payments
+    reward_per_transaction = (total_n_payments in start_block< x <= end_block/ total_n_payments from  start_snapshot_block < x <= end_snapshot_block)
+    reward_per_payee (amount) = (total_n_payments of payee in start_block < x <= end_block) * reward_per_transaction
     """
 
     def __init__(self, core_parameters, user_defined_parameters):
@@ -53,10 +54,6 @@ class RetroAirdrop(Rule):
         new_df["amount"] = new_df["transactions"] * reward_per_transaction
         new_df = new_df.drop(["transactions"], axis=1)
         return new_df
-
-    def get_reward_per_transaction(self, start_block, end_block):
-        reward_per_transaction = self.count_rows(start_block, end_block)
-        return reward_per_transaction
 
     def count_rows(self, start_block, end_block):
         table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
