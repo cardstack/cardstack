@@ -12,7 +12,7 @@
   margin: auto;
   background: var(--card-space-background);
   color: var(--card-space-text-color);
-  padding: var(--boxel-sp-xl);
+  padding: min(var(--boxel-sp-xl), 5vw);
   border-radius: 2rem;
   min-height: 90vh;
   max-width: 90%;
