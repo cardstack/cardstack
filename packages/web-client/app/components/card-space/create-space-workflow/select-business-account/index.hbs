@@ -1,13 +1,13 @@
 <ActionCardContainer
-  @header="Business account"
+  @header="Payment profile"
   @isComplete={{@isComplete}}
   {{did-insert this.setupBusinessAccountSelection}}
   data-test-card-space-select-business-account-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Select a business account">
+  <ActionCardContainer::Section @title="Select a profile">
     {{#if @isComplete}}
       <Boxel::Field
-        @label="Business Name"
+        @label="Profile Name"
         @centeredDisplay={{true}}
       >
         <CardPay::Merchant
@@ -19,7 +19,7 @@
         />
       </Boxel::Field>
 
-      <Boxel::Field @label="Business ID">
+      <Boxel::Field @label="Profile ID">
         {{this.merchantData.id}}
       </Boxel::Field>
 
@@ -29,7 +29,7 @@
     {{else}}
       <CardPay::FieldStack>
         <Boxel::Field
-          @label="Business Account"
+          @label="Payment Profile"
         >
           <CardPay::SafeChooserDropdown
             @safes={{this.merchantSafes}}
@@ -39,8 +39,8 @@
           />
           <div></div>
           <div class="form-input-info">
-            The business ID will be used for your Card Space URL. Only business accounts that
-            you haven't yet been used for Card Space are shown.
+            The profile ID will be used for your Card Space URL. Only profiles that
+            you haven't used for Card Space are shown.
           </div>
         </Boxel::Field>
 

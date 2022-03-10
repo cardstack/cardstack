@@ -323,7 +323,7 @@ module('Acceptance | create card space', function (hooks) {
         await waitFor(postableSel(1, 2));
         assert
           .dom(postableSel(1, 2))
-          .containsText(`Please select a business account`);
+          .containsText(`Please select a payment profile`);
 
         let workflowPersistenceService = this.owner.lookup(
           'service:workflow-persistence'
@@ -453,7 +453,7 @@ module('Acceptance | create card space', function (hooks) {
           assert
             .dom('[data-test-cancelation]')
             .containsText(
-              'It looks like you all your business accounts have already been used to create a Card Space'
+              'It looks like you all your payment profiles have already been used to create a Card Space'
             );
           await waitFor(
             '[data-test-create-card-space-workflow-create-business-account-cta]'
@@ -464,7 +464,7 @@ module('Acceptance | create card space', function (hooks) {
 
           assert
             .dom('[data-test-boxel-thread-header]')
-            .containsText('Business Account Creation');
+            .containsText('Payment Profile Creation');
         });
       });
     });
@@ -491,7 +491,7 @@ module('Acceptance | create card space', function (hooks) {
         assert
           .dom('[data-test-cancelation]')
           .containsText(
-            'It looks like you haven’t created a business account yet'
+            'It looks like you haven’t created a payment profile yet'
           );
 
         await click(
@@ -500,7 +500,7 @@ module('Acceptance | create card space', function (hooks) {
 
         assert
           .dom('[data-test-boxel-thread-header]')
-          .containsText('Business Account Creation');
+          .containsText('Payment Profile Creation');
       });
     });
   });
