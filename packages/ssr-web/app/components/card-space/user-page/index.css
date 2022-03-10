@@ -12,7 +12,7 @@
   margin: auto;
   background: var(--card-space-background);
   color: var(--card-space-text-color);
-  padding: var(--boxel-sp-xl);
+  padding: min(var(--boxel-sp-xl), 5vw);
   border-radius: 2rem;
   min-height: 90vh;
   max-width: 90%;
@@ -32,7 +32,15 @@
 }
 
 .card-space-user-page__header svg {
-  fill: var(--card-space-text-color);
+  /*
+    inherit the text color so that the logo does not have contrast issues.
+    background and text color on this page are dynamic.
+  */
+  fill: currentColor;
+}
+
+.card-space-user-page__header > a:hover {
+  color: currentColor;
 }
 
 .card-space-user-page__description {
@@ -43,7 +51,8 @@
   text-align: center;
   font-size: var(--boxel-font-size-xl);
   font-weight: 600;
-  margin: var(--boxel-sp-xxl);
+  margin: var(--boxel-sp-xxl) auto;
+  word-break: break-all;
 }
 
 .card-space-user-page__url {
@@ -67,6 +76,10 @@
   text-align: center;
   font-size: var(--boxel-font-size-sm);
   margin-top: var(--boxel-sp-lg);
+}
+
+.payment-link__qr {
+  max-width: 100%;
 }
 
 .payment-link__qr-container__actions {
