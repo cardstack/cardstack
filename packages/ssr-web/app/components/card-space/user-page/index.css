@@ -63,7 +63,7 @@
   text-align: center;
   font-size: var(--boxel-font-size-xl);
   font-weight: 600;
-  margin: var(--boxel-sp-xxl) auto;
+  margin-bottom: var(--boxel-sp-xxl);
   word-break: break-all;
 }
 
