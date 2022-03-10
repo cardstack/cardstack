@@ -29,7 +29,7 @@ const SUPPLIERS_PANEL = {
       title: 'Withdrawals',
       description: `Withdraw CPXD tokens from your Card Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
       bullets: [
-        `Withdraw from a depot or business account in your Card Wallet`,
+        `Withdraw from a depot or payment profile in your Card Wallet`,
         `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
       ],
       cta: 'Withdraw Tokens',

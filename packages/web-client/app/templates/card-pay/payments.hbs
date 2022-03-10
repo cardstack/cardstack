@@ -18,7 +18,7 @@
           </:cta>
           <:disclaimer>
             {{#if (eq section.workflow "create-business")}}
-              Business accounts are on-chain. We charge a nominal
+              Payment profiles are on-chain. We charge a nominal
               <span class="card-pay-dashboard__payments-fee">$1 USD</span>
               setup fee to offset gas and other administrative costs. You can use a prepaid card in your account to cover this fee.
             {{/if}}
@@ -49,7 +49,7 @@
   {{#if this.layer2Network.isConnected}}
     <section data-test-merchants-section>
       <header class="card-pay-dashboard__payments-section-header">
-        <h3 class="card-pay-dashboard__payments-title">Business Services</h3>
+        <h3 class="card-pay-dashboard__payments-title">Payment Profiles</h3>
         {{#let @model.panel.sections.[0] as |section|}}
           <Boxel::Button
             {{on "click" (fn this.transitionToWorkflow section.workflow)}}
