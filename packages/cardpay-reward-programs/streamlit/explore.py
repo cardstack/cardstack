@@ -6,7 +6,7 @@ from cardpay_reward_programs.utils import check_env
 from cloudpathlib import S3Client
 from dotenv import load_dotenv
 from views import min_other_merchants_paid, min_spend, retro_airdrop, weighted_usage
-from views.config import view_config_map
+from views.config import main_config, view_config_map
 from views.core_parameters import core_parameters
 from views.utils import download_csv
 
@@ -29,13 +29,14 @@ st.header("Rule Configurator")
 
 o = {
     "min_spend": {
-        # env depenedent configs
         "config": {
             "staging": {
                 "config_location": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["sokol"]["token"],
             },
             "prod": {
                 "config_location": "s3://cardpay-production-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["xdai"]["token"],
             },
         },
         "view": {"single": min_spend.view_single, "multiple": min_spend.view_multiple},
@@ -44,9 +45,11 @@ o = {
         "config": {
             "staging": {
                 "config_location": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["sokol"]["token"],
             },
             "prod": {
                 "config_location": "s3://cardpay-production-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["xdai"]["token"],
             },
         },
         "view": {
@@ -58,9 +61,11 @@ o = {
         "config": {
             "staging": {
                 "config_location": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["sokol"]["token"],
             },
             "prod": {
                 "config_location": "s3://cardpay-production-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["xdai"]["token"],
             },
         },
         "view": {
@@ -72,9 +77,11 @@ o = {
         "config": {
             "staging": {
                 "config_location": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["sokol"]["token"],
             },
             "prod": {
                 "config_location": "s3://cardpay-production-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
+                "token": main_config["xdai"]["token"],
             },
         },
         "view": {"single": retro_airdrop.view_single},
