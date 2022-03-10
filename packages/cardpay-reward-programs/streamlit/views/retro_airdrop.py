@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from cardpay_reward_programs.rules import RetroAirdrop
 
-from .utils import block_to_timestamp_converter, read_attributes
+from .utils import read_attributes
 
 const_start_snapshot_block = 17265698
 const_end_snapshot_block = 25165824
