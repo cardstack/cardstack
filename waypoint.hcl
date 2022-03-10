@@ -233,6 +233,11 @@ app "cardpay-subg-ext" {
             count = 1
             subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
             task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
+            execution_role_name = "cardpay-staging-subgraph-extraction-ecr-task-executor-role"
+            secrets = {
+                SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4",
+                SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_output_location-P04N4G"
+            }
             disable_alb = true
         }
     }
@@ -266,7 +271,7 @@ app "ssr-web" {
             task_role_name = "ssr-web-staging-ecr-task"
 
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/496043d250eb05f7"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/1b6996d108e2cbca"
             }
         }
 

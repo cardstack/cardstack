@@ -1,0 +1,21 @@
+<div class={{cn "boxel-card-picker" boxel-card-picker--change-card=@selectedItem}} data-test-boxel-card-picker ...attributes>
+  {{#if this.selectedOption}}
+    <div class="boxel-card-picker__selected-card" data-test-boxel-card-picker-selected-card>
+      {{yield this.selectedOption}}
+    </div>
+  {{/if}}
+  <PowerSelect
+    class={{cn "boxel-card-picker__dropdown" boxel-card-picker__dropdown--selected=@selectedItem}}
+    @options={{@items}}
+    @selected={{this.selectedOption}}
+    @selectedItemComponent="boxel/card-picker/selected-item"
+    @placeholder="Select Card"
+    @onChange={{@chooseItem}}
+    @renderInPlace={{true}}
+    @eventType="click"
+    @verticalPosition="below"
+    data-test-boxel-card-picker-dropdown
+  as |item|>
+    {{yield item}}
+  </PowerSelect>
+</div>

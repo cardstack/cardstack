@@ -50,7 +50,7 @@ export interface ExportMeta {
 
 export interface FileMeta {
   exports?: ExportMeta[];
-  fields?: FieldsMeta;
+  fields: FieldsMeta;
   parent?: ParentMeta;
 }
 
@@ -59,21 +59,25 @@ const metas = new WeakMap<State['opts'], FileMeta>();
 function getMeta(obj: State['opts']): FileMeta {
   let meta = metas.get(obj);
   if (!meta) {
-    return {};
+    return {
+      fields: {},
+    };
   }
   return meta;
 }
 
-export default function (
-  source: string,
-  options: any
-): { code: BabelFileResult['code']; ast: BabelFileResult['ast']; meta: FileMeta } {
+export default function (source: string): {
+  code: BabelFileResult['code'];
+  ast: BabelFileResult['ast'];
+  meta: FileMeta;
+} {
   let out: BabelFileResult;
+  let key = {};
   try {
     out = transformSync(source, {
       ast: true,
       plugins: [
-        [babelPluginCardFileAnalyze, options],
+        [babelPluginCardFileAnalyze, key],
         [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
         classPropertiesSyntaxPlugin,
       ],
@@ -85,7 +89,7 @@ export default function (
   return {
     code: out!.code,
     ast: out!.ast,
-    meta: getMeta(options),
+    meta: getMeta(key),
   };
 }
 
@@ -165,7 +169,7 @@ function storeDecoratorMeta(key: State['opts'], path: NodePath<t.ImportDeclarati
   }
 
   let meta = getMeta(key);
-  meta.fields = fields;
+  meta.fields = { ...meta.fields, ...fields };
   meta.parent = parent;
   metas.set(key, meta);
 }

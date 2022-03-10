@@ -20,6 +20,12 @@ if (process.env.COMPILER) {
             import string from "https://cardstack.com/base/string";
             export default class Pet {
               @contains(string) species;
+              @contains(string) name;
+
+              @contains(string)
+              get description() {
+                return this.name + " the " + this.species;
+              }
             }
           `,
         },
@@ -37,6 +43,16 @@ if (process.env.COMPILER) {
             export default class Person {
               @contains(string) name;
               @contains(pet) bestFriend;
+
+              @contains(string)
+              get summary() {
+                return this.name + "'s best friend is " + this.bestFriend.description;
+              }
+
+              @contains(string)
+              get about() {
+                return "Author " + this.name + " lives with their best friend, " + this.bestFriend.description;
+              }
             }
           `,
         },
@@ -51,6 +67,7 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
+            import integer from "https://cardstack.com/base/integer";
             import datetime from "https://cardstack.com/base/datetime";
             import person from '${realmURL}person';
             export default class Post {
@@ -60,10 +77,15 @@ if (process.env.COMPILER) {
               @contains(string) extra;
               @contains(person) author;
               @contains(string) favoriteColor;
+              @contains(integer) rating;
+              @contains(string)
+              get ratingPct() {
+                return this.rating / 5 * 100 + '%';
+              }
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
+            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/><@fields.author.summary/><@fields.ratingPct/></article>'
           ),
         },
       });
@@ -76,10 +98,12 @@ if (process.env.COMPILER) {
           title: 'Hello World',
           body: 'First post.',
           favoriteColor: 'blue',
+          rating: 3,
           author: {
             name: 'Emily',
             bestFriend: {
               species: 'dog',
+              name: 'Max',
             },
           },
         },
@@ -100,11 +124,13 @@ if (process.env.COMPILER) {
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Hello World',
         body: 'First post.',
+        ratingPct: '60%',
         author: {
           name: 'Emily',
           bestFriend: {
             species: 'dog',
           },
+          summary: "Emily's best friend is Max the dog",
         },
       });
       expect(response.body.data?.meta.componentModule).to.not.be.undefined;
@@ -126,11 +152,17 @@ if (process.env.COMPILER) {
         favoriteColor: 'blue',
         createdAt: null,
         extra: null,
+        rating: 3,
+        ratingPct: '60%',
         author: {
-          name: 'Emily',
+          about: 'Author Emily lives with their best friend, Max the dog',
           bestFriend: {
+            description: 'Max the dog',
+            name: 'Max',
             species: 'dog',
           },
+          name: 'Emily',
+          summary: "Emily's best friend is Max the dog",
         },
       });
     });

@@ -40,20 +40,20 @@ jobs:
 
       - name: Send success notification to Discord
         if: ${{ success() }}
-        uses: ./.github/actions/discord-message
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
+          args: |
             :checkered_flag: **subgraph extractor** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send failure notification to Discord
         if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
+          args: |
             :warning: **subgraph extractor** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
