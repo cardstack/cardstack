@@ -9,6 +9,7 @@ import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
 import { PaymentLinkMode } from '../../common/payment-link';
 import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
+import CardPayLogoPng from '@cardstack/ssr-web/images/logos/card-pay-logo.png';
 
 interface CardSpaceUserPageArgs {
   model: {
@@ -27,11 +28,20 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
   @tracked addressFetchingError: string | null = null;
   @service declare subgraph: Subgraph;
   cardstackLogoForQR = CardstackLogoForQR;
+  cardPayLogoPng = CardPayLogoPng;
   defaultAddressFetchingErrorMsg =
     'We ran into an issue while generating the payment request link. Please reload the page and try again. If the issue persists, please contact support.';
 
   get canDeepLink() {
     return this.UAService.isIOS() || this.UAService.isAndroid();
+  }
+
+  get meta() {
+    return {
+      description: 'Cardstack',
+      title: `${this.args.model.name} Profile`,
+      url: `https://${this.args.model.id}${config.cardSpaceHostnameSuffix}`,
+    };
   }
 
   @action async loadAddress() {
