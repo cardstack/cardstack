@@ -28,17 +28,3 @@ def download_csv(payment_list):
         file_name="payment_list.csv",
         mime="text/csv",
     )
-
-
-def block_to_timestamp_converter(w3, block_min):
-    block = st.number_input(label="block", min_value=block_min)
-    t = get_timestamp(w3, block)
-    st.write(datetime.utcfromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S"))
-    st.write(t)
-
-
-def get_timestamp(w3, block):
-    block = w3.eth.get_block(block)
-    t = block.timestamp
-    print(datetime.utcfromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S"))
-    return t
