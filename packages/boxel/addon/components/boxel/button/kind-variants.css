@@ -60,3 +60,15 @@
   --boxel-button-border: 1px solid var(--boxel-danger-hover);
   --boxel-button-color: var(--boxel-danger-hover);
 }
+
+.boxel-button--kind-primary-dark:not(:disabled) {
+  --boxel-button-color: var(--boxel-dark);
+  --boxel-button-border: 1px solid var(--boxel-dark);
+  --boxel-button-text-color: var(--boxel-light);
+}
+
+.boxel-button--kind-primary-dark:not(:disabled):hover,
+.boxel-button--kind-primary-dark:not(:disabled):active {
+  --boxel-button-border: 1px solid var(--boxel-purple-800);
+  --boxel-button-color: var(--boxel-purple-800);
+}

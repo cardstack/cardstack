@@ -95,6 +95,7 @@ module.exports = function (environment) {
       mailToSupportUrl: 'mailto:support@cardstack.com',
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
+      cardPayLink: 'https://cardstack.com/cardpay',
     },
     'ember-cli-mirage': {
       enabled: false,

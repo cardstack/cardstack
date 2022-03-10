@@ -7,6 +7,7 @@ interface UrlsOptions {
   mailToSupportUrl: string;
   statusPageBase: string;
   statusPageUrl: string;
+  cardPayLink: string;
 }
 
 /**

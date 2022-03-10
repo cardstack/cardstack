@@ -3,11 +3,12 @@ import { tracked } from '@glimmer/tracking';
 import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
-import { PaymentLinkMode } from '../payment-link';
 import { inject as service } from '@ember/service';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
+import { PaymentLinkMode } from '../../common/payment-link';
+import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
 
 interface CardSpaceUserPageArgs {
   model: {
@@ -25,18 +26,9 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
   @tracked address: string | null = null;
   @tracked addressFetchingError: string | null = null;
   @service declare subgraph: Subgraph;
+  cardstackLogoForQR = CardstackLogoForQR;
   defaultAddressFetchingErrorMsg =
     'We ran into an issue while generating the payment request link. Please reload the page and try again. If the issue persists, please contact support.';
-
-  @action setInitialPaymentLinkMode() {
-    if (!this.canDeepLink) {
-      this.paymentLinkMode = 'qr-non-mobile';
-    }
-  }
-
-  @action setPaymentLinkMode(mode: PaymentLinkMode) {
-    this.paymentLinkMode = mode;
-  }
 
   get canDeepLink() {
     return this.UAService.isIOS() || this.UAService.isAndroid();

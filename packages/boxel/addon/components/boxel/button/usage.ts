@@ -7,7 +7,13 @@ import './usage.css';
 export default class extends Component {
   sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
-    all: ['primary', 'secondary-light', 'secondary-dark', 'danger'],
+    all: [
+      'primary',
+      'primary-dark',
+      'secondary-light',
+      'secondary-dark',
+      'danger',
+    ],
     light: ['primary', 'secondary-light'],
     dark: ['primary', 'secondary-dark'],
   };
