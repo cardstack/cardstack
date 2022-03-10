@@ -237,9 +237,9 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we don't have enough balance (50 USD equivalent)
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
-        `Looks like you don’t have a business account or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+        `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
           c.layer2.fullName
-        } wallet, or by claiming business revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+        } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
@@ -256,7 +256,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       template: (session: IWorkflowSession) =>
         `You attempted to restore an unfinished workflow, but the chosen source does not have enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
           c.layer2.fullName
-        } wallet, or by claiming business revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+        } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
