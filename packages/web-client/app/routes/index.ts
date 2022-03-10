@@ -38,7 +38,7 @@ const ORGS = [
     subtitle: 'Fast, cheap & easy payments',
     description: 'Launch this dApp to',
     descriptionList: [
-      'Create a business account',
+      'Create a payment profile',
       'Issue prepaid cards',
       'View your wallet balances',
       'Deposit or withdraw tokens',
