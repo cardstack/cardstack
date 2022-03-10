@@ -635,7 +635,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_INFO_MISSING_MESSAGE)
       .containsText(
-        'Unable to find business details for this address. Use caution when paying.'
+        'Unable to find payment profile for this address. Use caution when paying.'
       );
     assert
       .dom(AMOUNT)
@@ -698,7 +698,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no business found - please ask the business to confirm the payment link'
+        'Oops, no payment profile found - please ask for confirmation of the payment link'
       );
   });
 
@@ -710,7 +710,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no business found - please ask the business to confirm the payment link'
+        'Oops, no payment profile found - please ask for confirmation of the payment link'
       );
   });
 
