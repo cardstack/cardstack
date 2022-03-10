@@ -47,7 +47,7 @@
   text-align: center;
   font-size: var(--boxel-font-size-xl);
   font-weight: 600;
-  margin: var(--boxel-sp-xxl);
+  margin: var(--boxel-sp-xxl) auto;
 }
 
 .card-space-user-page__url {
