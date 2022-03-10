@@ -32,7 +32,11 @@
 }
 
 .card-space-user-page__header svg {
-  fill: var(--card-space-text-color);
+  /*
+    inherit the text color so that the logo does not have contrast issues.
+    background and text color on this page are dynamic.
+  */
+  fill: currentColor;
 }
 
 .card-space-user-page__description {
