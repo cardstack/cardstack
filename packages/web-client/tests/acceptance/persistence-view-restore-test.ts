@@ -263,8 +263,8 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Business Account Creation')
-        .containsText('Save business details');
+        .containsText('Payment Profile Creation')
+        .containsText('Save profile details');
 
       assert.equal(
         getProgressIconCompletion(
@@ -427,7 +427,7 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-tracker-toggle]');
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Create business account');
+        .containsText('Create payment profile');
     });
 
     test('a storage event causes the count to update', async function (assert) {
