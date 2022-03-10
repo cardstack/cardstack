@@ -4,6 +4,7 @@ import os
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rules import *
+from cardpay_reward_programs.utils import check_env
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 
@@ -11,6 +12,7 @@ from .payment_tree import PaymentTree
 from .utils import get_parameters, to_camel_case, write_parquet_file
 
 load_dotenv()
+check_env()
 
 cached_client = S3Client(
     local_cache_dir="mycache",
