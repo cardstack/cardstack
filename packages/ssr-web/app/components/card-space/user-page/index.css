@@ -27,6 +27,10 @@
   }
 }
 
+.card-space-user-page__header svg {
+  fill: var(--card-space-text-color);
+}
+
 .card-space-user-page__description {
   text-align: center;
 }
