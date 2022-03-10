@@ -1,7 +1,7 @@
 import streamlit as st
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 
-from .utils import read_attributes, slider_partition
+from .utils import read_attributes
 
 
 def user_defined_parameters(config):
