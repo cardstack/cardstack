@@ -97,7 +97,7 @@ export default class NotifyMerchantClaim {
 
     let token = result.token.symbol;
     let amountInWei = result.amount;
-    let notificationBody = `You claimed ${Web3.utils.fromWei(amountInWei)} ${token} of revenue`;
+    let notificationBody = `You claimed ${Web3.utils.fromWei(amountInWei)} ${token}`;
     if (merchantName) notificationBody += ` from ${merchantName}`;
     let notificationData = {
       notificationType: 'merchant_claim',

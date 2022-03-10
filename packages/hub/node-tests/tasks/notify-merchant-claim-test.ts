@@ -106,7 +106,7 @@ describe('NotifyMerchantClaimTask', function () {
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue from Mandello',
+        notificationBody: 'You claimed 1155 DAI.CPXD from Mandello',
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
@@ -121,7 +121,7 @@ describe('NotifyMerchantClaimTask', function () {
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue from Mandello',
+        notificationBody: 'You claimed 1155 DAI.CPXD from Mandello',
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
@@ -170,7 +170,7 @@ describe('NotifyMerchantClaimTask', function () {
 
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue',
+        notificationBody: 'You claimed 1155 DAI.CPXD',
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
@@ -185,7 +185,7 @@ describe('NotifyMerchantClaimTask', function () {
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue',
+        notificationBody: 'You claimed 1155 DAI.CPXD',
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
@@ -232,7 +232,7 @@ describe('NotifyMerchantClaimTask', function () {
 
     expect(addedJobPayloads).to.deep.equal([
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue',
+        notificationBody: 'You claimed 1155 DAI.CPXD',
         notificationId: 'sokol::a::123::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
@@ -247,7 +247,7 @@ describe('NotifyMerchantClaimTask', function () {
         sendBy: MERCHANT_CLAIM_EXPIRY_TIME,
       },
       {
-        notificationBody: 'You claimed 1155 DAI.CPXD of revenue',
+        notificationBody: 'You claimed 1155 DAI.CPXD',
         notificationId: 'sokol::a::456::eoa-address',
         notificationData: {
           notificationType: 'merchant_claim',
