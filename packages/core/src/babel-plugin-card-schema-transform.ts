@@ -4,11 +4,12 @@ import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
 import { error, unusedClassMember } from './utils/babel';
 import { FieldMeta, FileMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-file-analyze';
-import { CompiledCard } from './interfaces';
+import { CompiledCard, ComponentInfo, ModuleRef } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
 import { BASE_CARD_URL } from './compiler';
 import { keys } from './utils';
+import { fieldsAsList } from './utils/fields';
 
 interface State {
   importUtil: ImportUtil;
@@ -22,6 +23,7 @@ export interface Options {
   fields: CompiledCard['fields'];
   meta: FileMeta;
   parent: CompiledCard | undefined;
+  componentInfos: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<ModuleRef>>>;
 }
 
 export default function main(babel: typeof Babel) {
@@ -31,6 +33,10 @@ export default function main(babel: typeof Babel) {
       Program: {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
+        },
+        exit(path: NodePath<t.Program>, state: State) {
+          addUsedFieldsExport(path, state, babel);
+          addAllFieldsExport(path, state, babel);
         },
       },
 
@@ -202,6 +208,34 @@ function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: Sta
         }) as t.Statement,
       ])
     )
+  );
+}
+
+function addUsedFieldsExport(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`
+      export const usedFields = %%usedFields%%;
+    `)({
+      usedFields: t.objectExpression(
+        Object.entries(state.opts.componentInfos).map(([format, info]) => {
+          return t.objectProperty(
+            t.identifier(format),
+            t.arrayExpression((info?.usedFields ?? []).map((f) => t.stringLiteral(f)))
+          );
+        })
+      ),
+    }) as t.Statement
+  );
+}
+function addAllFieldsExport(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`
+      export const allFields = %%allFields%%;
+    `)({
+      allFields: t.arrayExpression(fieldsAsList(state.opts.fields).map((f) => t.stringLiteral(f))),
+    }) as t.Statement
   );
 }
 

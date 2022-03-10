@@ -4,6 +4,7 @@ import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
+import partition from 'lodash/partition';
 import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
@@ -154,12 +155,30 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     parentCard: CompiledCard | undefined
   ) {
-    return Object.assign(
+    let { cardSource } = this;
+    let [schemaModules, nonSchemaModules] = partition(
+      Object.entries(inputModules),
+      ([localPath]) => localPath === cardSource.schema
+    );
+
+    let outputModules = Object.assign(
       {},
-      ...Object.entries(inputModules).map(([localPath, mod]) =>
+      ...nonSchemaModules.map(([localPath, mod]) =>
         this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
       )
     );
+
+    // handle the schema module last so that we have all the knowledge of the
+    // components' used fields before processing the schema module.
+    return {
+      ...outputModules,
+      ...Object.assign(
+        {},
+        ...schemaModules.map(([localPath, mod]) =>
+          this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
+        )
+      ),
+    };
   }
 
   private transformFile(
@@ -349,7 +368,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   ) {
     let { source, ast, meta } = schemaModule;
     let out: BabelFileResult;
-    let opts: Options = { meta, fields, parent };
+    let opts: Options = { meta, fields, parent, componentInfos: this.componentInfos };
     try {
       out = transformFromAstSync(ast, source, {
         ast: true,

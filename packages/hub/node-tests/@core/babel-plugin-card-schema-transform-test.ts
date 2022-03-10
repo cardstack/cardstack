@@ -1,10 +1,11 @@
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { RawCard } from '@cardstack/core/src/interfaces';
 import { cardURL } from '@cardstack/core/src/utils';
 
 if (process.env.COMPILER) {
-  describe.only('babel-plugin-card-schema-transform', function () {
+  describe('babel-plugin-card-schema-transform', function () {
     let { cards, getFileCache } = configureHubWithCompiler(this);
     let fancyDateCard: RawCard = {
       realm,
@@ -31,6 +32,9 @@ if (process.env.COMPILER) {
       realm,
       id: 'person',
       schema: 'schema.js',
+      isolated: 'isolated.js',
+      embedded: 'embedded.js',
+      edit: 'edit.js',
       files: {
         'schema.js': `
             import { contains } from "@cardstack/types";
@@ -54,6 +58,11 @@ if (process.env.COMPILER) {
               _cachedSlowName = "don't collide!";
             }
           `,
+        'edit.js': templateOnlyComponentTemplate(`<div><@fields.lastName/><@fields.aboutMe/></div>`),
+        'isolated.js': templateOnlyComponentTemplate(
+          `<div><@fields.fullName/><@fields.aboutMe.birthdate/><@fields.slowName/></div>`
+        ),
+        'embedded.js': templateOnlyComponentTemplate(`<div><@fields.fullName/></div>`),
       },
     };
     let fancyPersonCard: RawCard = {
@@ -131,6 +140,26 @@ if (process.env.COMPILER) {
 
       // success is really just not throwing an exception
       expect(card.compiled.url).to.eq(`${realm}test`);
+    });
+
+    it('can compile used fields into schema module', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        export const usedFields = {
+          edit: ["lastName", "aboutMe.birthdate"],
+          isolated: ["fullName", "aboutMe.birthdate", "slowName"],
+          embedded: ["fullName"]
+        }
+      `);
+    });
+
+    it('can compile all fields into schema module', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        export const allFields = ["lastName", "aboutMe.birthdate", "fullName", "slowName"];
+      `);
     });
 
     it('can compile schema class constructor for composite card', async function () {
