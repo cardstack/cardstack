@@ -42,6 +42,8 @@ class RetroAirdrop(Rule):
         self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
     ):
         total_n_payments = self.count_rows(self.start_snapshot_block, self.end_snapshot_block)
+        if total_n_payments == 0:
+            return default_payment_list
         reward_per_transaction = self.total_reward / total_n_payments
         if df.empty:
             return default_payment_list.copy()
@@ -63,7 +65,10 @@ class RetroAirdrop(Rule):
         from {table_query}
         where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer 
         """
-        return self.run_query(table_query, [start_block, end_block], sql)["count"][0]
+        if table_query == "parquet_scan([])":
+            return 0
+        else:
+            return self.run_query(table_query, [start_block, end_block], sql)["count"][0]
 
     def run(self, start_block: int, end_block: int):
         vars = [start_block, end_block]
