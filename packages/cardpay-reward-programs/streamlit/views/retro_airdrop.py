@@ -6,7 +6,7 @@ from cardpay_reward_programs.rules import RetroAirdrop
 from .utils import read_attributes
 
 const_start_snapshot_block = 17265698
-const_end_snapshot_block = 25165824
+const_end_snapshot_block = 20986720
 
 
 def user_defined_parameters(config):
