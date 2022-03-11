@@ -29,10 +29,12 @@ const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     convertHostnameSuffixToRegex(CARD_SPACE_STAGING_HOSTNAME_SUFFIX),
+    '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs
   ],
   production: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
     convertHostnameSuffixToRegex(CARD_SPACE_HOSTNAME_SUFFIX),
+    '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs FIXME deduplicate?
   ],
 };
 
@@ -104,7 +106,6 @@ module.exports = function (environment) {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
         '/.+.card.space.localhost:\\d+$/',
         '/^localhost:\\d+$/',
-        '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs
       ],
     },
     cardSpaceHostnameSuffix:
