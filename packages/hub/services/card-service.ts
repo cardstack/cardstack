@@ -112,6 +112,7 @@ export class CardService implements CardServiceInterface {
     let allFields = fieldsAsList(compiledCard.fields);
     let { id, realm, adoptsFrom } = raw;
     let rawCard = await this.realmManager.create(
+      // TODO remove the makeEmptyCardData() after we have internalized serialization within the schema instance
       merge({ id, realm, adoptsFrom, data: makeEmptyCardData(allFields) } as RawCard, raw)
     );
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
