@@ -228,6 +228,7 @@ export interface CardSchemaModule {
   };
   usedFields: UsedFields;
   allFields: string[];
+  dataMember: string;
 }
 
 export interface CardComponentMetaModule {

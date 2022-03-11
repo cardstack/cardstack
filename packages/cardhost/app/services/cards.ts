@@ -241,7 +241,7 @@ export default class Cards extends Service implements CardService {
     return fullURL.join('');
   }
 
-  async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
+  async loadModule(moduleIdentifier: string): Promise<any> {
     if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
@@ -275,6 +275,12 @@ export default class Cards extends Service implements CardService {
       // module was built by our Builder, so ask Builder for it
       let builder = await this.builder();
       return await builder.loadModule(moduleIdentifier);
+    } else if (moduleIdentifier === 'lodash/set') {
+      /* webpackInclude: /\.(js|hbs)$/ */
+      return await import('lodash/set');
+    } else if (moduleIdentifier === 'lodash/get') {
+      /* webpackInclude: /\.(js|hbs)$/ */
+      return await import('lodash/get');
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`

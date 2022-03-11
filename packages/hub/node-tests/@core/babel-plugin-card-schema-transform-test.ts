@@ -56,6 +56,7 @@ if (process.env.COMPILER) {
               }
 
               _cachedSlowName = "don't collide!";
+              data = "don't collide!";
             }
           `,
         'edit.js': templateOnlyComponentTemplate(`<div><@fields.lastName/><@fields.aboutMe/></div>`),
@@ -162,6 +163,31 @@ if (process.env.COMPILER) {
       `);
     });
 
+    it('can compile a data method into the schema class', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import set from "lodash/set";
+        import get from "lodash/get";
+      `);
+      expect(source).to.containsSource(`
+        export const dataMember = "data0";
+      `);
+      expect(source).to.containsSource(`
+        data0(format) {
+          let data = {};
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          for (let field of fields) {
+            let value = get(this, field);
+            if (value !== undefined) {
+              set(data, field, value);
+            }
+          }
+          return data;
+        }
+      `);
+    });
+
     it('can compile schema class constructor for composite card', async function () {
       let { compiled } = await cards.load(`${realm}bio`);
       // the browser source has a lot less babel shenanigans
@@ -237,9 +263,17 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}fancy-person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-          import PersonClass from "@cardstack/compiled/https-cardstack.local-person/schema.js";
-          export default class FancyPerson extends PersonClass {}
-        `);
+        import PersonClass from "@cardstack/compiled/https-cardstack.local-person/schema.js";
+      `);
+      expect(source).to.containsSource(`
+        export default class FancyPerson extends PersonClass {
+      `);
+      expect(source).to.not.containsSource(`
+        getRawField;
+      `);
+      expect(source).to.not.containsSource(`
+        constructor(
+      `);
     });
 
     it('can make a constructor for a schema.js that adopts from a composite card has additional fields', async function () {

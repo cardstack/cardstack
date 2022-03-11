@@ -15,6 +15,7 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
+  dataMember: string;
   cardName: string | undefined;
   opts: Options;
 }
@@ -35,6 +36,7 @@ export default function main(babel: typeof Babel) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
+          addDataMemberSymbol(path, state, babel);
           addUsedFieldsExport(path, state, babel);
           addAllFieldsExport(path, state, babel);
         },
@@ -137,6 +139,10 @@ export default function main(babel: typeof Babel) {
             }
           }
         },
+
+        exit(path: NodePath<t.Class>, state: State) {
+          addDataMethod(path, state, babel);
+        },
       },
     },
   };
@@ -228,6 +234,7 @@ function addUsedFieldsExport(path: NodePath<t.Program>, state: State, babel: typ
     }) as t.Statement
   );
 }
+
 function addAllFieldsExport(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
   let t = babel.types;
   path.node.body.push(
@@ -235,6 +242,46 @@ function addAllFieldsExport(path: NodePath<t.Program>, state: State, babel: type
       export const allFields = %%allFields%%;
     `)({
       allFields: t.arrayExpression(fieldsAsList(state.opts.fields).map((f) => t.stringLiteral(f))),
+    }) as t.Statement
+  );
+}
+
+function addDataMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  state.dataMember = unusedClassMember(path, 'data', t);
+  let body = path.get('body');
+  body.node.body.push(
+    t.classMethod(
+      'method',
+      t.identifier(state.dataMember),
+      [t.identifier('format')],
+      t.blockStatement(
+        babel.template(`
+          let data = {};
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          for (let field of fields) {
+            let value = %%get%%(this, field);
+            if (value !== undefined) {
+              %%set%%(data, field, value);
+            }
+          }
+          return data;
+        `)({
+          get: state.importUtil.import(body, 'lodash/get', 'default', 'get'),
+          set: state.importUtil.import(body, 'lodash/set', 'default', 'set'),
+        }) as t.Statement[]
+      )
+    )
+  );
+}
+
+function addDataMemberSymbol(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`
+      export const dataMember = %%dataMember%%;
+    `)({
+      dataMember: t.stringLiteral(state.dataMember),
     }) as t.Statement
   );
 }

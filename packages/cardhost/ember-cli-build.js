@@ -48,6 +48,10 @@ module.exports = function (defaults) {
         },
         resolve: {
           fallback: {
+            // external module allow list
+            'lodash/set': require.resolve('lodash/set'),
+            'lodash/get': require.resolve('lodash/get'),
+
             path: require.resolve('path-browserify'),
             process: require.resolve('process/'),
             fs: false,
