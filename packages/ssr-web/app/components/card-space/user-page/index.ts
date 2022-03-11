@@ -9,7 +9,7 @@ import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
 import { PaymentLinkMode } from '../../common/payment-link';
 import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
-import CardSpaceLogo from '../../../images/icons/card-space-logo-clear-background.png';
+import CardSpaceLogo from '../../../images/logos/card-space-logo-with-background.png';
 
 interface CardSpaceUserPageArgs {
   model: {
