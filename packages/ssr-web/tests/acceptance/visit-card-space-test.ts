@@ -80,11 +80,11 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert
         .dom(`meta[property='og:title']`, document.documentElement)
-        .hasAttribute('content', 'merchant name Profile');
+        .hasAttribute('content', 'merchant name’s Profile');
 
       assert
         .dom(`meta[name='twitter:title']`, document.documentElement)
-        .hasAttribute('content', 'merchant name Profile');
+        .hasAttribute('content', 'merchant name’s Profile');
 
       assert
         .dom(`meta[property='og:description']`, document.documentElement)
