@@ -82,8 +82,10 @@ export default class SearchIndex {
     await this.runIndexing(cardID.realm, async (ops) => {
       switch (action) {
         case 'save': {
-          let rawCard = await this.realmManager.read(cardID);
-          await ops.save(rawCard);
+          let rawCard = await ops.read(cardID);
+          if (rawCard) {
+            await ops.save(rawCard);
+          }
           break;
         }
         case 'delete': {
@@ -153,6 +155,7 @@ class IndexerRun implements IndexerHandle {
   private touchCounter = 0;
   private touched = new Map<string, number>();
   private newMeta: PgPrimitive = null;
+  private realmManager = service('realm-manager', { as: 'realmManager' });
 
   constructor(private db: PoolClient, private realmURL: string) {}
 
@@ -238,6 +241,17 @@ class IndexerRun implements IndexerHandle {
         await fn(row);
       }
     } while (rows.length > 0);
+  }
+
+  async read(card: any): Promise<RawCard | void> {
+    try {
+      let rawCard = await this.realmManager.read(card);
+      return rawCard;
+    } catch (err: any) {
+      let compiler = await this.builder.compileCardFromRaw(card);
+      log.trace('Read: Error during compile', cardURL(card));
+      await this.saveErrorState(card, err, compiler.dependencies);
+    }
   }
 
   // available to each realm's indexer

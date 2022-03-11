@@ -69,7 +69,11 @@ export default class RealmManager {
   }
 
   async read(cardId: CardId): Promise<RawCard> {
-    return this.findRealm(cardId.realm).read(cardId);
+    return this.findRealm(cardId.realm)
+      .read(cardId)
+      .catch((err): any => {
+        throw err;
+      });
   }
 
   async update(raw: RawCard): Promise<RawCard> {
