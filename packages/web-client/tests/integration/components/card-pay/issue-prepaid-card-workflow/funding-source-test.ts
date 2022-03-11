@@ -126,7 +126,7 @@ module(
 
         assert
           .dom('[data-test-funding-source-safe]')
-          .containsText('Business account');
+          .containsText('Payment Profile');
       });
 
       test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
@@ -147,7 +147,7 @@ module(
 
         assert
           .dom('[data-test-funding-source-safe]')
-          .containsText('Business account');
+          .containsText('Payment Profile');
       });
 
       test('it only lists compatible safes with balances of compatible tokens that exceed the minimum in the workflow', async function (this: Context, assert) {

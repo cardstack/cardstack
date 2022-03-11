@@ -39,6 +39,16 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
   }
 
+  get selectedSafeTypeCopy() {
+    if (this.selectedSafe) {
+      return this.selectedSafe.type === 'merchant'
+        ? 'Payment Profile'
+        : this.selectedSafe.type;
+    } else {
+      return '';
+    }
+  }
+
   get withdrawalToken(): BridgedTokenSymbol {
     return (
       this.args.workflowSession.getValue('withdrawalToken') ??

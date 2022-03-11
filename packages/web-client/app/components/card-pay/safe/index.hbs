@@ -74,12 +74,12 @@
   {{#unless this.isDepot}}
     <section class="card-pay-safe__footer">
       <div>
-        <div>Business ID</div>
+        <div>Profile ID</div>
         <div class="card-pay-safe__footer-value" {{tippy this.data.info.id}} data-test-safe-footer-business-id>{{this.data.info.id}}</div>
       </div>
       <div data-test-safe-footer-managers>
         <span class="card-pay-safe__footer-value">{{@safe.owners.length}}</span>
-        {{if (eq @safe.owners.length 1) "Manager" "Managers"}}
+        {{if (eq @safe.owners.length 1) "Owner" "Owners"}}
         {{svg-jar "user-avatar" width="16" height="14" class="card-pay-safe__manager-icon"}}
       </div>
     </section>

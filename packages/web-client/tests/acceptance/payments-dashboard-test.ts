@@ -68,7 +68,7 @@ module('Acceptance | payments dashboard', function (hooks) {
 
     assert.dom('[data-test-safe-title]').containsText('Mandello');
     assert.dom('[data-test-safe-footer-business-id]').containsText('mandello1');
-    assert.dom('[data-test-safe-footer-managers]').containsText('1 Manager');
+    assert.dom('[data-test-safe-footer-managers]').containsText('1 Owner');
     assert.dom('[data-test-merchant-logo-background="#00ffcc"]').exists();
     assert.dom('[data-test-merchant-logo-text-color="#000000"]').exists();
 

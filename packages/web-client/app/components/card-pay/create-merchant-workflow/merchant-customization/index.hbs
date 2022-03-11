@@ -1,17 +1,17 @@
 <ActionCardContainer
-  @header="Business Account"
+  @header="Payment Profile"
   @isComplete={{@isComplete}}
   data-test-merchant-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a name and ID for the business">
+  <ActionCardContainer::Section @title="Choose a name and ID for your payment profile">
     <Boxel::Field
-      @label={{if @isComplete "Business Name" "Preview"}}
+      @label={{if @isComplete "Payment Profile Name" "Preview"}}
       @centeredDisplay={{true}}
       data-test-merchant-customization-merchant-preview
     >
       <CardPay::Merchant
         class={{unless this.trimmedMerchantName "merchant-customization__enter-name"}}
-        @name={{or this.trimmedMerchantName "Enter business name"}}
+        @name={{or this.trimmedMerchantName "Enter profile name"}}
         @logoBackground={{this.merchantBgColor}}
         @logoTextColor={{this.merchantTextColor}}
         @size="large"
@@ -19,7 +19,7 @@
       />
     </Boxel::Field>
     {{#if @isComplete}}
-      <Boxel::Field @label="Business ID" data-test-merchant-customization-merchant-id-field>
+      <Boxel::Field @label="Unique ID" data-test-merchant-customization-merchant-id-field>
         {{this.merchantId}}
       </Boxel::Field>
       <Boxel::Field @label="Custom Color" data-test-merchant-customization-color-field>
@@ -28,7 +28,7 @@
           {{or this.merchantBgColor "#0069F9"}}
         </div>
       </Boxel::Field>
-      <Boxel::Field @label="Manager">
+      <Boxel::Field @label="Owned By">
         <CardPay::AccountDisplay
           @wrapped={{true}}
           @address={{this.layer2Network.walletInfo.firstAddress}}
@@ -39,7 +39,7 @@
       <CardPay::FieldStack>
         <Boxel::Field
           @tag="label"
-          @label="Business name"
+          @label="Profile name"
           data-test-merchant-customization-merchant-name-field
         >
           <Boxel::Input
@@ -57,7 +57,7 @@
         </Boxel::Field>
         <Boxel::Field
           @tag="label"
-          @label="Business ID"
+          @label="Unique ID"
           data-test-merchant-customization-merchant-id-field
         >
           <Boxel::Input::ValidationState
@@ -66,7 +66,7 @@
             @onInput={{this.onMerchantIdInput}}
             @onBlur={{this.validateMerchantId}}
             @errorMessage={{this.merchantIdValidationMessage}}
-            @helperText="This is a unique ID that will be used to identify your business in the Cardstack network. Please note that this ID cannot be changed once the business has been created."
+            @helperText="This unique ID will also be used as a publicly available tag for payments."
           />
         </Boxel::Field>
         <Boxel::Field
@@ -85,7 +85,7 @@
             {{this.merchantBgColor}}
           </div>
         </Boxel::Field>
-        <Boxel::Field @label="Manager">
+        <Boxel::Field @label="Owned By">
           <CardPay::AccountDisplay
             @wrapped={{true}}
             @address={{this.layer2Network.walletInfo.firstAddress}}

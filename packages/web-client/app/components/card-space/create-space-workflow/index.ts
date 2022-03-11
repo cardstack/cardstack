@@ -36,7 +36,7 @@ const FAILURE_REASONS = {
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.conversationalName} wallet`,
-  `Select business account`,
+  `Select payment profile`,
   `Pick display name`,
   `Save Card Space details`,
   `Create Card Space`,
@@ -140,7 +140,7 @@ class CreateSpaceWorkflow extends Workflow {
           },
         }),
         new WorkflowMessage({
-          message: `Please select a business account you would like to associate with your Card Space. The business ID will be used in the URL to access your Card Space.`,
+          message: `Please select a payment profile you would like to associate with your Card Space. The profile ID will be used in the URL to access your Card Space.`,
         }),
         new WorkflowCard({
           cardName: 'SELECT_BUSINESS_ACCOUNT',
@@ -148,7 +148,7 @@ class CreateSpaceWorkflow extends Workflow {
             'card-space/create-space-workflow/select-business-account',
         }),
       ],
-      completedDetail: `Business selected`,
+      completedDetail: `Profile selected`,
     }),
     new Milestone({
       title: MILESTONE_TITLES[2],
@@ -231,8 +231,8 @@ class CreateSpaceWorkflow extends Workflow {
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
     }),
     new WorkflowMessage({
-      message: `It looks like you haven't created a business account yet. In order to create your Card Space, you must first create your first business account. This is required
-          because your Card Space URL will depend on your business account ID.`,
+      message: `It looks like you haven't created a payment profile yet. In order to create your Card Space, you must first create your first payment profile. This is required
+          because your Card Space URL will depend on your profile ID.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -241,7 +241,7 @@ class CreateSpaceWorkflow extends Workflow {
       },
     }),
     new WorkflowMessage({
-      message: `It looks like you all your business accounts have already been used to create a Card Space. In order to create your Card Space, you must first create a new business account.`,
+      message: `It looks like you all your payment profiles have already been used to create a Card Space. In order to create your Card Space, you must first create a new payment profile.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -293,7 +293,7 @@ class CreateSpaceWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
 
-    // TODO: check if there are any business accounts available for Card Space which haven't been used yet
+    // TODO: check if there are any payment profiles available for Card Space which haven't been used yet
 
     return errors;
   }

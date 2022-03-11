@@ -85,9 +85,7 @@ export default class NotifyMerchantClaim {
       if (result.merchantSafe.infoDid) {
         let merchantInfo = await this.merchantInfo.getMerchantInfo(result.merchantSafe.infoDid);
 
-        if (merchantInfo?.name) {
-          merchantName = ` ${merchantInfo.name}`;
-        }
+        merchantName = merchantInfo?.name ?? '';
       }
     } catch (e) {
       Sentry.captureException(e, {
@@ -99,9 +97,8 @@ export default class NotifyMerchantClaim {
 
     let token = result.token.symbol;
     let amountInWei = result.amount;
-    let notificationBody = `You just claimed ${Web3.utils.fromWei(
-      amountInWei
-    )} ${token} from your${merchantName} business account`;
+    let notificationBody = `You claimed ${Web3.utils.fromWei(amountInWei)} ${token}`;
+    if (merchantName) notificationBody += ` from ${merchantName}`;
     let notificationData = {
       notificationType: 'merchant_claim',
       transactionInformation: JSON.stringify({
