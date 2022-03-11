@@ -87,6 +87,14 @@ module('Acceptance | visit card space', function (hooks) {
         .hasAttribute('content', 'merchant name Profile');
 
       assert
+        .dom(`meta[property='og:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
+        .dom(`meta[name='twitter:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
         .dom(
           `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
           document.documentElement

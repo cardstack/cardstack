@@ -38,7 +38,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
 
   get meta() {
     return {
-      description: 'Cardstack',
+      description: `Visit ${this.args.model.name}’s profile on Card Space`,
       title: `${this.args.model.name} Profile`,
       url: `https://${this.args.model.id}${config.cardSpaceHostnameSuffix}`,
     };
