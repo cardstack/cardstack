@@ -116,6 +116,56 @@ if (process.env.COMPILER) {
       expect(example.data.title).to.eq('Hello World');
     });
 
+    it.only(`gives good error for missing module during reindexing`, async function () {
+      outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
+        realm: realmURL,
+        schema: 'schema.js',
+        data: { title: 'Clippy' },
+      });
+      outputFileSync(
+        join(getRealmDir(), 'clip', 'schema.js'),
+        `
+        import { contains } from '@cardstack/types';
+        import string from 'https://cardstack.com/base/string';
+        export default class Clip {
+          @contains(string) title;
+        }
+      `
+      );
+
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
+      await si.indexAllRealms();
+
+      let dbManager = await await getContainer().lookup('database-manager');
+      let db = await dbManager.getClient();
+      let {
+        rows: [result],
+      } = await db.query(`SELECT "data", "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
+      expect(result.data).to.deep.equal({ title: 'Clippy' });
+      expect(result.compileErrors).to.be.null;
+
+      outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
+        realm: realmURL,
+        schema: 'schema.js',
+        edit: 'edit.js',
+        data: { title: 'Clippy 2' },
+      });
+
+      await si.notify(`${realmURL}clip`, 'save');
+
+      let {
+        rows: [result2],
+      } = await db.query(`SELECT "data", "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
+      // expect(result2.data).to.deep.equal({ title: 'Clippy 2' });
+      expect(result2.compileErrors).to.deep.equal({
+        title: 'Internal Server Error',
+        detail: 'card.json for undefined refers to non-existent module edit.js',
+        status: 500,
+        additionalErrors: null,
+        isCardstackError: true,
+      });
+    });
+
     it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
         adoptsFrom: '../post',

@@ -243,7 +243,7 @@ class IndexerRun implements IndexerHandle {
     } while (rows.length > 0);
   }
 
-  async read(card: any): Promise<RawCard | void> {
+  async read(card: RawCard): Promise<RawCard | void> {
     try {
       let rawCard = await this.realmManager.read(card);
       return rawCard;
