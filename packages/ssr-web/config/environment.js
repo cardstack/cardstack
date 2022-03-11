@@ -104,6 +104,7 @@ module.exports = function (environment) {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
         '/.+.card.space.localhost:\\d+$/',
         '/^localhost:\\d+$/',
+        '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs
       ],
     },
     cardSpaceHostnameSuffix:
