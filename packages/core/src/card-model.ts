@@ -156,12 +156,6 @@ export default abstract class CardModel implements CardModelInterface {
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
-    if (!this.schemaModule) {
-      throw new CardstackError(this.noSchemaModuleMsg());
-    }
-    if (!this._schemaInstance) {
-      throw new CardstackError(this.noSchemaInstanceMsg());
-    }
     let url: string | undefined;
     if (this.state.type === 'loaded') {
       url = this.state.url;
@@ -170,20 +164,12 @@ export default abstract class CardModel implements CardModelInterface {
     }
 
     if (this.state.type === 'created') {
-      return serializeCardAsResource(
-        url,
-        this.schemaModule.dataMember in this._schemaInstance
-          ? this._schemaInstance[this.schemaModule.dataMember]('all')
-          : {},
-        this.serializerMap
-      );
+      return serializeCardAsResource(url, this.getSchemaInstanceData('all-fields'), this.serializerMap);
     }
 
     let resource = serializeCardAsResource(
       url,
-      this.schemaModule.dataMember in this._schemaInstance
-        ? this._schemaInstance[this.schemaModule.dataMember](this.state.allFields ? 'all' : this.format)
-        : {},
+      this.getSchemaInstanceData(this.state.allFields ? 'all-fields' : 'used-fields'),
       this.serializerMap
     );
     resource.meta = merge(
@@ -326,21 +312,27 @@ export default abstract class CardModel implements CardModelInterface {
     }
   }
 
+  private getSchemaInstanceData(type: 'all-fields' | 'used-fields'): Record<string, any> {
+    if (!this.schemaModule) {
+      throw new CardstackError(this.noSchemaModuleMsg());
+    }
+    if (!this._schemaInstance) {
+      throw new CardstackError(this.noSchemaInstanceMsg());
+    }
+    return this.schemaModule.dataMember in this._schemaInstance
+      ? this._schemaInstance[this.schemaModule.dataMember](type === 'all-fields' ? 'all' : this.format)
+      : {};
+  }
+
   private makeSetter(segments: string[] = []): Setter {
     let s = (value: any) => {
-      if (!this.schemaModule) {
-        throw new CardstackError(this.noSchemaModuleMsg());
-      }
-      if (!this._schemaInstance) {
-        throw new CardstackError(this.noSchemaInstanceMsg());
-      }
       let innerSegments = segments.slice();
       let lastSegment = innerSegments.pop();
       if (!lastSegment) {
         return;
       }
 
-      let data = this._schemaInstance[this.schemaModule.dataMember]('all');
+      let data = this.getSchemaInstanceData('all-fields');
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
