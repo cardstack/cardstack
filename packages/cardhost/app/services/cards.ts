@@ -135,13 +135,13 @@ export default class Cards extends Service implements CardService {
     format: Format,
     allFields = false
   ): Promise<CardModelForBrowser> {
-    let schemaModule = cardResponse.meta?.schemaModule;
-    if (!schemaModule) {
+    let schemaModuleRef = cardResponse.meta?.schemaModule;
+    if (!schemaModuleRef) {
       throw new Error(
         `card payload for ${cardResponse.id} has no meta.schemaModule`
       );
     }
-    if (typeof schemaModule !== 'string') {
+    if (typeof schemaModuleRef !== 'string') {
       throw new Error(
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
@@ -166,7 +166,7 @@ export default class Cards extends Service implements CardService {
       {
         format,
         realm: realm as string,
-        schemaModule,
+        schemaModuleRef,
         rawData: cloneDeep(cardResponse.attributes ?? {}),
         componentModuleRef,
         saveModel: this.saveModel.bind(this),

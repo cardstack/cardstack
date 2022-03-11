@@ -1,27 +1,13 @@
-import { CardModel, SerializerMap, CardComponentMetaModule } from '@cardstack/core/src/interfaces';
+import { CardModel, SerializerMap } from '@cardstack/core/src/interfaces';
 import BaseCardModel from '@cardstack/core/src/card-model';
 
 export default class CardModelForHub extends BaseCardModel implements CardModel {
-  // TODO these are things that we can teach the schema instance during
+  // TODO The serializer can move into schema instance during
   // compilation, so that eventually this implementation can go away
   protected get serializerMap(): SerializerMap {
     if (!this.componentMeta) {
       throw new Error(`bug: CardModelForHub has no componentMeta`);
     }
     return this.componentMeta.serializerMap;
-  }
-
-  protected get usedFields(): CardComponentMetaModule['usedFields'] {
-    if (!this.componentMeta) {
-      throw new Error(`bug: CardModelForHub has no componentMeta`);
-    }
-    return this.componentMeta.usedFields;
-  }
-
-  protected get allFields(): CardComponentMetaModule['allFields'] {
-    if (!this.componentMeta) {
-      throw new Error(`bug: CardModelForHub has no componentMeta`);
-    }
-    return this.componentMeta.allFields;
   }
 }

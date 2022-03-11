@@ -205,8 +205,8 @@ export class CardService implements CardServiceInterface {
       {
         format,
         realm,
-        schemaModule: result.schemaModule,
-        rawData: merge(makeEmptyCardData(componentMeta.allFields), result.data ?? {}),
+        schemaModuleRef: result.schemaModule,
+        rawData: result.data ?? {},
         componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,
         saveModel: this.saveModel.bind(this),

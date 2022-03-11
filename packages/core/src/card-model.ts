@@ -47,16 +47,16 @@ export default abstract class CardModel implements CardModelInterface {
   protected componentMeta: CardComponentMetaModule | undefined;
 
   private _realm: string;
-  private schemaModule: CompiledCard['schemaModule']['global'];
+  private schemaModuleRef: CompiledCard['schemaModule']['global'];
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
-  private _schemaClass: CardSchemaModule['default'] | undefined;
   private recomputePromise: Promise<void> = Promise.resolve();
+  private schemaModule: CardSchemaModule | undefined;
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
-    let { realm, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
+    let { realm, schemaModuleRef, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
     this._realm = realm;
-    this.schemaModule = schemaModule;
+    this.schemaModuleRef = schemaModuleRef;
     this._format = format;
     this.componentModuleRef = componentModuleRef;
     this.rawData = rawData;
@@ -67,8 +67,6 @@ export default abstract class CardModel implements CardModelInterface {
   }
 
   protected abstract get serializerMap(): SerializerMap;
-  protected abstract get usedFields(): string[];
-  protected abstract get allFields(): string[];
 
   editable(): Promise<CardModelInterface> {
     throw new Error('editable() is unsupported');
@@ -92,9 +90,9 @@ export default abstract class CardModel implements CardModelInterface {
       {
         realm,
         format: this.format,
-        rawData: makeEmptyCardData(this.allFields),
+        rawData: {},
         saveModel: this.saveModel,
-        schemaModule: this.schemaModule,
+        schemaModuleRef: this.schemaModuleRef,
         componentMeta: this.componentMeta,
         componentModuleRef: this.componentModuleRef,
       }
@@ -145,6 +143,28 @@ export default abstract class CardModel implements CardModelInterface {
     }
   }
 
+  get usedFields(): string[] {
+    if (!this.schemaModule) {
+      throw new Error(
+        `The schema module has not yet been loaded for card ${
+          this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
+        }`
+      );
+    }
+    return this.schemaModule.usedFields?.[this.format] ?? [];
+  }
+
+  get allFields(): string[] {
+    if (!this.schemaModule) {
+      throw new Error(
+        `The schema module has not yet been loaded for card ${
+          this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
+        }`
+      );
+    }
+    return this.schemaModule.allFields ?? [];
+  }
+
   serialize(): ResourceObject<Saved | Unsaved> {
     let url: string | undefined;
     if (this.state.type === 'loaded') {
@@ -162,11 +182,16 @@ export default abstract class CardModel implements CardModelInterface {
       this.shapeData(this.state.allFields ? 'all-fields' : 'used-fields'),
       this.serializerMap
     );
-    resource.meta = merge({ componentModule: this.componentModuleRef, schemaModule: this.schemaModule }, resource.meta);
+    resource.meta = merge(
+      { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
+      resource.meta
+    );
     return resource;
   }
 
   async save(): Promise<void> {
+    await this.loadSchemaModule();
+
     let data: ResourceObject<Saved>;
     switch (this.state.type) {
       case 'created':
@@ -192,6 +217,7 @@ export default abstract class CardModel implements CardModelInterface {
   }
 
   async setData(data: RawCardData): Promise<void> {
+    await this.loadSchemaModule();
     let nonExistentFields = this.assertFieldsExists(data);
     if (nonExistentFields.length) {
       throw new BadRequest(
@@ -201,11 +227,7 @@ export default abstract class CardModel implements CardModelInterface {
       );
     }
 
-    this.rawData = merge(
-      makeEmptyCardData(this.allFields),
-      this.rawData,
-      serializeAttributes(data, this.serializerMap, 'serialize')
-    );
+    this.rawData = merge(this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
     await this.recompute();
   }
 
@@ -280,7 +302,8 @@ export default abstract class CardModel implements CardModelInterface {
   }
 
   private async createSchemaInstance() {
-    let klass = await this.schemaClass();
+    let schemaModule = await this.loadSchemaModule();
+    let klass = schemaModule.default;
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
     return new klass(this.getRawField.bind(this)) as any;
   }
@@ -290,17 +313,27 @@ export default abstract class CardModel implements CardModelInterface {
     if ('missing' in result) {
       throw new Error(`TODO: ${result.missing}`);
     } else {
+      // TODO it would be wonderful if the schema instance knew how to deserialize its own fields
       return serializeField(this.serializerMap, fieldPath, result.value, 'deserialize');
     }
   }
 
-  private async schemaClass() {
-    if (this._schemaClass) {
-      return this._schemaClass;
+  private async loadSchemaModule(): Promise<CardSchemaModule> {
+    if (!this.schemaModule) {
+      this.schemaModule = await this.cards.loadModule<CardSchemaModule>(this.schemaModuleRef);
+      this.setDataShape();
     }
-    this._schemaClass = (await this.cards.loadModule<CardSchemaModule>(this.schemaModule)).default;
+    return this.schemaModule;
+  }
 
-    return this._schemaClass;
+  // This is rather awkward and scaffolding until the schema instance knows how
+  // to serialize itself. Remove this as soon as it becomes possible
+  private setDataShape() {
+    if (this.state.type === 'created' || this.state.allFields) {
+      this.rawData = merge(makeEmptyCardData(this.allFields), this.rawData);
+    } else {
+      this.rawData = merge(makeEmptyCardData(this.usedFields), this.rawData);
+    }
   }
 
   private makeSetter(segments: string[] = []): Setter {

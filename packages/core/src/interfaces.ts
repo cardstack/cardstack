@@ -202,7 +202,7 @@ export interface CardModel {
 
 export interface CardModelArgs {
   realm: string;
-  schemaModule: string;
+  schemaModuleRef: string;
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];
@@ -220,10 +220,14 @@ export interface CardService {
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
+type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
+
 export interface CardSchemaModule {
   default: {
     new (fieldGetter: (fieldPath: string) => any): unknown;
   };
+  usedFields: UsedFields;
+  allFields: string[];
 }
 
 export interface CardComponentMetaModule {

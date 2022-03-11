@@ -20,7 +20,6 @@ import {
 import { getOwner, inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import Cursor from 'pg-cursor';
-import merge from 'lodash/merge';
 import { BROWSER, NODE } from '../interfaces';
 import { Expression, expressionToSql, Param, param, PgPrimitive, upsert } from '../utils/expressions';
 import type { types as t } from '@babel/core';
@@ -31,7 +30,6 @@ import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
 import CardModelForHub from '../lib/card-model-for-hub';
 import { INSECURE_CONTEXT } from './card-service';
-import { makeEmptyCardData } from '@cardstack/core/src/utils/fields';
 
 const log = logger('hub/search-index');
 
@@ -288,8 +286,8 @@ class IndexerRun implements IndexerHandle {
       {
         format,
         realm: rawCard.realm,
-        rawData: merge(makeEmptyCardData(componentMeta.allFields), rawCard.data ?? {}),
-        schemaModule: definedCard.schemaModule.global,
+        rawData: rawCard.data ?? {},
+        schemaModuleRef: definedCard.schemaModule.global,
         componentModuleRef: definedCard.componentInfos[format].componentModule.global,
         componentMeta,
         saveModel: cardService.saveModel.bind(cardService),
