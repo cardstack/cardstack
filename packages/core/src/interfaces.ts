@@ -232,9 +232,6 @@ export interface CardSchemaModule {
 
 export interface CardComponentMetaModule {
   serializerMap: SerializerMap;
-  computedFields: string[];
-  usedFields: string[];
-  allFields: string[];
 }
 
 export type CardComponentModule = {

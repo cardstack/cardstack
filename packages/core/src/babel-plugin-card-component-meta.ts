@@ -10,7 +10,7 @@ import { ImportUtil } from 'babel-import-util';
 import { CompiledCard, SerializerMap, Field } from './interfaces';
 
 import { augmentBadRequest } from './utils/errors';
-import { fieldsAsList, getFieldForPath } from './utils/fields';
+import { getFieldForPath } from './utils/fields';
 import { capitalize } from 'lodash';
 
 export interface CardComponentMetaPluginOptions {
@@ -50,9 +50,6 @@ export function babelPluginComponentMeta(babel: typeof Babel) {
         },
         exit(path: NodePath<t.Program>, state: State) {
           path.node.body.push(exportSerializerMap(path, state, babel));
-          path.node.body.push(exportComputedFields(state, babel));
-          path.node.body.push(exportUsedFields(state, babel));
-          path.node.body.push(exportAllFields(state, babel));
         },
       },
     },
@@ -77,34 +74,6 @@ function exportSerializerMap(path: NodePath<t.Program>, state: State, babel: typ
 
   return babel.template(`export const serializerMap = %%serializerMap%%;`)({
     serializerMap: t.objectExpression(buildSerializerMapProp(map, t)),
-  }) as t.Statement;
-}
-
-function exportComputedFields(state: State, babel: typeof Babel): t.Statement {
-  let t = babel.types;
-
-  return babel.template(`export const computedFields = %%computedFields%%;`)({
-    computedFields: t.arrayExpression(
-      Object.values(state.opts.fields)
-        .filter((field) => field.computed)
-        .map((field) => t.stringLiteral(field.name))
-    ),
-  }) as t.Statement;
-}
-
-function exportUsedFields(state: State, babel: typeof Babel): t.Statement {
-  let t = babel.types;
-
-  return babel.template(`export const usedFields = %%usedFields%%;`)({
-    usedFields: t.arrayExpression(state.opts.usedFields.map((field) => t.stringLiteral(field))),
-  }) as t.Statement;
-}
-
-function exportAllFields(state: State, babel: typeof Babel): t.Statement {
-  let t = babel.types;
-  let fieldList = fieldsAsList(state.opts.fields);
-  return babel.template(`export const allFields = %%allFields%%;`)({
-    allFields: t.arrayExpression(fieldList.map((field) => t.stringLiteral(field))),
   }) as t.Statement;
 }
 
