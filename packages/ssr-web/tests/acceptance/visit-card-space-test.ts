@@ -79,17 +79,11 @@ module('Acceptance | visit card space', function (hooks) {
       assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
 
       assert
-        .dom(
-          `meta[property='og:title'][content='merchant name Profile']`,
-          document.documentElement
-        )
+        .dom(`meta[property='og:title']`, document.documentElement)
         .hasAttribute('content', 'merchant name Profile');
 
       assert
-        .dom(
-          `meta[name='twitter:title'][content='merchant name Profile']`,
-          document.documentElement
-        )
+        .dom(`meta[name='twitter:title']`, document.documentElement)
         .hasAttribute('content', 'merchant name Profile');
 
       assert
