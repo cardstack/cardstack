@@ -236,7 +236,7 @@ app "ssr-web" {
             task_role_name = "ssr-web-prod-ecr-task"
 
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/ssr-web-prod/f793ac7cf27c362b/86347f16c37c00b0"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/ssr-web-prod/f793ac7cf27c362b/e9955fc64afd9393"
             }
         }
 
