@@ -78,6 +78,36 @@ module('Acceptance | visit card space', function (hooks) {
         .hasAttribute('data-test-boxel-styled-qr-code', link);
       assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
 
+      assert
+        .dom(`meta[property='og:title']`, document.documentElement)
+        .hasAttribute('content', 'merchant name’s Profile');
+
+      assert
+        .dom(`meta[name='twitter:title']`, document.documentElement)
+        .hasAttribute('content', 'merchant name’s Profile');
+
+      assert
+        .dom(`meta[property='og:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
+        .dom(`meta[name='twitter:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
+        .dom(
+          `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
+      assert
+        .dom(
+          `meta[name='twitter:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
       await percySnapshot(assert);
     });
 
