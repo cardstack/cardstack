@@ -22,6 +22,7 @@ module('Integration | Service | app-context', function (hooks) {
     isFastBoot: boolean;
     request: {
       host: string;
+      headers: object;
     };
   };
   let appContext: AppContextService;
@@ -62,6 +63,14 @@ module('Integration | Service | app-context', function (hooks) {
 
       fastboot.request.host = 'oops.wallet';
       assert.equal(appContext.cardSpaceId, '');
+    });
+
+    test('it can detect the ELB health checker', function (assert) {
+      fastboot.request.headers = {
+        'user-agent': 'ELB-HealthChecker/2.0',
+      };
+
+      assert.ok(appContext.isELBHealthChecker);
     });
   });
 

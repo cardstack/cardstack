@@ -7,6 +7,7 @@ export interface AppContextService {
   currentApp: 'card-space' | 'wallet';
   cardSpaceId: string;
   isCardSpace: boolean;
+  isELBHealthChecker: boolean;
 }
 
 // escape dots for regexp
@@ -49,6 +50,15 @@ export default class AppContext extends Service implements AppContextService {
       let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
       return id;
     } else return '';
+  }
+
+  get isELBHealthChecker() {
+    return (
+      this.fastboot.isFastBoot &&
+      this.fastboot.request?.headers['user-agent']?.includes(
+        'ELB-HealthChecker'
+      )
+    );
   }
 }
 

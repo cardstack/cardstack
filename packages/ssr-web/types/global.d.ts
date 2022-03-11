@@ -13,7 +13,7 @@ declare module 'ember-cli-fastboot/services/fastboot' {
     method: string;
     body: unknown;
     cookies: unknown;
-    headers: unknown;
+    headers: any;
     queryParams: unknown;
     path: string;
     protocol: string;

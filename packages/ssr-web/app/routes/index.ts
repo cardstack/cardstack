@@ -19,7 +19,15 @@ export default class IndexRoute extends Route {
   @service declare fastboot: Fastboot;
 
   async model(): Promise<CardSpaceIndexRouteModel> {
-    if (this.appContext.isCardSpace) {
+    if (this.appContext.isELBHealthChecker) {
+      return {
+        did: '',
+        id: '',
+        name: '',
+        backgroundColor: '',
+        textColor: '',
+      };
+    } else if (this.appContext.isCardSpace) {
       try {
         const response = await fetch(
           `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
