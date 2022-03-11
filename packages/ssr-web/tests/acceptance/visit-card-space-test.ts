@@ -55,7 +55,12 @@ module('Acceptance | visit card space', function (hooks) {
         slug: 'slug',
       });
 
-      cardSpace.createMerchantInfo({ name: 'merchant name', slug: 'slug' });
+      cardSpace.createMerchantInfo({
+        name: 'merchant name',
+        slug: 'slug',
+        color: 'blue',
+        textColor: 'hotpink',
+      });
 
       link = generateMerchantPaymentUrl({
         domain: config.universalLinkDomain,
