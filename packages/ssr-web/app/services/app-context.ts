@@ -53,12 +53,15 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   get isELBHealthChecker() {
-    return (
-      this.fastboot.isFastBoot &&
-      this.fastboot.request?.headers['user-agent']?.includes(
-        'ELB-HealthChecker'
-      )
-    );
+    if (this.fastboot.isFastBoot) {
+      let userAgents = this.fastboot.request.headers['user-agent'] || [];
+
+      return userAgents.any((userAgent: string) =>
+        userAgent.includes('ELB-HealthChecker')
+      );
+    } else {
+      return false;
+    }
   }
 }
 
