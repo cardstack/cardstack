@@ -24,10 +24,10 @@ class MinSpend(Rule):
         sum(spend_amount_uint64) as total_spent
 
         from {table_query}
-        where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer 
+        where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer 
         
         group by prepaid_card_owner
-        having(total_spent) >= ?::integer
+        having(total_spent) >= $3::integer
         """
 
     def df_to_payment_list(
@@ -45,9 +45,10 @@ class MinSpend(Rule):
         new_df = new_df.drop(["total_spent"], axis=1)
         return new_df[new_df["amount"] > 0].reset_index()
 
-    def run(self, start_block: int, end_block: int):
+    def run(self, payment_cycle: int):
+        start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
         vars = [start_block, end_block, self.min_spend]
-        table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
+        table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
             return pd.DataFrame(columns=["payee", "total_spent"])
         else:

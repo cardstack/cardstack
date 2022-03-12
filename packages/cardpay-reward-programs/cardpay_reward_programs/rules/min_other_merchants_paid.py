@@ -28,7 +28,7 @@ class MinOtherMerchantsPaid(Rule):
         merchant
 
         from {table_query}
-        where block_number_uint64 > ?::integer and block_number_uint64 <= ?::integer and merchant != payee 
+        where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer and merchant != payee 
         """
 
     def df_to_payment_list(
@@ -48,9 +48,10 @@ class MinOtherMerchantsPaid(Rule):
         new_df = new_df.drop(["merchant"], axis=1)
         return new_df[new_df["amount"] > 0]
 
-    def run(self, start_block: int, end_block: int):
+    def run(self, payment_cycle: int):
+        start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
         vars = [start_block, end_block]
-        table_query = self._get_table_query("prepaid_card_payment", start_block, end_block)
+        table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
             return pd.DataFrame(columns=["payee", "merchant"])
         else:

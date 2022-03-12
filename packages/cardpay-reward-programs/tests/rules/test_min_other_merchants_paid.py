@@ -1,5 +1,7 @@
 import hashlib
 import itertools
+from tracemalloc import start
+from turtle import st
 
 import pandas as pd
 import pytest
@@ -61,7 +63,8 @@ class TestMinOtherMerchantsPaidSingle:
         df_hash, summary = ans
         start_block = 24000000
         end_block = 26000000
-        df = rule.run(start_block, end_block)
+        rule.payment_cycle_length = end_block - start_block
+        df = rule.run(end_block)
         payment_list = rule.df_to_payment_list(df)
         h = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
         computed_summary = rule.get_summary(payment_list)
@@ -99,7 +102,7 @@ class TestMinOtherMerchantsPaidMultiple:
         cached_df = []
         for i in range(start_block, end_block, rule.payment_cycle_length):
             tail = min(end_block, i + rule.payment_cycle_length)
-            cached_df.append(rule.run(i, tail))
+            cached_df.append(rule.run(tail))
         aggregate_df = rule.aggregate(cached_df)
         payment_list = rule.df_to_payment_list(aggregate_df)
         computed_summary = rule.get_summary(payment_list)

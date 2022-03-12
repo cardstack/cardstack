@@ -47,9 +47,7 @@ def run_reward_program(
     with open(AnyPath(parameters_file), "r") as stream:
         parameters = json.load(stream)
     rule = to_rule(parameters)
-    start_block = rule.start_block
-    end_block = rule.end_block
-    results_df = rule.run(start_block, end_block)
+    results_df = rule.run(parameters["core"]["payment_cycle"])
     payment_list = rule.df_to_payment_list(results_df, reward_program_id)
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
