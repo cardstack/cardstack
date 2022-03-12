@@ -13,10 +13,8 @@ from .utils import get_parameters, to_camel_case, write_parquet_file
 load_dotenv()
 
 cached_client = S3Client(
-    local_cache_dir="mycache",
+    local_cache_dir=".cache",
     boto3_session=Session(
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     ),
 )
 cached_client.set_as_default_client()
