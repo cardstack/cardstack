@@ -281,6 +281,10 @@ module.exports = {
       message: /the request of a dependency is an expression/,
     },
     {
+      module: /node_modules\/chokidar\/lib\/fsevents-handler\.js/,
+      message: /Can't resolve 'fsevents'/,
+    },
+    {
       // this require is wrapped in a try catch and will import a local pkg if the fast-crc32c is not available
       module: /node_modules\/hash-stream-validation\/index\.js/,
       message: /Can't resolve 'fast-crc32c'/,
