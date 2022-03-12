@@ -33,7 +33,6 @@ def to_rule(parameters):
 
 
 def run_reward_program(
-    reward_program_id: str,
     parameters_file: str = typer.Option(
         default="./input/parameters.json", help="The parameters file to use"
     ),
@@ -48,7 +47,7 @@ def run_reward_program(
         parameters = json.load(stream)
     rule = to_rule(parameters)
     results_df = rule.run(parameters["core"]["payment_cycle"])
-    payment_list = rule.df_to_payment_list(results_df, reward_program_id)
+    payment_list = rule.df_to_payment_list(results_df, parameters["core"]["reward_program_id"])
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
