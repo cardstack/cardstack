@@ -30,7 +30,7 @@ def view_multiple(core_parameters):
     for i in range(start_block, end_block, program.payment_cycle_length):
         progress.progress((i - start_block) / (end_block - start_block))
         tail = min(end_block, i + program.payment_cycle_length)
-        df = program.run(i, tail)
+        df = program.run(tail)
         if not df.empty:
             cached_df.append(df)
     df = program.aggregate(cached_df)
@@ -41,7 +41,6 @@ def view_multiple(core_parameters):
 def view_single(core_parameters):
     program = min_spend(core_parameters)
     block = slider_partition(type="one_end")
-    end_block = block + program.payment_cycle_length
-    df = program.run(block, end_block)
-    payment_list = program.df_to_payment_list(df, end_block)
+    df = program.run(block)
+    payment_list = program.df_to_payment_list(df, block)
     return payment_list, df, program.get_summary(payment_list)
