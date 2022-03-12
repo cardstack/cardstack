@@ -1,6 +1,12 @@
 import streamlit as st
-from cardpay_reward_programs.config import default_core_config
 import pandas as pd
+
+
+default_core_config = {
+    "payment_cycle_length": 32768,
+    "start_block": 20000000,
+    "end_block": 26000000,
+}
 
 def read_core_config(rule):
     r = st.expander(label="Rule config")
