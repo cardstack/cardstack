@@ -22,11 +22,11 @@ cached_client.set_as_default_client()
 
 
 def run_reward_program(
-    rule_name: str = typer.Option(default="MinSpend", help="Rule name"),
-    parameters_file: str = typer.Option(
+    rule_name: str = typer.Argument(default="MinSpend", help="Rule name"),
+    parameters_file: str = typer.Argument(
         default="./input/parameters.json", help="The parameters file to use"
     ),
-    output_location: str = typer.Option(
+    output_location: str = typer.Argument(
         default="./output", help="The directory to write the results to"
     ),
 ):
