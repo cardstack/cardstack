@@ -4,15 +4,7 @@ from pathlib import PosixPath
 import pyarrow.parquet as pq
 import yaml
 from cloudpathlib import AnyPath, CloudPath
-
-
-def exists(file_location):
-    # Checks if we already have the file in our local cache
-    # as our files are immutable we don't need to check remotely
-    if isinstance(file_location, CloudPath):
-        if file_location._local.exists():
-            return True
-    return file_location.exists()
+from cachetools import cached, TTLCache
 
 
 def get_local_file(file_location):
@@ -29,13 +21,30 @@ def get_local_file(file_location):
     else:
         raise Exception("Unsupported path type")
 
+@cached(TTLCache(maxsize=1000, ttl=60))
+def get_latest_details(config_location):
+    with open(config_location / "latest.yaml", "r") as stream:
+        return yaml.safe_load(stream)
+
+def get_partition_iterator(min_partition, max_partition, partition_sizes):
+    for partition_size in sorted(partition_sizes, reverse=True):
+        start_partition_allowed = (min_partition // partition_size) * partition_size
+        end_partition_allowed = (max_partition // partition_size) * partition_size
+        last_max_partition = None
+        for start_partition in range(
+            start_partition_allowed, end_partition_allowed, partition_size
+        ):
+            last_max_partition = start_partition + partition_size
+            yield partition_size, start_partition, start_partition + partition_size
+        if last_max_partition is not None:
+            min_partition = last_max_partition
 
 def get_partition_files(config_location, table, min_partition, max_partition):
     # Get config
     with open(get_local_file(config_location / "config.yaml"), "r") as stream:
         config = yaml.safe_load(stream)
-    with open(config_location / "latest.yaml", "r") as stream:
-        latest = yaml.safe_load(stream)
+    latest = get_latest_details(config_location)
+    latest_block = latest.get("latest_block")
     # Get table
     table_config = config["tables"][table]
     partition_sizes = sorted(table_config["partition_sizes"], reverse=True)
@@ -43,28 +52,15 @@ def get_partition_files(config_location, table, min_partition, max_partition):
         "data", f"subgraph={latest['subgraph_deployment']}", f"table={table}"
     )
     files = []
-    # First required file is the floor
-    start_partition = (min_partition // partition_sizes[0]) * partition_sizes[0]
-    for partition_size in partition_sizes:
-        end_partition = start_partition + partition_size
-        file_location = table_dir.joinpath(
-            f"partition_size={partition_size}",
-            f"start_partition={start_partition}",
-            f"end_partition={end_partition}",
-            "data.parquet",
-        )
-        while exists(file_location):
-            files.append(file_location)
-            start_partition = end_partition
-            end_partition += partition_size
-            file_location = table_dir.joinpath(
+    for partition_size, start_partition, end_partition in get_partition_iterator(
+        min_partition, latest_block, partition_sizes):
+        if start_partition < max_partition:
+            files.append(table_dir.joinpath(
                 f"partition_size={partition_size}",
                 f"start_partition={start_partition}",
                 f"end_partition={end_partition}",
                 "data.parquet",
-            )
-            if start_partition > max_partition:
-                break
+            ))
     return files
 
 
