@@ -57,7 +57,7 @@ class WeightedUsage(Rule):
         new_df["paymentCycle"] = self.end_block
         return new_df[new_df["amount"] > 0]
 
-    def run(self, payment_cycle: int):
+    def run(self, payment_cycle: int, reward_program_id: str):
         start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
         vars = [
             self.base_reward,
@@ -68,9 +68,10 @@ class WeightedUsage(Rule):
         ]
         table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
-            return pd.DataFrame(columns=["payee", "amount", "transactions", "total_spent"])
+            base_df = pd.DataFrame(columns=["payee", "amount", "transactions", "total_spent"])
         else:
-            return self.run_query(table_query, vars)
+            base_df = self.run_query(table_query, vars)
+        return self.df_to_payment_list(base_df, payment_cycle, reward_program_id)
 
     def aggregate(self, cached_df=[]):
         return pd.concat(cached_df)

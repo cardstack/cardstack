@@ -1,6 +1,5 @@
 {
   "core": {
-    "docker_image": "weighted_usage",
     "payment_cycle_length": 32768,
     "start_block": 24000000,
     "end_block": 26000000

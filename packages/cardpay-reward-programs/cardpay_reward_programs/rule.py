@@ -14,8 +14,7 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(self, docker_image, payment_cycle_length, start_block, end_block):
-        self.docker_image = docker_image
+    def set_core_parameters(self, payment_cycle_length, start_block, end_block):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
         self.end_block = end_block
@@ -41,7 +40,7 @@ class Rule(ABC):
         return con.fetchdf()
 
     @abstractmethod
-    def run(self, payment_cycle: int):
+    def run(self, payment_cycle: int, reward_program_id: str):
         raise NotImplementedError
 
     @staticmethod

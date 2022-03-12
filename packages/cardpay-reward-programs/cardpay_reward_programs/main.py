@@ -3,6 +3,7 @@ import os
 
 import typer
 from boto3.session import Session
+from cardpay_reward_programs.rule import Rule
 from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
@@ -20,19 +21,8 @@ cached_client = S3Client(
 cached_client.set_as_default_client()
 
 
-def select_rule(name, core_parameters, user_defined_parameters):
-    rule_constructor = globals()[name]
-    instance = rule_constructor(core_parameters, user_defined_parameters)
-    return instance
-
-
-def to_rule(parameters):
-    core_parameters, user_defined_parameters = get_parameters(parameters)
-    name = to_camel_case(core_parameters["docker_image"])
-    return select_rule(name, core_parameters, user_defined_parameters)
-
-
 def run_reward_program(
+    rule_name: str = typer.Option(default="MinSpend", help="Rule name"),
     parameters_file: str = typer.Option(
         default="./input/parameters.json", help="The parameters file to use"
     ),
@@ -45,9 +35,11 @@ def run_reward_program(
     """
     with open(AnyPath(parameters_file), "r") as stream:
         parameters = json.load(stream)
-    rule = to_rule(parameters)
-    results_df = rule.run(parameters["run"]["payment_cycle"])
-    payment_list = rule.df_to_payment_list(results_df, parameters["run"]["reward_program_id"])
+    
+    for subclass in Rule.__subclasses__():
+        if subclass.__name__ == rule_name:
+            rule = subclass(parameters["core"], parameters["user_defined"])
+    payment_list = rule.run(parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"])
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)

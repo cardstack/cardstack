@@ -45,14 +45,15 @@ class MinSpend(Rule):
         new_df = new_df.drop(["total_spent"], axis=1)
         return new_df[new_df["amount"] > 0].reset_index()
 
-    def run(self, payment_cycle: int):
+    def run(self, payment_cycle: int, reward_program_id: str):
         start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
         vars = [start_block, end_block, self.min_spend]
         table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
         if table_query == "parquet_scan([])":
-            return pd.DataFrame(columns=["payee", "total_spent"])
+            base_df = pd.DataFrame(columns=["payee", "total_spent"])
         else:
-            return self.run_query(table_query, vars)
+            base_df = self.run_query(table_query, vars)
+        return self.df_to_payment_list(base_df, payment_cycle, reward_program_id)
 
     def aggregate(self, cached_df=[]):
         if len(cached_df) == 0:
