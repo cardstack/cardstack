@@ -11,6 +11,7 @@
       "module": "cardpay_reward_programs.main",
       "args": [
         "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "1",
         "--output-location",
         "s3://tall-data-dev/local_test"
       ]
