@@ -1,10 +1,7 @@
-from audioop import mul
-import hashlib
 import itertools
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import MinSpend
 
 from .fixture import indexed_data
@@ -25,10 +22,9 @@ min_spend_ls = [2]
 def rule(request):
     payment_cycle_length, min_spend = request.param
     core_config = {
-        **default_core_config,
-        **{
-            "payment_cycle_length": payment_cycle_length,
-        },
+        "start_block": 20000000,
+        "end_block": 26000000,
+        "payment_cycle_length": payment_cycle_length,
     }
     user_config = {
         "base_reward": 10,

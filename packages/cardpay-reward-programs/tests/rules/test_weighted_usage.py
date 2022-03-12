@@ -1,10 +1,7 @@
-import hashlib
 import itertools
-from turtle import end_fill
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import WeightedUsage
 
 from .fixture import indexed_data
@@ -26,8 +23,10 @@ transaction_factor_ls = [2.0]
 def rule(request):
     payment_cycle_length, spend_factor, transaction_factor = request.param
     core_config = {
-        **default_core_config,
-        **{"payment_cycle_length": payment_cycle_length},
+        "payment_cycle_length": 32768,
+        "start_block": 20000000,
+        "end_block": 26000000,
+        "payment_cycle_length": payment_cycle_length,
     }
     user_config = {
         "base_reward": 10,

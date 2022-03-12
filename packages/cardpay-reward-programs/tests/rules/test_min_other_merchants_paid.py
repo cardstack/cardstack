@@ -1,11 +1,7 @@
-import hashlib
 import itertools
-from tracemalloc import start
-from turtle import st
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import default_core_config
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 
 from .fixture import indexed_data
@@ -27,10 +23,9 @@ min_other_merchants_ls = [1]
 def rule(request):
     payment_cycle_length, min_other_merchants = request.param
     core_config = {
-        **default_core_config,
-        **{
-            "payment_cycle_length": payment_cycle_length,
-        },
+        "start_block": 20000000,
+        "end_block": 26000000,
+        "payment_cycle_length": payment_cycle_length,
     }
     user_config = {
         "base_reward": 10,
