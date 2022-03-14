@@ -275,12 +275,6 @@ export default class Cards extends Service implements CardService {
       // module was built by our Builder, so ask Builder for it
       let builder = await this.builder();
       return await builder.loadModule(moduleIdentifier);
-    } else if (moduleIdentifier === 'lodash/set') {
-      /* webpackInclude: /\.(js|hbs)$/ */
-      return await import('lodash/set');
-    } else if (moduleIdentifier === 'lodash/get') {
-      /* webpackInclude: /\.(js|hbs)$/ */
-      return await import('lodash/get');
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`

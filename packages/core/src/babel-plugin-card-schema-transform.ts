@@ -257,18 +257,10 @@ function addDataMethod(path: NodePath<t.Class>, state: State, babel: typeof Babe
       [t.identifier('format')],
       t.blockStatement(
         babel.template(`
-          let data = {};
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          for (let field of fields) {
-            let value = %%get%%(this, field);
-            if (value !== undefined) {
-              %%set%%(data, field, value);
-            }
-          }
-          return data;
+          return %%getProperties%%(this, fields);
         `)({
-          get: state.importUtil.import(body, 'lodash/get', 'default', 'get'),
-          set: state.importUtil.import(body, 'lodash/set', 'default', 'set'),
+          getProperties: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getProperties'),
         }) as t.Statement[]
       )
     )

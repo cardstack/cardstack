@@ -148,15 +148,6 @@ export default class FileCache {
       return require(`@cardstack/base-cards/base/schema`);
     }
 
-    if (moduleIdentifier === 'lodash/get') {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require(`lodash/get`);
-    }
-    if (moduleIdentifier === 'lodash/set') {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      return require(`lodash/set`);
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return __non_webpack_require__(__non_webpack_require__.resolve(moduleIdentifier, { paths: [this.dir] }));
   }

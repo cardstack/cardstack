@@ -167,23 +167,15 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import set from "lodash/set";
-        import get from "lodash/get";
+        import { getProperties } from "@cardstack/core/src/utils/fields";
       `);
       expect(source).to.containsSource(`
         export const dataMember = "data0";
       `);
       expect(source).to.containsSource(`
         data0(format) {
-          let data = {};
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          for (let field of fields) {
-            let value = get(this, field);
-            if (value !== undefined) {
-              set(data, field, value);
-            }
-          }
-          return data;
+          return getProperties(this, fields);
         }
       `);
     });

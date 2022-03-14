@@ -2,6 +2,7 @@ import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
+import get from 'lodash/get';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -106,6 +107,17 @@ export function makeEmptyCardData(allFields: string[]): RawCardData {
   let data: RawCardData = {};
   for (let field of allFields) {
     set(data, field, null);
+  }
+  return data;
+}
+
+export function getProperties(object: Record<string, any>, properties: string[]) {
+  let data = {};
+  for (let field of properties) {
+    let value = get(object, field);
+    if (value !== undefined) {
+      set(data, field, value);
+    }
   }
   return data;
 }
