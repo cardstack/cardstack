@@ -256,9 +256,15 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
       t.identifier(state.serializeMember),
       ['action', 'format', 'serializerMap', 'data'].map((name) => t.identifier(name)),
       t.blockStatement(
+        // in the case of deserialization, the data is already deserialized via
+        // the schema instance's getters (due to this.getRawField), so we skip
+        // an extra deserialization in that case.
         babel.template(`
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          return %%serializeAttributes%%( %%getProperties%%(data ?? this, fields), serializerMap, action, fields);
+          if (action === 'deserialize' && data === undefined) {
+            return %%getProperties%%(this, fields);
+          }
+          return %%serializeAttributes%%(%%getProperties%%(data ?? this, fields), serializerMap, action, fields);
         `)({
           getProperties: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getProperties'),
           serializeAttributes: state.importUtil.import(body, '@cardstack/core/src/serializers', 'serializeAttributes'),
