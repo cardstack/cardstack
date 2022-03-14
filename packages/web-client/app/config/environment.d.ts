@@ -32,7 +32,6 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   universalLinkDomain: string;
-  cardSpaceHostnameSuffix: string;
   chains: ChainsOptions;
   features: FeaturesOptions;
   version: string;

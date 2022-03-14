@@ -15,8 +15,5 @@ Router.map(function () {
     this.route('reward');
     this.route('deposit-withdrawal');
   });
-  this.route('card-space', function () {
-    this.route('profile-card-temp');
-  });
   this.route('boom');
 });

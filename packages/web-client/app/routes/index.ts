@@ -1,8 +1,4 @@
 import Route from '@ember/routing/route';
-import config from '@cardstack/web-client/config/environment';
-import Controller from '@ember/controller';
-import { inject as service } from '@ember/service';
-import { LocationService } from '../services/location';
 
 // we're using file-loader to get assets since we want webpack to hash them.
 // these imports are done this way so that we have a consistent way to import assets
@@ -23,7 +19,7 @@ import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-m
 import '@cardstack/web-client/css/cardstack-landing-page.css';
 
 import ENV from '../config/environment';
-const { enableCardSpace, enableCardPay } = ENV.features;
+const { enableCardPay } = ENV.features;
 
 const ORGS = [
   {
@@ -66,9 +62,9 @@ const ORGS = [
       'Request donations',
       'Embed features from Card Catalog',
     ],
-    cta: enableCardSpace ? 'Open' : 'Launching soon',
-    launched: enableCardSpace,
-    route: enableCardSpace ? 'card-space' : 'index',
+    cta: 'Launching soon',
+    launched: false,
+    route: 'index',
   },
   {
     sideImage: CardCatalogImage,
@@ -117,42 +113,9 @@ const ORGS = [
 ];
 
 export default class CardstackRoute extends Route {
-  @service declare location: LocationService;
-  cardSpaceId = '';
-
-  model(params: any) {
-    this.cardSpaceId = params['cardSpaceId'];
+  model() {
     return {
       orgs: ORGS,
     };
-  }
-
-  renderTemplate(controller: Controller) {
-    if (this.location.hostname.endsWith(config.cardSpaceHostnameSuffix)) {
-      let displayName: string;
-      if (config.environment === 'development') {
-        displayName = this.cardSpaceId;
-        if (!displayName) {
-          throw new Error(
-            'card-space-id query parameter is required for card space user page in development'
-          );
-        }
-      } else {
-        displayName = this.location.hostname.replace(
-          `.${config.cardSpaceHostnameSuffix}`,
-          ''
-        );
-      }
-
-      this.render('card-space', {
-        into: 'application',
-      });
-      this.render('view-card-space', {
-        into: 'card-space',
-        model: { displayName },
-      });
-    } else {
-      super.renderTemplate(controller, null);
-    }
   }
 }

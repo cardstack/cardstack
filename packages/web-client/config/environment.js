@@ -16,17 +16,6 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.xyz.test';
-const CARD_SPACE_HOSTNAME_SUFFIX = 'card.xyz';
-const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
-const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
-
-const cardSpaceHostnameSuffixesByTarget = {
-  production: CARD_SPACE_HOSTNAME_SUFFIX,
-  staging: CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
-  test: CARD_SPACE_HOSTNAME_TEST_SUFFIX,
-};
-
 const pkg = require('../package.json');
 
 // eslint-disable-next-line no-undef
@@ -40,9 +29,6 @@ module.exports = function (environment) {
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    cardSpaceHostnameSuffix:
-      cardSpaceHostnameSuffixesByTarget[process.env.DEPLOY_TARGET] ??
-      CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
