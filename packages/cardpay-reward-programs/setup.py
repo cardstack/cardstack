@@ -9,6 +9,7 @@ setup(
     author_email="ian.calvert@cardstack.com",
     license="MIT",
     install_requires=[
+        "cachetools",
         "pyyaml",
         "fastparquet",
         "typer",

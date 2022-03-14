@@ -1,12 +1,10 @@
-import altair as alt
-import pandas as pd
 import streamlit as st
 from cardpay_reward_programs.rules import WeightedUsage
 
-from .utils import read_core_config, slider_partition
+def get_rule_class():
+    return WeightedUsage
 
-
-def weighted_usage(core_parameters):
+def get_user_defined_parameters():
     s = st.expander(label="User defined parameters", expanded=True)
     base_reward = s.number_input("Base reward", value=5, step=1, min_value=0, max_value=100)
     transaction_factor = s.number_input(
@@ -26,66 +24,4 @@ def weighted_usage(core_parameters):
         },
         "duration": 43200,
     }
-    rule = WeightedUsage(core_parameters, user_defined_parameters)
-    read_core_config(rule)
-    return rule
-
-
-def view_multiple(core_parameters):
-    program = weighted_usage(core_parameters)
-    start_block, end_block = slider_partition(type="two_end")
-    progress = st.progress(0.0)
-    payments = []
-    cached_df = []
-    for i in range(start_block, end_block, program.payment_cycle_length):
-        progress.progress((i - start_block) / (end_block - start_block))
-        tail = min(end_block, i + program.payment_cycle_length)
-        df = program.run(i, tail)
-        payments.append({"block": i, "amount": df["amount"].sum()})
-        if not df.empty:
-            cached_df.append(df)
-
-    df = program.aggregate(cached_df)
-    payment_list = program.df_to_payment_list(df, end_block)
-    multiple_df = pd.DataFrame(payments)
-    amount_each_cycle = (
-        alt.Chart(multiple_df)
-        .mark_bar()
-        .encode(
-            alt.X("block"),
-            y="amount",
-        )
-    )
-
-    st.altair_chart(amount_each_cycle, use_container_width=True)
-    amounts = (
-        alt.Chart(multiple_df)
-        .mark_bar()
-        .encode(
-            alt.X("amount:Q", bin=alt.Bin()),
-            y="count()",
-        )
-    )
-
-    st.altair_chart(amounts, use_container_width=True)
-    return payment_list, df, program.get_summary(payment_list)
-
-
-def view_single(core_parameters):
-    program = weighted_usage(core_parameters)
-    block = slider_partition(type="one_end")
-    end_block = block + program.payment_cycle_length
-    df = program.run(block, end_block)
-    payment_list = program.df_to_payment_list(df, end_block)
-
-    altair_chart = (
-        alt.Chart(df)
-        .mark_bar()
-        .encode(
-            alt.X("amount:Q", bin=alt.Bin()),
-            y="count()",
-        )
-    )
-
-    st.altair_chart(altair_chart, use_container_width=True)
-    return payment_list, df, program.get_summary(payment_list)
+    return user_defined_parameters

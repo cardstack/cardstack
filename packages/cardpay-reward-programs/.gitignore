@@ -7,3 +7,4 @@ mycache/*
 __pycache__
 .env
 output/
+.cache

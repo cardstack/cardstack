@@ -14,8 +14,7 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(self, docker_image, payment_cycle_length, start_block, end_block):
-        self.docker_image = docker_image
+    def set_core_parameters(self, payment_cycle_length, start_block, end_block):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
         self.end_block = end_block
@@ -30,8 +29,8 @@ class Rule(ABC):
     def sql(self, table_query):
         raise NotImplementedError
 
-    def _get_table_query(self, table_name, min_partition: int, max_partition: int):
-        config_location = self.subgraph_config_location[table_name]
+    def _get_table_query(self, config_name, table_name, min_partition: int, max_partition: int):
+        config_location = self.subgraph_config_location[config_name]
         local_files = get_files(config_location, table_name, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 
@@ -41,22 +40,12 @@ class Rule(ABC):
         return con.fetchdf()
 
     @abstractmethod
-    def run(self, start_block: int, end_block: int):
-        raise NotImplementedError
-
-    @abstractmethod
-    def aggregate(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def df_to_payment_list(self, df, payment_cycle, reward_program_id):
+    def run(self, payment_cycle: int, reward_program_id: str):
         raise NotImplementedError
 
     @staticmethod
     def get_summary(payment_list):
-        return pd.DataFrame(
-            {
+        return {
                 "total_reward": [payment_list["amount"].sum()],
                 "unique_payee": [len(pd.unique(payment_list["payee"]))],
             }
-        )
