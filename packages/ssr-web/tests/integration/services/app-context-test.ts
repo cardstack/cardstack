@@ -22,7 +22,7 @@ module('Integration | Service | app-context', function (hooks) {
     isFastBoot: boolean;
     request: {
       host: string;
-      headers: object;
+      headers: Headers;
     };
   };
   let appContext: AppContextService;
