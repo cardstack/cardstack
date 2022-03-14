@@ -19,10 +19,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { registerDestructor } from '@ember/destroyable';
 import { tracked as _tracked } from '@glimmer/tracking';
 
-export default class CardModelForBrowser
-  extends BaseCardModel
-  implements CardModel
-{
+export default class CardModelForBrowser extends BaseCardModel {
   private _componentModule: CardComponentModule | undefined;
   private wrapperComponent: unknown | undefined;
 

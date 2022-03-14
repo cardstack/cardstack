@@ -192,7 +192,7 @@ export class CardService implements CardServiceInterface {
     format: Format,
     result: Record<string, any>,
     allFields = false
-  ): Promise<CardModelForHub> {
+  ): Promise<CardModel> {
     let { realm } = this.realmManager.parseCardURL(result.url);
     let componentMetaModule = result.componentInfos[format].metaModule.global;
     let componentMeta: CardComponentMetaModule = await this.loadModule(componentMetaModule);

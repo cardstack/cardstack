@@ -10,7 +10,6 @@ import {
   CardService,
   CardModelArgs,
   CardSchemaModule,
-  CardModel as CardModelInterface,
   Setter,
   SerializerMap,
   CardComponentMetaModule,
@@ -35,7 +34,7 @@ export interface LoadedState {
   allFields: boolean;
 }
 
-export default abstract class CardModel implements CardModelInterface {
+export default abstract class CardModel {
   setters: Setter;
 
   protected _schemaInstance: any | undefined;
@@ -66,14 +65,14 @@ export default abstract class CardModel implements CardModelInterface {
 
   protected abstract get serializerMap(): SerializerMap;
 
-  editable(): Promise<CardModelInterface> {
+  editable(): Promise<CardModel> {
     throw new CardstackError('editable() is unsupported');
   }
   component(): Promise<unknown> {
     throw new CardstackError('component() is unsupported');
   }
 
-  adoptIntoRealm(realm: string, id?: string): CardModelInterface {
+  adoptIntoRealm(realm: string, id?: string): CardModel {
     if (this.state.type !== 'loaded') {
       throw new CardstackError(`tried to adopt from an unsaved card`);
     }
@@ -107,7 +106,7 @@ export default abstract class CardModel implements CardModelInterface {
     return await getFieldValue(schemaInstance, name);
   }
 
-  get data(): object {
+  get data(): Record<string, any> {
     return this._schemaInstance;
   }
 
@@ -141,14 +140,14 @@ export default abstract class CardModel implements CardModelInterface {
     }
   }
 
-  get usedFields(): string[] {
+  private get usedFields(): string[] {
     if (!this.schemaModule) {
       throw new CardstackError(this.noSchemaModuleMsg());
     }
     return this.schemaModule.usedFields?.[this.format] ?? [];
   }
 
-  get allFields(): string[] {
+  private get allFields(): string[] {
     if (!this.schemaModule) {
       throw new CardstackError(this.noSchemaModuleMsg());
     }
@@ -221,7 +220,7 @@ export default abstract class CardModel implements CardModelInterface {
     await this.recompute();
   }
 
-  async didRecompute(): Promise<void> {
+  protected async didRecompute(): Promise<void> {
     return await this.recomputePromise;
   }
 

@@ -1,7 +1,7 @@
-import { CardModel, SerializerMap } from '@cardstack/core/src/interfaces';
+import { SerializerMap } from '@cardstack/core/src/interfaces';
 import BaseCardModel from '@cardstack/core/src/card-model';
 
-export default class CardModelForHub extends BaseCardModel implements CardModel {
+export default class CardModelForHub extends BaseCardModel {
   // TODO The serializer can move into schema instance during
   // compilation, so that eventually this implementation can go away
   protected get serializerMap(): SerializerMap {

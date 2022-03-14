@@ -3,6 +3,7 @@ import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { keys } from './utils';
 import { Query } from './query';
+import type CardModel from './card-model';
 
 export { Query } from './query';
 
@@ -13,6 +14,7 @@ const componentFormats = {
 };
 export type Format = keyof typeof componentFormats;
 export const FORMATS = keys(componentFormats);
+export type { CardModel };
 
 export function isFormat(s: any): s is Format {
   return s && s in componentFormats;
@@ -181,23 +183,6 @@ export interface CardContent {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-}
-
-export interface CardModel {
-  setters: Setter | undefined;
-  adoptIntoRealm(realm: string, id?: string): CardModel;
-  editable(): Promise<CardModel>;
-  url: string;
-  id: string | undefined;
-  realm: string;
-  data: Record<string, any>;
-  getField(name: string): Promise<any>;
-  format: Format;
-  setData(data: RawCardData): void;
-  serialize(): ResourceObject<Saved | Unsaved>;
-  component(): Promise<unknown>;
-  save(): Promise<void>;
-  parentCardURL: string;
 }
 
 export interface CardModelArgs {
