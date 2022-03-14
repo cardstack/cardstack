@@ -20,6 +20,8 @@ const cardSpaceHostnameSuffixByTarget = {
   production: CARD_SPACE_HOSTNAME_SUFFIX,
 };
 
+const HEALTH_CHECK_IP_REGEX = '/^10.\\d+.\\d+.\\d+:4000$/';
+
 function convertHostnameSuffixToRegex(suffix) {
   // .pouty.pizza → /^.+\.pouty\.pizza$/
   return `/^.+${suffix.replace(/\./g, '\\.')}$/`;
@@ -29,12 +31,12 @@ const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     convertHostnameSuffixToRegex(CARD_SPACE_STAGING_HOSTNAME_SUFFIX),
-    '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs
+    HEALTH_CHECK_IP_REGEX,
   ],
   production: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
     convertHostnameSuffixToRegex(CARD_SPACE_HOSTNAME_SUFFIX),
-    '/^10.\\d+.\\d+.\\d+:4000$/', // AWS VPC IPs FIXME deduplicate?
+    HEALTH_CHECK_IP_REGEX,
   ],
 };
 
