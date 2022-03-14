@@ -15,7 +15,6 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
-  dataMember: string;
   serializeMember: string;
   cardName: string | undefined;
   opts: Options;
@@ -142,7 +141,6 @@ export default function main(babel: typeof Babel) {
         },
 
         exit(path: NodePath<t.Class>, state: State) {
-          addDataMethod(path, state, babel);
           addSerializeMethod(path, state, babel);
         },
       },
@@ -248,27 +246,6 @@ function addAllFieldsExport(path: NodePath<t.Program>, state: State, babel: type
   );
 }
 
-function addDataMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
-  let t = babel.types;
-  state.dataMember = unusedClassMember(path, 'data', t);
-  let body = path.get('body');
-  body.node.body.push(
-    t.classMethod(
-      'method',
-      t.identifier(state.dataMember),
-      [t.identifier('format')],
-      t.blockStatement(
-        babel.template(`
-          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          return %%getProperties%%(this, fields);
-        `)({
-          getProperties: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getProperties'),
-        }) as t.Statement[]
-      )
-    )
-  );
-}
-
 function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
   let t = babel.types;
   state.serializeMember = unusedClassMember(path, 'serialize', t);
@@ -277,18 +254,14 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
     t.classMethod(
       'method',
       t.identifier(state.serializeMember),
-      ['url', 'format', 'serializerMap'].map((name) => t.identifier(name)),
+      ['action', 'format', 'serializerMap', 'data'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          return %%serializeCardAsResource%%(url, %%getProperties%%(this, fields), serializerMap);
+          return %%serializeAttributes%%( %%getProperties%%(data ?? this, fields), serializerMap, action, fields);
         `)({
           getProperties: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getProperties'),
-          serializeCardAsResource: state.importUtil.import(
-            body,
-            '@cardstack/core/src/serializers',
-            'serializeCardAsResource'
-          ),
+          serializeAttributes: state.importUtil.import(body, '@cardstack/core/src/serializers', 'serializeAttributes'),
         }) as t.Statement[]
       )
     )
@@ -298,13 +271,11 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
 function addMemberSymbols(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
   let t = babel.types;
   path.node.body.push(
-    ...(babel.template(`
-      export const dataMember = %%dataMember%%;
+    babel.template(`
       export const serializeMember = %%serializeMember%%;
     `)({
-      dataMember: t.stringLiteral(state.dataMember),
       serializeMember: t.stringLiteral(state.serializeMember),
-    }) as t.Statement[])
+    }) as t.Statement
   );
 }
 

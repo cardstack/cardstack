@@ -56,7 +56,7 @@ if (process.env.COMPILER) {
               }
 
               _cachedSlowName = "don't collide!";
-              data = "don't collide!";
+              serialize = "don't collide!";
             }
           `,
         'edit.js': templateOnlyComponentTemplate(`<div><@fields.lastName/><@fields.aboutMe/></div>`),
@@ -163,19 +163,20 @@ if (process.env.COMPILER) {
       `);
     });
 
-    it('can compile a data method into the schema class', async function () {
+    it('can compile a serialize method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
+        import { serializeAttributes } from "@cardstack/core/src/serializers";
         import { getProperties } from "@cardstack/core/src/utils/fields";
       `);
       expect(source).to.containsSource(`
-        export const dataMember = "data0";
+        export const serializeMember = "serialize0";
       `);
       expect(source).to.containsSource(`
-        data0(format) {
+        serialize0(action, format, serializerMap, data) {
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          return getProperties(this, fields);
+          return serializeAttributes(getProperties(data ?? this, fields), serializerMap, action, fields);
         }
       `);
     });

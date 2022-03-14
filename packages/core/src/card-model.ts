@@ -14,7 +14,7 @@ import {
   SerializerMap,
   CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
-import { serializeAttributes, serializeField } from '@cardstack/core/src/serializers';
+import { serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import cloneDeep from 'lodash/cloneDeep';
@@ -61,13 +61,17 @@ export default class CardModel {
     this.schemaModule = schemaModule;
     this._format = format;
     this.componentModuleRef = componentModuleRef;
-    this.rawData = rawData;
     this.componentMeta = componentMeta;
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
     this._schemaInstance = this.createSchemaInstance();
-    this.setDataShape();
+
+    if (this.state.type === 'created' || this.state.allFields) {
+      this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
+    } else {
+      this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
+    }
   }
 
   protected get serializerMap(): SerializerMap {
@@ -162,8 +166,12 @@ export default class CardModel {
       url = cardURL({ realm: this.realm, id: this.state.id });
     }
 
-    let format = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
-    let resource = this._schemaInstance[this.schemaModule.serializeMember](url, format, this.serializerMap);
+    let format = this.state.type === 'created' || this.state.allFields ? 'all' : (this.format as Format | 'all');
+    let resource: ResourceObject<Saved | Unsaved> = {
+      id: url,
+      type: 'card',
+      attributes: this.schemaSerialize('serialize', format),
+    };
 
     if (this.state.type === 'loaded') {
       resource.meta = merge(
@@ -209,7 +217,7 @@ export default class CardModel {
       );
     }
 
-    this.rawData = merge(this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
+    this.rawData = merge(this.rawData, this.schemaSerialize('serialize', 'all', data));
     await this.recompute();
   }
 
@@ -261,11 +269,19 @@ export default class CardModel {
     done!();
   }
 
-  // TODO We should be able to get rid of this after the serializer has been
+  // TODO We should be able to get rid of this after the serializerMap has been
   // internalized into the schema instance
   protected async beginRecompute(): Promise<void> {
     // This is a hook for subclasses to override if there is initial async work
     // to do before doing the recompute
+  }
+
+  private schemaSerialize(
+    action: 'serialize' | 'deserialize',
+    format: Format | 'all',
+    data?: Record<string, any>
+  ): Record<string, any> {
+    return this._schemaInstance[this.schemaModule.serializeMember](action, format, this.serializerMap, data);
   }
 
   private createSchemaInstance() {
@@ -284,22 +300,6 @@ export default class CardModel {
     }
   }
 
-  // This is rather awkward and scaffolding until the schema instance knows how
-  // to serialize itself. Remove this as soon as it becomes possible
-  private setDataShape() {
-    if (this.state.type === 'created' || this.state.allFields) {
-      this.rawData = merge(makeEmptyCardData(this.allFields), this.rawData);
-    } else {
-      this.rawData = merge(makeEmptyCardData(this.usedFields), this.rawData);
-    }
-  }
-
-  private getSchemaInstanceData(type: 'all-fields' | 'used-fields'): Record<string, any> {
-    return this.schemaModule.dataMember in this._schemaInstance
-      ? this._schemaInstance[this.schemaModule.dataMember](type === 'all-fields' ? 'all' : this.format)
-      : {};
-  }
-
   private makeSetter(segments: string[] = []): Setter {
     let s = (value: any) => {
       let innerSegments = segments.slice();
@@ -308,7 +308,7 @@ export default class CardModel {
         return;
       }
 
-      let data = this.getSchemaInstanceData('all-fields');
+      let data = this.schemaSerialize('deserialize', 'all', this.serializerMap);
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -319,7 +319,7 @@ export default class CardModel {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this.rawData = serializeAttributes(data, this.serializerMap, 'serialize');
+      this.rawData = this.schemaSerialize('serialize', 'all', data);
       this.recompute();
     };
     (s as any).setters = new Proxy(
