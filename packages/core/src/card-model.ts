@@ -308,7 +308,7 @@ export default class CardModel {
         return;
       }
 
-      let data = this.schemaSerialize('deserialize', 'all', this.serializerMap);
+      let data = this.schemaSerialize('deserialize', 'all');
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
