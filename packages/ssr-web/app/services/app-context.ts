@@ -56,6 +56,7 @@ export default class AppContext extends Service implements AppContextService {
     if (this.fastboot.isFastBoot) {
       console.log('headers in fastboot', this.fastboot.request.headers);
       let userAgents = this.fastboot.request.headers['user-agent'] || [];
+      console.log('user agents?', userAgents);
       let isELBHealthChecker = userAgents.some((userAgent: string) =>
         userAgent.includes('ELB-HealthChecker')
       );
