@@ -215,6 +215,7 @@ export interface CardSchemaModule {
   usedFields: UsedFields;
   allFields: string[];
   dataMember: string;
+  serializeMember: string;
 }
 
 export interface CardComponentMetaModule {

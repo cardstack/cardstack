@@ -14,7 +14,7 @@ import {
   SerializerMap,
   CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
-import { serializeAttributes, serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
+import { serializeAttributes, serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import cloneDeep from 'lodash/cloneDeep';
