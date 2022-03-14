@@ -13,11 +13,8 @@ Router.map(function () {
   this.route('pay-missing-route', {
     path: '/pay/:*',
   });
-
   this.route('boom');
   this.route('boom-client');
-
-  this.route('health');
 
   this.route('not-found', { path: '/*path' });
 });

@@ -3,9 +3,6 @@ const FastBootAppServer = require('fastboot-app-server');
 const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
-const winston = require('winston'),
-  expressWinston = require('express-winston');
-
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
   environment: process.env.SSR_WEB_ENVIRONMENT,
@@ -29,20 +26,6 @@ let server = new FastBootAppServer({
   chunkedResponse: false, // Optional - Opt-in to chunked transfer encoding, transferring the head, body and potential shoeboxes in separate chunks. Chunked transfer encoding should have a positive effect in particular when the app transfers a lot of data in the shoebox.
 
   beforeMiddleware: function (app) {
-    app.use(
-      expressWinston.logger({
-        transports: [new winston.transports.Console()],
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.json()
-        ),
-        meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-        msg: 'HTTP {{req.method}} {{req.url}}', // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
-        expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-        colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-      })
-    );
-
     app.use(Sentry.Handlers.requestHandler());
   },
 
