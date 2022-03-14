@@ -16,6 +16,7 @@ interface State {
   parentLocalName: string | undefined;
   getRawFieldIdentifier: string;
   dataMember: string;
+  serializeMember: string;
   cardName: string | undefined;
   opts: Options;
 }
@@ -36,7 +37,7 @@ export default function main(babel: typeof Babel) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
-          addDataMemberSymbol(path, state, babel);
+          addMemberSymbols(path, state, babel);
           addUsedFieldsExport(path, state, babel);
           addAllFieldsExport(path, state, babel);
         },
@@ -142,6 +143,7 @@ export default function main(babel: typeof Babel) {
 
         exit(path: NodePath<t.Class>, state: State) {
           addDataMethod(path, state, babel);
+          addSerializeMethod(path, state, babel);
         },
       },
     },
@@ -267,14 +269,42 @@ function addDataMethod(path: NodePath<t.Class>, state: State, babel: typeof Babe
   );
 }
 
-function addDataMemberSymbol(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  state.serializeMember = unusedClassMember(path, 'serialize', t);
+  let body = path.get('body');
+  body.node.body.push(
+    t.classMethod(
+      'method',
+      t.identifier(state.serializeMember),
+      ['url', 'format', 'serializerMap'].map((name) => t.identifier(name)),
+      t.blockStatement(
+        babel.template(`
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          return %%serializeCardAsResource%%(url, %%getProperties%%(this, fields), serializerMap);
+        `)({
+          getProperties: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getProperties'),
+          serializeCardAsResource: state.importUtil.import(
+            body,
+            '@cardstack/core/src/serializers',
+            'serializeCardAsResource'
+          ),
+        }) as t.Statement[]
+      )
+    )
+  );
+}
+
+function addMemberSymbols(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
   let t = babel.types;
   path.node.body.push(
-    babel.template(`
+    ...(babel.template(`
       export const dataMember = %%dataMember%%;
+      export const serializeMember = %%serializeMember%%;
     `)({
       dataMember: t.stringLiteral(state.dataMember),
-    }) as t.Statement
+      serializeMember: t.stringLiteral(state.serializeMember),
+    }) as t.Statement[])
   );
 }
 

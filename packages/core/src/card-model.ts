@@ -162,19 +162,15 @@ export default class CardModel {
       url = cardURL({ realm: this.realm, id: this.state.id });
     }
 
-    if (this.state.type === 'created') {
-      return serializeCardAsResource(url, this.getSchemaInstanceData('all-fields'), this.serializerMap);
-    }
+    let format = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
+    let resource = this._schemaInstance[this.schemaModule.serializeMember](url, format, this.serializerMap);
 
-    let resource = serializeCardAsResource(
-      url,
-      this.getSchemaInstanceData(this.state.allFields ? 'all-fields' : 'used-fields'),
-      this.serializerMap
-    );
-    resource.meta = merge(
-      { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
-      resource.meta
-    );
+    if (this.state.type === 'loaded') {
+      resource.meta = merge(
+        { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
+        resource.meta
+      );
+    }
     return resource;
   }
 
