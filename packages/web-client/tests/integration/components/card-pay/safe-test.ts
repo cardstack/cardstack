@@ -104,7 +104,7 @@ module('Integration | Component | card-pay/safe', function (hooks) {
       />
     `);
     assert.dom('[data-test-safe-count]').containsText('1');
-    assert.dom('[data-test-safe-type]').containsText('Business');
+    assert.dom('[data-test-safe-type]').containsText('Payment Profile');
 
     await settled();
     assert.dom('[data-test-safe-title]').containsText('Mandello');

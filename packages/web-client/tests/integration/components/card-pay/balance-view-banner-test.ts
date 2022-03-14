@@ -115,7 +115,7 @@ module(
         .dom('[data-test-balance-view-summary]')
         .containsText('Account')
         .containsText('0x1826...6E44')
-        .containsText('Merchant Mandello')
+        .containsText('Payment Profile Mandello')
         .containsText('450.11 CARD.CPXD');
 
       assert
@@ -125,7 +125,7 @@ module(
 
       assert
         .dom('[data-test-balance-view-safe-address')
-        .containsText('Merchant Mandello:')
+        .containsText('Payment Profile Mandello:')
         .containsText(merchantAddress);
 
       assert

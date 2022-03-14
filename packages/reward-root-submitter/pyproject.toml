@@ -1,0 +1,39 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Ian Calvert", email = "ian.calvert@cardstack.com"},
+]
+dependencies = [
+    "cloudpathlib[s3]>=0.7.0",
+    "python-dotenv>=0.19.2",
+    "web3>=5.28.0",
+    "pyarrow>=7.0.0",
+    "schedule>=1.1.0",
+]
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = ""
+
+[project.optional-dependencies]
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.0.1",
+    "black>=22.1.0",
+    "isort>=5.10.1",
+    "web3[tester]>=5.28.0",
+]
+[tool.pdm.scripts]
+fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"
+fork_sokol = "ganache-cli  --fork https://sokol-archive.blockscout.com/"
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[project.scripts]
+reward_root_submit_loop = "reward_root_submitter.main:run_all"

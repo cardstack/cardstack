@@ -11,7 +11,7 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.space.localhost';
+const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.xyz.localhost';
 const CARD_SPACE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
 const CARD_SPACE_HOSTNAME_SUFFIX = '.card.xyz';
 
@@ -19,12 +19,21 @@ const cardSpaceHostnameSuffixByTarget = {
   staging: CARD_SPACE_STAGING_HOSTNAME_SUFFIX,
   production: CARD_SPACE_HOSTNAME_SUFFIX,
 };
+
+function convertHostnameSuffixToRegex(suffix) {
+  // .pouty.pizza → /^.+\.pouty\.pizza$/
+  return `/^.+${suffix.replace(/\./g, '\\.')}$/`;
+}
+
 const hostWhitelistByTarget = {
   staging: [
     MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    '/.+\\.pouty\\.pizza$/',
+    convertHostnameSuffixToRegex(CARD_SPACE_STAGING_HOSTNAME_SUFFIX),
   ],
-  production: [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, '/.+\\.card\\.xyz$/'],
+  production: [
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+    convertHostnameSuffixToRegex(CARD_SPACE_HOSTNAME_SUFFIX),
+  ],
 };
 
 const pkg = require('../package.json');
@@ -86,6 +95,7 @@ module.exports = function (environment) {
       mailToSupportUrl: 'mailto:support@cardstack.com',
       statusPageBase: 'https://status.cardstack.com',
       statusPageUrl: 'https://status.cardstack.com/api/v2/summary.json',
+      cardPayLink: 'https://cardstack.com/cardpay',
     },
     'ember-cli-mirage': {
       enabled: false,

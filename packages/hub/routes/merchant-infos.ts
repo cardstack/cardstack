@@ -157,15 +157,13 @@ export default class MerchantInfosRoute {
       ) {
         return {
           slugAvailable: false,
-          detail: 'This Merchant ID is not allowed',
+          detail: 'This ID is not allowed',
         };
       } else {
         let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
         return {
           slugAvailable: merchantInfo ? false : true,
-          detail: merchantInfo
-            ? 'This Merchant ID is already taken. Please choose another one'
-            : 'Merchant slug is available',
+          detail: merchantInfo ? 'This ID is already taken. Please choose another one' : 'ID is available',
         };
       }
     }

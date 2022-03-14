@@ -11,7 +11,7 @@
     "accountId": "HUB_AWS_ACCOUNT_ID"
   },
   "db": {
-    "url": "DATABASE_URL"
+    "url": "HUB_DATABASE_URL"
   },
   "discord": {
     "botId": "CARDBOT_ID",

@@ -315,7 +315,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // // funding-source card
     assert
       .dom(`${post} [data-test-funding-source-safe]`)
-      .containsText(`Ollednam Business account ${otherMerchantSafe.address}`);
+      .containsText(`Ollednam Payment Profile ${otherMerchantSafe.address}`);
 
     assert
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
@@ -349,7 +349,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom('[data-test-balance-view-summary]')
       .containsText('499.00 DAI')
-      .containsText('Merchant Mandello');
+      .containsText('Payment Profile Mandello');
     await click('[data-test-balance-view-summary]');
     assert
       .dom('[data-test-balance-view-account-address]')
@@ -536,7 +536,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance-label]`)
-      .containsText('Business balance');
+      .containsText('Payment Profile balance');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
       .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString());
@@ -768,9 +768,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `Looks like you don’t have a business account or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+          `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming business revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,

@@ -1,7 +1,7 @@
 <div class="payment-link" ...attributes>
   {{#if this.showingQR}}
     <div class="payment-link__qr-container">
-      <StyledQrCode
+      <Boxel::StyledQrCode
         @data={{@paymentURL}}
         @image={{@image}}
         @size={{340}}
@@ -23,7 +23,7 @@
       href={{@deepLinkPaymentURL}}
       data-test-payment-link-deep-link
     >
-      {{or @cta "Pay Business"}}
+      {{or @cta "Pay with Card Wallet"}}
     </Boxel::Button>
   {{/if}}
 

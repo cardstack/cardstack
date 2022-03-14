@@ -1,16 +1,3 @@
-<div class="card-space-user-page">
-  <CardPay::Merchant
-    @name={{@model.name}}
-    @logoBackground={{@model.backgroundColor}}
-    @logoTextColor={{@model.textColor}}
-    @vertical={{true}}
-    @size="large"
-    @text={{@model.id}}
-  />
-  <Common::PaymentLink
-    @mode={{this.paymentLinkMode}}
-    @switchMode={{this.setPaymentLinkMode}}
-    @paymentURL={{@model.paymentURL}}
-    @deepLinkPaymentURL={{@model.deepLinkPaymentURL}}
-  />
-</div>
+<CardSpace::UserPage
+  @model={{this.model}}
+/>

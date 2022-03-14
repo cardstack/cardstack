@@ -38,8 +38,8 @@ const FAILURE_REASONS = {
 
 export const MILESTONE_TITLES = [
   `Connect ${c.layer2.fullName} wallet`,
-  'Save business details',
-  'Create business account',
+  'Save profile details',
+  'Create payment profile',
 ];
 export const WORKFLOW_VERSION = 3;
 
@@ -59,8 +59,8 @@ class CreateMerchantWorkflow extends Workflow {
           message: `Hello, nice to see you!`,
         }),
         new WorkflowMessage({
-          message: `To receive payment through Card Pay, you need to create a business account.
-          All you need is to choose a name for your business and sign a transaction to create your business account on the ${c.layer2.fullName}.`,
+          message: `To receive payment through Card Pay, you need to create a payment profile.
+          All you need is to choose a name for your payment profile and sign a transaction to create your payment profile on the ${c.layer2.fullName}.`,
         }),
         new NetworkAwareWorkflowMessage({
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
@@ -149,7 +149,7 @@ class CreateMerchantWorkflow extends Workflow {
           },
         }),
         new WorkflowMessage({
-          message: 'Let’s create a new business account.',
+          message: 'Let’s create a new payment profile.',
         }),
         new WorkflowCard({
           cardName: 'MERCHANT_CUSTOMIZATION',
@@ -157,7 +157,7 @@ class CreateMerchantWorkflow extends Workflow {
             'card-pay/create-merchant-workflow/merchant-customization',
         }),
       ],
-      completedDetail: 'Business details saved',
+      completedDetail: 'Profile details saved',
     }),
     new Milestone({
       title: MILESTONE_TITLES[2],
@@ -166,7 +166,7 @@ class CreateMerchantWorkflow extends Workflow {
           message: 'Looking great!',
         }),
         new WorkflowMessage({
-          message: `On the next step: You need to pay a small protocol fee to create your business account.
+          message: `On the next step: You need to pay a small protocol fee to create your payment profile.
           Please select a prepaid card and balance from your ${c.layer2.fullName} wallet`,
         }),
         new WorkflowCard({
@@ -175,12 +175,12 @@ class CreateMerchantWorkflow extends Workflow {
             'card-pay/create-merchant-workflow/prepaid-card-choice',
         }),
       ],
-      completedDetail: 'Business account created',
+      completedDetail: 'Payment profile created',
     }),
   ];
   epilogue = new PostableCollection([
     new WorkflowMessage({
-      message: `Congratulations! You have created a business account.`,
+      message: `Congratulations! You have created a payment profile.`,
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',
@@ -191,13 +191,13 @@ class CreateMerchantWorkflow extends Workflow {
     // if we disconnect from layer 2
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.DISCONNECTED,
-      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.`,
+      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a payment profile, please start again by connecting your wallet.`,
     }),
     // cancelation for changing accounts
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.ACCOUNT_CHANGED,
       message:
-        'It looks like you changed accounts in the middle of this workflow. If you still want to create a business account, please restart the workflow.',
+        'It looks like you changed accounts in the middle of this workflow. If you still want to create a payment profile, please restart the workflow.',
     }),
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
@@ -205,7 +205,7 @@ class CreateMerchantWorkflow extends Workflow {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
@@ -218,7 +218,7 @@ class CreateMerchantWorkflow extends Workflow {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )} business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

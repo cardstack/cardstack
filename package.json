@@ -52,7 +52,7 @@
     "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
     "start:hub": "yarn --cwd packages/hub start",
     "console:hub": "yarn --cwd packages/hub console",
-    "start:ssr-web": "cd packages/ssr-web && ember serve -prod",
+    "start:ssr-web": "cd packages/ssr-web && ember serve",
     "start:web-client": "cd packages/web-client && ember serve",
     "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
     "test:boxel": "cd packages/boxel && ember test",

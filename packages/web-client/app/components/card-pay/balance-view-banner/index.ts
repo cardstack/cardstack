@@ -44,9 +44,9 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
   get summaryBalanceLabel() {
     if (this.args.safe.type === 'merchant') {
       if (this.merchantInfo.loading) {
-        return `Merchant`;
+        return `Payment Profile`;
       } else {
-        return `Merchant ${this.merchantInfo.name}`;
+        return `Payment Profile ${this.merchantInfo.name}`;
       }
     } else if (this.args.safe.type === 'depot') {
       return 'DEPOT';

@@ -1,0 +1,49 @@
+.card-picker-option {
+  --card-preview-scale: 0.7;
+  --vertical-field-gap: 4px;
+
+  /* clean up */
+  --card-width: 22.75rem; /* 364px */
+  --card-height: 14.375rem; /* 230px */
+
+  color: var(--boxel-dark);
+  padding-bottom: var(--boxel-sp);
+}
+
+.card-picker-option__network-label {
+  display: inline-block;
+  padding: 0 var(--boxel-sp-xxxs);
+  background-color: var(--boxel-light-400);
+  border-radius: 50px;
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.card-picker-option__address {
+  margin-top: var(--vertical-field-gap);
+  color: var(--boxel-purple-400);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+  line-height: calc(18 / 13);
+  letter-spacing: var(--boxel-lsp-sm);
+  max-width: 22ch;
+  word-break: break-all;
+}
+
+.card-picker-option__balance {
+  margin-top: var(--vertical-field-gap);
+  margin-bottom: var(--boxel-sp-sm);
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.card-picker-option__card-container {
+  width: calc(var(--card-width) * var(--card-preview-scale));
+  height: calc(var(--card-height) * var(--card-preview-scale));
+}
+
+.card-picker-option__card {
+  transform: scale(var(--card-preview-scale));
+  transform-origin: top left;
+}

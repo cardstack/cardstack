@@ -147,7 +147,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -176,7 +176,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'The Business ID cannot be more than 50 characters long. It is currently 51 characters long',
+        detail: 'Unique ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -238,7 +238,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'This Merchant ID is not allowed',
+        detail: 'This ID is not allowed',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -247,7 +247,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'This Merchant ID is not allowed',
+        detail: 'This ID is not allowed',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -256,7 +256,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'This Merchant ID is not allowed',
+        detail: 'This ID is not allowed',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -265,7 +265,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'This Merchant ID is not allowed',
+        detail: 'This ID is not allowed',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -315,7 +315,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'This Merchant ID is already taken. Please choose another one',
+        detail: 'This ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -360,7 +360,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -372,7 +372,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -384,7 +384,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -398,7 +398,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Business ID cannot be more than 50 characters long. It is currently 51 characters long',
+        detail: 'Unique ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -433,7 +433,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'This Merchant ID is already taken. Please choose another one',
+        detail: 'This ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -445,7 +445,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: true,
-        detail: 'Merchant slug is available',
+        detail: 'ID is available',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });

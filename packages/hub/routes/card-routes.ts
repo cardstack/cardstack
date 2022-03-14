@@ -27,7 +27,7 @@ export default class CardRoutes {
     } = ctx;
     let allFields = ctx.query.allFields !== undefined;
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format, allFields);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadModel(url, format, allFields);
     ctx.body = { data: card.serialize() };
     ctx.status = 200;
   }
@@ -53,7 +53,7 @@ export default class CardRoutes {
 
     let parentCard;
     try {
-      parentCard = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(parentCardURL, format);
+      parentCard = await (await this.cardService.as(INSECURE_CONTEXT)).loadModel(parentCardURL, format);
     } catch (e) {
       if (!isCardstackError(e) || e.status !== 404) {
         throw e;
@@ -63,8 +63,8 @@ export default class CardRoutes {
       throw noParentError;
     }
 
-    let card = await parentCard.adoptIntoRealm(realmURL, cardId);
-    card.setData(data.attributes);
+    let card = parentCard.adoptIntoRealm(realmURL, cardId);
+    await card.setData(data.attributes);
     await card.save();
     ctx.body = { data: card.serialize() };
     ctx.status = 201;
@@ -79,8 +79,8 @@ export default class CardRoutes {
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, format);
-    card.setData(data.attributes);
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadModel(url, format);
+    await card.setData(data.attributes);
     await card.save();
     ctx.body = { data: card.serialize() };
     ctx.status = 200;
@@ -111,7 +111,7 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadData(url, 'isolated');
+    let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadModel(url, 'isolated');
     ctx.body = { data: card.serialize() };
   }
 

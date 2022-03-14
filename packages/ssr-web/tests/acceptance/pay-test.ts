@@ -32,7 +32,7 @@ const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
-const QR_CODE = '[data-test-styled-qr-code]';
+const QR_CODE = '[data-test-boxel-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-link-deep-link]';
 const PAYMENT_URL = '[data-test-payment-link-url]';
 
@@ -179,7 +179,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -232,7 +234,7 @@ module('Acceptance | pay', function (hooks) {
       spendToUsd(roundedSpendAmount)!,
       'USD'
     );
-    let description = `Pay ${amountInUSD}`;
+    let description = `Use Card Wallet to pay ${amountInUSD}`;
 
     assert
       .dom(
@@ -244,6 +246,25 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(
         `meta[name='twitter:description'][content$='${description}']`,
+        document.documentElement
+      )
+      .exists();
+  });
+
+  test('it has a fallback meta description if there is no amount param specified', async function (assert) {
+    await visit(`/pay/${network}/${merchantSafe.address}`);
+    await waitFor(MERCHANT);
+
+    let description = `Use Card Wallet to pay ${merchantName}`;
+    assert
+      .dom(
+        `meta[property='og:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[name='twitter:description'][content="${description}"]`,
         document.documentElement
       )
       .exists();
@@ -270,7 +291,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: roundedSpendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -291,7 +314,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: minSpendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -315,7 +340,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -338,7 +365,9 @@ module('Acceptance | pay', function (hooks) {
       currency: usdSymbol,
       amount: usdAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -359,7 +388,9 @@ module('Acceptance | pay', function (hooks) {
       currency: usdSymbol,
       amount: minUsdAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -395,7 +426,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: Number(roundedJpyAmount),
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -431,7 +464,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: minJpyAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -458,7 +493,9 @@ module('Acceptance | pay', function (hooks) {
       currency: jpySymbol,
       amount: jpyAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -480,7 +517,9 @@ module('Acceptance | pay', function (hooks) {
       currency: invalidCurrencySymbol,
       amount: 300,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -499,7 +538,9 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: 0,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
@@ -522,7 +563,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay Business')
+      .containsText('Pay with Card Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -561,7 +602,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay Business')
+      .containsText('Pay with Card Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -594,7 +635,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_INFO_MISSING_MESSAGE)
       .containsText(
-        'Unable to find business details for this address. Use caution when paying.'
+        'Unable to find payment profile for this address. Use caution when paying.'
       );
     assert
       .dom(AMOUNT)
@@ -610,8 +651,41 @@ module('Acceptance | pay', function (hooks) {
       currency: spendSymbol,
       amount: spendAmount,
     });
-    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert
+      .dom(QR_CODE)
+      .hasAttribute('data-test-boxel-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it renders appropriate meta tags when merchant info is not fetched', async function (assert) {
+    await visit(`/pay/${network}/${merchantSafeWithoutInfo.address}`);
+
+    let title = 'Payment Requested';
+    let description = `Use Card Wallet to pay Payment Request`;
+    assert
+      .dom(
+        `meta[property='og:title'][content="${title}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[name='twitter:title'][content="${title}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[property='og:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
+    assert
+      .dom(
+        `meta[name='twitter:description'][content="${description}"]`,
+        document.documentElement
+      )
+      .exists();
   });
 
   test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
@@ -624,7 +698,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no business found - please ask the business to confirm the payment link'
+        'Oops, no payment profile found - please ask for confirmation of the payment link'
       );
   });
 
@@ -636,7 +710,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no business found - please ask the business to confirm the payment link'
+        'Oops, no payment profile found - please ask for confirmation of the payment link'
       );
   });
 

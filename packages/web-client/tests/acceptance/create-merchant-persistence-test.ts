@@ -117,10 +117,10 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .containsText(merchantId);
       assert
         .dom(
-          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
+          `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
         )
         .exists();
-      assert.dom('[data-test-card-picker-dropdown]').exists();
+      assert.dom('[data-test-boxel-card-picker-dropdown]').exists();
       assert.dom('[data-test-create-merchant-button]').isNotDisabled();
     });
 
@@ -159,6 +159,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-milestone-completed][data-test-milestone="2"]')
         .exists(); // Prepaid card choice
+      assert.dom('[data-test-prepaid-card-choice-selected-card]').exists();
+      assert.dom('[data-test-boxel-card-picker]').doesNotExist();
       assert
         .dom('[data-test-prepaid-card-choice-merchant-address]')
         .containsText(merchantAddress);
@@ -169,7 +171,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .hasText('View on Blockscout');
       assert
         .dom('[data-test-epilogue][data-test-postable="0"]')
-        .includesText('Congratulations! You have created a business account.');
+        .includesText('Congratulations! You have created a payment profile.');
 
       await click('[data-test-create-merchant-next-step="dashboard"]');
       assert.dom('[data-test-workflow-thread]').doesNotExist();
@@ -204,7 +206,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'It looks like your L2 test chain wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.'
+          'It looks like your L2 test chain wallet got disconnected. If you still want to create a payment profile, please start again by connecting your wallet.'
         );
 
       await waitFor(

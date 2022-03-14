@@ -187,7 +187,12 @@ app "cardie" {
             cluster = "default"
             subnets = ["subnet-89968ba2"]
             task_role_name = "cardie-ecr-task"
+            execution_role_name = "cardie-ecr-task-executor-role"
             disable_alb = true
+            secrets = {
+                DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
+                GITHUB_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
+            }
         }
     }
 }
@@ -228,6 +233,11 @@ app "cardpay-subg-ext" {
             count = 1
             subnets = ["subnet-081966e0d7a798bc1","subnet-0544a2e18d66d0040"]
             task_role_name = "cardpay-staging-subgraph-extraction-ecr-task"
+            execution_role_name = "cardpay-staging-subgraph-extraction-ecr-task-executor-role"
+            secrets = {
+                SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4",
+                SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_output_location-P04N4G"
+            }
             disable_alb = true
         }
     }
@@ -261,7 +271,7 @@ app "ssr-web" {
             task_role_name = "ssr-web-staging-ecr-task"
 
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/496043d250eb05f7"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/ssr-web-staging/c0a4414517c7acb4/1b6996d108e2cbca"
             }
         }
 
@@ -273,6 +283,50 @@ app "ssr-web" {
         hook {
             when    = "after"
             command = ["node", "./scripts/fix-listener.mjs", "wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+    }
+}
+
+
+app "reward-submit" {
+    path = "./packages/reward-root-submitter"
+
+    config {
+        env = {
+            ENVIRONMENT = "staging"
+            ETHEREUM_NODE_URL = "https://sokol-archive.blockscout.com/"
+            REWARD_POOL_ADDRESS = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
+            REWARD_PROGRAM_OUTPUT="s3://tally-staging-reward-programs/"
+        }
+    }
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "reward-root-submitter"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "reward-root-submitter"
+            count = 1
+            task_role_name = "reward-root-submitter-ecr-task"
+            execution_role_name = "reward-root-submitter-ecr-task-executor-role"
+            disable_alb = true
+            secrets = {
+                OWNER = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
+                OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
+            }
         }
     }
 }

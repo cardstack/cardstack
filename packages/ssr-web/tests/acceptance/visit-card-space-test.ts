@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { click, currentURL, visit } from '@ember/test-helpers';
+import { currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 import AppContext from '@cardstack/ssr-web/services/app-context';
 import percySnapshot from '@percy/ember';
@@ -8,6 +8,7 @@ import type { SubgraphServiceOptionals } from '@cardstack/ssr-web/services/subgr
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
+import sinon from 'sinon';
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
   async query(
@@ -54,7 +55,12 @@ module('Acceptance | visit card space', function (hooks) {
         slug: 'slug',
       });
 
-      cardSpace.createMerchantInfo({ name: 'merchant name', slug: 'slug' });
+      cardSpace.createMerchantInfo({
+        name: 'merchant name',
+        slug: 'slug',
+        color: 'blue',
+        textColor: 'hotpink',
+      });
 
       link = generateMerchantPaymentUrl({
         domain: config.universalLinkDomain,
@@ -71,11 +77,42 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').includesText('slug');
       assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
+        .dom('[data-test-boxel-styled-qr-code]')
+        .hasAttribute('data-test-boxel-styled-qr-code', link);
+      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
+
+      assert
+        .dom(`meta[property='og:title']`, document.documentElement)
+        .hasAttribute('content', 'merchant name’s Profile');
+
+      assert
+        .dom(`meta[name='twitter:title']`, document.documentElement)
+        .hasAttribute('content', 'merchant name’s Profile');
+
+      assert
+        .dom(`meta[property='og:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
+        .dom(`meta[name='twitter:description']`, document.documentElement)
+        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+
+      assert
+        .dom(
+          `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
+      assert
+        .dom(
+          `meta[name='twitter:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          document.documentElement
+        )
+        .exists();
+
       await percySnapshot(assert);
     });
 
@@ -94,21 +131,14 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').containsText('slug');
 
-      assert.dom('[data-test-styled-qr-code]').doesNotExist();
-      assert.dom('[data-test-payment-link-url]').containsText(deepLink);
+      assert.dom('[data-test-boxel-styled-qr-code]').exists();
+
       assert
         .dom('[data-test-payment-link-deep-link]')
         .hasAttribute('href', deepLink);
 
-      await click('[data-test-payment-link-link-view-toggle]');
-
-      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
-      assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
     });
 
@@ -127,22 +157,44 @@ module('Acceptance | visit card space', function (hooks) {
       await visit('/');
 
       assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-text]').hasText('slug');
+      assert.dom('[data-test-merchant-url]').containsText('slug');
 
-      assert.dom('[data-test-styled-qr-code]').doesNotExist();
-      assert.dom('[data-test-payment-link-url]').containsText(deepLink);
+      assert.dom('[data-test-boxel-styled-qr-code]').exists();
+
       assert
         .dom('[data-test-payment-link-deep-link]')
         .hasAttribute('href', deepLink);
 
-      await click('[data-test-payment-link-link-view-toggle]');
-
-      assert.dom('[data-test-payment-link-deep-link]').doesNotExist();
-      assert
-        .dom('[data-test-styled-qr-code]')
-        .hasAttribute('data-test-styled-qr-code', link);
-      assert.dom('[data-test-payment-link-url]').containsText(link);
       await percySnapshot(assert);
+    });
+
+    test('it shows an error when subgraph fetch fails', async function (this: MirageTestContext, assert) {
+      let subgraphService = this.owner.lookup('service:subgraph');
+      sinon
+        .stub(subgraphService, 'query')
+        .throws(new Error('Subgraph failure'));
+      await visit('/');
+
+      assert
+        .dom('[data-test-address-fetching-error]')
+        .includesText(
+          'We ran into an issue while generating the payment request link'
+        );
+    });
+
+    test('it shows an error when subgraph fetch does not return a merchant safe', async function (this: MirageTestContext, assert) {
+      let subgraphService = this.owner.lookup('service:subgraph');
+      sinon
+        .stub(subgraphService, 'query')
+        .returns(Promise.resolve({ data: { merchantSafes: [] } }));
+
+      await visit('/');
+
+      assert
+        .dom('[data-test-address-fetching-error]')
+        .includesText(
+          'We ran into an issue while generating the payment request link'
+        );
     });
   });
 

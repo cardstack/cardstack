@@ -30,7 +30,7 @@ export default class CardPaySafeComponent extends Component<CardPaySafeComponent
     let safe = this.args.safe as SupportedSafe;
     return {
       depot: 'Depot',
-      merchant: 'Business',
+      merchant: 'Payment Profile',
     }[safe.type];
   }
 

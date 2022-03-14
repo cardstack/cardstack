@@ -1,0 +1,128 @@
+.card-space-user-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  padding: var(--boxel-sp-lg);
+  background: var(--boxel-purple-600);
+}
+
+.card-space-user-page__wrapper {
+  margin: auto;
+  background: var(--card-space-background);
+  color: var(--card-space-text-color);
+  padding: min(var(--boxel-sp-xl), 5vw);
+  border-radius: 2rem;
+  min-height: 90vh;
+  max-width: 90%;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: [user-content-start header-start] 100% [header-end user-content-end];
+  grid-template-rows: [header-start user-content-start] 2.5rem [header-end] 1fr [user-content-end];
+}
+
+.card-space-user-page__user-content {
+  align-self: center;
+  grid-area: user-content;
+  max-width: 100%;
+  padding: 2.5rem 0;
+}
+
+.card-space-user-page__header {
+  grid-area: header;
+}
+
+@media only screen and (max-width: 992px) {
+  .card-space-user-page {
+    padding: 0;
+  }
+
+  .card-space-user-page__wrapper {
+    min-height: 100vh;
+    min-width: 100%;
+    border-radius: 0;
+  }
+}
+
+.card-space-user-page__header svg {
+  /*
+    inherit the text color so that the logo does not have contrast issues.
+    background and text color on this page are dynamic.
+  */
+  fill: currentColor;
+}
+
+.card-space-user-page__header > a:hover {
+  color: currentColor;
+}
+
+.card-space-user-page__description {
+  text-align: center;
+}
+
+.card-space-user-page__title {
+  text-align: center;
+  font-size: var(--boxel-font-size-xl);
+  font-weight: 600;
+  max-width: 30rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--boxel-sp-xxl);
+  overflow-wrap: break-all;
+}
+
+.card-space-user-page__url {
+  text-align: center;
+  opacity: 0.9;
+  font-weight: 700;
+  letter-spacing: 1px;
+  word-break: break-all;
+}
+
+.card-space-user-payment-link {
+  margin-top: var(--boxel-sp-sm);
+}
+
+.card-space-user-page-payment-link__error {
+  margin: var(--boxel-sp-sm);
+  text-align: center;
+}
+
+.card-space-user-footer {
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  margin-top: var(--boxel-sp-lg);
+}
+
+.payment-link__qr {
+  max-width: 100%;
+}
+
+.payment-link__qr-container__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-link__qr-container__actions > a {
+  margin: var(--boxel-sp-lg);
+}
+
+.payment-link__qr-container__separator {
+  width: 100%;
+  height: 1px;
+  background: var(--boxel-light-600);
+  margin-top: var(--boxel-sp-xs);
+}
+
+.payment-link__qr-container__separator-or {
+  margin: auto;
+  color: #000;
+  background: #fff;
+  margin-top: -10px;
+  width: 4rem;
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 700;
+}

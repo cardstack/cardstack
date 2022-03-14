@@ -55,6 +55,16 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
   }
 
+  get selectedSafeTypeCopy() {
+    if (this.selectedSafe) {
+      return this.selectedSafe.type === 'merchant'
+        ? 'Payment Profile'
+        : this.selectedSafe.type;
+    } else {
+      return '';
+    }
+  }
+
   get prepaidFundingToken(): BridgedTokenSymbol {
     return (
       this.args.workflowSession.getValue('prepaidFundingToken') ??

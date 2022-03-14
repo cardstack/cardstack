@@ -4,6 +4,7 @@
   @disabled={{@isConnecting}}
   @checkedId={{@currentWalletProviderId}}
   @hideRadio={{true}}
+  class="card-pay-layer-one-wallet-provider-selection__group"
   ...attributes
   data-test-wallet-selection
   as |option|
@@ -12,12 +13,15 @@
     <option.component
       @name="wallet-provider-selection"
       @onChange={{fn (optional @changeWalletProvider) item.id}}
+      @disabled={{not item.enabled}}
       data-test-wallet-option={{item.id}}
     >
       <div class="card-pay-layer-one-wallet-provider-selection__item">
         <img src={{item.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-provider-selection__item-image">
         <span class="card-pay-layer-one-wallet-provider-selection__item-name">{{item.name}}</span>
-        <span class="card-pay-layer-one-wallet-provider-selection__item-description" aria-hidden="true">{{item.description}}</span>
+        {{#if item.explanation}}
+          <span class="card-pay-layer-one-wallet-provider-selection__item-description">{{item.explanation}}</span>
+        {{/if}}
       </div>
     </option.component>
   {{/let}}

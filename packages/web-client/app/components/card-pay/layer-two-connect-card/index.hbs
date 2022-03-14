@@ -100,7 +100,7 @@
         {{/if}}
         {{#if this.layer2Network.walletConnectUri}}
           <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
-            <StyledQrCode
+            <Boxel::StyledQrCode
               @data={{this.layer2Network.walletConnectUri}}
               @image={{this.cardstackLogoForQR}}
               @size={{340}}
