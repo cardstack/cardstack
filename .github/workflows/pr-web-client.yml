@@ -99,8 +99,8 @@ jobs:
       - name: Deploy preview
         run: yarn deploy:web-client:preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.WEB_CLIENT_PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.WEB_CLIENT_PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
 
   # FIXME add later
   # comment-on-web-client-pr:
