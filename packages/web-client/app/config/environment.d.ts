@@ -5,11 +5,7 @@ interface ChainsOptions {
   layer2: string;
 }
 
-interface FeaturesOptions {
-  createMerchant: boolean;
-  enableCardSpace: boolean;
-  enableCardPay: boolean;
-}
+interface FeaturesOptions {}
 
 interface UrlsOptions {
   about: string;

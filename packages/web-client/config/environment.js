@@ -69,11 +69,7 @@ module.exports = function (environment) {
       layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
       layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
     },
-    features: {
-      createMerchant: true,
-      enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
-      enableCardPay: true,
-    },
+    features: {},
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {

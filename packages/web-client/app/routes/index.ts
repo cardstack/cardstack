@@ -18,9 +18,6 @@ import CardMembershipHor from '@cardstack/web-client/images/illustrations/card-m
 
 import '@cardstack/web-client/css/cardstack-landing-page.css';
 
-import ENV from '../config/environment';
-const { enableCardPay } = ENV.features;
-
 const ORGS = [
   {
     sideImage: CardPayImage,
@@ -40,8 +37,8 @@ const ORGS = [
       'Deposit or withdraw tokens',
       'Earn rewards (coming soon)',
     ],
-    cta: enableCardPay ? 'Open' : 'Launching soon',
-    launched: enableCardPay,
+    cta: 'Open',
+    launched: true,
     route: 'card-pay',
   },
   {
