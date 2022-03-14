@@ -54,7 +54,6 @@ class WeightedUsage(Rule):
         new_df["validFrom"] = payment_cycle
         new_df["validTo"] = payment_cycle + self.duration
         new_df["token"] = self.token
-        new_df["paymentCycle"] = self.end_block
         return new_df[new_df["amount"] > 0]
 
     def run(self, payment_cycle: int, reward_program_id: str):
