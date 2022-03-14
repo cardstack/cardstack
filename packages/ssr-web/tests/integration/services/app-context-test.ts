@@ -66,9 +66,9 @@ module('Integration | Service | app-context', function (hooks) {
     });
 
     test('it can detect the ELB health checker', function (assert) {
-      fastboot.request.headers = {
-        'user-agent': ['ELB-HealthChecker/2.0', 'NCSA Mosaic'],
-      };
+      let headers = new Headers();
+      headers.set('User-Agent', 'ELB-HealthChecker');
+      fastboot.request.headers = headers;
 
       assert.ok(appContext.isELBHealthChecker);
     });
