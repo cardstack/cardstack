@@ -116,7 +116,7 @@ if (process.env.COMPILER) {
       expect(example.data.title).to.eq('Hello World');
     });
 
-    it.only(`gives good error for missing module during reindexing`, async function () {
+    it(`gives good error for missing module during reindexing`, async function () {
       outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
         realm: realmURL,
         schema: 'schema.js',
@@ -136,7 +136,7 @@ if (process.env.COMPILER) {
       let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
-      let dbManager = await await getContainer().lookup('database-manager');
+      let dbManager = await getContainer().lookup('database-manager');
       let db = await dbManager.getClient();
       let {
         rows: [result],
@@ -148,15 +148,15 @@ if (process.env.COMPILER) {
         realm: realmURL,
         schema: 'schema.js',
         edit: 'edit.js',
-        data: { title: 'Clippy 2' },
+        data: { title: 'Clipster' },
       });
 
-      await si.notify(`${realmURL}clip`, 'save');
+      si.notify(`${realmURL}clip`, 'save'); // this is not sufficient. need `si.indexCardFromNotification` method to pass the below test, but `indexCardFromNotification` is private.
 
       let {
         rows: [result2],
       } = await db.query(`SELECT "data", "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
-      // expect(result2.data).to.deep.equal({ title: 'Clippy 2' });
+      // expect(result2.data).to.deep.equal({ title: 'Clipster' }); //??? what should the db look like for the columns other than `compileErrors`? `saveErrorState` currently sets most columns to null
       expect(result2.compileErrors).to.deep.equal({
         title: 'Internal Server Error',
         detail: 'card.json for undefined refers to non-existent module edit.js',
