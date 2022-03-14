@@ -239,6 +239,8 @@ module(
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
         .containsText('450.00 CARD.CPXD');
+
+      assert.dom('[data-test-choose-balance-continue]').isEnabled();
     });
   }
 );

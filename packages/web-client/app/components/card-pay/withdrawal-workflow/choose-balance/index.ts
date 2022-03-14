@@ -83,7 +83,6 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get isDisabled() {
     return (
-      !this.depotAddress ||
       !this.tokens.length ||
       !this.selectedToken?.balance ||
       this.selectedToken?.balance.isZero()

@@ -75,7 +75,7 @@
     @disabled={{or @frozen this.isDisabled}}
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.save}}>
+      <d.ActionButton {{on "click" this.save}} data-test-choose-balance-continue>
         Continue
       </d.ActionButton>
     </:default>
