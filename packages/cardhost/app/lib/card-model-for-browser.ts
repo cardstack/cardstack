@@ -9,6 +9,7 @@ import {
   CardComponentModule,
 } from '@cardstack/core/src/interfaces';
 import BaseCardModel, {
+  CardModelConstructor,
   CreatedState,
   LoadedState,
 } from '@cardstack/core/src/card-model';
@@ -19,7 +20,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { registerDestructor } from '@ember/destroyable';
 import { tracked as _tracked } from '@glimmer/tracking';
 
-export default class CardModelForBrowser extends BaseCardModel {
+const CardModelForBrowser: CardModelConstructor = class CardModelForBrowser extends BaseCardModel {
   private _componentModule: CardComponentModule | undefined;
   private wrapperComponent: unknown | undefined;
 
@@ -105,7 +106,9 @@ export default class CardModelForBrowser extends BaseCardModel {
     }
     return this._componentModule;
   }
-}
+};
+
+export default CardModelForBrowser;
 
 function tracked(
   target: CardModel,

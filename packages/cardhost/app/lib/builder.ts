@@ -106,6 +106,7 @@ export default class LocalRealm implements Builder {
         realm: this.realmURL,
         rawData: raw.data ?? {},
         schemaModuleRef: compiled.schemaModule.global,
+        schemaModule: await this.cards.loadModule(compiled.schemaModule.global),
         componentModuleRef:
           compiled.componentInfos[format].componentModule.global,
         saveModel: this.saveModel,

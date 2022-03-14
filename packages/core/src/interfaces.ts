@@ -188,6 +188,7 @@ export interface Builder {
 export interface CardModelArgs {
   realm: string;
   schemaModuleRef: string;
+  schemaModule: CardSchemaModule;
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];

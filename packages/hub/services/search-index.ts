@@ -2,6 +2,7 @@ import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler'
 import {
   CardComponentMetaModule,
   CardModel,
+  CardSchemaModule,
   CompiledCard,
   Format,
   ModuleRef,
@@ -274,6 +275,7 @@ class IndexerRun implements IndexerHandle {
 
     let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
     let componentMeta: CardComponentMetaModule = await this.fileCache.loadModule(componentMetaModule);
+    let schemaModule: CardSchemaModule = await this.fileCache.loadModule(definedCard.schemaModule.global);
     let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
     let cardModel = new CardModelForHub(
@@ -288,6 +290,7 @@ class IndexerRun implements IndexerHandle {
         realm: rawCard.realm,
         rawData: rawCard.data ?? {},
         schemaModuleRef: definedCard.schemaModule.global,
+        schemaModule,
         componentModuleRef: definedCard.componentInfos[format].componentModule.global,
         componentMeta,
         saveModel: cardService.saveModel.bind(cardService),

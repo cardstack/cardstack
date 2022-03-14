@@ -34,7 +34,11 @@ export interface LoadedState {
   allFields: boolean;
 }
 
-export default abstract class CardModel {
+export interface CardModelConstructor {
+  new (...params: ConstructorParameters<typeof CardModel>): CardModel;
+}
+
+export default class CardModel {
   setters: Setter;
 
   protected _schemaInstance: any | undefined;
@@ -48,12 +52,13 @@ export default abstract class CardModel {
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
   private recomputePromise: Promise<void> = Promise.resolve();
-  private schemaModule: CardSchemaModule | undefined;
+  private schemaModule: CardSchemaModule;
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
-    let { realm, schemaModuleRef, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
+    let { realm, schemaModuleRef, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
     this._realm = realm;
     this.schemaModuleRef = schemaModuleRef;
+    this.schemaModule = schemaModule;
     this._format = format;
     this.componentModuleRef = componentModuleRef;
     this.rawData = rawData;
@@ -61,9 +66,15 @@ export default abstract class CardModel {
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
+    this._schemaInstance = this.createSchemaInstance();
+    this.setDataShape();
   }
 
-  protected abstract get serializerMap(): SerializerMap;
+  protected get serializerMap(): SerializerMap {
+    throw new Error(
+      'serializerMap is abstract, children were supposed to provide it, we did not use typescript abstract keyword because it made the types harder'
+    );
+  }
 
   editable(): Promise<CardModel> {
     throw new CardstackError('editable() is unsupported');
@@ -77,7 +88,7 @@ export default abstract class CardModel {
       throw new CardstackError(`tried to adopt from an unsaved card`);
     }
 
-    return new (this.constructor as any)(
+    return new (this.constructor as CardModelConstructor)(
       this.cards,
       {
         type: 'created',
@@ -90,6 +101,7 @@ export default abstract class CardModel {
         rawData: {},
         saveModel: this.saveModel,
         schemaModuleRef: this.schemaModuleRef,
+        schemaModule: this.schemaModule,
         componentMeta: this.componentMeta,
         componentModuleRef: this.componentModuleRef,
       }
@@ -97,13 +109,7 @@ export default abstract class CardModel {
   }
 
   async getField(name: string, schemaInstance?: any): Promise<any> {
-    schemaInstance = schemaInstance ?? this._schemaInstance;
-
-    if (!schemaInstance) {
-      schemaInstance = this._schemaInstance = await this.createSchemaInstance();
-    }
-
-    return await getFieldValue(schemaInstance, name);
+    return await getFieldValue(schemaInstance ?? this._schemaInstance, name);
   }
 
   get data(): Record<string, any> {
@@ -141,16 +147,10 @@ export default abstract class CardModel {
   }
 
   private get usedFields(): string[] {
-    if (!this.schemaModule) {
-      throw new CardstackError(this.noSchemaModuleMsg());
-    }
     return this.schemaModule.usedFields?.[this.format] ?? [];
   }
 
   private get allFields(): string[] {
-    if (!this.schemaModule) {
-      throw new CardstackError(this.noSchemaModuleMsg());
-    }
     return this.schemaModule.allFields ?? [];
   }
 
@@ -179,8 +179,6 @@ export default abstract class CardModel {
   }
 
   async save(): Promise<void> {
-    await this.loadSchemaModule();
-
     let data: ResourceObject<Saved>;
     switch (this.state.type) {
       case 'created':
@@ -206,7 +204,6 @@ export default abstract class CardModel {
   }
 
   async setData(data: RawCardData): Promise<void> {
-    await this.loadSchemaModule();
     let nonExistentFields = this.assertFieldsExists(data);
     if (nonExistentFields.length) {
       throw new BadRequest(
@@ -242,7 +239,7 @@ export default abstract class CardModel {
       return;
     }
 
-    let newSchemaInstance = await this.createSchemaInstance();
+    let newSchemaInstance = this.createSchemaInstance();
     if (this.recomputePromise !== recomputePromise) {
       return;
     }
@@ -275,9 +272,8 @@ export default abstract class CardModel {
     // to do before doing the recompute
   }
 
-  private async createSchemaInstance() {
-    let schemaModule = await this.loadSchemaModule();
-    let klass = schemaModule.default;
+  private createSchemaInstance() {
+    let klass = this.schemaModule.default;
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
     return new klass(this.getRawField.bind(this)) as any;
   }
@@ -292,15 +288,6 @@ export default abstract class CardModel {
     }
   }
 
-  private async loadSchemaModule(): Promise<CardSchemaModule> {
-    if (!this.schemaModule) {
-      this.schemaModule = await this.cards.loadModule<CardSchemaModule>(this.schemaModuleRef);
-      this._schemaInstance = await this.createSchemaInstance();
-      this.setDataShape();
-    }
-    return this.schemaModule;
-  }
-
   // This is rather awkward and scaffolding until the schema instance knows how
   // to serialize itself. Remove this as soon as it becomes possible
   private setDataShape() {
@@ -312,12 +299,6 @@ export default abstract class CardModel {
   }
 
   private getSchemaInstanceData(type: 'all-fields' | 'used-fields'): Record<string, any> {
-    if (!this.schemaModule) {
-      throw new CardstackError(this.noSchemaModuleMsg());
-    }
-    if (!this._schemaInstance) {
-      throw new CardstackError(this.noSchemaInstanceMsg());
-    }
     return this.schemaModule.dataMember in this._schemaInstance
       ? this._schemaInstance[this.schemaModule.dataMember](type === 'all-fields' ? 'all' : this.format)
       : {};
@@ -374,17 +355,6 @@ export default abstract class CardModel {
       }
     }
     return nonExistentFields;
-  }
-
-  private noSchemaModuleMsg() {
-    return `The schema module has not yet been loaded for card ${
-      this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
-    }`;
-  }
-  private noSchemaInstanceMsg() {
-    return `The schema instance has not yet been instantiated for card ${
-      this.state.type === 'loaded' ? this.url : 'that adopts from ' + this.state.parentCardURL
-    }`;
   }
 }
 

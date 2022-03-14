@@ -1,7 +1,7 @@
 import { SerializerMap } from '@cardstack/core/src/interfaces';
-import BaseCardModel from '@cardstack/core/src/card-model';
+import BaseCardModel, { CardModelConstructor } from '@cardstack/core/src/card-model';
 
-export default class CardModelForHub extends BaseCardModel {
+const CardModelForHub: CardModelConstructor = class CardModelForHub extends BaseCardModel {
   // TODO The serializer can move into schema instance during
   // compilation, so that eventually this implementation can go away
   protected get serializerMap(): SerializerMap {
@@ -10,4 +10,5 @@ export default class CardModelForHub extends BaseCardModel {
     }
     return this.componentMeta.serializerMap;
   }
-}
+};
+export default CardModelForHub;

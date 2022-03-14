@@ -9,6 +9,7 @@ import {
   ResourceObject,
   Saved,
   CardComponentMetaModule,
+  CardSchemaModule,
 } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
@@ -196,6 +197,7 @@ export class CardService implements CardServiceInterface {
     let { realm } = this.realmManager.parseCardURL(result.url);
     let componentMetaModule = result.componentInfos[format].metaModule.global;
     let componentMeta: CardComponentMetaModule = await this.loadModule(componentMetaModule);
+    let schemaModule: CardSchemaModule = await this.loadModule(result.schemaModule);
     return new CardModelForHub(
       this,
       {
@@ -207,6 +209,7 @@ export class CardService implements CardServiceInterface {
         format,
         realm,
         schemaModuleRef: result.schemaModule,
+        schemaModule,
         rawData: result.data ?? {},
         componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,

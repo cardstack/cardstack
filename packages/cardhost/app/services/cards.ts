@@ -134,7 +134,7 @@ export default class Cards extends Service implements CardService {
     cardResponse: ResourceObject,
     format: Format,
     allFields = false
-  ): Promise<CardModelForBrowser> {
+  ): Promise<CardModel> {
     let schemaModuleRef = cardResponse.meta?.schemaModule;
     if (!schemaModuleRef) {
       throw new Error(
@@ -167,6 +167,7 @@ export default class Cards extends Service implements CardService {
         format,
         realm: realm as string,
         schemaModuleRef,
+        schemaModule: await this.loadModule(schemaModuleRef),
         rawData: cloneDeep(cardResponse.attributes ?? {}),
         componentModuleRef,
         saveModel: this.saveModel.bind(this),

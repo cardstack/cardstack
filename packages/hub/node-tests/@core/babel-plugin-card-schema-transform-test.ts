@@ -104,7 +104,7 @@ if (process.env.COMPILER) {
       await cards.create(reallyFancyPersonCard);
     });
 
-    it('can handle unconsumed field import', async function () {
+    it.skip('can handle unconsumed field import', async function () {
       await cards.create({
         realm,
         id: 'foo',
