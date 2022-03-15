@@ -155,15 +155,6 @@ if (process.env.COMPILER) {
 
       si.notify(`${realmURL}clip`, 'save');
       await si.flushNotifications();
-
-      // try {
-      //   await cards.loadModel(`${realmURL}clip`, 'isolated');
-      //   throw new Error('failed to throw expected exception');
-      // } catch (err: any) {
-      //   expect(err.status).to.eq(500);
-      //   expect(err.message).to.eq(`card.json for ${realmURL}clip refers to non-existent module edit.js`);
-      // }
-
       await cards.loadModel(`${realmURL}clip`, 'isolated');
 
       let {
