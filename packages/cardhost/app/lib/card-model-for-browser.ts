@@ -42,11 +42,6 @@ const CardModelForBrowser: CardModelConstructor = class CardModelForBrowser exte
     }
   }
 
-  protected async beginRecompute(): Promise<void> {
-    // need to load component module since usedFields originates from there
-    await this.componentModule();
-  }
-
   serialize(): ResourceObject<Saved | Unsaved> {
     let response = super.serialize();
     delete response.meta; // no need to serialize the meta on the browser

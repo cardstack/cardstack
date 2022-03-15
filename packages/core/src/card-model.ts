@@ -227,11 +227,6 @@ export default class CardModel {
       return;
     }
 
-    await this.beginRecompute();
-    if (this.recomputePromise !== recomputePromise) {
-      return;
-    }
-
     let newSchemaInstance = this.createSchemaInstance();
     if (this.recomputePromise !== recomputePromise) {
       return;
@@ -256,13 +251,6 @@ export default class CardModel {
 
     this._schemaInstance = newSchemaInstance;
     done!();
-  }
-
-  // TODO We should be able to get rid of this after the serializerMap has been
-  // internalized into the schema instance
-  protected async beginRecompute(): Promise<void> {
-    // This is a hook for subclasses to override if there is initial async work
-    // to do before doing the recompute
   }
 
   private schemaSerialize(
