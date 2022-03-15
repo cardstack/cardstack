@@ -4,10 +4,10 @@ const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
 function healthCheckMiddleware(req, res, next) {
-  let isHealthCheck = req.get('host').includes('merchie1');
+  let isHealthCheck = req.get('user-agent').includes('ELB-HealthChecker');
   if (isHealthCheck) {
     console.log(
-      'intercepting request because it is a health check, host:',
+      'intercepting request because it is a health check, user-agent:',
       req.get('host'),
       ', user-agent:',
       res.get('user-agent')
