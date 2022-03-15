@@ -7,10 +7,10 @@ function healthCheckMiddleware(req, res, next) {
   let isHealthCheck = req.get('user-agent').includes('ELB-HealthChecker');
   if (isHealthCheck) {
     console.log(
-      'intercepting request because it is a health check, user-agent:',
+      'intercepting request because it is a health check, host:',
       req.get('host'),
       ', user-agent:',
-      res.get('user-agent')
+      req.get('user-agent')
     );
     res.status(200).send('fastboot server is up and running');
   } else {
