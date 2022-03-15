@@ -3,6 +3,16 @@ const FastBootAppServer = require('fastboot-app-server');
 const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
+function healthCheckMiddleware(req, res, next) {
+  let isHealthCheck = req.get('user-agent').includes('ELB-HealthChecker');
+
+  if (isHealthCheck) {
+    res.status(200).send('fastboot server is up and running');
+  } else {
+    next();
+  }
+}
+
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
   environment: process.env.SSR_WEB_ENVIRONMENT,
@@ -27,6 +37,7 @@ let server = new FastBootAppServer({
 
   beforeMiddleware: function (app) {
     app.use(Sentry.Handlers.requestHandler());
+    app.use(healthCheckMiddleware);
   },
 
   afterMiddleware: function (app) {
