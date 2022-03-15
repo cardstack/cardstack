@@ -112,8 +112,9 @@ module.exports = function (deployTarget) {
   }
 
   if (deployTarget === 's3-preview') {
+    // FIXME what does it mean in this context?
     ENV.pipeline = {
-      activateOnDeploy: true,
+      activateOnDeploy: false,
     };
     ENV.s3 = {
       accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
