@@ -1,0 +1,5 @@
+subgraph: habdelra/cardpay-sokol
+subgraph_deployment: QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt
+updated: 2022-01-31 22:43:31.534100
+earliest_block: 23592960
+latest_block: 24859648

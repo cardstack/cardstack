@@ -1,0 +1,42 @@
+{
+  "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1": {
+    "core": {
+      "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
+      "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+      "docker_image": "reward_programs",
+      "payment_cycle_length": 32768,
+      "valid_from": 24000000,
+      "valid_to": 26000000
+    },
+    "user_defined": {
+      "reward_program_type": "usage",
+      "parameters": {
+        "token": "0xcd7AB5c678Bc0b90dD6f870B8F214c10A943FC67",
+        "base_reward": 10,
+        "transaction_factor": 1.5,
+        "spend_factor": 2,
+        "valid_duration": 100000
+      }
+    }
+  },
+  "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd": {
+    "core": {
+      "subgraph_config_location": "s3://tall-data-dev/subgraph_extraction/staging_rewards/0.0.1/",
+      "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
+      "docker_image": "reward_programs",
+      "payment_cycle_length": 32768,
+      "valid_from": 24000000,
+      "valid_to": 26000000
+    },
+    "user_defined": {
+      "reward_program_type": "usage",
+      "parameters": {
+        "token": "0xcd7AB5c678Bc0b90dD6f870B8F214c10A943FC67",
+        "base_reward": 100,
+        "transaction_factor": 6,
+        "spend_factor": 3,
+        "valid_duration": 500000
+      }
+    }
+  }
+}

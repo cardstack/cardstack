@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+*.log
+tmp/
+dist/*
+mycache/*
+__pycache__
+.env
+output/
+.cache
