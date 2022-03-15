@@ -42,6 +42,7 @@
     min-height: 100vh;
     min-width: 100%;
     border-radius: 0;
+    aspect-ratio: unset;
   }
 }
 
