@@ -139,35 +139,21 @@ if (process.env.COMPILER) {
       let card = await cards.loadModel(`${realmURL}clip`, 'isolated');
       expect(await card.getField('title')).to.equal('Clippy');
 
-      let dbManager = await getContainer().lookup('database-manager');
-      let db = await dbManager.getClient();
-      let {
-        rows: [result],
-      } = await db.query(`SELECT "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
-      expect(result.compileErrors).to.be.null;
-
       outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
         realm: realmURL,
         schema: 'schema.js',
         edit: 'edit.js',
-        data: { title: 'Clipster' },
       });
 
-      si.notify(`${realmURL}clip`, 'save');
+      await si.notify(`${realmURL}clip`, 'save');
       await si.flushNotifications();
-      await cards.loadModel(`${realmURL}clip`, 'isolated');
 
-      let {
-        rows: [result2],
-      } = await db.query(`SELECT "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
-
-      expect(result2.compileErrors).to.deep.equal({
-        title: 'Internal Server Error',
-        detail: `card.json for ${realmURL}clip refers to non-existent module edit.js`,
-        status: 500,
-        additionalErrors: null,
-        isCardstackError: true,
-      });
+      try {
+        await cards.loadModel(`${realmURL}clip`, 'isolated');
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`card.json for ${realmURL}clip refers to non-existent module edit.js`);
+      }
     });
 
     it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
