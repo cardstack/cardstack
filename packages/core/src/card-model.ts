@@ -61,13 +61,14 @@ export default class CardModel {
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
-    this._schemaInstance = this.createSchemaInstance();
 
+    // TODO move this logic into the schema instance
     if (this.state.type === 'created' || this.state.allFields) {
       this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
     } else {
       this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
     }
+    this._schemaInstance = this.createSchemaInstance();
   }
 
   editable(): Promise<CardModel> {
@@ -264,7 +265,7 @@ export default class CardModel {
   private createSchemaInstance() {
     let klass = this.schemaModule.default;
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
-    return new klass(this.getRawField.bind(this)) as any;
+    return new klass(this.rawData) as any;
   }
 
   private getRawField(fieldPath: string): any {

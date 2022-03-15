@@ -208,7 +208,7 @@ type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
 
 export interface CardSchemaModule {
   default: {
-    new (fieldGetter: (fieldPath: string) => any): unknown;
+    new (rawData: Record<string, any>, isDeserialized?: boolean): unknown;
   };
   serializerMap: SerializerMap;
   usedFields: UsedFields;

@@ -20,10 +20,12 @@ if (process.env.COMPILER) {
         'schema.js': `
             import { contains } from "@cardstack/types";
             import date from "https://cardstack.com/base/date";
+            import string from "https://cardstack.com/base/string";
 
             export default class Bio {
               getRawField = "don't collide!";
               @contains(date) birthdate;
+              @contains(string) background;
             }
           `,
       },
@@ -176,12 +178,13 @@ if (process.env.COMPILER) {
       `);
     });
 
-    it('can compile a serialize method into the schema class', async function () {
+    // HASSAN START HERE ON TUES: refactor serializer to use our new schema internal serialization
+    it.only('can compile a serialize method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         import { serializeAttributes } from "@cardstack/core/src/serializers";
-        import { getProperties } from "@cardstack/core/src/utils/fields";
+        import { camelCase, getProperties } from "@cardstack/core/src/utils/fields";
       `);
       expect(source).to.containsSource(`
         export const serializeMember = "serialize0";
@@ -202,10 +205,17 @@ if (process.env.COMPILER) {
       // the browser source has a lot less babel shenanigans
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-          getRawField0;
+          data = {};
+          isDeserialized = {};
 
-          constructor(get) {
-            this.getRawField0 = get;
+          constructor(rawData, isDeserialized = false) {
+            for (let [field, value] of Object.entries(rawData)) {
+              if (isDeserialized) {
+                this[field] = value;
+              } else {
+                this[camelCase('serialized-' + field)] = value;
+              }
+            }
           }
         `);
     });
@@ -215,9 +225,55 @@ if (process.env.COMPILER) {
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.not.containsSource(`@contains`);
       expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
+      // TODO need to use keySensitiveGet in our getters
+      expect(source).to.containsSource(`
+          get background() {
+            return this.data["background"];
+          }
+          get serializedBackground() {
+            return this.data["background"];
+          }
+          set background(value) {
+            this.data["background"] = value;
+            this.isDeserialized["background"] = true;
+          }
+          set serializedBackground(value) {
+            this.data["background"] = value;
+            this.isDeserialized["background"] = false;
+          }
+        `);
+    });
+
+    it('can compile primitive field with custom serializer in schema.js module', async function () {
+      let { compiled } = await cards.load(`${realm}bio`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.not.containsSource(`@contains`);
+      expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
+      expect(source).to.containsSource(`
+        import * as DateSerializer from "@cardstack/compiled/https-cardstack.com-base-date/serializer.js";
+      `);
       expect(source).to.containsSource(`
           get birthdate() {
-            return this.getRawField0("birthdate");
+            let value = this.data["birthdate"];
+            if (this.isDeserialized["birthdate"]) {
+              return value;
+            }
+            return DateSerializer.deserialize(value);
+          }
+          get serializedBirthdate() {
+            let value = this.data["birthdate"];
+            if (!this.isDeserialized["birthdate"]) {
+              return value;
+            }
+            return DateSerializer.serialize(value);
+          }
+          set birthdate(value) {
+            this.data["birthdate"] = value;
+            this.isDeserialized["birthdate"] = true;
+          }
+          set serializedBirthdate(value) {
+            this.data["birthdate"] = value;
+            this.isDeserialized["birthdate"] = false;
           }
         `);
     });
@@ -230,9 +286,18 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
           import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
         `);
+      // TODO need to use keySensitiveGet in our getters
       expect(source).to.containsSource(`
           get aboutMe() {
-            return new BioClass(innerField => this.getRawField("aboutMe." + innerField));
+            return this.data["aboutMe"];
+          }
+          set aboutMe(value) {
+            this.data["aboutMe"] = new BioClass(value, true);
+            this.isDeserialized["aboutMe"] = true;
+          }
+          set serializedAboutMe(value) {
+            this.data["aboutMe"] = new BioClass(value);
+            this.isDeserialized["aboutMe"] = false;
           }
         `);
     });
@@ -278,7 +343,8 @@ if (process.env.COMPILER) {
         export default class FancyPerson extends PersonClass {
       `);
       expect(source).to.not.containsSource(`
-        getRawField;
+        data = {};
+        isDeserialized = {};
       `);
       expect(source).to.not.containsSource(`
         constructor(
@@ -289,11 +355,18 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}really-fancy-person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-          getRawField;
+          data = {};
+          isDeserialized = {};
 
-          constructor(get) {
-            super(get);
-            this.getRawField = get;
+          constructor(rawData, isDeserialized = false) {
+            super(rawData, isDeserialized);
+            for (let [field, value] of Object.entries(rawData)) {
+              if (isDeserialized) {
+                this[field] = value;
+              } else {
+                this['serialized' + capitalize(field)] = value;
+              }
+            }
           }
         `);
     });

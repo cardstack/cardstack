@@ -3,6 +3,8 @@ import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../inte
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import _cloneDeep from 'lodash/cloneDeep';
+import _camelCase from 'lodash/camelCase';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -120,4 +122,9 @@ export function getProperties(object: Record<string, any>, properties: string[])
     }
   }
   return data;
+}
+
+// wrapping this to make it easy to import into compiled code
+export function camelCase(str: string) {
+  return _camelCase(str);
 }
