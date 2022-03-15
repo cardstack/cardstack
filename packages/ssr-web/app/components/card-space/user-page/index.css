@@ -70,7 +70,7 @@
   margin-left: auto;
   margin-right: auto;
   margin-bottom: var(--boxel-sp-xxl);
-  overflow-wrap: break-all;
+  overflow-wrap: break-word;
 }
 
 .card-space-user-page__url {
