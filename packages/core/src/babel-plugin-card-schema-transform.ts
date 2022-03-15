@@ -153,13 +153,10 @@ export default function main(babel: typeof Babel) {
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
   let [first, ...tail] = paths;
-
   let field = fields[first];
-
   if (paths.length > 1) {
     return getFieldForPath(field.card.fields, tail.join('.'));
   }
-
   return field;
 }
 
@@ -308,9 +305,6 @@ function addSerializerMap(path: NodePath<t.Program>, state: State, babel: typeof
     }
     addFieldToSerializerMap(map, field, fieldPath, path, state);
   }
-
-  // TODO remove the export after the schema instance is capable of internally
-  // doing deserialization as part of field getters
   path.node.body.push(
     babel.template(`export const serializerMap = %%serializerMap%%;`)({
       serializerMap: t.objectExpression(buildSerializerMapProp(map, t)),
@@ -468,16 +462,13 @@ function buildSerializerMapProp(
   t: typeof Babel.types
 ): t.ObjectExpression['properties'] {
   let props: t.ObjectExpression['properties'] = [];
-
   for (let fieldPath in serializerMap) {
     let modulePath = serializerMap[fieldPath];
     if (!modulePath) {
       continue;
     }
-
     props.push(t.objectProperty(t.stringLiteral(fieldPath), modulePath));
   }
-
   return props;
 }
 
