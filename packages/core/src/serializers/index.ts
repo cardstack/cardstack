@@ -16,8 +16,13 @@ export function serializeField(
   value: any,
   action: 'serialize' | 'deserialize'
 ) {
-  if (!value) {
+  // missing field
+  if (value === undefined) {
     return;
+  }
+  // empty field
+  if (value === null) {
+    return null;
   }
   let serializer = get(serializerMap, fieldPath);
   if (serializer) {
@@ -34,9 +39,10 @@ export function deserializeAttributes(attrs: any, serializerMap: SerializerMap):
 export function serializeAttributes(
   attrs: any,
   serializerMap: SerializerMap,
-  action: 'serialize' | 'deserialize' = 'serialize'
+  action: 'serialize' | 'deserialize' = 'serialize',
+  fields?: string[]
 ): JSON.Object {
-  let attributes = cloneDeep(attrs);
+  let attributes = fields ? pick(attrs, fields) : cloneDeep(attrs);
 
   for (let field of keys(serializerMap)) {
     let rawValue = get(attributes, field);

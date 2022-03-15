@@ -21,7 +21,6 @@ export interface CardComponentPluginOptions {
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
-  metaModulePath: string;
   resolveImport?: (relativePath: string) => string;
   // these are for gathering output
   usedFields: ComponentInfo['usedFields'];
@@ -57,13 +56,6 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
-        },
-        exit(path: NodePath<t.Program>, state: State) {
-          path.node.body.push(
-            babel.template(`export * from %%metaModulePath%%;`)({
-              metaModulePath: state.opts.metaModulePath,
-            }) as t.Statement
-          );
         },
       },
 

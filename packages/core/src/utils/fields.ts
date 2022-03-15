@@ -1,6 +1,8 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import { CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
+import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
 import { isNotReadyError } from './errors';
+import set from 'lodash/set';
+import get from 'lodash/get';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -87,4 +89,35 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
     }
   } while (!isLoaded);
   return result;
+}
+
+export function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): string[] {
+  let fieldList: string[] = [];
+  for (let [fieldName, field] of Object.entries(fields)) {
+    if (Object.keys(field.card.fields).length === 0) {
+      fieldList.push([...path, fieldName].join('.'));
+    } else {
+      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
+    }
+  }
+  return fieldList;
+}
+
+export function makeEmptyCardData(allFields: string[]): RawCardData {
+  let data: RawCardData = {};
+  for (let field of allFields) {
+    set(data, field, null);
+  }
+  return data;
+}
+
+export function getProperties(object: Record<string, any>, properties: string[]) {
+  let data = {};
+  for (let field of properties) {
+    let value = get(object, field);
+    if (value !== undefined) {
+      set(data, field, value);
+    }
+  }
+  return data;
 }

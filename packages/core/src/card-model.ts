@@ -10,20 +10,15 @@ import {
   CardService,
   CardModelArgs,
   CardSchemaModule,
-  CardModel as CardModelInterface,
   Setter,
-  SerializerMap,
-  CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
-import { serializeAttributes, serializeCardAsResource, serializeField } from '@cardstack/core/src/serializers';
+import { serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
-import get from 'lodash/get';
-import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
-import { getFieldValue } from '@cardstack/core/src/utils/fields';
-import { BadRequest, UnprocessableEntity } from './utils/errors';
+import { getFieldValue, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
+import { BadRequest, CardstackError, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
   type: 'created';
@@ -37,52 +32,57 @@ export interface LoadedState {
   allFields: boolean;
 }
 
-export default abstract class CardModel implements CardModelInterface {
+export interface CardModelConstructor {
+  new (...params: ConstructorParameters<typeof CardModel>): CardModel;
+}
+
+export default class CardModel {
   setters: Setter;
 
   protected _schemaInstance: any | undefined;
   protected componentModuleRef: ComponentInfo['componentModule']['global'];
   protected rawData: RawCardData;
   protected state: CreatedState | LoadedState;
-  protected componentMeta: CardComponentMetaModule | undefined;
 
   private _realm: string;
-  private schemaModule: CompiledCard['schemaModule']['global'];
+  private schemaModuleRef: CompiledCard['schemaModule']['global'];
   private _format: Format;
   private saveModel: CardModelArgs['saveModel'];
-  private _schemaClass: CardSchemaModule['default'] | undefined;
   private recomputePromise: Promise<void> = Promise.resolve();
+  private schemaModule: CardSchemaModule;
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
-    let { realm, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
+    let { realm, schemaModuleRef, schemaModule, format, componentModuleRef, rawData, saveModel } = args;
     this._realm = realm;
+    this.schemaModuleRef = schemaModuleRef;
     this.schemaModule = schemaModule;
     this._format = format;
     this.componentModuleRef = componentModuleRef;
-    this.rawData = rawData;
-    this.componentMeta = componentMeta;
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
+    this._schemaInstance = this.createSchemaInstance();
+
+    if (this.state.type === 'created' || this.state.allFields) {
+      this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
+    } else {
+      this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
+    }
   }
 
-  protected abstract get serializerMap(): SerializerMap;
-  protected abstract get usedFields(): string[];
-  protected abstract get allFields(): string[];
-
-  editable(): Promise<CardModelInterface> {
-    throw new Error('editable() is unsupported');
+  editable(): Promise<CardModel> {
+    throw new CardstackError('editable() is unsupported');
   }
   component(): Promise<unknown> {
-    throw new Error('component() is unsupported');
+    throw new CardstackError('component() is unsupported');
   }
 
-  adoptIntoRealm(realm: string, id?: string): CardModelInterface {
+  adoptIntoRealm(realm: string, id?: string): CardModel {
     if (this.state.type !== 'loaded') {
-      throw new Error(`tried to adopt from an unsaved card`);
+      throw new CardstackError(`tried to adopt from an unsaved card`);
     }
 
-    return new (this.constructor as any)(
+    return new (this.constructor as CardModelConstructor)(
       this.cards,
       {
         type: 'created',
@@ -94,24 +94,18 @@ export default abstract class CardModel implements CardModelInterface {
         format: this.format,
         rawData: {},
         saveModel: this.saveModel,
+        schemaModuleRef: this.schemaModuleRef,
         schemaModule: this.schemaModule,
-        componentMeta: this.componentMeta,
         componentModuleRef: this.componentModuleRef,
       }
     );
   }
 
   async getField(name: string, schemaInstance?: any): Promise<any> {
-    schemaInstance = schemaInstance ?? this._schemaInstance;
-
-    if (!schemaInstance) {
-      schemaInstance = this._schemaInstance = await this.createSchemaInstance();
-    }
-
-    return await getFieldValue(schemaInstance, name);
+    return await getFieldValue(schemaInstance ?? this._schemaInstance, name);
   }
 
-  get data(): object {
+  get data(): Record<string, any> {
     return this._schemaInstance;
   }
 
@@ -128,7 +122,7 @@ export default abstract class CardModel implements CardModelInterface {
 
   get url(): string {
     if (this.state.type === 'created') {
-      throw new Error(`bug: card in state ${this.state.type} does not have a url`);
+      throw new CardstackError(`bug: card in state ${this.state.type} does not have a url`);
     }
     return this.state.url;
   }
@@ -141,8 +135,16 @@ export default abstract class CardModel implements CardModelInterface {
     if (this.state.type === 'created') {
       return this.state.parentCardURL;
     } else {
-      throw new Error(`card ${this.url} in state ${this.state.type} does not support parentCardURL`);
+      throw new CardstackError(`card ${this.url} in state ${this.state.type} does not support parentCardURL`);
     }
+  }
+
+  private get usedFields(): string[] {
+    return this.schemaModule.usedFields?.[this.format] ?? [];
+  }
+
+  private get allFields(): string[] {
+    return this.schemaModule.allFields ?? [];
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -153,16 +155,19 @@ export default abstract class CardModel implements CardModelInterface {
       url = cardURL({ realm: this.realm, id: this.state.id });
     }
 
-    if (this.state.type === 'created') {
-      return serializeCardAsResource(url, this.shapeData('used-fields'), this.serializerMap);
-    }
+    let format = this.state.type === 'created' || this.state.allFields ? 'all' : (this.format as Format | 'all');
+    let resource: ResourceObject<Saved | Unsaved> = {
+      id: url,
+      type: 'card',
+      attributes: this.schemaSerialize('serialize', format),
+    };
 
-    let resource = serializeCardAsResource(
-      url,
-      this.shapeData(this.state.allFields ? 'all-fields' : 'used-fields'),
-      this.serializerMap
-    );
-    resource.meta = merge({ componentModule: this.componentModuleRef, schemaModule: this.schemaModule }, resource.meta);
+    if (this.state.type === 'loaded') {
+      resource.meta = merge(
+        { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
+        resource.meta
+      );
+    }
     return resource;
   }
 
@@ -201,11 +206,11 @@ export default abstract class CardModel implements CardModelInterface {
       );
     }
 
-    this.rawData = merge({}, this.rawData, serializeAttributes(data, this.serializerMap, 'serialize'));
+    this.rawData = merge(this.rawData, this.schemaSerialize('serialize', 'all', data));
     await this.recompute();
   }
 
-  async didRecompute(): Promise<void> {
+  protected async didRecompute(): Promise<void> {
     return await this.recomputePromise;
   }
 
@@ -222,12 +227,7 @@ export default abstract class CardModel implements CardModelInterface {
       return;
     }
 
-    await this.beginRecompute();
-    if (this.recomputePromise !== recomputePromise) {
-      return;
-    }
-
-    let newSchemaInstance = await this.createSchemaInstance();
+    let newSchemaInstance = this.createSchemaInstance();
     if (this.recomputePromise !== recomputePromise) {
       return;
     }
@@ -236,7 +236,11 @@ export default abstract class CardModel implements CardModelInterface {
       try {
         await this.getField(field, newSchemaInstance);
       } catch (err: any) {
-        let newError = new UnprocessableEntity(`Could not load field '${field}' for card ${this.url}`);
+        let newError = new UnprocessableEntity(
+          `Could not load field '${field}' for ${
+            this.state.type === 'loaded' ? 'card ' + this.url : 'new card of type ' + this.parentCardURL
+          }`
+        );
         newError.additionalErrors = [err, ...(err.additionalErrors || [])];
         throw newError;
       }
@@ -249,46 +253,28 @@ export default abstract class CardModel implements CardModelInterface {
     done!();
   }
 
-  protected async beginRecompute(): Promise<void> {
-    // This is a hook for subclasses to override if there is initial async work
-    // to do before doing the recompute
+  private schemaSerialize(
+    action: 'serialize' | 'deserialize',
+    format: Format | 'all',
+    data?: Record<string, any>
+  ): Record<string, any> {
+    return this._schemaInstance[this.schemaModule.serializeMember](action, format, data);
   }
 
-  // we have a few places that are very sensitive to the shape of the data, and
-  // won't be able to deal with a schema instance that has additional properties
-  // and methods beyond just the data itself, so this method is for those places
-  private shapeData(shape: 'used-fields' | 'all-fields') {
-    let syncData: Record<string, any> = {};
-
-    let fields = shape === 'used-fields' ? this.usedFields : this.allFields;
-    for (let field of fields) {
-      let value = get(this._schemaInstance, field);
-      // undefined is a signal that the field should not exist
-      if (value !== undefined) {
-        set(syncData, field, value);
-      }
-    }
-    return syncData;
-  }
-
-  private async createSchemaInstance() {
-    let klass = await this.schemaClass();
+  private createSchemaInstance() {
+    let klass = this.schemaModule.default;
     // We can't await the instance creation in a separate, as it's thenable and confuses async methods
     return new klass(this.getRawField.bind(this)) as any;
   }
 
   private getRawField(fieldPath: string): any {
-    let value = get(this.rawData, fieldPath);
-    return serializeField(this.serializerMap, fieldPath, value, 'deserialize');
-  }
-
-  private async schemaClass() {
-    if (this._schemaClass) {
-      return this._schemaClass;
+    let result = keySensitiveGet(this.rawData, fieldPath);
+    if ('missing' in result) {
+      throw new Error(`TODO: ${result.missing}`);
+    } else {
+      // TODO it would be wonderful if the schema instance knew how to deserialize its own fields
+      return serializeField(this.schemaModule.serializerMap, fieldPath, result.value, 'deserialize');
     }
-    this._schemaClass = (await this.cards.loadModule<CardSchemaModule>(this.schemaModule)).default;
-
-    return this._schemaClass;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -299,7 +285,7 @@ export default abstract class CardModel implements CardModelInterface {
         return;
       }
 
-      let data = this.shapeData('all-fields');
+      let data = this.schemaSerialize('deserialize', 'all');
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -310,7 +296,7 @@ export default abstract class CardModel implements CardModelInterface {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this.rawData = serializeAttributes(data, this.serializerMap, 'serialize');
+      this.rawData = this.schemaSerialize('serialize', 'all', data);
       this.recompute();
     };
     (s as any).setters = new Proxy(
@@ -343,6 +329,23 @@ export default abstract class CardModel implements CardModelInterface {
     }
     return nonExistentFields;
   }
+}
+
+// access a potentially-deep property path, stopping if a key is missing along
+// the way
+export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
+  let segments = path.split('.');
+  let current: any = obj;
+  let segment: string | undefined;
+  let completed: string[] = [];
+  while ((segment = segments.shift())) {
+    if (!(segment in current)) {
+      return { missing: [...completed, segment].join('.') };
+    }
+    current = current?.[segment];
+    completed.push(segment);
+  }
+  return { value: current };
 }
 
 function assertNever(value: never) {

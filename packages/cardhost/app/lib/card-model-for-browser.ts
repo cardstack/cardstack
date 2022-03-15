@@ -5,10 +5,10 @@ import {
   CardModel,
   CardService,
   CardModelArgs,
-  SerializerMap,
   CardComponentModule,
 } from '@cardstack/core/src/interfaces';
 import BaseCardModel, {
+  CardModelConstructor,
   CreatedState,
   LoadedState,
 } from '@cardstack/core/src/card-model';
@@ -19,10 +19,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { registerDestructor } from '@ember/destroyable';
 import { tracked as _tracked } from '@glimmer/tracking';
 
-export default class CardModelForBrowser
-  extends BaseCardModel
-  implements CardModel
-{
+const CardModelForBrowser: CardModelConstructor = class CardModelForBrowser extends BaseCardModel {
   private _componentModule: CardComponentModule | undefined;
   private wrapperComponent: unknown | undefined;
 
@@ -43,11 +40,6 @@ export default class CardModelForBrowser
     if (prop) {
       Object.defineProperty(this, '_schemaInstance', prop);
     }
-  }
-
-  protected async beginRecompute(): Promise<void> {
-    // need to load component module since usedFields originates from there
-    await this.componentModule();
   }
 
   serialize(): ResourceObject<Saved | Unsaved> {
@@ -91,35 +83,6 @@ export default class CardModelForBrowser
     return this.wrapperComponent;
   }
 
-  protected get serializerMap(): SerializerMap {
-    if (!this._componentModule) {
-      throw new Error(
-        `ComponentModule has not yet been loaded for card model ${this.url}`
-      );
-    }
-    return this._componentModule.serializerMap;
-  }
-
-  protected get usedFields(): string[] {
-    if (!this._componentModule) {
-      throw new Error(
-        `ComponentModule has not yet been loaded for card model ${this.url}`
-      );
-    }
-    return this._componentModule.usedFields;
-  }
-
-  protected get allFields(): string[] {
-    if (!this._componentModule) {
-      throw new Error(
-        `ComponentModule has not yet been loaded for card model ${this.url}`
-      );
-    }
-    // as far as the browser can tell all the fields that the server told it
-    // about are all that exist
-    return this._componentModule.usedFields;
-  }
-
   private async componentModule() {
     if (!this._componentModule) {
       this._componentModule = await this.cards.loadModule<CardComponentModule>(
@@ -128,7 +91,9 @@ export default class CardModelForBrowser
     }
     return this._componentModule;
   }
-}
+};
+
+export default CardModelForBrowser;
 
 function tracked(
   target: CardModel,

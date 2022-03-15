@@ -84,12 +84,10 @@ module('@core | compiler-basics', function (hooks) {
     createCard(card);
 
     let compiled = await builder.getCompiledCard(cardURL(card));
-    let source = await cardService.loadModule<any>(
-      compiled.schemaModule.global
-    );
-    assert.equal(
+    let source = await cardService.loadModule(compiled.schemaModule.global);
+    assert.includes(
       source.default.toString(),
-      'class Post {}',
+      'class Post {',
       'Source code is correct'
     );
   });
@@ -293,7 +291,7 @@ module('@core | compiler-basics', function (hooks) {
 
       let compiled = await builder.getCompiledCard(cardURL(PERSON_RAW_CARD));
 
-      let code = await cardService.loadModule<any>(
+      let code = await cardService.loadModule(
         compiled.componentInfos.embedded.componentModule.global
       );
 

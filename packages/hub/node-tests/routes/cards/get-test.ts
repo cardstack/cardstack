@@ -150,6 +150,8 @@ if (process.env.COMPILER) {
         title: 'Hello World',
         body: 'First post.',
         favoriteColor: 'blue',
+        createdAt: null,
+        extra: null,
         rating: 3,
         ratingPct: '60%',
         author: {
