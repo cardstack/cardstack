@@ -5,20 +5,10 @@ const Sentry = require('@sentry/node');
 
 function healthCheckMiddleware(req, res, next) {
   let isHealthCheck = req.get('user-agent').includes('ELB-HealthChecker');
+
   if (isHealthCheck) {
-    console.log(
-      'intercepting request because it is a health check, host:',
-      req.get('host'),
-      ', user-agent:',
-      req.get('user-agent')
-    );
     res.status(200).send('fastboot server is up and running');
   } else {
-    console.log(
-      `not health check, proceeding. host: ${req.get(
-        'host'
-      )}, user-agent: ${req.get('user-agent')}`
-    );
     next();
   }
 }
