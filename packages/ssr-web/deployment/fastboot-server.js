@@ -14,6 +14,11 @@ function healthCheckMiddleware(req, res, next) {
     );
     res.status(200).send('fastboot server is up and running');
   } else {
+    console.log(
+      `not health check, proceeding. host: ${req.get(
+        'host'
+      )}, user-agent: ${req.get('user-agent')}`
+    );
     next();
   }
 }
