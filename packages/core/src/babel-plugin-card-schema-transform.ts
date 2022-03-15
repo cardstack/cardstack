@@ -176,8 +176,7 @@ function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, babe
       throw error(path.get('key'), `cannot find field in card`);
     }
 
-    // TODO: NO BANGS
-    let meta = state.opts.meta.fields![fieldName];
+    let meta = state.opts.meta.fields[fieldName];
     if (meta.computed && meta.computeVia) {
       transformAsyncComputedField(path, state, babel);
     } else if (type === 'primitive') {
@@ -271,9 +270,8 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
       t.identifier(state.serializeMember),
       ['action', 'format', 'data'].map((name) => t.identifier(name)),
       t.blockStatement(
-        // in the case of deserialization, the data is already deserialized via
-        // the schema instance's getters (due to this.getRawField), so we skip
-        // an extra deserialization in that case.
+        // the data is already deserialized via the schema instance's getters
+        // (due to this.getRawField), so we skip the extra deserialization
         babel.template(`
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
           if (action === 'deserialize' && data === undefined) {
@@ -499,7 +497,6 @@ function addFieldToSerializerMap(
     if (!field.card.serializerModule) {
       return;
     }
-    // TEMP: Would be nice to have the Proper CardID on the compiled card
     let cardId = field.card.url.split('/')[field.card.url.split('/').length - 1];
     map[usedPath] = state.importUtil.import(
       path,
