@@ -136,12 +136,14 @@ if (process.env.COMPILER) {
       let si = await getContainer().lookup('searchIndex', { type: 'service' });
       await si.indexAllRealms();
 
+      let card = await cards.loadModel(`${realmURL}clip`, 'isolated');
+      expect(await card.getField('title')).to.equal('Clippy');
+
       let dbManager = await getContainer().lookup('database-manager');
       let db = await dbManager.getClient();
       let {
         rows: [result],
-      } = await db.query(`SELECT "data", "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
-      expect(result.data).to.deep.equal({ title: 'Clippy' });
+      } = await db.query(`SELECT "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
       expect(result.compileErrors).to.be.null;
 
       outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
@@ -151,15 +153,26 @@ if (process.env.COMPILER) {
         data: { title: 'Clipster' },
       });
 
-      si.notify(`${realmURL}clip`, 'save'); // this is not sufficient. need `si.indexCardFromNotification` method to pass the below test, but `indexCardFromNotification` is private.
+      si.notify(`${realmURL}clip`, 'save');
+      await si.flushNotifications();
+
+      // try {
+      //   await cards.loadModel(`${realmURL}clip`, 'isolated');
+      //   throw new Error('failed to throw expected exception');
+      // } catch (err: any) {
+      //   expect(err.status).to.eq(500);
+      //   expect(err.message).to.eq(`card.json for ${realmURL}clip refers to non-existent module edit.js`);
+      // }
+
+      await cards.loadModel(`${realmURL}clip`, 'isolated');
 
       let {
         rows: [result2],
-      } = await db.query(`SELECT "data", "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
-      // expect(result2.data).to.deep.equal({ title: 'Clipster' }); //??? what should the db look like for the columns other than `compileErrors`? `saveErrorState` currently sets most columns to null
+      } = await db.query(`SELECT "compileErrors" FROM cards WHERE url = '${realmURL}clip'`);
+
       expect(result2.compileErrors).to.deep.equal({
         title: 'Internal Server Error',
-        detail: 'card.json for undefined refers to non-existent module edit.js',
+        detail: `card.json for ${realmURL}clip refers to non-existent module edit.js`,
         status: 500,
         additionalErrors: null,
         isCardstackError: true,

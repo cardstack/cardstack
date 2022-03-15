@@ -1,5 +1,5 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import { CardId, CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -80,21 +80,7 @@ export default class SearchIndex {
     let cardID = this.realmManager.parseCardURL(cardURL);
     log.trace('indexCardFromNotification', cardURL);
     await this.runIndexing(cardID.realm, async (ops) => {
-      switch (action) {
-        case 'save': {
-          let rawCard = await ops.read(cardID);
-          if (rawCard) {
-            await ops.save(rawCard);
-          }
-          break;
-        }
-        case 'delete': {
-          await ops.delete(cardURL);
-          break;
-        }
-        default:
-          assertNever(action);
-      }
+      await ops.reindex(cardID, action);
     });
   }
 
@@ -243,14 +229,24 @@ class IndexerRun implements IndexerHandle {
     } while (rows.length > 0);
   }
 
-  async read(card: RawCard): Promise<RawCard | void> {
-    try {
-      let rawCard = await this.realmManager.read(card);
-      return rawCard;
-    } catch (err: any) {
-      let compiler = await this.builder.compileCardFromRaw(card);
-      log.trace('Read: Error during compile', cardURL(card));
-      await this.saveErrorState(card, err, compiler.dependencies);
+  async reindex(card: CardId, action: 'save' | 'delete'): Promise<void> {
+    switch (action) {
+      case 'save': {
+        try {
+          let rawCard = await this.realmManager.read(card);
+          await this.save(rawCard);
+        } catch (err: any) {
+          log.trace('Read: Error during compile', cardURL(card));
+          await this.saveErrorState(card, err, new Set());
+        }
+        break;
+      }
+      case 'delete': {
+        await this.delete(cardURL(card));
+        break;
+      }
+      default:
+        assertNever(action);
     }
   }
 
