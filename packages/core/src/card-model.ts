@@ -11,8 +11,6 @@ import {
   CardModelArgs,
   CardSchemaModule,
   Setter,
-  SerializerMap,
-  CardComponentMetaModule,
 } from '@cardstack/core/src/interfaces';
 import { serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
@@ -45,7 +43,6 @@ export default class CardModel {
   protected componentModuleRef: ComponentInfo['componentModule']['global'];
   protected rawData: RawCardData;
   protected state: CreatedState | LoadedState;
-  protected componentMeta: CardComponentMetaModule | undefined;
 
   private _realm: string;
   private schemaModuleRef: CompiledCard['schemaModule']['global'];
@@ -55,13 +52,12 @@ export default class CardModel {
   private schemaModule: CardSchemaModule;
 
   constructor(protected cards: CardService, state: CreatedState | LoadedState, args: CardModelArgs) {
-    let { realm, schemaModuleRef, schemaModule, format, componentModuleRef, rawData, componentMeta, saveModel } = args;
+    let { realm, schemaModuleRef, schemaModule, format, componentModuleRef, rawData, saveModel } = args;
     this._realm = realm;
     this.schemaModuleRef = schemaModuleRef;
     this.schemaModule = schemaModule;
     this._format = format;
     this.componentModuleRef = componentModuleRef;
-    this.componentMeta = componentMeta;
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
@@ -72,12 +68,6 @@ export default class CardModel {
     } else {
       this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
     }
-  }
-
-  protected get serializerMap(): SerializerMap {
-    throw new Error(
-      'serializerMap is abstract, children were supposed to provide it, we did not use typescript abstract keyword because it made the types harder'
-    );
   }
 
   editable(): Promise<CardModel> {
@@ -106,7 +96,6 @@ export default class CardModel {
         saveModel: this.saveModel,
         schemaModuleRef: this.schemaModuleRef,
         schemaModule: this.schemaModule,
-        componentMeta: this.componentMeta,
         componentModuleRef: this.componentModuleRef,
       }
     );
@@ -281,7 +270,7 @@ export default class CardModel {
     format: Format | 'all',
     data?: Record<string, any>
   ): Record<string, any> {
-    return this._schemaInstance[this.schemaModule.serializeMember](action, format, this.serializerMap, data);
+    return this._schemaInstance[this.schemaModule.serializeMember](action, format, data);
   }
 
   private createSchemaInstance() {
@@ -296,7 +285,7 @@ export default class CardModel {
       throw new Error(`TODO: ${result.missing}`);
     } else {
       // TODO it would be wonderful if the schema instance knew how to deserialize its own fields
-      return serializeField(this.serializerMap, fieldPath, result.value, 'deserialize');
+      return serializeField(this.schemaModule.serializerMap, fieldPath, result.value, 'deserialize');
     }
   }
 

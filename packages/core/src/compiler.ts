@@ -9,7 +9,6 @@ import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
 import cardSchemaTransformPlugin, { Options } from './babel-plugin-card-schema-transform';
-import generateComponentMeta, { CardComponentMetaPluginOptions } from './babel-plugin-card-component-meta';
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
@@ -28,7 +27,7 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { cardURL, getBasenameAndExtension, getCardAncestor, resolveCard, resolveModule } from './utils';
+import { cardURL, getCardAncestor, resolveCard, resolveModule } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 
@@ -455,13 +454,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: CompiledCard['fields'],
     format: Format
   ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
-    let metaModuleFileName = uniqueName(this.cardSource.files, appendToFilename(mod.localPath, '__meta'));
     let debugPath = `${this.cardSource.realm}${this.cardSource.id ?? 'NEW_CARD'}/${mod.localPath}`;
 
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
-      metaModulePath: './' + metaModuleFileName,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],
@@ -476,17 +473,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
     let componentTransformResult = transformCardComponent(mod.source, options);
 
-    let metaOptions: CardComponentMetaPluginOptions = {
-      debugPath: debugPath + '__meta',
-      fields: options.fields,
-      usedFields: options.usedFields,
-      serializerMap: {},
-    };
-    let componentMetaResult = generateComponentMeta(metaOptions);
-
     let componentInfo: ComponentInfo<LocalRef> = {
       componentModule: { local: mod.localPath },
-      metaModule: { local: metaModuleFileName },
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
     };
@@ -501,10 +489,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
           type: JS_TYPE,
           source: componentTransformResult.source,
           ast: componentTransformResult.ast,
-        },
-        [metaModuleFileName]: {
-          type: JS_TYPE,
-          source: componentMetaResult.source,
         },
       },
     };
@@ -567,11 +551,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 }
 
-function appendToFilename(filename: string, toAppend: string): string {
-  let { basename, extension } = getBasenameAndExtension(filename);
-  return `${basename}${toAppend}${extension}`;
-}
-
 function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
   return cardSource.id === BASE_CARD_ID.id && cardSource.realm === BASE_CARD_ID.realm;
 }
@@ -619,7 +598,6 @@ export function makeGloballyAddressable(
   function ensureGlobalComponentInfo(info: ComponentInfo<ModuleRef>): ComponentInfo<GlobalRef> {
     return {
       componentModule: ensureGlobal(info.componentModule),
-      metaModule: ensureGlobal(info.metaModule),
       usedFields: info.usedFields,
       inlineHBS: info.inlineHBS,
       inheritedFrom: info.inheritedFrom,

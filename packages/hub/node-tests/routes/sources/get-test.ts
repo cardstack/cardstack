@@ -126,7 +126,6 @@ if (process.env.COMPILER) {
       expect(compiledMeta?.attributes.componentInfos.isolated).to.have.all.keys([
         'usedFields',
         'componentModule',
-        'metaModule',
         'inlineHBS',
         'inheritedFrom',
       ]);

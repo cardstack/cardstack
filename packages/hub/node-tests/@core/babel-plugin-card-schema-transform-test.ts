@@ -163,6 +163,19 @@ if (process.env.COMPILER) {
       `);
     });
 
+    it('can compile serializerMap into schema module', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import * as DateSerializer from "@cardstack/compiled/https-cardstack.com-base-date/serializer.js";
+      `);
+      expect(source).to.containsSource(`
+        export const serializerMap = {
+          "aboutMe.birthdate": DateSerializer
+        };
+      `);
+    });
+
     it('can compile a serialize method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
@@ -174,8 +187,11 @@ if (process.env.COMPILER) {
         export const serializeMember = "serialize0";
       `);
       expect(source).to.containsSource(`
-        serialize0(action, format, serializerMap, data) {
+        serialize0(action, format, data) {
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          if (action === 'deserialize' && data === undefined) {
+            return getProperties(this, fields);
+          }
           return serializeAttributes(getProperties(data ?? this, fields), serializerMap, action, fields);
         }
       `);

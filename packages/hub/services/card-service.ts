@@ -4,13 +4,13 @@ import {
   Unsaved,
   RawCard,
   Format,
-  CardModel,
   CardService as CardServiceInterface,
   ResourceObject,
   Saved,
-  CardComponentMetaModule,
   CardSchemaModule,
+  CardModel,
 } from '@cardstack/core/src/interfaces';
+import CardModelImpl from '@cardstack/core/src/card-model';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
@@ -31,7 +31,6 @@ import {
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
 import merge from 'lodash/merge';
-import CardModelForHub from '../lib/card-model-for-hub';
 import { service } from '@cardstack/hub/services';
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { fieldsAsList, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
@@ -195,10 +194,8 @@ export class CardService implements CardServiceInterface {
     allFields = false
   ): Promise<CardModel> {
     let { realm } = this.realmManager.parseCardURL(result.url);
-    let componentMetaModule = result.componentInfos[format].metaModule.global;
-    let componentMeta: CardComponentMetaModule = await this.loadModule(componentMetaModule);
     let schemaModule: CardSchemaModule = await this.loadModule(result.schemaModule);
-    return new CardModelForHub(
+    return new CardModelImpl(
       this,
       {
         type: 'loaded',
@@ -211,7 +208,6 @@ export class CardService implements CardServiceInterface {
         schemaModuleRef: result.schemaModule,
         schemaModule,
         rawData: result.data ?? {},
-        componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,
         saveModel: this.saveModel.bind(this),
       }

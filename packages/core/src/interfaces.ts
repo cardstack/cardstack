@@ -150,7 +150,6 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   componentModule: Ref;
-  metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
   // optional optimization when this card can be inlined into cards that use it
@@ -192,7 +191,6 @@ export interface CardModelArgs {
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];
-  componentMeta?: CardComponentMetaModule;
   saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
 }
 
@@ -212,18 +210,15 @@ export interface CardSchemaModule {
   default: {
     new (fieldGetter: (fieldPath: string) => any): unknown;
   };
+  serializerMap: SerializerMap;
   usedFields: UsedFields;
   allFields: string[];
   serializeMember: string;
 }
 
-export interface CardComponentMetaModule {
-  serializerMap: SerializerMap;
-}
-
 export type CardComponentModule = {
   default: unknown;
-} & CardComponentMetaModule;
+};
 
 export interface RealmConfig {
   url: string;

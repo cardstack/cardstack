@@ -102,21 +102,6 @@ if (process.env.COMPILER) {
         compiled = card.compiled;
       });
 
-      it('generates a modules with meta information', async function () {
-        let { compiled: dateCompiled } = await cards.load('https://cardstack.com/base/date');
-        let { embedded } = compiled.componentInfos;
-        let metaModuleSource = getFileCache().getModule(embedded.metaModule.global, 'browser');
-
-        expect(metaModuleSource).to.containsSource(`
-          import * as DateSerializer from "${dateCompiled.serializerModule?.global}";
-        `);
-        expect(metaModuleSource).to.containsSource(`
-          export const serializerMap = {
-            "birthdate": DateSerializer
-          };
-        `);
-      });
-
       it('defines the component modules within the card itself', async function () {
         // Because this card defines it's own schema
         let {

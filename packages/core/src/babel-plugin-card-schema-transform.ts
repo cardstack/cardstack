@@ -4,12 +4,13 @@ import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
 import { error, unusedClassMember } from './utils/babel';
 import { FieldMeta, FileMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-file-analyze';
-import { CompiledCard, ComponentInfo, ModuleRef } from './interfaces';
+import { CompiledCard, ComponentInfo, Field, ModuleRef } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
 import { BASE_CARD_URL } from './compiler';
 import { keys } from './utils';
 import { fieldsAsList } from './utils/fields';
+import { capitalize } from 'lodash';
 
 interface State {
   importUtil: ImportUtil;
@@ -36,6 +37,7 @@ export default function main(babel: typeof Babel) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
+          addSerializerMap(path, state, babel);
           addMemberSymbols(path, state, babel);
           addUsedFieldsExport(path, state, babel);
           addAllFieldsExport(path, state, babel);
@@ -148,6 +150,19 @@ export default function main(babel: typeof Babel) {
   };
 }
 
+export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
+  let paths = path.split('.');
+  let [first, ...tail] = paths;
+
+  let field = fields[first];
+
+  if (paths.length > 1) {
+    return getFieldForPath(field.card.fields, tail.join('.'));
+  }
+
+  return field;
+}
+
 function handleClassProperty(path: NodePath<t.ClassProperty>, state: State, babel: typeof Babel) {
   let t = babel.types;
   forEachValidFieldDecorator(path, t, (p) => {
@@ -254,7 +269,7 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
     t.classMethod(
       'method',
       t.identifier(state.serializeMember),
-      ['action', 'format', 'serializerMap', 'data'].map((name) => t.identifier(name)),
+      ['action', 'format', 'data'].map((name) => t.identifier(name)),
       t.blockStatement(
         // in the case of deserialization, the data is already deserialized via
         // the schema instance's getters (due to this.getRawField), so we skip
@@ -281,6 +296,26 @@ function addMemberSymbols(path: NodePath<t.Program>, state: State, babel: typeof
       export const serializeMember = %%serializeMember%%;
     `)({
       serializeMember: t.stringLiteral(state.serializeMember),
+    }) as t.Statement
+  );
+}
+
+function addSerializerMap(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let map: SerializerModuleMap = {};
+  for (const fieldPath of fieldsAsList(state.opts.fields)) {
+    let field = getFieldForPath(state.opts.fields, fieldPath);
+    if (!field) {
+      continue;
+    }
+    addFieldToSerializerMap(map, field, fieldPath, path, state);
+  }
+
+  // TODO remove the export after the schema instance is capable of internally
+  // doing deserialization as part of field getters
+  path.node.body.push(
+    babel.template(`export const serializerMap = %%serializerMap%%;`)({
+      serializerMap: t.objectExpression(buildSerializerMapProp(map, t)),
     }) as t.Statement
   );
 }
@@ -426,6 +461,53 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, 
       false
     )
   );
+}
+
+type SerializerModuleMap = Record<string, t.Identifier>;
+
+function buildSerializerMapProp(
+  serializerMap: SerializerModuleMap,
+  t: typeof Babel.types
+): t.ObjectExpression['properties'] {
+  let props: t.ObjectExpression['properties'] = [];
+
+  for (let fieldPath in serializerMap) {
+    let modulePath = serializerMap[fieldPath];
+    if (!modulePath) {
+      continue;
+    }
+
+    props.push(t.objectProperty(t.stringLiteral(fieldPath), modulePath));
+  }
+
+  return props;
+}
+
+function addFieldToSerializerMap(
+  map: SerializerModuleMap,
+  field: Field,
+  usedPath: string,
+  path: NodePath<t.Program>,
+  state: State
+): void {
+  if (Object.keys(field.card.fields).length) {
+    let { fields } = field.card;
+    for (const name in fields) {
+      addFieldToSerializerMap(map, fields[name], `${usedPath}.${name}`, path, state);
+    }
+  } else {
+    if (!field.card.serializerModule) {
+      return;
+    }
+    // TEMP: Would be nice to have the Proper CardID on the compiled card
+    let cardId = field.card.url.split('/')[field.card.url.split('/').length - 1];
+    map[usedPath] = state.importUtil.import(
+      path,
+      field.card.serializerModule.global,
+      '*',
+      `${capitalize(cardId)}Serializer`
+    );
+  }
 }
 
 function asClassName(name: string): string {

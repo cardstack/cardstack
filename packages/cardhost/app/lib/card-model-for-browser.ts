@@ -5,7 +5,6 @@ import {
   CardModel,
   CardService,
   CardModelArgs,
-  SerializerMap,
   CardComponentModule,
 } from '@cardstack/core/src/interfaces';
 import BaseCardModel, {
@@ -87,15 +86,6 @@ const CardModelForBrowser: CardModelConstructor = class CardModelForBrowser exte
       );
     }
     return this.wrapperComponent;
-  }
-
-  protected get serializerMap(): SerializerMap {
-    if (!this._componentModule) {
-      throw new Error(
-        `ComponentModule has not yet been loaded for card model ${this.url}`
-      );
-    }
-    return this._componentModule.serializerMap;
   }
 
   private async componentModule() {
