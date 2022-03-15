@@ -1,5 +1,15 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
-import { CardId, CardModel, CompiledCard, Format, ModuleRef, RawCard, Unsaved } from '@cardstack/core/src/interfaces';
+import {
+  CardId,
+  CardModel,
+  CardSchemaModule,
+  CompiledCard,
+  Format,
+  ModuleRef,
+  RawCard,
+  Unsaved,
+} from '@cardstack/core/src/interfaces';
+import CardModelImpl from '@cardstack/core/src/card-model';
 import { RawCardDeserializer, RawCardSerializer } from '@cardstack/core/src/serializers';
 import { cardURL } from '@cardstack/core/src/utils';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
@@ -20,7 +30,6 @@ import { service } from '@cardstack/hub/services';
 
 import { transformToCommonJS } from '../utils/transforms';
 import flatMap from 'lodash/flatMap';
-import CardModelForHub from '../lib/card-model-for-hub';
 import { INSECURE_CONTEXT } from './card-service';
 
 const log = logger('hub/search-index');
@@ -274,11 +283,10 @@ class IndexerRun implements IndexerHandle {
     );
     let format: Format = 'isolated';
 
-    let componentMetaModule = definedCard.componentInfos[format].metaModule.global;
-    let componentMeta = await this.fileCache.loadModule(componentMetaModule);
+    let schemaModule: CardSchemaModule = await this.fileCache.loadModule(definedCard.schemaModule.global);
     let cardService = await this.cardService.as(INSECURE_CONTEXT);
 
-    let cardModel = new CardModelForHub(
+    let cardModel = new CardModelImpl(
       cardService,
       {
         type: 'loaded',
@@ -289,9 +297,9 @@ class IndexerRun implements IndexerHandle {
         format,
         realm: rawCard.realm,
         rawData: rawCard.data ?? {},
-        schemaModule: definedCard.schemaModule.global,
+        schemaModuleRef: definedCard.schemaModule.global,
+        schemaModule,
         componentModuleRef: definedCard.componentInfos[format].componentModule.global,
-        componentMeta,
         saveModel: cardService.saveModel.bind(cardService),
       }
     );

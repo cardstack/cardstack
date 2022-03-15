@@ -3,6 +3,7 @@ import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
 import { cardURL, keys } from './utils';
 import { Query } from './query';
+import type CardModel from './card-model';
 
 export { Query } from './query';
 
@@ -13,6 +14,7 @@ const componentFormats = {
 };
 export type Format = keyof typeof componentFormats;
 export const FORMATS = keys(componentFormats);
+export type { CardModel };
 
 export function isFormat(s: any): s is Format {
   return s && s in componentFormats;
@@ -149,7 +151,6 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   componentModule: Ref;
-  metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
   // optional optimization when this card can be inlined into cards that use it
@@ -184,30 +185,13 @@ export interface Builder {
   getCompiledCard(url: string): Promise<CompiledCard>;
 }
 
-export interface CardModel {
-  setters: Setter | undefined;
-  adoptIntoRealm(realm: string, id?: string): CardModel;
-  editable(): Promise<CardModel>;
-  url: string;
-  id: string | undefined;
-  realm: string;
-  data: Record<string, any>;
-  getField(name: string): Promise<any>;
-  format: Format;
-  setData(data: RawCardData): void;
-  serialize(): ResourceObject<Saved | Unsaved>;
-  component(): Promise<unknown>;
-  save(): Promise<void>;
-  parentCardURL: string;
-}
-
 export interface CardModelArgs {
   realm: string;
-  schemaModule: string;
+  schemaModuleRef: string;
+  schemaModule: CardSchemaModule;
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];
-  componentMeta?: CardComponentMetaModule;
   saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
 }
 
@@ -221,22 +205,21 @@ export interface CardService {
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
+type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
+
 export interface CardSchemaModule {
   default: {
     new (fieldGetter: (fieldPath: string) => any): unknown;
   };
-}
-
-export interface CardComponentMetaModule {
   serializerMap: SerializerMap;
-  computedFields: string[];
-  usedFields: string[];
+  usedFields: UsedFields;
   allFields: string[];
+  serializeMember: string;
 }
 
-export type CardComponentModule = {
+export interface CardComponentModule {
   default: unknown;
-} & CardComponentMetaModule;
+}
 
 export interface RealmConfig {
   url: string;

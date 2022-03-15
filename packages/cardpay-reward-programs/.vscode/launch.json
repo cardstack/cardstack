@@ -1,0 +1,32 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Reward Program",
+      "type": "python",
+      "request": "launch",
+      "module": "cardpay_reward_programs.main",
+      "args": [
+        "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "1",
+        "--output-location",
+        "s3://tall-data-dev/local_test"
+      ]
+    },
+    {
+      "name": "Explore using Streamlit",
+      "type": "python",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "${workspaceFolder}/streamlit/explore.py",
+        "--server.port",
+        "8501"
+      ]
+    }
+  ]
+}

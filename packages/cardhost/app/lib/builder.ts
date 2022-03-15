@@ -105,7 +105,8 @@ export default class LocalRealm implements Builder {
         format,
         realm: this.realmURL,
         rawData: raw.data ?? {},
-        schemaModule: compiled.schemaModule.global,
+        schemaModuleRef: compiled.schemaModule.global,
+        schemaModule: await this.cards.loadModule(compiled.schemaModule.global),
         componentModuleRef:
           compiled.componentInfos[format].componentModule.global,
         saveModel: this.saveModel,
@@ -121,7 +122,7 @@ export default class LocalRealm implements Builder {
   ): Promise<CardModel> {
     let routeCard = await this.getCompiledCard(routeCardURL);
     let routeCardClass = (
-      await this.cards.loadModule<any>(routeCard.schemaModule.global)
+      await this.cards.loadModule(routeCard.schemaModule.global)
     ).default;
     let routableCardURL = new routeCardClass().routeTo(pathname);
     if (!routableCardURL) {

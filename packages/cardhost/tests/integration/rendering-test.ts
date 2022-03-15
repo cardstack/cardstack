@@ -1,9 +1,10 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { setupCardTest } from '../helpers/setup';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import fillIn from '@ember/test-helpers/dom/fill-in';
 import find from '@ember/test-helpers/dom/find';
 import waitUntil from '@ember/test-helpers/wait-until';
+import { DEMO_REALM } from 'cardhost/lib/builder';
 
 module('Integration | Card Rendering', function (hooks) {
   let { createCard, renderCard, localRealmURL } = setupCardTest(hooks);
@@ -179,5 +180,16 @@ module('Integration | Card Rendering', function (hooks) {
     assert
       .dom('[data-test-field=loudFoodPref]')
       .containsText('Kirito likes pizza!');
+  });
+
+  skip('A computed field might access an unloaded field', async function (assert) {
+    await renderCard({ realm: DEMO_REALM, id: 'test-computed' }, 'edit');
+    await fillIn('[data-test-field-name="maritalStatus"]', 'married');
+    await waitUntil(() =>
+      find('[data-test-field="salutation"]')!.textContent?.includes('and')
+    );
+    assert
+      .dom('[data-test-field="salutation"]')
+      .containsText('Hello Bob and Alice');
   });
 });

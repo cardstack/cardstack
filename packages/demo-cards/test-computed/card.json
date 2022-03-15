@@ -1,0 +1,9 @@
+{
+  "schema": "schema.js",
+  "edit": "edit.js",
+  "data": {
+    "firstName": "Bob",
+    "maritalStatus": "single",
+    "partnerName": "Alice"
+  }
+}

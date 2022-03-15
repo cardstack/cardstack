@@ -1,0 +1,21 @@
+{
+  "core": {
+    "payment_cycle_length": 32768,
+    "start_block": 24000000,
+    "end_block": 26000000
+  },
+  "run": {
+    "reward_program_id": "0x0000000000000000000000000000000000000000",
+    "payment_cycle": 24032768
+  },
+  "user_defined": {
+    "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+    "base_reward": 5,
+    "transaction_factor": 2,
+    "spend_factor": 2,
+    "duration": 43200,
+    "subgraph_config_location": {
+      "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
+    }
+  }
+}

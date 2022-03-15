@@ -30,7 +30,6 @@ import {
 import { WORKFLOW_VERSION as WITHDRAWAL_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
 import { WORKFLOW_VERSION as MERCHANT_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
 import { WORKFLOW_VERSION as PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
-import { WORKFLOW_VERSION as CARD_SPACE_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-space/create-space-workflow';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import BN from 'bn.js';
 
@@ -193,58 +192,6 @@ module('Acceptance | persistence view and restore', function () {
           },
         }),
       });
-
-      workflowPersistenceService.persistData('persisted-card-space-creation', {
-        name: 'CARD_SPACE_CREATION',
-        state: buildState({
-          meta: {
-            version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT'],
-            completedMilestonesCount: 1,
-            milestonesCount: 4,
-            updatedAt: Date.UTC(2021, 8, 22, 20, 50, 18, 491).toString(),
-          },
-        }),
-      });
-
-      workflowPersistenceService.persistData(
-        'persisted-completed-card-space-creation',
-        {
-          name: 'CARD_SPACE_CREATION',
-          state: buildState({
-            meta: {
-              version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
-              completedCardNames: [
-                'LAYER2_CONNECT',
-                'CARD_SPACE_DISPLAY_NAME',
-                'CARD_SPACE_DETAILS',
-                'CARD_SPACE_CONFIRM',
-              ],
-              completedMilestonesCount: 4,
-              milestonesCount: 4,
-              updatedAt: Date.UTC(2021, 9, 22, 20, 50, 18, 491).toString(),
-            },
-          }),
-        }
-      );
-
-      workflowPersistenceService.persistData(
-        'persisted-canceled-card-space-creation',
-        {
-          name: 'CARD_SPACE_CREATION',
-          state: buildState({
-            meta: {
-              version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
-              completedCardNames: ['LAYER2_CONNECT'],
-              completedMilestonesCount: 1,
-              milestonesCount: 4,
-              updatedAt: Date.UTC(2021, 7, 22, 20, 50, 18, 491).toString(),
-              isCanceled: true,
-              cancelationReason: 'RESTORATION_UNAUTHENTICATED',
-            },
-          }),
-        }
-      );
 
       await visit('/card-pay/');
       assert.dom('[data-test-workflow-tracker-count]').containsText('2');
@@ -488,19 +435,6 @@ module('Acceptance | persistence view and restore', function () {
             }),
           });
         }
-
-        window.TEST__MOCK_LOCAL_STORAGE_INIT[
-          constructStorageKey(`persisted-card-space-wf`)
-        ] = JSON.stringify({
-          name: `CARD_SPACE_CREATION`,
-          state: buildState({
-            meta: {
-              completedCardNames: ['LAYER2_CONNECT'],
-              completedMilestonesCount: 1,
-              milestonesCount: 4,
-            },
-          }),
-        });
 
         window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
       });
