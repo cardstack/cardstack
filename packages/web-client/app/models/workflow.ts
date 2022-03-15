@@ -47,9 +47,7 @@ export type CardPayWorkflowName =
   | 'WITHDRAWAL'
   | 'MERCHANT_CREATION';
 
-export type CardSpaceWorkflowName = 'CARD_SPACE_CREATION';
-
-export type WorkflowName = CardPayWorkflowName | CardSpaceWorkflowName;
+export type WorkflowName = CardPayWorkflowName;
 export abstract class Workflow {
   name!: WorkflowName;
   abstract version: number;
@@ -276,11 +274,6 @@ export const CARD_PAY_WORKFLOW_NAMES = {
   WITHDRAWAL: 'Withdrawal',
 };
 
-export const CARD_SPACE_WORKFLOW_NAMES = {
-  CARD_SPACE_CREATION: 'Card Space Creation',
-};
-
 export const WORKFLOW_NAMES = {
   ...CARD_PAY_WORKFLOW_NAMES,
-  ...CARD_SPACE_WORKFLOW_NAMES,
 };
