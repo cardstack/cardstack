@@ -3,6 +3,21 @@ const FastBootAppServer = require('fastboot-app-server');
 const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
+function healthCheckMiddleware(req, res, next) {
+  let isHealthCheck = req.get('host').includes('merchie1');
+  if (isHealthCheck) {
+    console.log(
+      'intercepting request because it is a health check, host:',
+      req.get('host'),
+      ', user-agent:',
+      res.get('user-agent')
+    );
+    res.status(200).send('fastboot server is up and running');
+  } else {
+    next();
+  }
+}
+
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
   environment: process.env.SSR_WEB_ENVIRONMENT,
@@ -26,6 +41,7 @@ let server = new FastBootAppServer({
   chunkedResponse: false, // Optional - Opt-in to chunked transfer encoding, transferring the head, body and potential shoeboxes in separate chunks. Chunked transfer encoding should have a positive effect in particular when the app transfers a lot of data in the shoebox.
 
   beforeMiddleware: function (app) {
+    app.use(healthCheckMiddleware);
     app.use(Sentry.Handlers.requestHandler());
   },
 
