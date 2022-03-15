@@ -14,7 +14,7 @@
   color: var(--card-space-text-color);
   padding: min(var(--boxel-sp-xl), 5vw);
   border-radius: 2rem;
-  min-height: 90vh;
+  min-height: max(90vh, 40rem);
   max-width: 90%;
   aspect-ratio: 1;
   display: grid;
