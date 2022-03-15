@@ -216,9 +216,9 @@ export interface CardSchemaModule {
   serializeMember: string;
 }
 
-export type CardComponentModule = {
+export interface CardComponentModule {
   default: unknown;
-};
+}
 
 export interface RealmConfig {
   url: string;
