@@ -43,7 +43,7 @@ class WeightedUsage(Rule):
         """
 
     def df_to_payment_list(
-        self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+        self, df, payment_cycle, reward_program_id
     ):
         if df.empty:
             return default_payment_list
