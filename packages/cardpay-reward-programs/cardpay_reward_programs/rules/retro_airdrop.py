@@ -28,7 +28,7 @@ class RetroAirdrop(Rule):
         self.total_reward = total_reward
         self.start_snapshot_block = start_snapshot_block
         self.end_snapshot_block = end_snapshot_block
-        self.excluded_accounts = excluded_accounts
+        self.excluded_accounts = set(account.lower() for account in excluded_accounts)
 
     def sql(self, table_query):
         return f"""
@@ -51,8 +51,8 @@ class RetroAirdrop(Rule):
     def df_to_payment_list(
         self, df, payment_cycle, reward_program_id
     ):
-        mask = df['payee'].isin(self.excluded_accounts)
-        new_df = df[~mask]
+        mask = df['payee'].str.lower().isin(self.excluded_accounts)
+        new_df = df[~mask].copy()
         reward_per_transaction = self.total_reward / new_df["transactions"].sum()
         new_df["rewardProgramID"] = reward_program_id
         new_df["paymentCycle"] = payment_cycle
