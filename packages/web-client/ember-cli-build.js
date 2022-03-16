@@ -60,6 +60,12 @@ module.exports = function (defaults) {
   return require('@embroider/compat').compatBuild(app, Webpack, {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
+      // FIXME refine?
+      publicAssetURL:
+        process.env.DEPLOY_TARGET === 's3-preview'
+          ? process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT + '/'
+          : undefined,
+
       webpackConfig: {
         devtool: 'source-map',
         resolve: {
