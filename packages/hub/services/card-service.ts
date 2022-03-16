@@ -109,7 +109,7 @@ export class CardService implements CardServiceInterface {
   async create(raw: RawCard<Unsaved>): Promise<Card> {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
-    let allFields = fieldsAsList(compiledCard.fields);
+    let allFields = fieldsAsList(compiledCard.fields).map(([f]) => f);
     let { id, realm, adoptsFrom } = raw;
     let rawCard = await this.realmManager.create(
       // TODO remove the makeEmptyCardData() after we have internalized serialization within the schema instance
