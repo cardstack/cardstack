@@ -141,12 +141,14 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   schemaModule: Ref;
   serializerModule?: Ref;
 
-  componentInfos: Record<Format, ComponentInfo<Ref>>;
+  componentInfos: ComponentInfos<Ref>;
 
   modules: CardModules;
 
   deps: string[];
 }
+
+export type ComponentInfos<Ref extends ModuleRef = ModuleRef> = Record<Format, ComponentInfo<Ref>>;
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   componentModule: Ref;
@@ -157,6 +159,14 @@ export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
 
   // the URL of the card that originally defined this component, if it's not ourself
   inheritedFrom?: string;
+}
+
+export function assertAllComponentInfos(
+  infos: Partial<CompiledCard<Unsaved, ModuleRef>['componentInfos']>
+): asserts infos is CompiledCard<Unsaved, ModuleRef>['componentInfos'] {
+  if (FORMATS.some((f) => !infos[f])) {
+    throw new CardstackError(`bug: we're missing a component info`);
+  }
 }
 
 export interface Card {

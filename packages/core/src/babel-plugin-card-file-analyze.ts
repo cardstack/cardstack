@@ -59,6 +59,8 @@ export interface FileMeta {
   component:
     | {
         usageMeta: TemplateUsageMeta;
+        hasModifiedScope: boolean;
+        rawHBS: string;
       }
     | undefined;
 }
@@ -158,6 +160,7 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
 
       CallExpression: {
         enter(path: NodePath<t.CallExpression>, state: State) {
+          // TODO: Change this to setComponentTemplate analyze, so we can consider the component class
           if (isComponentTemplateExpression(path, state)) {
             analyzePrecompileTemplate(state.opts, path, t);
           }
@@ -348,7 +351,7 @@ function extractDecoratorArguments(
   return result;
 }
 
-function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: State): boolean {
+export function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: State): boolean {
   return (
     // Is this call expression inside of this files default export
     state.insideExportDefault &&
@@ -357,7 +360,7 @@ function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: 
 }
 
 function analyzePrecompileTemplate(key: State['opts'], path: NodePath<t.CallExpression>, t: typeof Babel.types) {
-  let rawTemplate = getAndValidateTemplate(path, t);
+  let { template: rawTemplate, precompileTemplateOptions } = getAndValidateTemplate(path, t);
   let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
 
   glimmerTemplateAnalyze(rawTemplate, {
@@ -365,11 +368,18 @@ function analyzePrecompileTemplate(key: State['opts'], path: NodePath<t.CallExpr
   });
 
   let meta = getMeta(key);
-  meta.component = { usageMeta };
+  meta.component = {
+    usageMeta,
+    hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
+    rawHBS: rawTemplate,
+  };
   metas.set(key, meta);
 }
 
-function getAndValidateTemplate(path: NodePath<t.CallExpression>, t: typeof Babel.types): string {
+export function getAndValidateTemplate(
+  path: NodePath<t.CallExpression>,
+  t: typeof Babel.types
+): { template: string; precompileTemplateOptions: NodePath<t.ObjectExpression> } {
   let args = path.get('arguments');
   if (args.length < 2) {
     throw error(path, 'precompileTemplate needs two arguments');
@@ -402,5 +412,5 @@ function getAndValidateTemplate(path: NodePath<t.CallExpression>, t: typeof Babe
     throw error(options as NodePath<any>, 'Card Template precompileOptions requires strictMode to be true');
   }
 
-  return templateString;
+  return { template: templateString, precompileTemplateOptions: options };
 }

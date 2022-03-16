@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 
@@ -11,11 +10,11 @@ import { ImportUtil } from 'babel-import-util';
 
 import { CompiledCard, ComponentInfo, Format } from './interfaces';
 
-import { getObjectKey, error } from './utils/babel';
+import { getObjectKey } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+import { getAndValidateTemplate, isComponentTemplateExpression } from './babel-plugin-card-file-analyze';
 
 export interface CardComponentPluginOptions {
   debugPath: string;
@@ -85,73 +84,15 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
 }
 
 function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {
-  if (shouldSkipExpression(path, state)) {
+  if (!isComponentTemplateExpression(path, state)) {
     return;
   }
 
-  let { options, template: inputTemplate } = handleArguments(path, t);
-
+  let { precompileTemplateOptions, template: inputTemplate } = getAndValidateTemplate(path, t);
   let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
-  if (shouldInlineHBS(options, neededScope, t)) {
-    state.opts.inlineHBS = template;
-  }
-
-  updateScope(options, neededScope, t);
-}
-
-function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): boolean {
-  return (
-    !state.insideExportDefault ||
-    !path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
-  );
-}
-
-function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>, t: typeof Babel.types) {
-  // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
-  return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
-}
-
-function handleArguments(
-  path: NodePath<t.CallExpression>,
-  t: typeof Babel.types
-): {
-  options: NodePath<t.ObjectExpression>;
-  template: string;
-} {
-  let args = path.get('arguments');
-  if (args.length < 2) {
-    throw error(path, 'precompileTemplate needs two arguments');
-  }
-  let template = args[0];
-  let templateString: string;
-  if (template.isStringLiteral()) {
-    templateString = template.node.value;
-  } else if (template.isTemplateLiteral()) {
-    if (template.node.quasis.length > 1) {
-      throw error(template, 'must not contain expressions');
-    }
-    let str = template.node.quasis[0].value.cooked;
-    if (!str) {
-      throw error(template, 'bug: no cooked value');
-    }
-    templateString = str;
-  } else {
-    throw error(template, 'must be a sting literal or template literal');
-  }
-
-  let options = args[1];
-  if (!options.isObjectExpression()) {
-    throw error(options, 'must be an object expression');
-  }
-
-  let strictMode = getObjectKey(options, 'strictMode', t);
-
-  if (!strictMode?.isBooleanLiteral() || !strictMode.node.value) {
-    throw error(options as NodePath<any>, 'Card Template precompileOptions requires strictMode to be true');
-  }
-  return { options, template: templateString };
+  updateScope(precompileTemplateOptions, neededScope, t);
 }
 
 function transformTemplate(
@@ -168,17 +109,12 @@ function transformTemplate(
     return name;
   }
 
-  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
-
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
-    usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
     debugPath: opts.debugPath,
     importAndChooseName,
   });
-
-  opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
 
   return { template, neededScope };
 }

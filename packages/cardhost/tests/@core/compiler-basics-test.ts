@@ -12,9 +12,8 @@ import type {
   CompiledCard,
   Builder,
 } from '@cardstack/core/src/interfaces';
-import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { LOCAL_REALM } from 'cardhost/lib/builder';
-import { cardURL } from '@cardstack/core/src/utils';
+import { BASE_CARD_URL, cardURL } from '@cardstack/core/src/utils';
 
 import type Cards from 'cardhost/services/cards';
 

@@ -4,7 +4,6 @@ import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
-import partition from 'lodash/partition';
 import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
@@ -13,11 +12,12 @@ import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
 import {
+  assertAllComponentInfos,
   Builder,
-  CardId,
   CardModules,
   CompiledCard,
   ComponentInfo,
+  ComponentInfos,
   Format,
   FORMATS,
   GlobalRef,
@@ -27,15 +27,11 @@ import {
   Saved,
   Unsaved,
 } from './interfaces';
-import { cardURL, getCardAncestor, resolveCard, resolveModule } from './utils';
+import { BASE_CARD_URL, getCardAncestor, isBaseCard, resolveCard, resolveModule } from './utils';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
-
-const BASE_CARD_ID: CardId = {
-  realm: 'https://cardstack.com/base/',
-  id: 'base',
-};
-export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
+import { defaultFormatForEmbeddedComponents, getComponentFormatsForPath, getInlineHBS } from './utils/component';
+import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 
 interface JSSourceModule {
   type: 'js';
@@ -44,7 +40,8 @@ interface JSSourceModule {
   ast: t.File;
   localPath: string;
   resolutionBase: string | undefined;
-  inheritedFrom: string | undefined;
+  componentAncestor: string | undefined;
+  componentFormat: Format[] | undefined;
 }
 
 interface AssetModule {
@@ -59,9 +56,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
 
-  // TODO: refactor this away
-  private componentInfos: Partial<CompiledCard<Unsaved, ModuleRef>['componentInfos']> = {};
-
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
     this.cardSource = params.cardSource;
@@ -75,12 +69,13 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let inputModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(inputModules);
-    let { modules, recompiledComponents, reusedComponents } = await this.inheritComponents(parentCard);
+
+    let { modules, reusedComponents } = await this.inheritComponents(parentCard);
     Object.assign(inputModules, modules);
     let fields = await this.lookupFieldsForCard(inputModules, parentCard);
     this.assertData(fields);
-    let outputModules = await this.transformFiles(inputModules, recompiledComponents, fields, parentCard);
-    let componentInfos = this.buildComponentInfos(reusedComponents);
+    let componentInfos = this.buildComponentInfos(inputModules, fields, reusedComponents);
+    let outputModules = await this.transformFiles(inputModules, fields, parentCard, componentInfos);
 
     return {
       realm: cardSource.realm,
@@ -104,88 +99,26 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
   }
 
-  private async inheritComponents(parentCard: CompiledCard | undefined) {
-    let { cardSource } = this;
-    let recompiledComponents: Partial<Record<Format, string>> = {};
-    let reusedComponents: Partial<CompiledCard['componentInfos']> = {};
-    let modules: InputModules = {};
-
-    for (let format of FORMATS) {
-      if (!cardSource[format]) {
-        if (!parentCard) {
-          throw new CardstackError(`bug: base card has no ${format} component`);
-        }
-
-        // recompile parent component because we extend the schema
-        if (cardSource.schema) {
-          // stick it into input modules so it will be recompiled
-          let mod = await this.inheritParentComponent(parentCard, format);
-          let name = uniqueName(cardSource.files, mod.localPath);
-          modules[name] = mod;
-          recompiledComponents[format] = name;
-        } else {
-          // directly reuse existing parent component because we didn't extend
-          // anything
-          let componentInfo = parentCard.componentInfos[format];
-          if (!componentInfo.inheritedFrom) {
-            componentInfo = {
-              ...componentInfo,
-              inheritedFrom: parentCard.url,
-            };
-          }
-          reusedComponents[format] = componentInfo;
-        }
-      }
-    }
-    return { modules, recompiledComponents, reusedComponents };
-  }
-
-  buildComponentInfos(reusedComponents: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<GlobalRef>>>) {
-    let { componentInfos } = this;
-    Object.assign(componentInfos, reusedComponents);
-    assertAllComponentInfos(componentInfos);
-
-    return componentInfos;
-  }
-
   private async transformFiles(
     inputModules: InputModules,
-    recompiledComponents: Record<string, string>,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard | undefined
+    parentCard: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ) {
-    let { cardSource } = this;
-    let [schemaModules, nonSchemaModules] = partition(
-      Object.entries(inputModules),
-      ([localPath]) => localPath === cardSource.schema
-    );
-
-    let outputModules = Object.assign(
+    return Object.assign(
       {},
-      ...nonSchemaModules.map(([localPath, mod]) =>
-        this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
+      ...Object.entries(inputModules).map(([localPath, mod]) =>
+        this.transformFile(localPath, mod, fields, parentCard, componentInfos)
       )
     );
-
-    // handle the schema module last so that we have all the knowledge of the
-    // components' used fields before processing the schema module.
-    return {
-      ...outputModules,
-      ...Object.assign(
-        {},
-        ...schemaModules.map(([localPath, mod]) =>
-          this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
-        )
-      ),
-    };
   }
 
   private transformFile(
     localPath: string,
-    recompiledComponents: Record<string, string>,
     mod: JSSourceModule | AssetModule,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard | undefined
+    parentCard: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let { cardSource } = this;
     if (mod.type === 'asset') {
@@ -199,7 +132,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
     if (localPath === cardSource.schema) {
       return {
-        [localPath]: this.prepareSchema(mod, fields, parentCard),
+        [localPath]: this.prepareSchema(mod, fields, parentCard, componentInfos),
       };
     }
 
@@ -209,13 +142,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       };
     }
 
-    let formats = this.isComponentFile(localPath, recompiledComponents);
-    if (formats) {
+    if (mod.componentFormat) {
       let formatsMod: CardModules[] = [];
       // The same component file can be used for multiple views
-      for (const format of formats) {
-        let { componentInfo, modules } = this.compileComponent(mod, fields, format);
-        this.componentInfos[format] = componentInfo;
+      for (const format of mod.componentFormat) {
+        let modules = this.compileComponent(mod, fields, format);
         formatsMod.push(modules);
       }
       return Object.assign({}, ...formatsMod);
@@ -228,16 +159,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         ast: mod.ast,
       },
     };
-  }
-
-  private isComponentFile(localPath: string, recompiledComponents: Record<string, string>): Format[] | undefined {
-    let formats: Format[] = [];
-    for (let format of FORMATS) {
-      if (localPath === this.cardSource[format] || localPath === recompiledComponents[format]) {
-        formats.push(format);
-      }
-    }
-    return formats.length ? formats : undefined;
   }
 
   private analyzeFiles() {
@@ -268,7 +189,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         meta,
         localPath,
         resolutionBase: undefined,
-        inheritedFrom: undefined,
+        // TODO: Should we be adding this info to meta.component to keep
+        componentAncestor: undefined,
+        componentFormat: getComponentFormatsForPath(this.cardSource, localPath),
       };
     }
   }
@@ -363,11 +286,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private prepareSchema(
     schemaModule: JSSourceModule,
     fields: CompiledCard['fields'],
-    parent: CompiledCard | undefined
+    parent: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ) {
     let { source, ast, meta } = schemaModule;
     let out: BabelFileResult;
-    let opts: Options = { meta, fields, parent, componentInfos: this.componentInfos };
+    let opts: Options = { meta, fields, parent, componentInfos };
     try {
       out = transformFromAstSync(ast, source, {
         ast: true,
@@ -430,6 +354,67 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return Object.assign({}, parentCard.fields, fields);
   }
 
+  private async inheritComponents(parentCard: CompiledCard | undefined) {
+    let { cardSource } = this;
+    let reusedComponents: Partial<ComponentInfos<GlobalRef>> = {};
+    let modules: InputModules = {};
+
+    for (let format of FORMATS) {
+      if (!cardSource[format]) {
+        if (!parentCard) {
+          throw new CardstackError(`bug: base card has no ${format} component`);
+        }
+
+        // recompile parent component because we extend the schema
+        if (cardSource.schema) {
+          // stick it into input modules so it will be recompiled
+          let mod = await this.inheritParentComponent(parentCard, format);
+          let name = uniqueFileName(cardSource.files, mod.localPath);
+          modules[name] = mod;
+        } else {
+          // directly reuse existing parent component because we didn't extend
+          // anything
+          let componentInfo = parentCard.componentInfos[format];
+          if (!componentInfo.inheritedFrom) {
+            componentInfo = {
+              ...componentInfo,
+              inheritedFrom: parentCard.url,
+            };
+          }
+          reusedComponents[format] = componentInfo;
+        }
+      }
+    }
+    return { modules, reusedComponents };
+  }
+
+  buildComponentInfos(
+    inputModules: InputModules,
+    fields: CompiledCard['fields'],
+    reusedComponents: Partial<ComponentInfos<GlobalRef>>
+  ): ComponentInfos {
+    let componentInfos: Partial<CompiledCard<Unsaved, LocalRef>['componentInfos']> = {};
+    for (const localPath in inputModules) {
+      let mod = inputModules[localPath];
+      if (mod.type === 'asset' || !mod.componentFormat || !mod.meta.component) {
+        continue;
+      }
+      for (const format of mod.componentFormat) {
+        let usedFields = buildUsedFieldsListFromUsageMeta(fields, format, mod.meta.component.usageMeta);
+        componentInfos[format] = {
+          componentModule: { local: mod.localPath },
+          usedFields,
+          inlineHBS: getInlineHBS(mod.meta.component, usedFields),
+          inheritedFrom: mod.componentAncestor ?? undefined,
+        };
+      }
+    }
+
+    Object.assign(componentInfos, reusedComponents);
+    assertAllComponentInfos(componentInfos);
+    return componentInfos;
+  }
+
   private async inheritParentComponent(parentCard: CompiledCard<string, GlobalRef>, which: Format) {
     let inheritedFrom = parentCard.componentInfos[which].inheritedFrom ?? parentCard.url;
     let originalRawCard = await this.builder.getRawCard(inheritedFrom);
@@ -445,7 +430,9 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     }
     let componentOwner = getCardAncestor(parentCard, inheritedFrom);
     mod.resolutionBase = componentOwner.componentInfos[which].componentModule.global;
-    mod.inheritedFrom = inheritedFrom;
+    mod.componentAncestor = inheritedFrom;
+    mod.componentFormat = [which];
+
     return mod;
   }
 
@@ -453,14 +440,14 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     mod: JSSourceModule,
     fields: CompiledCard['fields'],
     format: Format
-  ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
+  ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let debugPath = `${this.cardSource.realm}${this.cardSource.id ?? 'NEW_CARD'}/${mod.localPath}`;
 
     let options: CardComponentPluginOptions = {
       debugPath,
       fields,
       inlineHBS: undefined,
-      defaultFieldFormat: defaultFieldFormat(format),
+      defaultFieldFormat: defaultFormatForEmbeddedComponents(format),
       usedFields: [],
     };
 
@@ -473,23 +460,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
     let componentTransformResult = transformCardComponent(mod.source, options);
 
-    let componentInfo: ComponentInfo<LocalRef> = {
-      componentModule: { local: mod.localPath },
-      usedFields: options.usedFields,
-      inlineHBS: options.inlineHBS,
-    };
-    if (mod.inheritedFrom) {
-      componentInfo.inheritedFrom = mod.inheritedFrom;
-    }
-
     return {
-      componentInfo,
-      modules: {
-        [mod.localPath]: {
-          type: JS_TYPE,
-          source: componentTransformResult.source,
-          ast: componentTransformResult.ast,
-        },
+      [mod.localPath]: {
+        type: JS_TYPE,
+        source: componentTransformResult.source,
+        ast: componentTransformResult.ast,
       },
     };
   }
@@ -548,21 +523,6 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         { status: 422 }
       );
     }
-  }
-}
-
-function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
-  return cardSource.id === BASE_CARD_ID.id && cardSource.realm === BASE_CARD_ID.realm;
-}
-
-// we expect this to expand when we add edit format
-function defaultFieldFormat(format: Format): Format {
-  switch (format) {
-    case 'isolated':
-    case 'embedded':
-      return 'embedded';
-    case 'edit':
-      return 'edit';
   }
 }
 
@@ -650,7 +610,7 @@ class TrackedBuilder implements Builder {
   }
 }
 
-function uniqueName(files: RawCard['files'], desiredName: string) {
+function uniqueFileName(files: RawCard['files'], desiredName: string) {
   if (!files?.[desiredName]) {
     return desiredName;
   }
@@ -661,14 +621,5 @@ function uniqueName(files: RawCard['files'], desiredName: string) {
       return name;
     }
     counter++;
-  }
-}
-
-// TODO this will go away when we stop passing componentInfos via side effect
-function assertAllComponentInfos(
-  infos: Partial<CompiledCard<Unsaved, ModuleRef>['componentInfos']>
-): asserts infos is CompiledCard<Unsaved, ModuleRef>['componentInfos'] {
-  if (FORMATS.some((f) => !infos[f])) {
-    throw new CardstackError(`bug: we're missing a component info`);
   }
 }

@@ -1,4 +1,4 @@
-import { encodeCardURL } from '@cardstack/core/src/utils';
+import { BASE_CARD_URL, encodeCardURL } from '@cardstack/core/src/utils';
 import { Environment, ENVIRONMENTS } from '../interfaces';
 import {
   writeFileSync,
@@ -21,7 +21,6 @@ declare global {
 
 import logger from '@cardstack/logger';
 import { service } from '@cardstack/hub/services';
-import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 const log = logger('hub/file-cache');
 
 export default class FileCache {

@@ -32,8 +32,8 @@ import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/
 import logger from '@cardstack/logger';
 import merge from 'lodash/merge';
 import { service } from '@cardstack/hub/services';
-import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { fieldsAsList, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
+import { BASE_CARD_URL } from '@cardstack/core/src/utils';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.

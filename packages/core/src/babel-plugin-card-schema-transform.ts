@@ -7,8 +7,7 @@ import { FieldMeta, FileMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card
 import { CompiledCard, ComponentInfo, Field, ModuleRef } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
-import { BASE_CARD_URL } from './compiler';
-import { keys } from './utils';
+import { BASE_CARD_URL, keys } from './utils';
 import { fieldsAsList } from './utils/fields';
 import { capitalize } from 'lodash';
 

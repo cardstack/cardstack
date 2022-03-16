@@ -1,9 +1,8 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 import { TEST_REALM as realm } from '@cardstack/core/tests/helpers/fixtures';
 import { configureHubWithCompiler } from '../helpers/cards';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
-import { cardURL } from '@cardstack/core/src/utils';
+import { BASE_CARD_URL, cardURL } from '@cardstack/core/src/utils';
 
 const PERSON_CARD: RawCard = {
   realm,
@@ -432,6 +431,7 @@ if (process.env.COMPILER) {
       it('date card', async function () {
         let { compiled } = await cards.load('https://cardstack.com/base/date');
         expect(compiled.serializerModule?.global, 'Date card has date serializer').to.be.ok;
+        expect(compiled.componentInfos.embedded.inlineHBS).to.be.undefined;
         let serializer = getFileCache().getModule(compiled.serializerModule?.global!, 'browser');
         expect(serializer).to.containsSource(`export function serialize(d) {`);
       });

@@ -1,7 +1,7 @@
 import flow from 'lodash/flow';
 import upperFirst from 'lodash/upperFirst';
 import camelCase from 'lodash/camelCase';
-import { CardId, CompiledCard, GlobalRef, Saved } from '../interfaces';
+import { CardId, CompiledCard, GlobalRef, RawCard, Saved, Unsaved } from '../interfaces';
 import { CardstackError } from './errors';
 
 const SPECIAL_CHAR_REPLACEMENT = '-';
@@ -45,6 +45,16 @@ export function getCardAncestor(
   }
 
   throw new CardstackError(`Tried to find a card ancestory for ${url}, but could not`);
+}
+
+export const BASE_CARD_ID: CardId = {
+  realm: 'https://cardstack.com/base/',
+  id: 'base',
+};
+export const BASE_CARD_URL = cardURL(BASE_CARD_ID);
+
+export function isBaseCard(cardSource: RawCard<Unsaved>): boolean {
+  return cardSource.id === BASE_CARD_ID.id && cardSource.realm === BASE_CARD_ID.realm;
 }
 
 export function resolveCard(url: string, realm: string): string {

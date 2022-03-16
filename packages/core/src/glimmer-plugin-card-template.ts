@@ -24,14 +24,8 @@ class InvalidFieldsUsageError extends Error {
 
 type ImportAndChooseName = (desiredName: string, moduleSpecifier: string, importedName: string) => string;
 
-export interface TemplateUsageMeta {
-  model: 'self' | Set<string>;
-  fields: Map<string, Format>;
-}
-
 export interface Options {
   fields: CompiledCard['fields'];
-  usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
   debugPath?: string;
   importAndChooseName: ImportAndChooseName;
@@ -98,7 +92,7 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta, defaultFieldFormat } = options;
+    let { fields, importAndChooseName, defaultFieldFormat } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -125,7 +119,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usageMeta.fields.set(fieldFullPath, fieldFormat);
             return rewriteElementNode({
               field,
               importAndChooseName,
@@ -155,7 +148,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (val.expandable && val.field.type === 'containsMany') {
                 return expandContainsManyShorthand(`${FIELDS}.${val.fieldFullPath}`);
               }
-              usageMeta.fields.set(val.fieldFullPath, fieldFormat);
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
@@ -183,7 +175,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (isFieldPathExpression(node)) {
                 throw new InvalidFieldsUsageError();
               }
-              trackUsageForModel(usageMeta, node, state.handledModelExpressions);
 
               return;
             case 'stringLiteral':
@@ -455,30 +446,6 @@ function fieldPathForPathExpression(exp: PathExpression): string | undefined {
     return exp.tail.join('.');
   }
   return undefined;
-}
-
-function trackUsageForModel(
-  usageMeta: TemplateUsageMeta,
-  node: syntax.ASTv1.PathExpression,
-  handledModelExpressions: State['handledModelExpressions']
-) {
-  if (
-    node.original === 'debugger' ||
-    node.head.type !== 'AtHead' ||
-    node.head.name !== MODEL ||
-    handledModelExpressions.has(node)
-  ) {
-    return;
-  }
-
-  let path = node.tail.join('.');
-  if (!path) {
-    usageMeta.model = 'self';
-  } else {
-    if (usageMeta.model !== 'self') {
-      usageMeta.model.add(path);
-    }
-  }
 }
 
 function fieldPathForElementNode(node: ElementNode): string | undefined {
