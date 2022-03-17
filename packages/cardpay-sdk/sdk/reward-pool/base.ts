@@ -63,10 +63,6 @@ export default class RewardPool {
 
   constructor(private layer2Web3: Web3) {}
 
-  async getCurrentPaymentCycle(): Promise<number> {
-    return 2;
-  }
-
   async getBalance(address: string, rewardProgramId?: string, tokenAddress?: string): Promise<BN> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
     return unclaimedProofs.reduce((total, { amount }) => {
