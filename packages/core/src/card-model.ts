@@ -222,7 +222,7 @@ export default class CardModel {
       return;
     }
 
-    for (let field of this.schemaModule.default.fieldList(newSchemaInstance)) {
+    for (let field of this.schemaModule.default.loadedFields(newSchemaInstance)) {
       try {
         await this.getField(field, newSchemaInstance);
       } catch (err: any) {
@@ -245,7 +245,7 @@ export default class CardModel {
   private createSchemaInstance() {
     let format: Format | 'all' = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
     let klass = this.schemaModule.default;
-    return new klass(this.rawData, format) as any;
+    return new klass(this.rawData, format) as any; // we pass the format so the schema instance can calculate what fields are loaded
   }
 
   private makeSetter(segments: string[] = []): Setter {

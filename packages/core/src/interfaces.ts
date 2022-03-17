@@ -208,7 +208,7 @@ export interface CardSchema {
   serializedMemberNames: { [key: string]: string };
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
   hasField(fieldName: string): boolean;
-  fieldList(schemaInstance: any): string[];
+  loadedFields(schemaInstance: any): string[];
 }
 
 export interface CardSchemaModule {

@@ -15,7 +15,7 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   dataIdentifier: string;
-  fieldListIdentifier: string;
+  loadedFieldsIdentifier: string;
   isDeserializedIdentifier: string;
   serializedMemberNames: { [fieldName: string]: string };
   cardName: string;
@@ -88,7 +88,7 @@ export default function main(babel: typeof Babel) {
           state.cardName = path.node.id.name;
           state.dataIdentifier = unusedClassMember(path, 'data', t);
           state.isDeserializedIdentifier = unusedClassMember(path, 'isDeserialized', t);
-          state.fieldListIdentifier = unusedClassMember(path, 'fieldList', t);
+          state.loadedFieldsIdentifier = unusedClassMember(path, 'loadedFields', t);
           let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? BASE_CARD_URL, state);
           // you can't upgrade a primitive card to a composite card--you are
           // either a primitive card or a composite card. so if we adopt from a
@@ -97,7 +97,7 @@ export default function main(babel: typeof Babel) {
             path.get('body').node.body.unshift(
               t.classProperty(t.identifier(state.dataIdentifier), t.objectExpression([])),
               t.classProperty(t.identifier(state.isDeserializedIdentifier), t.objectExpression([])),
-              t.classProperty(t.identifier(state.fieldListIdentifier), t.arrayExpression([])),
+              t.classProperty(t.identifier(state.loadedFieldsIdentifier), t.arrayExpression([])),
               t.classMethod(
                 'constructor',
                 t.identifier('constructor'),
@@ -112,7 +112,7 @@ export default function main(babel: typeof Babel) {
                     : []),
                   ...(babel.template(`
                     let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-                    this.%%fieldList%% = fields;
+                    this.%%loadedFields%% = fields;
                     let data = %%padDataWithNull%%(rawData, fields);
                     for (let [field, value] of Object.entries(data)) {
                       if (!writableFields.includes(field)) {
@@ -131,7 +131,7 @@ export default function main(babel: typeof Babel) {
                       '@cardstack/core/src/utils/fields',
                       'padDataWithNull'
                     ),
-                    fieldList: t.identifier(state.fieldListIdentifier),
+                    loadedFields: t.identifier(state.loadedFieldsIdentifier),
                   }) as t.Statement[]),
                 ])
               )
@@ -149,7 +149,7 @@ export default function main(babel: typeof Babel) {
         },
 
         exit(path: NodePath<t.Class>, state: State) {
-          addFieldListMethod(path, state, babel);
+          addLoadedFieldsMethod(path, state, babel);
           addHasFieldMethod(path, state, babel);
           addSerializeMethod(path, state, babel);
           addSerializedMemberNames(path, state, babel.types);
@@ -634,16 +634,16 @@ function addHasFieldMethod(path: NodePath<t.Class>, _state: State, babel: typeof
   );
 }
 
-function addFieldListMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+function addLoadedFieldsMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
   let t = babel.types;
   path.get('body').node.body.unshift(
     t.classMethod(
       'method',
-      t.identifier('fieldList'),
+      t.identifier('loadedFields'),
       [t.identifier('schemaInstance')],
       t.blockStatement([
-        babel.template(`return [...schemaInstance.%%fieldList%%];`)({
-          fieldList: t.identifier(state.fieldListIdentifier),
+        babel.template(`return [...schemaInstance.%%loadedFields%%];`)({
+          loadedFields: t.identifier(state.loadedFieldsIdentifier),
         }) as t.Statement,
       ]),
       false,

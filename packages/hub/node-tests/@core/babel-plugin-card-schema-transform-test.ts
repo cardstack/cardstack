@@ -203,12 +203,12 @@ if (process.env.COMPILER) {
       `);
     });
 
-    it('can compile a fieldList method into the schema class', async function () {
+    it('can compile a loadedFields method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static fieldList(schemaInstance) {
-          return [...schemaInstance.fieldList];
+        static loadedFields(schemaInstance) {
+          return [...schemaInstance.loadedFields];
         }
       `);
     });
@@ -243,11 +243,11 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         data = {};
         isDeserialized = {};
-        fieldList = [];
+        loadedFields = [];
 
         constructor(rawData, format, isDeserialized = false) {
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          this.fieldList = fields;
+          this.loadedFields = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {
             if (!writableFields.includes(field)) {
@@ -397,12 +397,12 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         data = {};
         isDeserialized = {};
-        fieldList = [];
+        loadedFields = [];
 
         constructor(rawData, format, isDeserialized = false) {
           super(rawData, format, isDeserialized);
           let fields = format === 'all' ? allFields : usedFields[format] ?? [];
-          this.fieldList = fields;
+          this.loadedFields = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {
             if (!writableFields.includes(field)) {
