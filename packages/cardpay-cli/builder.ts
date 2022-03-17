@@ -35,17 +35,15 @@ export function buildYargs(args: string[]) {
         return 'Wallet is not specified. Either specify that wallet connect should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var';
       }
 
-      if(argv.trezor){
-        argv.mnemonic = undefined
-        argv.walletConnect = undefined
+      if (argv.trezor) {
+        argv.mnemonic = undefined;
+        argv.walletConnect = undefined;
       }
       if (argv.walletConnect && !argv.trezor) {
         argv.mnemonic = undefined;
-        argv.trezor = undefined 
+        argv.trezor = undefined;
       }
       return true;
     })
     .demandOption(['network'], `'network' must be specified.`);
 }
-
-

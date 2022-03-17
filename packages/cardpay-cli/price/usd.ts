@@ -47,7 +47,13 @@ async function ethToUsdPrice(network: string, ethAmount: string, mnemonic?: stri
   console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 }
 
-async function usdPrice(network: string, token: string, amount: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+async function usdPrice(
+  network: string,
+  token: string,
+  amount: string,
+  mnemonic?: string,
+  trezor?: boolean
+): Promise<void> {
   let web3 = await getWeb3(network, mnemonic, trezor);
   let amountInWei = toWei(amount);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);

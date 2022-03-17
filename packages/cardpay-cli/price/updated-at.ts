@@ -38,7 +38,12 @@ export async function layer1PriceOracleUpdatedAt(network: string, mnemonic?: str
   console.log(`The ETH / USD rate was last updated at ${date.toString()}`);
 }
 
-export async function layer2PriceOracleUpdatedAt(network: string, token: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+export async function layer2PriceOracleUpdatedAt(
+  network: string,
+  token: string,
+  mnemonic?: string,
+  trezor?: boolean
+): Promise<void> {
   let web3 = await getWeb3(network, mnemonic, trezor);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
   let date = await layerTwoOracle.getUpdatedAt(token);

@@ -67,7 +67,8 @@ export default {
     let body = await response.json();
     if (!response.ok) {
       console.log(
-        `Could not provision prepaid card for customer ${recipient}, sku ${sku}, received ${response.status
+        `Could not provision prepaid card for customer ${recipient}, sku ${sku}, received ${
+          response.status
         } from relay server: ${JSON.stringify(body)}`
       );
       return;
