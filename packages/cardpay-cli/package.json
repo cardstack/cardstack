@@ -39,6 +39,7 @@
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "parity-hdwallet-provider": "^1.3.0-fork.2",
+    "trezor-cli-wallet-provider": "^1.0.6",
     "ts-node": "^10.3.0",
     "web3": "1.5.2",
     "web3-core": "1.5.2",
