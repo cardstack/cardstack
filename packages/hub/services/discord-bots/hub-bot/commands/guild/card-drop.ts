@@ -1,7 +1,7 @@
 import { Command } from '@cardstack/discord-bot/bot';
 import config from 'config';
 import { sendDM, createDM } from '@cardstack/discord-bot/utils/dm';
-import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
+import { getCardDropRecipient, setCardDropRecipient } from '../../utils/card-drop';
 
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
@@ -24,8 +24,8 @@ export const run: Command['run'] = async (bot: Client, message: Message) => {
   let dm = await createDM(message);
 
   let db = await bot.getDatabaseClient();
-  let betaTester = await getBetaTester(db, member.id);
-  if (betaTester?.airdropTxnHash) {
+  let cardDropRecipient = await getCardDropRecipient(db, member.id);
+  if (cardDropRecipient?.airdropTxnHash) {
     await sendDM(
       message,
       member,
@@ -58,7 +58,7 @@ export const run: Command['run'] = async (bot: Client, message: Message) => {
 
   Sentry.addBreadcrumb({ message: `sku quantity for sku ${sku} is ${quantity}` });
 
-  await setBetaTester(db, member.id, member.user.username);
+  await setCardDropRecipient(db, member.id, member.user.username);
   await bot.discordBotsDbGateway.activateDMConversation(dm.id, member.id, 'airdrop-prepaidcard:start');
   await sendDM(
     message,
