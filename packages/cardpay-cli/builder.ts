@@ -20,20 +20,32 @@ export function buildYargs(args: string[]) {
         type: 'boolean',
         description: 'A flag to indicate that wallet connect should be used for the wallet',
       },
+      trezor: {
+        alias: 't',
+        type: 'boolean',
+        description: 'A flag to indicate that trezor should be used for the wallet',
+      },
     })
     .check((argv) => {
       if (process.env.BUILDING_README) {
         return true;
       }
 
-      if (!argv.mnemonic && !argv.walletConnect) {
+      if (!argv.trezor && !argv.mnemonic && !argv.walletConnect) {
         return 'Wallet is not specified. Either specify that wallet connect should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var';
       }
-      // is this the right way to do this?
-      if (argv.walletConnect) {
+
+      if(argv.trezor){
+        argv.mnemonic = undefined
+        argv.walletConnect = undefined
+      }
+      if (argv.walletConnect && !argv.trezor) {
         argv.mnemonic = undefined;
+        argv.trezor = undefined 
       }
       return true;
     })
     .demandOption(['network'], `'network' must be specified.`);
 }
+
+
