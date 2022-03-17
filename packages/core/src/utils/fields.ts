@@ -113,20 +113,17 @@ export function makeEmptyCardData(allFields: string[]): RawCardData {
 }
 
 export function getProperties(object: Record<string, any>, properties: string[]) {
-  let data = {};
-  for (let field of properties) {
-    let value = get(object, field);
-    if (value !== undefined) {
-      set(data, field, value);
-    }
-  }
-  return data;
+  return _getProperties(object, properties, get);
 }
 
 export function getSerializedProperties(object: Record<string, any>, properties: string[]) {
+  return _getProperties(object, properties, serializedGet);
+}
+
+function _getProperties(object: Record<string, any>, properties: string[], getter: (obj: any, key: string) => any) {
   let data = {};
   for (let field of properties) {
-    let value = serializedGet(object, field);
+    let value = getter(object, field);
     if (value !== undefined) {
       set(data, field, value);
     }
@@ -162,27 +159,28 @@ export function serializerFor(schemaInstance: any, field: string) {
 // because it is missing (and we are about to set it). lodash set will
 // inadvertently trigger our NotReady errors
 export function keySensitiveSet(obj: Record<string, any>, path: string, value: any) {
-  let segments = path.split('.');
-  let current: any = obj;
-  let segment: string;
-  let completed: string[] = [];
-  while (current && (segment = segments.shift()!)) {
-    if (segments.length === 0) {
-      current[segment] = value;
-    }
-    current = current?.[segment];
-    completed.push(segment);
-  }
+  visitObjectLeaves(obj, path, (context, key) => (context[key] = value));
 }
 
 function serializedGet(obj: Record<string, any>, path: string) {
+  return visitObjectLeaves(obj, path, (context, key) => serializerFor(context, key));
+}
+
+function visitObjectLeaves(
+  obj: Record<string, any>,
+  path: string,
+  visitor: (context: Record<string, any>, key: string) => string | undefined
+): any {
   let segments = path.split('.');
   let current: any = obj;
   let segment: string;
   let completed: string[] = [];
   while ((segment = segments.shift()!)) {
     if (segments.length === 0) {
-      segment = serializerFor(current, segment);
+      let result = visitor(current, segment);
+      if (typeof result === 'string') {
+        segment = result;
+      }
     }
     current = current?.[segment];
     completed.push(segment);

@@ -146,14 +146,12 @@ export default class CardModel {
     } else if (this.state.id != null) {
       url = cardURL({ realm: this.realm, id: this.state.id });
     }
-
     let format = this.state.type === 'created' || this.state.allFields ? 'all' : (this.format as Format | 'all');
     let resource: ResourceObject<Saved | Unsaved> = {
       id: url,
       type: 'card',
       attributes: this.schemaModule.default.serialize(this._schemaInstance, format),
     };
-
     if (this.state.type === 'loaded') {
       resource.meta = merge(
         { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
@@ -246,7 +244,6 @@ export default class CardModel {
         return;
       }
     }
-
     this._schemaInstance = newSchemaInstance;
     done!();
   }
@@ -272,8 +269,6 @@ export default class CardModel {
       if (!lastSegment) {
         return;
       }
-
-      // let data = this.schemaModule.default.deserialize(this._schemaInstance);
       let newSchemaInstance = this.createSchemaInstance();
       let cursor: any = newSchemaInstance;
       for (let segment of innerSegments) {
@@ -299,26 +294,8 @@ export default class CardModel {
         },
       }
     );
-
     return s;
   }
-}
-
-// access a potentially-deep property path, stopping if a key is missing along
-// the way
-export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
-  let segments = path.split('.');
-  let current: any = obj;
-  let segment: string | undefined;
-  let completed: string[] = [];
-  while ((segment = segments.shift())) {
-    if (!(segment in current)) {
-      return { missing: [...completed, segment].join('.') };
-    }
-    current = current?.[segment];
-    completed.push(segment);
-  }
-  return { value: current };
 }
 
 function assertNever(value: never) {
