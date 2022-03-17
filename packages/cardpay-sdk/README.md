@@ -879,7 +879,7 @@ interface RewardProgramInfo {
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+await rewardManagerAPI.getRewardProgramsInfo()
 ```
 
 ## `LayerOneOracle`
