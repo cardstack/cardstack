@@ -1,7 +1,7 @@
 import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
-import { keys } from './utils';
+import { cardURL, keys } from './utils';
 import { Query } from './query';
 import type CardModel from './card-model';
 
@@ -76,27 +76,28 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (typeof obj.realm !== 'string') {
     throw new CardstackError('A card requires a realm');
   }
+  let url = obj.url ?? cardURL(obj);
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
       let filePath = obj[featureFile];
       if (typeof filePath !== 'string') {
-        throw new CardstackError(`card.json for ${obj.url} has an invalid value for "${featureFile}"`);
+        throw new CardstackError(`card.json for ${url} has an invalid value for "${featureFile}"`);
       }
       filePath = filePath.replace(/^\.\//, '');
       if (!obj.files?.[filePath]) {
-        throw new CardstackError(`card.json for ${obj.url} refers to non-existent module ${obj[featureFile]}`);
+        throw new CardstackError(`card.json for ${url} refers to non-existent module ${obj[featureFile]}`);
       }
     }
   }
   if ('adoptsFrom' in obj) {
     if (typeof obj.adoptsFrom !== 'string') {
-      throw new CardstackError(`invalid adoptsFrom property in ${obj.url}`);
+      throw new CardstackError(`invalid adoptsFrom property in ${url}`);
     }
   }
 
   if ('data' in obj) {
     if (typeof obj.data !== 'object' || obj.data == null) {
-      throw new CardstackError(`invalid data property in ${obj.url}`);
+      throw new CardstackError(`invalid data property in ${url}`);
     }
   }
 }

@@ -116,6 +116,46 @@ if (process.env.COMPILER) {
       expect(example.data.title).to.eq('Hello World');
     });
 
+    it(`gives good error for missing module during reindexing`, async function () {
+      outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
+        realm: realmURL,
+        schema: 'schema.js',
+        data: { title: 'Clippy' },
+      });
+      outputFileSync(
+        join(getRealmDir(), 'clip', 'schema.js'),
+        `
+        import { contains } from '@cardstack/types';
+        import string from 'https://cardstack.com/base/string';
+        export default class Clip {
+          @contains(string) title;
+        }
+      `
+      );
+
+      let si = await getContainer().lookup('searchIndex', { type: 'service' });
+      await si.indexAllRealms();
+
+      let card = await cards.loadModel(`${realmURL}clip`, 'isolated');
+      expect(await card.getField('title')).to.equal('Clippy');
+
+      outputJSONSync(join(getRealmDir(), 'clip', 'card.json'), {
+        realm: realmURL,
+        schema: 'schema.js',
+        edit: 'edit.js',
+      });
+
+      await si.notify(`${realmURL}clip`, 'save');
+      await si.flushNotifications();
+
+      try {
+        await cards.loadModel(`${realmURL}clip`, 'isolated');
+        throw new Error('failed to throw expected exception');
+      } catch (err: any) {
+        expect(err.message).to.eq(`card.json for ${realmURL}clip refers to non-existent module edit.js`);
+      }
+    });
+
     it(`can invalidate a card via creation of non-existent grandparent card`, async function () {
       outputJSONSync(join(getRealmDir(), 'example', 'card.json'), {
         adoptsFrom: '../post',
