@@ -45,14 +45,13 @@ export default class RelayService {
         owner: toChecksumAddress(userAddress),
       }),
     });
-    let body = await response.json();
     if (!response.ok) {
+      let body = await response.text();
       throw new Error(
-        `Could not provision prepaid card for customer ${userAddress}, sku ${sku}, received ${
-          response.status
-        } from relay server: ${JSON.stringify(body)}`
+        `Could not provision prepaid card for customer ${userAddress}, sku ${sku}, received ${response.status} from relay server: ${body}`
       );
     }
+    let body = await response.json();
     return body.txHash;
   }
 }
