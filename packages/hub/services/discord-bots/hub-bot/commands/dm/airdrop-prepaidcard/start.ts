@@ -5,6 +5,7 @@ import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
 import {
+  existsCardDropRecipientWithTransactionHash,
   getCardDropRecipient,
   setCardDropRecipient,
   setCardDropRecipientAddress,
@@ -71,6 +72,13 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
     await setCardDropRecipient(db, userId, message.author.username);
     Sentry.addBreadcrumb({ message: `captured user address for prepaid card airdrop ${address} of sku ${sku}` });
     await setCardDropRecipientAddress(db, userId, address);
+    let addressAlreadyUsed = await existsCardDropRecipientWithTransactionHash(db, address);
+    if (addressAlreadyUsed) {
+      await message.reply(
+        `Sorry, it appears that we have previously dropped a prepaid card to your wallet (address ${address}). There is a limit of one card per address.`
+      );
+      return;
+    }
     if (!(await checkInventory(message, bot))) {
       return;
     }

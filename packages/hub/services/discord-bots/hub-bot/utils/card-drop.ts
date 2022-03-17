@@ -53,3 +53,9 @@ export async function setCardDropRecipientAirdropPrepaidCard(
   let query = `UPDATE card_drop_recipients SET airdrop_prepaid_card = $2 WHERE user_id = $1`;
   await db.query(query, [userId, prepaidCard]);
 }
+
+export async function existsCardDropRecipientWithTransactionHash(db: DBClient, address: string): Promise<boolean> {
+  let query = `SELECT * FROM card_drop_recipients WHERE airdrop_txn_hash IS NOT NULL AND address = $1`;
+  let { rows } = await db.query(query, [address]);
+  return rows.length > 0;
+}
