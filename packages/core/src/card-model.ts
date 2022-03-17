@@ -259,8 +259,7 @@ export default class CardModel {
       if (!lastSegment) {
         return;
       }
-      let newSchemaInstance = this.createSchemaInstance();
-      let cursor: any = newSchemaInstance;
+      let cursor = this.rawData;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
         if (!nextCursor) {
@@ -270,7 +269,7 @@ export default class CardModel {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this.recompute(newSchemaInstance);
+      this.recompute();
     };
     (s as any).setters = new Proxy(
       {},
