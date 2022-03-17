@@ -47,6 +47,8 @@ module.exports = function (defaults) {
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
 
+  app.import('node_modules/broadcastchannel-polyfill/index.js');
+
   const { Webpack } = require('@embroider/webpack');
 
   let appComponentsStylesTree = concat(path.join(__dirname, 'app/components'), {

@@ -156,6 +156,7 @@
   "dependencies": {
     "@walletconnect/core": "^1.7.5",
     "@walletconnect/iso-crypto": "^1.7.5",
+    "broadcastchannel-polyfill": "^1.0.1",
     "ember-elsewhere": "^1.2.1",
     "node-fetch": "^2.6.7",
     "short-uuid": "^4.2.0",
