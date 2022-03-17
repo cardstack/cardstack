@@ -49,20 +49,20 @@ module('Acceptance | visit card space', function (hooks) {
 
   module('render', function (hooks) {
     let link: string;
-    let deepLink: string;
     hooks.beforeEach(function (this: MirageTestContext) {
       let cardSpace = this.server.create('card-space', {
         slug: 'slug',
       });
 
-      cardSpace.createMerchantInfo({ name: 'merchant name', slug: 'slug' });
+      cardSpace.createMerchantInfo({
+        name: 'merchant name',
+        slug: 'slug',
+        color: 'blue',
+        textColor: 'hotpink',
+      });
 
       link = generateMerchantPaymentUrl({
         domain: config.universalLinkDomain,
-        merchantSafeID: '0x1234',
-        network: config.chains.layer2,
-      });
-      deepLink = generateMerchantPaymentUrl({
         merchantSafeID: '0x1234',
         network: config.chains.layer2,
       });
@@ -132,7 +132,7 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert
         .dom('[data-test-payment-link-deep-link]')
-        .hasAttribute('href', deepLink);
+        .hasAttribute('href', link);
 
       await percySnapshot(assert);
     });
@@ -158,7 +158,7 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert
         .dom('[data-test-payment-link-deep-link]')
-        .hasAttribute('href', deepLink);
+        .hasAttribute('href', link);
 
       await percySnapshot(assert);
     });

@@ -33,7 +33,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
       this.args.workflowSession.getValue<string>('withdrawalSafe');
     this.selectedSafe = withdrawalSafeAddress
       ? this.layer2Network.safes.getByAddress(withdrawalSafeAddress)
-      : this.layer2Network.depotSafe;
+      : this.layer2Network.depotSafe ?? this.compatibleSafes[0];
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.withdrawalToken)
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
@@ -83,7 +83,6 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get isDisabled() {
     return (
-      !this.depotAddress ||
       !this.tokens.length ||
       !this.selectedToken?.balance ||
       this.selectedToken?.balance.isZero()

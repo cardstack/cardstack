@@ -22,25 +22,6 @@ interface CheckMerchantSlugUniquenessTaskParams {
 export default class MerchantInfoService extends Service {
   @service declare hubAuthentication: HubAuthentication;
 
-  @task
-  *fetchMerchantInfosAvailableForCardSpace(): TaskGenerator<MerchantInfo[]> {
-    let response = yield fetch(
-      `${config.hubURL}/api/merchant-infos?availableForCardSpace=true`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer ' + this.hubAuthentication.authToken,
-          Accept: 'application/vnd.api+json',
-          'Content-Type': 'application/vnd.api+json',
-        },
-      }
-    );
-
-    let merchantInfosData = yield response.json();
-
-    return merchantInfosData.data.map((m: any) => ({ did: m.attributes.did }));
-  }
-
   @task *persistMerchantInfoTask(
     params: PersistMerchantInfoTaskParams
   ): TaskGenerator<MerchantInfo> {

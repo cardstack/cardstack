@@ -86,13 +86,4 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
       network: config.chains.layer2,
     });
   }
-
-  get deepLinkPaymentURL() {
-    if (!this.address) return null;
-
-    return generateMerchantPaymentUrl({
-      merchantSafeID: this.address as string,
-      network: config.chains.layer2,
-    });
-  }
 }
