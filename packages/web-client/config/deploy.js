@@ -122,11 +122,11 @@ module.exports = function (deployTarget) {
       region: process.env.S3_PREVIEW_REGION,
       prefix: process.env.PR_BRANCH_NAME,
       filePattern:
-        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac}',
+        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
     };
     ENV.manifest = {
       filePattern:
-        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac}',
+        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
     };
     ENV['s3-index'] = {
       accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
