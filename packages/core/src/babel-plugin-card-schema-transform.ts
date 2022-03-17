@@ -10,7 +10,6 @@ import upperFirst from 'lodash/upperFirst';
 import capitalize from 'lodash/capitalize';
 import { BASE_CARD_URL } from './compiler';
 import { keys } from './utils';
-import { fieldsAsList } from './utils/fields';
 
 interface State {
   importUtil: ImportUtil;
@@ -37,6 +36,10 @@ export default function main(babel: typeof Babel) {
         enter(path: NodePath<t.Program>, state: State) {
           state.serializedMemberNames = {};
           state.importUtil = new ImportUtil(babel.types, path);
+        },
+        exit(path: NodePath<t.Program>, state: State) {
+          addAllFields(path, state, babel);
+          addWritableFields(path, state, babel);
         },
       },
 
@@ -94,14 +97,20 @@ export default function main(babel: typeof Babel) {
               t.classMethod(
                 'constructor',
                 t.identifier('constructor'),
-                [t.identifier('rawData'), t.assignmentPattern(t.identifier('isDeserialized'), t.booleanLiteral(false))],
+                [
+                  t.identifier('rawData'),
+                  t.identifier('format'),
+                  t.assignmentPattern(t.identifier('isDeserialized'), t.booleanLiteral(false)),
+                ],
                 t.blockStatement([
                   ...(state.opts.meta.parent?.cardURL
-                    ? [babel.template.ast(`super(rawData, isDeserialized);`) as t.Statement]
+                    ? [babel.template.ast(`super(rawData, format, isDeserialized);`) as t.Statement]
                     : []),
-                  babel.template(`
-                    for (let [field, value] of Object.entries(rawData)) {
-                      if (!%%cardClass%%.writableFields.includes(field)) {
+                  ...(babel.template(`
+                    let fields = format === 'all' ? allFields : %%cardClass%%.usedFields[format] ?? [];
+                    let data = %%padDataWithNull%%(rawData, fields);
+                    for (let [field, value] of Object.entries(data)) {
+                      if (!writableFields.includes(field)) {
                         continue;
                       }
                       if (isDeserialized) {
@@ -112,8 +121,13 @@ export default function main(babel: typeof Babel) {
                     }
                   `)({
                     serializerFor: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'serializerFor'),
+                    padDataWithNull: state.importUtil.import(
+                      path,
+                      '@cardstack/core/src/utils/fields',
+                      'padDataWithNull'
+                    ),
                     cardClass: t.identifier(state.cardName),
-                  }) as t.Statement,
+                  }) as t.Statement[]),
                 ])
               )
             );
@@ -130,10 +144,9 @@ export default function main(babel: typeof Babel) {
         },
 
         exit(path: NodePath<t.Class>, state: State) {
+          addHasFieldMethod(path, state, babel);
           addSerializeMethod(path, state, babel);
           addUsedFields(path, state, babel.types);
-          addAllFields(path, state, babel.types);
-          addWritableFields(path, state, babel.types);
           addSerializedMemberNames(path, state, babel.types);
         },
       },
@@ -440,9 +453,7 @@ function makeIdentitySerializerGetter(
     t.identifier(fieldName),
     [],
     t.blockStatement([
-      babel.template(`
-        return %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);
-      `)({
+      babel.template(`return %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);`)({
         data: t.identifier(state.dataIdentifier),
         fieldName: t.stringLiteral(originalFieldName),
         keySensitiveGet: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'keySensitiveGet'),
@@ -519,25 +530,25 @@ function addUsedFields(path: NodePath<t.Class>, state: State, t: typeof Babel.ty
   );
 }
 
-function addAllFields(path: NodePath<t.Class>, state: State, t: typeof Babel.types) {
-  addStaticProperty(
-    path,
-    'allFields',
-    t.arrayExpression(fieldsAsList(state.opts.fields).map(([f]) => t.stringLiteral(f))),
-    t
+function addAllFields(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`const allFields = %%allFields%%;`)({
+      allFields: t.arrayExpression(fieldsAsList(state.opts.fields).map(([f]) => t.stringLiteral(f))),
+    }) as t.Statement
   );
 }
 
-function addWritableFields(path: NodePath<t.Class>, state: State, t: typeof Babel.types) {
-  addStaticProperty(
-    path,
-    'writableFields',
-    t.arrayExpression(
-      Object.entries(state.opts.fields)
-        .filter(([, field]) => !field.computed)
-        .map(([fieldName]) => t.stringLiteral(fieldName))
-    ),
-    t
+function addWritableFields(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`const writableFields = %%writableFields%%;`)({
+      writableFields: t.arrayExpression(
+        Object.entries(state.opts.fields)
+          .filter(([, field]) => !field.computed)
+          .map(([fieldName]) => t.stringLiteral(fieldName))
+      ),
+    }) as t.Statement
   );
 }
 
@@ -564,7 +575,7 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
       ['instance', 'format'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
-          let fields = format === 'all' ? %%cardClass%%.allFields : %%cardClass%%.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : %%cardClass%%.usedFields[format] ?? [];
           return %%getSerializedProperties%%(instance, fields);
         `)({
           cardClass: t.identifier(state.cardName),
@@ -575,6 +586,20 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
           ),
         }) as t.Statement[]
       ),
+      false,
+      true // static
+    )
+  );
+}
+
+function addHasFieldMethod(path: NodePath<t.Class>, _state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.get('body').node.body.unshift(
+    t.classMethod(
+      'method',
+      t.identifier('hasField'),
+      [t.identifier('field')],
+      t.blockStatement([babel.template.ast(`return allFields.includes(field);`) as t.Statement]),
       false,
       true // static
     )
@@ -600,4 +625,16 @@ function asClassName(name: string): string {
     name = name.slice(0, -5);
   }
   return upperFirst(camelCase(`${name}-class`));
+}
+
+function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): [string, Field][] {
+  let fieldList: [string, Field][] = [];
+  for (let [fieldName, field] of Object.entries(fields)) {
+    if (Object.keys(field.card.fields).length === 0) {
+      fieldList.push([[...path, fieldName].join('.'), field]);
+    } else {
+      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
+    }
+  }
+  return fieldList;
 }

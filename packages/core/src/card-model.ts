@@ -15,8 +15,9 @@ import {
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import cloneDeep from 'lodash/cloneDeep';
-import difference from 'lodash/difference';
-import { flattenData, getFieldValue, keySensitiveSet, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
+import isPlainObject from 'lodash/isPlainObject';
+import flatMap from 'lodash/flatMap';
+import { getFieldValue, keySensitiveSet } from '@cardstack/core/src/utils/fields';
 import { BadRequest, CardstackError, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
@@ -60,12 +61,7 @@ export default class CardModel {
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
-
-    if (this.state.type === 'created' || this.state.allFields) {
-      this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
-    } else {
-      this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
-    }
+    this.rawData = rawData;
     this._schemaInstance = this.createSchemaInstance();
   }
 
@@ -187,9 +183,8 @@ export default class CardModel {
 
   async setData(data: RawCardData): Promise<void> {
     let flattened = flattenData(data);
-    let nonExistentFields = difference(
-      flattened.map(([f]) => f),
-      this.allFields
+    let nonExistentFields = flatMap(flattened, ([fieldName]) =>
+      !this.schemaModule.default.hasField(fieldName) ? [fieldName] : []
     );
     if (nonExistentFields.length) {
       throw new BadRequest(
@@ -251,14 +246,10 @@ export default class CardModel {
     return this.schemaModule.default.usedFields?.[this.format] ?? [];
   }
 
-  private get allFields(): string[] {
-    return this.schemaModule.default.allFields ?? [];
-  }
-
   private createSchemaInstance() {
+    let format: Format | 'all' = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
     let klass = this.schemaModule.default;
-    // We can't await the instance creation in a separate, as it's thenable and confuses async methods
-    return new klass(this.rawData) as any;
+    return new klass(this.rawData, format) as any;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -297,6 +288,17 @@ export default class CardModel {
   }
 }
 
+function flattenData(data: Record<string, any>, path: string[] = []): [string, any][] {
+  let result: [string, any][] = [];
+  for (let [field, value] of Object.entries(data)) {
+    if (isPlainObject(value)) {
+      result = [...result, ...flattenData(value, [...path, field])];
+    } else {
+      result.push([[...path, field].join('.'), value]);
+    }
+  }
+  return result;
+}
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
 }

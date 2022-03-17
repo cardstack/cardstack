@@ -206,11 +206,11 @@ export interface CardService {
 type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
 
 export interface CardSchema {
-  new (rawData: Record<string, any>, isDeserialized?: boolean): unknown;
+  new (rawData: Record<string, any>, format: Format | 'all', isDeserialized?: boolean): unknown;
   usedFields: UsedFields;
-  allFields: string[];
   serializedMemberNames: { [key: string]: string };
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
+  hasField(fieldName: string): boolean;
 }
 
 export interface CardSchemaModule {

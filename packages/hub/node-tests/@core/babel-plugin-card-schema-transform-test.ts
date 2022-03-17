@@ -162,7 +162,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static allFields = ["lastName", "aboutMe.birthdate", "aboutMe.background", "fullName", "slowName"];
+        const allFields = ["lastName", "aboutMe.birthdate", "aboutMe.background", "fullName", "slowName"];
       `);
     });
 
@@ -170,7 +170,15 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static writableFields = ["lastName", "aboutMe"];
+        const writableFields = ["lastName", "aboutMe"];
+      `);
+    });
+
+    it(`can include imports from @cardstack/core/src/utils/fields`, async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import { serializerFor, padDataWithNull, keySensitiveGet, getSerializedProperties } from "@cardstack/core/src/utils/fields";
       `);
     });
 
@@ -178,12 +186,19 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import { serializerFor, keySensitiveGet, getSerializedProperties } from "@cardstack/core/src/utils/fields";
-      `);
-      expect(source).to.containsSource(`
         static serialize(instance, format) {
-          let fields = format === 'all' ? Person.allFields : Person.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : Person.usedFields[format] ?? [];
           return getSerializedProperties(instance, fields);
+        }
+      `);
+    });
+
+    it('can compile a hasField method into the schema class', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        static hasField(field) {
+          return allFields.includes(field);
         }
       `);
     });
@@ -219,9 +234,11 @@ if (process.env.COMPILER) {
         data = {};
         isDeserialized = {};
 
-        constructor(rawData, isDeserialized = false) {
-          for (let [field, value] of Object.entries(rawData)) {
-            if (!Bio.writableFields.includes(field)) {
+        constructor(rawData, format, isDeserialized = false) {
+          let fields = format === 'all' ? allFields : Bio.usedFields[format] ?? [];
+          let data = padDataWithNull(rawData, fields);
+          for (let [field, value] of Object.entries(data)) {
+            if (!writableFields.includes(field)) {
               continue;
             }
             if (isDeserialized) {
@@ -366,10 +383,12 @@ if (process.env.COMPILER) {
         data = {};
         isDeserialized = {};
 
-        constructor(rawData, isDeserialized = false) {
-          super(rawData, isDeserialized);
-          for (let [field, value] of Object.entries(rawData)) {
-            if (!ReallyFancyPerson.writableFields.includes(field)) {
+        constructor(rawData, format, isDeserialized = false) {
+          super(rawData, format, isDeserialized);
+          let fields = format === 'all' ? allFields : ReallyFancyPerson.usedFields[format] ?? [];
+          let data = padDataWithNull(rawData, fields);
+          for (let [field, value] of Object.entries(data)) {
+            if (!writableFields.includes(field)) {
               continue;
             }
             if (isDeserialized) {

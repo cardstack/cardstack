@@ -3,7 +3,7 @@ import { CardSchema, CompiledCard, ComponentInfo, Field, Format, RawCardData } f
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
-import isPlainObject from 'lodash/isPlainObject';
+import merge from 'lodash/merge';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -92,19 +92,11 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
   return result;
 }
 
-export function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): [string, Field][] {
-  let fieldList: [string, Field][] = [];
-  for (let [fieldName, field] of Object.entries(fields)) {
-    if (Object.keys(field.card.fields).length === 0) {
-      fieldList.push([[...path, fieldName].join('.'), field]);
-    } else {
-      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
-    }
-  }
-  return fieldList;
+export function padDataWithNull(data: Record<string, any>, fields: string[]) {
+  return merge(makeEmptyDataShape(fields), data);
 }
 
-export function makeEmptyCardData(allFields: string[]): RawCardData {
+function makeEmptyDataShape(allFields: string[]): RawCardData {
   let data: RawCardData = {};
   for (let field of allFields) {
     set(data, field, null);
@@ -113,14 +105,14 @@ export function makeEmptyCardData(allFields: string[]): RawCardData {
 }
 
 export function getProperties(object: Record<string, any>, properties: string[]) {
-  return _getProperties(object, properties, get);
+  return getDataWithShape(object, properties, get);
 }
 
 export function getSerializedProperties(object: Record<string, any>, properties: string[]) {
-  return _getProperties(object, properties, serializedGet);
+  return getDataWithShape(object, properties, serializedGet);
 }
 
-function _getProperties(object: Record<string, any>, properties: string[], getter: (obj: any, key: string) => any) {
+function getDataWithShape(object: Record<string, any>, properties: string[], getter: (obj: any, key: string) => any) {
   let data = {};
   for (let field of properties) {
     let value = getter(object, field);
@@ -131,22 +123,10 @@ function _getProperties(object: Record<string, any>, properties: string[], gette
   return data;
 }
 
-export function flattenData(data: Record<string, any>, path: string[] = []): [string, any][] {
-  let result: [string, any][] = [];
-  for (let [field, value] of Object.entries(data)) {
-    if (isPlainObject(value)) {
-      result = [...result, ...flattenData(value, [...path, field])];
-    } else {
-      result.push([[...path, field].join('.'), value]);
-    }
-  }
-  return result;
-}
-
 export function keySensitiveGet(data: any, key: string) {
   let value = data[key];
   if (value === undefined) {
-    throw new Error(`TODO: field ${key} is missing`);
+    throw new Error(`TODO: ${key}`);
   }
   return value;
 }

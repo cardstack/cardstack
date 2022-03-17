@@ -33,7 +33,6 @@ import logger from '@cardstack/logger';
 import merge from 'lodash/merge';
 import { service } from '@cardstack/hub/services';
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
-import { fieldsAsList, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -109,12 +108,7 @@ export class CardService implements CardServiceInterface {
   async create(raw: RawCard<Unsaved>): Promise<Card> {
     let compiler = this.builder.compileCardFromRaw(raw);
     let compiledCard = await compiler.compile();
-    let allFields = fieldsAsList(compiledCard.fields).map(([f]) => f);
-    let { id, realm, adoptsFrom } = raw;
-    let rawCard = await this.realmManager.create(
-      // TODO remove the makeEmptyCardData() after we have internalized serialization within the schema instance
-      merge({ id, realm, adoptsFrom, data: makeEmptyCardData(allFields) } as RawCard, raw)
-    );
+    let rawCard = await this.realmManager.create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard, compiledCard, compiler);
     return { raw: rawCard, compiled };
   }
