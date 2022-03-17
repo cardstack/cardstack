@@ -17,12 +17,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, sku } = args as unknown as {
+    let { network, mnemonic, sku, trezor } = args as unknown as {
       network: string;
       sku: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
     let assets = await getSDK('Assets', web3);
     let skuInfo = await prepaidCardMarket.getSKUInfo(sku);

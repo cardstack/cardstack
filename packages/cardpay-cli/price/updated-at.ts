@@ -17,28 +17,29 @@ export default {
       });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token } = args as unknown as {
+    let { network, mnemonic, token, trezor } = args as unknown as {
       network: string;
       token: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
     if (token.toUpperCase() === 'ETH') {
-      await layer1PriceOracleUpdatedAt(network, mnemonic);
+      await layer1PriceOracleUpdatedAt(network, mnemonic, trezor);
     } else {
-      await layer2PriceOracleUpdatedAt(network, token, mnemonic);
+      await layer2PriceOracleUpdatedAt(network, token, mnemonic, trezor);
     }
   },
 } as CommandModule;
 
-export async function layer1PriceOracleUpdatedAt(network: string, mnemonic?: string): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
+export async function layer1PriceOracleUpdatedAt(network: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic, trezor);
   let layerOneOracle = await getSDK('LayerOneOracle', web3);
   let date = await layerOneOracle.getEthToUsdUpdatedAt();
   console.log(`The ETH / USD rate was last updated at ${date.toString()}`);
 }
 
-export async function layer2PriceOracleUpdatedAt(network: string, token: string, mnemonic?: string): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
+export async function layer2PriceOracleUpdatedAt(network: string, token: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic, trezor);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
   let date = await layerTwoOracle.getUpdatedAt(token);
   console.log(`The ${token} rate was last updated at ${date.toString()}`);

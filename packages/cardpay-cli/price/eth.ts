@@ -22,13 +22,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token, amount } = args as unknown as {
+    let { network, mnemonic, token, amount, trezor } = args as unknown as {
       network: string;
       token: string;
       amount: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let amountInWei = toWei(amount);
     let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
     let ethWeiPrice = await layerTwoOracle.getETHPrice(token, amountInWei);

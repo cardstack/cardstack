@@ -21,14 +21,15 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, newOwner, from } = args as unknown as {
+    let { network, mnemonic, prepaidCard, newOwner, from, trezor } = args as unknown as {
       network: string;
       prepaidCard: string;
       newOwner: string;
       mnemonic?: string;
       from?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
 
     let prepaidCardAPI = await getSDK('PrepaidCard', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);

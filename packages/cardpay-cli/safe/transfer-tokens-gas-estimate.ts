@@ -29,15 +29,16 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token, safeAddress, recipient, amount } = args as unknown as {
+    let { network, mnemonic, token, safeAddress, recipient, amount, trezor } = args as unknown as {
       network: string;
       mnemonic?: string;
       safeAddress: string;
       token: string;
       recipient: string;
       amount: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let weiAmount = toWei(amount);
 
     let safes = await getSDK('Safes', web3);

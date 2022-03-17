@@ -20,11 +20,12 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, address, safeType } = args as unknown as {
+    let { network, mnemonic, address, safeType, trezor } = args as unknown as {
       network: string;
       mnemonic?: string;
       address?: string;
       safeType?: Exclude<Safe['type'], 'external'>;
+      trezor?: boolean;
     };
     if (!safeType && address && !address.startsWith('0x')) {
       safeType = address as Exclude<Safe['type'], 'external'>;
@@ -34,7 +35,7 @@ export default {
       throw new Error(`Invalid safe type: ${safeType}`);
     }
 
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     address = address || undefined;
 
     let safesApi = await getSDK('Safes', web3);

@@ -31,15 +31,16 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, sku, recipient, environment, provisionerSecret } = args as unknown as {
+    let { network, mnemonic, sku, recipient, environment, provisionerSecret, trezor } = args as unknown as {
       network: string;
       sku: string;
       recipient: string;
       environment: string;
       provisionerSecret: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
     let inventories = await getInventoriesFromAPI(web3, environment);
     let blockExplorer = await getConstant('blockExplorer', web3);
@@ -66,8 +67,7 @@ export default {
     let body = await response.json();
     if (!response.ok) {
       console.log(
-        `Could not provision prepaid card for customer ${recipient}, sku ${sku}, received ${
-          response.status
+        `Could not provision prepaid card for customer ${recipient}, sku ${sku}, received ${response.status
         } from relay server: ${JSON.stringify(body)}`
       );
       return;

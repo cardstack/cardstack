@@ -15,12 +15,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, tokenAddress } = args as unknown as {
+    let { network, mnemonic, tokenAddress, trezor } = args as unknown as {
       network: string;
       tokenAddress: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let prepaidCard = await getSDK('PrepaidCard', web3);
     let weiAmount = await prepaidCard.gasFee(tokenAddress);
     console.log(`The gas fee for a new prepaid card in units of this token is ${fromWei(weiAmount)}`);

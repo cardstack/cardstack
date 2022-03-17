@@ -19,14 +19,15 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, fromBlock, txnHash } = args as unknown as {
+    let { network, mnemonic, fromBlock, txnHash, trezor } = args as unknown as {
       network: string;
-      mnemonic: string;
+      mnemonic?: string;
       fromBlock: string;
       txnHash: string;
+      trezor?: boolean;
     };
 
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
 
     console.log(`Waiting for bridge validation to complete for ${txnHash}...`);

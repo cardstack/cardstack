@@ -19,13 +19,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, admin } = args as unknown as {
+    let { network, mnemonic, prepaidCard, admin, trezor } = args as unknown as {
       network: string;
       prepaidCard: string;
       admin: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let rewardManagerAPI = await getSDK('RewardManager', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
     let { rewardProgramId } = await rewardManagerAPI.registerRewardProgram(prepaidCard, admin, {

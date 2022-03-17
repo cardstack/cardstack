@@ -42,12 +42,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, environment } = args as unknown as {
+    let { network, mnemonic, environment, trezor } = args as unknown as {
       network: string;
       environment: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let query = `
   {
     skuinventories {

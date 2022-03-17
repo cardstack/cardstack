@@ -28,15 +28,16 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, merchantSafe, prepaidCard, spendAmount, from } = args as unknown as {
+    let { network, mnemonic, merchantSafe, prepaidCard, spendAmount, from, trezor } = args as unknown as {
       network: string;
       merchantSafe: string;
       prepaidCard: string;
       spendAmount: number;
       mnemonic?: string;
       from?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let prepaidCardSdk = await getSDK('PrepaidCard', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
 

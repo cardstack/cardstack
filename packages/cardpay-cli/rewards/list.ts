@@ -12,11 +12,12 @@ export default {
     });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic } = args as unknown as {
+    let { network, mnemonic, trezor } = args as unknown as {
       network: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let rewardManagerAPI = await getSDK('RewardManager', web3);
     let rewardProgramInfos = await rewardManagerAPI.getRewardProgramsInfo();
     rewardProgramInfos.map((rewardProgramInfo) => displayRewardProgramInfo(rewardProgramInfo));

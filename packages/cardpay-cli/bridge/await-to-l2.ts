@@ -19,13 +19,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, fromBlock, recipient } = args as unknown as {
+    let { network, mnemonic, fromBlock, recipient, trezor } = args as unknown as {
       network: string;
       mnemonic: string;
       fromBlock: string;
       recipient?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
     recipient = recipient ?? (await web3.eth.getAccounts())[0];
 

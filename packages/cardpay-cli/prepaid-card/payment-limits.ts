@@ -11,11 +11,12 @@ export default {
     });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic } = args as unknown as {
+    let { network, mnemonic, trezor } = args as unknown as {
       network: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let prepaidCard = await getSDK('PrepaidCard', web3);
     let { min, max } = await prepaidCard.getPaymentLimits();
     console.log(`The prepaid card payments limits are:

@@ -27,15 +27,16 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, rewardSafe, recipient, tokenAddress, amount } = args as unknown as {
+    let { network, mnemonic, rewardSafe, recipient, tokenAddress, amount, trezor } = args as unknown as {
       network: string;
       rewardSafe: string;
       recipient: string;
       tokenAddress: string;
       amount: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let rewardManagerAPI = await getSDK('RewardManager', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
     await rewardManagerAPI.withdraw(rewardSafe, recipient, tokenAddress, amount, {

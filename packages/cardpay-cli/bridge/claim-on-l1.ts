@@ -26,15 +26,16 @@ export default {
       });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, messageId, encodedData, signatures } = args as unknown as {
+    let { network, mnemonic, messageId, encodedData, signatures, trezor } = args as unknown as {
       network: string;
-      mnemonic: string;
+      mnemonic?: string;
       messageId: string;
       encodedData: string;
       signatures: string[];
+      trezor?: boolean;
     };
 
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
 

@@ -29,18 +29,19 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, safeAddress, receiver, amount, tokenAddress } = args as unknown as {
+    let { network, mnemonic, safeAddress, receiver, amount, tokenAddress, trezor } = args as unknown as {
       network: string;
-      mnemonic: string;
+      mnemonic?: string;
       safeAddress: string;
       receiver: string;
       amount: string;
       tokenAddress: string;
+      trezor?: boolean;
     };
 
     const amountInWei = toWei(amount);
 
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
     let assets = await getSDK('Assets', web3);
     let { symbol } = await assets.getTokenInfo(tokenAddress);

@@ -24,30 +24,31 @@ export default {
       });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token, amount } = args as unknown as {
+    let { network, mnemonic, token, amount, trezor } = args as unknown as {
       network: string;
       token: string;
       amount: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
     if (token.toUpperCase() === 'ETH') {
-      await ethToUsdPrice(network, amount, mnemonic);
+      await ethToUsdPrice(network, amount, mnemonic, trezor);
     } else {
-      await usdPrice(network, token, amount, mnemonic);
+      await usdPrice(network, token, amount, mnemonic, trezor);
     }
   },
 } as CommandModule;
 
-async function ethToUsdPrice(network: string, ethAmount: string, mnemonic?: string): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
+async function ethToUsdPrice(network: string, ethAmount: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic, trezor);
   let ethAmountInWei = toWei(ethAmount);
   let layerOneOracle = await getSDK('LayerOneOracle', web3);
   let usdPrice = await layerOneOracle.ethToUsd(ethAmountInWei);
   console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 }
 
-async function usdPrice(network: string, token: string, amount: string, mnemonic?: string): Promise<void> {
-  let web3 = await getWeb3(network, mnemonic);
+async function usdPrice(network: string, token: string, amount: string, mnemonic?: string, trezor?: boolean): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic, trezor);
   let amountInWei = toWei(amount);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
   let usdPrice = await layerTwoOracle.getUSDPrice(token, amountInWei);

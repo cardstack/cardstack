@@ -24,14 +24,15 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, merchantSafe, tokenAddress, amount } = args as unknown as {
+    let { network, mnemonic, merchantSafe, tokenAddress, amount, trezor } = args as unknown as {
       network: string;
       merchantSafe: string;
       tokenAddress: string;
       amount: string;
       mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let revenuePool = await getSDK('RevenuePool', web3);
     let assets = await getSDK('Assets', web3);
     let { symbol } = await assets.getTokenInfo(tokenAddress);

@@ -16,12 +16,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, safeAddress } = args as unknown as {
+    let { network, mnemonic, safeAddress, trezor } = args as unknown as {
       network: string;
       mnemonic?: string;
       safeAddress: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
 
     let safesApi = await getSDK('Safes', web3);
     console.log(`Getting safe ${safeAddress}`);

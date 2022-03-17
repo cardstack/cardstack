@@ -15,12 +15,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { hubRootUrl, network, mnemonic } = args as unknown as {
+    let { hubRootUrl, network, mnemonic, trezor } = args as unknown as {
       hubRootUrl: string;
       network: string;
-      mnemonic: string;
+      mnemonic?: string;
+      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, mnemonic, trezor);
     let authToken = await (await getSDK('HubAuth', web3, hubRootUrl)).authenticate();
     console.log(`Authentication token for ${hubRootUrl}: ${authToken}`);
   },
