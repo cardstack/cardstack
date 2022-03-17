@@ -217,7 +217,6 @@ if (process.env.COMPILER) {
       {
         let { compiled } = await cards.load(`${realm}bio`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        // we don't list out members for fields that do not have a serializer module
         expect(source).to.containsSource(`
           static serializedMemberNames = {
             birthdate: "serializedBirthdate0"
@@ -227,7 +226,6 @@ if (process.env.COMPILER) {
       {
         let { compiled } = await cards.load(`${realm}person`);
         let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        // composite fields always have a serializer member
         expect(source).to.containsSource(`
           static serializedMemberNames = {
             aboutMe: "serializedAboutMe"
@@ -238,7 +236,6 @@ if (process.env.COMPILER) {
 
     it('can compile schema class constructor for composite card', async function () {
       let { compiled } = await cards.load(`${realm}bio`);
-      // the browser source has a lot less babel shenanigans
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         data = {};
