@@ -37,10 +37,10 @@ module.exports = function (environment) {
     rootURL: process.env.PR_BRANCH_NAME
       ? `/${process.env.PR_BRANCH_NAME}/`
       : '/',
-    // FIXME duplicated in ember-cli-build.js
+    // FIXME semi-duplicated in ember-cli-build.js, though no trailing / and '' instead of /
     assetRoot:
       process.env.DEPLOY_TARGET === 's3-preview'
-        ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}/`
+        ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}`
         : '',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
