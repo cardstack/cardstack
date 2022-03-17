@@ -547,8 +547,8 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   }
 
   async get_reward_tokens(): Promise<string[]> {
-    let card_token_address = await getAddress('cardCpxd', this.layer2Web3)
-    return [card_token_address]
+    let card_token_address = await getAddress('cardCpxd', this.layer2Web3);
+    return [card_token_address];
   }
 
   async addTokenSymbol<T extends Proof | RewardTokenBalance>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
