@@ -34,7 +34,9 @@ module.exports = function (environment) {
   let ENV = {
     modulePrefix: '@cardstack/web-client',
     environment,
-    rootURL: '/',
+    rootURL: process.env.PR_BRANCH_NAME
+      ? `/${process.env.PR_BRANCH_NAME}/`
+      : '/',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
