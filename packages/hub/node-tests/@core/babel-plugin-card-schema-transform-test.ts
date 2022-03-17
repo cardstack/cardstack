@@ -281,7 +281,7 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         get birthdate() {
           let value = keySensitiveGet(this.data, "birthdate");
-          if (this.isDeserialized["birthdate"]) {
+          if (this.isDeserialized["birthdate"] || value === null) {
             return value;
           }
           return DateSerializer.deserialize(value);
@@ -292,7 +292,7 @@ if (process.env.COMPILER) {
         }
         get serializedBirthdate0() {
           let value = keySensitiveGet(this.data, "birthdate");
-          if (!this.isDeserialized["birthdate"]) {
+          if (!this.isDeserialized["birthdate"] || value === null) {
             return value;
           }
           return DateSerializer.serialize(value);

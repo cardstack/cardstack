@@ -506,7 +506,7 @@ function makeCustomSerializerGetter(
     t.blockStatement(
       babel.template(`
           let value = %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);
-          if (${isDeserialized ? '' : '!'}this.%%isDeserialized%%[%%fieldName%%]) {
+          if (${isDeserialized ? '' : '!'}this.%%isDeserialized%%[%%fieldName%%] || value === null) {
             return value;
           }
           return %%serializerModule%%.${isDeserialized ? 'deserialize' : 'serialize'}(value);
