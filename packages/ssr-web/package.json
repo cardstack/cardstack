@@ -29,6 +29,7 @@
     "@cardstack/boxel": "0.28.26",
     "@cardstack/cardpay-sdk": "0.28.26",
     "@cardstack/did-resolver": "0.28.26",
+    "@cardstack/wc-provider": "0.28.26",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.0",
     "@ember/test-helpers": "^2.4.0",
@@ -71,6 +72,7 @@
     "@types/rsvp": "^4.0.3",
     "@types/sinon": "^9.0.11",
     "@types/ua-parser-js": "^0.7.36",
+    "@walletconnect/types": "^1.7.5",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-concat": "^4.2.4",
@@ -152,11 +154,14 @@
     "extends": "../../package.json"
   },
   "dependencies": {
+    "@walletconnect/core": "^1.7.5",
+    "@walletconnect/iso-crypto": "^1.7.5",
     "ember-elsewhere": "^1.2.1",
     "node-fetch": "^2.6.7",
     "short-uuid": "^4.2.0",
     "typescript": "^4.2.3",
-    "ua-parser-js": "^0.7.28"
+    "ua-parser-js": "^0.7.28",
+    "web3": "^1.7.1"
   },
   "resolutions": {
     "ember-test-selectors": "^5.0.0"

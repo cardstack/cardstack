@@ -1,13 +1,13 @@
 import Component from '@glimmer/component';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
-import UA from '@cardstack/web-client/services/ua';
+import Layer2Network from '@cardstack/ssr-web/services/layer2-network';
+import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
+import UA from '@cardstack/ssr-web/services/ua';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { race, rawTimeout, task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
-import config from '@cardstack/web-client/config/environment';
+import config from '@cardstack/ssr-web/config/environment';
 
 const AUTH_STEPS = {
   WALLET_CONNECT: 'WALLET_CONNECT',
