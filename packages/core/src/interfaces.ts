@@ -209,7 +209,6 @@ export interface CardSchema {
   new (rawData: Record<string, any>, isDeserialized?: boolean): unknown;
   usedFields: UsedFields;
   allFields: string[];
-  writableFields: string[];
   serializedMemberNames: { [key: string]: string };
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
 }
