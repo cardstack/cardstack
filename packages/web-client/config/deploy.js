@@ -120,6 +120,7 @@ module.exports = function (deployTarget) {
       secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
       bucket: process.env.S3_PREVIEW_ASSET_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
+      prefix: process.env.PR_BRANCH_NAME,
       filePattern:
         '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac}',
     };
