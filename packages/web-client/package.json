@@ -120,7 +120,6 @@
     "ember-qunit": "^5.1.4",
     "ember-resolver": "^8.0.2",
     "ember-resources": "^3.1.2",
-    "ember-root-url": "^1.0.1",
     "ember-set-helper": "^2.0.0",
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~3.25.1",

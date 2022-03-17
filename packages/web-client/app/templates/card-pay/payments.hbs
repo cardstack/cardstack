@@ -31,14 +31,14 @@
             Add your payment link to your website and start receiving payments today.
           </p>
           <img
-            src={{root-url "/images/dashboard/payments-networks.webp"}}
-            srcset={{concat (root-url "/images/dashboard/payments-networks@2x.webp") "2x,"
-              (root-url "/images/dashboard/payments-networks@3x.webp") "3x"}}
+            src="{{config 'assetRoot'}}/images/dashboard/payments-networks.webp"
+            srcset="{{config 'assetRoot'}}/images/dashboard/payments-networks@2x.webp 2x, 
+              {{config 'assetRoot'}}/images/dashboard/payments-networks@3x.webp 3x"
             class="card-pay-dashboard__payments-networks-img"
               alt="Icons of Social Networks">
-          <img src={{root-url "/images/dashboard/payments-screens.webp"}}
-            srcset={{concat (root-url "/images/dashboard/payments-screens@2x.webp") "2x,"
-              (root-url "/images/dashboard/payments-screens@3x.webp") "3x"}}
+          <img src="{{config 'assetRoot'}}/images/dashboard/payments-screens.webp"
+            srcset="{{config 'assetRoot'}}/images/dashboard/payments-screens@2x.webp 2x,
+              {{config 'assetRoot'}}/images/dashboard/payments-screens@3x.webp 3x"
             class="card-pay-dashboard__payments-screens-img"
               alt="example twitter bio highlighting cardpay URL, plus two example transactions images from the Card Wallet app">
         </div>
