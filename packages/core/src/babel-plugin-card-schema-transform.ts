@@ -50,19 +50,12 @@ export default function main(babel: typeof Babel) {
           }
 
           if (path.node.source.value === state.opts.meta.parent?.cardURL) {
-            // we note the user provided local name for the parent card so that
-            // we can provide it to babel-import-utils
             state.parentLocalName = path.node.specifiers[0].local.name;
           }
-
-          // we'll use babel-import-utils to build the import declarations
           path.remove();
         }
       },
 
-      // TODO do we want @adopts to be transpiled into ES class extension or
-      // maybe we use composition (and perhaps use a Proxy to project the
-      // composed schema's field methods)?
       ClassDeclaration(path: NodePath<t.ClassDeclaration>, state: State) {
         if (state.opts.meta.parent?.cardURL && state.opts.parent?.schemaModule.global && state.parentLocalName) {
           let superClass = path.get('superClass') as NodePath<t.Identifier>;
@@ -133,7 +126,6 @@ export default function main(babel: typeof Babel) {
             if (t.isClassProperty(bodyItem.node)) {
               handleClassProperty(path, bodyItem as NodePath<t.ClassProperty>, state, babel);
             }
-            // TODO need to add serialized member for sync computed fields
           }
         },
 
@@ -188,7 +180,6 @@ function handleClassProperty(
   });
 }
 
-// TODO need to add serialized member
 function transformAsyncComputedField(path: NodePath<t.ClassProperty>, state: State, babel: typeof Babel) {
   let t = babel.types;
   if (!t.isIdentifier(path.node.key)) {

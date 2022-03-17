@@ -61,7 +61,6 @@ export default class CardModel {
     this.state = state;
     this.setters = this.makeSetter();
 
-    // TODO move this logic into the schema instance
     if (this.state.type === 'created' || this.state.allFields) {
       this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
     } else {
