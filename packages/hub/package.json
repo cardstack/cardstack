@@ -21,7 +21,7 @@
     "start:bot": "node --no-deprecation -r source-map-support/register dist/hub.js bot",
     "start:event-listener": "node --no-deprecation -r source-map-support/register dist/hub.js event-listener",
     "console": "yarn build_if_missing && node --no-deprecation --experimental-repl-await ./dist/hub.js console",
-    "db:test-init": "yarn build && NODE_ENV=test node --no-deprecation -r source-map-support/register ./dist/hub.js db init",
+    "db:test-init": "yarn build_if_missing && NODE_ENV=test node --no-deprecation -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts",
     "test": "yarn build_if_missing && npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha --no-deprecation -r source-map-support/register dist/tests.js --timeout 60000",
