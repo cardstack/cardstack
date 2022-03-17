@@ -18,11 +18,14 @@ import {
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';
+import Fastboot from 'ember-cli-fastboot/services/fastboot';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
 {
   @service declare hubAuthentication: HubAuthentication;
+  @service declare fastboot: Fastboot;
+
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isInitializing') declare isInitializing: boolean;
@@ -33,6 +36,10 @@ export default class Layer2Network
 
   constructor(props: object | undefined) {
     super(props);
+    if (this.fastboot.isFastBoot) {
+      return;
+    }
+
     switch (config.chains.layer2) {
       case 'xdai':
         this.strategy = new XDaiWeb3Strategy();

@@ -7,6 +7,7 @@ import { task, waitForProperty, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '@cardstack/ssr-web/utils/browser-mocks';
+import Fastboot from 'ember-cli-fastboot/services/fastboot';
 
 declare global {
   interface Window {
@@ -16,12 +17,18 @@ declare global {
 
 export default class HubAuthentication extends Service {
   @service declare layer2Network: Layer2Network;
+  @service declare fastboot: Fastboot;
+
   storage!: Storage | MockLocalStorage;
 
   @tracked isAuthenticated = false;
 
   constructor() {
     super(...arguments);
+    if (this.fastboot.isFastBoot) {
+      return;
+    }
+
     if (config.environment === 'test') {
       this.storage = new MockLocalStorage();
       if (window.TEST__AUTH_TOKEN) {
