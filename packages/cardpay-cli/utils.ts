@@ -4,7 +4,7 @@ import { AbstractProvider } from 'web3-core';
 import { HttpProvider, getConstant, networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Options } from 'yargs';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+/* eslint-disable @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires */
 const TrezorWalletProvider = require('trezor-cli-wallet-provider');
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
