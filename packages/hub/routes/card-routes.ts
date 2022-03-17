@@ -127,6 +127,11 @@ export default class CardRoutes {
     if (query.include === 'compiledMeta') {
       compiledCard = card.compiled;
     }
+    // The semantics for the data returned by this route are different than in
+    // the /cards/ route since we are not using the SchemaInstance to serialize
+    // the data, i.e. we can't tell the difference between missing and empty
+    // values and there are no computed fields in the result. Unsure if that is
+    // what is desired.
     let data = new RawCardSerializer().serialize(card.raw, compiledCard);
     ctx.body = data;
   }
