@@ -1,6 +1,6 @@
 import { Client as DBClient } from 'pg';
 
-interface BetaTester {
+interface CardDropRecipient {
   userId: string;
   userName: string;
   address: string;
@@ -8,7 +8,7 @@ interface BetaTester {
   airdropPrepaidCard: string | null;
 }
 
-export async function getBetaTester(db: DBClient, userId: string): Promise<BetaTester | undefined> {
+export async function getCardDropRecipient(db: DBClient, userId: string): Promise<CardDropRecipient | undefined> {
   let query = `SELECT * FROM card_drop_recipients WHERE user_id = $1`;
   let { rows } = await db.query(query, [userId]);
   if (rows.length === 0) {
@@ -25,7 +25,7 @@ export async function getBetaTester(db: DBClient, userId: string): Promise<BetaT
   };
 }
 
-export async function setBetaTester(db: DBClient, userId: string, userName: string): Promise<void> {
+export async function setCardDropRecipient(db: DBClient, userId: string, userName: string): Promise<void> {
   let query = `INSERT INTO card_drop_recipients (user_id, user_name)
     VALUES ($1, $2)
     ON CONFLICT (user_id)
@@ -35,17 +35,17 @@ export async function setBetaTester(db: DBClient, userId: string, userName: stri
   await db.query(query, [userId, userName]);
 }
 
-export async function setBetaTesterAddress(db: DBClient, userId: string, address: string): Promise<void> {
+export async function setCardDropRecipientAddress(db: DBClient, userId: string, address: string): Promise<void> {
   let query = `UPDATE card_drop_recipients SET address = $2 WHERE user_id = $1`;
   await db.query(query, [userId, address]);
 }
 
-export async function setBetaTesterAirdropTxnHash(db: DBClient, userId: string, txnHash: string): Promise<void> {
+export async function setCardDropRecipientAirdropTxnHash(db: DBClient, userId: string, txnHash: string): Promise<void> {
   let query = `UPDATE card_drop_recipients SET airdrop_txn_hash = $2 WHERE user_id = $1`;
   await db.query(query, [userId, txnHash]);
 }
 
-export async function setBetaTesterAirdropPrepaidCard(
+export async function setCardDropRecipientAirdropPrepaidCard(
   db: DBClient,
   userId: string,
   prepaidCard: string

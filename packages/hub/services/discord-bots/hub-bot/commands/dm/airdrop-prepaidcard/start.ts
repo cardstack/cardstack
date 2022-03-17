@@ -5,12 +5,12 @@ import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
 import {
-  getBetaTester,
-  setBetaTester,
-  setBetaTesterAddress,
-  setBetaTesterAirdropPrepaidCard,
-  setBetaTesterAirdropTxnHash,
-} from '../../../utils/beta-tester';
+  getCardDropRecipient,
+  setCardDropRecipient,
+  setCardDropRecipientAddress,
+  setCardDropRecipientAirdropPrepaidCard,
+  setCardDropRecipientAirdropTxnHash,
+} from '../../../utils/card-drop';
 import { CardDropConfig, Web3Config } from '../../../types';
 import { name as cardmeName } from '../../guild/card-drop';
 import HubBot from '../../..';
@@ -52,9 +52,9 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
 
   let userId = message.author.id;
   try {
-    let betaTester = await getBetaTester(db, userId);
+    let cardDropRecipient = await getCardDropRecipient(db, userId);
     let address: string;
-    if (!betaTester?.address) {
+    if (!cardDropRecipient?.address) {
       let web3 = await (bot as HubBot).walletConnect.getWeb3(message);
 
       if (!web3) {
@@ -65,12 +65,12 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       }
       address = (await web3.eth.getAccounts())[0];
     } else {
-      address = betaTester.address;
+      address = cardDropRecipient.address;
     }
 
-    await setBetaTester(db, userId, message.author.username);
+    await setCardDropRecipient(db, userId, message.author.username);
     Sentry.addBreadcrumb({ message: `captured user address for prepaid card airdrop ${address} of sku ${sku}` });
-    await setBetaTesterAddress(db, userId, address);
+    await setCardDropRecipientAddress(db, userId, address);
     if (!(await checkInventory(message, bot))) {
       return;
     }
@@ -81,7 +81,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       assertHubBot(bot);
       txnHash = await bot.relay.provisionPrepaidCard(address, sku);
       Sentry.addBreadcrumb({ message: `obtained txnHash for prepaid card airdrop to ${address}: ${txnHash}` });
-      await setBetaTesterAirdropTxnHash(db, userId, txnHash);
+      await setCardDropRecipientAirdropTxnHash(db, userId, txnHash);
 
       let explorer = getConstantByNetwork('blockExplorer', network);
       await message.reply(
@@ -94,7 +94,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       Sentry.addBreadcrumb({
         message: `obtained prepaid card address for prepaid card airdrop to ${address}: ${prepaidCard.address}`,
       });
-      await setBetaTesterAirdropPrepaidCard(db, userId, prepaidCard.address);
+      await setCardDropRecipientAirdropPrepaidCard(db, userId, prepaidCard.address);
 
       let prepaidCardImage = join(__dirname, '..', '..', '..', 'assets', 'prepaid-cards', `${sku}.png`);
       let embed = new MessageEmbed()
