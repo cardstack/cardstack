@@ -318,18 +318,37 @@ function transformCompositeField(
     return;
   }
   let fieldName = path.node.key.name;
+  let fieldMeta = state.opts.meta.fields![fieldName];
+  let field = state.opts.fields[fieldName];
   let serializedField = (state.serializedMemberNames[fieldName] = unusedClassMember(
     classPath,
     camelCase(`serialized-${fieldName}`),
     t
   ));
 
-  // Always make both serialized and deserialized setters fnd setters for composite fields
+  // Always make both serialized and deserialized getters/setters for composite fields
   makeIdentitySerializerGetter(path, fieldName, fieldName, state, babel, true);
-  // TODO need a serialized getter for composite fields, probably this just
-  // calls serialize() on the field's schema instance
   let newPath = makeCompositeSetter(path, fieldName, fieldName, true, state, babel);
-  makeCompositeSetter(newPath, fieldName, serializedField, false, state, babel);
+  newPath = makeCompositeSetter(newPath, fieldName, serializedField, false, state, babel);
+  newPath.insertAfter(
+    t.classMethod(
+      'get',
+      t.identifier(serializedField),
+      [],
+      t.blockStatement([
+        babel.template(`return %%fieldClass%%.serialize(this.%%data%%[%%fieldName%%], 'all');`)({
+          data: t.identifier(state.dataIdentifier),
+          fieldName: t.stringLiteral(fieldName),
+          fieldClass: state.importUtil.import(
+            newPath,
+            field.card.schemaModule.global,
+            'default',
+            asClassName(fieldMeta.typeDecoratorLocalName)
+          ),
+        }) as t.Statement,
+      ])
+    )
+  );
 }
 
 function transformPrimitiveField(

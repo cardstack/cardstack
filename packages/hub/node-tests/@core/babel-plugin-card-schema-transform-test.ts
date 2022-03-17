@@ -324,6 +324,9 @@ if (process.env.COMPILER) {
           this.data["aboutMe"] = new BioClass(value);
           this.isDeserialized["aboutMe"] = false;
         }
+        get serializedAboutMe() {
+          return BioClass.serialize(this.data["aboutMe"], 'all');
+        }
       `);
     });
 
