@@ -203,14 +203,12 @@ export interface CardService {
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
-type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
-
 export interface CardSchema {
   new (rawData: Record<string, any>, format: Format | 'all', isDeserialized?: boolean): unknown;
-  usedFields: UsedFields;
   serializedMemberNames: { [key: string]: string };
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
   hasField(fieldName: string): boolean;
+  fieldList(schemaInstance: any): string[];
 }
 
 export interface CardSchemaModule {

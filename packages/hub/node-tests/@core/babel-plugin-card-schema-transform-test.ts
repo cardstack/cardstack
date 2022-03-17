@@ -150,7 +150,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static usedFields = {
+        const usedFields = {
           edit: ["lastName", "aboutMe.birthdate", "aboutMe.background"],
           isolated: ["fullName", "aboutMe.birthdate", "slowName"],
           embedded: ["fullName"]
@@ -187,7 +187,7 @@ if (process.env.COMPILER) {
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         static serialize(instance, format) {
-          let fields = format === 'all' ? allFields : Person.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
           return getSerializedProperties(instance, fields);
         }
       `);
@@ -199,6 +199,16 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         static hasField(field) {
           return allFields.includes(field);
+        }
+      `);
+    });
+
+    it('can compile a fieldList method into the schema class', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        static fieldList(schemaInstance) {
+          return [...schemaInstance.fieldList];
         }
       `);
     });
@@ -233,9 +243,11 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         data = {};
         isDeserialized = {};
+        fieldList = [];
 
         constructor(rawData, format, isDeserialized = false) {
-          let fields = format === 'all' ? allFields : Bio.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          this.fieldList = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {
             if (!writableFields.includes(field)) {
@@ -385,10 +397,12 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         data = {};
         isDeserialized = {};
+        fieldList = [];
 
         constructor(rawData, format, isDeserialized = false) {
           super(rawData, format, isDeserialized);
-          let fields = format === 'all' ? allFields : ReallyFancyPerson.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          this.fieldList = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {
             if (!writableFields.includes(field)) {

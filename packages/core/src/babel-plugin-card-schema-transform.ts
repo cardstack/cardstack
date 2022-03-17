@@ -15,6 +15,7 @@ interface State {
   importUtil: ImportUtil;
   parentLocalName: string | undefined;
   dataIdentifier: string;
+  fieldListIdentifier: string;
   isDeserializedIdentifier: string;
   serializedMemberNames: { [fieldName: string]: string };
   cardName: string;
@@ -38,6 +39,7 @@ export default function main(babel: typeof Babel) {
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
+          addUsedFields(path, state, babel);
           addAllFields(path, state, babel);
           addWritableFields(path, state, babel);
         },
@@ -86,6 +88,7 @@ export default function main(babel: typeof Babel) {
           state.cardName = path.node.id.name;
           state.dataIdentifier = unusedClassMember(path, 'data', t);
           state.isDeserializedIdentifier = unusedClassMember(path, 'isDeserialized', t);
+          state.fieldListIdentifier = unusedClassMember(path, 'fieldList', t);
           let type = cardTypeByURL(state.opts.meta.parent?.cardURL ?? BASE_CARD_URL, state);
           // you can't upgrade a primitive card to a composite card--you are
           // either a primitive card or a composite card. so if we adopt from a
@@ -94,6 +97,7 @@ export default function main(babel: typeof Babel) {
             path.get('body').node.body.unshift(
               t.classProperty(t.identifier(state.dataIdentifier), t.objectExpression([])),
               t.classProperty(t.identifier(state.isDeserializedIdentifier), t.objectExpression([])),
+              t.classProperty(t.identifier(state.fieldListIdentifier), t.arrayExpression([])),
               t.classMethod(
                 'constructor',
                 t.identifier('constructor'),
@@ -107,7 +111,8 @@ export default function main(babel: typeof Babel) {
                     ? [babel.template.ast(`super(rawData, format, isDeserialized);`) as t.Statement]
                     : []),
                   ...(babel.template(`
-                    let fields = format === 'all' ? allFields : %%cardClass%%.usedFields[format] ?? [];
+                    let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+                    this.%%fieldList%% = fields;
                     let data = %%padDataWithNull%%(rawData, fields);
                     for (let [field, value] of Object.entries(data)) {
                       if (!writableFields.includes(field)) {
@@ -126,7 +131,7 @@ export default function main(babel: typeof Babel) {
                       '@cardstack/core/src/utils/fields',
                       'padDataWithNull'
                     ),
-                    cardClass: t.identifier(state.cardName),
+                    fieldList: t.identifier(state.fieldListIdentifier),
                   }) as t.Statement[]),
                 ])
               )
@@ -144,9 +149,9 @@ export default function main(babel: typeof Babel) {
         },
 
         exit(path: NodePath<t.Class>, state: State) {
+          addFieldListMethod(path, state, babel);
           addHasFieldMethod(path, state, babel);
           addSerializeMethod(path, state, babel);
-          addUsedFields(path, state, babel.types);
           addSerializedMemberNames(path, state, babel.types);
         },
       },
@@ -533,19 +538,19 @@ function makeCustomSerializerGetter(
   }
 }
 
-function addUsedFields(path: NodePath<t.Class>, state: State, t: typeof Babel.types) {
-  addStaticProperty(
-    path,
-    'usedFields',
-    t.objectExpression(
-      Object.entries(state.opts.componentInfos).map(([format, info]) =>
-        t.objectProperty(
-          t.identifier(format),
-          t.arrayExpression((info?.usedFields ?? []).map((f) => t.stringLiteral(f)))
+function addUsedFields(path: NodePath<t.Program>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.node.body.push(
+    babel.template(`const usedFields = %%usedFields%%;`)({
+      usedFields: t.objectExpression(
+        Object.entries(state.opts.componentInfos).map(([format, info]) =>
+          t.objectProperty(
+            t.identifier(format),
+            t.arrayExpression((info?.usedFields ?? []).map((f) => t.stringLiteral(f)))
+          )
         )
-      )
-    ),
-    t
+      ),
+    }) as t.Statement
   );
 }
 
@@ -572,15 +577,20 @@ function addWritableFields(path: NodePath<t.Program>, state: State, babel: typeo
 }
 
 function addSerializedMemberNames(path: NodePath<t.Class>, state: State, t: typeof Babel.types) {
-  addStaticProperty(
-    path,
-    'serializedMemberNames',
-    t.objectExpression(
-      Object.entries(state.serializedMemberNames).map(([field, assignedName]) =>
-        t.objectProperty(t.identifier(field), t.stringLiteral(assignedName))
-      )
-    ),
-    t
+  let body = path.get('body');
+  body.node.body.unshift(
+    t.classProperty(
+      t.identifier('serializedMemberNames'),
+      t.objectExpression(
+        Object.entries(state.serializedMemberNames).map(([field, assignedName]) =>
+          t.objectProperty(t.identifier(field), t.stringLiteral(assignedName))
+        )
+      ),
+      undefined,
+      undefined,
+      false,
+      true // static
+    )
   );
 }
 
@@ -594,10 +604,9 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
       ['instance', 'format'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
-          let fields = format === 'all' ? allFields : %%cardClass%%.usedFields[format] ?? [];
+          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
           return %%getSerializedProperties%%(instance, fields);
         `)({
-          cardClass: t.identifier(state.cardName),
           getSerializedProperties: state.importUtil.import(
             body,
             '@cardstack/core/src/utils/fields',
@@ -625,14 +634,18 @@ function addHasFieldMethod(path: NodePath<t.Class>, _state: State, babel: typeof
   );
 }
 
-function addStaticProperty(path: NodePath<t.Class>, name: string, expression: t.Expression, t: typeof Babel.types) {
-  let body = path.get('body');
-  body.node.body.unshift(
-    t.classProperty(
-      t.identifier(name),
-      expression,
-      undefined,
-      undefined,
+function addFieldListMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  path.get('body').node.body.unshift(
+    t.classMethod(
+      'method',
+      t.identifier('fieldList'),
+      [t.identifier('schemaInstance')],
+      t.blockStatement([
+        babel.template(`return [...schemaInstance.%%fieldList%%];`)({
+          fieldList: t.identifier(state.fieldListIdentifier),
+        }) as t.Statement,
+      ]),
       false,
       true // static
     )

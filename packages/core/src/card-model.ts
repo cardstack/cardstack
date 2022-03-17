@@ -222,7 +222,7 @@ export default class CardModel {
       return;
     }
 
-    for (let field of this.usedFields) {
+    for (let field of this.schemaModule.default.fieldList(newSchemaInstance)) {
       try {
         await this.getField(field, newSchemaInstance);
       } catch (err: any) {
@@ -240,10 +240,6 @@ export default class CardModel {
     }
     this._schemaInstance = newSchemaInstance;
     done!();
-  }
-
-  private get usedFields(): string[] {
-    return this.schemaModule.default.usedFields?.[this.format] ?? [];
   }
 
   private createSchemaInstance() {
