@@ -1,5 +1,6 @@
 import { Compiler, makeGloballyAddressable } from '@cardstack/core/src/compiler';
 import {
+  CardId,
   CardModel,
   CardSchemaModule,
   CompiledCard,
@@ -88,19 +89,7 @@ export default class SearchIndex {
     let cardID = this.realmManager.parseCardURL(cardURL);
     log.trace('indexCardFromNotification', cardURL);
     await this.runIndexing(cardID.realm, async (ops) => {
-      switch (action) {
-        case 'save': {
-          let rawCard = await this.realmManager.read(cardID);
-          await ops.save(rawCard);
-          break;
-        }
-        case 'delete': {
-          await ops.delete(cardURL);
-          break;
-        }
-        default:
-          assertNever(action);
-      }
+      await ops.reindex(cardID, action);
     });
   }
 
@@ -161,6 +150,7 @@ class IndexerRun implements IndexerHandle {
   private touchCounter = 0;
   private touched = new Map<string, number>();
   private newMeta: PgPrimitive = null;
+  private realmManager = service('realm-manager', { as: 'realmManager' });
 
   constructor(private db: PoolClient, private realmURL: string) {}
 
@@ -246,6 +236,27 @@ class IndexerRun implements IndexerHandle {
         await fn(row);
       }
     } while (rows.length > 0);
+  }
+
+  async reindex(card: CardId, action: 'save' | 'delete'): Promise<void> {
+    switch (action) {
+      case 'save': {
+        try {
+          let rawCard = await this.realmManager.read(card);
+          await this.save(rawCard);
+        } catch (err: any) {
+          log.trace('Read: Error during compile', cardURL(card));
+          await this.saveErrorState(card, err, new Set());
+        }
+        break;
+      }
+      case 'delete': {
+        await this.delete(cardURL(card));
+        break;
+      }
+      default:
+        assertNever(action);
+    }
   }
 
   // available to each realm's indexer
