@@ -47,7 +47,9 @@ export default function main(babel: typeof Babel) {
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         let type = cardTypeByURL(path.node.source.value, state);
         if (type === 'primitive') {
-          path.remove();
+          let [[fieldName]] = fieldMetasForCardURL(path.node.source.value, state);
+          let field = state.opts.fields[fieldName];
+          path.node.source.value = field.card.schemaModule.global;
         } else if (type === 'composite') {
           if (path.node.specifiers.length !== 1 || !t.isImportDefaultSpecifier(path.node.specifiers[0])) {
             throw error(path, `expecting a default import for card`);
@@ -61,6 +63,26 @@ export default function main(babel: typeof Babel) {
 
           // we'll use babel-import-utils to build the import declarations
           path.remove();
+        } else {
+          // if the import declaration is unconsumed then remove it
+          let specifiers = path.get('specifiers');
+          if (specifiers.length === 0) {
+            return;
+          }
+          let numUsed = 0;
+          let programPath = path.parentPath as NodePath<t.Program>;
+          let scope = programPath.scope;
+          for (let specifier of specifiers) {
+            let bindings = scope.getBinding(specifier.node.local.name)?.referencePaths ?? [];
+            if (bindings.length === 0) {
+              specifier.remove();
+            } else {
+              numUsed++;
+            }
+          }
+          if (numUsed === 0) {
+            path.remove();
+          }
         }
       },
 

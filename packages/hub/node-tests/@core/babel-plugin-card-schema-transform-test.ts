@@ -146,6 +146,11 @@ if (process.env.COMPILER) {
       // import foo from "@cardstack/compiled/https-cardstack.local-foo/schema.js";
 
       // success is really just not throwing an exception
+
+      // also think about different types of import specifiers that are unused, like:
+      // import foo from 'foo';
+      // import bar3, { bar, bar2 } from 'bar'
+      // import * as blop from 'blop'
       expect(card.compiled.url).to.eq(`${realm}test`);
     });
 
