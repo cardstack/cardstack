@@ -72,7 +72,7 @@
     "@types/rsvp": "^4.0.3",
     "@types/sinon": "^9.0.11",
     "@types/ua-parser-js": "^0.7.36",
-    "@walletconnect/types": "^1.7.5",
+    "@walletconnect/types": "^1.6.0",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-concat": "^4.2.4",
@@ -154,8 +154,8 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@walletconnect/core": "^1.7.5",
-    "@walletconnect/iso-crypto": "^1.7.5",
+    "@walletconnect/core": "^1.6.0",
+    "@walletconnect/iso-crypto": "^1.6.0",
     "broadcastchannel-polyfill": "^1.0.1",
     "ember-elsewhere": "^1.2.1",
     "node-fetch": "^2.6.7",
