@@ -4,3 +4,8 @@ declare module '@cardstack/boxel/templates/*' {
   const tmpl: TemplateFactory;
   export default tmpl;
 }
+
+// Needed because `yarn prepack` was not recognising assert.dom
+// and this fix caused other typing problems:
+// https://github.com/simplabs/qunit-dom#typescript
+import 'qunit-dom';

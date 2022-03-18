@@ -11,6 +11,7 @@ export type {
   DepotSafe,
   MerchantSafe,
   PrepaidCardSafe,
+  RewardSafe,
   ExternalSafe,
   TokenInfo,
   ViewSafeResult,
