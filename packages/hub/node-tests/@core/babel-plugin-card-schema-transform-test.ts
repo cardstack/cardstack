@@ -104,7 +104,7 @@ if (process.env.COMPILER) {
       await cards.create(reallyFancyPersonCard);
     });
 
-    it.only('can handle unconsumed field import', async function () {
+    it('can handle unconsumed field import', async function () {
       await cards.create({
         realm,
         id: 'foo',
@@ -130,7 +130,7 @@ if (process.env.COMPILER) {
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
               import date from "https://cardstack.com/base/date";
-              import foo from "../foo";
+              import Foo from "../foo";
 
               export default class Test {
                 @contains(string) name;
@@ -138,19 +138,78 @@ if (process.env.COMPILER) {
             `,
         },
       });
-      // instead of:
-      // import date from "https://cardstack.com/base/date";
-      // import foo from "../foo";
-      // convert to:
-      // import date from "@cardstack/compiled/https-cardstack.com-base-date/schema.js";
-      // import foo from "@cardstack/compiled/https-cardstack.local-foo/schema.js";
 
       // success is really just not throwing an exception
+      expect(card.compiled.url).to.eq(`${realm}test`);
+    });
 
+    it.only('can handle unconsumed field import for different types of import specifiers', async function () {
       // also think about different types of import specifiers that are unused, like:
       // import foo from 'foo';
       // import bar3, { bar, bar2 } from 'bar'
       // import * as blop from 'blop'
+
+      await cards.create({
+        realm,
+        id: 'foo',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+
+              export default class Foo {
+                @contains(string) bar;
+              }
+
+              let bar1 = 'bar-1';
+              export { bar1 };
+            `,
+        },
+      });
+
+      let card = await cards.create({
+        realm,
+        id: 'test',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+              import { contains } from "@cardstack/types";
+              import string from "https://cardstack.com/base/string";
+              import { bar1 } from "../foo";
+
+              export default class Test {
+                @contains(string) name;
+
+                get myBar1() {
+                  return bar1;
+                }
+              }
+            `,
+        },
+      });
+
+      // let card = await cards.create({
+      //   realm,
+      //   id: 'test',
+      //   schema: 'schema.js',
+      //   files: {
+      //     'schema.js': `
+      //         import { contains } from "@cardstack/types";
+      //         import string from "https://cardstack.com/base/string";
+      //         import * as bar from "../foo";
+
+      //         export default class Test {
+      //           @contains(string) name;
+
+      //           get foo() {
+      //             return bar;
+      //           }
+      //         }
+      //       `,
+      //   },
+      // });
+
       expect(card.compiled.url).to.eq(`${realm}test`);
     });
 
