@@ -1,6 +1,6 @@
 {
   "name": "discord-bot",
-  "version": "0.28.25",
+  "version": "0.28.26",
   "description": "",
   "main": "server.ts",
   "private": true,
