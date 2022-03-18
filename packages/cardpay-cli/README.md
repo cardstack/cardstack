@@ -319,6 +319,7 @@ Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
       --force          Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
+      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -349,6 +350,7 @@ Positionals:
 Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -391,6 +393,7 @@ Positionals:
 Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -407,6 +410,7 @@ Positionals:
 Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -422,6 +426,7 @@ Positionals:
 Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -740,6 +745,7 @@ Positionals:
 Options:
   -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
