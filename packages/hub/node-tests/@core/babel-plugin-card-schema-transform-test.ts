@@ -178,7 +178,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import { serializerFor, padDataWithNull, keySensitiveGet, getSerializedProperties } from "@cardstack/core/src/utils/fields";
+        import { serializerFor, padDataWithNull, keySensitiveGet, getChildFields, getSerializedProperties } from "@cardstack/core/src/utils/fields";
       `);
     });
 
@@ -186,8 +186,15 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static serialize(instance, format) {
-          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+        static serialize(instance, fieldsOrFormat) {
+          let fields;
+          if (typeof fieldsOrFormat === 'string') {
+            fields = fieldsOrFormat === 'all' ? allFields : usedFields[fieldsOrFormat] ?? [];
+          } else if (Array.isArray(fieldsOrFormat)) {
+            fields = [...fieldsOrFormat];
+          } else {
+            throw new Error('fieldsOrFormat must be a string or an array');
+          }
           return getSerializedProperties(instance, fields);
         }
       `);
@@ -242,8 +249,15 @@ if (process.env.COMPILER) {
         isDeserialized = {};
         loadedFields = [];
 
-        constructor(rawData, format, isDeserialized = false) {
-          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+        constructor(rawData, loadedFields, isDeserialized = false) {
+          let fields;
+          if (typeof loadedFields === 'string') {
+            fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
+          } else if (Array.isArray(loadedFields)) {
+            fields = [...loadedFields];
+          } else {
+            throw new Error('loadedFields must be a string or an array');
+          }
           this.loadedFields = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {
@@ -326,15 +340,18 @@ if (process.env.COMPILER) {
           return keySensitiveGet(this.data, "aboutMe");
         }
         set aboutMe(value) {
-          this.data["aboutMe"] = new BioClass(value, true);
+          let fields = getChildFields("aboutMe", this.loadedFields);
+          this.data["aboutMe"] = new BioClass(value, fields, true);
           this.isDeserialized["aboutMe"] = true;
         }
         set serializedAboutMe(value) {
-          this.data["aboutMe"] = new BioClass(value);
+          let fields = getChildFields("aboutMe", this.loadedFields);
+          this.data["aboutMe"] = new BioClass(value, fields);
           this.isDeserialized["aboutMe"] = false;
         }
         get serializedAboutMe() {
-          return BioClass.serialize(this.data["aboutMe"], 'all');
+          let fields = getChildFields("aboutMe", this.loadedFields);
+          return BioClass.serialize(this.data["aboutMe"], fields);
         }
       `);
     });
@@ -396,9 +413,16 @@ if (process.env.COMPILER) {
         isDeserialized = {};
         loadedFields = [];
 
-        constructor(rawData, format, isDeserialized = false) {
-          super(rawData, format, isDeserialized);
-          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+        constructor(rawData, loadedFields, isDeserialized = false) {
+          super(rawData, loadedFields, isDeserialized);
+          let fields;
+          if (typeof loadedFields === 'string') {
+            fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
+          } else if (Array.isArray(loadedFields)) {
+            fields = [...loadedFields];
+          } else {
+            throw new Error('loadedFields must be a string or an array');
+          }
           this.loadedFields = fields;
           let data = padDataWithNull(rawData, fields);
           for (let [field, value] of Object.entries(data)) {

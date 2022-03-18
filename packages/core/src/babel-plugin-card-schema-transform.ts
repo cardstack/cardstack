@@ -103,15 +103,22 @@ export default function main(babel: typeof Babel) {
                 t.identifier('constructor'),
                 [
                   t.identifier('rawData'),
-                  t.identifier('format'),
+                  t.identifier('loadedFields'),
                   t.assignmentPattern(t.identifier('isDeserialized'), t.booleanLiteral(false)),
                 ],
                 t.blockStatement([
                   ...(state.opts.meta.parent?.cardURL
-                    ? [babel.template.ast(`super(rawData, format, isDeserialized);`) as t.Statement]
+                    ? [babel.template.ast(`super(rawData, loadedFields, isDeserialized);`) as t.Statement]
                     : []),
                   ...(babel.template(`
-                    let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+                    let fields;
+                    if (typeof loadedFields === 'string') {
+                      fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
+                    } else if (Array.isArray(loadedFields)) {
+                      fields = [...loadedFields];
+                    } else {
+                      throw new Error('loadedFields must be a string or an array');
+                    }
                     this.%%loadedFields%% = fields;
                     let data = %%padDataWithNull%%(rawData, fields);
                     for (let [field, value] of Object.entries(data)) {
@@ -345,18 +352,23 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
       'get',
       t.identifier(serializedField),
       [],
-      t.blockStatement([
-        babel.template(`return %%fieldClass%%.serialize(this.%%data%%[%%fieldName%%], 'all');`)({
+      t.blockStatement(
+        babel.template(`
+          let fields = %%getChildFields%%(%%fieldName%%, this.%%loadedFields%%);
+          return %%fieldClass%%.serialize(this.%%data%%[%%fieldName%%], fields);
+        `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
+          loadedFields: t.identifier(state.loadedFieldsIdentifier),
+          getChildFields: state.importUtil.import(newPath, '@cardstack/core/src/utils/fields', 'getChildFields'),
           fieldClass: state.importUtil.import(
             newPath,
             field.card.schemaModule.global,
             'default',
             asClassName(fieldMeta.typeDecoratorLocalName)
           ),
-        }) as t.Statement,
-      ])
+        }) as t.Statement[]
+      )
     )
   );
 }
@@ -445,12 +457,19 @@ function makeCompositeSetter({
       [t.identifier('value')],
       t.blockStatement(
         babel.template(`
-          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value${isDeserializedSet ? ', true' : ''});
+          let fields = %%getChildFields%%(%%fieldName%%, this.%%loadedFields%%);
+          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, fields${isDeserializedSet ? ', true' : ''});
           this.%%isDeserialized%%[%%fieldName%%] = ${isDeserializedSet ? 'true' : 'false'};
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
           isDeserialized: t.identifier(state.isDeserializedIdentifier),
+          loadedFields: t.identifier(state.loadedFieldsIdentifier),
+          getChildFields: state.importUtil.import(
+            insertAfterPath,
+            '@cardstack/core/src/utils/fields',
+            'getChildFields'
+          ),
           fieldClass: state.importUtil.import(
             insertAfterPath,
             field.card.schemaModule.global,
@@ -653,10 +672,17 @@ function addSerializeMethod(path: NodePath<t.Class>, state: State, babel: typeof
     t.classMethod(
       'method',
       t.identifier('serialize'),
-      ['instance', 'format'].map((name) => t.identifier(name)),
+      ['instance', 'fieldsOrFormat'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
-          let fields = format === 'all' ? allFields : usedFields[format] ?? [];
+          let fields;
+          if (typeof fieldsOrFormat === 'string') {
+            fields = fieldsOrFormat === 'all' ? allFields : usedFields[fieldsOrFormat] ?? [];
+          } else if (Array.isArray(fieldsOrFormat)) {
+            fields = [...fieldsOrFormat];
+          } else {
+            throw new Error('fieldsOrFormat must be a string or an array');
+          }
           return %%getSerializedProperties%%(instance, fields);
         `)({
           getSerializedProperties: state.importUtil.import(

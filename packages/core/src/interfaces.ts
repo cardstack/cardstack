@@ -204,7 +204,7 @@ export interface CardService {
 }
 
 export interface CardSchema {
-  new (rawData: Record<string, any>, format: Format | 'all', isDeserialized?: boolean): unknown;
+  new (rawData: Record<string, any>, loadedFields: string[] | Format | 'all', isDeserialized?: boolean): unknown;
   serializedMemberNames: { [key: string]: string };
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
   hasField(fieldName: string): boolean;
