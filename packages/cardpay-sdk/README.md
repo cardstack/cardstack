@@ -66,6 +66,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
+  - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
