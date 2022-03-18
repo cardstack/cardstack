@@ -66,6 +66,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
+  - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -879,7 +880,7 @@ interface RewardProgramInfo {
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+await rewardManagerAPI.getRewardProgramsInfo()
 ```
 
 ## `LayerOneOracle`
