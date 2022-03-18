@@ -1,54 +1,103 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { TemplateUsageMeta } from './glimmer-plugin-card-template';
-// import ETC from 'ember-source/dist/ember-template-compiler';
-// const { preprocess, print } = ETC._GlimmerSyntax;
-
-import { transformSync } from '@babel/core';
+import { transformSync, transformFromAstSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
-
 import { CompiledCard, ComponentInfo, Format } from './interfaces';
-
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
 
-export interface CardComponentPluginOptions {
+interface TransformComponentOptions {
+  templateSource: string;
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
-  resolveImport?: (relativePath: string) => string;
-  // these are for gathering output
+  resolveImport: (relativePath: string) => string;
+}
+
+export default function (params: TransformComponentOptions): {
+  source: string;
+  ast: t.File;
   usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
-}
+} {
+  // HACK: The / resets the relative path setup, removing the cwd of the hub.
+  // This allows the error module to look a lot more like the card URL.
+  let debugPath = '/' + params.debugPath.replace(/^\//, '');
 
-interface State {
-  opts: CardComponentPluginOptions;
-  insideExportDefault: boolean;
-  importUtil: ImportUtil;
-}
-
-export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
   try {
-    let out = transformSync(templateSource, {
-      ast: true,
-      plugins: [[babelPluginCardTemplate, options]],
-      // HACK: The / resets the relative path setup, removing the cwd of the hub.
-      // This allows the error module to look a lot more like the card URL.
-      filename: '/' + options.debugPath.replace(/^\//, ''),
-    });
-    return { source: out!.code!, ast: out!.ast! };
+    // this part will move into compiler's analyze phase, so it shouldn't use
+    // any knowledge of CompiledCard, shouldn't resolve imports, etc.
+    let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
+
+    // this part will move into the compiler's transform phase
+    return transformComponent(
+      {
+        ...params,
+        debugPath,
+      },
+      ast,
+      meta
+    );
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
 }
 
-export function babelPluginCardTemplate(babel: typeof Babel) {
+function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: TemplateUsageMeta } {
+  let meta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
+
+  let out = transformSync(templateSource, {
+    ast: true,
+    code: false,
+    plugins: [],
+    filename: debugFilename,
+  });
+
+  return { ast: out!.ast!, meta };
+}
+
+function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: TemplateUsageMeta) {
+  let output: Partial<{
+    usedFields: ComponentInfo['usedFields'];
+    inlineHBS: string | undefined;
+  }> = {};
+
+  let pluginOptions: TransformPluginOptions = {
+    transformOpts,
+    output,
+    meta,
+  };
+
+  let out = transformFromAstSync(ast, transformOpts.templateSource, {
+    ast: true,
+    plugins: [[babelPluginCardTemplate, pluginOptions]],
+    filename: transformOpts.debugPath,
+  })!;
+
+  return { source: out!.code!, ast: out!.ast!, usedFields: output.usedFields!, inlineHBS: output.inlineHBS! };
+}
+
+interface State {
+  opts: TransformPluginOptions;
+  insideExportDefault: boolean;
+  importUtil: ImportUtil;
+}
+
+interface TransformPluginOptions {
+  output: Partial<{
+    usedFields: ComponentInfo['usedFields'];
+    inlineHBS: string | undefined;
+  }>;
+  transformOpts: TransformComponentOptions;
+  meta: TemplateUsageMeta;
+}
+
+function babelPluginCardTemplate(babel: typeof Babel) {
   let t = babel.types;
   return {
     visitor: {
@@ -60,9 +109,9 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
       },
 
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
-        let { resolveImport } = state.opts;
-        if (resolveImport) {
-          path.node.source.value = resolveImport(path.node.source.value);
+        let resolved = state.opts.transformOpts.resolveImport(path.node.source.value);
+        if (resolved !== path.node.source.value) {
+          path.node.source.value = resolved;
         }
       },
 
@@ -91,11 +140,17 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: 
 
   let { options, template: inputTemplate } = handleArguments(path, t);
 
-  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.importUtil);
+  let { template, neededScope, usedFields } = transformTemplate(
+    inputTemplate,
+    path,
+    state.opts.transformOpts,
+    state.importUtil
+  );
   path.node.arguments[0] = t.stringLiteral(template);
 
+  state.opts.output.usedFields = usedFields;
   if (shouldInlineHBS(options, neededScope, t)) {
-    state.opts.inlineHBS = template;
+    state.opts.output.inlineHBS = template;
   }
 
   updateScope(options, neededScope, t);
@@ -157,9 +212,9 @@ function handleArguments(
 function transformTemplate(
   source: string,
   path: NodePath<t.CallExpression>,
-  opts: CardComponentPluginOptions,
+  opts: TransformComponentOptions,
   importUtil: ImportUtil
-): { template: string; neededScope: Set<string> } {
+): { template: string; neededScope: Set<string>; usedFields: ComponentInfo['usedFields'] } {
   let neededScope = new Set<string>();
 
   function importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string): string {
@@ -178,9 +233,11 @@ function transformTemplate(
     importAndChooseName,
   });
 
-  opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
-
-  return { template, neededScope };
+  return {
+    template,
+    neededScope,
+    usedFields: buildUsedFieldsListFromUsageMeta(opts.fields, opts.defaultFieldFormat, usageMeta),
+  };
 }
 
 function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {

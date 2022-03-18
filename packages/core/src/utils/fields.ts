@@ -19,6 +19,7 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
 
 export function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
+  defaultFieldFormat: Format,
   usageMeta: TemplateUsageMeta
 ): ComponentInfo['usedFields'] {
   let usedFields: Set<string> = new Set();
@@ -29,8 +30,17 @@ export function buildUsedFieldsListFromUsageMeta(
     }
   }
 
-  for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
-    buildUsedFieldListFromComponents(usedFields, fieldPath, fields, fieldFormat);
+  if (usageMeta.fields === 'self') {
+    throw new Error('TODO: expand out all my fields in default format');
+  } else {
+    for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        fieldPath,
+        fields,
+        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
+      );
+    }
   }
 
   return [...usedFields];

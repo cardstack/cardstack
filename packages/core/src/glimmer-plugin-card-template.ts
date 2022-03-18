@@ -26,7 +26,7 @@ type ImportAndChooseName = (desiredName: string, moduleSpecifier: string, import
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
-  fields: Map<string, Format>;
+  fields: 'self' | Map<string, Format | 'default'>;
 }
 
 export interface Options {
@@ -114,7 +114,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             throw new InvalidFieldsUsageError();
           }
 
-          let fieldFormat = getFieldFormat(node, defaultFieldFormat);
+          let fieldFormat = getFieldFormat(node);
           let fieldFullPath = fieldPathForElementNode(node);
 
           if (fieldFullPath) {
@@ -125,12 +125,14 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usageMeta.fields.set(fieldFullPath, fieldFormat);
+            if (usageMeta.fields !== 'self') {
+              usageMeta.fields.set(fieldFullPath, fieldFormat);
+            }
             return rewriteElementNode({
               field,
               importAndChooseName,
               modelArgument: `${MODEL}.${fieldFullPath}`,
-              format: field.computed ? 'embedded' : fieldFormat,
+              format: field.computed ? 'embedded' : fieldFormat === 'default' ? defaultFieldFormat : fieldFormat,
               state,
             });
           }
@@ -155,12 +157,14 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (val.expandable && val.field.type === 'containsMany') {
                 return expandContainsManyShorthand(`${FIELDS}.${val.fieldFullPath}`);
               }
-              usageMeta.fields.set(val.fieldFullPath, fieldFormat);
+              if (usageMeta.fields !== 'self') {
+                usageMeta.fields.set(val.fieldFullPath, fieldFormat);
+              }
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
-                format: val.field.computed ? 'embedded' : fieldFormat,
+                format: val.field.computed ? 'embedded' : fieldFormat === 'default' ? defaultFieldFormat : fieldFormat,
                 state,
               });
             default:
@@ -508,7 +512,7 @@ function inlineTemplateForField(inlineHBS: string, fieldName: string, state: Sta
   return body;
 }
 
-function getFieldFormat(_node: ElementNode, defaultFieldFormat: Format): Format {
+function getFieldFormat(_node: ElementNode): Format | 'default' {
   // TODO: look at @format parameter on node to override default
-  return defaultFieldFormat;
+  return 'default';
 }

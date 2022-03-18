@@ -26,7 +26,7 @@ let attributes: Record<string, any> = {
 };
 
 if (process.env.COMPILER) {
-  describe('CardModelForHub', function () {
+  describe.only('CardModelForHub', function () {
     let { realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {
