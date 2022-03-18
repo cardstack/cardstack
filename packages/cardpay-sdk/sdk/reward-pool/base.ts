@@ -63,11 +63,7 @@ export default class RewardPool {
 
   constructor(private layer2Web3: Web3) {}
 
-  async getCurrentPaymentCycle(): Promise<number> {
-    return 2;
-  }
-
-  async getBalance(address: string, rewardProgramId?: string, tokenAddress?: string): Promise<BN> {
+  async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
     return unclaimedProofs.reduce((total, { amount }) => {
       return total.add(amount);
@@ -159,7 +155,7 @@ export default class RewardPool {
     tokenAddress: string,
     rewardProgramId?: string
   ): Promise<RewardTokenBalance> {
-    let balance = await this.getBalance(address, rewardProgramId, tokenAddress);
+    let balance = await this.getBalance(address, tokenAddress, rewardProgramId);
     return {
       rewardProgramId,
       tokenAddress,
@@ -527,7 +523,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   }
 
   async balances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const tokensAvailable = await this.rewardTokensAvailable(rewardProgramId);
+    const tokensAvailable = await this.get_reward_tokens();
     let promises = tokensAvailable.map((tokenAddress) => {
       return this.balance(rewardProgramId, tokenAddress);
     });
@@ -548,6 +544,11 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
 
   async address(): Promise<string> {
     return await getAddress('rewardPool', this.layer2Web3);
+  }
+
+  async get_reward_tokens(): Promise<string[]> {
+    let card_token_address = await getAddress('cardCpxd', this.layer2Web3);
+    return [card_token_address];
   }
 
   async addTokenSymbol<T extends Proof | RewardTokenBalance>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
