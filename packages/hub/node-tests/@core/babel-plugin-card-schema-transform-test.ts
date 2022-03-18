@@ -104,7 +104,7 @@ if (process.env.COMPILER) {
       await cards.create(reallyFancyPersonCard);
     });
 
-    it.skip('can handle unconsumed field import', async function () {
+    it.only('can handle unconsumed field import', async function () {
       await cards.create({
         realm,
         id: 'foo',
@@ -130,7 +130,7 @@ if (process.env.COMPILER) {
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
               import date from "https://cardstack.com/base/date";
-              import Foo from "../foo";
+              import foo from "../foo";
 
               export default class Test {
                 @contains(string) name;
@@ -138,6 +138,12 @@ if (process.env.COMPILER) {
             `,
         },
       });
+      // instead of:
+      // import date from "https://cardstack.com/base/date";
+      // import foo from "../foo";
+      // convert to:
+      // import date from "@cardstack/compiled/https-cardstack.com-base-date/schema.js";
+      // import foo from "@cardstack/compiled/https-cardstack.local-foo/schema.js";
 
       // success is really just not throwing an exception
       expect(card.compiled.url).to.eq(`${realm}test`);
