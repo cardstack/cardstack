@@ -143,17 +143,17 @@ export function serializerFor(schemaInstance: any, field: string) {
 // because it is missing (and we are about to set it). lodash set will
 // inadvertently trigger our NotReady errors
 export function keySensitiveSet(obj: Record<string, any>, path: string, value: any) {
-  visitObjectPath(obj, path, (context, key) => (context[key] = value));
+  visitObjectPath(obj, path, (pathParent, key) => (pathParent[key] = value));
 }
 
 function serializedGet(obj: Record<string, any>, path: string) {
-  return visitObjectPath(obj, path, (context, key) => serializerFor(context, key));
+  return visitObjectPath(obj, path, (pathParent, key) => serializerFor(pathParent, key));
 }
 
 function visitObjectPath(
   obj: Record<string, any>,
   path: string,
-  visitor: (context: Record<string, any>, key: string) => string | undefined
+  visitor: (pathParent: Record<string, any>, key: string) => string | undefined
 ): any {
   let segments = path.split('.');
   let current: any = obj;
