@@ -354,13 +354,13 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
       [],
       t.blockStatement(
         babel.template(`
-          let fields = %%getChildFields%%(%%fieldName%%, this.%%loadedFields%%);
+          let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
           return %%fieldClass%%.serialize(this.%%data%%[%%fieldName%%], fields);
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
           loadedFields: t.identifier(state.loadedFieldsIdentifier),
-          getChildFields: state.importUtil.import(newPath, '@cardstack/core/src/utils/fields', 'getChildFields'),
+          getFieldsAtPath: state.importUtil.import(newPath, '@cardstack/core/src/utils/fields', 'getFieldsAtPath'),
           fieldClass: state.importUtil.import(
             newPath,
             field.card.schemaModule.global,
@@ -457,7 +457,7 @@ function makeCompositeSetter({
       [t.identifier('value')],
       t.blockStatement(
         babel.template(`
-          let fields = %%getChildFields%%(%%fieldName%%, this.%%loadedFields%%);
+          let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
           this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, fields${isDeserializedSet ? ', true' : ''});
           this.%%isDeserialized%%[%%fieldName%%] = ${isDeserializedSet ? 'true' : 'false'};
         `)({
@@ -465,10 +465,10 @@ function makeCompositeSetter({
           fieldName: t.stringLiteral(fieldName),
           isDeserialized: t.identifier(state.isDeserializedIdentifier),
           loadedFields: t.identifier(state.loadedFieldsIdentifier),
-          getChildFields: state.importUtil.import(
+          getFieldsAtPath: state.importUtil.import(
             insertAfterPath,
             '@cardstack/core/src/utils/fields',
-            'getChildFields'
+            'getFieldsAtPath'
           ),
           fieldClass: state.importUtil.import(
             insertAfterPath,

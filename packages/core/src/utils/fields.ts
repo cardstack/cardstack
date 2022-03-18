@@ -123,7 +123,7 @@ function getDataWithShape(object: Record<string, any>, properties: string[], get
   return data;
 }
 
-export function getChildFields(path: string, fields: string[]): string[] {
+export function getFieldsAtPath(path: string, fields: string[]): string[] {
   return fields.filter((field) => field.startsWith(path)).map((field) => field.substring(path.length + 1));
 }
 

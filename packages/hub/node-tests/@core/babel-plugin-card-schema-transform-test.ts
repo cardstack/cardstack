@@ -178,7 +178,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import { serializerFor, padDataWithNull, keySensitiveGet, getChildFields, getSerializedProperties } from "@cardstack/core/src/utils/fields";
+        import { serializerFor, padDataWithNull, keySensitiveGet, getFieldsAtPath, getSerializedProperties } from "@cardstack/core/src/utils/fields";
       `);
     });
 
@@ -340,17 +340,17 @@ if (process.env.COMPILER) {
           return keySensitiveGet(this.data, "aboutMe");
         }
         set aboutMe(value) {
-          let fields = getChildFields("aboutMe", this.loadedFields);
+          let fields = getFieldsAtPath("aboutMe", this.loadedFields);
           this.data["aboutMe"] = new BioClass(value, fields, true);
           this.isDeserialized["aboutMe"] = true;
         }
         set serializedAboutMe(value) {
-          let fields = getChildFields("aboutMe", this.loadedFields);
+          let fields = getFieldsAtPath("aboutMe", this.loadedFields);
           this.data["aboutMe"] = new BioClass(value, fields);
           this.isDeserialized["aboutMe"] = false;
         }
         get serializedAboutMe() {
-          let fields = getChildFields("aboutMe", this.loadedFields);
+          let fields = getFieldsAtPath("aboutMe", this.loadedFields);
           return BioClass.serialize(this.data["aboutMe"], fields);
         }
       `);
