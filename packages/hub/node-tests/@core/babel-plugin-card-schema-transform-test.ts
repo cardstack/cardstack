@@ -200,6 +200,15 @@ if (process.env.COMPILER) {
       `);
     });
 
+    //TODO use a static method for serializedGet and serializedSet
+    // setSerialized(key, value) {
+    // compile into this the serialized function
+    // if (["birthdate", "settlementDate"]).includes(key)) {
+    // do the serialization
+    // }
+    //}
+    //getSerialize(){}
+
     it('can compile a hasField method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
@@ -240,6 +249,10 @@ if (process.env.COMPILER) {
         `);
       }
     });
+
+    // data = {}
+    // serializedData = {}
+    // constructor(rawData, isComplete, isDeserialized = false) {
 
     it('can compile schema class constructor for composite card', async function () {
       let { compiled } = await cards.load(`${realm}bio`);
@@ -324,7 +337,9 @@ if (process.env.COMPILER) {
           this.data["birthdate"] = value;
           this.isDeserialized["birthdate"] = false;
         }
-      `);
+        `);
+      // the setter should remove field from the deserialized data and sets the field in the serialized data and vice-versa
+      // the getter should populate either the serialized data or the deserialized data so it's cached and used a cached value if available
     });
 
     it('can compile composite field implementation in schema.js module', async function () {

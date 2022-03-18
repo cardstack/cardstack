@@ -127,6 +127,7 @@ export function getFieldsAtPath(path: string, fields: string[]): string[] {
   return fields.filter((field) => field.startsWith(path)).map((field) => field.substring(path.length + 1));
 }
 
+// pay attention to the schemainstance.isComplete--don't throw when this is true
 export function keySensitiveGet(data: any, key: string) {
   let value = data[key];
   if (value === undefined) {
