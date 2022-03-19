@@ -141,6 +141,9 @@ const safeQueryFields = `
     rewardee {
       id
     }
+    rewardProgram {
+      id
+    }
   }
 `;
 
@@ -439,7 +442,9 @@ interface GraphQLSafeResult {
   };
   reward: {
     id: string;
-    rewardProgramId: string;
+    rewardProgram: {
+      id: string;
+    };
     rewardee: {
       id: string;
     };
@@ -517,7 +522,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
     let reward: RewardSafe = {
       type: 'reward',
       address: safe.reward.id,
-      rewardProgramId: safe.reward.rewardProgramId,
+      rewardProgramId: safe.reward.rewardProgram.id,
       tokens,
       createdAt,
       owners,

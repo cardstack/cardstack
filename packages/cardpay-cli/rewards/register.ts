@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { FROM_OPTION, getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
@@ -16,22 +16,29 @@ export default {
         type: 'string',
         description: 'Reward program id',
       })
+      .option('from', FROM_OPTION)
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, prepaidCard, rewardProgramId, trezor } = args as unknown as {
+    let { network, mnemonic, prepaidCard, rewardProgramId, from, trezor } = args as unknown as {
       network: string;
       prepaidCard: string;
       rewardProgramId: string;
       mnemonic?: string;
       trezor?: boolean;
+      from?: string;
     };
     let web3 = await getWeb3(network, mnemonic, trezor);
     let rewardManagerAPI = await getSDK('RewardManager', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
-    let { rewardSafe } = await rewardManagerAPI.registerRewardee(prepaidCard, rewardProgramId, {
-      onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
+    let { rewardSafe } = await rewardManagerAPI.registerRewardee(
+      prepaidCard,
+      rewardProgramId,
+      {
+        onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      },
+      { from }
+    );
     console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
   },
 } as CommandModule;
