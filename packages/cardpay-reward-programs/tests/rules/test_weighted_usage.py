@@ -27,15 +27,15 @@ def rule(request):
         "start_block": 20000000,
         "end_block": 26000000,
         "payment_cycle_length": payment_cycle_length,
+        "subgraph_config_locations": {
+            "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
+        },
     }
     user_config = {
         "base_reward": 10,
         "transaction_factor": transaction_factor,
         "spend_factor": spend_factor,
         "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
-        "subgraph_config_location": {
-            "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
-        },
         "duration": 43200,
     }
     return WeightedUsage(core_config, user_config)

@@ -16,14 +16,12 @@ class RetroAirdrop(Rule):
         self,
         total_reward,
         token,
-        subgraph_config_location,
         duration,
         start_snapshot_block,
         end_snapshot_block,
         excluded_accounts
     ):
         self.token = token
-        self.subgraph_config_location = subgraph_config_location
         self.duration = duration
         self.total_reward = total_reward
         self.start_snapshot_block = start_snapshot_block
@@ -53,11 +51,11 @@ class RetroAirdrop(Rule):
     ):
         mask = df['payee'].str.lower().isin(self.excluded_accounts)
         new_df = df[~mask].copy()
-        reward_per_transaction = self.total_reward / new_df["transactions"].sum()
+        reward_per_transaction = int(self.total_reward // new_df["transactions"].sum())
         new_df["rewardProgramID"] = reward_program_id
         new_df["paymentCycle"] = payment_cycle
-        new_df["validFrom"] = self.end_block
-        new_df["validTo"] = self.end_block + self.duration
+        new_df["validFrom"] = payment_cycle
+        new_df["validTo"] = payment_cycle + self.duration
         new_df["token"] = self.token
         new_df["amount"] = new_df["transactions"] * reward_per_transaction
         new_df = new_df.drop(["transactions"], axis=1)

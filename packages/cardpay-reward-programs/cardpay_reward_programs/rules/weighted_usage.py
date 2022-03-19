@@ -14,13 +14,11 @@ class WeightedUsage(Rule):
         spend_factor: int,
         token: str,
         duration: int,
-        subgraph_config_location,
     ):
         self.base_reward = base_reward
         self.transaction_factor = transaction_factor
         self.spend_factor = spend_factor
         self.token = token
-        self.subgraph_config_location = subgraph_config_location
         self.duration = duration
 
     def sql(self, table_query):
