@@ -1,0 +1,40 @@
+[project]
+name = "Cardpay rewards"
+version = "0.0.1"
+description = ""
+authors = [
+    {name = "Ian Calvert", email = "i.calvert@digital-science.com"},
+]
+dependencies = [
+    "cachetools>=5.0.0",
+    "pyyaml>=6.0",
+    "pyarrow>=7.0.0",
+    "typer>=0.4.0",
+    "pandas>=1.4.1",
+    "cloudpathlib[s3]>=0.7.0",
+    "boto3>=1.21.16",
+    "eth-utils>=1.10.0",
+    "eth-abi>=2.1.1",
+    "eth-typing>=2.3.0",
+    "merklelib @ git+https://git@github.com/cardstack/merklelib@master",
+    "pysha3>=1.0.2",
+    "duckdb>=0.3.2",
+    "python-dotenv>=0.19.2",
+    "future-fstrings>=1.2.0",
+]
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = ""
+[tool.pdm]
+[project.optional-dependencies]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.0.1",
+    "black>=22.1.0",
+    "isort>=5.10.1"
+]
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"

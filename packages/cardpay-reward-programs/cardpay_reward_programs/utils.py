@@ -7,6 +7,7 @@ from cloudpathlib import AnyPath, CloudPath
 from cachetools import cached, TTLCache
 
 
+
 def get_local_file(file_location):
     if isinstance(file_location, PosixPath):
         return file_location.as_posix()
@@ -76,10 +77,6 @@ def get_parameters(parameters):
     core_parameters = parameters.get("core")
     user_defined_parameters = parameters.get("user_defined")
     return core_parameters, user_defined_parameters
-
-
-def to_camel_case(snake_str):
-    return "".join(word.title() for word in snake_str.split("_"))
 
 
 def get_payment_cycle(start_block, end_block, payment_cycle_length):
