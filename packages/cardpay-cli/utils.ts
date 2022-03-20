@@ -11,39 +11,33 @@ const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export type ConnectionType = 'mnemonic' | 'trezor' | 'wallet-connect';
 
-interface Web3OptsDefault {}
-
-interface Web3OptsMnemonic extends Web3OptsDefault {
+interface Web3OptsMnemonic {
   connectionType: 'mnemonic';
   mnemonic: string;
 }
 
-interface Web3OptsTrezor extends Web3OptsDefault {
+interface Web3OptsTrezor {
   connectionType: 'trezor';
 }
 
-interface Web3OptsWalletConnect extends Web3OptsDefault {
+interface Web3OptsWalletConnect {
   connectionType: 'wallet-connect';
 }
 
 export type Web3Opts = Web3OptsMnemonic | Web3OptsTrezor | Web3OptsWalletConnect;
 
 export function getWeb3Opts(args: Arguments): Web3Opts {
-  let o: Web3OptsDefault = {};
   switch (args.connectionType as ConnectionType) {
     case 'wallet-connect':
       return {
-        ...o,
         connectionType: 'wallet-connect',
       } as Web3OptsWalletConnect;
     case 'trezor':
       return {
-        ...o,
         connectionType: 'trezor',
       } as Web3OptsTrezor;
     case 'mnemonic':
       return {
-        ...o,
         connectionType: 'mnemonic',
         mnemonic: args.mnemonic,
       } as Web3OptsMnemonic;
