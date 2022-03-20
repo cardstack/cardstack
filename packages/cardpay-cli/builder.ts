@@ -15,6 +15,11 @@ export function buildYargs(args: string[]) {
         type: 'string',
         description: 'Phrase for mnemonic wallet',
       },
+      walletConnect: {
+        alias: 'w',
+        type: 'boolean',
+        description: 'A flag to indicate that wallet connect should be used for the wallet',
+      },
     })
     .check((argv) => {
       if (process.env.BUILDING_README) {
@@ -23,7 +28,7 @@ export function buildYargs(args: string[]) {
       switch (argv.connectionType) {
         case 'mnemonic':
           if (!argv.mnemonic) {
-            return `mnemonic not specified with connectionType ${argv.connectionType}`;
+            return `Must specify '--mnemonic' when using connectionType of 'mnemonic'`;
           } else {
             argv.web3Opts = {
               mnemonic: argv.mnemonic,
@@ -35,8 +40,9 @@ export function buildYargs(args: string[]) {
         case 'trezor':
           return true;
         default:
-          return 'You need connectionType';
+          return `Wrong arguments with using connectionType of '${argv.connectionType}'`;
       }
     })
-    .demandOption(['network'], `'network' must be specified.`);
+    .demandOption(['network'], `'network' must be specified.`)
+    .demandOption(['connectionType'], `'connectionType' must be specified.`);
 }
