@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { Proof, getSDK, WithSymbol } from '@cardstack/cardpay-sdk';
 import groupBy from 'lodash/groupBy';
@@ -25,15 +25,13 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, address, rewardProgramId, tokenAddress, trezor } = args as unknown as {
+    let { network, address, rewardProgramId, tokenAddress } = args as unknown as {
       network: string;
       address: string;
       rewardProgramId?: string;
       tokenAddress?: string;
-      mnemonic?: string;
-      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic, trezor);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
     const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
     displayProofs(proofs);

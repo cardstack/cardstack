@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 const { toWei } = Web3.utils;
@@ -29,16 +29,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token, safeAddress, recipient, amount, trezor } = args as unknown as {
+    let { network, token, safeAddress, recipient, amount } = args as unknown as {
       network: string;
-      mnemonic?: string;
       safeAddress: string;
       token: string;
       recipient: string;
       amount: string;
-      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic, trezor);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let weiAmount = toWei(amount);
 
     let safes = await getSDK('Safes', web3);

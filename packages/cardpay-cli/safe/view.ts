@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { displaySafe } from './utils';
 
@@ -16,13 +16,12 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, safeAddress, trezor } = args as unknown as {
+    let { network, safeAddress } = args as unknown as {
       network: string;
-      mnemonic?: string;
       safeAddress: string;
-      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic, trezor);
+
+    let web3 = await getWeb3(network, getWeb3Opts(args));
 
     let safesApi = await getSDK('Safes', web3);
     console.log(`Getting safe ${safeAddress}`);

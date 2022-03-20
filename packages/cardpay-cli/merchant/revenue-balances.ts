@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
@@ -16,13 +16,11 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, merchantSafe, trezor } = args as unknown as {
+    let { network, merchantSafe } = args as unknown as {
       network: string;
       merchantSafe: string;
-      mnemonic?: string;
-      trezor?: boolean;
     };
-    let web3 = await getWeb3(network, mnemonic, trezor);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let revenuePool = await getSDK('RevenuePool', web3);
     let balanceInfo = await revenuePool.balances(merchantSafe);
     console.log(`Merchant revenue balance for merchant safe ${merchantSafe}:`);

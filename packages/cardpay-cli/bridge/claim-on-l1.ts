@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_1 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_1, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -26,16 +26,14 @@ export default {
       });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, messageId, encodedData, signatures, trezor } = args as unknown as {
+    let { network, messageId, encodedData, signatures } = args as unknown as {
       network: string;
-      mnemonic?: string;
       messageId: string;
       encodedData: string;
       signatures: string[];
-      trezor?: boolean;
     };
 
-    let web3 = await getWeb3(network, mnemonic, trezor);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
 
