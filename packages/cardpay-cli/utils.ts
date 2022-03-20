@@ -46,7 +46,7 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
 
 export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
   switch (opts.connectionType) {
-    case 'wallet-connect':
+    case 'wallet-connect': {
       let provider = new WalletConnectProvider({
         clientMeta: {
           description: '',
@@ -64,6 +64,7 @@ export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
       });
       await provider.enable();
       return new Web3(provider as unknown as AbstractProvider);
+    }
     case 'mnemonic':
       return new Web3(
         new HDWalletProvider({
