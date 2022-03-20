@@ -15,11 +15,6 @@ export function buildYargs(args: string[]) {
         type: 'string',
         description: 'Phrase for mnemonic wallet',
       },
-      walletConnect: {
-        alias: 'w',
-        type: 'boolean',
-        description: 'A flag to indicate that wallet connect should be used for the wallet',
-      },
     })
     .check((argv) => {
       if (process.env.BUILDING_README) {
