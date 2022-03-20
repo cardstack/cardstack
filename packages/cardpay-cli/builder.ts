@@ -9,17 +9,22 @@ export function buildYargs(args: string[]) {
     .help()
     .command(commands)
     .options({
-      mnemonic: {
-        alias: 'm',
-        default: process.env.MNEMONIC_PHRASE,
-        type: 'string',
-        description: 'Phrase for mnemonic wallet',
-      },
       connectionType: {
         alias: 'c',
         type: 'string',
         description: 'Connection type',
         demandOption: true,
+      },
+      network: {
+        type: 'string',
+        description: 'Network',
+        demandOption: true,
+      },
+      mnemonic: {
+        alias: 'm',
+        default: process.env.MNEMONIC_PHRASE,
+        type: 'string',
+        description: 'Phrase for mnemonic wallet',
       },
     })
     .check((argv) => {
@@ -41,8 +46,7 @@ export function buildYargs(args: string[]) {
         case 'trezor':
           return true;
         default:
-          return `Wrong arguments with using connectionType of '${argv.connectionType}'`;
+          return `Must choose either 'mnemonic, wallet-connect, treozr' for connectionType`;
       }
-    })
-    .demandOption(['network'], `'network' must be specified.`);
+    });
 }
