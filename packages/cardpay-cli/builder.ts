@@ -15,6 +15,12 @@ export function buildYargs(args: string[]) {
         type: 'string',
         description: 'Phrase for mnemonic wallet',
       },
+      connectionType: {
+        alias: 'c',
+        type: 'string',
+        description: 'Connection type',
+        demandOption: true,
+      },
     })
     .check((argv) => {
       if (process.env.BUILDING_README) {
@@ -38,6 +44,5 @@ export function buildYargs(args: string[]) {
           return `Wrong arguments with using connectionType of '${argv.connectionType}'`;
       }
     })
-    .demandOption(['network'], `'network' must be specified.`)
-    .demandOption(['connectionType'], `'connectionType' must be specified.`);
+    .demandOption(['network'], `'network' must be specified.`);
 }
