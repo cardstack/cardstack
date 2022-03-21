@@ -140,6 +140,11 @@
   "engines": {
     "node": ">= 12"
   },
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not op_mini all"
+  ],
   "ember": {
     "edition": "octane"
   },

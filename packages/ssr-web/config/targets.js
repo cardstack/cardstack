@@ -1,6 +1,6 @@
 'use strict';
 
-const browsers = ['defaults', 'not ie 11', 'not op_mini all'];
+const browsers = require('../package.json').browserslist;
 
 // const isCI = Boolean(process.env.CI);
 // const isProduction = process.env.EMBER_ENV === 'production';
