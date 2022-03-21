@@ -17,7 +17,8 @@ module.exports = {
       true,
       {
         severity: 'warning',
-        ignoreValues: ['string'],
+        // needed for multiline truncation (-webkit-box)
+        ignoreValues: ['box'],
       },
     ],
     'plugin/no-unsupported-browser-features': [
