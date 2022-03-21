@@ -1,11 +1,19 @@
 {
   "extends": "stylelint-config-standard",
+  "plugins": [
+    "stylelint-no-unsupported-browser-features"
+  ],
   "ignoreFiles": [
     "dist/**/*.css",
     "node_modules/**/*.css"
   ],
   "rules": {
     "property-no-vendor-prefix": null,
-    "selector-class-pattern": "^[a-z]([a-z0-9-]+)?(__([a-z0-9]+-?)+)?(--([a-z0-9]+-?)+){0,2}$"
+    "selector-class-pattern": "^[a-z]([a-z0-9-]+)?(__([a-z0-9]+-?)+)?(--([a-z0-9]+-?)+){0,2}$",
+    "plugin/no-unsupported-browser-features": [true, {
+      "browsers": ["defaults", "not ie 11", "not op_mini all"],
+      "severity": "warning",
+      "ignore": ["multicolumn"]
+    }]
   }
 }
