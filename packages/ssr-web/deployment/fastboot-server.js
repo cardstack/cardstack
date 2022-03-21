@@ -19,6 +19,7 @@ Sentry.init({
 });
 
 let server = new FastBootAppServer({
+  log: false,
   distPath: 'dist',
   gzip: true, // Optional - Enables gzip compression.
   host: '0.0.0.0', // Optional - Sets the host the server listens on.
@@ -38,6 +39,23 @@ let server = new FastBootAppServer({
   beforeMiddleware: function (app) {
     app.use(Sentry.Handlers.requestHandler());
     app.use(healthCheckMiddleware);
+
+    let ignoreUrlPattern = /^\/(assets\/|images\/).*(\..*)/;
+
+    let logger = function (req, res, next) {
+      if (!ignoreUrlPattern.test(req.url)) {
+        let fullUrl = req.get('host') + req.originalUrl;
+
+        console.log(
+          `${new Date().toISOString()}: ${req.method} ${fullUrl} ${
+            res.statusCode
+          }`
+        );
+      }
+      next();
+    };
+
+    app.use(logger);
   },
 
   afterMiddleware: function (app) {
