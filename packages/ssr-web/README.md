@@ -77,6 +77,36 @@ resolver #8
 
 You may need to specifically type the full url in Safari: `http://someone.card.xyz.localhost:4210`.
 
+### Viewing the locally served app on a mobile device
+
+To connect a wallet using WalletConnect on a mobile device, a https connection is needed, otherwise connecting a wallet will fail.
+
+To get around that, we recommend setting up a tunnel, for
+example a [Cloudflare tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/) which exposes your locally served app via a secure tunnel. If you need to view the locally served app on your mobile often, it makes sense to use long-lived urls, which you can configure using your own subdomains which you set up within your DNS provider.
+
+Your `config.yml` should look like this (replace the hostnames with your own):
+
+```yml
+tunnel: <Tunnel-UUID>
+credentials-file: .cloudflared/<Tunnel-UUID>.json // depends on your cloudflared installation path
+
+ingress:
+  - hostname: cardstack-hub-develop.your-domain.com
+    service: http://localhost:3000
+  - hostname: cardstack-ssr-web-develop.your-domain.com
+    service: http://localhost:4210
+  - hostname: cardstack-web-client-develop.your-domain.com # If you work on web-client too
+    service: http://localhost:4200
+  - service: http_status:404
+```
+
+Follow the [instructions](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/) on how to create CNAME records for your development
+subdomains, and run the tunnel. After your tunnel is running, run the app with the following command (make sure to change the value of `HUB_URL`):
+
+`HUB_URL="https://cardstack-hub-develop.your-domain.com" ember s`
+
+Then, you can access your locally served app on your mobile device using `https://cardstack-ssr-web-develop.your-domain.com`.
+
 ### Running Tests
 
 * `ember test`

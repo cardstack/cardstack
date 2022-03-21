@@ -118,15 +118,15 @@
   justify-content: space-between;
 }
 
-.prepaid-card__content-bottom--without-attributes .prepaid-card__logo {
-  margin-left: auto;
-}
-
 .prepaid-card__logo {
   width: 45px;
   height: 45px;
   background-image: url("/images/icons/cardstack-logo-engraved.svg");
   background-repeat: no-repeat;
+}
+
+.prepaid-card__content-bottom--without-attributes .prepaid-card__logo {
+  margin-left: auto;
 }
 
 .prepaid-card__attributes {

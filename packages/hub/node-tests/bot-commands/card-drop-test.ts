@@ -77,7 +77,7 @@ describe('bot command: card-drop', function () {
 
     await command(getBot(), message);
     expect(channel.responses).to.deep.equal([]);
-    expect(dm.lastResponse).to.contain(`Connect your Card Wallet app to receive your prepaid card.`);
+    expect(dm.lastResponse).to.contain(`Card Wallet app to receive your prepaid card.`);
   });
 
   it(`does not give prepaid cards to users that already received airdrop`, async function () {
