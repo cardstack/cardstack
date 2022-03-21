@@ -94,6 +94,7 @@
   background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
 }
 
+/* stylelint-disable-next-line max-line-length */
 .boxel-card-picker__dropdown .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
   cursor: pointer;
 }
