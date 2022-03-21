@@ -143,7 +143,7 @@ if (process.env.COMPILER) {
       expect(card.compiled.url).to.eq(`${realm}test`);
     });
 
-    it.only('can handle unconsumed field import for different types of import specifiers', async function () {
+    it('can handle unconsumed field import for different types of import specifiers', async function () {
       await cards.create({
         realm,
         id: 'bar',
