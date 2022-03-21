@@ -25,7 +25,7 @@
 }
 
 .card-space-user-page__user-content {
-  align-self:center;
+  align-self: center;
   grid-area: user-content;
   max-width: 100%;
 }
@@ -53,11 +53,11 @@
     inherit the text color so that the logo does not have contrast issues.
     background and text color on this page are dynamic.
   */
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .card-space-user-page__header > a:hover {
-  color: currentColor;
+  color: currentcolor;
 }
 
 .card-space-user-page__description {
