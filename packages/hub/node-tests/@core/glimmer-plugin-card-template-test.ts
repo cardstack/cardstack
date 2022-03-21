@@ -10,7 +10,6 @@ function importAndChooseName() {
 if (process.env.COMPILER) {
   describe('Glimmer CardTemplatePlugin', function () {
     let options: Options;
-    let defaultFieldFormat: Options['defaultFieldFormat'];
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
@@ -48,7 +47,6 @@ if (process.env.COMPILER) {
 
     this.beforeEach(function () {
       usageMeta = { model: new Set(), fields: new Map() };
-      defaultFieldFormat = 'embedded';
     });
 
     describe('Primitive Fields', function () {
@@ -56,25 +54,20 @@ if (process.env.COMPILER) {
         let template = transform('{{@model}}', {
           fields: {},
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
         expect(template).to.equal('{{@model}}');
-
-        expect(usageMeta['model']).to.equal('self');
-        expect(usageMeta['fields']).to.deep.equal(new Map());
       });
 
       it('date-like', async function () {
         let template = transform('<FormatDate @date={{@model}} />', {
           fields: {},
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
         expect(template).to.equal('<FormatDate @date={{@model}} />');
-        expect(usageMeta['model']).to.equal('self');
-        expect(usageMeta['fields']).to.deep.equal(new Map());
       });
     });
 
@@ -90,15 +83,13 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
 
         expect(template, 'Component invocation is converted to handlebars expression').to.deep.equal(
           '{{@model.title}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['title', defaultFieldFormat]]));
       });
 
       it('simple model usage', async function () {
@@ -112,15 +103,13 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
 
         expect(template, 'Component invocation is converted to handlebars expression').to.deep.equal(
           '{{helper @model.title}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set(['title']));
-        expect(usageMeta['fields']).to.deep.equal(new Map());
       });
 
       it('Embedding with imports', async function () {
@@ -135,7 +124,7 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string) {
             expect(desiredName, 'desiredName is based on the type of card').to.deep.equal('HttpsCardstackComBaseDate');
             expect(importedName, 'Uses the default import').to.deep.equal('default');
@@ -150,8 +139,6 @@ if (process.env.COMPILER) {
         expect(template, 'Use the desired importname at component invocation site').to.equal(
           '<HttpsCardstackComBaseDateField @model={{@model.createdAt}} data-test-field-name="createdAt" />'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['createdAt', defaultFieldFormat]]));
       });
 
       it('Nested fields', async function () {
@@ -171,19 +158,12 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
 
         expect(template, 'Component invocation is converted to handlebars expression').to.equal(
           '{{@model.title}}{{@model.list.name}}'
-        );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(
-          new Map([
-            ['title', defaultFieldFormat],
-            ['list.name', defaultFieldFormat],
-          ])
         );
       });
     });
@@ -206,7 +186,7 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         };
       });
@@ -215,32 +195,23 @@ if (process.env.COMPILER) {
         expect(
           transform('{{#each @fields.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options)
         ).to.equal('{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}');
-        expect(usageMeta['model']).to.deep.equal(new Set(), 'No @model usage meta');
-        expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]), 'items as @field meta');
       });
 
       it('each-as loops for strings in nested cards', async function () {
         expect(
           transform('{{#each @fields.list.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options)
         ).to.equal('{{#each @model.list.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}');
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['list.items', defaultFieldFormat]]));
       });
 
       it('Compononet invocation for strings', async function () {
         let template = transform('<@fields.items />', options);
-
         expect(template).to.equal('{{#each @model.items as |item|}}{{item}}{{/each}}');
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
       });
 
       it('Compononet invocation for nested fields', async function () {
         let template = transform('<@fields.list.items />', options);
 
         expect(template).to.equal('{{#each @model.list.items as |item|}}{{item}}{{/each}}');
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['list.items', defaultFieldFormat]]));
       });
     });
 
@@ -263,7 +234,7 @@ if (process.env.COMPILER) {
           },
           usageMeta,
           importAndChooseName,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
         };
       });
 
@@ -272,8 +243,6 @@ if (process.env.COMPILER) {
           transform('{{#each @fields.items as |Item|}}<Item />{{/each}}', options),
           '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} data-test-field-name="items" />{{/each}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
       });
 
       it('each-as loops for dates in nested card', async function () {
@@ -281,8 +250,6 @@ if (process.env.COMPILER) {
           transform('{{#each @fields.list.dates as |ADate|}}<ADate />{{/each}}', options),
           '{{#each @model.list.dates as |ADate|}}<BestGuess @model={{ADate}} data-test-field-name="dates" />{{/each}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['list.dates', defaultFieldFormat]]));
       });
 
       it('component invocation for dates', async function () {
@@ -290,8 +257,6 @@ if (process.env.COMPILER) {
           transform('<@fields.items />', options),
           '{{#each @model.items as |item|}}<BestGuess @model={{item}} data-test-field-name="items" />{{/each}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
       });
 
       it('component invocation for dates in nested card', async function () {
@@ -299,8 +264,6 @@ if (process.env.COMPILER) {
           transform('<@fields.list.dates />', options),
           '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} data-test-field-name="dates" />{{/each}}'
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(new Map([['list.dates', defaultFieldFormat]]));
       });
     });
 
@@ -360,11 +323,9 @@ if (process.env.COMPILER) {
       transform(template, {
         fields: compiled.fields,
         usageMeta,
-        defaultFieldFormat,
+        defaultFieldFormat: 'embedded',
         importAndChooseName,
       });
-      expect(usageMeta['model']).to.deep.equal(new Set());
-      expect(usageMeta['fields']).to.deep.equal(new Map([['posts', defaultFieldFormat]]));
     });
 
     describe('@fields API', function () {
@@ -397,7 +358,7 @@ if (process.env.COMPILER) {
             },
           },
           usageMeta,
-          defaultFieldFormat,
+          defaultFieldFormat: 'embedded',
           importAndChooseName,
         };
       });
@@ -432,15 +393,6 @@ if (process.env.COMPILER) {
          <Whichever @field={{Field}} />
          `
         );
-        expect(usageMeta['model']).to.deep.equal(new Set());
-        expect(usageMeta['fields']).to.deep.equal(
-          new Map([
-            ['title', defaultFieldFormat],
-            ['startDate', defaultFieldFormat],
-            ['items', defaultFieldFormat],
-            ['events', defaultFieldFormat],
-          ])
-        );
       });
     });
 
@@ -456,7 +408,7 @@ if (process.env.COMPILER) {
           {
             usageMeta,
             importAndChooseName,
-            defaultFieldFormat,
+            defaultFieldFormat: 'embedded',
             fields: {
               birthdays: {
                 name: 'birthdays',
@@ -475,8 +427,6 @@ if (process.env.COMPILER) {
           {{/let}}
         {{/each}}`
       );
-      expect(usageMeta['model']).to.deep.equal(new Set());
-      expect(usageMeta['fields']).to.deep.equal(new Map([['birthdays', defaultFieldFormat]]));
     });
 
     describe('Error Scenarios', function () {

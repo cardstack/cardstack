@@ -48,7 +48,10 @@ export default function (params: TransformComponentOptions): {
   }
 }
 
-function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: TemplateUsageMeta } {
+export function analyzeComponent(
+  templateSource: string,
+  debugFilename: string
+): { ast: t.File; meta: TemplateUsageMeta } {
   let meta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
 
   let out = transformSync(templateSource, {
