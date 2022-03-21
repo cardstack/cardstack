@@ -144,26 +144,26 @@ if (process.env.COMPILER) {
     });
 
     it.only('can handle unconsumed field import for different types of import specifiers', async function () {
-      // also think about different types of import specifiers that are unused, like:
-      // import foo from 'foo';
-      // import bar3, { bar, bar2 } from 'bar'
-      // import * as blop from 'blop'
-
       await cards.create({
         realm,
-        id: 'foo',
+        id: 'bar',
         schema: 'schema.js',
         files: {
           'schema.js': `
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
 
-              export default class Foo {
+              export default class Bar {
                 @contains(string) bar;
               }
 
               let bar1 = 'bar-1';
-              export { bar1 };
+              let bar3 = 'bar-3';
+              let bar4 = 'bar-4';
+              let bar5 = 'bar-5';
+              export { bar1, bar3, bar4, bar5 };
+
+              export let bar2 = 'bar-2';
             `,
         },
       });
@@ -176,40 +176,17 @@ if (process.env.COMPILER) {
           'schema.js': `
               import { contains } from "@cardstack/types";
               import string from "https://cardstack.com/base/string";
-              import { bar1 } from "../foo";
+              import * as foo from "../bar";
+              import { bar3 } from "../bar";
+              import bar2, { bar1, bar4 } from "../bar";
+              import { bar5 as bar } from "../bar";
 
               export default class Test {
                 @contains(string) name;
-
-                get myBar1() {
-                  return bar1;
-                }
               }
             `,
         },
       });
-
-      // let card = await cards.create({
-      //   realm,
-      //   id: 'test',
-      //   schema: 'schema.js',
-      //   files: {
-      //     'schema.js': `
-      //         import { contains } from "@cardstack/types";
-      //         import string from "https://cardstack.com/base/string";
-      //         import * as bar from "../foo";
-
-      //         export default class Test {
-      //           @contains(string) name;
-
-      //           get foo() {
-      //             return bar;
-      //           }
-      //         }
-      //       `,
-      //   },
-      // });
-
       expect(card.compiled.url).to.eq(`${realm}test`);
     });
 
