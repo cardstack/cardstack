@@ -68,7 +68,7 @@ export const run: Command['run'] = async (bot: Client, message: Message) => {
 
 To claim a prepaid card you’ll need Card Wallet app to receive your prepaid card.
 
-If you do not have the Card Wallet app, download Card Wallet at https://cardstack.com/ios or https://cardstack.com/android
+If you do not have the Card Wallet app, download Card Wallet at <https://cardstack.com/ios> or <https://cardstack.com/android>
 
 Type "ok" if you are ready to continue.`
   );
