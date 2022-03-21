@@ -17,7 +17,6 @@ interface State {
   dataIdentifier: string;
   loadedFieldsIdentifier: string;
   isDeserializedIdentifier: string;
-  serializedMemberNames: { [fieldName: string]: string };
   cardName: string;
   opts: Options;
 }
@@ -159,7 +158,8 @@ export default function main(babel: typeof Babel) {
           addLoadedFieldsMethod(path, state, babel);
           addHasFieldMethod(path, state, babel);
           addSerializeMethod(path, state, babel);
-          addSerializedMemberNames(path, state, babel.types);
+          addSerializedGetMethod(path, state, babel);
+          addSerializedSetMethod(path, state, babel);
         },
       },
     },
@@ -431,6 +431,10 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, 
     });
   }
 }
+
+// HASSAN start here on monday
+function addSerializedGetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {}
+function addSerializedSetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {}
 
 function makeCompositeSetter({
   insertAfterPath,

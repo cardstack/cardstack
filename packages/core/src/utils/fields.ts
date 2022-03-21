@@ -136,10 +136,6 @@ export function keySensitiveGet(data: any, key: string) {
   return value;
 }
 
-export function serializerFor(schemaInstance: any, field: string) {
-  return (schemaInstance.constructor as CardSchema).serializedMemberNames[field] ?? field;
-}
-
 // In this setter we are careful not to get the leaf, as it may throw a NotReady
 // because it is missing (and we are about to set it). lodash set will
 // inadvertently trigger our NotReady errors

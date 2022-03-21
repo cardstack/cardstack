@@ -26,8 +26,6 @@ if (process.env.COMPILER) {
               getRawField = "don't collide!";
               @contains(date) birthdate;
               @contains(string) background;
-
-              serializedBirthdate = "don't collide!";
             }
           `,
       },
@@ -200,6 +198,82 @@ if (process.env.COMPILER) {
       `);
     });
 
+    it('can compile a serializedGet', async function () {
+      let { compiled } = await cards.load(`${realm}bio`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import * as DateSerializer from "@cardstack/compiled/https-cardstack.com-base-date/serializer.js";
+      `);
+      expect(source).to.containsSource(`
+        static serializeGet(instance, field) {
+          let fields;
+          if (field === "birthdate") {
+            let value = keySensitiveGet(instance.data, field);
+            if (!instance.isDeserialized[field] || value === null) {
+              return value;
+            }
+            return DateSerializer.serialize(value);
+          }
+          return keySensitiveGet(instance.data, field);
+        }
+      `);
+    });
+
+    it('can compile a serializedSet', async function () {
+      let { compiled } = await cards.load(`${realm}bio`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        static serializeSet(instance, field, value) {
+          if (field === "birthdate") {
+            instance.data[field] = value;
+            instance.isDeserialized[field] = false;
+          } else {
+            instance.data[field] = value;
+            instance.isDeserialized[field] = false;
+          }
+        }
+      `);
+    });
+
+    it('can compile a serializedGet for a schema that has composite fields', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
+      `);
+      expect(source).to.containsSource(`
+        static serializeGet(instance, field) {
+          let fields;
+          if (field === "aboutMe") {
+            let fields = getFieldsAtPath(field, instance.loadedFields);
+            return BioClass.serialize(instance.data[field], fields);
+          }
+          return keySensitiveGet(instance.data, field);
+        }
+      `);
+    });
+
+    it('can compile a serializedSet for a schema that has composite fields', async function () {
+      let { compiled } = await cards.load(`${realm}person`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(`
+        import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
+      `);
+      expect(source).to.containsSource(`
+        static serializeSet(instance, field, value) {
+          let fields;
+          if (field === "aboutMe") {
+            let fields = getFieldsAtPath(field, instance.loadedFields);
+            instance.data[field] = new BioClass(value, fields);
+            instance.isDeserialized[field] = false;
+          } else {
+            instance.data[field] = value;
+            instance.isDeserialized[field] = false;
+          }
+        }
+      `);
+    });
+
     //TODO use a static method for serializedGet and serializedSet
     // setSerialized(key, value) {
     // compile into this the serialized function
@@ -227,27 +301,6 @@ if (process.env.COMPILER) {
           return [...schemaInstance.loadedFields];
         }
       `);
-    });
-
-    it('can compile serialized field member names into the schema class', async function () {
-      {
-        let { compiled } = await cards.load(`${realm}bio`);
-        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        expect(source).to.containsSource(`
-          static serializedMemberNames = {
-            birthdate: "serializedBirthdate0"
-          }
-        `);
-      }
-      {
-        let { compiled } = await cards.load(`${realm}person`);
-        let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
-        expect(source).to.containsSource(`
-          static serializedMemberNames = {
-            aboutMe: "serializedAboutMe"
-          }
-        `);
-      }
     });
 
     // data = {}
@@ -301,9 +354,6 @@ if (process.env.COMPILER) {
           this.isDeserialized["background"] = true;
         }
       `);
-      expect(source).to.not.containsSource(`
-        serializedBackground(
-      `);
     });
 
     it('can compile primitive field with custom serializer in schema.js module', async function () {
@@ -326,17 +376,6 @@ if (process.env.COMPILER) {
           this.data["birthdate"] = value;
           this.isDeserialized["birthdate"] = true;
         }
-        get serializedBirthdate0() {
-          let value = keySensitiveGet(this.data, "birthdate");
-          if (!this.isDeserialized["birthdate"] || value === null) {
-            return value;
-          }
-          return DateSerializer.serialize(value);
-        }
-        set serializedBirthdate0(value) {
-          this.data["birthdate"] = value;
-          this.isDeserialized["birthdate"] = false;
-        }
         `);
       // the setter should remove field from the deserialized data and sets the field in the serialized data and vice-versa
       // the getter should populate either the serialized data or the deserialized data so it's cached and used a cached value if available
@@ -348,9 +387,6 @@ if (process.env.COMPILER) {
       expect(source).to.not.containsSource(`@contains`);
       expect(source).to.not.containsSource(`${realm}bio`);
       expect(source).to.containsSource(`
-          import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
-        `);
-      expect(source).to.containsSource(`
         get aboutMe() {
           return keySensitiveGet(this.data, "aboutMe");
         }
@@ -358,15 +394,6 @@ if (process.env.COMPILER) {
           let fields = getFieldsAtPath("aboutMe", this.loadedFields);
           this.data["aboutMe"] = new BioClass(value, fields, true);
           this.isDeserialized["aboutMe"] = true;
-        }
-        set serializedAboutMe(value) {
-          let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-          this.data["aboutMe"] = new BioClass(value, fields);
-          this.isDeserialized["aboutMe"] = false;
-        }
-        get serializedAboutMe() {
-          let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-          return BioClass.serialize(this.data["aboutMe"], fields);
         }
       `);
     });
