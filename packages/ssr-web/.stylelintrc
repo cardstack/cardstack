@@ -14,6 +14,10 @@
       "severity": "warning",
       "ignoreShorthands": ["/^grid-.+/"]
     }],
+    "value-no-vendor-prefix": [true, {
+      "severity": "warning",
+      "ignoreValues": ["string"]
+    }],
     "plugin/no-unsupported-browser-features": [true, {
       "severity": "warning",
       "ignore": ["multicolumn"]
