@@ -98,28 +98,28 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.payment-link__qr {
+.card-space-user-payment-link__qr {
   max-width: 100%;
 }
 
-.payment-link__qr-container__actions {
+.card-space-user-payment-link__qr-container__actions {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.payment-link__qr-container__actions > a {
+.card-space-user-payment-link__qr-container__actions > a {
   margin: var(--boxel-sp-lg);
 }
 
-.payment-link__qr-container__separator {
+.card-space-user-payment-link__qr-container__separator {
   width: 100%;
   height: 1px;
   background: var(--boxel-light-600);
   margin-top: var(--boxel-sp-xs);
 }
 
-.payment-link__qr-container__separator-or {
+.card-space-user-payment-link__qr-container__separator-or {
   margin: auto;
   color: #000;
   background: #fff;
