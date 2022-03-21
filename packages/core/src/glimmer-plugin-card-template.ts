@@ -14,9 +14,6 @@ import { classify } from './utils';
 import { augmentBadRequest } from './utils/errors';
 import { getFieldForPath } from './utils/fields';
 
-const MODEL = '@model';
-const FIELDS = '@fields';
-
 const IN_PROCESS_ELEMENT_ESCAPE = '__';
 class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
@@ -110,7 +107,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       name: 'card-glimmer-plugin',
       visitor: {
         ElementNode(node, path) {
-          if (node.tag === FIELDS) {
+          if (node.tag === '@fields') {
             throw new InvalidFieldsUsageError();
           }
 
@@ -123,7 +120,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               throw new Error(`unknown field ${fieldFullPath}`);
             }
             if (field.type === 'containsMany') {
-              return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
+              return expandContainsManyShorthand(`@fields.${fieldFullPath}`);
             }
             if (usageMeta.fields !== 'self') {
               usageMeta.fields.set(fieldFullPath, fieldFormat);
@@ -131,7 +128,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             return rewriteElementNode({
               field,
               importAndChooseName,
-              modelArgument: `${MODEL}.${fieldFullPath}`,
+              modelArgument: `@model.${fieldFullPath}`,
               format: field.computed ? 'embedded' : fieldFormat === 'default' ? defaultFieldFormat : fieldFormat,
               state,
             });
@@ -155,7 +152,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               throw new Error(`tried to replace a component invocation with a path expression`);
             case 'fieldComponent':
               if (val.expandable && val.field.type === 'containsMany') {
-                return expandContainsManyShorthand(`${FIELDS}.${val.fieldFullPath}`);
+                return expandContainsManyShorthand(`@fields.${val.fieldFullPath}`);
               }
               if (usageMeta.fields !== 'self') {
                 usageMeta.fields.set(val.fieldFullPath, fieldFormat);
@@ -174,9 +171,9 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
         PathExpression(node, path) {
           if (state.handledFieldExpressions.has(node)) {
-            let pathTail = node.original.slice(`${FIELDS}.`.length);
+            let pathTail = node.original.slice(`@fields.`.length);
 
-            let newExpression = env.syntax.builders.path(`${MODEL}.${pathTail}`);
+            let newExpression = env.syntax.builders.path(`@model.${pathTail}`);
             state.handledModelExpressions.add(newExpression);
             return newExpression;
           }
@@ -432,7 +429,7 @@ function rewriteFieldToComponent(
   let attrs = [attr('@model', mustache(modelExpression)), attr('data-test-field-name', text(field.name))];
 
   if (format === 'edit') {
-    let setterArg = modelArgument.replace(MODEL + '.', '');
+    let setterArg = modelArgument.replace('@model.', '');
     attrs.push(attr('@set', mustache(path(`@set.setters.${setterArg}`))));
   }
 
@@ -451,7 +448,7 @@ function isFieldsIterator(node: BlockStatement): boolean {
 }
 
 function isFieldPathExpression(exp: PathExpression): boolean {
-  return exp.original.startsWith(FIELDS);
+  return exp.original.startsWith('@fields');
 }
 
 function fieldPathForPathExpression(exp: PathExpression): string | undefined {
@@ -469,7 +466,7 @@ function trackUsageForModel(
   if (
     node.original === 'debugger' ||
     node.head.type !== 'AtHead' ||
-    node.head.name !== MODEL ||
+    node.head.name !== '@model' ||
     handledModelExpressions.has(node)
   ) {
     return;
@@ -486,8 +483,8 @@ function trackUsageForModel(
 }
 
 function fieldPathForElementNode(node: ElementNode): string | undefined {
-  if (node.tag.startsWith(`${FIELDS}.`)) {
-    return node.tag.slice(`${FIELDS}.`.length);
+  if (node.tag.startsWith(`@fields.`)) {
+    return node.tag.slice(`@fields.`.length);
   }
   return undefined;
 }
