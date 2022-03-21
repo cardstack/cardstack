@@ -108,6 +108,8 @@
   flex-direction: column;
 }
 
+/* the violation below is for 2 different parents */
+/* stylelint-disable-next-line no-descending-specificity */
 .card-space-user-payment-link__qr-container__actions > a {
   margin: var(--boxel-sp-lg);
 }
