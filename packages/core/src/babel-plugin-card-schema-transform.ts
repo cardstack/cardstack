@@ -34,7 +34,6 @@ export default function main(babel: typeof Babel) {
     visitor: {
       Program: {
         enter(path: NodePath<t.Program>, state: State) {
-          state.serializedMemberNames = {};
           state.importUtil = new ImportUtil(babel.types, path);
         },
         exit(path: NodePath<t.Program>, state: State) {
@@ -127,16 +126,16 @@ export default function main(babel: typeof Babel) {
                       if (isDeserialized) {
                         this[field] = value;
                       } else {
-                        this[%%serializerFor%%(this, field)] = value;
+                        %%cardClass%%.serializedSet(this, field, value);
                       }
                     }
                   `)({
-                    serializerFor: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'serializerFor'),
                     padDataWithNull: state.importUtil.import(
                       path,
                       '@cardstack/core/src/utils/fields',
                       'padDataWithNull'
                     ),
+                    cardClass: t.identifier(state.cardName),
                     loadedFields: t.identifier(state.loadedFieldsIdentifier),
                   }) as t.Statement[]),
                 ])
@@ -319,58 +318,14 @@ function transformCompositeField(path: NodePath<t.ClassProperty>, state: State, 
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
-  let classPath = path.parentPath.parentPath as NodePath<t.Class>;
   let fieldName = path.node.key.name;
-  let fieldMeta = state.opts.meta.fields![fieldName];
-  let field = state.opts.fields[fieldName];
-  let serializedField = (state.serializedMemberNames[fieldName] = unusedClassMember(
-    classPath,
-    camelCase(`serialized-${fieldName}`),
-    t
-  ));
-
-  // Always make serialized and deserialized getters/setters for composite fields
-  makeIdentitySerializerGetter({ path, fieldName, getterName: fieldName, state, babel, replace: true });
-  let newPath = makeCompositeSetter({
+  makeFieldGetter({ path, fieldName, state, babel, replace: true });
+  makeCompositeSetter({
     insertAfterPath: path,
     fieldName,
-    setterName: fieldName,
-    isDeserializedSet: true,
     state,
     babel,
   });
-  newPath = makeCompositeSetter({
-    insertAfterPath: newPath,
-    fieldName,
-    setterName: serializedField,
-    isDeserializedSet: false,
-    state,
-    babel,
-  });
-  newPath.insertAfter(
-    t.classMethod(
-      'get',
-      t.identifier(serializedField),
-      [],
-      t.blockStatement(
-        babel.template(`
-          let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-          return %%fieldClass%%.serialize(this.%%data%%[%%fieldName%%], fields);
-        `)({
-          data: t.identifier(state.dataIdentifier),
-          fieldName: t.stringLiteral(fieldName),
-          loadedFields: t.identifier(state.loadedFieldsIdentifier),
-          getFieldsAtPath: state.importUtil.import(newPath, '@cardstack/core/src/utils/fields', 'getFieldsAtPath'),
-          fieldClass: state.importUtil.import(
-            newPath,
-            field.card.schemaModule.global,
-            'default',
-            asClassName(fieldMeta.typeDecoratorLocalName)
-          ),
-        }) as t.Statement[]
-      )
-    )
-  );
 }
 
 function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, babel: typeof Babel) {
@@ -378,76 +333,150 @@ function transformPrimitiveField(path: NodePath<t.ClassProperty>, state: State, 
   if (!t.isIdentifier(path.node.key)) {
     return;
   }
-
   let fieldName = path.node.key.name;
-  let field = state.opts.fields[fieldName];
-  let classPath = path.parentPath.parentPath as NodePath<t.Class>;
-
-  // always add deserialized getters and setters
-  if (field.card.serializerModule) {
-    makeCustomSerializerGetter({
-      path,
-      fieldName,
-      getterName: fieldName,
-      isDeserialized: true,
-      state,
-      babel,
-      replace: true,
-    });
-  } else {
-    makeIdentitySerializerGetter({ path, fieldName, getterName: fieldName, state, babel, replace: true });
-  }
-  let deserializedSetter = makePrimitiveSetter({
+  makeFieldGetter({ path, fieldName, state, babel, replace: true });
+  makePrimitiveSetter({
     insertAfterPath: path,
     fieldName,
     setterName: fieldName,
-    isDeserializedSet: true,
     state,
     babel,
   });
-
-  // if there is a custom serializer module then make serialized getters and setters
-  if (field.card.serializerModule) {
-    let serializedField = (state.serializedMemberNames[fieldName] = unusedClassMember(
-      classPath,
-      camelCase(`serialized-${fieldName}`),
-      t
-    ));
-    let serializedGetter = makeCustomSerializerGetter({
-      path: deserializedSetter,
-      fieldName,
-      getterName: serializedField,
-      isDeserialized: false,
-      state,
-      babel,
-    });
-    makePrimitiveSetter({
-      insertAfterPath: serializedGetter,
-      fieldName,
-      setterName: serializedField,
-      isDeserializedSet: false,
-      state,
-      babel,
-    });
-  }
 }
 
-// HASSAN start here on monday
-function addSerializedGetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {}
-function addSerializedSetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {}
+function addSerializedGetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let body = path.get('body');
+  let fieldsWithCustomSerialization = Object.entries(state.opts.fields)
+    .filter(([, field]) => field.card.serializerModule)
+    .map(
+      ([fieldName, field]) =>
+        babel.template(`
+          if (field === %%fieldName%% && value !== null) {
+            return %%serializerModule%%.serialize(value);
+          }
+        `)({
+          fieldName: t.stringLiteral(fieldName),
+          serializerModule: state.importUtil.import(
+            path,
+            field.card.serializerModule!.global,
+            '*',
+            `${capitalize(field.card.url.split('/')[field.card.url.split('/').length - 1])}Serializer`
+          ),
+        }) as t.Statement
+    );
+
+  let compositeFields = Object.entries(state.opts.fields)
+    .filter(([, field]) => Object.keys(field.card.fields).length > 0)
+    .map(
+      ([fieldName, field]) =>
+        babel.template(`
+        if (field === %%fieldName%%) {
+          let fields = %%getFieldsAtPath%%(field, instance.%%loadedFields%%);
+          return %%fieldClass%%.serialize(value, fields);
+        }
+      `)({
+          fieldName: t.stringLiteral(fieldName),
+          loadedFields: t.identifier(state.loadedFieldsIdentifier),
+          getFieldsAtPath: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getFieldsAtPath'),
+          fieldClass: state.importUtil.import(
+            path,
+            field.card.schemaModule.global,
+            'default',
+            asClassName(
+              state.opts.meta.fields[fieldName]?.typeDecoratorLocalName ??
+                state.opts.fields[fieldName].card.url.split('/').pop()
+            )
+          ),
+        }) as t.Statement
+    );
+
+  body.node.body.unshift(
+    t.classMethod(
+      'method',
+      t.identifier('serializedGet'),
+      ['instance', 'field'].map((name) => t.identifier(name)),
+      t.blockStatement(
+        babel.template(`
+          let value = instance[field];
+          %%fieldsWithCustomSerialization%%
+          %%compositeFields%%
+          return value;
+        `)({
+          fieldsWithCustomSerialization:
+            fieldsWithCustomSerialization.length > 0 ? fieldsWithCustomSerialization : t.emptyStatement(),
+          compositeFields: compositeFields.length > 0 ? compositeFields : t.emptyStatement(),
+        }) as t.Statement[]
+      ),
+      false,
+      true // static
+    )
+  );
+}
+
+function addSerializedSetMethod(path: NodePath<t.Class>, state: State, babel: typeof Babel) {
+  let t = babel.types;
+  let body = path.get('body');
+
+  let compositeFields = Object.entries(state.opts.fields)
+    .filter(([, field]) => Object.keys(field.card.fields).length > 0)
+    .map(
+      ([fieldName, field]) =>
+        babel.template(`
+        if (field === %%fieldName%%) {
+          let fields = %%getFieldsAtPath%%(field, instance.%%loadedFields%%);
+          instance.%%data%%[field] = new %%fieldClass%%(value, fields);
+          instance.%%isDeserialized%%[field] = false;
+          return;
+        }
+      `)({
+          fieldName: t.stringLiteral(fieldName),
+          data: t.identifier(state.dataIdentifier),
+          isDeserialized: t.identifier(state.isDeserializedIdentifier),
+          loadedFields: t.identifier(state.loadedFieldsIdentifier),
+          getFieldsAtPath: state.importUtil.import(body, '@cardstack/core/src/utils/fields', 'getFieldsAtPath'),
+          fieldClass: state.importUtil.import(
+            path,
+            field.card.schemaModule.global,
+            'default',
+            asClassName(
+              state.opts.meta.fields[fieldName]?.typeDecoratorLocalName ??
+                state.opts.fields[fieldName].card.url.split('/').pop()
+            )
+          ),
+        }) as t.Statement
+    );
+
+  body.node.body.unshift(
+    t.classMethod(
+      'method',
+      t.identifier('serializedSet'),
+      ['instance', 'field', 'value'].map((name) => t.identifier(name)),
+      t.blockStatement(
+        babel.template(`
+          %%compositeFields%%
+          instance.%%data%%[field] = value;
+          instance.%%isDeserialized%%[field] = false;
+        `)({
+          data: t.identifier(state.dataIdentifier),
+          isDeserialized: t.identifier(state.isDeserializedIdentifier),
+          compositeFields: compositeFields.length > 0 ? compositeFields : t.emptyStatement(),
+        }) as t.Statement[]
+      ),
+      false,
+      true // static
+    )
+  );
+}
 
 function makeCompositeSetter({
   insertAfterPath,
   fieldName,
-  setterName,
-  isDeserializedSet,
   state,
   babel,
 }: {
   insertAfterPath: NodePath<t.ClassProperty | t.ClassMethod>;
   fieldName: string;
-  setterName: string;
-  isDeserializedSet: boolean;
   state: State;
   babel: typeof Babel;
 }): NodePath<t.ClassMethod> {
@@ -457,13 +486,13 @@ function makeCompositeSetter({
   let [newPath] = insertAfterPath.insertAfter(
     t.classMethod(
       'set',
-      t.identifier(setterName),
+      t.identifier(fieldName),
       [t.identifier('value')],
       t.blockStatement(
         babel.template(`
           let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, fields${isDeserializedSet ? ', true' : ''});
-          this.%%isDeserialized%%[%%fieldName%%] = ${isDeserializedSet ? 'true' : 'false'};
+          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, fields, true);
+          this.%%isDeserialized%%[%%fieldName%%] = true;
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
@@ -491,14 +520,12 @@ function makePrimitiveSetter({
   insertAfterPath,
   fieldName,
   setterName,
-  isDeserializedSet,
   state,
   babel,
 }: {
   insertAfterPath: NodePath<t.ClassProperty | t.ClassMethod>;
   fieldName: string;
   setterName: string;
-  isDeserializedSet: boolean;
   state: State;
   babel: typeof Babel;
 }): NodePath<t.ClassMethod> {
@@ -511,7 +538,7 @@ function makePrimitiveSetter({
       t.blockStatement(
         babel.template(`
           this.%%data%%[%%fieldName%%] = value;
-          this.%%isDeserialized%%[%%fieldName%%] = ${isDeserializedSet ? 'true' : 'false'};
+          this.%%isDeserialized%%[%%fieldName%%] = true;
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
@@ -523,56 +550,15 @@ function makePrimitiveSetter({
   return newPath;
 }
 
-function makeIdentitySerializerGetter({
+function makeFieldGetter({
   path,
   fieldName,
-  getterName,
   state,
   babel,
   replace = false,
 }: {
   path: NodePath<t.ClassProperty | t.ClassMethod>;
   fieldName: string;
-  getterName: string;
-  state: State;
-  babel: typeof Babel;
-  replace?: boolean;
-}): NodePath<t.ClassMethod> {
-  let t = babel.types;
-  let method = t.classMethod(
-    'get',
-    t.identifier(getterName),
-    [],
-    t.blockStatement([
-      babel.template(`return %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);`)({
-        data: t.identifier(state.dataIdentifier),
-        fieldName: t.stringLiteral(fieldName),
-        keySensitiveGet: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'keySensitiveGet'),
-      }) as t.Statement,
-    ])
-  );
-  if (replace) {
-    path.replaceWith(method);
-    return path as NodePath<t.ClassMethod>;
-  } else {
-    let [newPath] = path.insertAfter(method);
-    return newPath;
-  }
-}
-
-function makeCustomSerializerGetter({
-  path,
-  fieldName,
-  getterName,
-  isDeserialized,
-  state,
-  babel,
-  replace = false,
-}: {
-  path: NodePath<t.ClassProperty | t.ClassMethod>;
-  fieldName: string;
-  getterName: string;
-  isDeserialized: boolean;
   state: State;
   babel: typeof Babel;
   replace?: boolean;
@@ -581,28 +567,36 @@ function makeCustomSerializerGetter({
   let field = state.opts.fields[fieldName];
   let method = t.classMethod(
     'get',
-    t.identifier(getterName),
+    t.identifier(fieldName),
     [],
-    t.blockStatement(
-      babel.template(`
+    t.blockStatement([
+      ...(field.card.serializerModule
+        ? (babel.template(`
           let value = %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);
-          if (${isDeserialized ? '' : '!'}this.%%isDeserialized%%[%%fieldName%%] || value === null) {
+          if (this.%%isDeserialized%%[%%fieldName%%] || value === null) {
             return value;
           }
-          return %%serializerModule%%.${isDeserialized ? 'deserialize' : 'serialize'}(value);
+          return %%serializerModule%%.deserialize(value);
         `)({
-        data: t.identifier(state.dataIdentifier),
-        fieldName: t.stringLiteral(fieldName),
-        isDeserialized: t.identifier(state.isDeserializedIdentifier),
-        keySensitiveGet: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'keySensitiveGet'),
-        serializerModule: state.importUtil.import(
-          path,
-          field.card.serializerModule!.global,
-          '*',
-          `${capitalize(field.card.url.split('/')[field.card.url.split('/').length - 1])}Serializer`
-        ),
-      }) as t.Statement[]
-    )
+            data: t.identifier(state.dataIdentifier),
+            fieldName: t.stringLiteral(fieldName),
+            isDeserialized: t.identifier(state.isDeserializedIdentifier),
+            keySensitiveGet: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'keySensitiveGet'),
+            serializerModule: state.importUtil.import(
+              path,
+              field.card.serializerModule!.global,
+              '*',
+              `${capitalize(field.card.url.split('/')[field.card.url.split('/').length - 1])}Serializer`
+            ),
+          }) as t.Statement[])
+        : [
+            babel.template(`return %%keySensitiveGet%%(this.%%data%%, %%fieldName%%);`)({
+              data: t.identifier(state.dataIdentifier),
+              fieldName: t.stringLiteral(fieldName),
+              keySensitiveGet: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'keySensitiveGet'),
+            }) as t.Statement,
+          ]),
+    ])
   );
   if (replace) {
     path.replaceWith(method);
@@ -648,24 +642,6 @@ function addWritableFields(path: NodePath<t.Program>, state: State, babel: typeo
           .map(([fieldName]) => t.stringLiteral(fieldName))
       ),
     }) as t.Statement
-  );
-}
-
-function addSerializedMemberNames(path: NodePath<t.Class>, state: State, t: typeof Babel.types) {
-  let body = path.get('body');
-  body.node.body.unshift(
-    t.classProperty(
-      t.identifier('serializedMemberNames'),
-      t.objectExpression(
-        Object.entries(state.serializedMemberNames).map(([field, assignedName]) =>
-          t.objectProperty(t.identifier(field), t.stringLiteral(assignedName))
-        )
-      ),
-      undefined,
-      undefined,
-      false,
-      true // static
-    )
   );
 }
 

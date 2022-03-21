@@ -144,7 +144,9 @@ export function keySensitiveSet(obj: Record<string, any>, path: string, value: a
 }
 
 function serializedGet(obj: Record<string, any>, path: string) {
-  return visitObjectPath(obj, path, (pathParent, key) => serializerFor(pathParent, key));
+  return visitObjectPath(obj, path, (pathParent, key) =>
+    (pathParent.constructor as CardSchema).serializedGet(pathParent, key)
+  );
 }
 
 function visitObjectPath(
@@ -158,10 +160,7 @@ function visitObjectPath(
   let completed: string[] = [];
   while ((segment = segments.shift()!)) {
     if (segments.length === 0) {
-      let result = visitor(current, segment);
-      if (typeof result === 'string') {
-        segment = result;
-      }
+      return visitor(current, segment);
     }
     current = current?.[segment];
     completed.push(segment);

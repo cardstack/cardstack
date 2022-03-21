@@ -176,7 +176,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import { serializerFor, padDataWithNull, keySensitiveGet, getFieldsAtPath, getSerializedProperties } from "@cardstack/core/src/utils/fields";
+        import { padDataWithNull, keySensitiveGet, getFieldsAtPath, getSerializedProperties } from "@cardstack/core/src/utils/fields";
       `);
     });
 
@@ -205,16 +205,14 @@ if (process.env.COMPILER) {
         import * as DateSerializer from "@cardstack/compiled/https-cardstack.com-base-date/serializer.js";
       `);
       expect(source).to.containsSource(`
-        static serializeGet(instance, field) {
-          let fields;
-          if (field === "birthdate") {
-            let value = keySensitiveGet(instance.data, field);
-            if (!instance.isDeserialized[field] || value === null) {
-              return value;
-            }
+        static serializedGet(instance, field) {
+          let value = instance[field];
+          if (field === "birthdate" && value !== null) {
             return DateSerializer.serialize(value);
           }
-          return keySensitiveGet(instance.data, field);
+
+          ;
+          return value;
         }
       `);
     });
@@ -223,14 +221,10 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}bio`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        static serializeSet(instance, field, value) {
-          if (field === "birthdate") {
-            instance.data[field] = value;
-            instance.isDeserialized[field] = false;
-          } else {
-            instance.data[field] = value;
-            instance.isDeserialized[field] = false;
-          }
+        static serializedSet(instance, field, value) {
+          ;
+          instance.data[field] = value;
+          instance.isDeserialized[field] = false;
         }
       `);
     });
@@ -242,13 +236,16 @@ if (process.env.COMPILER) {
         import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
       `);
       expect(source).to.containsSource(`
-        static serializeGet(instance, field) {
-          let fields;
+        static serializedGet(instance, field) {
+          let value = instance[field];
+          ;
+
           if (field === "aboutMe") {
             let fields = getFieldsAtPath(field, instance.loadedFields);
-            return BioClass.serialize(instance.data[field], fields);
+            return BioClass.serialize(value, fields);
           }
-          return keySensitiveGet(instance.data, field);
+
+          return value;
         }
       `);
     });
@@ -260,28 +257,19 @@ if (process.env.COMPILER) {
         import BioClass from "@cardstack/compiled/https-cardstack.local-bio/schema.js";
       `);
       expect(source).to.containsSource(`
-        static serializeSet(instance, field, value) {
-          let fields;
+        static serializedSet(instance, field, value) {
           if (field === "aboutMe") {
             let fields = getFieldsAtPath(field, instance.loadedFields);
             instance.data[field] = new BioClass(value, fields);
             instance.isDeserialized[field] = false;
-          } else {
-            instance.data[field] = value;
-            instance.isDeserialized[field] = false;
+            return;
           }
+
+          instance.data[field] = value;
+          instance.isDeserialized[field] = false;
         }
       `);
     });
-
-    //TODO use a static method for serializedGet and serializedSet
-    // setSerialized(key, value) {
-    // compile into this the serialized function
-    // if (["birthdate", "settlementDate"]).includes(key)) {
-    // do the serialization
-    // }
-    //}
-    //getSerialize(){}
 
     it('can compile a hasField method into the schema class', async function () {
       let { compiled } = await cards.load(`${realm}person`);
@@ -333,7 +321,7 @@ if (process.env.COMPILER) {
             if (isDeserialized) {
               this[field] = value;
             } else {
-              this[serializerFor(this, field)] = value;
+              Bio.serializedSet(this, field, value);
             }
           }
         }
@@ -474,7 +462,7 @@ if (process.env.COMPILER) {
             if (isDeserialized) {
               this[field] = value;
             } else {
-              this[serializerFor(this, field)] = value;
+              ReallyFancyPerson.serializedSet(this, field, value);
             }
           }
         }
