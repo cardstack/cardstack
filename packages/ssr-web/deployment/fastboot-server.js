@@ -4,7 +4,8 @@ const fetch = require('node-fetch');
 const Sentry = require('@sentry/node');
 
 function healthCheckMiddleware(req, res, next) {
-  let isHealthCheck = req.get('user-agent').includes('ELB-HealthChecker');
+  let userAgent = req.get('user-agent') || '';
+  let isHealthCheck = userAgent.includes('ELB-HealthChecker');
 
   if (isHealthCheck) {
     res.status(200).send('fastboot server is up and running');
