@@ -1,8 +1,8 @@
-import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import { TemplateUsageMeta } from '../babel-plugin-card-template';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -31,7 +31,7 @@ export function buildUsedFieldsListFromUsageMeta(
   }
 
   if (usageMeta.fields === 'self') {
-    throw new Error('TODO: expand out all my fields in default format');
+    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
   } else {
     for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
       buildUsedFieldListFromComponents(

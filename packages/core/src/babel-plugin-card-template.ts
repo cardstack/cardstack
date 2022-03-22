@@ -1,4 +1,3 @@
-import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 import { transformSync, transformFromAstSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
@@ -10,6 +9,12 @@ import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
+
+export interface TemplateUsageMeta {
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
+}
 
 interface TransformComponentOptions {
   templateSource: string;
@@ -34,18 +39,23 @@ export default function (params: TransformComponentOptions): {
     // any knowledge of CompiledCard, shouldn't resolve imports, etc.
     let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
 
-    // this part will move into the compiler's transform phase
-    return transformComponent(
-      {
-        ...params,
-        debugPath,
-      },
-      ast,
-      meta
-    );
+    return {
+      // this part will move into the compiler's transform phase
+      ...transformComponent({ ...params, debugPath }, ast, meta),
+      usedFields: buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta),
+    };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
+}
+
+interface AnalyzePluginOptions {
+  meta: TemplateUsageMeta;
+  debugPath: string;
+}
+interface AnalyzePluginState {
+  opts: AnalyzePluginOptions;
+  insideExportDefault: boolean;
 }
 
 export function analyzeComponent(
@@ -54,14 +64,51 @@ export function analyzeComponent(
 ): { ast: t.File; meta: TemplateUsageMeta } {
   let meta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
 
+  let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
+
   let out = transformSync(templateSource, {
     ast: true,
     code: false,
-    plugins: [],
+    plugins: [[babelPluginComponentAnalyze, options]],
     filename: debugFilename,
   });
 
   return { ast: out!.ast!, meta };
+}
+
+function babelPluginComponentAnalyze(babel: typeof Babel) {
+  let t = babel.types;
+  return {
+    visitor: {
+      Program: {
+        enter(_path: NodePath<t.Program>, state: AnalyzePluginState) {
+          state.insideExportDefault = false;
+        },
+      },
+
+      ExportDefaultDeclaration: {
+        enter(_path: NodePath, state: AnalyzePluginState) {
+          state.insideExportDefault = true;
+        },
+        exit(_path: NodePath, state: AnalyzePluginState) {
+          state.insideExportDefault = false;
+        },
+      },
+
+      CallExpression: {
+        enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
+          if (isComponentTemplateExpression(path, state)) {
+            // TODO: we need to deal with the options for inlineHBS
+            let { /*options: precompileTemplateOptions,*/ template: rawTemplate } = handleArguments(path, t);
+            glimmerTemplateAnalyze(rawTemplate, {
+              usageMeta: state.opts.meta,
+              debugPath: state.opts.debugPath,
+            });
+          }
+        },
+      },
+    },
+  };
 }
 
 function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: TemplateUsageMeta) {
@@ -82,7 +129,7 @@ function transformComponent(transformOpts: TransformComponentOptions, ast: t.Fil
     filename: transformOpts.debugPath,
   })!;
 
-  return { source: out!.code!, ast: out!.ast!, usedFields: output.usedFields!, inlineHBS: output.inlineHBS! };
+  return { source: out!.code!, ast: out!.ast!, inlineHBS: output.inlineHBS! };
 }
 
 interface TransformState {
@@ -143,15 +190,9 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
 
   let { options, template: inputTemplate } = handleArguments(path, t);
 
-  let { template, neededScope, usedFields } = transformTemplate(
-    inputTemplate,
-    path,
-    state.opts.transformOpts,
-    state.importUtil
-  );
+  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts.transformOpts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
-  state.opts.output.usedFields = usedFields;
   if (shouldInlineHBS(options, neededScope, t)) {
     state.opts.output.inlineHBS = template;
   }
@@ -174,6 +215,7 @@ function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set
   return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
 }
 
+// TODO: Rename to validateAndGetComponent
 function handleArguments(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
@@ -220,7 +262,7 @@ function transformTemplate(
   path: NodePath<t.CallExpression>,
   opts: TransformComponentOptions,
   importUtil: ImportUtil
-): { template: string; neededScope: Set<string>; usedFields: ComponentInfo['usedFields'] } {
+): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
 
   function importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string): string {
@@ -229,11 +271,8 @@ function transformTemplate(
     return name;
   }
 
-  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
-
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
-    usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
     debugPath: opts.debugPath,
     importAndChooseName,
@@ -242,7 +281,6 @@ function transformTemplate(
   return {
     template,
     neededScope,
-    usedFields: buildUsedFieldsListFromUsageMeta(opts.fields, opts.defaultFieldFormat, usageMeta),
   };
 }
 

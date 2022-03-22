@@ -152,7 +152,7 @@ if (process.env.COMPILER) {
     });
   });
 
-  describe.skip('components', function () {
+  describe('components', function () {
     function analyzeComponent(template: string) {
       return fullAnalyzeComponent(templateOnlyComponentTemplate(template), 'test.js');
     }

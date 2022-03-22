@@ -149,7 +149,7 @@ if (process.env.COMPILER) {
       expect(source).to.containsSource(`
         export const usedFields = {
           edit: ["lastName", "aboutMe.birthdate"],
-          isolated: ["fullName", "slowName", "aboutMe.birthdate"],
+          isolated: ["fullName", "aboutMe.birthdate", "slowName"],
           embedded: ["fullName"]
         }
       `);
