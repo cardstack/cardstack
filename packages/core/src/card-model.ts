@@ -247,7 +247,6 @@ export default class CardModel {
     done!();
   }
 
-  // on the hub isComplete is always true, and also for newly created cards
   private createSchemaInstance() {
     let klass = this.schemaModule.default;
     return new klass(this.rawData, this.state.type === 'created' ? true : this.state.makeDataComplete) as any;
