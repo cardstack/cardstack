@@ -2,10 +2,10 @@ import itertools
 
 import pandas as pd
 import pytest
+from cardpay_reward_programs.config import reward_token_addresses
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 
 from .fixture import indexed_data
-
 
 summaries = [
     {"total_reward": 20, "unique_payee": 2},
@@ -16,7 +16,6 @@ summaries = [
 
 payment_cycle_length_ls = [1024, 1024 * 32, 1024 * 512]
 min_other_merchants_ls = [1]
-
 
 
 @pytest.fixture
@@ -33,7 +32,7 @@ def rule(request):
     user_config = {
         "base_reward": 10,
         "min_other_merchants": min_other_merchants,
-        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+        "token": reward_token_addresses["xdai"],
         "duration": 43200,
     }
     return MinOtherMerchantsPaid(core_config, user_config)
@@ -56,7 +55,6 @@ class TestMinOtherMerchantsPaidSingle:
         computed_summary = rule.get_summary(payment_list)
         assert computed_summary["total_reward"][0] == summary["total_reward"]
         assert computed_summary["unique_payee"][0] == summary["unique_payee"]
-
 
 
 multiple_summaries = [

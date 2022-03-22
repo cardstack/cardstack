@@ -12,7 +12,7 @@
     "payment_cycle": 24032768
   },
   "user_defined": {
-    "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+    "token": "0x52031d287Bb58E26A379A7Fec2c84acB",
     "base_reward": 5,
     "transaction_factor": 2,
     "spend_factor": 2,
