@@ -204,6 +204,14 @@ if (process.env.COMPILER) {
       expect(meta).to.deep.equal({ model: new Set(), fields: 'self' });
     });
 
+    it('Block usage for @model path', async function () {
+      let { meta } = analyzeComponent(
+        '<Whatever @name={{@model.title}} /> {{#each @model.comments as |comment|}} <Other @name={{comment.createdAt}}/> {{/each}} <Whichever @field={{Field}} />'
+      );
+
+      expect(meta).to.deep.equal({ model: new Set(['title', 'comments.createdAt']), fields: new Map() });
+    });
+
     it('Block usage for field', async function () {
       let { meta } = analyzeComponent(
         '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
@@ -222,6 +230,24 @@ if (process.env.COMPILER) {
         model: new Set(),
         fields: new Map([['birthdays.location', 'default']]),
       });
+    });
+
+    it.skip('Errors when things are used incorrectly', async function () {
+      try {
+        analyzeComponent('<@model.pizza />');
+      } catch (e: any) {
+        expect(e).to.be;
+      }
+      try {
+        analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday /> {{/each}}');
+      } catch (e: any) {
+        expect(e).to.be;
+      }
+      try {
+        analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday.location /> {{/each}}');
+      } catch (e: any) {
+        expect(e).to.be;
+      }
     });
   });
 }
