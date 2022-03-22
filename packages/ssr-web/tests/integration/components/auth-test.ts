@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import config from '@cardstack/web-client/config/environment';
+import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import sinon from 'sinon';

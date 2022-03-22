@@ -1,6 +1,6 @@
 .card-pay-layer-one-wallet-provider-selection__group .boxel-radio-option--disabled {
   background: var(--boxel-purple-100);
-  filter:grayscale(0.8);
+  filter: grayscale(0.8);
   cursor: not-allowed;
 }
 

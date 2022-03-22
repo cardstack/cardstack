@@ -25,7 +25,7 @@
 }
 
 .card-space-user-page__user-content {
-  align-self:center;
+  align-self: center;
   grid-area: user-content;
   max-width: 100%;
 }
@@ -53,11 +53,11 @@
     inherit the text color so that the logo does not have contrast issues.
     background and text color on this page are dynamic.
   */
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .card-space-user-page__header > a:hover {
-  color: currentColor;
+  color: currentcolor;
 }
 
 .card-space-user-page__description {
@@ -98,28 +98,30 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.payment-link__qr {
+.card-space-user-payment-link__qr {
   max-width: 100%;
 }
 
-.payment-link__qr-container__actions {
+.card-space-user-payment-link__qr-container__actions {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.payment-link__qr-container__actions > a {
+/* the violation below is for 2 different parents */
+/* stylelint-disable-next-line no-descending-specificity */
+.card-space-user-payment-link__qr-container__actions > a {
   margin: var(--boxel-sp-lg);
 }
 
-.payment-link__qr-container__separator {
+.card-space-user-payment-link__qr-container__separator {
   width: 100%;
   height: 1px;
   background: var(--boxel-light-600);
   margin-top: var(--boxel-sp-xs);
 }
 
-.payment-link__qr-container__separator-or {
+.card-space-user-payment-link__qr-container__separator-or {
   margin: auto;
   color: #000;
   background: #fff;

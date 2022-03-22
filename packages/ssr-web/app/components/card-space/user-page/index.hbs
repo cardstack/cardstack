@@ -52,9 +52,9 @@
           </div>
         {{else}}
 
-          <div class="payment-link__qr-container">
+          <div class="card-space-user-payment-link__qr-container">
             <Boxel::StyledQrCode
-              class="payment-link__qr"
+              class="card-space-user-payment-link__qr"
               @data={{this.paymentURL}}
               @image={{this.cardstackLogoForQR}}
               @size={{340}}
@@ -67,9 +67,9 @@
               @imageMargin={{5}}
             >
               {{#if this.canDeepLink}}
-                <div class="payment-link__qr-container__actions">
-                  <div class="payment-link__qr-container__separator"></div>
-                  <div class="payment-link__qr-container__separator-or">OR</div>
+                <div class="card-space-user-payment-link__qr-container__actions">
+                  <div class="card-space-user-payment-link__qr-container__separator"></div>
+                  <div class="card-space-user-payment-link__qr-container__separator-or">OR</div>
 
                   <Boxel::Button @kind="primary-dark" @as="anchor" @size="large" href={{this.paymentURL}} data-test-payment-link-deep-link>
                     Pay with Card Wallet

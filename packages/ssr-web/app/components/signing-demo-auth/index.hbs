@@ -1,0 +1,117 @@
+  {{!-- template-lint-disable no-inline-styles --}}
+<div
+  class="auth"
+  ...attributes
+  {{did-insert this.setCardWalletPreference}}
+>
+  {{#if (eq this.currentStep this.AUTH_STEPS.WALLET_CONNECT)}}
+      <Auth::Step
+        @header="Connect your wallet"
+        @description="Use your unique blockchain address to verify your identity"
+        data-test-auth-step={{this.currentStep}}
+        {{did-insert this.resetHubAuthState}}
+      >
+        <Boxel::StyledQrCode
+          @data={{this.walletConnectUri}}
+          @image={{this.logoForQR}}
+          @size={{340}}
+          @margin={{15}}
+          @backgroundColor="#ffffff"
+          @dotType="dots"
+          @dotColor="#000"
+          @cornerDotType="dot"
+          @cornerSquareType="extra-rounded"
+          @imageMargin={{5}}
+          style="max-width: 100%; background: white;"
+          data-test-auth-connect-qr-code
+        >
+          {{#if this.canDeepLink}}
+            <Boxel::Button
+              @as="anchor"
+              @href={{concat "https://" this.universalLinkDomain "/wc?uri=" this.walletConnectUri}}
+              data-test-auth-connect-link
+            >
+              Connect
+            </Boxel::Button>
+          {{/if}}
+        </Boxel::StyledQrCode>
+        <div style="margin-top: auto; display: grid; gap: 12px;; background: #eee; padding: 12px; border-radius: 6px;">
+          <h4>Dev only - for easier moving between states</h4>
+          <Boxel::Button {{on "click" this.removeCardWalletPreference}}>
+            Don't open Card Wallet for hub auth
+          </Boxel::Button>
+          <Boxel::Button {{on "click" this.setCardWalletPreference}}>
+            Open Card Wallet for hub auth
+          </Boxel::Button>
+        </div>
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
+      <Auth::Step
+        @header="Authenticate with hub"
+        @description="Authenticate to access and modify off-chain data for your account."
+        data-test-auth-step={{this.currentStep}}
+      >
+        <Boxel::Button
+          @kind="primary"
+          {{on "click" (perform this.authenticate)}}
+          data-test-hub-auth-button
+        >
+          Authenticate with Hub
+        </Boxel::Button>
+
+        {{#if this.hubError}}
+          <span data-test-hub-auth-error>
+            {{#if (eq this.hubError "AUTH_TIMEOUT")}}
+              Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+            {{else}}
+              Authentication failed or was canceled.
+            {{/if}}
+          </span>
+        {{/if}}
+      <div style="margin-top: auto; display: grid; gap: 12px;; background: #eee; padding: 12px; border-radius: 6px;">
+        <h4>Dev only - for easier moving between states</h4>
+        <Boxel::Button {{on "click" this.disconnect}}>
+          Disconnect Wallet
+        </Boxel::Button>
+        <Boxel::Button {{on "click" this.removeCardWalletPreference}}>
+          Don't open Card Wallet for hub auth
+        </Boxel::Button>
+        <Boxel::Button {{on "click" this.setCardWalletPreference}}>
+          Open Card Wallet for hub auth
+        </Boxel::Button>
+      </div>
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.DONE)}}
+      <Auth::Step
+        @header="You're authenticated!"
+        data-test-auth-step={{this.currentStep}}
+        {{did-insert this.onComplete}}
+      >
+        You're done!
+        <div style="margin-top: auto; display: grid; gap: 12px;; background: #eee; padding: 12px; border-radius: 6px;">
+          <h4>Dev only - for easier moving between states</h4>
+          <Boxel::Button {{on "click" this.disconnect}}>
+            Disconnect Wallet
+          </Boxel::Button>
+          <Boxel::Button {{on "click" this.unAuthenticate}}>
+            Clear hub auth
+          </Boxel::Button>
+          <Boxel::Button {{on "click" this.removeCardWalletPreference}}>
+            Don't open Card Wallet for hub auth
+          </Boxel::Button>
+          <Boxel::Button {{on "click" this.setCardWalletPreference}}>
+            Open Card Wallet for hub auth
+          </Boxel::Button>
+        </div>
+      </Auth::Step>
+    {{else if (eq this.currentStep this.AUTH_STEPS.LOADING)}}
+      <Auth::Step
+        @header="Checking your authentication status"
+        data-test-auth-step={{this.currentStep}}
+      >
+        <Boxel::LoadingIndicator data-test-auth-loading-indicator/>
+      </Auth::Step>
+    {{else}}
+      An error occurred.
+  {{/if}}
+</div>
