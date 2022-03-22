@@ -127,18 +127,10 @@ export function getFieldsAtPath(path: string, fields: string[]): string[] {
   return fields.filter((field) => field.startsWith(path)).map((field) => field.substring(path.length + 1));
 }
 
-// pay attention to the schemainstance.isComplete--don't throw when this is true
-export function keySensitiveGet(data: any, key: string) {
-  let value = data[key];
-  if (value === undefined) {
-    throw new Error(`TODO: ${key}`);
-  }
-  return value;
-}
-
 // In this setter we are careful not to get the leaf, as it may throw a NotReady
 // because it is missing (and we are about to set it). lodash set will
 // inadvertently trigger our NotReady errors
+// TODO do we actually need this anymore?
 export function keySensitiveSet(obj: Record<string, any>, path: string, value: any) {
   visitObjectPath(obj, path, (pathParent, key) => (pathParent[key] = value));
 }

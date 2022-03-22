@@ -281,6 +281,7 @@ class IndexerRun implements IndexerHandle {
         type: 'loaded',
         url,
         allFields: false,
+        makeDataComplete: true,
       },
       {
         format,

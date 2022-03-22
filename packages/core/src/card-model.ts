@@ -30,6 +30,7 @@ export interface LoadedState {
   type: 'loaded';
   url: string;
   allFields: boolean;
+  makeDataComplete: boolean;
 }
 
 export interface CardModelConstructor {
@@ -178,6 +179,7 @@ export default class CardModel {
       type: 'loaded',
       url,
       allFields: false,
+      makeDataComplete: this.makeCompleteData(),
     };
   }
 
@@ -202,6 +204,10 @@ export default class CardModel {
 
   protected async didRecompute(): Promise<void> {
     return await this.recomputePromise;
+  }
+
+  protected makeCompleteData(): boolean {
+    return true;
   }
 
   async recompute(newSchemaInstance?: any): Promise<void> {
@@ -246,7 +252,7 @@ export default class CardModel {
   private createSchemaInstance() {
     let format: Format | 'all' = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
     let klass = this.schemaModule.default;
-    return new klass(this.rawData, format) as any; // we pass the format so the schema instance can calculate what fields are loaded
+    return new klass(this.rawData, this.state.type === 'created' ? true : this.state.makeDataComplete, format) as any;
   }
 
   private makeSetter(segments: string[] = []): Setter {

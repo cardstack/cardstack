@@ -195,6 +195,7 @@ export class CardService implements CardServiceInterface {
         type: 'loaded',
         url: result.url,
         allFields,
+        makeDataComplete: true,
       },
       {
         format,
