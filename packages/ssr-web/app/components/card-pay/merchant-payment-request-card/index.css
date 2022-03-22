@@ -37,14 +37,14 @@
 .merchant-payment-request-card__card-wallet-text {
   display: flex;
   flex-direction: column;
-  font-weight: bold;
+  font-weight: 700;
   line-height: 1.36;
   font-size: 0.875rem;
   letter-spacing: 0.11px;
 }
 
 .merchant-payment-request-card__card-wallet-fine-print {
-  font-weight: normal;
+  font-weight: 400;
 }
 
 @media only screen and (max-width: 480px) {
