@@ -31,7 +31,6 @@ export default {
   async handler(args: Arguments) {
     let { network, safeAddress, receiver, amount, tokenAddress } = args as unknown as {
       network: string;
-
       safeAddress: string;
       receiver: string;
       amount: string;

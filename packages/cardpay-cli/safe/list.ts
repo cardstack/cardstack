@@ -32,8 +32,7 @@ export default {
     if (safeType && !['depot', 'merchant', 'prepaid-card', 'reward'].includes(safeType)) {
       throw new Error(`Invalid safe type: ${safeType}`);
     }
-    let web3Opts = getWeb3Opts(args);
-    let web3 = await getWeb3(network, web3Opts);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     address = address || undefined;
 
     let safesApi = await getSDK('Safes', web3);

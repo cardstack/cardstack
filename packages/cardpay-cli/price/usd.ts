@@ -29,10 +29,11 @@ export default {
       token: string;
       amount: string;
     };
+    let web3Opts = getWeb3Opts(args);
     if (token.toUpperCase() === 'ETH') {
-      await ethToUsdPrice(network, amount, getWeb3Opts(args));
+      await ethToUsdPrice(network, amount, web3Opts);
     } else {
-      await usdPrice(network, token, amount, getWeb3Opts(args));
+      await usdPrice(network, token, amount, web3Opts);
     }
   },
 } as CommandModule;
