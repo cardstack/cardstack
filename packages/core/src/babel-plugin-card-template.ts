@@ -136,8 +136,8 @@ function babelPluginCardTemplate(babel: typeof Babel) {
   };
 }
 
-  if (shouldSkipExpression(path, state)) {
 function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformState, t: typeof Babel.types) {
+  if (!isComponentTemplateExpression(path, state)) {
     return;
   }
 
@@ -159,10 +159,13 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
   updateScope(options, neededScope, t);
 }
 
-function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): boolean {
+function isComponentTemplateExpression(
+  path: NodePath<t.CallExpression>,
+  state: TransformState | AnalyzePluginState
+): boolean {
   return (
-    !state.insideExportDefault ||
-    !path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
+    state.insideExportDefault &&
+    path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
   );
 }
 
