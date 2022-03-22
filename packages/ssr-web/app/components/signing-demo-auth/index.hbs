@@ -1,9 +1,9 @@
+  {{!-- template-lint-disable no-inline-styles --}}
 <div
   class="auth"
   ...attributes
   {{did-insert this.setCardWalletPreference}}
 >
-  {{!-- template-lint-disable no-inline-styles --}}
   {{#if (eq this.currentStep this.AUTH_STEPS.WALLET_CONNECT)}}
       <Auth::Step
         @header="Connect your wallet"
@@ -22,7 +22,7 @@
           @cornerDotType="dot"
           @cornerSquareType="extra-rounded"
           @imageMargin={{5}}
-          style="max-width: 100%;"
+          style="max-width: 100%; background: white;"
           data-test-auth-connect-qr-code
         >
           {{#if this.canDeepLink}}
