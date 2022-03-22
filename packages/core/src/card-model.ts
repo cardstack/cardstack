@@ -15,9 +15,8 @@ import {
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import cloneDeep from 'lodash/cloneDeep';
-import isPlainObject from 'lodash/isPlainObject';
 import flatMap from 'lodash/flatMap';
-import { getFieldValue, keySensitiveSet } from '@cardstack/core/src/utils/fields';
+import { getFieldValue, keySensitiveSet, flattenData } from '@cardstack/core/src/utils/fields';
 import { BadRequest, CardstackError, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
@@ -250,9 +249,8 @@ export default class CardModel {
 
   // on the hub isComplete is always true, and also for newly created cards
   private createSchemaInstance() {
-    let format: Format | 'all' = this.state.type === 'created' || this.state.allFields ? 'all' : this.format;
     let klass = this.schemaModule.default;
-    return new klass(this.rawData, this.state.type === 'created' ? true : this.state.makeDataComplete, format) as any;
+    return new klass(this.rawData, this.state.type === 'created' ? true : this.state.makeDataComplete) as any;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -290,17 +288,6 @@ export default class CardModel {
   }
 }
 
-function flattenData(data: Record<string, any>, path: string[] = []): [string, any][] {
-  let result: [string, any][] = [];
-  for (let [field, value] of Object.entries(data)) {
-    if (isPlainObject(value)) {
-      result = [...result, ...flattenData(value, [...path, field])];
-    } else {
-      result.push([[...path, field].join('.'), value]);
-    }
-  }
-  return result;
-}
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
 }

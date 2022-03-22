@@ -204,12 +204,7 @@ export interface CardService {
 }
 
 export interface CardSchema {
-  new (
-    rawData: Record<string, any>,
-    makeComplete: boolean,
-    loadedFields: string[] | Format | 'all',
-    isDeserialized?: boolean
-  ): unknown;
+  new (rawData: Record<string, any>, makeComplete: boolean, isDeserialized?: boolean): unknown;
   serializedGet(schemaInstance: any, field: string): any;
   serializedSet(schemaInstance: any, field: string, value: any): any;
   serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;

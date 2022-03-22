@@ -1,9 +1,9 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import { CardSchema, CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
+import { CardSchema, CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
-import merge from 'lodash/merge';
+import isPlainObject from 'lodash/isPlainObject';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -92,16 +92,16 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
   return result;
 }
 
-export function padDataWithNull(data: Record<string, any>, fields: string[]) {
-  return merge(makeEmptyDataShape(fields), data);
-}
-
-function makeEmptyDataShape(allFields: string[]): RawCardData {
-  let data: RawCardData = {};
-  for (let field of allFields) {
-    set(data, field, null);
+export function flattenData(data: Record<string, any>, path: string[] = []): [string, any][] {
+  let result: [string, any][] = [];
+  for (let [field, value] of Object.entries(data)) {
+    if (isPlainObject(value)) {
+      result = [...result, ...flattenData(value, [...path, field])];
+    } else {
+      result.push([[...path, field].join('.'), value]);
+    }
   }
-  return data;
+  return result;
 }
 
 export function getProperties(object: Record<string, any>, properties: string[]) {
@@ -130,7 +130,6 @@ export function getFieldsAtPath(path: string, fields: string[]): string[] {
 // In this setter we are careful not to get the leaf, as it may throw a NotReady
 // because it is missing (and we are about to set it). lodash set will
 // inadvertently trigger our NotReady errors
-// TODO do we actually need this anymore?
 export function keySensitiveSet(obj: Record<string, any>, path: string, value: any) {
   visitObjectPath(obj, path, (pathParent, key) => (pathParent[key] = value));
 }

@@ -176,7 +176,7 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        import { padDataWithNull, getFieldsAtPath, getSerializedProperties } from "@cardstack/core/src/utils/fields";
+        import { flattenData, getFieldsAtPath, getSerializedProperties } from "@cardstack/core/src/utils/fields";
       `);
     });
 
@@ -280,7 +280,6 @@ if (process.env.COMPILER) {
       `);
     });
 
-    // constructor(rawData, isComplete, isDeserialized = false) {
     it('can compile schema class constructor for composite card', async function () {
       let { compiled } = await cards.load(`${realm}bio`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
@@ -290,19 +289,10 @@ if (process.env.COMPILER) {
         loadedFields = [];
         isComplete;
 
-        constructor(rawData, makeComplete, loadedFields, isDeserialized = false) {
-          let fields;
-          if (typeof loadedFields === 'string') {
-            fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
-          } else if (Array.isArray(loadedFields)) {
-            fields = [...loadedFields];
-          } else {
-            throw new Error('loadedFields must be a string or an array');
-          }
-          this.loadedFields = fields;
-          let data = padDataWithNull(rawData, fields);
+        constructor(rawData, makeComplete, isDeserialized = false) {
+          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           this.isComplete = makeComplete;
-          for (let [field, value] of Object.entries(data)) {
+          for (let [field, value] of Object.entries(rawData)) {
             if (!writableFields.includes(field)) {
               continue;
             }
@@ -396,12 +386,10 @@ if (process.env.COMPILER) {
             return this.data["aboutMe"];
           }
 
-          if ("aboutMe" in this.serializedData) {
+          if ("aboutMe" in this.serializedData || this.isComplete) {
             let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-            let value = this.serializedData["aboutMe"];
-            if (value !== null) { 
-              value = new BioClass(value, this.isComplete, fields);
-            }
+            let value = this.serializedData["aboutMe"] || {};
+            value = new BioClass(value, this.isComplete);
             this.data["aboutMe"] = value;
             return value;
           }
@@ -416,7 +404,7 @@ if (process.env.COMPILER) {
         set aboutMe(value) {
           delete this.serializedData["aboutMe"];
           let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-          this.data["aboutMe"] = new BioClass(value, this.isComplete, fields, true);
+          this.data["aboutMe"] = new BioClass(value, this.isComplete, true);
         }
       `);
     });
@@ -479,20 +467,11 @@ if (process.env.COMPILER) {
         loadedFields = [];
         isComplete;
 
-        constructor(rawData, makeComplete, loadedFields, isDeserialized = false) {
-          super(rawData, makeComplete, loadedFields, isDeserialized);
-          let fields;
-          if (typeof loadedFields === 'string') {
-            fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
-          } else if (Array.isArray(loadedFields)) {
-            fields = [...loadedFields];
-          } else {
-            throw new Error('loadedFields must be a string or an array');
-          }
-          this.loadedFields = fields;
-          let data = padDataWithNull(rawData, fields);
+        constructor(rawData, makeComplete, isDeserialized = false) {
+          super(rawData, makeComplete, isDeserialized);
+          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           this.isComplete = makeComplete;
-          for (let [field, value] of Object.entries(data)) {
+          for (let [field, value] of Object.entries(rawData)) {
             if (!writableFields.includes(field)) {
               continue;
             }

@@ -105,26 +105,16 @@ export default function main(babel: typeof Babel) {
                 [
                   t.identifier('rawData'),
                   t.identifier('makeComplete'),
-                  t.identifier('loadedFields'),
                   t.assignmentPattern(t.identifier('isDeserialized'), t.booleanLiteral(false)),
                 ],
                 t.blockStatement([
                   ...(state.opts.meta.parent?.cardURL
-                    ? [babel.template.ast(`super(rawData, makeComplete, loadedFields, isDeserialized);`) as t.Statement]
+                    ? [babel.template.ast(`super(rawData, makeComplete, isDeserialized);`) as t.Statement]
                     : []),
                   ...(babel.template(`
-                    let fields;
-                    if (typeof loadedFields === 'string') {
-                      fields = loadedFields === 'all' ? allFields : usedFields[loadedFields] ?? [];
-                    } else if (Array.isArray(loadedFields)) {
-                      fields = [...loadedFields];
-                    } else {
-                      throw new Error('loadedFields must be a string or an array');
-                    }
-                    this.%%loadedFields%% = fields;
-                    let data = %%padDataWithNull%%(rawData, fields);
+                    this.%%loadedFields%% = makeComplete ? allFields : %%flattenData%%(rawData).map(([fieldName]) => fieldName);
                     this.%%isComplete%% = makeComplete;
-                    for (let [field, value] of Object.entries(data)) {
+                    for (let [field, value] of Object.entries(rawData)) {
                       if (!writableFields.includes(field)) {
                         continue;
                       }
@@ -135,14 +125,10 @@ export default function main(babel: typeof Babel) {
                       }
                     }
                   `)({
-                    padDataWithNull: state.importUtil.import(
-                      path,
-                      '@cardstack/core/src/utils/fields',
-                      'padDataWithNull'
-                    ),
                     cardClass: t.identifier(state.cardName),
                     loadedFields: t.identifier(state.loadedFieldsIdentifier),
                     isComplete: t.identifier(state.isCompleteIdentifier),
+                    flattenData: state.importUtil.import(path, '@cardstack/core/src/utils/fields', 'flattenData'),
                   }) as t.Statement[]),
                 ])
               )
@@ -472,7 +458,7 @@ function makeCompositeSetter({
         babel.template(`
           delete this.%%serializedData%%[%%fieldName%%];
           let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, this.%%isComplete%%, fields, true);
+          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, this.%%isComplete%%, true);
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
@@ -552,12 +538,10 @@ function makeFieldGetter({
   if (Object.keys(field.card.fields).length > 0) {
     // getter for composite field
     getFromDeserializedData = babel.template(`
-      if (%%fieldName%% in this.%%serializedData%%) {
+      if (%%fieldName%% in this.%%serializedData%% || this.isComplete) {
         let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-        let value = this.%%serializedData%%[%%fieldName%%];
-        if (value !== null) {
-          value = new %%fieldClass%%(value, this.%%isComplete%%, fields);
-        }
+        let value = this.%%serializedData%%[%%fieldName%%] || {};
+        value = new %%fieldClass%%(value, this.%%isComplete%%);
         this.%%data%%[%%fieldName%%] = value;
         return value;
       }
