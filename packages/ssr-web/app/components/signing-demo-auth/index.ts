@@ -20,6 +20,7 @@ const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60;
 
 export default class AuthComponent extends Component<{
   onComplete: Function;
+  walletConnectDeepLink: string;
 }> {
   @service declare layer2Network: Layer2Network;
   @service('hub-authentication') declare hubAuthentication: HubAuthentication;
@@ -102,7 +103,7 @@ export default class AuthComponent extends Component<{
     localStorage.setItem(
       'WALLETCONNECT_DEEPLINK_CHOICE',
       JSON.stringify({
-        href: 'https://' + config.universalLinkDomain,
+        href: this.args.walletConnectDeepLink,
       })
     );
   }
