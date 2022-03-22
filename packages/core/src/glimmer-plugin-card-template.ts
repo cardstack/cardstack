@@ -28,7 +28,6 @@ export interface TemplateUsageMeta {
 
 export interface Options {
   fields: CompiledCard['fields'];
-  usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
   debugPath?: string;
   importAndChooseName: ImportAndChooseName;
@@ -78,7 +77,7 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta, defaultFieldFormat } = options;
+    let { fields, importAndChooseName, defaultFieldFormat } = options;
     let state: State = {
       handledFieldExpressions: new WeakSet(),
       handledModelExpressions: new WeakSet(),
@@ -103,9 +102,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             }
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`@fields.${fieldFullPath}`);
-            }
-            if (usageMeta.fields !== 'self') {
-              usageMeta.fields.set(fieldFullPath, fieldFormat);
             }
             return rewriteElementNode({
               field,
@@ -139,9 +135,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                 case 'fieldComponent':
                   if (value.expandable && value.field.type === 'containsMany') {
                     return expandContainsManyShorthand(`@fields.${value.fieldFullPath}`);
-                  }
-                  if (usageMeta.fields !== 'self') {
-                    usageMeta.fields.set(value.fieldFullPath, fieldFormat);
                   }
                   return rewriteElementNode({
                     field: value.field,
@@ -179,7 +172,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (isFieldPathExpression(node)) {
                 throw new InvalidFieldsUsageError();
               }
-              trackUsageForModel(usageMeta, node, state.handledModelExpressions);
 
               return;
             case 'assigned': {
@@ -419,30 +411,6 @@ function fieldPathForPathExpression(exp: PathExpression): string | undefined {
     return exp.tail.join('.');
   }
   return undefined;
-}
-
-function trackUsageForModel(
-  usageMeta: TemplateUsageMeta,
-  node: syntax.ASTv1.PathExpression,
-  handledModelExpressions: State['handledModelExpressions']
-) {
-  if (
-    node.original === 'debugger' ||
-    node.head.type !== 'AtHead' ||
-    node.head.name !== '@model' ||
-    handledModelExpressions.has(node)
-  ) {
-    return;
-  }
-
-  let path = node.tail.join('.');
-  if (!path) {
-    usageMeta.model = 'self';
-  } else {
-    if (usageMeta.model !== 'self') {
-      usageMeta.model.add(path);
-    }
-  }
 }
 
 function fieldPathForElementNode(node: ElementNode): string | undefined {

@@ -10,7 +10,6 @@ function importAndChooseName() {
 if (process.env.COMPILER) {
   describe('Glimmer CardTemplatePlugin', function () {
     let options: Options;
-    let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
     let { realmURL, cards } = configureHubWithCompiler(this);
@@ -45,15 +44,10 @@ if (process.env.COMPILER) {
       compiledDateCard = dateCard.compiled;
     });
 
-    this.beforeEach(function () {
-      usageMeta = { model: new Set(), fields: new Map() };
-    });
-
     describe('Primitive Fields', function () {
       it('string-like', async function () {
         let template = transform('{{@model}}', {
           fields: {},
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
@@ -63,7 +57,6 @@ if (process.env.COMPILER) {
       it('date-like', async function () {
         let template = transform('<FormatDate @date={{@model}} />', {
           fields: {},
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
@@ -82,7 +75,6 @@ if (process.env.COMPILER) {
               type: 'contains',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
@@ -102,7 +94,6 @@ if (process.env.COMPILER) {
               type: 'contains',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
@@ -123,7 +114,6 @@ if (process.env.COMPILER) {
               name: 'createdAt',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string) {
             expect(desiredName, 'desiredName is based on the type of card').to.deep.equal('HttpsCardstackComBaseDate');
@@ -157,7 +147,6 @@ if (process.env.COMPILER) {
               type: 'contains',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         });
@@ -185,7 +174,6 @@ if (process.env.COMPILER) {
               type: 'contains',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         };
@@ -232,7 +220,6 @@ if (process.env.COMPILER) {
               type: 'contains',
             },
           },
-          usageMeta,
           importAndChooseName,
           defaultFieldFormat: 'embedded',
         };
@@ -322,7 +309,6 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realmURL}post-list`);
       transform(template, {
         fields: compiled.fields,
-        usageMeta,
         defaultFieldFormat: 'embedded',
         importAndChooseName,
       });
@@ -357,7 +343,6 @@ if (process.env.COMPILER) {
               name: 'events',
             },
           },
-          usageMeta,
           defaultFieldFormat: 'embedded',
           importAndChooseName,
         };
@@ -406,7 +391,6 @@ if (process.env.COMPILER) {
               {{/let}}
            {{/each}}`,
           {
-            usageMeta,
             importAndChooseName,
             defaultFieldFormat: 'embedded',
             fields: {
