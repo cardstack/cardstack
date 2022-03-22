@@ -99,6 +99,7 @@ if (process.env.COMPILER) {
       let attributes = {
         title: 'Placeholder Title',
         body: 'Placeholder Body',
+        createdAt: '2022-03-22',
       };
       let initialResponse = await updateCard(`${realmURL}post`, {
         data: {
