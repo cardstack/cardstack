@@ -182,7 +182,7 @@ export default class CardModel {
     };
   }
 
-  async setData(data: RawCardData): Promise<void> {
+  async setData(data: RawCardData, isSerialized = false): Promise<void> {
     let flattened = flattenData(data);
     let nonExistentFields = flatMap(flattened, ([fieldName]) =>
       !this.schemaModule.default.hasField(fieldName) ? [fieldName] : []
@@ -196,7 +196,11 @@ export default class CardModel {
     }
     let newSchemaInstance = this.createSchemaInstance();
     for (let [field, value] of flattened) {
-      keySensitiveSet(newSchemaInstance, field, value);
+      if (isSerialized) {
+        this.schemaModule.default.serializedSet(newSchemaInstance, field, value);
+      } else {
+        keySensitiveSet(newSchemaInstance, field, value);
+      }
     }
     await this.recompute(newSchemaInstance);
   }

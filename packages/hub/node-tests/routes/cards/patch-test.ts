@@ -28,14 +28,19 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
+            import date from "https://cardstack.com/base/date";
             export default class Post {
               @contains(string)
               title;
               @contains(string)
               body;
+              @contains(date)
+              createdAt;
             }
           `,
-          'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
+          'isolated.js': templateOnlyComponentTemplate(
+            '<h1><@fields.title/></h1><article><@fields.createdAt/><@fields.body/></article>'
+          ),
         },
       });
 
@@ -46,6 +51,7 @@ if (process.env.COMPILER) {
         data: {
           title: 'Hello World',
           body: 'First post.',
+          createdAt: '1976-08-27',
         },
       });
     });
@@ -65,6 +71,7 @@ if (process.env.COMPILER) {
           attributes: {
             title: 'Goodbye World!',
             body: 'First post',
+            createdAt: '2019-10-30',
           },
         },
       }).expect(200);
@@ -72,6 +79,7 @@ if (process.env.COMPILER) {
         {
           title: 'Goodbye World!',
           body: 'First post',
+          createdAt: '2019-10-30',
         },
         'PATCH Response'
       );
@@ -81,6 +89,7 @@ if (process.env.COMPILER) {
         {
           title: 'Goodbye World!',
           body: 'First post',
+          createdAt: '2019-10-30',
         },
         'Followup Request'
       );
