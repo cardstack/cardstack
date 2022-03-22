@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
@@ -27,15 +27,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, safeAddress, rewardProgramId, tokenAddress, amount } = args as unknown as {
+    let { network, safeAddress, rewardProgramId, tokenAddress, amount } = args as unknown as {
       network: string;
       safeAddress: string;
       rewardProgramId: string;
       tokenAddress: string;
       amount: string;
-      mnemonic?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let assets = await getSDK('Assets', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
