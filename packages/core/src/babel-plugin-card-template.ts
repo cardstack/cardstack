@@ -85,7 +85,7 @@ function transformComponent(transformOpts: TransformComponentOptions, ast: t.Fil
   return { source: out!.code!, ast: out!.ast!, usedFields: output.usedFields!, inlineHBS: output.inlineHBS! };
 }
 
-interface State {
+interface TransformState {
   opts: TransformPluginOptions;
   insideExportDefault: boolean;
   importUtil: ImportUtil;
@@ -105,13 +105,13 @@ function babelPluginCardTemplate(babel: typeof Babel) {
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<t.Program>, state: State) {
+        enter(path: NodePath<t.Program>, state: TransformState) {
           state.importUtil = new ImportUtil(babel.types, path);
           state.insideExportDefault = false;
         },
       },
 
-      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
+      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: TransformState) {
         let resolved = state.opts.transformOpts.resolveImport(path.node.source.value);
         if (resolved !== path.node.source.value) {
           path.node.source.value = resolved;
@@ -119,16 +119,16 @@ function babelPluginCardTemplate(babel: typeof Babel) {
       },
 
       ExportDefaultDeclaration: {
-        enter(_path: NodePath, state: State) {
+        enter(_path: NodePath, state: TransformState) {
           state.insideExportDefault = true;
         },
-        exit(_path: NodePath, state: State) {
+        exit(_path: NodePath, state: TransformState) {
           state.insideExportDefault = false;
         },
       },
 
       CallExpression: {
-        enter(path: NodePath<CallExpression>, state: State) {
+        enter(path: NodePath<CallExpression>, state: TransformState) {
           callExpressionEnter(path, state, t);
         },
       },
@@ -136,8 +136,8 @@ function babelPluginCardTemplate(babel: typeof Babel) {
   };
 }
 
-function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {
   if (shouldSkipExpression(path, state)) {
+function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformState, t: typeof Babel.types) {
     return;
   }
 
