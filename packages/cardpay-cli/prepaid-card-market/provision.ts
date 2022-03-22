@@ -1,7 +1,7 @@
 /*global fetch */
 import { Argv } from 'yargs';
 import { getConstant, getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getInventoriesFromAPI } from './utils';
 import Web3 from 'web3';
@@ -31,15 +31,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, sku, recipient, environment, provisionerSecret } = args as unknown as {
+    let { network, sku, recipient, environment, provisionerSecret } = args as unknown as {
       network: string;
       sku: string;
       recipient: string;
       environment: string;
       provisionerSecret: string;
-      mnemonic?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
     let inventories = await getInventoriesFromAPI(web3, environment);
     let blockExplorer = await getConstant('blockExplorer', web3);

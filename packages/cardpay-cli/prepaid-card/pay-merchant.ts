@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { ContractOptions } from 'web3-eth-contract';
 
@@ -28,15 +28,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, merchantSafe, prepaidCard, spendAmount, from } = args as unknown as {
+    let { network, merchantSafe, prepaidCard, spendAmount, from } = args as unknown as {
       network: string;
       merchantSafe: string;
       prepaidCard: string;
       spendAmount: number;
-      mnemonic?: string;
       from?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let prepaidCardSdk = await getSDK('PrepaidCard', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
 
