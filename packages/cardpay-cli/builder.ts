@@ -9,16 +9,15 @@ export function buildYargs(args: string[]) {
     .help()
     .command(commands)
     .options({
-      connectionType: {
-        alias: 'c',
-        type: 'string',
-        description: 'Connection type',
-        demandOption: true,
+      walletConnect: {
+        alias: 'w',
+        type: 'boolean',
+        description: 'A flag to indicate that wallet connect should be used for the wallet',
       },
-      network: {
-        type: 'string',
-        description: 'Network',
-        demandOption: true,
+      trezor: {
+        alias: 't',
+        type: 'boolean',
+        description: 'A flag to indicate that trezor should be used for the wallet',
       },
       mnemonic: {
         alias: 'm',
@@ -31,22 +30,28 @@ export function buildYargs(args: string[]) {
       if (process.env.BUILDING_README) {
         return true;
       }
-      switch (argv.connectionType) {
-        case 'mnemonic':
-          if (!argv.mnemonic) {
-            return `Must specify '--mnemonic' when using connectionType of 'mnemonic'`;
-          } else {
-            argv.web3Opts = {
-              mnemonic: argv.mnemonic,
-            };
-            return true;
-          }
-        case 'wallet-connect':
-          return true;
-        case 'trezor':
-          return true;
-        default:
-          return `Must choose either 'mnemonic, wallet-connect, treozr' for connectionType`;
+      if (!argv.mnemonic && !argv.walletConnect && !argv.trezor) {
+        return 'Wallet is not specified. Either specify that wallet connect or trezor should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var';
       }
-    });
+      if (argv.trezor) {
+        argv.connectionType = 'trezor';
+        argv.walletConnect = undefined;
+        argv.mnemonic = undefined;
+        return true;
+      }
+      if (argv.mnemonic) {
+        argv.connectionType = 'mnemonic';
+        argv.walletConnect = undefined;
+        argv.trezor = undefined;
+        return true;
+      }
+      if (argv.walletConnect) {
+        argv.connectionType = 'wallet-connect';
+        argv.mnemonic = undefined;
+        argv.trezor = undefined;
+        return true;
+      }
+      return true;
+    })
+    .demandOption(['network'], `'network' must be specified.`);
 }
