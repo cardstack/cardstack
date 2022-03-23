@@ -7,7 +7,7 @@ import { fromWei } from 'web3-utils';
 
 export default {
   command: 'claimable-proofs <address>',
-  describe: 'View proofs that are claimable',
+  describe: 'View proofs that are claimable. It will also display expired proofs',
   builder(yargs: Argv) {
     return yargs
       .positional('address', {
@@ -22,19 +22,28 @@ export default {
         type: 'string',
         description: 'The address of the tokens that are being claimed as rewards',
       })
+      .option('isValidOnly', {
+        type: 'boolean',
+        description: 'Filter only for proofs which are valid, i.e. validFrom <= currentBlock < validTo',
+      })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, address, rewardProgramId, tokenAddress } = args as unknown as {
+    let { network, address, rewardProgramId, tokenAddress, isValidOnly } = args as unknown as {
       network: string;
       address: string;
       rewardProgramId?: string;
       tokenAddress?: string;
+      isValidOnly?: boolean;
     };
     let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
     const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
-    displayProofs(proofs);
+    if (isValidOnly) {
+      displayProofs(proofs.filter((o) => o.isValid));
+    } else {
+      displayProofs(proofs);
+    }
   },
 } as CommandModule;
 
@@ -56,6 +65,7 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
       leaf: ${o.leaf}
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
+      isValid: ${o.isValid} 
         `);
     });
   });

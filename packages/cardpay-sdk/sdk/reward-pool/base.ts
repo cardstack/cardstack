@@ -34,6 +34,7 @@ export interface Proof {
   rewardProgramId: string;
   amount: BN;
   leaf: string;
+  isValid: boolean;
 }
 
 export interface Leaf {
@@ -72,7 +73,10 @@ export default class RewardPool {
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
     const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
-    return unclaimedProofs.reduce((total, { amount }) => {
+    const unclaimedValidProofs = unclaimedProofs.filter((o) => {
+      o.isValid;
+    });
+    return unclaimedValidProofs.reduce((total, { amount }) => {
       return total.add(amount);
     }, new BN('0'));
   }
@@ -147,10 +151,13 @@ export default class RewardPool {
     if (!response?.ok) {
       throw new Error(await response.text());
     }
+    let currentBlock = await this.layer2Web3.eth.getBlockNumber();
     return this.addTokenSymbol(
       json['results'].map((o: any) => {
+        let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
         return {
           ...o,
+          isValid: validFrom <= currentBlock && validTo > currentBlock,
           amount: new BN(o.amount.toString()),
         };
       })
@@ -171,8 +178,11 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
-    let tokenBalances = unclaimedProofs.map((o: Proof) => {
+    let unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
+    const unclaimedValidProofs = unclaimedProofs.filter((o) => {
+      o.isValid;
+    });
+    let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
       return {
         tokenAddress: o.tokenAddress,
         rewardProgramId: o.rewardProgramId,
