@@ -28,10 +28,9 @@ export default {
     };
     let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardManager = await getSDK('RewardManager', web3);
-    let estimate = await rewardManager.registerRewardeeGasEstimate(prepaidCard, rewardProgramId);
-    console.log(
-      `The gas estimate for registering a rewardee for ${rewardProgramId} is
-      ${fromWei(estimate)}`
-    );
+    let assets = await getSDK('Assets', web3);
+    let { gasToken, amount } = await rewardManager.registerRewardeeGasEstimate(prepaidCard, rewardProgramId);
+    let { symbol } = await assets.getTokenInfo(gasToken);
+    console.log(`The gas estimate for registering a rewardee is ${fromWei(amount)} ${symbol}`);
   },
 } as CommandModule;

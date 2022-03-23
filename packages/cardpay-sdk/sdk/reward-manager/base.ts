@@ -21,6 +21,7 @@ import {
   executeTransaction,
   Operation,
   gasInToken,
+  GasEstimate,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -212,7 +213,7 @@ export default class RewardManager {
     };
   }
 
-  async registerRewardeeGasEstimate(prepaidCardAddress: string, rewardProgramId: string): Promise<string> {
+  async registerRewardeeGasEstimate(prepaidCardAddress: string, rewardProgramId: string): Promise<GasEstimate> {
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let prepaidCardManager = new this.layer2Web3.eth.Contract(
       PrepaidCardManagerABI as AbiItem[],
@@ -221,7 +222,10 @@ export default class RewardManager {
     let issuingToken = (await prepaidCardManager.methods.cardDetails(prepaidCardAddress).call()).issueToken;
     let rateLock = await layerTwoOracle.getRateLock(issuingToken);
     let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
-    return gasInToken(payload).toString();
+    return {
+      gasToken: payload.gasToken,
+      amount: gasInToken(payload).toString(),
+    };
   }
 
   async lockRewardProgram(txnHash: string): Promise<SuccessfulTransactionReceipt>;
