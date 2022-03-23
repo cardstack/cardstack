@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardpay-subgraph",
-  "version": "0.28.27",
+  "version": "0.28.28",
   "license": "MIT",
   "scripts": {
     "codegen-sokol": "node ./etc/pre-codegen.js poa-sokol && graph codegen && node ./etc/pre-tsc-build.js",
@@ -33,7 +33,7 @@
     "xdai-blue-status": "ts-node ./lib/sync-status.ts xdai-blue"
   },
   "devDependencies": {
-    "@cardstack/cardpay-sdk": "0.28.27",
+    "@cardstack/cardpay-sdk": "0.28.28",
     "@graphprotocol/graph-cli": "0.20.0",
     "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
     "@protofire/subgraph-toolkit": "0.1.2",
