@@ -7,7 +7,7 @@ import { fromWei } from 'web3-utils';
 
 export default {
   command: 'claimable-proofs <address>',
-  describe: 'View proofs that are claimable. It will also display expired proofs',
+  describe: 'View proofs that are claimable',
   builder(yargs: Argv) {
     return yargs
       .positional('address', {
@@ -24,7 +24,7 @@ export default {
       })
       .option('isValidOnly', {
         type: 'boolean',
-        description: 'Filter only for proofs which are valid, i.e. validFrom <= currentBlock < validTo',
+        description: 'Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo',
       })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
