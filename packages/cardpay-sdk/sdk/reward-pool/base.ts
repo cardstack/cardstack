@@ -11,7 +11,14 @@ import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation, gasInToken } from '../utils/safe-utils';
+import {
+  gasEstimate,
+  executeTransaction,
+  getNextNonceFromEstimate,
+  Operation,
+  gasInToken,
+  GasEstimate,
+} from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -424,7 +431,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     leaf: string,
     proofArray: string[],
     acceptPartialClaim?: boolean
-  ): Promise<string> {
+  ): Promise<GasEstimate> {
     let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
     let o: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
     if (!o.token) {
@@ -440,7 +447,10 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       Operation.CALL,
       o.token
     );
-    return gasInToken(estimate).toString();
+    return {
+      gasToken: estimate.gasToken,
+      amount: gasInToken(estimate),
+    };
   }
 
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;

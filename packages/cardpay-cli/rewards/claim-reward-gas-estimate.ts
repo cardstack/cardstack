@@ -41,7 +41,9 @@ export default {
     let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let proofArray = fromProof(proof);
-    let estimate = await rewardPool.claimGasEstimate(rewardSafe, leaf, proofArray, acceptPartialClaim);
-    console.log(`The gas estimate for claiming reward to ${rewardSafe} is ${fromWei(estimate)} `);
+    let assets = await getSDK('Assets', web3);
+    let { gasToken, amount } = await rewardPool.claimGasEstimate(rewardSafe, leaf, proofArray, acceptPartialClaim);
+    let { symbol } = await assets.getTokenInfo(gasToken);
+    console.log(`The gas estimate for claiming reward to reward safe ${rewardSafe} is ${fromWei(amount)} ${symbol}`);
   },
 } as CommandModule;
