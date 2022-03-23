@@ -72,8 +72,7 @@ export default class RewardPool {
   constructor(private layer2Web3: Web3) {}
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
-    const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
-    const unclaimedValidProofs = unclaimedProofs.filter((o) => {
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter((o) => {
       o.isValid;
     });
     return unclaimedValidProofs.reduce((total, { amount }) => {
@@ -178,8 +177,7 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    let unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
-    const unclaimedValidProofs = unclaimedProofs.filter((o) => {
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, undefined, false)).filter((o) => {
       o.isValid;
     });
     let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
