@@ -759,7 +759,7 @@ await rewardPool.balances(rewardProgramId)
 
 ### `RewardPool.claim`
 
-The `Claim` API is used by the rewardee to claim rewards for a reward program id.
+The `Claim` API is used by the rewardee to claim rewards from an associated reward program. 
 
 Pre-requisite for this action:
 - reward program has to be registered
