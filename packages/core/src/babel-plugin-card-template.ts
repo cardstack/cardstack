@@ -67,6 +67,8 @@ interface AnalyzePluginState {
 export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
   let meta: ComponentMeta = {
     usage: { model: new Set(), fields: new Map() },
+    hasModifiedScope: false,
+    rawHBS: undefined,
   };
 
   let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
@@ -103,8 +105,10 @@ function babelPluginComponentAnalyze(babel: typeof Babel) {
       CallExpression: {
         enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
           if (isComponentTemplateExpression(path, state)) {
-            // TODO: we need to deal with the options for inlineHBS
-            let { /*options: precompileTemplateOptions,*/ template: rawTemplate } = handleArguments(path, t);
+            let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
+            state.opts.meta.rawHBS = rawTemplate;
+            state.opts.meta.hasModifiedScope = !!getObjectKey(precompileTemplateOptions, 'scope', t);
+
             glimmerTemplateAnalyze(rawTemplate, {
               usageMeta: state.opts.meta.usage,
               debugPath: state.opts.debugPath,
@@ -193,7 +197,7 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
     return;
   }
 
-  let { options, template: inputTemplate } = handleArguments(path, t);
+  let { options, template: inputTemplate } = validateAndGetComponent(path, t);
 
   let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts.transformOpts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
@@ -220,8 +224,7 @@ function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set
   return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
 }
 
-// TODO: Rename to validateAndGetComponent
-function handleArguments(
+function validateAndGetComponent(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
 ): {

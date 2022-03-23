@@ -161,7 +161,11 @@ if (process.env.COMPILER) {
     it('string-like', async function () {
       let { meta } = analyzeComponent('{{@model}}');
 
-      expect(meta.usage).to.deep.equal({ model: 'self', fields: new Map() });
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '{{@model}}',
+        hasModifiedScope: false,
+      });
     });
 
     it('date-like', async function () {
@@ -233,7 +237,18 @@ if (process.env.COMPILER) {
       });
     });
 
-    // describe('')
+    it('Understands when a card has modified the scope of a template', async function () {
+      let { meta } = fullAnalyzeComponent(
+        templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
+        'test.js'
+      );
+
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '<FancyTool @value={{@model}} />',
+        hasModifiedScope: true,
+      });
+    });
 
     describe('Error handling', function () {
       it('errors when using @model as an element', async function () {
