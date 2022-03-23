@@ -57,17 +57,18 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
   - [`RewardPool.balances`](#rewardpoolbalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
+  - [`RewardPool.claimGasEstimate`](#rewardpoolclaimgasestimate)
   - [`RewardPool.getProofs`](#rewardpoolgetproofs)
   - [`RewardPool.recoverTokens`](#rewardpoolrecovertokens)
 - [`RewardManager`](#rewardmanager)
   - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
   - [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.registerRewardeeGasEstimate`](#rewardmanagerregisterrewardeegasestimate)
   - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
-  - [`RewardManager.getRegisterRewardeeGasEstimate`](#rewardmanagergetregisterrewardeegasestimate)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -771,7 +772,7 @@ let rewardPool = await getSDK('RewardPool', web3);
 await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
 ```
 
-### `RewardManager.getClaimGasEstimate`
+### `RewardPool.claimGasEstimate`
 
 The `getClaimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive 10 CARD - (gas fees in CARD) into their reward safe. 
 
@@ -900,9 +901,9 @@ let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.getRewardProgramsInfo()
 ```
 
-### `RewardManager.getRegisterRewardeeGasEstimate`
+### `RewardManager.registerRewardeeGasEstimate`
 
-The `getRegisterRewardeeGasEstimate` returns a gas estimate for the prepaid card send transaction when registering a rewardee. 
+The `registerRewardeeGasEstimate` returns a gas estimate for the prepaid card send transaction when registering a rewardee. 
 
 ```ts
 interface GasEstimate {
@@ -913,7 +914,7 @@ interface GasEstimate {
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-await rewardManagerAPI.getRegisterRewardeeGasEstimate(prepaidCard, rewardProgramId)
+await rewardManagerAPI.registerRewardeeGasEstimate(prepaidCard, rewardProgramId)
 ```
 
 
