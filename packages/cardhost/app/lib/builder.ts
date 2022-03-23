@@ -100,6 +100,7 @@ export default class LocalRealm implements Builder {
         type: 'loaded',
         url,
         allFields,
+        makeDataComplete: true,
       },
       {
         format,

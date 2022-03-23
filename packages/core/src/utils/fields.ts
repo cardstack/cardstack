@@ -1,8 +1,9 @@
-import { CompiledCard, ComponentInfo, Field, Format, RawCardData } from '../interfaces';
+import { CardSchema, CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import { TemplateUsageMeta } from '../babel-plugin-card-template';
+import isPlainObject from 'lodash/isPlainObject';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
@@ -101,33 +102,69 @@ async function loadField(schemaInstance: any, fieldName: string): Promise<any> {
   return result;
 }
 
-export function fieldsAsList(fields: { [key: string]: Field }, path: string[] = []): string[] {
-  let fieldList: string[] = [];
-  for (let [fieldName, field] of Object.entries(fields)) {
-    if (Object.keys(field.card.fields).length === 0) {
-      fieldList.push([...path, fieldName].join('.'));
+export function flattenData(data: Record<string, any>, path: string[] = []): [string, any][] {
+  let result: [string, any][] = [];
+  for (let [field, value] of Object.entries(data)) {
+    if (isPlainObject(value)) {
+      result = [...result, ...flattenData(value, [...path, field])];
     } else {
-      fieldList = [...fieldList, ...fieldsAsList(field.card.fields, [...path, fieldName])];
+      result.push([[...path, field].join('.'), value]);
     }
   }
-  return fieldList;
-}
-
-export function makeEmptyCardData(allFields: string[]): RawCardData {
-  let data: RawCardData = {};
-  for (let field of allFields) {
-    set(data, field, null);
-  }
-  return data;
+  return result;
 }
 
 export function getProperties(object: Record<string, any>, properties: string[]) {
+  return getDataWithShape(object, properties, get);
+}
+
+export function getSerializedProperties(object: Record<string, any>, properties: string[]) {
+  return getDataWithShape(object, properties, serializedGet);
+}
+
+function getDataWithShape(object: Record<string, any>, properties: string[], getter: (obj: any, key: string) => any) {
   let data = {};
   for (let field of properties) {
-    let value = get(object, field);
+    let value = getter(object, field);
     if (value !== undefined) {
       set(data, field, value);
     }
   }
   return data;
+}
+
+export function getFieldsAtPath(path: string, fields: string[]): string[] {
+  return fields.filter((field) => field.startsWith(path)).map((field) => field.substring(path.length + 1));
+}
+
+// In this setter we are careful not to get the leaf, as it may throw a NotReady
+// because it is missing (and we are about to set it). lodash set will
+// inadvertently trigger our NotReady errors
+export function keySensitiveSet(obj: Record<string, any>, path: string, value: any) {
+  visitObjectPath(obj, path, (pathParent, key) => (pathParent[key] = value));
+}
+
+function serializedGet(obj: Record<string, any>, path: string) {
+  return visitObjectPath(obj, path, (pathParent, key) =>
+    (pathParent.constructor as CardSchema).serializedGet(pathParent, key)
+  );
+}
+
+function visitObjectPath(
+  obj: Record<string, any>,
+  path: string,
+  visitor: (pathParent: Record<string, any>, key: string) => string | undefined
+): any {
+  let segments = path.split('.');
+  let current: any = obj;
+  let segment: string;
+  let completed: string[] = [];
+  while ((segment = segments.shift()!)) {
+    if (segments.length === 0) {
+      return visitor(current, segment);
+    }
+    current = current?.[segment];
+    completed.push(segment);
+  }
+  return current;
 }

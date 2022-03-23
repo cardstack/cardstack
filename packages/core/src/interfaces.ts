@@ -27,7 +27,6 @@ const featureNamesMap = {
 export type FeatureFile = keyof typeof featureNamesMap | Format | 'asset';
 export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
-export type SerializerMap = Record<string, PrimitiveSerializer>;
 export interface PrimitiveSerializer {
   serialize(val: any): any;
   deserialize(val: any): any;
@@ -205,16 +204,17 @@ export interface CardService {
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
-type UsedFields = Partial<Record<'isolated' | 'embedded' | 'edit', string[]>>;
+export interface CardSchema {
+  new (rawData: Record<string, any>, makeComplete: boolean, isDeserialized?: boolean): unknown;
+  serializedGet(schemaInstance: any, field: string): any;
+  serializedSet(schemaInstance: any, field: string, value: any): any;
+  serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
+  hasField(fieldName: string): boolean;
+  loadedFields(schemaInstance: any): string[];
+}
 
 export interface CardSchemaModule {
-  default: {
-    new (fieldGetter: (fieldPath: string) => any): unknown;
-  };
-  serializerMap: SerializerMap;
-  usedFields: UsedFields;
-  allFields: string[];
-  serializeMember: string;
+  default: CardSchema;
 }
 
 export interface CardComponentModule {

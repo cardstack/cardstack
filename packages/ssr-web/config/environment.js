@@ -148,6 +148,7 @@ module.exports = function (environment) {
       enabled: true,
       trackRequests: true,
     };
+    ENV.chains.layer2 = 'test';
   }
 
   if (environment === 'production') {

@@ -16,7 +16,6 @@
   grid-template-rows: 1.25rem 1.875rem;
   grid-template-columns: 1.25rem 1fr 0.5rem;
   gap: 0 var(--boxel-sp);
-  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   grid-template-areas:
     "icon title drag"
     "icon description drag";

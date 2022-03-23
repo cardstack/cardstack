@@ -1,5 +1,5 @@
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, Argv, CommandModule } from 'yargs';
 
 export default {
@@ -11,11 +11,10 @@ export default {
     });
   },
   async handler(args: Arguments) {
-    let { network, mnemonic } = args as unknown as {
+    let { network } = args as unknown as {
       network: string;
-      mnemonic?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let prepaidCard = await getSDK('PrepaidCard', web3);
     let { min, max } = await prepaidCard.getPaymentLimits();
     console.log(`The prepaid card payments limits are:

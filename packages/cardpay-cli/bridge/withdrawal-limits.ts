@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { fromWei, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -15,12 +15,11 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, token } = args as unknown as {
+    let { network, token } = args as unknown as {
       network: string;
-      mnemonic: string;
       token: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
     let { max, min } = await tokenBridge.getWithdrawalLimits(token);
     let assets = await getSDK('Assets', web3);

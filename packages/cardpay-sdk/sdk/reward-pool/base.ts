@@ -11,7 +11,14 @@ import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation } from '../utils/safe-utils';
+import {
+  gasEstimate,
+  executeTransaction,
+  getNextNonceFromEstimate,
+  Operation,
+  gasInToken,
+  GasEstimate,
+} from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -27,6 +34,7 @@ export interface Proof {
   rewardProgramId: string;
   amount: BN;
   leaf: string;
+  isValid: boolean;
 }
 
 export interface Leaf {
@@ -64,8 +72,10 @@ export default class RewardPool {
   constructor(private layer2Web3: Web3) {}
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
-    const unclaimedProofs = await this.getProofs(address, rewardProgramId, tokenAddress, false);
-    return unclaimedProofs.reduce((total, { amount }) => {
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter(
+      (o) => o.isValid
+    );
+    return unclaimedValidProofs.reduce((total, { amount }) => {
       return total.add(amount);
     }, new BN('0'));
   }
@@ -140,10 +150,13 @@ export default class RewardPool {
     if (!response?.ok) {
       throw new Error(await response.text());
     }
+    let currentBlock = await this.layer2Web3.eth.getBlockNumber();
     return this.addTokenSymbol(
       json['results'].map((o: any) => {
+        let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
         return {
           ...o,
+          isValid: validFrom <= currentBlock && validTo > currentBlock,
           amount: new BN(o.amount.toString()),
         };
       })
@@ -164,8 +177,10 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedProofs = await this.getProofs(address, rewardProgramId, undefined, false);
-    let tokenBalances = unclaimedProofs.map((o: Proof) => {
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, undefined, false)).filter(
+      (o) => o.isValid
+    );
+    let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
       return {
         tokenAddress: o.tokenAddress,
         rewardProgramId: o.rewardProgramId,
@@ -417,6 +432,33 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
+
+  async claimGasEstimate(
+    rewardSafeAddress: string,
+    leaf: string,
+    proofArray: string[],
+    acceptPartialClaim?: boolean
+  ): Promise<GasEstimate> {
+    let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
+    let o: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
+    if (!o.token) {
+      throw new Error('token must be provided');
+    }
+    let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      rewardSafeAddress,
+      rewardPoolAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      o.token
+    );
+    return {
+      gasToken: estimate.gasToken,
+      amount: gasInToken(estimate),
+    };
   }
 
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;

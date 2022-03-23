@@ -6,18 +6,9 @@
         data-test-auth-step={{this.currentStep}}
         {{did-insert this.resetHubAuthState}}
       >
-      {{#if this.canDeepLink}}
-        <Boxel::Button
-          @as="anchor"
-          @href={{concat "https://" this.universalLinkDomain "/wc?uri=" this.walletConnectUri}}
-          data-test-auth-connect-link
-        >
-          Connect
-        </Boxel::Button>
-      {{else}}
         <Boxel::StyledQrCode
           @data={{this.walletConnectUri}}
-          {{!-- @image={{@logo}} --}}
+          @image={{this.logoForQR}}
           @size={{340}}
           @margin={{15}}
           @backgroundColor="#ffffff"
@@ -27,8 +18,17 @@
           @cornerSquareType="extra-rounded"
           @imageMargin={{5}}
           data-test-auth-connect-qr-code
-        />
-      {{/if}}
+        >
+          {{#if this.canDeepLink}}
+            <Boxel::Button
+              @as="anchor"
+              @href={{concat "https://" this.universalLinkDomain "/wc?uri=" this.walletConnectUri}}
+              data-test-auth-connect-link
+            >
+              Connect
+            </Boxel::Button>
+          {{/if}}
+        </Boxel::StyledQrCode>
       </Auth::Step>
     {{else if (eq this.currentStep this.AUTH_STEPS.HUB_AUTH)}}
       <Auth::Step

@@ -12,12 +12,11 @@ import {
   CardSchemaModule,
   Setter,
 } from '@cardstack/core/src/interfaces';
-import { serializeField } from '@cardstack/core/src/serializers';
 import merge from 'lodash/merge';
 import { cardURL } from '@cardstack/core/src/utils';
 import cloneDeep from 'lodash/cloneDeep';
-import isPlainObject from 'lodash/isPlainObject';
-import { getFieldValue, makeEmptyCardData } from '@cardstack/core/src/utils/fields';
+import flatMap from 'lodash/flatMap';
+import { getFieldValue, keySensitiveSet, flattenData } from '@cardstack/core/src/utils/fields';
 import { BadRequest, CardstackError, UnprocessableEntity } from './utils/errors';
 
 export interface CreatedState {
@@ -30,6 +29,7 @@ export interface LoadedState {
   type: 'loaded';
   url: string;
   allFields: boolean;
+  makeDataComplete: boolean;
 }
 
 export interface CardModelConstructor {
@@ -61,13 +61,8 @@ export default class CardModel {
     this.saveModel = saveModel;
     this.state = state;
     this.setters = this.makeSetter();
+    this.rawData = rawData;
     this._schemaInstance = this.createSchemaInstance();
-
-    if (this.state.type === 'created' || this.state.allFields) {
-      this.rawData = merge(makeEmptyCardData(this.allFields), rawData);
-    } else {
-      this.rawData = merge(makeEmptyCardData(this.usedFields), rawData);
-    }
   }
 
   editable(): Promise<CardModel> {
@@ -139,14 +134,6 @@ export default class CardModel {
     }
   }
 
-  private get usedFields(): string[] {
-    return this.schemaModule.usedFields?.[this.format] ?? [];
-  }
-
-  private get allFields(): string[] {
-    return this.schemaModule.allFields ?? [];
-  }
-
   serialize(): ResourceObject<Saved | Unsaved> {
     let url: string | undefined;
     if (this.state.type === 'loaded') {
@@ -154,14 +141,12 @@ export default class CardModel {
     } else if (this.state.id != null) {
       url = cardURL({ realm: this.realm, id: this.state.id });
     }
-
     let format = this.state.type === 'created' || this.state.allFields ? 'all' : (this.format as Format | 'all');
     let resource: ResourceObject<Saved | Unsaved> = {
       id: url,
       type: 'card',
-      attributes: this.schemaSerialize('serialize', format),
+      attributes: this.schemaModule.default.serialize(this._schemaInstance, format),
     };
-
     if (this.state.type === 'loaded') {
       resource.meta = merge(
         { componentModule: this.componentModuleRef, schemaModule: this.schemaModuleRef },
@@ -193,11 +178,15 @@ export default class CardModel {
       type: 'loaded',
       url,
       allFields: false,
+      makeDataComplete: this.state.type === 'loaded' ? this.state.makeDataComplete : false,
     };
   }
 
-  async setData(data: RawCardData): Promise<void> {
-    let nonExistentFields = this.assertFieldsExists(data);
+  async setData(data: RawCardData, isSerialized = false): Promise<void> {
+    let flattened = flattenData(data);
+    let nonExistentFields = flatMap(flattened, ([fieldName]) =>
+      !this.schemaModule.default.hasField(fieldName) ? [fieldName] : []
+    );
     if (nonExistentFields.length) {
       throw new BadRequest(
         `the field(s) ${nonExistentFields.map((f) => `'${f}'`).join(', ')} are not allowed to be set for the card ${
@@ -205,16 +194,22 @@ export default class CardModel {
         }`
       );
     }
-
-    this.rawData = merge(this.rawData, this.schemaSerialize('serialize', 'all', data));
-    await this.recompute();
+    let newSchemaInstance = this.createSchemaInstance();
+    for (let [field, value] of flattened) {
+      if (isSerialized) {
+        this.schemaModule.default.serializedSet(newSchemaInstance, field, value);
+      } else {
+        keySensitiveSet(newSchemaInstance, field, value);
+      }
+    }
+    await this.recompute(newSchemaInstance);
   }
 
   protected async didRecompute(): Promise<void> {
     return await this.recomputePromise;
   }
 
-  async recompute(): Promise<void> {
+  async recompute(newSchemaInstance?: any): Promise<void> {
     // Note that after each async step we check to see if we are still the
     // current promise, otherwise we bail
 
@@ -227,12 +222,12 @@ export default class CardModel {
       return;
     }
 
-    let newSchemaInstance = this.createSchemaInstance();
+    newSchemaInstance = newSchemaInstance ?? this.createSchemaInstance();
     if (this.recomputePromise !== recomputePromise) {
       return;
     }
 
-    for (let field of this.usedFields) {
+    for (let field of this.schemaModule.default.loadedFields(newSchemaInstance)) {
       try {
         await this.getField(field, newSchemaInstance);
       } catch (err: any) {
@@ -248,33 +243,13 @@ export default class CardModel {
         return;
       }
     }
-
     this._schemaInstance = newSchemaInstance;
     done!();
   }
 
-  private schemaSerialize(
-    action: 'serialize' | 'deserialize',
-    format: Format | 'all',
-    data?: Record<string, any>
-  ): Record<string, any> {
-    return this._schemaInstance[this.schemaModule.serializeMember](action, format, data);
-  }
-
   private createSchemaInstance() {
     let klass = this.schemaModule.default;
-    // We can't await the instance creation in a separate, as it's thenable and confuses async methods
-    return new klass(this.getRawField.bind(this)) as any;
-  }
-
-  private getRawField(fieldPath: string): any {
-    let result = keySensitiveGet(this.rawData, fieldPath);
-    if ('missing' in result) {
-      throw new Error(`TODO: ${result.missing}`);
-    } else {
-      // TODO it would be wonderful if the schema instance knew how to deserialize its own fields
-      return serializeField(this.schemaModule.serializerMap, fieldPath, result.value, 'deserialize');
-    }
+    return new klass(this.rawData, this.state.type === 'created' ? true : this.state.makeDataComplete) as any;
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -284,9 +259,7 @@ export default class CardModel {
       if (!lastSegment) {
         return;
       }
-
-      let data = this.schemaSerialize('deserialize', 'all');
-      let cursor: any = data;
+      let cursor = this.rawData;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
         if (!nextCursor) {
@@ -296,7 +269,6 @@ export default class CardModel {
         cursor = nextCursor;
       }
       cursor[lastSegment] = value;
-      this.rawData = this.schemaSerialize('serialize', 'all', data);
       this.recompute();
     };
     (s as any).setters = new Proxy(
@@ -311,41 +283,8 @@ export default class CardModel {
         },
       }
     );
-
     return s;
   }
-
-  // TODO: we need to really use a validation mechanism which will use code from
-  // the schema.js module to validate the fields
-  private assertFieldsExists(data: RawCardData, path = ''): string[] {
-    let nonExistentFields: string[] = [];
-    for (let [field, value] of Object.entries(data)) {
-      let fieldPath = path ? `${path}.${field}` : field;
-      if (isPlainObject(value)) {
-        nonExistentFields = [...nonExistentFields, ...this.assertFieldsExists(value, fieldPath)];
-      } else if (!this.allFields.includes(fieldPath)) {
-        nonExistentFields.push(fieldPath);
-      }
-    }
-    return nonExistentFields;
-  }
-}
-
-// access a potentially-deep property path, stopping if a key is missing along
-// the way
-export function keySensitiveGet(obj: object, path: string): { missing: string } | { value: any } {
-  let segments = path.split('.');
-  let current: any = obj;
-  let segment: string | undefined;
-  let completed: string[] = [];
-  while ((segment = segments.shift())) {
-    if (!(segment in current)) {
-      return { missing: [...completed, segment].join('.') };
-    }
-    current = current?.[segment];
-    completed.push(segment);
-  }
-  return { value: current };
 }
 
 function assertNever(value: never) {
