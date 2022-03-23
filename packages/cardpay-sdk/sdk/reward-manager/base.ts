@@ -224,7 +224,7 @@ export default class RewardManager {
     let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
     return {
       gasToken: payload.gasToken,
-      amount: gasInToken(payload).toString(),
+      amount: gasInToken(payload),
     };
   }
 

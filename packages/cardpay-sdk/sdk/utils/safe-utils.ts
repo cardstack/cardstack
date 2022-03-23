@@ -30,7 +30,7 @@ export interface SendPayload extends Estimate {
 }
 
 export interface GasEstimate {
-  amount: string;
+  amount: BN;
   gasToken: string;
 }
 
