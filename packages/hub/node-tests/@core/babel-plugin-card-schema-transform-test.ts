@@ -150,21 +150,20 @@ if (process.env.COMPILER) {
         schema: 'schema.js',
         files: {
           'schema.js': `
-              import { contains } from "@cardstack/types";
-              import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-              export default class Bar {
-                @contains(string) bar;
-              }
+            export default class Bar {
+              @contains(string) bar;
+            }
 
-              let bar1 = 'bar-1';
-              let bar3 = 'bar-3';
-              let bar4 = 'bar-4';
-              let bar5 = 'bar-5';
-              export { bar1, bar3, bar4, bar5 };
+            let foo = 'foo';
+            let bar1 = 'bar-1';
+            let bar3 = 'bar-3';
+            export { foo, bar1, bar3 };
 
-              export let bar2 = 'bar-2';
-            `,
+            export let bar2 = 'bar-2';
+          `,
         },
       });
 
@@ -174,17 +173,19 @@ if (process.env.COMPILER) {
         schema: 'schema.js',
         files: {
           'schema.js': `
-              import { contains } from "@cardstack/types";
-              import string from "https://cardstack.com/base/string";
-              import * as foo from "../bar";
-              import { bar3 } from "../bar";
-              import bar2, { bar1, bar4 } from "../bar";
-              import { bar5 as bar } from "../bar";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import _, { _camelCase } from 'lodash';
+            import * as randomImport from 'i-dont-exist';
+            import badImport, { incorrectUnusedImport } from 'i-dont-exist';
+            import * as foo from "../bar";
+            import { bar3 } from "../bar";
+            import bar2, { bar1, foo as foo1 } from "../bar";
 
-              export default class Test {
-                @contains(string) name;
-              }
-            `,
+            export default class Test {
+              @contains(string) name;
+            }
+          `,
         },
       });
       expect(card.compiled.url).to.eq(`${realm}test`);
