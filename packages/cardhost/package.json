@@ -1,6 +1,6 @@
 {
   "name": "cardhost",
-  "version": "0.28.26",
+  "version": "0.28.27",
   "private": true,
   "description": "The standard clientside app for hosting Cardstack Cards",
   "repository": {
@@ -33,9 +33,9 @@
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.12.13",
     "@babel/plugin-transform-typescript": "^7.12.13",
-    "@cardstack/base-cards": "0.28.26",
-    "@cardstack/compiled": "0.28.26",
-    "@cardstack/core": "0.28.26",
+    "@cardstack/base-cards": "0.28.27",
+    "@cardstack/compiled": "0.28.27",
+    "@cardstack/core": "0.28.27",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^1.0.2",
     "@ember/test-helpers": "^2.2.8",
