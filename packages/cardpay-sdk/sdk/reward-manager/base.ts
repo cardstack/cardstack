@@ -20,7 +20,7 @@ import {
   gasEstimate,
   executeTransaction,
   Operation,
-  gasInToken
+  gasInToken,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -220,9 +220,8 @@ export default class RewardManager {
     );
     let issuingToken = (await prepaidCardManager.methods.cardDetails(prepaidCardAddress).call()).issueToken;
     let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-    let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock)
+    let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
     return gasInToken(payload).toString();
-
   }
 
   async lockRewardProgram(txnHash: string): Promise<SuccessfulTransactionReceipt>;
