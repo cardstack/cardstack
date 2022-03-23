@@ -7,8 +7,11 @@ import { TemplateUsageMeta } from './babel-plugin-card-template';
 class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
 }
+class InvalidModelUsageError extends Error {
+  message = 'Invalid use of @model API';
+}
 
-type HandledFieldExpressions = WeakSet<syntax.ASTv1.PathExpression>;
+type HandledPathExpressions = WeakSet<syntax.ASTv1.PathExpression>;
 
 export interface Options {
   usageMeta: TemplateUsageMeta;
@@ -16,7 +19,8 @@ export interface Options {
 }
 
 type ScopeValue =
-  | { type: 'field'; fieldPath: string }
+  | { type: '@fields'; path: string }
+  | { type: '@model'; path: string }
   | { type: 'stringLiteral'; value: string }
   | { type: 'pathExpression'; value: string };
 
@@ -41,7 +45,7 @@ export default function glimmerTemplateAnalyze(source: string, options: Options)
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(_env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
     let { usageMeta } = options;
-    let handledFieldExpressions: HandledFieldExpressions = new WeakSet();
+    let handledPathExpressions: HandledPathExpressions = new WeakSet();
     let scopeTracker = new ScopeTracker<ScopeValue>();
 
     function trackFieldUsage(path: string, format: Format | 'default' = 'default') {
@@ -59,34 +63,38 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
     ): ReturnType<ScopeTracker<ScopeValue>['lookup']> {
       let [head, ...tail] = fullPath.split('.');
       let result = scopeTracker.lookup(head, path);
-      if (result.type !== 'assigned' || result.value.type !== 'field' || tail.length === 0) {
-        return result;
+      if (
+        result.type === 'assigned' &&
+        (result.value.type === '@fields' || result.value.type === '@model') &&
+        tail.length > 0
+      ) {
+        return {
+          type: 'assigned',
+          value: {
+            type: result.value.type,
+            path: result.value.path + '.' + tail.join('.'),
+          },
+        };
       }
-      return {
-        type: 'assigned',
-        value: {
-          type: 'field',
-          fieldPath: result.value.fieldPath + '.' + tail.join('.'),
-        },
-      };
+
+      return result;
     }
 
-    function trackScopeIfLoopingOverSpecificFieldPath(node: syntax.ASTv1.BlockStatement) {
+    function trackScopeIfLoopingOverSpecificPath(node: syntax.ASTv1.BlockStatement) {
+      let [param] = node.params;
       if (
         node.path.type === 'PathExpression' &&
         node.path.original === 'each' &&
-        node.params[0]?.type === 'PathExpression' &&
-        node.params[0].original.startsWith('@fields')
+        param?.type === 'PathExpression' &&
+        param.head.type === 'AtHead' &&
+        (param.head.name === '@model' || param.head.name === '@fields')
       ) {
-        let fieldFullPath = fieldPathForPathExpression(node.params[0]);
-        if (fieldFullPath) {
-          scopeTracker.assign(
-            node.program.blockParams[0],
-            { type: 'field', fieldPath: fieldFullPath },
-            { onNextScope: true }
-          );
-          handledFieldExpressions.add(node.params[0]);
-        }
+        scopeTracker.assign(
+          node.program.blockParams[0],
+          { type: param.head.name, path: param.tail.join('.') },
+          { onNextScope: true }
+        );
+        handledPathExpressions.add(param);
       }
     }
 
@@ -98,23 +106,23 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
         node.params[0].original === '@fields'
       ) {
         usageMeta.fields = 'self';
-        handledFieldExpressions.add(node.params[0]);
+        handledPathExpressions.add(node.params[0]);
       }
     }
 
-    function trackUsageForModel(node: syntax.ASTv1.PathExpression) {
-      if (node.original === 'debugger' || node.head.type !== 'AtHead' || node.head.name !== '@model') {
+    function trackModelUsage(path: string | undefined) {
+      // If the model usage has already been set to self, adding a more precise
+      // key is not neccessary, because all keys will be needed
+      if (usageMeta.model === 'self') {
+        return;
+      }
+      // If we call this but turns out the path is empty, assume we want to track the whole model
+      if (!path || path.length === 0) {
+        usageMeta.model = 'self';
         return;
       }
 
-      let path = node.tail.join('.');
-      if (!path) {
-        usageMeta.model = 'self';
-      } else {
-        if (usageMeta.model !== 'self') {
-          usageMeta.model.add(path);
-        }
-      }
+      usageMeta.model.add(path);
     }
 
     return {
@@ -131,22 +139,41 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           }
 
           let result = lookupScopeVal(node.tag, path);
-          if (result.type === 'assigned' && result.value.type === 'field') {
-            trackFieldUsage(result.value.fieldPath);
+          if (result.type === 'assigned') {
+            switch (result.value.type) {
+              case '@fields':
+                trackFieldUsage(result.value.path);
+                break;
+              case '@model':
+                throw new InvalidModelUsageError();
+            }
           }
         },
 
         PathExpression(node, path) {
-          if (handledFieldExpressions.has(node)) {
+          if (handledPathExpressions.has(node)) {
             return;
           }
 
-          let result = scopeTracker.lookup(node.original, path);
-          if (result.type === 'normal') {
-            if (isFieldPathExpression(node)) {
-              throw new InvalidFieldsUsageError();
-            }
-            return trackUsageForModel(node);
+          let result = lookupScopeVal(node.original, path);
+          switch (result.type) {
+            case 'normal':
+              if (node.original.startsWith('@fields')) {
+                throw new InvalidFieldsUsageError();
+              }
+
+              if (node.head.type === 'AtHead' && node.head.name === '@model') {
+                trackModelUsage(node.tail.join('.'));
+              }
+              break;
+            case 'assigned':
+              if (result.value.type === '@model') {
+                trackModelUsage(result.value.path);
+              }
+              if (result.value.type === '@fields') {
+                throw new InvalidFieldsUsageError();
+              }
+              break;
           }
         },
 
@@ -163,24 +190,13 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           enter(node) {
             scopeTracker.blockStatementEnter(node);
             trackUsageIfEachInLoopOverFields(node);
-            trackScopeIfLoopingOverSpecificFieldPath(node);
+            trackScopeIfLoopingOverSpecificPath(node);
           },
           exit() {},
         },
       },
     };
   };
-}
-
-function isFieldPathExpression(exp: syntax.ASTv1.PathExpression): boolean {
-  return exp.original.startsWith('@fields');
-}
-
-function fieldPathForPathExpression(exp: syntax.ASTv1.PathExpression): string | undefined {
-  if (isFieldPathExpression(exp)) {
-    return exp.tail.join('.');
-  }
-  return undefined;
 }
 
 function fieldPathForElementNode(node: syntax.ASTv1.ElementNode): string | undefined {
