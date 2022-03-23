@@ -4,10 +4,10 @@ import { augmentBadRequest } from './utils/errors';
 import { ScopeTracker } from './glimmer-scope-tracker';
 import { TemplateUsageMeta } from './babel-plugin-card-template';
 
-class InvalidFieldsUsageError extends Error {
+export class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
 }
-class InvalidModelUsageError extends Error {
+export class InvalidModelUsageError extends Error {
   message = 'Invalid use of @model API';
 }
 
@@ -131,6 +131,9 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
         ElementNode(node, path) {
           if (node.tag === '@fields') {
             throw new InvalidFieldsUsageError();
+          }
+          if (node.tag.startsWith('@model')) {
+            throw new InvalidModelUsageError();
           }
 
           let fieldFullPath = fieldPathForElementNode(node);

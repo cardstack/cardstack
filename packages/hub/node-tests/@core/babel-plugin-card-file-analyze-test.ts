@@ -1,5 +1,6 @@
 import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
 import { analyzeComponent as fullAnalyzeComponent } from '@cardstack/core/src/babel-plugin-card-template';
+import { InvalidFieldsUsageError, InvalidModelUsageError } from '@cardstack/core/src/glimmer-plugin-component-analyze';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 if (process.env.COMPILER) {
@@ -232,22 +233,40 @@ if (process.env.COMPILER) {
       });
     });
 
-    it.skip('Errors when things are used incorrectly', async function () {
-      try {
-        analyzeComponent('<@model.pizza />');
-      } catch (e: any) {
-        expect(e).to.be;
-      }
-      try {
-        analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday /> {{/each}}');
-      } catch (e: any) {
-        expect(e).to.be;
-      }
-      try {
-        analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday.location /> {{/each}}');
-      } catch (e: any) {
-        expect(e).to.be;
-      }
+    describe('Error handling', function () {
+      it('errors when using @model as an element', async function () {
+        try {
+          analyzeComponent('<@model.pizza />');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+      });
+
+      it('errors when using @model as an element inside of a block', async function () {
+        try {
+          analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday /> {{/each}}');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+
+        try {
+          analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday.location /> {{/each}}');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+      });
+
+      it('errors when using @fields as an element without a path', async function () {
+        try {
+          analyzeComponent('<@fields />');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidFieldsUsageError);
+        }
+      });
     });
   });
 }
