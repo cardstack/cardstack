@@ -804,6 +804,26 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Register Rewardee Gas Estimate",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "register-rewardee-gas-estimate",
+        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Add Reward Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
