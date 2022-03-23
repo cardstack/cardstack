@@ -29,3 +29,25 @@ export function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): 
     console.log(`    ${tokenSymbol} : ${fromWei(balance)}`);
   });
 }
+
+export const fromProof = (proof: string): any => {
+  if (proof == '0x') {
+    return [];
+  }
+  let bytesSize = 32;
+  let hexChunkSize = bytesSize * 2;
+  let hexStr = proof.replace('0x', '');
+  if (hexStr.length % hexChunkSize != 0) {
+    throw new Error('proof array is wrong size');
+  }
+  return chunkString(hexStr, hexChunkSize).map((s) => '0x' + s);
+};
+
+function chunkString(str: string, chunkSize: number) {
+  let arr = str.match(new RegExp('.{1,' + chunkSize + '}', 'g'));
+  if (arr) {
+    return arr;
+  } else {
+    throw new Error('proof cannot be converted to proof array  split properly');
+  }
+}
