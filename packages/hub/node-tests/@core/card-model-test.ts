@@ -56,10 +56,13 @@ if (process.env.COMPILER) {
 
     it('.data', async function () {
       let model: CardModel = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
-      expect(model.data.name).to.equal(attributes.name);
-      expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
-      expect(model.data.address.street).to.equal(attributes.address.street);
-      expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await model.getField('name')).to.equal(attributes.name);
+      expect(isSameDay(await model.getField('birthdate'), p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await model.getField('address.street')).to.equal(attributes.address.street);
+      expect(
+        isSameDay(await model.getField('address.settlementDate'), p('1990-01-01')),
+        'Dates are serialized to Dates'
+      ).to.be.ok;
     });
 
     it('.url on new card throws error', async function () {
@@ -77,14 +80,20 @@ if (process.env.COMPILER) {
       let parentCard = await cards.loadModel(`${realmURL}person`, 'isolated');
       let model = parentCard.adoptIntoRealm(realmURL);
       await model.setData({ name: 'Kirito', address: { settlementDate: p('2022-02-22') } });
-      expect(model.data.address.settlementDate instanceof Date).to.be.true;
-      expect(isSameDay(model.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect((await model.getField('address.settlementDate')) instanceof Date).to.be.true;
+      expect(
+        isSameDay(await model.getField('address.settlementDate'), p('2022-02-22')),
+        'Dates are serialized to Dates'
+      ).to.be.ok;
       await model.save();
 
       let kirito = await cards.loadModel(model.url, 'isolated');
-      expect(kirito.data.name).to.equal('Kirito');
-      expect(kirito.data.address.settlementDate instanceof Date).to.be.true;
-      expect(isSameDay(kirito.data.address.settlementDate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await kirito.getField('name')).to.equal('Kirito');
+      expect((await kirito.getField('address.settlementDate')) instanceof Date).to.be.true;
+      expect(
+        isSameDay(await kirito.getField('address.settlementDate'), p('2022-02-22')),
+        'Dates are serialized to Dates'
+      ).to.be.ok;
     });
 
     it('.save() loaded card - isolated', async function () {
@@ -93,25 +102,27 @@ if (process.env.COMPILER) {
       await model.save();
 
       expect(model.format).to.equal('isolated');
-      expect(model.data.name).to.equal('Robert Barker');
-      expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await model.getField('name')).to.equal('Robert Barker');
+      expect(isSameDay(await model.getField('birthdate'), p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
 
       await model.setData({ birthdate: p('2022-02-22') });
 
-      expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect(isSameDay(await model.getField('birthdate'), p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
 
       await model.save();
 
-      expect(isSameDay(model.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect(isSameDay(await model.getField('birthdate'), p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
 
       let savedModel = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
-      expect(savedModel.data.name).to.equal('Robert Barker');
-      expect(isSameDay(savedModel.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await savedModel.getField('name')).to.equal('Robert Barker');
+      expect(isSameDay(await savedModel.getField('birthdate'), p('2022-02-22')), 'Dates are serialized to Dates').to.be
+        .ok;
       // fields that were not specified in setData should be unchanged
-      expect(savedModel.data.address.city).to.equal('Los Angeles');
+      expect(await savedModel.getField('address.city')).to.equal('Los Angeles');
       let embedded = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
-      expect(embedded.data.name).to.equal('Robert Barker');
-      expect(isSameDay(embedded.data.birthdate, p('2022-02-22')), 'Dates are serialized to Dates').to.be.ok;
+      expect(await embedded.getField('name')).to.equal('Robert Barker');
+      expect(isSameDay(await embedded.getField('birthdate'), p('2022-02-22')), 'Dates are serialized to Dates').to.be
+        .ok;
     });
 
     it('.save() loaded card - embedded', async function () {
@@ -119,13 +130,13 @@ if (process.env.COMPILER) {
       await model.setData({ name: 'Robert Barker' });
       await model.save();
 
-      expect(model.data.name).to.equal('Robert Barker');
+      expect(await model.getField('name')).to.equal('Robert Barker');
       expect(model.format).to.equal('embedded');
 
       let savedModel = await cards.loadModel(`${realmURL}bob-barker`, 'embedded');
-      expect(savedModel.data.name).to.equal('Robert Barker');
+      expect(await savedModel.getField('name')).to.equal('Robert Barker');
       let isolated = await cards.loadModel(`${realmURL}bob-barker`, 'isolated');
-      expect(isolated.data.name).to.equal('Robert Barker');
+      expect(await isolated.getField('name')).to.equal('Robert Barker');
     });
 
     it('.save() on adopted card using pre-existing id', async function () {

@@ -190,7 +190,7 @@ if (process.env.COMPILER) {
     describe('.load() & .loadData()', function () {
       it('returns a card thats been indexed', async function () {
         let card = await cards.loadModel(`${realmURL}post1`, 'isolated');
-        expect(card.data.title).to.eq('Hello again');
+        expect(await card.getField('title')).to.eq('Hello again');
         expect(card.url).to.eq(`${realmURL}post1`);
         let { compiled } = await cards.load(`${realmURL}post1`);
         expect(compiled.adoptsFrom!.url).to.eq(`${realmURL}post`);
@@ -544,8 +544,8 @@ if (process.env.COMPILER) {
         });
 
         let card = await cards.loadModel('https://cardstack.local/sue', 'isolated');
-        expect(card.data.author.name).to.equal('Sue');
-        expect(card.data.author.id).to.equal('https://cardstack.local/sue');
+        expect(await card.getField('author.name')).to.equal('Sue');
+        expect(await card.getField('author.id')).to.equal('https://cardstack.local/sue');
       });
     });
 

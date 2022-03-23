@@ -63,16 +63,16 @@ module('Integration | card-service', function (hooks) {
       let model = await cards.loadModel(cardID, 'isolated');
       assert.equal(model.url, cardID, '@model id is correct');
       assert.equal(
-        model.data.title,
+        await model.getField('title'),
         'A blog post title',
         'post title is correct'
       );
       assert.ok(
-        model.data.createdAt instanceof Date,
+        (await model.getField('createdAt')) instanceof Date,
         'CreatedAt is an instance of Date'
       );
       assert.equal(
-        model.data.createdAt.getTime(),
+        (await model.getField('createdAt')).getTime(),
         1614714692121,
         'post created at is correct'
       );
@@ -125,11 +125,11 @@ module('Integration | card-service', function (hooks) {
         'isolated'
       );
       assert.ok(
-        model.data.posts[0].createdAt instanceof Date,
+        (await model.getField('posts[0].createdAt')) instanceof Date,
         'CreatedAt is an instance of Date'
       );
       assert.equal(
-        model.data.posts[0].createdAt.getTime(),
+        (await model.getField('posts[0].createdAt')).getTime(),
         1621265481000,
         'post created at is correct'
       );

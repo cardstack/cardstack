@@ -86,21 +86,24 @@ module('@core | card-model-for-browser', function (hooks) {
     );
 
     assert.equal(
-      model.data.name,
+      await model.getField('name'),
       attributes.name,
       'name field value is correct'
     );
     assert.ok(
-      isSameDay(model.data.birthdate, p('1923-12-12')),
+      isSameDay(await model.getField('birthdate'), p('1923-12-12')),
       'Dates are serialized to Dates'
     );
     assert.equal(
-      model.data.address.street,
+      await model.getField('address.street'),
       attributes.address.street,
       'street field value is correct'
     );
     assert.ok(
-      isSameDay(model.data.address.settlementDate, p('1990-01-01')),
+      isSameDay(
+        await model.getField('address.settlementDate'),
+        p('1990-01-01')
+      ),
       'Nested card Dates are serialized to Dates'
     );
   });
@@ -111,12 +114,12 @@ module('@core | card-model-for-browser', function (hooks) {
       'embedded'
     );
     assert.equal(
-      model.data.name,
+      await model.getField('name'),
       attributes.name,
       'name field value is correct'
     );
     assert.equal(
-      model.data.birthdate,
+      await model.getField('birthdate'),
       undefined,
       'birthdate field should be missing'
     );
