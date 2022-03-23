@@ -95,8 +95,8 @@ export default function main(babel: typeof Babel) {
           // card that is primitive, then we ourselves must be primitive as well.
           if (type === 'composite' && state.opts.meta.fields && keys(state.opts.meta.fields).length > 0) {
             path.get('body').node.body.unshift(
-              t.classProperty(t.identifier(state.dataIdentifier), t.objectExpression([])),
-              t.classProperty(t.identifier(state.serializedDataIdentifier), t.objectExpression([])),
+              t.classProperty(t.identifier(state.dataIdentifier), t.newExpression(t.identifier('Map'), [])),
+              t.classProperty(t.identifier(state.serializedDataIdentifier), t.newExpression(t.identifier('Map'), [])),
               t.classProperty(t.identifier(state.loadedFieldsIdentifier), t.arrayExpression([])),
               t.classProperty(t.identifier(state.isCompleteIdentifier)),
               t.classMethod(
@@ -390,13 +390,13 @@ function addSerializedGetMethod(path: NodePath<t.Class>, state: State, babel: ty
       ['instance', 'field'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
-          if (field in instance.%%serializedData%%) {
-            return instance.%%serializedData%%[field];
+          if (instance.%%serializedData%%.has(field)) {
+            return instance.%%serializedData%%.get(field);
           }
           let value = instance[field];
           %%fieldsWithCustomSerialization%%
           %%compositeFields%%
-          instance.%%serializedData%%[field] = value;
+          instance.%%serializedData%%.set(field, value);
           return value;
         `)({
           fieldsWithCustomSerialization:
@@ -422,8 +422,8 @@ function addSerializedSetMethod(path: NodePath<t.Class>, state: State, babel: ty
       ['instance', 'field', 'value'].map((name) => t.identifier(name)),
       t.blockStatement(
         babel.template(`
-          delete instance.%%data%%[field];
-          instance.%%serializedData%%[field] = value;
+          instance.%%data%%.delete(field);
+          instance.%%serializedData%%.set(field, value);
         `)({
           data: t.identifier(state.dataIdentifier),
           serializedData: t.identifier(state.serializedDataIdentifier),
@@ -456,9 +456,9 @@ function makeCompositeSetter({
       [t.identifier('value')],
       t.blockStatement(
         babel.template(`
-          delete this.%%serializedData%%[%%fieldName%%];
+          this.%%serializedData%%.delete(%%fieldName%%);
           let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-          this.%%data%%[%%fieldName%%] = new %%fieldClass%%(value, this.%%isComplete%%, true);
+          this.%%data%%.set(%%fieldName%%, new %%fieldClass%%(value, this.%%isComplete%%, true));
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
@@ -504,8 +504,8 @@ function makePrimitiveSetter({
       [t.identifier('value')],
       t.blockStatement(
         babel.template(`
-          delete this.%%serializedData%%[%%fieldName%%];
-          this.%%data%%[%%fieldName%%] = value;
+          this.%%serializedData%%.delete(%%fieldName%%);
+          this.%%data%%.set(%%fieldName%%, value);
         `)({
           data: t.identifier(state.dataIdentifier),
           fieldName: t.stringLiteral(fieldName),
@@ -538,11 +538,11 @@ function makeFieldGetter({
   if (Object.keys(field.card.fields).length > 0) {
     // getter for composite field
     getFromDeserializedData = babel.template(`
-      if (%%fieldName%% in this.%%serializedData%% || this.isComplete) {
+      if (this.%%serializedData%%.has(%%fieldName%%) || this.isComplete) {
         let fields = %%getFieldsAtPath%%(%%fieldName%%, this.%%loadedFields%%);
-        let value = this.%%serializedData%%[%%fieldName%%] || {};
+        let value = this.%%serializedData%%.get(%%fieldName%%) || {};
         value = new %%fieldClass%%(value, this.%%isComplete%%);
-        this.%%data%%[%%fieldName%%] = value;
+        this.%%data%%.set(%%fieldName%%, value);
         return value;
       }
     `)({
@@ -562,12 +562,12 @@ function makeFieldGetter({
   } else if (field.card.serializerModule) {
     // getter for field with custom serializer
     getFromDeserializedData = babel.template(`
-      if (%%fieldName%% in this.%%serializedData%%) {
-        let value = this.%%serializedData%%[%%fieldName%%];
+      if (this.%%serializedData%%.has(%%fieldName%%)) {
+        let value = this.%%serializedData%%.get(%%fieldName%%);
         if (value !== null) {
           value = %%serializerModule%%.deserialize(value);
         }
-        this.%%data%%[%%fieldName%%] = value;
+        this.%%data%%.set(%%fieldName%%, value);
         return value;
       }
     `)({
@@ -584,8 +584,8 @@ function makeFieldGetter({
   } else {
     // getter for primitive field with no custom serializer
     getFromDeserializedData = babel.template(`
-      if (%%fieldName%% in this.%%serializedData%%) {
-        return this.%%serializedData%%[%%fieldName%%];
+      if (this.%%serializedData%%.has(%%fieldName%%)) {
+        return this.%%serializedData%%.get(%%fieldName%%);
       }
     `)({
       fieldName: t.stringLiteral(fieldName),
@@ -599,8 +599,8 @@ function makeFieldGetter({
     [],
     t.blockStatement(
       babel.template(`
-        if (%%fieldName%% in this.%%data%%) {
-          return this.%%data%%[%%fieldName%%];
+        if (this.%%data%%.has(%%fieldName%%)) {
+          return this.%%data%%.get(%%fieldName%%);
         }
         %%getFromDeserializedData%%
         if (!this.%%isComplete%%) {

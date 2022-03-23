@@ -206,8 +206,8 @@ if (process.env.COMPILER) {
       `);
       expect(source).to.containsSource(`
         static serializedGet(instance, field) {
-          if (field in instance.serializedData) {
-            return instance.serializedData[field];
+          if (instance.serializedData.has(field)) {
+            return instance.serializedData.get(field);
           }
 
           let value = instance[field];
@@ -217,7 +217,7 @@ if (process.env.COMPILER) {
           }
 
           ;
-          instance.serializedData[field] = value;
+          instance.serializedData.set(field, value);
           return value;
         }
       `);
@@ -228,8 +228,8 @@ if (process.env.COMPILER) {
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         static serializedSet(instance, field, value) {
-          delete instance.data[field];
-          instance.serializedData[field] = value;
+          instance.data.delete(field);
+          instance.serializedData.set(field, value);
         }
       `);
     });
@@ -242,8 +242,8 @@ if (process.env.COMPILER) {
       `);
       expect(source).to.containsSource(`
         static serializedGet(instance, field) {
-          if (field in instance.serializedData) {
-            return instance.serializedData[field];
+          if (instance.serializedData.has(field)) {
+            return instance.serializedData.get(field);
           }
 
           let value = instance[field];
@@ -254,7 +254,7 @@ if (process.env.COMPILER) {
             value = BioClass.serialize(value, fields);
           }
 
-          instance.serializedData[field] = value;
+          instance.serializedData.set(field, value);
           return value;
         }
       `);
@@ -284,8 +284,8 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}bio`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        data = {};
-        serializedData = {};
+        data = new Map();
+        serializedData = new Map();
         loadedFields = [];
         isComplete;
 
@@ -313,12 +313,12 @@ if (process.env.COMPILER) {
       expect(source).to.not.containsSource(`https://cardstack.com/base/string`);
       expect(source).to.containsSource(`
         get background() {
-          if ("background" in this.data) {
-            return this.data["background"];
+          if (this.data.has("background")) {
+            return this.data.get("background");
           }
 
-          if ("background" in this.serializedData) {
-            return this.serializedData["background"];
+          if (this.serializedData.has("background")) {
+            return this.serializedData.get("background");
           }
 
           if (!this.isComplete) {
@@ -329,8 +329,8 @@ if (process.env.COMPILER) {
         }
 
         set background(value) {
-          delete this.serializedData["background"];
-          this.data["background"] = value;
+          this.serializedData.delete("background");
+          this.data.set("background", value);
         }
       `);
     });
@@ -345,16 +345,16 @@ if (process.env.COMPILER) {
       `);
       expect(source).to.containsSource(`
         get birthdate() {
-          if ("birthdate" in this.data) {
-            return this.data["birthdate"];
+          if (this.data.has("birthdate")) {
+            return this.data.get("birthdate");
           }
 
-          if ("birthdate" in this.serializedData) {
-            let value = this.serializedData["birthdate"];
+          if (this.serializedData.has("birthdate")) {
+            let value = this.serializedData.get("birthdate");
             if (value !== null) {
               value = DateSerializer.deserialize(value);
             }
-            this.data["birthdate"] = value;
+            this.data.set("birthdate", value);
             return value;
           }
 
@@ -366,8 +366,8 @@ if (process.env.COMPILER) {
         }
 
         set birthdate(value) {
-          delete this.serializedData["birthdate"];
-          this.data["birthdate"] = value;
+          this.serializedData.delete("birthdate");
+          this.data.set("birthdate", value);
         }
       `);
     });
@@ -382,15 +382,15 @@ if (process.env.COMPILER) {
       `);
       expect(source).to.containsSource(`
         get aboutMe() {
-          if ("aboutMe" in this.data) {
-            return this.data["aboutMe"];
+          if (this.data.has("aboutMe")) {
+            return this.data.get("aboutMe");
           }
 
-          if ("aboutMe" in this.serializedData || this.isComplete) {
+          if (this.serializedData.has("aboutMe") || this.isComplete) {
             let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-            let value = this.serializedData["aboutMe"] || {};
+            let value = this.serializedData.get("aboutMe") || {};
             value = new BioClass(value, this.isComplete);
-            this.data["aboutMe"] = value;
+            this.data.set("aboutMe", value);
             return value;
           }
 
@@ -402,9 +402,9 @@ if (process.env.COMPILER) {
         }
 
         set aboutMe(value) {
-          delete this.serializedData["aboutMe"];
+          this.serializedData.delete("aboutMe");
           let fields = getFieldsAtPath("aboutMe", this.loadedFields);
-          this.data["aboutMe"] = new BioClass(value, this.isComplete, true);
+          this.data.set("aboutMe", new BioClass(value, this.isComplete, true));
         }
       `);
     });
@@ -462,8 +462,8 @@ if (process.env.COMPILER) {
       let { compiled } = await cards.load(`${realm}really-fancy-person`);
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
-        data = {};
-        serializedData = {};
+        data = new Map();
+        serializedData = new Map();
         loadedFields = [];
         isComplete;
 
