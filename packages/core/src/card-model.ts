@@ -178,7 +178,7 @@ export default class CardModel {
       type: 'loaded',
       url,
       allFields: false,
-      makeDataComplete: this.makeCompleteData(),
+      makeDataComplete: this.state.type === 'loaded' ? this.state.makeDataComplete : false,
     };
   }
 
@@ -207,10 +207,6 @@ export default class CardModel {
 
   protected async didRecompute(): Promise<void> {
     return await this.recomputePromise;
-  }
-
-  protected makeCompleteData(): boolean {
-    return true;
   }
 
   async recompute(newSchemaInstance?: any): Promise<void> {

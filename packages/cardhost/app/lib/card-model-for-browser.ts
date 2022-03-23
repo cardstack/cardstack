@@ -83,10 +83,6 @@ const CardModelForBrowser: CardModelConstructor = class CardModelForBrowser exte
     return this.wrapperComponent;
   }
 
-  protected makeCompleteData(): boolean {
-    return false;
-  }
-
   private async componentModule() {
     if (!this._componentModule) {
       this._componentModule = await this.cards.loadModule<CardComponentModule>(
