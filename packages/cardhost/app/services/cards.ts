@@ -162,6 +162,7 @@ export default class Cards extends Service implements CardService {
         type: 'loaded',
         url: cardResponse.id,
         allFields,
+        makeDataComplete: false,
       },
       {
         format,

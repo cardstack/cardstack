@@ -25,6 +25,7 @@ if (process.env.COMPILER) {
         attributes: {
           title: 'Blogigidy blog',
           body: 'First post!',
+          createdAt: '2022-03-22',
         },
       },
     };
@@ -39,12 +40,16 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
+            import date from "https://cardstack.com/base/date";
             export default class Post {
               @contains(string) title;
               @contains(string) body;
+              @contains(date) createdAt;
             }
           `,
-          'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
+          'isolated.js': templateOnlyComponentTemplate(
+            '<h1><@fields.title/></h1><article><@fields.createdAt/><@fields.body/></article>'
+          ),
         },
       });
     });
@@ -57,6 +62,7 @@ if (process.env.COMPILER) {
       expect(data.attributes).to.deep.equal({
         title: 'Blogigidy blog',
         body: 'First post!',
+        createdAt: '2022-03-22',
       });
       let componentModule = data.meta.componentModule;
       expect(componentModule, 'should have componentModule').to.not.be.undefined;
