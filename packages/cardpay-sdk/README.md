@@ -57,11 +57,13 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
   - [`RewardPool.balances`](#rewardpoolbalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
+  - [`RewardPool.claimGasEstimate`](#rewardpoolclaimgasestimate)
   - [`RewardPool.getProofs`](#rewardpoolgetproofs)
   - [`RewardPool.recoverTokens`](#rewardpoolrecovertokens)
 - [`RewardManager`](#rewardmanager)
   - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
   - [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
+  - [`RewardManager.registerRewardeeGasEstimate`](#rewardmanagerregisterrewardeegasestimate)
   - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
@@ -757,17 +759,38 @@ await rewardPool.balances(rewardProgramId)
 
 ### `RewardPool.claim`
 
-The `Claim` API is used by the rewardee to claim rewards for a reward program id.
+The `Claim` API is used by the rewardee to claim rewards from an associated reward program. 
 
 Pre-requisite for this action:
 - reward program has to be registered
 - rewardee has to register and create safe for that particular reward program. The funds will be claimed into this safe -- reward safe
-- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs` 
+- rewardee must get an existing proof and leaf from tally api  -- look at `rewardPool.getProofs`
 - reward pool has to be filled with reward token for that reward program
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
+await rewardPool.claim(safe, leaf, proofArray, acceptPartialClaim)
+```
+
+The leaf item contains most information about the claim, such as the reward program (`rewardProgramId`), the expiry of the proof (`validFrom`, `validTo`), the type of token of the reward (`tokenType`, `transferData`), the eoa owner of the safe (`payee`). This information can be decoded easily. 
+
+`acceptPartialClaim` is a special scenario whereby a rewardee is willing to compromise his full reward compensation for a partial one. This scneario occurs, for example, when rewardee has 10 card in his proof but the reward pool only has 5 card, the rewardee may opt to just accepting that 5 card by setting `acceptPartialClaim=true`.
+
+
+### `RewardPool.claimGasEstimate`
+
+The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive 10 CARD - (gas fees in CARD) into their reward safe. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: string; // tokens in unit of wei
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acceptPartialClaim)
 ```
 
 ### `RewardPool.getProofs`
@@ -882,6 +905,23 @@ interface RewardProgramInfo {
 let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.getRewardProgramsInfo()
 ```
+
+### `RewardManager.registerRewardeeGasEstimate`
+
+The `registerRewardeeGasEstimate` returns a gas estimate for the prepaid card send transaction when registering a rewardee. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: string; // tokens in unit of wei
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.registerRewardeeGasEstimate(prepaidCard, rewardProgramId)
+```
+
 
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.

@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import RewardSafeDelegateABI from '../../contracts/abi/v0.9.0/reward-safe-delegate-implementation';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
 import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
@@ -19,6 +20,8 @@ import {
   gasEstimate,
   executeTransaction,
   Operation,
+  gasInToken,
+  GasEstimate,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -207,6 +210,21 @@ export default class RewardManager {
     return {
       rewardSafe: await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash),
       txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+    };
+  }
+
+  async registerRewardeeGasEstimate(prepaidCardAddress: string, rewardProgramId: string): Promise<GasEstimate> {
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let prepaidCardManager = new this.layer2Web3.eth.Contract(
+      PrepaidCardManagerABI as AbiItem[],
+      await getAddress('prepaidCardManager', this.layer2Web3)
+    );
+    let issuingToken = (await prepaidCardManager.methods.cardDetails(prepaidCardAddress).call()).issueToken;
+    let rateLock = await layerTwoOracle.getRateLock(issuingToken);
+    let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
+    return {
+      gasToken: payload.gasToken,
+      amount: gasInToken(payload),
     };
   }
 

@@ -2,11 +2,13 @@ import { Argv } from 'yargs';
 import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { fromProof } from './utils';
 import { Arguments, CommandModule } from 'yargs';
-import { getSDK, getConstant } from '@cardstack/cardpay-sdk';
+import { getSDK } from '@cardstack/cardpay-sdk';
+import Web3 from 'web3';
+const { fromWei } = Web3.utils;
 
 export default {
-  command: 'claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]',
-  describe: 'Claim rewards using proof',
+  command: 'claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]',
+  describe: 'Obtain a gas estimate to claim rewards to a reward safe',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardSafe', {
@@ -38,11 +40,10 @@ export default {
     };
     let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    let blockExplorer = await getConstant('blockExplorer', web3);
     let proofArray = fromProof(proof);
-    await rewardPool.claim(rewardSafe, leaf, proofArray, acceptPartialClaim, {
-      onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
-    console.log(`Claimed reward to safe ${rewardSafe}`);
+    let assets = await getSDK('Assets', web3);
+    let { gasToken, amount } = await rewardPool.claimGasEstimate(rewardSafe, leaf, proofArray, acceptPartialClaim);
+    let { symbol } = await assets.getTokenInfo(gasToken);
+    console.log(`The gas estimate for claiming reward to reward safe ${rewardSafe} is ${fromWei(amount)} ${symbol}`);
   },
 } as CommandModule;

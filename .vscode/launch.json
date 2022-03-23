@@ -804,6 +804,26 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Register Rewardee Gas Estimate",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "register-rewardee-gas-estimate",
+        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Add Reward Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
@@ -858,6 +878,27 @@
         "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
         "0x0000000000000000000000005e4e148baae93424b969a0ea67ff54c315248bba00000000000000000000000000000000000000000000000000000000000000d00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000000de0b6b3a7640000",
         "0x554badb5d8f79c28610854156701ee15e624c2fec46aeca5adf4c07c54eeee27",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Claim Rewards Gas Estimate",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "claim-reward-gas-estimate",
+        "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
+        "0x0000000000000000000000005e4e148baae93424b969a0ea67ff54c315248bba00000000000000000000000000000000000000000000000000000000000000dd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000174876e8000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b236ca8dbab0644ffcd32518ebf4924ba866f7ee0000000000000000000000000000000000000000000000001bc16d674ec80000",
+        "0x138782a670e98567aa477631a43fcbf9e3701181a3bdbb3b60b1e131f5f7054d",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
