@@ -90,7 +90,9 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline
       - name: Set PR branch name
-        run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+        run: echo "RAW_PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+      - name: Convert branch name to subdomain-compatible form
+        run: echo "PR_BRANCH_NAME=`echo ghostprev-${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
       # FIXME are Boxel tests running twice?
       # - name: Test with percy
       #   run: yarn test:boxel:percy
