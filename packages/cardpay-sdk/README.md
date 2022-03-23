@@ -764,13 +764,18 @@ The `Claim` API is used by the rewardee to claim rewards for a reward program id
 Pre-requisite for this action:
 - reward program has to be registered
 - rewardee has to register and create safe for that particular reward program. The funds will be claimed into this safe -- reward safe
-- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs` 
+- rewardee must get an existing proof and leaf from tally api  -- look at `rewardPool.getProofs`
 - reward pool has to be filled with reward token for that reward program
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
+await rewardPool.claim(safe, leaf, proofArray, acceptPartialClaim)
 ```
+
+The leaf item contains most information about the claim, such as the reward program (`rewardProgramId`), the expiry of the proof (`validFrom`, `validTo`), the type of token of the reward (`tokenType`, `transferData`), the eoa owner of the safe (`payee`). This information can be decoded easily. 
+
+`acceptPartialClaim` is a special scenario whereby a rewardee is willing to compromise his full reward compensation for a partial one. This scneario occurs, for example, when rewardee has 10 card in his proof but the reward pool only has 5 card, the rewardee may opt to just accepting that 5 card by setting `acceptPartialClaim=true`.
+
 
 ### `RewardPool.claimGasEstimate`
 
