@@ -75,7 +75,7 @@ jobs:
       # FIXME manually created buckets, not in Terraform; also, no need for two probably
       S3_PREVIEW_INDEX_BUCKET_NAME: web-client-preview.stack.cards
       S3_PREVIEW_ASSET_BUCKET_NAME: web-client-preview.stack.cards
-      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://web-client-preview.stack.cards
+      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com
       S3_PREVIEW_REGION: us-east-1
     steps:
       - uses: actions/checkout@v2
