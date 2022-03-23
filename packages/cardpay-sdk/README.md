@@ -67,6 +67,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
+  - [`RewardManager.getRegisterRewardeeGasEstimate`](#rewardmanagergetregisterrewardeegasestimate)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -881,6 +882,22 @@ interface RewardProgramInfo {
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.getRewardProgramsInfo()
+```
+
+### `RewardManager.getRegisterRewardeeGasEstimate`
+
+The `getRegisterRewardeeGasEstimate` returns a gas estimate for the prepaid card send transaction when registering a rewardee. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: string; // tokens in unit of wei
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.getRegisterRewardeeGasEstimate(prepaidCard, rewardProgramId)
 ```
 
 ## `LayerOneOracle`
