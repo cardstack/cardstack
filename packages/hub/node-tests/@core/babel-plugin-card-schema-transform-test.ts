@@ -175,9 +175,9 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import _, { _camelCase } from 'lodash';
-            import * as randomImport from 'i-dont-exist';
-            import badImport, { incorrectUnusedImport } from 'i-dont-exist';
+            import _, { _camelCase } from "lodash";
+            import * as randomImport from "i-dont-exist";
+            import badImport, { incorrectUnusedImport } from "i-dont-exist";
             import * as foo from "../bar";
             import { bar3 } from "../bar";
             import bar2, { bar1, foo as foo1 } from "../bar";
@@ -189,6 +189,16 @@ if (process.env.COMPILER) {
         },
       });
       expect(card.compiled.url).to.eq(`${realm}test`);
+
+      let { compiled } = await cards.load(`${realm}test`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(
+        `import string from "@cardstack/compiled/https-cardstack.com-base-string/schema.js";`
+      );
+      expect(source).not.to.containsSource(`import _, { _camelCase } from "lodash";`);
+      expect(source).not.to.match(/import .*? from "i-dont-exist";/gm);
+      expect(source).not.to.match(/import .*? from "\.\.\/bar";/gm);
+      expect(source).not.to.match(/foo\d?|bar\d?|randomImport|badImport|incorrectUnusedImport/gm);
     });
 
     it('can compile used fields into schema module', async function () {
