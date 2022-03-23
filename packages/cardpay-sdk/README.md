@@ -771,6 +771,22 @@ let rewardPool = await getSDK('RewardPool', web3);
 await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
 ```
 
+### `RewardManager.getClaimGasEstimate`
+
+The `getClaimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive 10 CARD - (gas fees in CARD) into their reward safe. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: string; // tokens in unit of wei
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.getClaimGasEstimate(rewardSafeAddress, leaf, proofArray, acceptPartialClaim)
+```
+
 ### `RewardPool.getProofs`
 
 The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner; Once a proof is used it cannot be it will be `knownClaimed=true` and it cannot be re-used.
@@ -899,6 +915,7 @@ interface GasEstimate {
 let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.getRegisterRewardeeGasEstimate(prepaidCard, rewardProgramId)
 ```
+
 
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
