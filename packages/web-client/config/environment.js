@@ -34,9 +34,7 @@ module.exports = function (environment) {
   let ENV = {
     modulePrefix: '@cardstack/web-client',
     environment,
-    rootURL: process.env.PR_BRANCH_NAME
-      ? `/${process.env.PR_BRANCH_NAME}/`
-      : '/',
+    rootURL: '/',
     // FIXME semi-duplicated in ember-cli-build.js, though no trailing / and '' instead of /
     assetRoot:
       process.env.DEPLOY_TARGET === 's3-preview'
