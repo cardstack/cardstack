@@ -36,10 +36,9 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     // FIXME semi-duplicated in ember-cli-build.js, though no trailing / and '' instead of /
-    assetRoot:
-      process.env.DEPLOY_TARGET === 's3-preview'
-        ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}`
-        : '',
+    assetRoot: process.env.DEPLOY_TARGET.startsWith('s3-preview')
+      ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}`
+      : '',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
@@ -85,8 +84,12 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
-      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
+      layer1: (process.env.DEPLOY_TARGET || '').endsWith('production')
+        ? 'eth'
+        : 'keth',
+      layer2: (process.env.DEPLOY_TARGET || '').endsWith('production')
+        ? 'xdai'
+        : 'sokol',
     },
     features: {
       createMerchant: true,
@@ -111,7 +114,7 @@ module.exports = function (environment) {
       '/images/icon-favicon-32x32.png',
     ].map((v) => {
       return (
-        (process.env.DEPLOY_TARGET === 'production'
+        ((process.env.DEPLOY_TARGET || '').endsWith('production')
           ? 'https://app.cardstack.com'
           : 'https://app-staging.stack.cards') + v
       );

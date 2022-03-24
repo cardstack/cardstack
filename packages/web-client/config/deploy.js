@@ -111,7 +111,10 @@ module.exports = function (deployTarget) {
     ENV.cloudfront.distribution = 'E3VPNGI7F1WEW8';
   }
 
-  if (deployTarget === 's3-preview') {
+  if (
+    deployTarget === 's3-preview-staging' ||
+    deployTarget === 's3-preview-production'
+  ) {
     ENV.pipeline = {
       activateOnDeploy: true,
     };

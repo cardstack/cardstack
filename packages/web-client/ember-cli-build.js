@@ -61,10 +61,9 @@ module.exports = function (defaults) {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       // FIXME refine?
-      publicAssetURL:
-        process.env.DEPLOY_TARGET === 's3-preview'
-          ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.S3_PREVIEW_INDEX_BUCKET_NAME}/${process.env.PR_BRANCH_NAME}/`
-          : undefined,
+      publicAssetURL: process.env.DEPLOY_TARGET.startsWith('s3-preview')
+        ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.S3_PREVIEW_INDEX_BUCKET_NAME}/${process.env.PR_BRANCH_NAME}/`
+        : undefined,
 
       webpackConfig: {
         devtool: 'source-map',

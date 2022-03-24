@@ -94,7 +94,7 @@ jobs:
       - name: Convert branch name to subdomain-compatible form
         run: echo "PR_BRANCH_NAME=`echo ${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
       - name: Deploy preview
-        run: yarn deploy:web-client:preview
+        run: yarn deploy:web-client:preview-staging
         env:
           PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
           PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
@@ -145,7 +145,7 @@ jobs:
       - name: Convert branch name to subdomain-compatible form
         run: echo "PR_BRANCH_NAME=`echo ${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
       - name: Deploy preview
-        run: yarn deploy:web-client:preview
+        run: yarn deploy:web-client:preview-production
         env:
           PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}
           PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
