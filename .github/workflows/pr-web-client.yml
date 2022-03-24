@@ -69,6 +69,7 @@ jobs:
     name: Deploy a staging preview to S3
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Deploy web-client preview
         uses: ./.github/actions/deploy-web-client-preview
         env:
@@ -88,6 +89,7 @@ jobs:
     name: Deploy a production preview to S3
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Deploy web-client preview
         uses: ./.github/actions/deploy-web-client-preview
         env:
