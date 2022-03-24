@@ -1,82 +1,181 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { TemplateUsageMeta } from './glimmer-plugin-card-template';
-// import ETC from 'ember-source/dist/ember-template-compiler';
-// const { preprocess, print } = ETC._GlimmerSyntax;
-
-import { transformSync } from '@babel/core';
+import { transformSync, transformFromAstSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
-
 import { CompiledCard, ComponentInfo, Format } from './interfaces';
-
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
+import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 
-export interface CardComponentPluginOptions {
+export interface TemplateUsageMeta {
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
+}
+
+interface TransformComponentOptions {
+  templateSource: string;
   debugPath: string;
   fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
-  resolveImport?: (relativePath: string) => string;
-  // these are for gathering output
+  resolveImport: (relativePath: string) => string;
+}
+
+export default function (params: TransformComponentOptions): {
+  source: string;
+  ast: t.File;
   usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
-}
+} {
+  // HACK: The / resets the relative path setup, removing the cwd of the hub.
+  // This allows the error module to look a lot more like the card URL.
+  let debugPath = '/' + params.debugPath.replace(/^\//, '');
 
-interface State {
-  opts: CardComponentPluginOptions;
-  insideExportDefault: boolean;
-  importUtil: ImportUtil;
-}
-
-export default function (templateSource: string, options: CardComponentPluginOptions): { source: string; ast: t.File } {
   try {
-    let out = transformSync(templateSource, {
-      ast: true,
-      plugins: [[babelPluginCardTemplate, options]],
-      // HACK: The / resets the relative path setup, removing the cwd of the hub.
-      // This allows the error module to look a lot more like the card URL.
-      filename: '/' + options.debugPath.replace(/^\//, ''),
-    });
-    return { source: out!.code!, ast: out!.ast! };
+    // this part will move into compiler's analyze phase, so it shouldn't use
+    // any knowledge of CompiledCard, shouldn't resolve imports, etc.
+    let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
+
+    return {
+      // this part will move into the compiler's transform phase
+      ...transformComponent({ ...params, debugPath }, ast, meta),
+      usedFields: buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta),
+    };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
 }
 
-export function babelPluginCardTemplate(babel: typeof Babel) {
+interface AnalyzePluginOptions {
+  meta: TemplateUsageMeta;
+  debugPath: string;
+}
+interface AnalyzePluginState {
+  opts: AnalyzePluginOptions;
+  insideExportDefault: boolean;
+}
+
+export function analyzeComponent(
+  templateSource: string,
+  debugFilename: string
+): { ast: t.File; meta: TemplateUsageMeta } {
+  let meta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
+
+  let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
+
+  let out = transformSync(templateSource, {
+    ast: true,
+    code: false,
+    plugins: [[babelPluginComponentAnalyze, options]],
+    filename: debugFilename,
+  });
+
+  return { ast: out!.ast!, meta };
+}
+
+function babelPluginComponentAnalyze(babel: typeof Babel) {
   let t = babel.types;
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<t.Program>, state: State) {
-          state.importUtil = new ImportUtil(babel.types, path);
+        enter(_path: NodePath<t.Program>, state: AnalyzePluginState) {
           state.insideExportDefault = false;
         },
       },
 
-      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
-        let { resolveImport } = state.opts;
-        if (resolveImport) {
-          path.node.source.value = resolveImport(path.node.source.value);
-        }
-      },
-
       ExportDefaultDeclaration: {
-        enter(_path: NodePath, state: State) {
+        enter(_path: NodePath, state: AnalyzePluginState) {
           state.insideExportDefault = true;
         },
-        exit(_path: NodePath, state: State) {
+        exit(_path: NodePath, state: AnalyzePluginState) {
           state.insideExportDefault = false;
         },
       },
 
       CallExpression: {
-        enter(path: NodePath<CallExpression>, state: State) {
+        enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
+          if (isComponentTemplateExpression(path, state)) {
+            // TODO: we need to deal with the options for inlineHBS
+            let { /*options: precompileTemplateOptions,*/ template: rawTemplate } = handleArguments(path, t);
+            glimmerTemplateAnalyze(rawTemplate, {
+              usageMeta: state.opts.meta,
+              debugPath: state.opts.debugPath,
+            });
+          }
+        },
+      },
+    },
+  };
+}
+
+function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: TemplateUsageMeta) {
+  let output: Partial<{
+    usedFields: ComponentInfo['usedFields'];
+    inlineHBS: string | undefined;
+  }> = {};
+
+  let pluginOptions: TransformPluginOptions = {
+    transformOpts,
+    output,
+    meta,
+  };
+
+  let out = transformFromAstSync(ast, transformOpts.templateSource, {
+    ast: true,
+    plugins: [[babelPluginCardTemplate, pluginOptions]],
+    filename: transformOpts.debugPath,
+  })!;
+
+  return { source: out!.code!, ast: out!.ast!, inlineHBS: output.inlineHBS! };
+}
+
+interface TransformState {
+  opts: TransformPluginOptions;
+  insideExportDefault: boolean;
+  importUtil: ImportUtil;
+}
+
+interface TransformPluginOptions {
+  output: Partial<{
+    usedFields: ComponentInfo['usedFields'];
+    inlineHBS: string | undefined;
+  }>;
+  transformOpts: TransformComponentOptions;
+  meta: TemplateUsageMeta;
+}
+
+function babelPluginCardTemplate(babel: typeof Babel) {
+  let t = babel.types;
+  return {
+    visitor: {
+      Program: {
+        enter(path: NodePath<t.Program>, state: TransformState) {
+          state.importUtil = new ImportUtil(babel.types, path);
+          state.insideExportDefault = false;
+        },
+      },
+
+      ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: TransformState) {
+        let resolved = state.opts.transformOpts.resolveImport(path.node.source.value);
+        if (resolved !== path.node.source.value) {
+          path.node.source.value = resolved;
+        }
+      },
+
+      ExportDefaultDeclaration: {
+        enter(_path: NodePath, state: TransformState) {
+          state.insideExportDefault = true;
+        },
+        exit(_path: NodePath, state: TransformState) {
+          state.insideExportDefault = false;
+        },
+      },
+
+      CallExpression: {
+        enter(path: NodePath<CallExpression>, state: TransformState) {
           callExpressionEnter(path, state, t);
         },
       },
@@ -84,27 +183,30 @@ export function babelPluginCardTemplate(babel: typeof Babel) {
   };
 }
 
-function callExpressionEnter(path: NodePath<t.CallExpression>, state: State, t: typeof Babel.types) {
-  if (shouldSkipExpression(path, state)) {
+function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformState, t: typeof Babel.types) {
+  if (!isComponentTemplateExpression(path, state)) {
     return;
   }
 
   let { options, template: inputTemplate } = handleArguments(path, t);
 
-  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts, state.importUtil);
+  let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts.transformOpts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope, t)) {
-    state.opts.inlineHBS = template;
+    state.opts.output.inlineHBS = template;
   }
 
   updateScope(options, neededScope, t);
 }
 
-function shouldSkipExpression(path: NodePath<t.CallExpression>, state: State): boolean {
+function isComponentTemplateExpression(
+  path: NodePath<t.CallExpression>,
+  state: TransformState | AnalyzePluginState
+): boolean {
   return (
-    !state.insideExportDefault ||
-    !path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
+    state.insideExportDefault &&
+    path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
   );
 }
 
@@ -113,6 +215,7 @@ function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set
   return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
 }
 
+// TODO: Rename to validateAndGetComponent
 function handleArguments(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
@@ -157,7 +260,7 @@ function handleArguments(
 function transformTemplate(
   source: string,
   path: NodePath<t.CallExpression>,
-  opts: CardComponentPluginOptions,
+  opts: TransformComponentOptions,
   importUtil: ImportUtil
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -168,19 +271,17 @@ function transformTemplate(
     return name;
   }
 
-  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
-
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
-    usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
     debugPath: opts.debugPath,
     importAndChooseName,
   });
 
-  opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
-
-  return { template, neededScope };
+  return {
+    template,
+    neededScope,
+  };
 }
 
 function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {

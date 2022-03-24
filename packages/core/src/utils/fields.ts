@@ -1,8 +1,8 @@
-import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 import { CardSchema, CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import { TemplateUsageMeta } from '../babel-plugin-card-template';
 import isPlainObject from 'lodash/isPlainObject';
 
 export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
@@ -20,6 +20,7 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
 
 export function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
+  defaultFieldFormat: Format,
   usageMeta: TemplateUsageMeta
 ): ComponentInfo['usedFields'] {
   let usedFields: Set<string> = new Set();
@@ -30,8 +31,17 @@ export function buildUsedFieldsListFromUsageMeta(
     }
   }
 
-  for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
-    buildUsedFieldListFromComponents(usedFields, fieldPath, fields, fieldFormat);
+  if (usageMeta.fields === 'self') {
+    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
+  } else {
+    for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        fieldPath,
+        fields,
+        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
+      );
+    }
   }
 
   return [...usedFields];
