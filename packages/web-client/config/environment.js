@@ -36,7 +36,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     // FIXME semi-duplicated in ember-cli-build.js, though no trailing / and '' instead of /
-    assetRoot: process.env.DEPLOY_TARGET.startsWith('s3-preview')
+    assetRoot: (process.env.DEPLOY_TARGET || '').startsWith('s3-preview')
       ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}`
       : '',
     locationType: 'auto',
