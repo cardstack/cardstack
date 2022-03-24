@@ -20,8 +20,6 @@ jobs:
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
-            echo "LAYER_1_CHAIN=keth" >> $GITHUB_ENV # set to "eth" when ready to go to real money
-            echo "LAYER_2_CHAIN=sokol" >> $GITHUB_ENV # set to "xdai" when ready to go to real money
             echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
           elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
