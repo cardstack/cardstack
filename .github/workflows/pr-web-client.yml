@@ -98,8 +98,8 @@ jobs:
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
-          S3_PREVIEW_INDEX_BUCKET_NAME: web-client-preview.stack.cards
-          S3_PREVIEW_ASSET_BUCKET_NAME: web-client-preview.stack.cards
+          S3_PREVIEW_INDEX_BUCKET_NAME: web-client-preview.cardstack.com
+          S3_PREVIEW_ASSET_BUCKET_NAME: web-client-preview.cardstack.com
           S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com
           S3_PREVIEW_REGION: us-east-1
         with:
