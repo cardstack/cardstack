@@ -17,7 +17,7 @@ logging.basicConfig(level=LOGLEVEL)
 def run_all():
 
     for expected_env in [
-        "ETHEREUM_NODE_URL",
+        "EVM_FULL_NODE_URL",
         "OWNER",
         "OWNER_PRIVATE_KEY",
         "REWARD_POOL_ADDRESS",
@@ -27,7 +27,7 @@ def run_all():
             raise ValueError(f"Missing environment variable {expected_env}")
 
     submitter = RootSubmitter(
-        Web3(Web3.HTTPProvider(os.getenv("ETHEREUM_NODE_URL"))),
+        Web3(Web3.HTTPProvider(os.getenv("EVM_FULL_NODE_URL"))),
         os.getenv("OWNER"),
         os.getenv("OWNER_PRIVATE_KEY"),
         os.getenv("REWARD_POOL_ADDRESS"),
