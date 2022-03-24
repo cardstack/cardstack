@@ -740,7 +740,7 @@ function addLoadedFieldsMethod(path: NodePath<t.Class>, state: State, babel: typ
       t.identifier('loadedFields'),
       [t.identifier('schemaInstance')],
       t.blockStatement([
-        babel.template(`return [...schemaInstance.%%loadedFields%%];`)({
+        babel.template(`return allFields.length === 0 ? [] : [...schemaInstance.%%loadedFields%%];`)({
           loadedFields: t.identifier(state.loadedFieldsIdentifier),
         }) as t.Statement,
       ]),

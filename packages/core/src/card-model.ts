@@ -227,20 +227,23 @@ export default class CardModel {
       return;
     }
 
-    for (let field of this.schemaModule.default.loadedFields(newSchemaInstance)) {
-      try {
-        await this.getField(field, newSchemaInstance);
-      } catch (err: any) {
-        let newError = new UnprocessableEntity(
-          `Could not load field '${field}' for ${
-            this.state.type === 'loaded' ? 'card ' + this.url : 'new card of type ' + this.parentCardURL
-          }`
-        );
-        newError.additionalErrors = [err, ...(err.additionalErrors || [])];
-        throw newError;
-      }
-      if (this.recomputePromise !== recomputePromise) {
-        return;
+    let fields = this.schemaModule.default.loadedFields(newSchemaInstance);
+    if (fields.length) {
+      for (let field of fields) {
+        try {
+          await this.getField(field, newSchemaInstance);
+        } catch (err: any) {
+          let newError = new UnprocessableEntity(
+            `Could not load field '${field}' for ${
+              this.state.type === 'loaded' ? 'card ' + this.url : 'new card of type ' + this.parentCardURL
+            }`
+          );
+          newError.additionalErrors = [err, ...(err.additionalErrors || [])];
+          throw newError;
+        }
+        if (this.recomputePromise !== recomputePromise) {
+          return;
+        }
       }
     }
     this._schemaInstance = newSchemaInstance;
