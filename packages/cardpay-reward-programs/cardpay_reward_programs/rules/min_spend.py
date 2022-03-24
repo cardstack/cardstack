@@ -9,12 +9,11 @@ class MinSpend(Rule):
         super(MinSpend, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(
-        self, min_spend, base_reward, token, subgraph_config_location, duration
+        self, min_spend, base_reward, token, duration
     ):
         self.min_spend = min_spend
         self.base_reward = base_reward
         self.token = token
-        self.subgraph_config_location = subgraph_config_location
         self.duration = duration
 
     def sql(self, table_query):
@@ -31,7 +30,7 @@ class MinSpend(Rule):
         """
 
     def df_to_payment_list(
-        self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+        self, df, payment_cycle, reward_program_id
     ):
         if df.empty:
             return default_payment_list.copy()
