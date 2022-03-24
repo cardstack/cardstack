@@ -64,7 +64,7 @@
     The top padding precludes content from sitting on the curved area of the background
   */
   padding: var(--prepaid-card-curve-height) var(--boxel-sp) var(--boxel-sp-sm);
-  background-image: url("/images/backgrounds/curved-platter.svg");
+  background-image: url("/assets/images/backgrounds/curved-platter.svg"); /* FIXME leading slash was here */
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
