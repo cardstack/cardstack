@@ -514,7 +514,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private getSchemaModuleRef(parentCard: CompiledCard | undefined, schemaPath: string | undefined): ModuleRef {
     if (isBaseCard(this.cardSource)) {
-      return { global: `${BASE_CARD_URL}/schema` };
+      return { global: `@cardstack/compiled/https-cardstack.com-base-base/schema.js` };
     } else if (schemaPath) {
       return { local: schemaPath };
     } else if (parentCard?.schemaModule) {
