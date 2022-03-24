@@ -37,7 +37,7 @@ runs:
     - name: add URL check
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
         REPOSITORY: ${{ github.repository }}
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       run: |
