@@ -1,0 +1,43 @@
+name: Deploy web-client PR preview
+description: Deploy a preview of a web-client PR
+
+inputs:
+  environment:
+    description: Deployment environment
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+    - uses: volta-cli/action@v1
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Install dependencies
+      run: yarn --prefer-offline
+    - name: Set PR branch name
+      run: echo "RAW_PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+    - name: Convert branch name to subdomain-compatible form
+      run: echo "PR_BRANCH_NAME=`echo ${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
+    - name: Deploy preview
+      run: yarn deploy:web-client:preview-production
+
+    - name: Store preview host
+      run: echo "PREVIEW_HOST=https://$PR_BRANCH_NAME.$S3_PREVIEW_INDEX_BUCKET_NAME/" >> $GITHUB_ENV
+    - name: add URL check
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        curl \
+          -X POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/$REPOSITORY/statuses/$HEAD_SHA \
+          -d '{"context":"Preview production","description":"Production deployment of this branch","target_url":"'"$PREVIEW_HOST"'","state":"success"}'
