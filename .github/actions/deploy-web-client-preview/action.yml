@@ -29,7 +29,7 @@ runs:
       run: echo "PR_BRANCH_NAME=`echo ${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
     - name: Deploy preview
       shell: bash
-      run: yarn deploy:web-client:preview-production
+      run: yarn deploy:web-client:preview-${{ inputs.environment }}
 
     - name: Store preview host
       shell: bash

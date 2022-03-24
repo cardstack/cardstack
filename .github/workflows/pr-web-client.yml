@@ -103,7 +103,7 @@ jobs:
           S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com
           S3_PREVIEW_REGION: us-east-1
         with:
-          environment: staging
+          environment: production
 
 
   # xxdeploy-web-client-preview-staging:
