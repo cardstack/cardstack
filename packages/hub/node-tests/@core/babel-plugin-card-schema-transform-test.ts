@@ -105,7 +105,7 @@ if (process.env.COMPILER) {
       await cards.create(reallyFancyPersonCard);
     });
 
-    it.skip('can handle unconsumed field import', async function () {
+    it('can handle unconsumed field import', async function () {
       await cards.create({
         realm,
         id: 'foo',
@@ -142,6 +142,64 @@ if (process.env.COMPILER) {
 
       // success is really just not throwing an exception
       expect(card.compiled.url).to.eq(`${realm}test`);
+    });
+
+    it('can handle unconsumed field import for different types of import specifiers', async function () {
+      await cards.create({
+        realm,
+        id: 'bar',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+
+            export default class Bar {
+              @contains(string) bar;
+            }
+
+            let foo = 'foo';
+            let bar1 = 'bar-1';
+            let bar3 = 'bar-3';
+            export { foo, bar1, bar3 };
+
+            export let bar2 = 'bar-2';
+          `,
+        },
+      });
+
+      let card = await cards.create({
+        realm,
+        id: 'test',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import _, { _camelCase } from "lodash";
+            import * as randomImport from "i-dont-exist";
+            import badImport, { incorrectUnusedImport } from "i-dont-exist";
+            import * as foo from "../bar";
+            import { bar3 } from "../bar";
+            import bar2, { bar1, foo as foo1 } from "../bar";
+
+            export default class Test {
+              @contains(string) name;
+            }
+          `,
+        },
+      });
+      expect(card.compiled.url).to.eq(`${realm}test`);
+
+      let { compiled } = await cards.load(`${realm}test`);
+      let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
+      expect(source).to.containsSource(
+        `import string from "@cardstack/compiled/https-cardstack.com-base-string/schema.js";`
+      );
+      expect(source).not.to.containsSource(`import _, { _camelCase } from "lodash";`);
+      expect(source).not.to.match(/import .*? from "i-dont-exist";/gm);
+      expect(source).not.to.match(/import .*? from "\.\.\/bar";/gm);
+      expect(source).not.to.match(/foo\d?|bar\d?|randomImport|badImport|incorrectUnusedImport/gm);
     });
 
     it('can compile used fields into schema module', async function () {
