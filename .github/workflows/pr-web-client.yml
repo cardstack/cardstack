@@ -84,6 +84,7 @@ jobs:
           S3_PREVIEW_BUCKET_NAME: web-client-preview.stack.cards
           S3_PREVIEW_REGION: us-east-1
         with:
+          package: ssr-web
           environment: staging
 
   deploy-web-client-preview-production:
@@ -106,4 +107,5 @@ jobs:
           S3_PREVIEW_BUCKET_NAME: web-client-preview.cardstack.com
           S3_PREVIEW_REGION: us-east-1
         with:
+          package: ssr-web
           environment: production
