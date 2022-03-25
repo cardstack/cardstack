@@ -161,26 +161,30 @@ if (process.env.COMPILER) {
     it('string-like', async function () {
       let { meta } = analyzeComponent('{{@model}}');
 
-      expect(meta).to.deep.equal({ model: 'self', fields: new Map() });
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '{{@model}}',
+        hasModifiedScope: false,
+      });
     });
 
     it('date-like', async function () {
       let { meta } = analyzeComponent('<FormatDate @date={{@model}} />');
 
-      expect(meta).to.deep.equal({ model: 'self', fields: new Map() });
+      expect(meta.usage).to.deep.equal({ model: 'self', fields: new Map() });
     });
 
     it('simple embeds', async function () {
       let { meta } = analyzeComponent('<@fields.title />');
 
-      expect(meta.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
-      expect(meta.fields, 'The title field to be in fields').to.deep.equal(new Map([['title', 'default']]));
+      expect(meta.usage.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
+      expect(meta.usage.fields, 'The title field to be in fields').to.deep.equal(new Map([['title', 'default']]));
     });
 
     it('simple model usage', async function () {
       let { meta } = analyzeComponent('{{helper @model.title}}');
 
-      expect(meta).to.deep.equal({ model: new Set(['title']), fields: new Map() });
+      expect(meta.usage).to.deep.equal({ model: new Set(['title']), fields: new Map() });
     });
 
     it('Nested usage', async function () {
@@ -188,7 +192,7 @@ if (process.env.COMPILER) {
         '{{@model.title}} - <@fields.post.createdAt /> - <@fields.post.author.birthdate />'
       );
 
-      expect(meta).to.deep.equal({
+      expect(meta.usage).to.deep.equal({
         model: new Set(['title']),
         fields: new Map([
           ['post.createdAt', 'default'],
@@ -202,7 +206,7 @@ if (process.env.COMPILER) {
         '<Whatever @name={{name}} /> {{#each-in @fields as |name Field|}} <label>{{name}}</label> <Field /> {{/each-in}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta).to.deep.equal({ model: new Set(), fields: 'self' });
+      expect(meta.usage).to.deep.equal({ model: new Set(), fields: 'self' });
     });
 
     it('Block usage for @model path', async function () {
@@ -210,7 +214,7 @@ if (process.env.COMPILER) {
         '<Whatever @name={{@model.title}} /> {{#each @model.comments as |comment|}} <Other @name={{comment.createdAt}}/> {{/each}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta).to.deep.equal({ model: new Set(['title', 'comments.createdAt']), fields: new Map() });
+      expect(meta.usage).to.deep.equal({ model: new Set(['title', 'comments.createdAt']), fields: new Map() });
     });
 
     it('Block usage for field', async function () {
@@ -218,7 +222,7 @@ if (process.env.COMPILER) {
         '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
       );
 
-      expect(meta).to.deep.equal({
+      expect(meta.usage).to.deep.equal({
         model: new Set(['plane']),
         fields: new Map([['birthdays', 'default']]),
       });
@@ -227,9 +231,22 @@ if (process.env.COMPILER) {
     it('Block usage for fields field', async function () {
       let { meta } = analyzeComponent('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}');
 
-      expect(meta).to.deep.equal({
+      expect(meta.usage).to.deep.equal({
         model: new Set(),
         fields: new Map([['birthdays.location', 'default']]),
+      });
+    });
+
+    it('Understands when a card has modified the scope of a template', async function () {
+      let { meta } = fullAnalyzeComponent(
+        templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
+        'test.js'
+      );
+
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '<FancyTool @value={{@model}} />',
+        hasModifiedScope: true,
       });
     });
 
