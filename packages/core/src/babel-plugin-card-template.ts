@@ -305,7 +305,7 @@ function updatePrecompileTemplateScopeOption(
 }
 
 function buildUsedFieldsListFromUsageMeta(
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   defaultFieldFormat: Format,
   meta: ComponentMeta
 ): ComponentInfo['usedFields'] {
@@ -336,13 +336,13 @@ function buildUsedFieldsListFromUsageMeta(
 function buildUsedFieldListFromComponents(
   usedFields: Set<string>,
   fieldPath: string,
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   format: Format,
   prefix?: string
 ): void {
   let field = getFieldForPath(fields, fieldPath);
 
-  if (field && field.card.componentInfos[format].usedFields.length) {
+  if (field && field.card !== 'self' && field.card.componentInfos[format].usedFields.length) {
     for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
       buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
     }
@@ -358,7 +358,7 @@ function buildUsedFieldListFromComponents(
 function canInlineHBS(
   hasModifiedScope: boolean,
   meta: ComponentMeta,
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   defaultFieldFormat: Format
 ): boolean {
   if (hasModifiedScope) {
@@ -380,6 +380,6 @@ function canInlineHBS(
   return fieldsToInspect.every(([path, format]) => {
     let field = getFieldForPath(fields, path);
     let actualFormat: Format = format === 'default' ? defaultFieldFormat : format;
-    return !!field?.card.componentInfos[actualFormat].inlineHBS;
+    return field && field.card !== 'self' && !!field?.card.componentInfos[actualFormat].inlineHBS;
   });
 }
