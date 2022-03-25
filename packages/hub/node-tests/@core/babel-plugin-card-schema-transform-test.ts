@@ -333,7 +333,7 @@ if (process.env.COMPILER) {
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         static loadedFields(schemaInstance) {
-          return allFields.length === 0 ? [] : [...schemaInstance.loadedFields];
+          return [...schemaInstance.loadedFields];
         }
       `);
     });
