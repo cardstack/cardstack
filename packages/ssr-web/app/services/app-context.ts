@@ -9,6 +9,9 @@ export interface AppContextService {
   isCardSpace: boolean;
 }
 
+const cardSpaceSlugQueryRegex = /\?slug=(.*)/; // FIXME what if there are multiple parameters
+const previewSubdomain = 'ssr-web-preview'; // FIXME extract somewhere? derive?
+
 // escape dots for regexp
 function escapeDot(str: string) {
   let result = '';
@@ -36,8 +39,20 @@ export default class AppContext extends Service implements AppContextService {
     return host;
   }
 
+  get queryIsCardSpace() {
+    if (!this.fastboot.isFastBoot) {
+      return cardSpaceSlugQueryRegex.test(window.location.search);
+    }
+
+    return false;
+  }
+
   get currentApp(): 'card-space' | 'wallet' {
-    return this.hostSuffixPattern.test(this.host) ? 'card-space' : 'wallet';
+    if (this.hostSuffixPattern.test(this.host)) {
+      return 'card-space';
+    } else {
+      return 'wallet';
+    }
   }
 
   get isCardSpace() {
@@ -46,8 +61,12 @@ export default class AppContext extends Service implements AppContextService {
 
   get cardSpaceId() {
     if (this.isCardSpace) {
-      let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
-      return id;
+      if (this.host.includes(previewSubdomain) && this.queryIsCardSpace) {
+        return cardSpaceSlugQueryRegex.exec(window.location.search)![1];
+      } else {
+        let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
+        return id;
+      }
     } else return '';
   }
 }
