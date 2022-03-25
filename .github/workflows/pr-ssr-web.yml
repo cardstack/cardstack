@@ -46,3 +46,63 @@ jobs:
         with:
           check_name: 'ssr-web test results'
           files: ci-xml-test-results/ssr-web.xml
+
+  check-if-requires-preview:
+    name: Check if a preview deploy is required
+    runs-on: ubuntu-latest
+    outputs:
+      ssr-web-files-changed: ${{ steps.ssr-web-files-that-changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get ssr-web files that changed
+        id: ssr-web-files-that-changed
+        uses: tj-actions/changed-files@v1.1.2
+        with:
+          files: |
+            ^packages/ssr-web
+
+  deploy-ssr-preview-staging:
+    name: Deploy a ssr-web staging preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.ssr-web-files-changed == 'true'
+    needs: check-if-requires-preview
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy ssr-web preview
+        uses: ./.github/actions/deploy-ember-preview
+        env:
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
+          HUB_URL: https://hub-staging.stack.cards
+          SENTRY_AUTH_TOKEN: ${{ secrets.SSR_WEB_SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
+          S3_PREVIEW_BUCKET_NAME: ssr-web-preview.stack.cards
+          S3_PREVIEW_REGION: us-east-1
+        with:
+          environment: staging
+
+  deploy-ssr-preview-production:
+    name: Deploy a ssr-web production preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.ssr-web-files-changed == 'true'
+    needs: check-if-requires-preview
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy ssr-web preview
+        uses: ./.github/actions/deploy-ember-preview
+        env:
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
+          HUB_URL: https://hub-staging.stack.cards
+          SENTRY_AUTH_TOKEN: ${{ secrets.SSR_WEB_SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
+          S3_PREVIEW_BUCKET_NAME: ssr-web-preview.cardstack.com
+          S3_PREVIEW_REGION: us-east-1
+        with:
+          environment: production
