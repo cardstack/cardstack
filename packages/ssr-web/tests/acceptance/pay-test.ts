@@ -719,4 +719,53 @@ module('Acceptance | pay', function (hooks) {
 
     assert.dom('[data-test-error]').includesText('404: Not Found');
   });
+
+  module('status page incidents', function () {
+    test('it renders a degraded service banner on the pay page', async function (this: MirageTestContext, assert) {
+      this.server.get(config.urls.statusPageUrl, function () {
+        return new MirageResponse(
+          200,
+          {},
+          {
+            incidents: [
+              {
+                name: 'Name',
+                impact: 'major',
+                incident_updates: [{ body: 'We are experiencing issues' }],
+              },
+            ],
+          }
+        );
+      });
+
+      await visit(`/pay/${network}/${merchantSafe.address}`);
+
+      assert.dom('[data-test-degraded-service-banner]').isVisible({ count: 1 });
+
+      await percySnapshot(assert);
+    });
+
+    test('it renders a degraded service banner on the pay error page', async function (this: MirageTestContext, assert) {
+      this.server.get(config.urls.statusPageUrl, function () {
+        return new MirageResponse(
+          200,
+          {},
+          {
+            incidents: [
+              {
+                name: 'Name',
+                impact: 'major',
+                incident_updates: [{ body: 'We are experiencing issues' }],
+              },
+            ],
+          }
+        );
+      });
+
+      await visit(`/pay/sok`);
+      await waitFor(MERCHANT_MISSING_MESSAGE);
+
+      assert.dom('[data-test-degraded-service-banner]').isVisible({ count: 1 });
+    });
+  });
 });
