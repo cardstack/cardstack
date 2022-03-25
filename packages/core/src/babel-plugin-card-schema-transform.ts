@@ -3,7 +3,7 @@ import type { types as t } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import { ImportUtil } from 'babel-import-util';
 import { error, unusedClassMember } from './utils/babel';
-import { FieldMeta, FileMeta, VALID_FIELD_DECORATORS } from './babel-plugin-card-file-analyze';
+import { FieldMeta, FileMeta, VALID_FIELD_DECORATORS } from './analyze';
 import { CompiledCard, ComponentInfo, Field, ModuleRef } from './interfaces';
 import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
