@@ -14,6 +14,7 @@
   max-width: var(--degraded-service-banner-content-max-width, 80ch);
   margin: auto;
   display: flex;
+  align-items: center;
   width: 100%;
 }
 
@@ -23,6 +24,7 @@
   display: flex;
   align-items: center;
   width: var(--degraded-service-banner-icon-area-width);
+  height: var(--degraded-service-banner-icon-area-width);
   margin-right: var(--boxel-sp-xxs);
 }
 
