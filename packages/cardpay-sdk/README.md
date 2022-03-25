@@ -324,7 +324,7 @@ This method is invoked with the following parameters:
 This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object contains a `Safe[]` type which conforms to the `Safe` shape below, and the block number at which the subgraph was last indexed:
 
 ```ts
-export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
   tokens: TokenInfo[];
@@ -336,6 +336,10 @@ interface DepotSafe extends BaseSafe {
 interface MerchantSafe extends BaseSafe {
   type: 'merchant';
   infoDID: string | undefined;
+}
+interface RewardSafe extends BaseSafe {
+    type: 'reward';
+    rewardProgramId: string;
 }
 interface ExternalSafe extends BaseSafe {
   type: 'external';
