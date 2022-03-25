@@ -2,7 +2,7 @@ import * as syntax from '@glimmer/syntax';
 import { Format } from './interfaces';
 import { augmentBadRequest } from './utils/errors';
 import { ScopeTracker } from './glimmer-scope-tracker';
-import { TemplateUsageMeta } from './babel-plugin-card-template';
+import { ComponentMeta } from './babel-plugin-card-template';
 
 export class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
@@ -14,7 +14,7 @@ export class InvalidModelUsageError extends Error {
 type HandledPathExpressions = WeakSet<syntax.ASTv1.PathExpression>;
 
 export interface Options {
-  usageMeta: TemplateUsageMeta;
+  meta: ComponentMeta;
   debugPath?: string;
 }
 
@@ -44,16 +44,16 @@ export default function glimmerTemplateAnalyze(source: string, options: Options)
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(_env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
-    let { usageMeta } = options;
+    let { meta } = options;
     let handledPathExpressions: HandledPathExpressions = new WeakSet();
     let scopeTracker = new ScopeTracker<ScopeValue>();
 
     function trackFieldUsage(path: string, format: Format | 'default' = 'default') {
       if (path === '') {
-        usageMeta.fields = 'self';
+        meta.fields = 'self';
       }
-      if (usageMeta.fields !== 'self') {
-        usageMeta.fields.set(path, format);
+      if (meta.fields !== 'self') {
+        meta.fields.set(path, format);
       }
     }
 
@@ -105,7 +105,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
         node.params[0]?.type === 'PathExpression' &&
         node.params[0].original === '@fields'
       ) {
-        usageMeta.fields = 'self';
+        meta.fields = 'self';
         handledPathExpressions.add(node.params[0]);
       }
     }
@@ -113,16 +113,16 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
     function trackModelUsage(path: string | undefined) {
       // If the model usage has already been set to self, adding a more precise
       // key is not neccessary, because all keys will be needed
-      if (usageMeta.model === 'self') {
+      if (meta.model === 'self') {
         return;
       }
       // If we call this but turns out the path is empty, assume we want to track the whole model
       if (!path || path.length === 0) {
-        usageMeta.model = 'self';
+        meta.model = 'self';
         return;
       }
 
-      usageMeta.model.add(path);
+      meta.model.add(path);
     }
 
     return {
