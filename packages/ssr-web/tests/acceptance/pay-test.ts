@@ -766,8 +766,6 @@ module('Acceptance | pay', function (hooks) {
       await waitFor(MERCHANT_MISSING_MESSAGE);
 
       assert.dom('[data-test-degraded-service-banner]').isVisible({ count: 1 });
-
-      await percySnapshot(assert);
     });
   });
 });
