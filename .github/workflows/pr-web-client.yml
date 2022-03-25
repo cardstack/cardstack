@@ -68,6 +68,10 @@ jobs:
   deploy-web-client-preview-staging:
     name: Deploy a staging preview to S3
     runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.web-client-files-changed == 'true'
+    needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
       - name: Deploy web-client preview
@@ -86,6 +90,10 @@ jobs:
   deploy-web-client-preview-production:
     name: Deploy a production preview to S3
     runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.web-client-files-changed == 'true'
+    needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
       - name: Deploy web-client preview
