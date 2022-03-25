@@ -806,7 +806,7 @@ await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acc
 
 ### `RewardPool.getProofs`
 
-The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner; Once a proof is used (i.e. `knownClaimed=true`) it cannot be re-used. `isValid` is a flag that checks if a proof is still valid. Assuming a proof has not been claimed, `isValid=false` means that a proof can no longer be claimed -- typically, to mean that the proof has expired.
+The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner. Once a proof is used (i.e. `knownClaimed=true`) it cannot be re-used. `isValid` is a flag that checks if a proof is still valid. Assuming a proof has not been claimed, `isValid=false` means that a proof can no longer be claimed -- typically, to mean that the proof has expired.
 
 ```js
 interface Proof {
