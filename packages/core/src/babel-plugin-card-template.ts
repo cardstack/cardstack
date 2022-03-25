@@ -6,11 +6,12 @@ import { ImportUtil } from 'babel-import-util';
 import { ComponentInfo, Format } from './interfaces';
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
+import { getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
 import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 import { FieldsWithPlaceholders } from './compiler';
+import { isEmpty } from 'lodash';
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
@@ -40,18 +41,32 @@ export default function (params: TransformComponentOptions): {
     // any knowledge of CompiledCard, shouldn't resolve imports, etc.
     let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
 
+    // This will become the semantic phase
+    let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta);
+    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta, params.fields, params.defaultFieldFormat)
+      ? meta.rawHBS
+      : undefined;
+
     return {
       // this part will move into the compiler's transform phase
       ...transformComponent({ ...params, debugPath }, ast, meta),
-      usedFields: buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta),
+      usedFields,
+      inlineHBS,
     };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
 }
 
+export interface ComponentMeta {
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
+  hasModifiedScope: boolean;
+  rawHBS: string | undefined;
+}
+
 interface AnalyzePluginOptions {
-  meta: TemplateUsageMeta;
+  meta: ComponentMeta | undefined;
   debugPath: string;
 }
 interface AnalyzePluginState {
@@ -59,13 +74,8 @@ interface AnalyzePluginState {
   insideExportDefault: boolean;
 }
 
-export function analyzeComponent(
-  templateSource: string,
-  debugFilename: string
-): { ast: t.File; meta: TemplateUsageMeta } {
-  let meta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
-
-  let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
+export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
+  let options: AnalyzePluginOptions = { debugPath: debugFilename, meta: undefined };
 
   let out = transformSync(templateSource, {
     ast: true,
@@ -74,7 +84,7 @@ export function analyzeComponent(
     filename: debugFilename,
   });
 
-  return { ast: out!.ast!, meta };
+  return { ast: out!.ast!, meta: options.meta! };
 }
 
 function babelPluginComponentAnalyze(babel: typeof Babel) {
@@ -99,12 +109,14 @@ function babelPluginComponentAnalyze(babel: typeof Babel) {
       CallExpression: {
         enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
           if (isComponentTemplateExpression(path, state)) {
-            // TODO: we need to deal with the options for inlineHBS
-            let { /*options: precompileTemplateOptions,*/ template: rawTemplate } = handleArguments(path, t);
-            glimmerTemplateAnalyze(rawTemplate, {
-              usageMeta: state.opts.meta,
-              debugPath: state.opts.debugPath,
-            });
+            let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
+            let { fields, model } = glimmerTemplateAnalyze(rawTemplate, state.opts.debugPath);
+            state.opts.meta = {
+              rawHBS: rawTemplate,
+              hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
+              fields,
+              model,
+            };
           }
         },
       },
@@ -112,15 +124,9 @@ function babelPluginComponentAnalyze(babel: typeof Babel) {
   };
 }
 
-function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: TemplateUsageMeta) {
-  let output: Partial<{
-    usedFields: ComponentInfo['usedFields'];
-    inlineHBS: string | undefined;
-  }> = {};
-
+function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: ComponentMeta) {
   let pluginOptions: TransformPluginOptions = {
     transformOpts,
-    output,
     meta,
   };
 
@@ -130,7 +136,7 @@ function transformComponent(transformOpts: TransformComponentOptions, ast: t.Fil
     filename: transformOpts.debugPath,
   })!;
 
-  return { source: out!.code!, ast: out!.ast!, inlineHBS: output.inlineHBS! };
+  return { source: out!.code!, ast: out!.ast! };
 }
 
 interface TransformState {
@@ -140,12 +146,8 @@ interface TransformState {
 }
 
 interface TransformPluginOptions {
-  output: Partial<{
-    usedFields: ComponentInfo['usedFields'];
-    inlineHBS: string | undefined;
-  }>;
   transformOpts: TransformComponentOptions;
-  meta: TemplateUsageMeta;
+  meta: ComponentMeta;
 }
 
 function babelPluginCardTemplate(babel: typeof Babel) {
@@ -189,16 +191,12 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
     return;
   }
 
-  let { options, template: inputTemplate } = handleArguments(path, t);
+  let { options, template: inputTemplate } = validateAndGetComponent(path, t);
 
   let { template, neededScope } = transformTemplate(inputTemplate, path, state.opts.transformOpts, state.importUtil);
   path.node.arguments[0] = t.stringLiteral(template);
 
-  if (shouldInlineHBS(options, neededScope, t)) {
-    state.opts.output.inlineHBS = template;
-  }
-
-  updateScope(options, neededScope, t);
+  updatePrecompileTemplateScopeOption(options, neededScope, t);
 }
 
 function isComponentTemplateExpression(
@@ -211,13 +209,7 @@ function isComponentTemplateExpression(
   );
 }
 
-function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set<string>, t: typeof Babel.types) {
-  // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
-  return !getObjectKey(options, 'scope', t) && neededScope.size == 0;
-}
-
-// TODO: Rename to validateAndGetComponent
-function handleArguments(
+function validateAndGetComponent(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
 ): {
@@ -285,7 +277,11 @@ function transformTemplate(
   };
 }
 
-function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, t: typeof Babel.types): void {
+function updatePrecompileTemplateScopeOption(
+  options: NodePath<t.ObjectExpression>,
+  names: Set<string>,
+  t: typeof Babel.types
+): void {
   let scopeVars: t.ObjectExpression['properties'] = [];
 
   for (let name of names) {
@@ -306,4 +302,84 @@ function updateScope(options: NodePath<t.ObjectExpression>, names: Set<string>, 
   }
 
   scope.node.body.properties = scope.node.body.properties.concat(scopeVars);
+}
+
+function buildUsedFieldsListFromUsageMeta(
+  fields: CompiledCard['fields'],
+  defaultFieldFormat: Format,
+  meta: ComponentMeta
+): ComponentInfo['usedFields'] {
+  let usedFields: Set<string> = new Set();
+
+  if (meta.model && meta.model !== 'self') {
+    for (const fieldPath of meta.model) {
+      usedFields.add(fieldPath);
+    }
+  }
+
+  if (meta.fields === 'self') {
+    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
+  } else {
+    for (const [fieldPath, fieldFormat] of meta.fields.entries()) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        fieldPath,
+        fields,
+        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
+      );
+    }
+  }
+
+  return [...usedFields];
+}
+
+function buildUsedFieldListFromComponents(
+  usedFields: Set<string>,
+  fieldPath: string,
+  fields: CompiledCard['fields'],
+  format: Format,
+  prefix?: string
+): void {
+  let field = getFieldForPath(fields, fieldPath);
+
+  if (field && field.card.componentInfos[format].usedFields.length) {
+    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
+      buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
+    }
+  } else {
+    if (prefix) {
+      usedFields.add(`${prefix}.${fieldPath}`);
+    } else {
+      usedFields.add(fieldPath);
+    }
+  }
+}
+
+function canInlineHBS(
+  hasModifiedScope: boolean,
+  meta: ComponentMeta,
+  fields: CompiledCard['fields'],
+  defaultFieldFormat: Format
+): boolean {
+  if (hasModifiedScope) {
+    return false;
+  }
+
+  if (isEmpty(fields)) {
+    return true;
+  }
+
+  let fieldsToInspect: [string, Format | 'default'][];
+  if (meta.fields === 'self') {
+    fieldsToInspect = Object.keys(fields).map((path) => [path, defaultFieldFormat]);
+  } else {
+    fieldsToInspect = [...meta.fields.entries()];
+  }
+
+  // If every field this card uses is inlinable, then this card can be inlined as well
+  return fieldsToInspect.every(([path, format]) => {
+    let field = getFieldForPath(fields, path);
+    let actualFormat: Format = format === 'default' ? defaultFieldFormat : format;
+    return !!field?.card.componentInfos[actualFormat].inlineHBS;
+  });
 }

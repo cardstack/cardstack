@@ -6,12 +6,10 @@ from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
 from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
-from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
-from .utils import get_parameters, to_camel_case, write_parquet_file
+from .utils import write_parquet_file
 
-load_dotenv()
 
 cached_client = S3Client(
     local_cache_dir=".cache",
@@ -22,13 +20,13 @@ cached_client.set_as_default_client()
 
 
 def run_reward_program(
-    rule_name: str = typer.Argument(default="MinSpend", help="Rule name"),
     parameters_file: str = typer.Argument(
         default="./input/parameters.json", help="The parameters file to use"
     ),
     output_location: str = typer.Argument(
         default="./output", help="The directory to write the results to"
     ),
+    rule_name: str = typer.Argument(default=os.getenv("RULE"), help="Rule name"),
 ):
     """
     Run a reward program as defined in the parameters file

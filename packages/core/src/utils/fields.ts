@@ -1,10 +1,10 @@
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
-import { TemplateUsageMeta } from '../babel-plugin-card-template';
 import isPlainObject from 'lodash/isPlainObject';
 import { FieldsWithPlaceholders, FieldWithPlaceholder } from '../compiler';
 import { CardSchema, ComponentInfo, Format } from '../interfaces';
+import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
 
 export function getFieldForPath(fields: FieldsWithPlaceholders, path: string): FieldWithPlaceholder | undefined {
   let paths = path.split('.');

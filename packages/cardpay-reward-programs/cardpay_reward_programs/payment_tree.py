@@ -44,9 +44,8 @@ class PaymentTree:
         tokenType: int = 1
         payee: ChecksumAddress = payment["payee"]
         token: ChecksumAddress = payment["token"]
-        amount: int = payment["amount"]
+        amount: int = int(payment["amount"])
         transferData: bytes = encode_abi(["address", "uint256"], [token, amount])
-
         return encode_abi(
             ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
             [

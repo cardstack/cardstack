@@ -227,4 +227,32 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
         'Name: We are experiencing issues. For more details, check our status page'
       );
   });
+
+  test('it can display the small size', async function (this: Context, assert) {
+    this.server.get(statusPageUrl, function () {
+      return new MirageResponse(
+        200,
+        {},
+        {
+          incidents: [
+            {
+              name: 'Name',
+              impact: 'major',
+              incident_updates: [{ body: 'We are experiencing issues' }],
+            },
+          ],
+        }
+      );
+    });
+
+    await render(hbs`<Common::DegradedServiceBanner @size="small" />`);
+    await waitFor('[data-test-degraded-service-banner="small"]');
+    assert
+      .dom('[data-test-degraded-service-banner]')
+      .hasAttribute('href', config.urls.statusPageBase);
+    assert.dom('[data-test-degraded-service-banner]').containsText('Name');
+    assert
+      .dom('[data-test-degraded-service-banner]')
+      .doesNotContainText('We are experiencing issues');
+  });
 });

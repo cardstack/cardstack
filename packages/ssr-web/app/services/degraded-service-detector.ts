@@ -7,7 +7,8 @@ import * as Sentry from '@sentry/browser';
 
 export default class DegradedServiceDetector extends Service {
   @tracked notificationShown: boolean = false;
-  @tracked notificationBody: string | null = null;
+  @tracked title: string | null = null;
+  @tracked body: string | null = null;
   @tracked impact: 'none' | 'minor' | 'major' | 'critical' | null = null;
 
   statusPageUrl = config.urls.statusPageUrl;
@@ -28,10 +29,12 @@ export default class DegradedServiceDetector extends Service {
       if (statusData) {
         this.notificationShown = true;
         this.impact = statusData.impact;
-        this.notificationBody = statusData.name;
+        this.title = statusData.title;
+        this.body = statusData.body;
       } else {
         this.notificationShown = false;
-        this.notificationBody = null;
+        this.title = null;
+        this.body = null;
         this.impact = null;
       }
 
@@ -88,7 +91,8 @@ export default class DegradedServiceDetector extends Service {
 
     return {
       status: incident.status,
-      name: `${incident.name}: ${this.addPunctuation(lastUpdate.body)}`,
+      title: incident.name,
+      body: this.addPunctuation(lastUpdate.body),
       impact: incident.impact,
     };
   }
@@ -120,7 +124,8 @@ type StatuspageIncidentOrMaintenance = {
 };
 
 type Incident = {
-  name: string;
   impact: string;
   status: string;
+  title: string;
+  body: string;
 };

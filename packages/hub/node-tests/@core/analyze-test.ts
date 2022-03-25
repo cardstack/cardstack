@@ -1,10 +1,10 @@
-import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
+import cardAnalyze, { ExportMeta } from '@cardstack/core/src/analyze';
 import { analyzeComponent as fullAnalyzeComponent } from '@cardstack/core/src/babel-plugin-card-template';
 import { InvalidFieldsUsageError, InvalidModelUsageError } from '@cardstack/core/src/glimmer-plugin-component-analyze';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 if (process.env.COMPILER) {
-  describe('BabelPluginCardAnalyze', function () {
+  describe('card analyze', function () {
     it('Returns empty meta information when there is nothing of note in the file', function () {
       let source = `function serializer() {}`;
       let out = cardAnalyze(source);
@@ -153,7 +153,7 @@ if (process.env.COMPILER) {
     });
   });
 
-  describe('components', function () {
+  describe('card analyze: components', function () {
     function analyzeComponent(template: string) {
       return fullAnalyzeComponent(templateOnlyComponentTemplate(template), 'test.js');
     }
@@ -161,13 +161,19 @@ if (process.env.COMPILER) {
     it('string-like', async function () {
       let { meta } = analyzeComponent('{{@model}}');
 
-      expect(meta).to.deep.equal({ model: 'self', fields: new Map() });
+      expect(meta).to.deep.equal({
+        model: 'self',
+        fields: new Map(),
+        rawHBS: '{{@model}}',
+        hasModifiedScope: false,
+      });
     });
 
     it('date-like', async function () {
       let { meta } = analyzeComponent('<FormatDate @date={{@model}} />');
 
-      expect(meta).to.deep.equal({ model: 'self', fields: new Map() });
+      expect(meta.model).to.equal('self');
+      expect(meta.fields).to.deep.equal(new Map());
     });
 
     it('simple embeds', async function () {
@@ -180,7 +186,7 @@ if (process.env.COMPILER) {
     it('simple model usage', async function () {
       let { meta } = analyzeComponent('{{helper @model.title}}');
 
-      expect(meta).to.deep.equal({ model: new Set(['title']), fields: new Map() });
+      expect(meta.model).to.deep.equal(new Set(['title']));
     });
 
     it('Nested usage', async function () {
@@ -188,13 +194,13 @@ if (process.env.COMPILER) {
         '{{@model.title}} - <@fields.post.createdAt /> - <@fields.post.author.birthdate />'
       );
 
-      expect(meta).to.deep.equal({
-        model: new Set(['title']),
-        fields: new Map([
+      expect(meta.model).to.deep.equal(new Set(['title']));
+      expect(meta.fields).to.deep.equal(
+        new Map([
           ['post.createdAt', 'default'],
           ['post.author.birthdate', 'default'],
-        ]),
-      });
+        ])
+      );
     });
 
     it('Block usage for self', async function () {
@@ -202,7 +208,7 @@ if (process.env.COMPILER) {
         '<Whatever @name={{name}} /> {{#each-in @fields as |name Field|}} <label>{{name}}</label> <Field /> {{/each-in}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta).to.deep.equal({ model: new Set(), fields: 'self' });
+      expect(meta.fields).to.equal('self');
     });
 
     it('Block usage for @model path', async function () {
@@ -210,7 +216,7 @@ if (process.env.COMPILER) {
         '<Whatever @name={{@model.title}} /> {{#each @model.comments as |comment|}} <Other @name={{comment.createdAt}}/> {{/each}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta).to.deep.equal({ model: new Set(['title', 'comments.createdAt']), fields: new Map() });
+      expect(meta.model).to.deep.equal(new Set(['title', 'comments.createdAt']));
     });
 
     it('Block usage for field', async function () {
@@ -218,18 +224,26 @@ if (process.env.COMPILER) {
         '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
       );
 
-      expect(meta).to.deep.equal({
-        model: new Set(['plane']),
-        fields: new Map([['birthdays', 'default']]),
-      });
+      expect(meta.model).to.deep.equal(new Set(['plane']));
+      expect(meta.fields).to.deep.equal(new Map([['birthdays', 'default']]));
     });
 
     it('Block usage for fields field', async function () {
       let { meta } = analyzeComponent('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}');
+      expect(meta.fields).to.deep.equal(new Map([['birthdays.location', 'default']]));
+    });
+
+    it('Understands when a card has modified the scope of a template', async function () {
+      let { meta } = fullAnalyzeComponent(
+        templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
+        'test.js'
+      );
 
       expect(meta).to.deep.equal({
-        model: new Set(),
-        fields: new Map([['birthdays.location', 'default']]),
+        model: 'self',
+        fields: new Map(),
+        rawHBS: '<FancyTool @value={{@model}} />',
+        hasModifiedScope: true,
       });
     });
 

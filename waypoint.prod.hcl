@@ -259,7 +259,6 @@ app "reward-submit" {
     config {
         env = {
             ENVIRONMENT = "production"
-            ETHEREUM_NODE_URL = "https://xdai-archive.blockscout.com/"
             REWARD_POOL_ADDRESS = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
             REWARD_PROGRAM_OUTPUT="s3://tally-production-reward-programs/"
         }
@@ -289,6 +288,7 @@ app "reward-submit" {
             execution_role_name = "reward-root-submitter-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 OWNER = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
                 OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
             }

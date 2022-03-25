@@ -14,10 +14,11 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(self, payment_cycle_length, start_block, end_block):
+    def set_core_parameters(self, payment_cycle_length, start_block, end_block, subgraph_config_locations):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
         self.end_block = end_block
+        self.subgraph_config_locations = subgraph_config_locations
 
     @abstractmethod
     def set_user_defined_parameters(
@@ -30,7 +31,7 @@ class Rule(ABC):
         raise NotImplementedError
 
     def _get_table_query(self, config_name, table_name, min_partition: int, max_partition: int):
-        config_location = self.subgraph_config_location[config_name]
+        config_location = self.subgraph_config_locations[config_name]
         local_files = get_files(config_location, table_name, min_partition, max_partition)
         return f"parquet_scan({local_files})"
 

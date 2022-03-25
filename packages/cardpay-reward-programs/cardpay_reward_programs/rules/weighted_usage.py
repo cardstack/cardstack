@@ -14,13 +14,11 @@ class WeightedUsage(Rule):
         spend_factor: int,
         token: str,
         duration: int,
-        subgraph_config_location,
     ):
         self.base_reward = base_reward
         self.transaction_factor = transaction_factor
         self.spend_factor = spend_factor
         self.token = token
-        self.subgraph_config_location = subgraph_config_location
         self.duration = duration
 
     def sql(self, table_query):
@@ -43,7 +41,7 @@ class WeightedUsage(Rule):
         """
 
     def df_to_payment_list(
-        self, df, payment_cycle=1, reward_program_id="0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E"
+        self, df, payment_cycle, reward_program_id
     ):
         if df.empty:
             return default_payment_list

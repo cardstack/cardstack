@@ -66,7 +66,7 @@ function getMeta(obj: State['opts']): FileMeta {
   return meta;
 }
 
-export default function (source: string): {
+export default function analyzeCardModule(source: string): {
   code: BabelFileResult['code'];
   ast: BabelFileResult['ast'];
   meta: FileMeta;

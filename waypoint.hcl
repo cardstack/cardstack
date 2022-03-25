@@ -303,7 +303,6 @@ app "reward-submit" {
     config {
         env = {
             ENVIRONMENT = "staging"
-            ETHEREUM_NODE_URL = "https://sokol-archive.blockscout.com/"
             REWARD_POOL_ADDRESS = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
             REWARD_PROGRAM_OUTPUT="s3://tally-staging-reward-programs/"
         }
@@ -333,6 +332,7 @@ app "reward-submit" {
             execution_role_name = "reward-root-submitter-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
                 OWNER = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
                 OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
             }

@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 import partition from 'lodash/partition';
 import differenceWith from 'lodash/differenceWith';
 
-import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
+import analyzeCardModule, { ExportMeta, FileMeta } from './analyze';
 import cardSchemaTransformPlugin, { Options } from './babel-plugin-card-schema-transform';
 import transformCardComponent from './babel-plugin-card-template';
 import {
@@ -288,7 +288,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         source,
       };
     } else {
-      let { code, ast, meta } = analyzeFileBabelPlugin(source);
+      let { code, ast, meta } = analyzeCardModule(source);
 
       return {
         type: 'js',

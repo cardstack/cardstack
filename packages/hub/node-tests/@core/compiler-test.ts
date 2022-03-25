@@ -432,6 +432,7 @@ if (process.env.COMPILER) {
       it('date card', async function () {
         let { compiled } = await cards.load('https://cardstack.com/base/date');
         expect(compiled.serializerModule?.global, 'Date card has date serializer').to.be.ok;
+        expect(compiled.componentInfos.embedded.inlineHBS).to.be.undefined;
         let serializer = getFileCache().getModule(compiled.serializerModule?.global!, 'browser');
         expect(serializer).to.containsSource(`export function serialize(d) {`);
       });
