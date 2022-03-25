@@ -324,10 +324,12 @@ This method is invoked with the following parameters:
 This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object contains a `Safe[]` type which conforms to the `Safe` shape below, and the block number at which the subgraph was last indexed:
 
 ```ts
-export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
+  createdAt: number;
   tokens: TokenInfo[];
+  owners: string[];
 }
 interface DepotSafe extends BaseSafe {
   type: 'depot';
@@ -335,7 +337,13 @@ interface DepotSafe extends BaseSafe {
 }
 interface MerchantSafe extends BaseSafe {
   type: 'merchant';
-  infoDID: string | undefined;
+  accumulatedSpendValue: number;
+  merchant: string;
+  infoDID?: string;
+}
+interface RewardSafe extends BaseSafe {
+    type: 'reward';
+    rewardProgramId: string;
 }
 interface ExternalSafe extends BaseSafe {
   type: 'external';
@@ -344,9 +352,12 @@ interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
+  prepaidCardOwner: string;
+  hasBeenUsed: boolean;
   issuer: string;
   reloadable: boolean;
-  customizationDID: string | undefined;
+  transferrable: boolean;
+  customizationDID?: string;
 }
 ```
 
@@ -779,7 +790,7 @@ The leaf item contains most information about the claim, such as the reward prog
 
 ### `RewardPool.claimGasEstimate`
 
-The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive 10 CARD - (gas fees in CARD) into their reward safe. 
+The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive `10 CARD - (gas fees in CARD)` into their reward safe. 
 
 ```ts
 interface GasEstimate {
@@ -795,7 +806,7 @@ await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acc
 
 ### `RewardPool.getProofs`
 
-The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner; Once a proof is used it cannot be it will be `knownClaimed=true` and it cannot be re-used.
+The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner. Once a proof is used (i.e. `knownClaimed=true`) it cannot be re-used. `isValid` is a flag that checks if a proof is still valid. Assuming a proof has not been claimed, `isValid=false` means that a proof can no longer be claimed -- typically, to mean that the proof has expired.
 
 ```js
 interface Proof {
@@ -809,6 +820,7 @@ interface Proof {
   rewardProgramId: string;
   amount: BN;
   leaf: string;
+  isValid: boolean;
 }
 ```
 
