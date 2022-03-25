@@ -1,10 +1,10 @@
-import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
+import cardAnalyze, { ExportMeta } from '@cardstack/core/src/analyze';
 import { analyzeComponent as fullAnalyzeComponent } from '@cardstack/core/src/babel-plugin-card-template';
 import { InvalidFieldsUsageError, InvalidModelUsageError } from '@cardstack/core/src/glimmer-plugin-component-analyze';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 if (process.env.COMPILER) {
-  describe('BabelPluginCardAnalyze', function () {
+  describe('card analyze', function () {
     it('Returns empty meta information when there is nothing of note in the file', function () {
       let source = `function serializer() {}`;
       let out = cardAnalyze(source);
@@ -153,7 +153,7 @@ if (process.env.COMPILER) {
     });
   });
 
-  describe('BabelPluginCardAnalyze components', function () {
+  describe('card analyze: components', function () {
     function analyzeComponent(template: string) {
       return fullAnalyzeComponent(templateOnlyComponentTemplate(template), 'test.js');
     }
