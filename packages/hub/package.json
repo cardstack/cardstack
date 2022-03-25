@@ -120,6 +120,7 @@
     "@types/yargs": "^17.0.2",
     "chai": "^4.3.4",
     "copy-webpack-plugin": "^10.0.0",
+    "date-fns": "^2.22.1",
     "fixturify-project": "^4.0.2",
     "ignore-loader": "^0.1.2",
     "json-stable-stringify": "^1.0.1",

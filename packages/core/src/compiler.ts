@@ -9,9 +9,7 @@ import differenceWith from 'lodash/differenceWith';
 
 import analyzeFileBabelPlugin, { ExportMeta, FileMeta } from './babel-plugin-card-file-analyze';
 import cardSchemaTransformPlugin, { Options } from './babel-plugin-card-schema-transform';
-import transformCardComponent, {
-  CardComponentPluginOptions as CardComponentPluginOptions,
-} from './babel-plugin-card-template';
+import transformCardComponent from './babel-plugin-card-template';
 import {
   Builder,
   CardId,
@@ -449,34 +447,34 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return mod;
   }
 
+  private buildResolver(mod: JSSourceModule) {
+    if (mod.resolutionBase) {
+      let base = mod.resolutionBase;
+      return (importPath: string): string => {
+        return resolveModule(importPath, base);
+      };
+    } else {
+      return (importPath: string) => importPath;
+    }
+  }
+
   private compileComponent(
     mod: JSSourceModule,
     fields: CompiledCard['fields'],
     format: Format
   ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
-    let debugPath = `${this.cardSource.realm}${this.cardSource.id ?? 'NEW_CARD'}/${mod.localPath}`;
-
-    let options: CardComponentPluginOptions = {
-      debugPath,
+    let componentTransformResult = transformCardComponent({
+      templateSource: mod.source,
+      debugPath: `${this.cardSource.realm}${this.cardSource.id ?? 'NEW_CARD'}/${mod.localPath}`,
       fields,
-      inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
-      usedFields: [],
-    };
-
-    if (mod.resolutionBase) {
-      let base = mod.resolutionBase;
-      options.resolveImport = (importPath: string): string => {
-        return resolveModule(importPath, base);
-      };
-    }
-
-    let componentTransformResult = transformCardComponent(mod.source, options);
+      resolveImport: this.buildResolver(mod),
+    });
 
     let componentInfo: ComponentInfo<LocalRef> = {
       componentModule: { local: mod.localPath },
-      usedFields: options.usedFields,
-      inlineHBS: options.inlineHBS,
+      usedFields: componentTransformResult.usedFields,
+      inlineHBS: componentTransformResult.inlineHBS,
     };
     if (mod.inheritedFrom) {
       componentInfo.inheritedFrom = mod.inheritedFrom;

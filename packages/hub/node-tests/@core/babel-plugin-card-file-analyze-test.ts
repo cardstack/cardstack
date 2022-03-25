@@ -1,4 +1,7 @@
 import cardAnalyze, { ExportMeta } from '@cardstack/core/src/babel-plugin-card-file-analyze';
+import { analyzeComponent as fullAnalyzeComponent } from '@cardstack/core/src/babel-plugin-card-template';
+import { InvalidFieldsUsageError, InvalidModelUsageError } from '@cardstack/core/src/glimmer-plugin-component-analyze';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
 if (process.env.COMPILER) {
   describe('BabelPluginCardAnalyze', function () {
@@ -146,6 +149,140 @@ if (process.env.COMPILER) {
         typeDecoratorLocalName: 'string',
         computed: true,
         computeVia: 'computeHome',
+      });
+    });
+  });
+
+  describe('components', function () {
+    function analyzeComponent(template: string) {
+      return fullAnalyzeComponent(templateOnlyComponentTemplate(template), 'test.js');
+    }
+
+    it('string-like', async function () {
+      let { meta } = analyzeComponent('{{@model}}');
+
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '{{@model}}',
+        hasModifiedScope: false,
+      });
+    });
+
+    it('date-like', async function () {
+      let { meta } = analyzeComponent('<FormatDate @date={{@model}} />');
+
+      expect(meta.usage).to.deep.equal({ model: 'self', fields: new Map() });
+    });
+
+    it('simple embeds', async function () {
+      let { meta } = analyzeComponent('<@fields.title />');
+
+      expect(meta.usage.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
+      expect(meta.usage.fields, 'The title field to be in fields').to.deep.equal(new Map([['title', 'default']]));
+    });
+
+    it('simple model usage', async function () {
+      let { meta } = analyzeComponent('{{helper @model.title}}');
+
+      expect(meta.usage).to.deep.equal({ model: new Set(['title']), fields: new Map() });
+    });
+
+    it('Nested usage', async function () {
+      let { meta } = analyzeComponent(
+        '{{@model.title}} - <@fields.post.createdAt /> - <@fields.post.author.birthdate />'
+      );
+
+      expect(meta.usage).to.deep.equal({
+        model: new Set(['title']),
+        fields: new Map([
+          ['post.createdAt', 'default'],
+          ['post.author.birthdate', 'default'],
+        ]),
+      });
+    });
+
+    it('Block usage for self', async function () {
+      let { meta } = analyzeComponent(
+        '<Whatever @name={{name}} /> {{#each-in @fields as |name Field|}} <label>{{name}}</label> <Field /> {{/each-in}} <Whichever @field={{Field}} />'
+      );
+
+      expect(meta.usage).to.deep.equal({ model: new Set(), fields: 'self' });
+    });
+
+    it('Block usage for @model path', async function () {
+      let { meta } = analyzeComponent(
+        '<Whatever @name={{@model.title}} /> {{#each @model.comments as |comment|}} <Other @name={{comment.createdAt}}/> {{/each}} <Whichever @field={{Field}} />'
+      );
+
+      expect(meta.usage).to.deep.equal({ model: new Set(['title', 'comments.createdAt']), fields: new Map() });
+    });
+
+    it('Block usage for field', async function () {
+      let { meta } = analyzeComponent(
+        '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
+      );
+
+      expect(meta.usage).to.deep.equal({
+        model: new Set(['plane']),
+        fields: new Map([['birthdays', 'default']]),
+      });
+    });
+
+    it('Block usage for fields field', async function () {
+      let { meta } = analyzeComponent('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}');
+
+      expect(meta.usage).to.deep.equal({
+        model: new Set(),
+        fields: new Map([['birthdays.location', 'default']]),
+      });
+    });
+
+    it('Understands when a card has modified the scope of a template', async function () {
+      let { meta } = fullAnalyzeComponent(
+        templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
+        'test.js'
+      );
+
+      expect(meta).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
+        rawHBS: '<FancyTool @value={{@model}} />',
+        hasModifiedScope: true,
+      });
+    });
+
+    describe('Error handling', function () {
+      it('errors when using @model as an element', async function () {
+        try {
+          analyzeComponent('<@model.pizza />');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+      });
+
+      it('errors when using @model as an element inside of a block', async function () {
+        try {
+          analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday /> {{/each}}');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+
+        try {
+          analyzeComponent('{{#each @model.birthdays as |birthday|}} <birthday.location /> {{/each}}');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidModelUsageError);
+        }
+      });
+
+      it('errors when using @fields as an element without a path', async function () {
+        try {
+          analyzeComponent('<@fields />');
+          throw new Error('failed to throw expected exception');
+        } catch (e: any) {
+          expect(e).to.be.instanceOf(InvalidFieldsUsageError);
+        }
       });
     });
   });
