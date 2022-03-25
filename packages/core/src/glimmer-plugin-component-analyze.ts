@@ -24,27 +24,32 @@ type ScopeValue =
   | { type: 'stringLiteral'; value: string }
   | { type: 'pathExpression'; value: string };
 
-export default function glimmerTemplateAnalyze(source: string, options: Options) {
+export default function glimmerTemplateAnalyze(
+  source: string,
+  debugPath: string
+): Pick<ComponentMeta, 'fields' | 'model'> {
+  let output: Pick<ComponentMeta, 'fields' | 'model'> = {
+    fields: new Map(),
+    model: new Set(),
+  };
   try {
-    return syntax.print(
-      syntax.preprocess(source, {
-        mode: 'codemod',
-        plugins: {
-          ast: [cardTransformPlugin(options)],
-        },
-        meta: {
-          moduleName: options.debugPath,
-        },
-      })
-    );
+    syntax.preprocess(source, {
+      mode: 'codemod',
+      plugins: {
+        ast: [cardTransformPlugin(output)],
+      },
+      meta: {
+        moduleName: debugPath,
+      },
+    });
   } catch (error: any) {
     throw augmentBadRequest(error);
   }
+  return output;
 }
 
-export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
+export function cardTransformPlugin(meta: Pick<ComponentMeta, 'fields' | 'model'>): syntax.ASTPluginBuilder {
   return function transform(_env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
-    let { meta } = options;
     let handledPathExpressions: HandledPathExpressions = new WeakSet();
     let scopeTracker = new ScopeTracker<ScopeValue>();
 

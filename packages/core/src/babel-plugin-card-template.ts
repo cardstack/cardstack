@@ -60,7 +60,7 @@ export interface ComponentMeta {
 }
 
 interface AnalyzePluginOptions {
-  meta: ComponentMeta;
+  meta: ComponentMeta | undefined;
   debugPath: string;
 }
 interface AnalyzePluginState {
@@ -69,14 +69,7 @@ interface AnalyzePluginState {
 }
 
 export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
-  let meta: ComponentMeta = {
-    model: new Set(),
-    fields: new Map(),
-    hasModifiedScope: false,
-    rawHBS: undefined,
-  };
-
-  let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
+  let options: AnalyzePluginOptions = { debugPath: debugFilename, meta: undefined };
 
   let out = transformSync(templateSource, {
     ast: true,
@@ -85,7 +78,7 @@ export function analyzeComponent(templateSource: string, debugFilename: string):
     filename: debugFilename,
   });
 
-  return { ast: out!.ast!, meta };
+  return { ast: out!.ast!, meta: options.meta! };
 }
 
 function babelPluginComponentAnalyze(babel: typeof Babel) {
@@ -111,13 +104,13 @@ function babelPluginComponentAnalyze(babel: typeof Babel) {
         enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
           if (isComponentTemplateExpression(path, state)) {
             let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
-            state.opts.meta.rawHBS = rawTemplate;
-            state.opts.meta.hasModifiedScope = !!getObjectKey(precompileTemplateOptions, 'scope', t);
-
-            glimmerTemplateAnalyze(rawTemplate, {
-              meta: state.opts.meta,
-              debugPath: state.opts.debugPath,
-            });
+            let { fields, model } = glimmerTemplateAnalyze(rawTemplate, state.opts.debugPath);
+            state.opts.meta = {
+              rawHBS: rawTemplate,
+              hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
+              fields,
+              model,
+            };
           }
         },
       },
