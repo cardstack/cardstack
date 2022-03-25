@@ -34,7 +34,7 @@ runs:
     - name: Store preview host
       shell: bash
       run: echo "PREVIEW_HOST=https://$PR_BRANCH_NAME.$S3_PREVIEW_BUCKET_NAME/" >> $GITHUB_ENV
-    - name: add URL check
+    - name: add check with link to preview deployment
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
