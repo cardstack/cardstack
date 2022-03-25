@@ -62,7 +62,7 @@ module.exports = function (defaults) {
     packagerOptions: {
       // FIXME refine?
       publicAssetURL: (process.env.DEPLOY_TARGET || '').startsWith('s3-preview')
-        ? `https://${process.env.PR_BRANCH_NAME}.${process.env.S3_PREVIEW_INDEX_BUCKET_NAME}/`
+        ? `https://${process.env.PR_BRANCH_NAME}.${process.env.S3_PREVIEW_BUCKET_NAME}/`
         : undefined,
 
       webpackConfig: {

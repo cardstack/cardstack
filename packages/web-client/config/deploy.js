@@ -121,7 +121,7 @@ module.exports = function (deployTarget) {
     ENV.s3 = {
       accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
       secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
-      bucket: process.env.S3_PREVIEW_ASSET_BUCKET_NAME,
+      bucket: process.env.S3_PREVIEW_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
       prefix: process.env.PR_BRANCH_NAME,
       filePattern:
@@ -134,7 +134,7 @@ module.exports = function (deployTarget) {
     ENV['s3-index'] = {
       accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
       secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
-      bucket: process.env.S3_PREVIEW_INDEX_BUCKET_NAME,
+      bucket: process.env.S3_PREVIEW_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
       allowOverwrite: true,
       prefix: process.env.PR_BRANCH_NAME,
