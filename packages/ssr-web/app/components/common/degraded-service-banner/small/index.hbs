@@ -1,0 +1,13 @@
+<a
+  class={{cn "degraded-service-banner" "degraded-service-banner--small" degraded-service-banner--severe=@isSevere}}
+  href={{config 'urls.statusPageBase'}} target="_blank" rel="noopener noreferrer"
+  data-test-degraded-service-banner="small"
+  ...attributes
+>
+  <div class="degraded-service-banner__container">
+    <div class="degraded-service-banner__icon-area">
+      {{svg-jar "failure-bordered" class="degraded-service-banner__icon"}}
+    </div>
+    {{@title}}
+  </div>
+</a>

@@ -1,0 +1,16 @@
+<div
+  class={{cn "degraded-service-banner" "degraded-service-banner--regular" degraded-service-banner--severe=@isSevere}}
+  data-test-degraded-service-banner
+  ...attributes
+>
+  <div class="degraded-service-banner__container">
+    <div class="degraded-service-banner__icon-area">
+      {{svg-jar "failure-bordered" class="degraded-service-banner__icon"}}
+    </div>
+
+    <div>
+      {{@title}}{{if @body (concat ": " @body)}}
+      For more details, check our <a href={{config 'urls.statusPageBase'}} target="_blank" rel="noopener noreferrer">status page</a>.
+    </div>
+  </div>
+</div>

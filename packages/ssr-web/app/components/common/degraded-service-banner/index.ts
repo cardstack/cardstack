@@ -8,8 +8,7 @@ export default class DegradedServiceBannerComponent extends Component {
 
   @reads('degradedServiceDetector.notificationShown')
   declare notificationShown: boolean;
-  @reads('degradedServiceDetector.notificationBody') declare notificationBody:
-    | string
-    | null;
+  @reads('degradedServiceDetector.body') declare body: string | null;
+  @reads('degradedServiceDetector.title') declare title: string | null;
   @reads('degradedServiceDetector.isSevere') declare isSevere: boolean;
 }

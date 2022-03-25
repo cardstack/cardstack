@@ -3,45 +3,63 @@
   <meta property='og:image' content={{this.cardPayLogoPng}} />
   <meta name='twitter:image' content={{this.cardPayLogoPng}} />
 </InHead>
-<Boxel::OrgHeader
-  class="merchant-payment-request-header"
-  @iconURL={{this.cardPayLogo}}
-  @title="Card Pay"
-  style={{css-var
-    boxel-org-header-logo-size="var(--card-pay-logo-size)"
-    boxel-org-header-logo-position="var(--card-pay-logo-position)"
-    boxel-org-header-padding="0"
-  }}
->
-  <div class="merchant-payment-request-header__links-container">
-    <ul class="merchant-payment-request-header__links">
-      <li>
-        <a href={{config 'urls.about'}}>
-          About
-        </a>
-      </li>
-      <li>
-        <a href={{config 'urls.mailToSupportUrl'}}>
-          Help
-        </a>
-      </li>
-    </ul>
-    <CardPay::HamburgerMenu
-      class="merchant-payment-request-header__hamburger"
-      @headerIconURL={{this.cardPayLogo}}
-      @headerTitle="Card Pay"
-      @open={{this.hamburgerMenuOpen}}
-      @onOpen={{fn (mut this.hamburgerMenuOpen) true}}
-      @onClose={{fn (mut this.hamburgerMenuOpen) false}}
-    >
-      <:body as |MenuItem|>
-        <MenuItem @url={{config 'urls.about'}}>
-          About
-        </MenuItem>
-        <MenuItem @url={{config 'urls.mailToSupportUrl'}}>
-          Help
-        </MenuItem>
-      </:body>
-    </CardPay::HamburgerMenu>
-  </div>
-</Boxel::OrgHeader>
+{{!--
+  control via css whether we want to show a degraded service banner
+  on top (big screens) or below (small screens) when there is an incident.
+  showing on top is to be aligned with behaviour on other large screens on web
+  showing below is because it respects the navbar + the hamburger menu pattern
+  where the x is at the same spot as the hamburger.
+  hence this must use the same breakpoint as the hamburger
+--}}
+<div>
+  <Common::DegradedServiceBanner
+    @size="regular"
+    class="merchant-payment-request-header__degraded-service-banner--regular"
+  />
+  <Boxel::OrgHeader
+    class="merchant-payment-request-header"
+    @iconURL={{this.cardPayLogo}}
+    @title="Card Pay"
+    style={{css-var
+      boxel-org-header-logo-size="var(--card-pay-logo-size)"
+      boxel-org-header-logo-position="var(--card-pay-logo-position)"
+      boxel-org-header-padding="0"
+    }}
+  >
+    <div class="merchant-payment-request-header__links-container">
+      <ul class="merchant-payment-request-header__links">
+        <li>
+          <a href={{config 'urls.about'}}>
+            About
+          </a>
+        </li>
+        <li>
+          <a href={{config 'urls.mailToSupportUrl'}}>
+            Help
+          </a>
+        </li>
+      </ul>
+      <CardPay::HamburgerMenu
+        class="merchant-payment-request-header__hamburger"
+        @headerIconURL={{this.cardPayLogo}}
+        @headerTitle="Card Pay"
+        @open={{this.hamburgerMenuOpen}}
+        @onOpen={{fn (mut this.hamburgerMenuOpen) true}}
+        @onClose={{fn (mut this.hamburgerMenuOpen) false}}
+      >
+        <:body as |MenuItem|>
+          <MenuItem @url={{config 'urls.about'}}>
+            About
+          </MenuItem>
+          <MenuItem @url={{config 'urls.mailToSupportUrl'}}>
+            Help
+          </MenuItem>
+        </:body>
+      </CardPay::HamburgerMenu>
+    </div>
+  </Boxel::OrgHeader>
+  <Common::DegradedServiceBanner
+    @size="small"
+    class="merchant-payment-request-header__degraded-service-banner--small"
+  />
+</div>
