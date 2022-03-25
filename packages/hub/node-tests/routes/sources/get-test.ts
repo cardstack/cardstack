@@ -89,7 +89,10 @@ if (process.env.COMPILER) {
         edit: null,
         serializer: null,
         adoptsFrom: '../post',
-        data: { title: 'Hello World', body: 'First post.' },
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
+        },
         realm: realmURL,
         id: 'post0',
       });
@@ -116,7 +119,6 @@ if (process.env.COMPILER) {
       expect(compiledMeta?.attributes.componentInfos.isolated).to.have.all.keys([
         'usedFields',
         'componentModule',
-        'metaModule',
         'inlineHBS',
         'inheritedFrom',
       ]);

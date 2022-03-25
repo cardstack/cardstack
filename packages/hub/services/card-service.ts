@@ -4,11 +4,13 @@ import {
   Unsaved,
   RawCard,
   Format,
-  CardModel,
   CardService as CardServiceInterface,
   ResourceObject,
   Saved,
+  CardSchemaModule,
+  CardModel,
 } from '@cardstack/core/src/interfaces';
+import CardModelImpl from '@cardstack/core/src/card-model';
 import { RawCardDeserializer } from '@cardstack/core/src/serializers';
 import { Filter, Query, Sort } from '@cardstack/core/src/query';
 import { getOwner, inject } from '@cardstack/di';
@@ -28,8 +30,7 @@ import {
 } from '../utils/expressions';
 import { BadRequest, CardstackError, NotFound } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
-import { merge } from 'lodash';
-import CardModelForHub from '../lib/card-model-for-hub';
+import merge from 'lodash/merge';
 import { service } from '@cardstack/hub/services';
 import { BASE_CARD_URL } from '@cardstack/core/src/compiler';
 
@@ -174,7 +175,8 @@ export class CardService implements CardServiceInterface {
   }
 
   private async updateModel(card: CardModel): Promise<ResourceObject<Saved>> {
-    let raw = await this.realmManager.update({ id: card.id!, realm: card.realm, data: card.serialize().attributes });
+    let partialRaw = { id: card.id!, realm: card.realm, data: card.serialize().attributes };
+    let raw = merge({}, await this.realmManager.read(partialRaw), partialRaw);
     let { id, data, realm } = raw;
     await this.searchIndex.indexData({ id, realm, data }, card);
     return { type: 'cards', id, attributes: data };
@@ -184,23 +186,23 @@ export class CardService implements CardServiceInterface {
     format: Format,
     result: Record<string, any>,
     allFields = false
-  ): Promise<CardModelForHub> {
+  ): Promise<CardModel> {
     let { realm } = this.realmManager.parseCardURL(result.url);
-    let componentMetaModule = result.componentInfos[format].metaModule.global;
-    let componentMeta = await this.loadModule(componentMetaModule);
-    return new CardModelForHub(
+    let schemaModule: CardSchemaModule = await this.loadModule(result.schemaModule);
+    return new CardModelImpl(
       this,
       {
         type: 'loaded',
         url: result.url,
         allFields,
+        makeDataComplete: true,
       },
       {
         format,
         realm,
-        schemaModule: result.schemaModule,
+        schemaModuleRef: result.schemaModule,
+        schemaModule,
         rawData: result.data ?? {},
-        componentMeta,
         componentModuleRef: result.componentInfos[format].componentModule.global,
         saveModel: this.saveModel.bind(this),
       }

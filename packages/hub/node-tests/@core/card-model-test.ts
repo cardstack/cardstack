@@ -21,11 +21,12 @@ let attributes: Record<string, any> = {
     city: 'Los Angeles',
     state: 'CA',
     settlementDate: '1990-01-01',
+    zip: null,
   },
 };
 
 if (process.env.COMPILER) {
-  describe('CardModelForHub', function () {
+  describe('CardModel', function () {
     let { realmURL, cards } = configureHubWithCompiler(this);
 
     this.beforeEach(async function () {

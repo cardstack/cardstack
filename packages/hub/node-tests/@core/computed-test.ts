@@ -1,6 +1,11 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
 import { configureHubWithCompiler } from '../helpers/cards';
+import { parse, isSameDay } from 'date-fns';
+
+function p(dateString: string): Date {
+  return parse(dateString, 'yyyy-MM-dd', new Date());
+}
 
 if (process.env.COMPILER) {
   describe('computed', function () {
@@ -177,7 +182,35 @@ if (process.env.COMPILER) {
       );
     });
 
-    it('can access a field that requires deserialization');
+    it('can access a field that requires deserialization', async function () {
+      await cards.create({
+        realm,
+        id: 'test',
+        schema: 'schema.js',
+        data: {
+          date: '2022-03-24',
+        },
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import date from "https://cardstack.com/base/date";
+            export default class Test {
+              @contains(date) date;
+              @contains(date) 
+              get nextDay() {
+                return new Date(this.date.getTime() + (24 * 60 * 60 * 1000));
+              }
+            }
+          `,
+        },
+      });
+
+      let card = await cards.loadModel(`${realm}test`, 'isolated');
+      expect(isSameDay(await card.getField('nextDay'), p('2022-03-25')), 'Dates are serialized to Dates').to.be.ok;
+      expect(isSameDay(card.data['nextDay'], p('2022-03-25')), 'Dates are serialized to Dates').to.be.ok;
+      expect(card.serialize().attributes?.nextDay).to.equal('2022-03-25');
+    });
+
     it('can have a field that is the same card as itself');
   });
 }

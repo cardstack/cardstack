@@ -2,7 +2,6 @@ import BaseRoute from './base';
 import '../../css/card-pay/payments.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
-import config from '@cardstack/web-client/config/environment';
 
 const MERCHANTS_PANEL = {
   title: 'Quick Payments',
@@ -23,7 +22,7 @@ const MERCHANTS_PANEL = {
         'Confirm transactions with Touch ID or Face ID in the Card Wallet mobile app',
       ],
       cta: 'Create Payment Profile',
-      isCtaDisabled: !config.features.createMerchant,
+      isCtaDisabled: false,
     },
   ],
 };

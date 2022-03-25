@@ -4,20 +4,18 @@
   --icon-background-color: var(--degraded-service-banner-text-color);
   --icon-color: var(--degraded-service-banner-background-color);
 
-  width: 100%;
   min-height: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--boxel-sp-xxs);
   font: 600 var(--boxel-font-sm);
   background: var(--degraded-service-banner-background-color);
   color: var(--degraded-service-banner-text-color);
 }
 
 .degraded-service-banner__container {
-  max-width: calc(var(--degraded-service-banner-icon-area-width) + 80ch);
+  max-width: var(--degraded-service-banner-content-max-width, 80ch);
+  margin: auto;
   display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .degraded-service-banner__icon-area {
@@ -26,6 +24,8 @@
   display: flex;
   align-items: center;
   width: var(--degraded-service-banner-icon-area-width);
+  height: var(--degraded-service-banner-icon-area-width);
+  margin-right: var(--boxel-sp-xxs);
 }
 
 .degraded-service-banner__container a {
@@ -39,8 +39,4 @@
 .degraded-service-banner.degraded-service-banner--severe {
   --degraded-service-banner-text-color: var(--boxel-light);
   --degraded-service-banner-background-color: var(--boxel-red);
-}
-
-.degraded-service-banner__icon {
-  margin-right: var(--boxel-sp-xxs);
 }

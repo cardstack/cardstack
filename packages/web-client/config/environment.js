@@ -16,17 +16,6 @@ const universalLinkHostnamesByTarget = {
   production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX = 'card.xyz.test';
-const CARD_SPACE_HOSTNAME_SUFFIX = 'card.xyz';
-const CARD_SPACE_HOSTNAME_STAGING_SUFFIX = 'pouty.pizza';
-const CARD_SPACE_HOSTNAME_TEST_SUFFIX = 'space.example.com';
-
-const cardSpaceHostnameSuffixesByTarget = {
-  production: CARD_SPACE_HOSTNAME_SUFFIX,
-  staging: CARD_SPACE_HOSTNAME_STAGING_SUFFIX,
-  test: CARD_SPACE_HOSTNAME_TEST_SUFFIX,
-};
-
 const pkg = require('../package.json');
 
 // eslint-disable-next-line no-undef
@@ -52,9 +41,6 @@ module.exports = function (environment) {
     universalLinkDomain:
       universalLinkHostnamesByTarget[deployTargetClass] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    cardSpaceHostnameSuffix:
-      cardSpaceHostnameSuffixesByTarget[deployTargetClass] ??
-      CARD_SPACE_HOSTNAME_LOCAL_DEV_SUFFIX,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
@@ -99,11 +85,7 @@ module.exports = function (environment) {
         ? 'xdai'
         : 'sokol',
     },
-    features: {
-      createMerchant: true,
-      enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
-      enableCardPay: true,
-    },
+    features: {},
     infuraId:
       infuraIdsByTarget[deployTargetClass] ?? process.env.INFURA_ID,
     urls: {

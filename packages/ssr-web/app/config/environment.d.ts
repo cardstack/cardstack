@@ -28,6 +28,6 @@ declare const config: {
   APP: Record<string, unknown>;
   cardSpaceHostnameSuffix: string;
   chains: {
-    layer2: 'sokol' | 'xdai';
+    layer2: 'sokol' | 'xdai' | 'test';
   };
 };

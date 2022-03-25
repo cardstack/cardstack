@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 
@@ -15,12 +15,11 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, sku } = args as unknown as {
+    let { network, sku } = args as unknown as {
       network: string;
       sku: string;
-      mnemonic?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
     let inventory = await prepaidCardMarket.getInventory(sku);
     console.log(`Inventory for SKU ${sku} (${inventory.length} items):

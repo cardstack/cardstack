@@ -213,4 +213,23 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Card Wallet app to see your new prepaid card.`
     );
   });
+
+  it('will not provision a prepaid card for an EOA which already has an airDropTxnHash', async function () {
+    await db.query(
+      `INSERT INTO card_drop_recipients (user_id, user_name, address, airdrop_txn_hash) VALUES ($1, $2, $3, $4)`,
+      [user.id, user.username, mockEOA, mockTxnHash]
+    );
+    let message = makeTestMessage({
+      user,
+      guild,
+      content: 'ok',
+      userRoles: roles,
+      channel: dm,
+    });
+    await command(getBot(), message, [dm.id]);
+    expect(dm.responses.length).to.equal(1);
+    expect(dm.responses[0]).to.equal(
+      `Sorry, it appears that we have previously dropped a prepaid card to your wallet (address ${mockEOA}). There is a limit of one card per address.`
+    );
+  });
 });

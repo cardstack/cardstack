@@ -17,6 +17,10 @@
   max-width: 100%;
 }
 
+.payment-link__qr {
+  max-width: 100%;
+}
+
 .payment-link__error {
   margin: var(--boxel-sp-sm);
   color: var(--boxel-purple-500);

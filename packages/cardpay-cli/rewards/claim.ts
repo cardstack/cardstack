@@ -1,5 +1,6 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2 } from '../utils';
+import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { fromProof } from './utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK, getConstant } from '@cardstack/cardpay-sdk';
 
@@ -28,15 +29,14 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, mnemonic, rewardSafe, leaf, proof, acceptPartialClaim } = args as unknown as {
+    let { network, rewardSafe, leaf, proof, acceptPartialClaim } = args as unknown as {
       network: string;
       rewardSafe: string;
       leaf: string;
       proof: string;
       acceptPartialClaim: boolean;
-      mnemonic?: string;
     };
-    let web3 = await getWeb3(network, mnemonic);
+    let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
     let proofArray = fromProof(proof);
@@ -46,25 +46,3 @@ export default {
     console.log(`Claimed reward to safe ${rewardSafe}`);
   },
 } as CommandModule;
-
-const fromProof = (proof: string): any => {
-  if (proof == '0x') {
-    return [];
-  }
-  let bytesSize = 32;
-  let hexChunkSize = bytesSize * 2;
-  let hexStr = proof.replace('0x', '');
-  if (hexStr.length % hexChunkSize != 0) {
-    throw new Error('proof array is wrong size');
-  }
-  return chunkString(hexStr, hexChunkSize).map((s) => '0x' + s);
-};
-
-function chunkString(str: string, chunkSize: number) {
-  let arr = str.match(new RegExp('.{1,' + chunkSize + '}', 'g'));
-  if (arr) {
-    return arr;
-  } else {
-    throw new Error('proof cannot be converted to proof array  split properly');
-  }
-}

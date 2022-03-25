@@ -134,14 +134,14 @@ export default class Cards extends Service implements CardService {
     cardResponse: ResourceObject,
     format: Format,
     allFields = false
-  ): Promise<CardModelForBrowser> {
-    let schemaModule = cardResponse.meta?.schemaModule;
-    if (!schemaModule) {
+  ): Promise<CardModel> {
+    let schemaModuleRef = cardResponse.meta?.schemaModule;
+    if (!schemaModuleRef) {
       throw new Error(
         `card payload for ${cardResponse.id} has no meta.schemaModule`
       );
     }
-    if (typeof schemaModule !== 'string') {
+    if (typeof schemaModuleRef !== 'string') {
       throw new Error(
         `card payload for ${cardResponse.id} meta.schemaModule is not a string`
       );
@@ -162,11 +162,13 @@ export default class Cards extends Service implements CardService {
         type: 'loaded',
         url: cardResponse.id,
         allFields,
+        makeDataComplete: false,
       },
       {
         format,
         realm: realm as string,
-        schemaModule,
+        schemaModuleRef,
+        schemaModule: await this.loadModule(schemaModuleRef),
         rawData: cloneDeep(cardResponse.attributes ?? {}),
         componentModuleRef,
         saveModel: this.saveModel.bind(this),
@@ -241,7 +243,7 @@ export default class Cards extends Service implements CardService {
     return fullURL.join('');
   }
 
-  async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
+  async loadModule(moduleIdentifier: string): Promise<any> {
     if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
       // module was built by webpack, use webpack's implementation of `await
       // import()`

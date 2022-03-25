@@ -35,6 +35,9 @@ export default class RelayService {
 
   async provisionPrepaidCard(userAddress: string, sku: string): Promise<string> {
     let relayUrl = getConstantByNetwork('relayServiceURL', network);
+    if (!provisionerSecret) {
+      throw new Error(`Could not provision prepaid card because relay.provisionerSecret config is not set.`);
+    }
     let response = await fetch(`${relayUrl}/v1/prepaid-card/provision/${sku}/`, {
       method: 'POST',
       headers: {
@@ -45,14 +48,13 @@ export default class RelayService {
         owner: toChecksumAddress(userAddress),
       }),
     });
-    let body = await response.json();
     if (!response.ok) {
+      let body = await response.text();
       throw new Error(
-        `Could not provision prepaid card for customer ${userAddress}, sku ${sku}, received ${
-          response.status
-        } from relay server: ${JSON.stringify(body)}`
+        `Could not provision prepaid card for customer ${userAddress}, sku ${sku}, received ${response.status} from relay server: ${body}`
       );
     }
+    let body = await response.json();
     return body.txHash;
   }
 }

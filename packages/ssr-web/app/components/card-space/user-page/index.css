@@ -14,19 +14,20 @@
   color: var(--card-space-text-color);
   padding: min(var(--boxel-sp-xl), 5vw);
   border-radius: 2rem;
-  min-height: 90vh;
+  height: max(90vh, 44rem);
+  width: max(90vh, 44rem);
   max-width: 90%;
   aspect-ratio: 1;
   display: grid;
-  grid-template-columns: [user-content-start header-start] 100% [header-end user-content-end];
-  grid-template-rows: [header-start user-content-start] 2.5rem [header-end] 1fr [user-content-end];
+  grid-template-columns: 100%;
+  grid-template-rows: 2.5rem 1fr 2.5rem;
+  grid-template-areas: "header" "user-content" "unused";
 }
 
 .card-space-user-page__user-content {
   align-self: center;
   grid-area: user-content;
   max-width: 100%;
-  padding: 2.5rem 0;
 }
 
 .card-space-user-page__header {
@@ -41,7 +42,9 @@
   .card-space-user-page__wrapper {
     min-height: 100vh;
     min-width: 100%;
+    height: auto;
     border-radius: 0;
+    aspect-ratio: unset;
   }
 }
 
@@ -50,11 +53,11 @@
     inherit the text color so that the logo does not have contrast issues.
     background and text color on this page are dynamic.
   */
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .card-space-user-page__header > a:hover {
-  color: currentColor;
+  color: currentcolor;
 }
 
 .card-space-user-page__description {
@@ -69,7 +72,7 @@
   margin-left: auto;
   margin-right: auto;
   margin-bottom: var(--boxel-sp-xxl);
-  overflow-wrap: break-all;
+  overflow-wrap: break-word;
 }
 
 .card-space-user-page__url {
@@ -95,28 +98,30 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.payment-link__qr {
+.card-space-user-payment-link__qr {
   max-width: 100%;
 }
 
-.payment-link__qr-container__actions {
+.card-space-user-payment-link__qr-container__actions {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.payment-link__qr-container__actions > a {
+/* the violation below is for 2 different parents */
+/* stylelint-disable-next-line no-descending-specificity */
+.card-space-user-payment-link__qr-container__actions > a {
   margin: var(--boxel-sp-lg);
 }
 
-.payment-link__qr-container__separator {
+.card-space-user-payment-link__qr-container__separator {
   width: 100%;
   height: 1px;
   background: var(--boxel-light-600);
   margin-top: var(--boxel-sp-xs);
 }
 
-.payment-link__qr-container__separator-or {
+.card-space-user-payment-link__qr-container__separator-or {
   margin: auto;
   color: #000;
   background: #fff;

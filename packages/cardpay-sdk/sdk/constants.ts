@@ -30,7 +30,6 @@ const SOKOL = {
   bridgedCardTokenSymbol: 'CARD',
   name: 'Sokol',
   rpcNode: 'https://sokol.poa.network',
-  rpcArchiveNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
@@ -85,12 +84,12 @@ const XDAI = {
   bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'Gnosis Chain',
   rpcNode: 'https://polished-still-thunder.xdai.quiknode.pro/474f8faa313d36e0dc2604c1373655f7e26fdfb6/',
-  rpcArchiveNode: 'https://xdai-archive.blockscout.com',
   rpcWssNode: 'wss://polished-still-thunder.xdai.quiknode.pro/474f8faa313d36e0dc2604c1373655f7e26fdfb6/',
   rpcWssNodeNext: 'wss://polished-still-thunder.xdai.quiknode.pro/474f8faa313d36e0dc2604c1373655f7e26fdfb6/',
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+  tallyServiceURL: 'https://tally-service.stack.cards/api/v1',
 };
 
 type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;

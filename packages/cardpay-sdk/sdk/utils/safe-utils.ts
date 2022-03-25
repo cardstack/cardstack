@@ -29,6 +29,11 @@ export interface SendPayload extends Estimate {
   data: any;
 }
 
+export interface GasEstimate {
+  amount: BN;
+  gasToken: string;
+}
+
 export enum Operation {
   CALL = 0,
   DELEGATECALL = 1,

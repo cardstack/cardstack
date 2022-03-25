@@ -2,6 +2,7 @@
   {{#if this.showingQR}}
     <div class="payment-link__qr-container">
       <Boxel::StyledQrCode
+        class="payment-link__qr"
         @data={{@paymentURL}}
         @image={{@image}}
         @size={{340}}

@@ -1,8 +1,9 @@
 import * as JSON from 'json-typescript';
 import { CardstackError } from './utils/errors';
 import type { types as t } from '@babel/core';
-import { keys } from './utils';
+import { cardURL, keys } from './utils';
 import { Query } from './query';
+import type CardModel from './card-model';
 
 export { Query } from './query';
 
@@ -13,6 +14,7 @@ const componentFormats = {
 };
 export type Format = keyof typeof componentFormats;
 export const FORMATS = keys(componentFormats);
+export type { CardModel };
 
 export function isFormat(s: any): s is Format {
   return s && s in componentFormats;
@@ -25,7 +27,6 @@ const featureNamesMap = {
 export type FeatureFile = keyof typeof featureNamesMap | Format | 'asset';
 export const FEATURE_NAMES = [...keys(featureNamesMap), ...FORMATS];
 
-export type SerializerMap = Record<string, PrimitiveSerializer>;
 export interface PrimitiveSerializer {
   serialize(val: any): any;
   deserialize(val: any): any;
@@ -74,27 +75,28 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (typeof obj.realm !== 'string') {
     throw new CardstackError('A card requires a realm');
   }
+  let url = obj.url ?? cardURL(obj);
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
       let filePath = obj[featureFile];
       if (typeof filePath !== 'string') {
-        throw new CardstackError(`card.json for ${obj.url} has an invalid value for "${featureFile}"`);
+        throw new CardstackError(`card.json for ${url} has an invalid value for "${featureFile}"`);
       }
       filePath = filePath.replace(/^\.\//, '');
       if (!obj.files?.[filePath]) {
-        throw new CardstackError(`card.json for ${obj.url} refers to non-existent module ${obj[featureFile]}`);
+        throw new CardstackError(`card.json for ${url} refers to non-existent module ${obj[featureFile]}`);
       }
     }
   }
   if ('adoptsFrom' in obj) {
     if (typeof obj.adoptsFrom !== 'string') {
-      throw new CardstackError(`invalid adoptsFrom property in ${obj.url}`);
+      throw new CardstackError(`invalid adoptsFrom property in ${url}`);
     }
   }
 
   if ('data' in obj) {
     if (typeof obj.data !== 'object' || obj.data == null) {
-      throw new CardstackError(`invalid data property in ${obj.url}`);
+      throw new CardstackError(`invalid data property in ${url}`);
     }
   }
 }
@@ -148,7 +150,6 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
 
 export interface ComponentInfo<Ref extends ModuleRef = GlobalRef> {
   componentModule: Ref;
-  metaModule: Ref;
   usedFields: string[]; // ["title", "author.firstName"]
 
   // optional optimization when this card can be inlined into cards that use it
@@ -183,30 +184,13 @@ export interface Builder {
   getCompiledCard(url: string): Promise<CompiledCard>;
 }
 
-export interface CardModel {
-  setters: Setter | undefined;
-  adoptIntoRealm(realm: string, id?: string): CardModel;
-  editable(): Promise<CardModel>;
-  url: string;
-  id: string | undefined;
-  realm: string;
-  data: Record<string, any>;
-  getField(name: string): Promise<any>;
-  format: Format;
-  setData(data: RawCardData): void;
-  serialize(): ResourceObject<Saved | Unsaved>;
-  component(): Promise<unknown>;
-  save(): Promise<void>;
-  parentCardURL: string;
-}
-
 export interface CardModelArgs {
   realm: string;
-  schemaModule: string;
+  schemaModuleRef: string;
+  schemaModule: CardSchemaModule;
   format: Format;
   rawData: NonNullable<RawCard['data']>;
   componentModuleRef: ComponentInfo['componentModule']['global'];
-  componentMeta?: CardComponentMetaModule;
   saveModel: (model: CardModel, operation: 'create' | 'update') => Promise<ResourceObject<Saved>>;
 }
 
@@ -220,22 +204,22 @@ export interface CardService {
   loadModule<T extends Object>(moduleIdentifier: string): Promise<T>;
 }
 
+export interface CardSchema {
+  new (rawData: Record<string, any>, makeComplete: boolean, isDeserialized?: boolean): unknown;
+  serializedGet(schemaInstance: any, field: string): any;
+  serializedSet(schemaInstance: any, field: string, value: any): any;
+  serialize(schemaInstance: any, format: Format | 'all'): Record<string, any>;
+  hasField(fieldName: string): boolean;
+  loadedFields(schemaInstance: any): string[];
+}
+
 export interface CardSchemaModule {
-  default: {
-    new (fieldGetter: (fieldPath: string) => any): unknown;
-  };
+  default: CardSchema;
 }
 
-export interface CardComponentMetaModule {
-  serializerMap: SerializerMap;
-  computedFields: string[];
-  usedFields: string[];
-  allFields: string[];
-}
-
-export type CardComponentModule = {
+export interface CardComponentModule {
   default: unknown;
-} & CardComponentMetaModule;
+}
 
 export interface RealmConfig {
   url: string;

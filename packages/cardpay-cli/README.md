@@ -88,6 +88,8 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards transfer-safe <rewardSafe> <newOwner>`](#cardpay-rewards-transfer-safe-rewardsafe-newowner)
  - [`cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-from-safe-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
+ - [`cardpay rewards register-rewardee-gas-estimate <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-rewardee-gas-estimate-prepaidcard-rewardprogramid)
+ - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
  - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
@@ -103,8 +105,9 @@ Positionals:
   tokenAddress  The address of the token to get the balance of. Defaults to native token for network  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
@@ -118,8 +121,9 @@ Positionals:
   txnHash    Layer 2 transaction hash of the bridging transaction  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -133,8 +137,9 @@ Positionals:
   recipient  Layer 2 address that is the owner of the bridged tokens, defaults to wallet address  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -149,8 +154,9 @@ Positionals:
   signatures   The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)  [array] [required] [default: []]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
@@ -166,8 +172,9 @@ Positionals:
   receiver      Layer 1 address to receive the bridged tokens  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -182,8 +189,9 @@ Positionals:
   receiver      Layer 2 address to be the owner of L2 safe, defaults to same as L1 address  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
@@ -196,8 +204,9 @@ Positionals:
   token  The layer 2 CPXD token address of the token being withdrawn  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -210,8 +219,9 @@ Positionals:
   did  The DID to decode  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
       --network  [required]
 ```
 
@@ -224,8 +234,9 @@ Positionals:
   did  The DID to decode  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
       --network  [required]
 ```
 
@@ -238,8 +249,9 @@ Positionals:
   hubRootUrl  The URL of the hub server to authenticate with  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -254,8 +266,9 @@ Positionals:
   amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -270,8 +283,9 @@ Positionals:
   amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -285,8 +299,9 @@ Positionals:
   infoDID      The DID string that can be resolved to a DID document representing the merchant's information  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -299,8 +314,9 @@ Positionals:
   merchantSafe  The address of the merchant's safe whose balances are to be viewed  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -316,9 +332,11 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
       --force          Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
+      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -331,8 +349,9 @@ Positionals:
   tokenAddress  The token address of the token that will be used to pay for the prepaid card  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -347,8 +366,10 @@ Positionals:
   spendAmount   The amount to send to the merchant in units of SPEND  [number] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -358,8 +379,9 @@ Get the minimum and maximum prepaid card payment limits in SPEND
 
 ```
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -373,8 +395,9 @@ Positionals:
   spendFaceValue  The desired face value in SPEND for the prepaid card  [number] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -389,8 +412,10 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -405,8 +430,10 @@ Positionals:
   quantity     The amount of prepaid cards to create  [number] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -420,8 +447,10 @@ Positionals:
   newOwner     The address of the new owner  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -435,8 +464,9 @@ Positionals:
   prepaidCard  The prepaid card to add to the inventory  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -449,8 +479,9 @@ Positionals:
   sku  The SKU to obtain inventory for  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -463,8 +494,9 @@ Positionals:
   environment  The environment to query  [string] [required] [choices: "staging", "production"]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -480,8 +512,9 @@ Positionals:
   secret       The "provisioner secret" phrase to enable provisioning  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -495,8 +528,9 @@ Positionals:
   prepaidCards  A list of prepaid cards (separated by spaces) to remove from inventory  [array] [required] [default: []]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -511,8 +545,9 @@ Positionals:
   askPrice     The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU  [number] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -525,8 +560,9 @@ Positionals:
   sku  The SKU to obtain details for  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -540,8 +576,9 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -554,8 +591,9 @@ Positionals:
   token  The token symbol (without the .CPXD suffix)  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
@@ -569,8 +607,9 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
@@ -586,8 +625,9 @@ Positionals:
   amount           The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -602,8 +642,9 @@ Positionals:
   blob             Hex encoding of rule blob  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -617,8 +658,9 @@ Positionals:
   prepaidCard  The address of the prepaid card that is being used to pay the reward program registration fee  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -632,8 +674,9 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -649,8 +692,9 @@ Positionals:
   amount           The amount of tokens to recover into safe  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -665,8 +709,9 @@ Positionals:
   newAdmin         The EOA admin of reward program  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -681,8 +726,9 @@ Positionals:
   proof       The proof used to claim reward  [string] [required]
 
 Options:
-  -m, --mnemonic            Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic            Phrase for mnemonic wallet  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -696,10 +742,12 @@ Positionals:
   address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
 
 Options:
-  -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic         Phrase for mnemonic wallet  [string]
       --rewardProgramId  The reward program id.  [string]
       --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
+      --isValidOnly      Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo  [boolean]
   -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -709,8 +757,9 @@ List reward programs
 
 ```
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -723,8 +772,9 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -738,8 +788,10 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -752,8 +804,9 @@ Positionals:
   address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
 
 Options:
-  -m, --mnemonic         Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic         Phrase for mnemonic wallet  [string]
       --rewardProgramId  The reward program id.  [string]
   -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -768,8 +821,9 @@ Positionals:
   newOwner    The address of the new owner  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -785,8 +839,9 @@ Positionals:
   amount        The amount of tokens to transfer (not in units of wei, but in eth)  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -799,9 +854,45 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards register-rewardee-gas-estimate <prepaidCard> <rewardProgramId>`
+
+Obtain a gas estimate to register rewardee from prepaid card payments
+
+```
+Positionals:
+  prepaidCard      The address of the prepaid card that is being used to pay the merchant  [string] [required]
+  rewardProgramId  Reward program id  [string] [required]
+
+Options:
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
+
+Obtain a gas estimate to claim rewards to a reward safe
+
+```
+Positionals:
+  rewardSafe  The address of the rewardSafe which will receive the rewards  [string] [required]
+  leaf        The encoded the encoded bytes of merkle tree  [string] [required]
+  proof       The proof used to claim reward  [string] [required]
+
+Options:
+  -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic            Phrase for mnemonic wallet  [string]
+      --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
+  -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe list [address] [safeType]`
@@ -814,8 +905,9 @@ Positionals:
   safeType  The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -831,8 +923,9 @@ Positionals:
   amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -848,8 +941,9 @@ Positionals:
   amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
@@ -862,8 +956,9 @@ Positionals:
   safeAddress  The address of the safe to view  [string]
 
 Options:
-  -m, --mnemonic       Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE  [string]
   -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
   -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 

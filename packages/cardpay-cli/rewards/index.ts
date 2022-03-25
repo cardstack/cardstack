@@ -9,6 +9,8 @@ import rewardBalances from './reward-balances';
 import transferSafe from './transfer-safe';
 import withdrawFromSafe from './withdraw-from-safe';
 import view from './view';
+import registerRewardeeGasEstimate from './register-rewardee-gas-estimate';
+import claimRewardGasEstimate from './claim-reward-gas-estimate';
 
 export const command = 'rewards <command>';
 export const desc = 'Commands to get interact with the reward programs and the reward manager contract';
@@ -26,6 +28,8 @@ export const builder = function (yargs: Argv) {
       transferSafe,
       withdrawFromSafe,
       view,
+      registerRewardeeGasEstimate,
+      claimRewardGasEstimate,
     ] as any)
     .demandCommand(1, 'You must specify a valid subcommand');
 };

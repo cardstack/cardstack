@@ -64,7 +64,7 @@ export default class CardRoutes {
     }
 
     let card = parentCard.adoptIntoRealm(realmURL, cardId);
-    await card.setData(data.attributes);
+    await card.setData(data.attributes, true);
     await card.save();
     ctx.body = { data: card.serialize() };
     ctx.status = 201;
@@ -80,7 +80,7 @@ export default class CardRoutes {
 
     let format = getCardFormatFromRequest(ctx.query.format);
     let card = await (await this.cardService.as(INSECURE_CONTEXT)).loadModel(url, format);
-    await card.setData(data.attributes);
+    await card.setData(data.attributes, true);
     await card.save();
     ctx.body = { data: card.serialize() };
     ctx.status = 200;
