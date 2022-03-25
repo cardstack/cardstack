@@ -327,15 +327,19 @@ This method returns a promise that includes an array of all the gnosis safes own
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
+  createdAt: number;
   tokens: TokenInfo[];
+  owners: string[];
 }
 interface DepotSafe extends BaseSafe {
   type: 'depot';
   infoDID: string | undefined;
 }
-interface MerchantSafe extends BaseSafe {
+export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
-  infoDID: string | undefined;
+  accumulatedSpendValue: number;
+  merchant: string;
+  infoDID?: string;
 }
 interface RewardSafe extends BaseSafe {
     type: 'reward';
@@ -344,13 +348,16 @@ interface RewardSafe extends BaseSafe {
 interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
-interface PrepaidCardSafe extends BaseSafe {
+export interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
+  prepaidCardOwner: string;
+  hasBeenUsed: boolean;
   issuer: string;
   reloadable: boolean;
-  customizationDID: string | undefined;
+  transferrable: boolean;
+  customizationDID?: string;
 }
 ```
 
