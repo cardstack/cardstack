@@ -12,11 +12,6 @@ import { CallExpression } from '@babel/types';
 import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 import { isEmpty } from 'lodash';
 
-export interface TemplateUsageMeta {
-  model: 'self' | Set<string>;
-  fields: 'self' | Map<string, Format | 'default'>;
-}
-
 interface TransformComponentOptions {
   templateSource: string;
   debugPath: string;
@@ -42,7 +37,7 @@ export default function (params: TransformComponentOptions): {
 
     // This will become the semantic phase
     let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta);
-    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta.usage, params.fields, params.defaultFieldFormat)
+    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta, params.fields, params.defaultFieldFormat)
       ? meta.rawHBS
       : undefined;
 
@@ -58,7 +53,8 @@ export default function (params: TransformComponentOptions): {
 }
 
 export interface ComponentMeta {
-  usage: TemplateUsageMeta;
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
   hasModifiedScope: boolean;
   rawHBS: string | undefined;
 }
@@ -74,7 +70,8 @@ interface AnalyzePluginState {
 
 export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
   let meta: ComponentMeta = {
-    usage: { model: new Set(), fields: new Map() },
+    model: new Set(),
+    fields: new Map(),
     hasModifiedScope: false,
     rawHBS: undefined,
   };
@@ -118,7 +115,7 @@ function babelPluginComponentAnalyze(babel: typeof Babel) {
             state.opts.meta.hasModifiedScope = !!getObjectKey(precompileTemplateOptions, 'scope', t);
 
             glimmerTemplateAnalyze(rawTemplate, {
-              usageMeta: state.opts.meta.usage,
+              meta: state.opts.meta,
               debugPath: state.opts.debugPath,
             });
           }
@@ -313,19 +310,18 @@ function buildUsedFieldsListFromUsageMeta(
   defaultFieldFormat: Format,
   meta: ComponentMeta
 ): ComponentInfo['usedFields'] {
-  let usageMeta = meta.usage;
   let usedFields: Set<string> = new Set();
 
-  if (usageMeta.model && usageMeta.model !== 'self') {
-    for (const fieldPath of usageMeta.model) {
+  if (meta.model && meta.model !== 'self') {
+    for (const fieldPath of meta.model) {
       usedFields.add(fieldPath);
     }
   }
 
-  if (usageMeta.fields === 'self') {
+  if (meta.fields === 'self') {
     usedFields = new Set([...usedFields, ...Object.keys(fields)]);
   } else {
-    for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
+    for (const [fieldPath, fieldFormat] of meta.fields.entries()) {
       buildUsedFieldListFromComponents(
         usedFields,
         fieldPath,
@@ -362,7 +358,7 @@ function buildUsedFieldListFromComponents(
 
 function canInlineHBS(
   hasModifiedScope: boolean,
-  usageMeta: TemplateUsageMeta,
+  meta: ComponentMeta,
   fields: CompiledCard['fields'],
   defaultFieldFormat: Format
 ): boolean {
@@ -375,10 +371,10 @@ function canInlineHBS(
   }
 
   let fieldsToInspect: [string, Format | 'default'][];
-  if (usageMeta.fields === 'self') {
+  if (meta.fields === 'self') {
     fieldsToInspect = Object.keys(fields).map((path) => [path, defaultFieldFormat]);
   } else {
-    fieldsToInspect = [...usageMeta.fields.entries()];
+    fieldsToInspect = [...meta.fields.entries()];
   }
 
   // If every field this card uses is inlinable, then this card can be inlined as well
