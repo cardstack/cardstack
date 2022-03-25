@@ -48,7 +48,10 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   get currentApp(): 'card-space' | 'wallet' {
-    if (this.hostSuffixPattern.test(this.host)) {
+    if (
+      this.hostSuffixPattern.test(this.host) ||
+      this.host.includes(previewSubdomain)
+    ) {
       return 'card-space';
     } else {
       return 'wallet';
@@ -61,7 +64,7 @@ export default class AppContext extends Service implements AppContextService {
 
   get cardSpaceId() {
     if (this.isCardSpace) {
-      if (this.host.includes(previewSubdomain) && this.queryIsCardSpace) {
+      if (this.queryIsCardSpace) {
         return cardSpaceSlugQueryRegex.exec(window.location.search)![1];
       } else {
         let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
