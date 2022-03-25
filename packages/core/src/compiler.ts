@@ -16,6 +16,7 @@ import {
   CardModules,
   CompiledCard,
   ComponentInfo,
+  Field,
   Format,
   FORMATS,
   GlobalRef,
@@ -53,6 +54,15 @@ interface AssetModule {
 
 type InputModules = Record<string, JSSourceModule | AssetModule>;
 
+export type FieldWithPlaceholder = Omit<Field, 'card'> & { card: CompiledCard | 'self' };
+export interface FieldsWithPlaceholders {
+  [fieldName: string]: FieldWithPlaceholder;
+}
+type CompiledCardWithPlaceholders<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> = Omit<
+  CompiledCard<Identity, Ref>,
+  'fields'
+> & { fields: FieldsWithPlaceholders };
+
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
@@ -80,7 +90,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let outputModules = await this.transformFiles(inputModules, recompiledComponents, fields, parentCard);
     let componentInfos = this.buildComponentInfos(reusedComponents);
 
-    return {
+    let compiledCard = {
       realm: cardSource.realm,
       url: (cardSource.id ? `${cardSource.realm}${cardSource.id}` : undefined) as Identity,
       schemaModule: this.getSchemaModuleRef(parentCard, cardSource.schema),
@@ -91,15 +101,36 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       modules: outputModules,
       deps: [...this.dependencies],
     };
+    return this.resolveFieldsWithPlaceholders(compiledCard);
   }
 
-  private assertData(fields: CompiledCard['fields']) {
+  private assertData(fields: FieldsWithPlaceholders) {
     if (this.cardSource.data) {
       let unexpectedFields = difference(Object.keys(this.cardSource.data), Object.keys(fields));
       if (unexpectedFields.length) {
         throw new BadRequest(`Field(s) "${unexpectedFields.join(',')}" does not exist on this card`);
       }
     }
+  }
+
+  private resolveFieldsWithPlaceholders(
+    enclosingCard: CompiledCardWithPlaceholders<Identity, ModuleRef> | CompiledCard<Identity, ModuleRef>,
+    currentCard?: CompiledCardWithPlaceholders<Identity, ModuleRef> | CompiledCard<Identity, ModuleRef>
+  ): CompiledCard<Identity, ModuleRef> {
+    let fields: { [fieldName: string]: Field<Identity, ModuleRef> } = {};
+    let card = currentCard ?? enclosingCard;
+    for (let [fieldName, field] of Object.entries(card.fields)) {
+      if (field.card === 'self') {
+        fields[fieldName] = { ...field, card: enclosingCard as CompiledCard<Identity, ModuleRef> };
+      } else {
+        fields[fieldName] = {
+          ...field,
+          card: this.resolveFieldsWithPlaceholders(enclosingCard, field.card),
+        };
+      }
+    }
+    card.fields = fields;
+    return card as CompiledCard<Identity, ModuleRef>;
   }
 
   private async inheritComponents(parentCard: CompiledCard | undefined) {
@@ -149,7 +180,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private async transformFiles(
     inputModules: InputModules,
     recompiledComponents: Record<string, string>,
-    fields: CompiledCard['fields'],
+    fields: FieldsWithPlaceholders,
     parentCard: CompiledCard | undefined
   ) {
     let { cardSource } = this;
@@ -182,7 +213,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     localPath: string,
     recompiledComponents: Record<string, string>,
     mod: JSSourceModule | AssetModule,
-    fields: CompiledCard['fields'],
+    fields: FieldsWithPlaceholders,
     parentCard: CompiledCard | undefined
   ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let { cardSource } = this;
@@ -360,7 +391,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private prepareSchema(
     schemaModule: JSSourceModule,
-    fields: CompiledCard['fields'],
+    fields: FieldsWithPlaceholders,
     parent: CompiledCard | undefined
   ) {
     let { source, ast, meta } = schemaModule;
@@ -384,16 +415,16 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private async lookupFieldsForCard(
     inputModules: InputModules,
     parentCard: CompiledCard | undefined
-  ): Promise<CompiledCard['fields']> {
+  ): Promise<FieldsWithPlaceholders> {
     let { realm, schema } = this.cardSource;
-    let fields: CompiledCard['fields'] = {};
+    let fields: FieldsWithPlaceholders = {};
     if (schema) {
       let metaFields = this.getSourceModule(inputModules, schema).meta.fields;
       for (let [name, { cardURL, type, computed }] of Object.entries(metaFields)) {
-        let fieldURL = resolveCard(cardURL, realm);
+        let fieldURL = cardURL === '.' ? '.' : resolveCard(cardURL, realm);
         try {
           fields[name] = {
-            card: await this.builder.getCompiledCard(fieldURL),
+            card: fieldURL === '.' ? 'self' : await this.builder.getCompiledCard(fieldURL),
             type,
             name,
             computed,
@@ -413,7 +444,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     return this.adoptFields(fields, parentCard);
   }
 
-  private adoptFields(fields: CompiledCard['fields'], parentCard: CompiledCard | undefined): CompiledCard['fields'] {
+  private adoptFields(fields: FieldsWithPlaceholders, parentCard: CompiledCard | undefined): FieldsWithPlaceholders {
     if (!parentCard) {
       return fields;
     }
@@ -460,7 +491,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private compileComponent(
     mod: JSSourceModule,
-    fields: CompiledCard['fields'],
+    fields: FieldsWithPlaceholders,
     format: Format
   ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
     let componentTransformResult = transformCardComponent({

@@ -3,13 +3,14 @@ import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
-import { CompiledCard, ComponentInfo, Format } from './interfaces';
+import { ComponentInfo, Format } from './interfaces';
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildUsedFieldsListFromUsageMeta } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
 import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
+import { FieldsWithPlaceholders } from './compiler';
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
@@ -19,7 +20,7 @@ export interface TemplateUsageMeta {
 interface TransformComponentOptions {
   templateSource: string;
   debugPath: string;
-  fields: CompiledCard['fields'];
+  fields: FieldsWithPlaceholders;
   defaultFieldFormat: Format;
   resolveImport: (relativePath: string) => string;
 }

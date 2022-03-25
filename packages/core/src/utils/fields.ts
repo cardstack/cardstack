@@ -1,17 +1,18 @@
-import { CardSchema, CompiledCard, ComponentInfo, Field, Format } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import { TemplateUsageMeta } from '../babel-plugin-card-template';
 import isPlainObject from 'lodash/isPlainObject';
+import { FieldsWithPlaceholders, FieldWithPlaceholder } from '../compiler';
+import { CardSchema, ComponentInfo, Format } from '../interfaces';
 
-export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
+export function getFieldForPath(fields: FieldsWithPlaceholders, path: string): FieldWithPlaceholder | undefined {
   let paths = path.split('.');
   let [first, ...tail] = paths;
 
   let field = fields[first];
 
-  if (paths.length > 1) {
+  if (paths.length > 1 && field.card !== 'self') {
     return getFieldForPath(field.card.fields, tail.join('.'));
   }
 
@@ -19,7 +20,7 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
 }
 
 export function buildUsedFieldsListFromUsageMeta(
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   defaultFieldFormat: Format,
   usageMeta: TemplateUsageMeta
 ): ComponentInfo['usedFields'] {
@@ -49,13 +50,13 @@ export function buildUsedFieldsListFromUsageMeta(
 function buildUsedFieldListFromComponents(
   usedFields: Set<string>,
   fieldPath: string,
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   format: Format,
   prefix?: string
 ): void {
   let field = getFieldForPath(fields, fieldPath);
 
-  if (field && field.card.componentInfos[format].usedFields.length) {
+  if (field && field.card !== 'self' && field.card.componentInfos[format].usedFields.length) {
     for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
       buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
     }
