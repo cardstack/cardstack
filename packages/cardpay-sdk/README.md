@@ -790,7 +790,7 @@ The leaf item contains most information about the claim, such as the reward prog
 
 ### `RewardPool.claimGasEstimate`
 
-The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive 10 CARD - (gas fees in CARD) into their reward safe. 
+The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive `10 CARD - (gas fees in CARD)` into their reward safe. 
 
 ```ts
 interface GasEstimate {
