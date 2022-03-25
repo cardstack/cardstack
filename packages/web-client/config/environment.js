@@ -26,7 +26,7 @@ module.exports = function (environment) {
   // Treat preview deployments (ex s3-preview-production) akin to main deployments
   if (deployTarget.endsWith('staging')) {
     deployTargetClass = 'staging';
-  } else (deployTarget.endsWith('production')) {
+  } else if (deployTarget.endsWith('production')) {
     deployTargetClass = 'production';
   }
 
