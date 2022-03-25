@@ -46,4 +46,4 @@ runs:
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/$REPOSITORY/statuses/$HEAD_SHA \
-          -d '{"context":"Preview ${{ inputs.environment }}","description":"${{ inputs.environment }} deployment of this branch","target_url":"'"$PREVIEW_HOST"'","state":"success"}'
+          -d '{"context":"Preview web-client ${{ inputs.environment }}","description":"${{ inputs.environment }} deployment of this branch","target_url":"'"$PREVIEW_HOST"'","state":"success"}'
