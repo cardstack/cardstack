@@ -78,16 +78,11 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: deployTargetClassIsProduction
-        ? 'eth'
-        : 'keth',
-      layer2: deployTargetClassIsProduction
-        ? 'xdai'
-        : 'sokol',
+      layer1: deployTargetClassIsProduction ? 'eth' : 'keth',
+      layer2: deployTargetClassIsProduction ? 'xdai' : 'sokol',
     },
     features: {},
-    infuraId:
-      infuraIdsByTarget[deployTargetClass] ?? process.env.INFURA_ID,
+    infuraId: infuraIdsByTarget[deployTargetClass] ?? process.env.INFURA_ID,
     urls: {
       about: 'https://cardstack.com/cardpay',
       appStoreLink:
@@ -104,7 +99,7 @@ module.exports = function (environment) {
       '/images/icon-favicon-32x32.png',
     ].map((v) => {
       return (
-        deployTargetClassIsProduction
+        (deployTargetClassIsProduction
           ? 'https://app.cardstack.com'
           : 'https://app-staging.stack.cards') + v
       );
