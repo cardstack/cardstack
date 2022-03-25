@@ -30,7 +30,6 @@ declare const config: {
   podModulePrefix: string;
   locationType: string;
   rootURL: string;
-  assetRoot: string;
   hubURL: string;
   universalLinkDomain: string;
   cardSpaceHostnameSuffix: string;

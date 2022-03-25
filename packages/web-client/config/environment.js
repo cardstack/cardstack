@@ -35,10 +35,6 @@ module.exports = function (environment) {
     modulePrefix: '@cardstack/web-client',
     environment,
     rootURL: '/',
-    // FIXME semi-duplicated in ember-cli-build.js, though no trailing / and '' instead of /
-    assetRoot: (process.env.DEPLOY_TARGET || '').startsWith('s3-preview')
-      ? `${process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT}/${process.env.PR_BRANCH_NAME}`
-      : '',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
