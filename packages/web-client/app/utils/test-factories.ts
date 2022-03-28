@@ -2,6 +2,7 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   DepotSafe,
+  RewardSafe,
 } from '@cardstack/cardpay-sdk';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 import { Resolver } from 'did-resolver';
@@ -166,6 +167,34 @@ export const createPrepaidCardSafe = (
     // Generate addresses here
   };
 };
+
+const defaultRewardSafe: RewardSafe = {
+  address: 'DEFAULT_REWARD_ADDRESS',
+  createdAt: DEFAULT_CREATED_AT_DATE,
+  tokens: [],
+  owners: ['DEFAULT_REWARD_OWNER_ADDRESS'],
+  type: 'reward',
+  rewardProgramId: 'FIXME_WHAT_DOES_IT_MEAN',
+};
+/**
+ * Defaults create a freshly created reward without customization:
+ * {
+ *   address: 'DEFAULT_REWARD_ADDRESS', // should be overwritten in factory
+ *   createdAt: DEFAULT_CREATED_AT_DATE,
+ *   tokens: [],
+ *   owners: ['DEFAULT_REWARD_OWNER_ADDRESS'], // should be overwritten in factory
+ *   type: 'reward',
+ *   accumulatedSpendValue: 0,
+ *   reward: 'EOA_ADDRESS', // should be overwritten in factory
+ * }
+ */
+export const createRewardSafe = (opts: Partial<RewardSafe>): RewardSafe => ({
+  ...defaultRewardSafe,
+  createdAt: DEFAULT_CREATED_AT_DATE,
+  ...opts,
+  address: opts.address || generateMockAddress(),
+  owners: opts.owners || [generateMockAddress()],
+});
 
 const defaultDepotSafe: DepotSafe = {
   address: 'DEFAULT_DEPOT_ADDRESS', // should be overwritten in factory

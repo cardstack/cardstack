@@ -13,6 +13,7 @@ import {
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
+  createRewardSafe,
 } from '@cardstack/web-client/utils/test-factories';
 
 module(
@@ -26,6 +27,7 @@ module(
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+    let rewardAddress = '0xrewardAAbAB0644ffCD32518eBF4924ba8666666';
     let secondLayer2AccountAddress =
       '0x22222222222222222222222222222222222222222';
     let secondMerchantAddress = '0xmerchant22222222222222222222222222222222';
@@ -71,6 +73,10 @@ module(
           prepaidCardOwner: layer2AccountAddress,
           issuer: layer2AccountAddress,
           transferrable: false,
+        }),
+        createRewardSafe({
+          address: rewardAddress,
+          owners: [layer2AccountAddress],
         }),
       ]);
 
@@ -125,13 +131,17 @@ module(
       await click(
         '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
       );
-      assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      assert.dom('.ember-power-select-options li').exists({ count: 3 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
         .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
         .containsText(merchantAddress);
+      assert
+        .dom('.ember-power-select-options li:nth-child(3)')
+        .containsText('Unknown')
+        .containsText(rewardAddress);
       await click('.ember-power-select-options li:nth-child(2)');
 
       assert

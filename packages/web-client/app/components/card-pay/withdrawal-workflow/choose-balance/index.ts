@@ -14,7 +14,7 @@ import BN from 'bn.js';
 import { reads } from 'macro-decorators';
 
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
-  compatibleSafeTypes = ['depot', 'merchant'];
+  compatibleSafeTypes = ['depot', 'merchant', 'reward'];
 
   @reads('layer2Network.defaultTokenSymbol')
   defaultTokenSymbol!: BridgedTokenSymbol;
