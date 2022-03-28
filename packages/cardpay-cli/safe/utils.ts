@@ -17,6 +17,9 @@ export function displaySafe(address: string, safe: Safe): void {
   if (safe.type === 'merchant') {
     console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
   }
+  if (safe.type === 'reward') {
+    console.log(`Reward Program ID: ${safe.rewardProgramId}`);
+  }
   if (tokens.length === 0) {
     console.log('No tokens in safe');
   }
