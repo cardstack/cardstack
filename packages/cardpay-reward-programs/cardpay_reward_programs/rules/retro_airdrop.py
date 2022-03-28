@@ -1,4 +1,5 @@
 import pandas as pd
+from eth_utils import is_checksum_address
 from cardpay_reward_programs.rule import Rule
 
 
@@ -21,14 +22,17 @@ class RetroAirdrop(Rule):
         start_snapshot_block,
         end_snapshot_block,
         test_accounts,
-        test_reward
+        test_reward,
     ):
         self.token = token
         self.duration = duration
         self.total_reward = total_reward
         self.start_snapshot_block = start_snapshot_block
         self.end_snapshot_block = end_snapshot_block
-        self.test_accounts = set(account.lower() for account in test_accounts)
+        for account in test_accounts:
+            if not is_checksum_address(account):
+                raise ValueError(f"{account} is not a valid checksum address")
+        self.test_accounts = test_accounts
         self.test_reward = test_reward
 
     def sql(self, table_query):
@@ -42,17 +46,17 @@ class RetroAirdrop(Rule):
         """
 
     def get_reward_per_transaction(self):
-        total_n_payments = self.count_rows(self.start_snapshot_block, self.end_snapshot_block)
+        total_n_payments = self.count_rows(
+            self.start_snapshot_block, self.end_snapshot_block
+        )
         reward_per_transaction = self.total_reward / total_n_payments
         if total_n_payments == 0:
             return 0
         else:
             return reward_per_transaction
 
-    def calculate_airdrop_reward_amounts(
-        self, df, payment_cycle, reward_program_id
-    ):
-        mask = df['payee'].str.lower().isin(self.test_accounts)
+    def calculate_airdrop_reward_amounts(self, df, payment_cycle, reward_program_id):
+        mask = df["payee"].isin(self.test_accounts)
         new_df = df[~mask].copy()
         reward_per_transaction = int(self.total_reward // new_df["transactions"].sum())
         new_df["rewardProgramID"] = reward_program_id
@@ -73,21 +77,30 @@ class RetroAirdrop(Rule):
                 "validFrom": payment_cycle,
                 "validTo": payment_cycle + self.duration,
                 "token": self.token,
-                "amount": self.test_reward
-            } for account in self.test_accounts
+                "amount": self.test_reward,
+            }
+            for account in self.test_accounts
         )
-
 
     def run(self, payment_cycle: int, reward_program_id: str):
         vars = [self.start_snapshot_block, self.end_snapshot_block]
-        table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", self.start_snapshot_block, self.end_snapshot_block)
+        table_query = self._get_table_query(
+            "prepaid_card_payment",
+            "prepaid_card_payment",
+            self.start_snapshot_block,
+            self.end_snapshot_block,
+        )
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "transactions"])
         else:
             base_df = self.run_query(table_query, vars)
-        airdrop_payments = self.calculate_airdrop_reward_amounts(base_df, payment_cycle, reward_program_id)
+        airdrop_payments = self.calculate_airdrop_reward_amounts(
+            base_df, payment_cycle, reward_program_id
+        )
         if len(self.test_accounts) > 0 and self.test_reward > 0:
-            test_payments = self.get_test_reward_amounts(payment_cycle, reward_program_id)
+            test_payments = self.get_test_reward_amounts(
+                payment_cycle, reward_program_id
+            )
             return pd.concat([airdrop_payments, test_payments])
         else:
             return airdrop_payments
