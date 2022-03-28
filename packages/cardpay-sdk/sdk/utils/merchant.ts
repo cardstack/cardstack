@@ -33,10 +33,10 @@ export const generateMerchantPaymentUrl = ({
   network,
   currency,
 }: MerchantPaymentURLParams) => {
-  const handleAmountAndCurrency = currency ? `${amount ? `amount=${amount}&` : ''}currency=${currency}` : '';
+  const handleAmountAndCurrency = currency ? `?${amount ? `amount=${amount}&` : ''}currency=${currency}` : '';
   const https = isUniversalDomain(domain) ? 'https://' : '';
 
-  return `${https}${domain}/pay/${network}/${merchantSafeID}?${handleAmountAndCurrency}`;
+  return `${https}${domain}/pay/${network}/${merchantSafeID}${handleAmountAndCurrency}`;
 };
 
 // see https://github.com/cardstack/cardstack/pull/2095 for test cases used during dev
