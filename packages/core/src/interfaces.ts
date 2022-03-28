@@ -128,6 +128,8 @@ export interface CardModule {
   ast?: t.File;
 }
 
+export type ComponentInfos<Ref extends ModuleRef = ModuleRef> = Record<Format, ComponentInfo<Ref>>;
+
 // CompiledCard is everything you need when operating at the level of code &
 // schema changes. It should not be needed just to render and edit data of
 // cards.
@@ -141,10 +143,8 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   schemaModule: Ref;
   serializerModule?: Ref;
 
-  componentInfos: Record<Format, ComponentInfo<Ref>>;
-
+  componentInfos: ComponentInfos<Ref>;
   modules: CardModules;
-
   deps: string[];
 }
 

@@ -22,11 +22,6 @@ class InvalidFieldsUsageError extends Error {
 
 type ImportAndChooseName = (desiredName: string, moduleSpecifier: string, importedName: string) => string;
 
-export interface TemplateUsageMeta {
-  model: 'self' | Set<string>;
-  fields: 'self' | Map<string, Format | 'default'>;
-}
-
 export interface Options {
   fields: FieldsWithPlaceholders;
   defaultFieldFormat: Format;

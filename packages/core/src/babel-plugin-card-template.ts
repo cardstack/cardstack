@@ -1,4 +1,4 @@
-import { transformSync, transformFromAstSync } from '@babel/core';
+import { transformFromAstSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
@@ -9,15 +9,17 @@ import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
-import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 import { FieldsWithPlaceholders } from './compiler';
 import { isEmpty } from 'lodash';
+import { ComponentMeta } from './analyze';
 
 interface TransformComponentOptions {
+  ast: t.File;
   templateSource: string;
   debugPath: string;
   fields: FieldsWithPlaceholders;
   defaultFieldFormat: Format;
+  meta: ComponentMeta;
   resolveImport: (relativePath: string) => string;
 }
 
@@ -32,91 +34,26 @@ export default function (params: TransformComponentOptions): {
   let debugPath = '/' + params.debugPath.replace(/^\//, '');
 
   try {
-    // this part will move into compiler's analyze phase, so it shouldn't use
-    // any knowledge of CompiledCard, shouldn't resolve imports, etc.
-    let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
-
     // This will become the semantic phase
-    let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta);
-    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta, params.fields, params.defaultFieldFormat)
-      ? meta.rawHBS
+    let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, params.meta.usage);
+    let inlineHBS = canInlineHBS(
+      params.meta.hasModifiedScope,
+      params.meta.usage,
+      params.fields,
+      params.defaultFieldFormat
+    )
+      ? params.meta.rawHBS
       : undefined;
 
     return {
       // this part will move into the compiler's transform phase
-      ...transformComponent({ ...params, debugPath }, ast, meta),
+      ...transformComponent({ ...params, debugPath }, params.ast, params.meta),
       usedFields,
       inlineHBS,
     };
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
-}
-
-export interface ComponentMeta {
-  model: 'self' | Set<string>;
-  fields: 'self' | Map<string, Format | 'default'>;
-  hasModifiedScope: boolean;
-  rawHBS: string | undefined;
-}
-
-interface AnalyzePluginOptions {
-  meta: ComponentMeta | undefined;
-  debugPath: string;
-}
-interface AnalyzePluginState {
-  opts: AnalyzePluginOptions;
-  insideExportDefault: boolean;
-}
-
-export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
-  let options: AnalyzePluginOptions = { debugPath: debugFilename, meta: undefined };
-
-  let out = transformSync(templateSource, {
-    ast: true,
-    code: false,
-    plugins: [[babelPluginComponentAnalyze, options]],
-    filename: debugFilename,
-  });
-
-  return { ast: out!.ast!, meta: options.meta! };
-}
-
-function babelPluginComponentAnalyze(babel: typeof Babel) {
-  let t = babel.types;
-  return {
-    visitor: {
-      Program: {
-        enter(_path: NodePath<t.Program>, state: AnalyzePluginState) {
-          state.insideExportDefault = false;
-        },
-      },
-
-      ExportDefaultDeclaration: {
-        enter(_path: NodePath, state: AnalyzePluginState) {
-          state.insideExportDefault = true;
-        },
-        exit(_path: NodePath, state: AnalyzePluginState) {
-          state.insideExportDefault = false;
-        },
-      },
-
-      CallExpression: {
-        enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
-          if (isComponentTemplateExpression(path, state)) {
-            let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
-            let { fields, model } = glimmerTemplateAnalyze(rawTemplate, state.opts.debugPath);
-            state.opts.meta = {
-              rawHBS: rawTemplate,
-              hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
-              fields,
-              model,
-            };
-          }
-        },
-      },
-    },
-  };
 }
 
 function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: ComponentMeta) {
@@ -194,17 +131,15 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
   updatePrecompileTemplateScopeOption(options, neededScope, t);
 }
 
-function isComponentTemplateExpression(
-  path: NodePath<t.CallExpression>,
-  state: TransformState | AnalyzePluginState
-): boolean {
+function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: TransformState): boolean {
   return (
     state.insideExportDefault &&
     path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
   );
 }
 
-function validateAndGetComponent(
+// TODO: Should this be exported from here or placed somewhere else?
+export function validateAndGetComponent(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
 ): {
@@ -302,7 +237,7 @@ function updatePrecompileTemplateScopeOption(
 function buildUsedFieldsListFromUsageMeta(
   fields: FieldsWithPlaceholders,
   defaultFieldFormat: Format,
-  meta: ComponentMeta
+  meta: ComponentMeta['usage']
 ): ComponentInfo['usedFields'] {
   let usedFields: Set<string> = new Set();
 
@@ -352,7 +287,7 @@ function buildUsedFieldListFromComponents(
 
 function canInlineHBS(
   hasModifiedScope: boolean,
-  meta: ComponentMeta,
+  meta: ComponentMeta['usage'],
   fields: FieldsWithPlaceholders,
   defaultFieldFormat: Format
 ): boolean {

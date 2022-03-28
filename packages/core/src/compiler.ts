@@ -288,7 +288,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
         source,
       };
     } else {
-      let { code, ast, meta } = analyzeCardModule(source);
+      let { code, ast, meta } = analyzeCardModule(
+        source,
+        debugPath(this.cardSource.realm, this.cardSource.id, localPath)
+      );
 
       return {
         type: 'js',
@@ -495,8 +498,10 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     format: Format
   ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
     let componentTransformResult = transformCardComponent({
+      ast: mod.ast,
       templateSource: mod.source,
-      debugPath: `${this.cardSource.realm}${this.cardSource.id ?? 'NEW_CARD'}/${mod.localPath}`,
+      meta: mod.meta.component!,
+      debugPath: debugPath(this.cardSource.realm, this.cardSource.id, mod.localPath),
       fields,
       defaultFieldFormat: defaultFieldFormat(format),
       resolveImport: this.buildResolver(mod),
@@ -700,4 +705,8 @@ function assertAllComponentInfos(
   if (FORMATS.some((f) => !infos[f])) {
     throw new CardstackError(`bug: we're missing a component info`);
   }
+}
+
+function debugPath(realm: string, id: string | undefined, localPath: string): string {
+  return `${realm}${id ?? 'NEW_CARD'}/${localPath}`;
 }

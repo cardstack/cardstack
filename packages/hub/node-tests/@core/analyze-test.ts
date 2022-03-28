@@ -1,5 +1,4 @@
 import cardAnalyze, { ExportMeta } from '@cardstack/core/src/analyze';
-import { analyzeComponent as fullAnalyzeComponent } from '@cardstack/core/src/babel-plugin-card-template';
 import { InvalidFieldsUsageError, InvalidModelUsageError } from '@cardstack/core/src/glimmer-plugin-component-analyze';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 
@@ -7,10 +6,10 @@ if (process.env.COMPILER) {
   describe('card analyze', function () {
     it('Returns empty meta information when there is nothing of note in the file', function () {
       let source = `function serializer() {}`;
-      let out = cardAnalyze(source);
+      let out = cardAnalyze(source, 'test.js');
       expect(out).to.have.property('ast');
       expect(out.code).to.equal(source);
-      expect(out.meta).to.deep.equal({ fields: {} });
+      expect(out.meta).to.deep.equal({ component: undefined, fields: {} });
     });
 
     it('It captures meta information about exports in the file', function () {
@@ -19,7 +18,7 @@ if (process.env.COMPILER) {
         export default class FancyClass {}
         export const KEEP = 'ME AROUND';
       `;
-      let out = cardAnalyze(source);
+      let out = cardAnalyze(source, 'test.js');
       expect(out.code).to.containsSource(source);
       expect(out).to.have.property('ast');
       expect(out.meta).to.have.property('exports');
@@ -46,7 +45,7 @@ if (process.env.COMPILER) {
   	      @contains(date) settlementDate;
   	    }
   	  `;
-      let out = cardAnalyze(source);
+      let out = cardAnalyze(source, 'test.js');
       expect(out).to.have.property('ast');
       expect(out).to.have.property('code');
       expect(out).to.have.property('meta');
@@ -102,7 +101,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      let { meta } = cardAnalyze(source);
+      let { meta } = cardAnalyze(source, 'test.js');
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',
@@ -134,7 +133,7 @@ if (process.env.COMPILER) {
 					};
   	    }
   	  `;
-      let { meta } = cardAnalyze(source);
+      let { meta } = cardAnalyze(source, 'test.js');
 
       expect(meta.fields).to.deep.property('street', {
         cardURL: 'https://cardstack.com/base/string',
@@ -155,93 +154,100 @@ if (process.env.COMPILER) {
 
   describe('card analyze: components', function () {
     function analyzeComponent(template: string) {
-      return fullAnalyzeComponent(templateOnlyComponentTemplate(template), 'test.js');
+      let out = cardAnalyze(templateOnlyComponentTemplate(template), 'test.js');
+      return out.meta.component!;
     }
 
     it('string-like', async function () {
-      let { meta } = analyzeComponent('{{@model}}');
+      let component = analyzeComponent('{{@model}}');
 
-      expect(meta).to.deep.equal({
-        model: 'self',
-        fields: new Map(),
+      expect(component).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
         rawHBS: '{{@model}}',
         hasModifiedScope: false,
       });
     });
 
     it('date-like', async function () {
-      let { meta } = analyzeComponent('<FormatDate @date={{@model}} />');
+      let component = analyzeComponent('<FormatDate @date={{@model}} />');
 
-      expect(meta.model).to.equal('self');
-      expect(meta.fields).to.deep.equal(new Map());
+      expect(component.usage).to.deep.equal({ model: 'self', fields: new Map() });
     });
 
     it('simple embeds', async function () {
-      let { meta } = analyzeComponent('<@fields.title />');
+      let component = analyzeComponent('<@fields.title />');
 
-      expect(meta.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
-      expect(meta.fields, 'The title field to be in fields').to.deep.equal(new Map([['title', 'default']]));
+      expect(component.usage.model, 'an empty set for usageMeta.model').to.deep.equal(new Set());
+      expect(component.usage.fields, 'The title field to be in fields').to.deep.equal(new Map([['title', 'default']]));
     });
 
     it('simple model usage', async function () {
-      let { meta } = analyzeComponent('{{helper @model.title}}');
+      let component = analyzeComponent('{{helper @model.title}}');
 
-      expect(meta.model).to.deep.equal(new Set(['title']));
+      expect(component.usage).to.deep.equal({ model: new Set(['title']), fields: new Map() });
     });
 
     it('Nested usage', async function () {
-      let { meta } = analyzeComponent(
+      let component = analyzeComponent(
         '{{@model.title}} - <@fields.post.createdAt /> - <@fields.post.author.birthdate />'
       );
 
-      expect(meta.model).to.deep.equal(new Set(['title']));
-      expect(meta.fields).to.deep.equal(
-        new Map([
+      expect(component.usage).to.deep.equal({
+        model: new Set(['title']),
+        fields: new Map([
           ['post.createdAt', 'default'],
           ['post.author.birthdate', 'default'],
-        ])
-      );
+        ]),
+      });
     });
 
     it('Block usage for self', async function () {
-      let { meta } = analyzeComponent(
+      let component = analyzeComponent(
         '<Whatever @name={{name}} /> {{#each-in @fields as |name Field|}} <label>{{name}}</label> <Field /> {{/each-in}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta.fields).to.equal('self');
+      expect(component.usage).to.deep.equal({ model: new Set(), fields: 'self' });
     });
 
     it('Block usage for @model path', async function () {
-      let { meta } = analyzeComponent(
+      let component = analyzeComponent(
         '<Whatever @name={{@model.title}} /> {{#each @model.comments as |comment|}} <Other @name={{comment.createdAt}}/> {{/each}} <Whichever @field={{Field}} />'
       );
 
-      expect(meta.model).to.deep.equal(new Set(['title', 'comments.createdAt']));
+      expect(component.usage).to.deep.equal({
+        model: new Set(['title', 'comments.createdAt']),
+        fields: new Map(),
+      });
     });
 
     it('Block usage for field', async function () {
-      let { meta } = analyzeComponent(
+      let component = analyzeComponent(
         '{{@model.plane}} {{#each @fields.birthdays as |Birthday|}} <Birthday /> {{#let (whatever) as |Birthday|}} <Birthday /> {{/let}} {{/each}}'
       );
 
-      expect(meta.model).to.deep.equal(new Set(['plane']));
-      expect(meta.fields).to.deep.equal(new Map([['birthdays', 'default']]));
+      expect(component.usage).to.deep.equal({
+        model: new Set(['plane']),
+        fields: new Map([['birthdays', 'default']]),
+      });
     });
 
     it('Block usage for fields field', async function () {
-      let { meta } = analyzeComponent('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}');
-      expect(meta.fields).to.deep.equal(new Map([['birthdays.location', 'default']]));
+      let component = analyzeComponent('{{#each @fields.birthdays as |Birthday|}} <Birthday.location /> {{/each}}');
+
+      expect(component.usage).to.deep.equal({
+        model: new Set(),
+        fields: new Map([['birthdays.location', 'default']]),
+      });
     });
 
     it('Understands when a card has modified the scope of a template', async function () {
-      let { meta } = fullAnalyzeComponent(
+      let { meta } = cardAnalyze(
         templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
         'test.js'
       );
 
-      expect(meta).to.deep.equal({
-        model: 'self',
-        fields: new Map(),
+      expect(meta.component).to.deep.equal({
+        usage: { model: 'self', fields: new Map() },
         rawHBS: '<FancyTool @value={{@model}} />',
         hasModifiedScope: true,
       });
