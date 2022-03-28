@@ -50,7 +50,7 @@ export default class AppContext extends Service implements AppContextService {
   get currentApp(): 'card-space' | 'wallet' {
     if (
       this.hostSuffixPattern.test(this.host) ||
-      this.host.includes(previewSubdomain)
+      (this.host.includes(previewSubdomain) && this.queryIsCardSpace)
     ) {
       return 'card-space';
     } else {
