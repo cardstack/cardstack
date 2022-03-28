@@ -18,12 +18,12 @@ summaries = [
 
 payment_cycle_length_ls = [1024, 1024 * 32, 1024 * 512]
 total_reward_ls = [6_000_000 * 1_000_000_000_000_000_000]
-excluded_accounts_ls = [[]]
+test_accounts_ls = [[]]
 
 
 @pytest.fixture
 def rule(request):
-    payment_cycle_length, total_reward, excluded_accounts = request.param
+    payment_cycle_length, total_reward, test_accounts = request.param
     core_config = {
         "start_block": 23592960,
         "end_block": 24859648,
@@ -38,7 +38,7 @@ def rule(request):
         "duration": 43200,
         "start_snapshot_block": 23592960,
         "end_snapshot_block": 24859648,
-        "excluded_accounts": excluded_accounts,
+        "test_accounts": test_accounts,
     }
     return RetroAirdrop(core_config, user_config)
 
@@ -48,7 +48,7 @@ class TestRetroAirdropSingle:
         "rule,summary",
         zip(
             itertools.product(
-                payment_cycle_length_ls, total_reward_ls, excluded_accounts_ls
+                payment_cycle_length_ls, total_reward_ls, test_accounts_ls
             ),
             summaries,
         ),

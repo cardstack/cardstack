@@ -1,5 +1,4 @@
 import pandas as pd
-from cardpay_reward_programs.config import default_payment_list
 from cardpay_reward_programs.rule import Rule
 
 
@@ -19,14 +18,14 @@ class RetroAirdrop(Rule):
         duration,
         start_snapshot_block,
         end_snapshot_block,
-        excluded_accounts
+        test_accounts
     ):
         self.token = token
         self.duration = duration
         self.total_reward = total_reward
         self.start_snapshot_block = start_snapshot_block
         self.end_snapshot_block = end_snapshot_block
-        self.excluded_accounts = set(account.lower() for account in excluded_accounts)
+        self.test_accounts = set(account.lower() for account in test_accounts)
 
     def sql(self, table_query):
         return f"""
@@ -49,7 +48,7 @@ class RetroAirdrop(Rule):
     def df_to_payment_list(
         self, df, payment_cycle, reward_program_id
     ):
-        mask = df['payee'].str.lower().isin(self.excluded_accounts)
+        mask = df['payee'].str.lower().isin(self.test_accounts)
         new_df = df[~mask].copy()
         reward_per_transaction = int(self.total_reward // new_df["transactions"].sum())
         new_df["rewardProgramID"] = reward_program_id
