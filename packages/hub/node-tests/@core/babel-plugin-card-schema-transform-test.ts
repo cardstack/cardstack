@@ -348,8 +348,11 @@ if (process.env.COMPILER) {
         isComplete;
 
         constructor(rawData, makeComplete, isDeserialized = false) {
-          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           this.isComplete = makeComplete;
+          if (!rawData) {
+            return;
+          }
+          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           for (let [field, value] of Object.entries(rawData)) {
             if (!writableFields.includes(field)) {
               continue;
@@ -511,8 +514,30 @@ if (process.env.COMPILER) {
         data = {};
         isDeserialized = {};
       `);
-      expect(source).to.not.containsSource(`
-        constructor(
+      expect(source).to.containsSource(`
+        data = new Map();
+        serializedData = new Map();
+        loadedFields = [];
+        isComplete;
+
+        constructor(rawData, makeComplete, isDeserialized = false) {
+          super(rawData, makeComplete, isDeserialized);
+          this.isComplete = makeComplete;
+          if (!rawData) {
+            return;
+          }
+          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
+          for (let [field, value] of Object.entries(rawData)) {
+            if (!writableFields.includes(field)) {
+              continue;
+            }
+            if (isDeserialized) {
+              this[field] = value;
+            } else {
+              FancyPerson.serializedSet(this, field, value);
+            }
+          }
+        }
       `);
     });
 
@@ -527,8 +552,11 @@ if (process.env.COMPILER) {
 
         constructor(rawData, makeComplete, isDeserialized = false) {
           super(rawData, makeComplete, isDeserialized);
-          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           this.isComplete = makeComplete;
+          if (!rawData) {
+            return;
+          }
+          this.loadedFields = makeComplete ? allFields : flattenData(rawData).map(([fieldName]) => fieldName);
           for (let [field, value] of Object.entries(rawData)) {
             if (!writableFields.includes(field)) {
               continue;
