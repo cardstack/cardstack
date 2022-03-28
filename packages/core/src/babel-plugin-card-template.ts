@@ -13,11 +13,6 @@ import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 import { FieldsWithPlaceholders } from './compiler';
 import { isEmpty } from 'lodash';
 
-export interface TemplateUsageMeta {
-  model: 'self' | Set<string>;
-  fields: 'self' | Map<string, Format | 'default'>;
-}
-
 interface TransformComponentOptions {
   templateSource: string;
   debugPath: string;
