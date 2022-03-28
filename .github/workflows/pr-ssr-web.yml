@@ -98,8 +98,8 @@ jobs:
       - name: Deploy ssr-web preview
         uses: ./.github/actions/deploy-ember-preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.SSR_WEB_PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.SSR_WEB_PRODUCTION_EMBER_DEPLOY_AWS_SECRET }}
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.SSR_WEB_PROD_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.SSR_WEB_PROD_EMBER_DEPLOY_AWS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.SSR_WEB_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
