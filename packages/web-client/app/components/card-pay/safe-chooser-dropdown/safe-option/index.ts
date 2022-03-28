@@ -25,6 +25,13 @@ export default class CardPaySafeChooserDropdownSafeOptionComponent extends Compo
           name: 'DEPOT',
         },
       };
+    } else if (this.args.safe.type === 'reward') {
+      return {
+        icon: 'reward',
+        info: {
+          name: 'Rewards',
+        },
+      };
     } else {
       return {
         icon: 'question',

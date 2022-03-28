@@ -140,7 +140,7 @@ module(
         .containsText(merchantAddress);
       assert
         .dom('.ember-power-select-options li:nth-child(3)')
-        .containsText('Unknown')
+        .containsText('Rewards')
         .containsText(rewardAddress);
       await click('.ember-power-select-options li:nth-child(2)');
 
