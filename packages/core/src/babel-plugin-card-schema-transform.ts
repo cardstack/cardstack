@@ -9,7 +9,6 @@ import camelCase from 'lodash/camelCase';
 import upperFirst from 'lodash/upperFirst';
 import capitalize from 'lodash/capitalize';
 import { BASE_CARD_URL } from './compiler';
-import { keys } from './utils';
 
 interface State {
   importUtil: ImportUtil;
@@ -115,7 +114,7 @@ export default function main(babel: typeof Babel) {
           // you can't upgrade a primitive card to a composite card--you are
           // either a primitive card or a composite card. so if we adopt from a
           // card that is primitive, then we ourselves must be primitive as well.
-          if (type === 'composite' && state.opts.meta.fields && keys(state.opts.meta.fields).length > 0) {
+          if (type === 'composite' && state.opts.meta.fields) {
             path.get('body').node.body.unshift(
               t.classProperty(t.identifier(state.dataIdentifier), t.newExpression(t.identifier('Map'), [])),
               t.classProperty(t.identifier(state.serializedDataIdentifier), t.newExpression(t.identifier('Map'), [])),
@@ -134,8 +133,9 @@ export default function main(babel: typeof Babel) {
                     ? [babel.template.ast(`super(rawData, makeComplete, isDeserialized);`) as t.Statement]
                     : []),
                   ...(babel.template(`
-                    this.%%loadedFields%% = makeComplete ? allFields : %%flattenData%%(rawData).map(([fieldName]) => fieldName);
                     this.%%isComplete%% = makeComplete;
+                    if (!rawData) { return; }
+                    this.%%loadedFields%% = makeComplete ? allFields : %%flattenData%%(rawData).map(([fieldName]) => fieldName);
                     for (let [field, value] of Object.entries(rawData)) {
                       if (!writableFields.includes(field)) {
                         continue;
