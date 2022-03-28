@@ -852,7 +852,7 @@ summary = "Send file to trash natively under Mac OS X, Windows and Linux."
 
 [[package]]
 name = "setuptools"
-version = "61.0.0"
+version = "61.2.0"
 requires_python = ">=3.7"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
 
@@ -1041,7 +1041,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:b3bbc21db0d6f67c129969196cc1e758def88e0412e1d2dfbbc8c1a90d003c41"
+content_hash = "sha256:f88bffbe36a3656ca87390a82865e6cd7edc5eac347a70ac2cd5bb0805be2a59"
 
 [metadata.files]
 "altair 4.2.0" = [
@@ -1902,9 +1902,9 @@ content_hash = "sha256:b3bbc21db0d6f67c129969196cc1e758def88e0412e1d2dfbbc8c1a90
     {file = "Send2Trash-1.8.0-py3-none-any.whl", hash = "sha256:f20eaadfdb517eaca5ce077640cb261c7d2698385a6a0f072a4a5447fd49fa08"},
     {file = "Send2Trash-1.8.0.tar.gz", hash = "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d"},
 ]
-"setuptools 61.0.0" = [
-    {file = "setuptools-61.0.0-py3-none-any.whl", hash = "sha256:ad88b13f3dc60420259c9877486908ddad12c7befaff0d624c7190f742abd64f"},
-    {file = "setuptools-61.0.0.tar.gz", hash = "sha256:6221e37dc86fcdc9dad9d9eb2002e9f9798fe4aca1bf18f280e66e50c0eb7fca"},
+"setuptools 61.2.0" = [
+    {file = "setuptools-61.2.0-py3-none-any.whl", hash = "sha256:8f4813dd6a4d6cc17bde85fb2e635fe19763f96efbb0ddf5575562e5ee0bc47a"},
+    {file = "setuptools-61.2.0.tar.gz", hash = "sha256:c3d4e2ab578fbf83775755cd76dae73627915a22832cf4ea5de895978767833b"},
 ]
 "six 1.16.0" = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
