@@ -29,7 +29,7 @@ export default class CardPaySafeChooserDropdownSafeOptionComponent extends Compo
       return {
         icon: 'reward',
         info: {
-          name: 'Rewards',
+          name: 'Cardstack Rewards',
         },
       };
     } else {
