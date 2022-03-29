@@ -64,7 +64,7 @@ module.exports = function (deployTarget) {
       bucket: process.env.S3_PREVIEW_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
       prefix: process.env.PR_BRANCH_NAME,
-      filePattern: s3AssetPattern.replace('}', ',html}'),
+      filePattern: s3AssetPattern.replace('}', ',css,html}'),
     };
     ENV.plugins = ['build', 'compress', 's3'];
   }
