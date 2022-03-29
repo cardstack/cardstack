@@ -23,7 +23,7 @@ interface CardSpaceUserPageArgs {
 }
 
 export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> {
-  @service declare hubAuthentication: HubAuthentication;
+  @service('hub-authentication') declare hubAuthentication: HubAuthentication;
   @service('ua') declare UAService: UA;
   @tracked paymentLinkMode: PaymentLinkMode = 'link';
   @tracked address: string | null = null;
