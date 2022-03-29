@@ -126,17 +126,7 @@ module.exports = function (deployTarget) {
       prefix: process.env.PR_BRANCH_NAME,
       filePattern: s3AssetPattern.replace('}', ',html}'),
     };
-    ENV.manifest = {
-      filePattern:
-        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
-    };
-    ENV.plugins = [
-      'build',
-      'compress',
-      'display-revisions',
-      'revision-data',
-      's3',
-    ];
+    ENV.plugins = ['build', 'compress', 's3'];
   }
 
   // Note: if you need to build some configuration asynchronously, you can return
