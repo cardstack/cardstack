@@ -49,12 +49,17 @@ export default class PayController extends Controller {
         },
       };
     } else if (this.currency === 'SPD') {
-      let amount = Math.max(Math.ceil(this.amount), minSpendAmount);
+      let amount = Number(
+        roundAmountToNativeCurrencyDecimals(
+          spendToUsd(Math.max(this.amount, minSpendAmount))!,
+          'USD'
+        )
+      );
       return {
         amount,
-        currency: this.currency,
+        currency: 'USD',
         displayed: {
-          amount: convertAmountToNativeDisplay(spendToUsd(amount)!, 'USD'),
+          amount: convertAmountToNativeDisplay(amount, 'USD'),
         },
       };
     } else if (this.currency === 'USD') {
