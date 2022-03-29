@@ -15,14 +15,6 @@
   <meta name='twitter:site' content='@cardstack' />
 </InHead>
 
-{{#if this.hubAuthentication.showAuth}}
-  {{#if this.hubAuthentication.isAuthenticated}}
-    Authed!
-  {{else}}
-    <Boxel::Button>Auth</Boxel::Button>
-  {{/if}}
-{{/if}}
-
 <div class="card-space-user-page"
   {{did-insert this.loadAddress}}
   style={{css-var
@@ -30,6 +22,7 @@
     card-space-text-color=@model.textColor
   }}
 >
+
   <div class="card-space-user-page__wrapper">
     <div class="card-space-user-page__header">
       <a href={{config 'urls.cardPayLink'}} target='_blank' rel='noopener noreferrer'>
@@ -38,6 +31,16 @@
         </span>
         {{svg-jar "card-pay-logo-with-text"}}
       </a>
+
+      {{#if this.hubAuthentication.showAuth}}
+        <section class='card-space-user-page__auth'>
+          {{#if this.hubAuthentication.isAuthenticated}}
+            Authed!
+          {{else}}
+            <Boxel::Button>Auth</Boxel::Button>
+          {{/if}}
+        </section>
+      {{/if}}
     </div>
 
     <div class="card-space-user-page__user-content">

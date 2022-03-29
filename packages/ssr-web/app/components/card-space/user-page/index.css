@@ -32,6 +32,9 @@
 
 .card-space-user-page__header {
   grid-area: header;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 @media only screen and (max-width: 992px) {
