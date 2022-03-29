@@ -4,10 +4,10 @@ import difference from 'lodash/difference';
 import type { types as t } from '@babel/core';
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
-import partition from 'lodash/partition';
+import isEmpty from 'lodash/isEmpty';
 import differenceWith from 'lodash/differenceWith';
 
-import analyzeCardModule, { ExportMeta, FileMeta } from './analyze';
+import analyzeCardModule, { ComponentMeta, ExportMeta, FileMeta } from './analyze';
 import cardSchemaTransformPlugin, { Options } from './babel-plugin-card-schema-transform';
 import transformCardComponent from './babel-plugin-card-template';
 import {
@@ -16,6 +16,7 @@ import {
   CardModules,
   CompiledCard,
   ComponentInfo,
+  ComponentInfos,
   Field,
   Format,
   FORMATS,
@@ -27,6 +28,7 @@ import {
   Unsaved,
 } from './interfaces';
 import { cardURL, getCardAncestor, resolveCard, resolveModule } from './utils';
+import { getFieldForPath } from './utils/fields';
 import { getFileType } from './utils/content';
 import { CardstackError, BadRequest, augmentBadRequest, isCardstackError } from './utils/errors';
 
@@ -63,12 +65,11 @@ type CompiledCardWithPlaceholders<Identity extends Unsaved = Saved, Ref extends 
   'fields'
 > & { fields: FieldsWithPlaceholders };
 
+type RecompiledComponents = Partial<Record<Format, string>>;
+
 export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private builder: TrackedBuilder;
   private cardSource: RawCard<Identity>;
-
-  // TODO: refactor this away
-  private componentInfos: Partial<CompiledCard<Unsaved, ModuleRef>['componentInfos']> = {};
 
   constructor(params: { builder: Builder; cardSource: RawCard<Identity> }) {
     this.builder = new TrackedBuilder(params.builder);
@@ -83,12 +84,18 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let inputModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(inputModules);
-    let { modules, recompiledComponents, reusedComponents } = await this.inheritComponents(parentCard);
+    let { modules, recompiledComponents, inheritedComponents } = await this.inheritComponents(parentCard);
     Object.assign(inputModules, modules);
     let fields = await this.lookupFieldsForCard(inputModules, parentCard);
     this.assertData(fields);
-    let outputModules = await this.transformFiles(inputModules, recompiledComponents, fields, parentCard);
-    let componentInfos = this.buildComponentInfos(reusedComponents);
+    let componentInfos = this.buildComponentInfos(inputModules, fields, recompiledComponents, inheritedComponents);
+    let outputModules = await this.transformFiles(
+      inputModules,
+      recompiledComponents,
+      fields,
+      parentCard,
+      componentInfos
+    );
 
     let compiledCard = {
       realm: cardSource.realm,
@@ -135,8 +142,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
   private async inheritComponents(parentCard: CompiledCard | undefined) {
     let { cardSource } = this;
-    let recompiledComponents: Partial<Record<Format, string>> = {};
-    let reusedComponents: Partial<CompiledCard['componentInfos']> = {};
+    let recompiledComponents: RecompiledComponents = {};
+    let inheritedComponents: Partial<CompiledCard['componentInfos']> = {};
     let modules: InputModules = {};
 
     for (let format of FORMATS) {
@@ -162,51 +169,69 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
               inheritedFrom: parentCard.url,
             };
           }
-          reusedComponents[format] = componentInfo;
+          inheritedComponents[format] = componentInfo;
         }
       }
     }
-    return { modules, recompiledComponents, reusedComponents };
+    return { modules, recompiledComponents, inheritedComponents };
   }
 
-  buildComponentInfos(reusedComponents: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<GlobalRef>>>) {
-    let { componentInfos } = this;
-    Object.assign(componentInfos, reusedComponents);
-    assertAllComponentInfos(componentInfos);
+  buildComponentInfos(
+    inputModules: InputModules,
+    fields: FieldsWithPlaceholders,
+    recompiledComponents: RecompiledComponents,
+    inheritedComponents: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<GlobalRef>>>
+  ) {
+    let componentInfos: Partial<CompiledCard<Unsaved, LocalRef>['componentInfos']> = {};
+    for (let format of FORMATS) {
+      let localPath = recompiledComponents[format] ?? this.cardSource[format];
+      if (!localPath) {
+        continue;
+      }
+      let mod = inputModules[localPath];
+      if (mod.type === 'asset' || !mod.meta.component) {
+        continue;
+      }
+      componentInfos[format] = this.buildComponentInfo(mod, fields, mod.meta.component, defaultFieldFormat(format));
+    }
 
+    Object.assign(componentInfos, inheritedComponents);
+    assertAllComponentInfos(componentInfos);
     return componentInfos;
+  }
+
+  buildComponentInfo(
+    mod: JSSourceModule,
+    fields: FieldsWithPlaceholders,
+    meta: ComponentMeta,
+    defaultFieldFormat: Format
+  ): ComponentInfo<LocalRef> {
+    let usedFields = buildUsedFieldsListFromUsageMeta(fields, defaultFieldFormat, meta.usage);
+    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta.usage, fields, defaultFieldFormat)
+      ? meta.rawHBS
+      : undefined;
+
+    return {
+      componentModule: { local: mod.localPath },
+      usedFields,
+      inlineHBS,
+      inheritedFrom: mod.inheritedFrom,
+    };
   }
 
   private async transformFiles(
     inputModules: InputModules,
-    recompiledComponents: Record<string, string>,
+    recompiledComponents: RecompiledComponents,
     fields: FieldsWithPlaceholders,
-    parentCard: CompiledCard | undefined
+    parentCard: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ) {
-    let { cardSource } = this;
-    let [schemaModules, nonSchemaModules] = partition(
-      Object.entries(inputModules),
-      ([localPath]) => localPath === cardSource.schema
-    );
-
-    let outputModules = Object.assign(
+    return Object.assign(
       {},
-      ...nonSchemaModules.map(([localPath, mod]) =>
-        this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
+      ...Object.entries(inputModules).map(([localPath, mod]) =>
+        this.transformFile(localPath, recompiledComponents, mod, fields, parentCard, componentInfos)
       )
     );
-
-    // handle the schema module last so that we have all the knowledge of the
-    // components' used fields before processing the schema module.
-    return {
-      ...outputModules,
-      ...Object.assign(
-        {},
-        ...schemaModules.map(([localPath, mod]) =>
-          this.transformFile(localPath, recompiledComponents, mod, fields, parentCard)
-        )
-      ),
-    };
   }
 
   private transformFile(
@@ -214,7 +239,8 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     recompiledComponents: Record<string, string>,
     mod: JSSourceModule | AssetModule,
     fields: FieldsWithPlaceholders,
-    parentCard: CompiledCard | undefined
+    parentCard: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let { cardSource } = this;
     if (mod.type === 'asset') {
@@ -228,7 +254,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
 
     if (localPath === cardSource.schema) {
       return {
-        [localPath]: this.prepareSchema(mod, fields, parentCard),
+        [localPath]: this.prepareSchema(mod, fields, parentCard, componentInfos),
       };
     }
 
@@ -243,8 +269,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       let formatsMod: CardModules[] = [];
       // The same component file can be used for multiple views
       for (const format of formats) {
-        let { componentInfo, modules } = this.compileComponent(mod, fields, format);
-        this.componentInfos[format] = componentInfo;
+        let modules = this.compileComponent(mod, fields, format);
         formatsMod.push(modules);
       }
       return Object.assign({}, ...formatsMod);
@@ -395,11 +420,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   private prepareSchema(
     schemaModule: JSSourceModule,
     fields: FieldsWithPlaceholders,
-    parent: CompiledCard | undefined
+    parent: CompiledCard | undefined,
+    componentInfos: ComponentInfos
   ) {
     let { source, ast, meta } = schemaModule;
     let out: BabelFileResult;
-    let opts: Options = { meta, fields, parent, componentInfos: this.componentInfos };
+    let opts: Options = { meta, fields, parent, componentInfos };
     try {
       out = transformFromAstSync(ast, source, {
         ast: true,
@@ -496,7 +522,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     mod: JSSourceModule,
     fields: FieldsWithPlaceholders,
     format: Format
-  ): { componentInfo: ComponentInfo<LocalRef>; modules: CompiledCard<Unsaved, LocalRef>['modules'] } {
+  ): CompiledCard<Unsaved, LocalRef>['modules'] {
     let componentTransformResult = transformCardComponent({
       ast: mod.ast,
       templateSource: mod.source,
@@ -507,23 +533,11 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       resolveImport: this.buildResolver(mod),
     });
 
-    let componentInfo: ComponentInfo<LocalRef> = {
-      componentModule: { local: mod.localPath },
-      usedFields: componentTransformResult.usedFields,
-      inlineHBS: componentTransformResult.inlineHBS,
-    };
-    if (mod.inheritedFrom) {
-      componentInfo.inheritedFrom = mod.inheritedFrom;
-    }
-
     return {
-      componentInfo,
-      modules: {
-        [mod.localPath]: {
-          type: JS_TYPE,
-          source: componentTransformResult.source,
-          ast: componentTransformResult.ast,
-        },
+      [mod.localPath]: {
+        type: JS_TYPE,
+        source: componentTransformResult.source,
+        ast: componentTransformResult.ast,
       },
     };
   }
@@ -709,4 +723,84 @@ function assertAllComponentInfos(
 
 function debugPath(realm: string, id: string | undefined, localPath: string): string {
   return `${realm}${id ?? 'NEW_CARD'}/${localPath}`;
+}
+
+function buildUsedFieldsListFromUsageMeta(
+  fields: FieldsWithPlaceholders,
+  defaultFieldFormat: Format,
+  meta: ComponentMeta['usage']
+): ComponentInfo['usedFields'] {
+  let usedFields: Set<string> = new Set();
+
+  if (meta.model && meta.model !== 'self') {
+    for (const fieldPath of meta.model) {
+      usedFields.add(fieldPath);
+    }
+  }
+
+  if (meta.fields === 'self') {
+    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
+  } else {
+    for (const [fieldPath, fieldFormat] of meta.fields.entries()) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        fieldPath,
+        fields,
+        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
+      );
+    }
+  }
+
+  return [...usedFields];
+}
+
+function buildUsedFieldListFromComponents(
+  usedFields: Set<string>,
+  fieldPath: string,
+  fields: FieldsWithPlaceholders,
+  format: Format,
+  prefix?: string
+): void {
+  let field = getFieldForPath(fields, fieldPath);
+
+  if (field && field.card !== 'self' && field.card.componentInfos[format].usedFields.length) {
+    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
+      buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
+    }
+  } else {
+    if (prefix) {
+      usedFields.add(`${prefix}.${fieldPath}`);
+    } else {
+      usedFields.add(fieldPath);
+    }
+  }
+}
+
+function canInlineHBS(
+  hasModifiedScope: boolean,
+  meta: ComponentMeta['usage'],
+  fields: FieldsWithPlaceholders,
+  defaultFieldFormat: Format
+): boolean {
+  if (hasModifiedScope) {
+    return false;
+  }
+
+  if (isEmpty(fields)) {
+    return true;
+  }
+
+  let fieldsToInspect: [string, Format | 'default'][];
+  if (meta.fields === 'self') {
+    fieldsToInspect = Object.keys(fields).map((path) => [path, defaultFieldFormat]);
+  } else {
+    fieldsToInspect = [...meta.fields.entries()];
+  }
+
+  // If every field this card uses is inlinable, then this card can be inlined as well
+  return fieldsToInspect.every(([path, format]) => {
+    let field = getFieldForPath(fields, path);
+    let actualFormat: Format = format === 'default' ? defaultFieldFormat : format;
+    return field && field.card !== 'self' && !!field?.card.componentInfos[actualFormat].inlineHBS;
+  });
 }

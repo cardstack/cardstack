@@ -3,14 +3,12 @@ import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
-import { ComponentInfo, Format } from './interfaces';
+import { Format } from './interfaces';
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
 import { FieldsWithPlaceholders } from './compiler';
-import { isEmpty } from 'lodash';
 import { ComponentMeta } from './analyze';
 
 interface TransformComponentOptions {
@@ -26,31 +24,13 @@ interface TransformComponentOptions {
 export default function (params: TransformComponentOptions): {
   source: string;
   ast: t.File;
-  usedFields: ComponentInfo['usedFields'];
-  inlineHBS: string | undefined;
 } {
   // HACK: The / resets the relative path setup, removing the cwd of the hub.
   // This allows the error module to look a lot more like the card URL.
   let debugPath = '/' + params.debugPath.replace(/^\//, '');
 
   try {
-    // This will become the semantic phase
-    let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, params.meta.usage);
-    let inlineHBS = canInlineHBS(
-      params.meta.hasModifiedScope,
-      params.meta.usage,
-      params.fields,
-      params.defaultFieldFormat
-    )
-      ? params.meta.rawHBS
-      : undefined;
-
-    return {
-      // this part will move into the compiler's transform phase
-      ...transformComponent({ ...params, debugPath }, params.ast, params.meta),
-      usedFields,
-      inlineHBS,
-    };
+    return transformComponent({ ...params, debugPath }, params.ast, params.meta);
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
@@ -232,84 +212,4 @@ function updatePrecompileTemplateScopeOption(
   }
 
   scope.node.body.properties = scope.node.body.properties.concat(scopeVars);
-}
-
-function buildUsedFieldsListFromUsageMeta(
-  fields: FieldsWithPlaceholders,
-  defaultFieldFormat: Format,
-  meta: ComponentMeta['usage']
-): ComponentInfo['usedFields'] {
-  let usedFields: Set<string> = new Set();
-
-  if (meta.model && meta.model !== 'self') {
-    for (const fieldPath of meta.model) {
-      usedFields.add(fieldPath);
-    }
-  }
-
-  if (meta.fields === 'self') {
-    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
-  } else {
-    for (const [fieldPath, fieldFormat] of meta.fields.entries()) {
-      buildUsedFieldListFromComponents(
-        usedFields,
-        fieldPath,
-        fields,
-        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
-      );
-    }
-  }
-
-  return [...usedFields];
-}
-
-function buildUsedFieldListFromComponents(
-  usedFields: Set<string>,
-  fieldPath: string,
-  fields: FieldsWithPlaceholders,
-  format: Format,
-  prefix?: string
-): void {
-  let field = getFieldForPath(fields, fieldPath);
-
-  if (field && field.card !== 'self' && field.card.componentInfos[format].usedFields.length) {
-    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
-      buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
-    }
-  } else {
-    if (prefix) {
-      usedFields.add(`${prefix}.${fieldPath}`);
-    } else {
-      usedFields.add(fieldPath);
-    }
-  }
-}
-
-function canInlineHBS(
-  hasModifiedScope: boolean,
-  meta: ComponentMeta['usage'],
-  fields: FieldsWithPlaceholders,
-  defaultFieldFormat: Format
-): boolean {
-  if (hasModifiedScope) {
-    return false;
-  }
-
-  if (isEmpty(fields)) {
-    return true;
-  }
-
-  let fieldsToInspect: [string, Format | 'default'][];
-  if (meta.fields === 'self') {
-    fieldsToInspect = Object.keys(fields).map((path) => [path, defaultFieldFormat]);
-  } else {
-    fieldsToInspect = [...meta.fields.entries()];
-  }
-
-  // If every field this card uses is inlinable, then this card can be inlined as well
-  return fieldsToInspect.every(([path, format]) => {
-    let field = getFieldForPath(fields, path);
-    let actualFormat: Format = format === 'default' ? defaultFieldFormat : format;
-    return field && field.card !== 'self' && !!field?.card.componentInfos[actualFormat].inlineHBS;
-  });
 }
