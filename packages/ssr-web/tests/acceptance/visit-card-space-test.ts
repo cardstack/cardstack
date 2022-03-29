@@ -3,7 +3,6 @@ import { setupApplicationTest } from 'ember-qunit';
 import { currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 import AppContext from '@cardstack/ssr-web/services/app-context';
-import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import TestLayer2Web3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
 import percySnapshot from '@percy/ember';
 import type { SubgraphServiceOptionals } from '@cardstack/ssr-web/services/subgraph';
@@ -15,7 +14,6 @@ import sinon from 'sinon';
 let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 let layer2Service: TestLayer2Web3Strategy;
-let hubAuthentication: HubAuthentication;
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
   async query(
