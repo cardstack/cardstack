@@ -10,7 +10,6 @@ export interface AppContextService {
 }
 
 const CARD_SPACE_SLUG_PARAMETER_NAME = 'slug';
-const previewSubdomain = 'ssr-web-preview'; // FIXME extract somewhere? derive?
 
 // escape dots for regexp
 function escapeDot(str: string) {
@@ -50,7 +49,8 @@ export default class AppContext extends Service implements AppContextService {
   get currentApp(): 'card-space' | 'wallet' {
     if (
       this.hostSuffixPattern.test(this.host) ||
-      (this.host.includes(previewSubdomain) && this.queryIsCardSpace)
+      (this.host.includes(config.previewSubdomainInfix) &&
+        this.queryIsCardSpace)
     ) {
       return 'card-space';
     } else {
