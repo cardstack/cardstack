@@ -82,6 +82,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
           S3_PREVIEW_BUCKET_NAME: ssr-web-preview.stack.cards
           S3_PREVIEW_REGION: us-east-1
+          SSR_WEB_ENVIRONMENT: staging
         with:
           package: ssr-web
           environment: staging
@@ -105,6 +106,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
           S3_PREVIEW_BUCKET_NAME: ssr-web-preview.cardstack.com
           S3_PREVIEW_REGION: us-east-1
+          SSR_WEB_ENVIRONMENT: production
         with:
           package: ssr-web
           environment: production
