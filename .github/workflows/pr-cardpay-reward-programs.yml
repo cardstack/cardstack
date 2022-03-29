@@ -29,4 +29,4 @@ jobs:
           pdm install -d
       - name: Test with pytest
         run: |
-          pdm run pytest tests
+          pdm run -s pytest tests
