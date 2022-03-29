@@ -542,9 +542,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
   }
 
   private getSchemaModuleRef(parentCard: CompiledCard | undefined, schemaPath: string | undefined): ModuleRef {
-    if (isBaseCard(this.cardSource)) {
-      return { global: `${BASE_CARD_URL}/schema` };
-    } else if (schemaPath) {
+    if (schemaPath) {
       return { local: schemaPath };
     } else if (parentCard?.schemaModule) {
       return parentCard.schemaModule;
