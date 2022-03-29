@@ -1,9 +1,12 @@
 .merchant-payment-request-page {
+  --page-content-max-width: 720px;
+  --degraded-service-banner-content-max-width: var(--page-content-max-width);
+
   position: relative;
   min-height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
-  grid-template-columns: minmax(200px, 720px);
+  grid-template-columns: minmax(200px, var(--page-content-max-width));
   gap: var(--boxel-sp);
   align-items: center;
   justify-content: center;
@@ -12,7 +15,7 @@
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
   z-index: 0;
-  padding: var(--boxel-sp) var(--boxel-sp) var(--boxel-sp-xxxl) var(--boxel-sp);
+  padding: 0 var(--boxel-sp) var(--boxel-sp-xxxl) var(--boxel-sp);
 }
 
 .merchant-payment-request-page__merchant-missing-message {

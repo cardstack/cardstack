@@ -1,16 +1,17 @@
-import { CardSchema, CompiledCard, Field } from '../interfaces';
 import { isNotReadyError } from './errors';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
+import { FieldsWithPlaceholders, FieldWithPlaceholder } from '../compiler';
+import { CardSchema } from '../interfaces';
 
-export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
+export function getFieldForPath(fields: FieldsWithPlaceholders, path: string): FieldWithPlaceholder | undefined {
   let paths = path.split('.');
   let [first, ...tail] = paths;
 
   let field = fields[first];
 
-  if (paths.length > 1) {
+  if (paths.length > 1 && field.card !== 'self') {
     return getFieldForPath(field.card.fields, tail.join('.'));
   }
 

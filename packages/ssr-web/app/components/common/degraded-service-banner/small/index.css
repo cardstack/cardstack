@@ -1,0 +1,4 @@
+.degraded-service-banner--small {
+  border-radius: 10px;
+  padding: var(--boxel-sp-xxxs);
+}

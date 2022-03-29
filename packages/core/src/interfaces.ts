@@ -101,10 +101,10 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
-export interface Field {
+export interface Field<Identity extends Unsaved = Saved, Ref extends ModuleRef = GlobalRef> {
   type: 'contains' | 'containsMany' | 'linksTo';
   computed: boolean;
-  card: CompiledCard;
+  card: CompiledCard<Identity, Ref>; // a field's reference to its containing card might not have an ID yet
   name: string;
 }
 
@@ -136,7 +136,7 @@ export interface CompiledCard<Identity extends Unsaved = Saved, Ref extends Modu
   realm: string;
   adoptsFrom?: CompiledCard<string, GlobalRef>;
   fields: {
-    [key: string]: Field;
+    [key: string]: Field<Identity, Ref>;
   };
   schemaModule: Ref;
   serializerModule?: Ref;
@@ -245,6 +245,16 @@ export function assertDocumentDataIsResource<Identity extends Saved | Unsaved = 
 ): asserts data is ResourceObject<Identity> {
   if (Array.isArray(data)) {
     throw new CardstackError('JSONAPIDocument was Collection. We expected a single resource');
+  }
+}
+
+export function assertIsField(field: any): asserts field is Field {
+  let properties = ['type', 'name', 'computed', 'card'];
+  if (!properties.map((p) => p in field).every(Boolean)) {
+    throw new CardstackError(`expected field to have properties: ${properties.join()}`);
+  }
+  if (typeof field.card === 'string') {
+    throw new CardstackError(`expected field to not be a placeholder`);
   }
 }
 

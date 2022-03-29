@@ -42,10 +42,6 @@ if (process.env.COMPILER) {
               getRawField = "don't collide!";
               @contains(string) firstName;
               @contains(string) lastName;
-
-              // TODO:
-              // @contains(Person) parent;
-
               @contains(bio) aboutMe;
 
               @contains(string)
@@ -210,7 +206,5 @@ if (process.env.COMPILER) {
       expect(isSameDay(card.data['nextDay'], p('2022-03-25')), 'Dates are serialized to Dates').to.be.ok;
       expect(card.serialize().attributes?.nextDay).to.equal('2022-03-25');
     });
-
-    it('can have a field that is the same card as itself');
   });
 }
