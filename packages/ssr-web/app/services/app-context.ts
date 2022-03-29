@@ -9,7 +9,7 @@ export interface AppContextService {
   isCardSpace: boolean;
 }
 
-const cardSpaceSlugQueryRegex = /\?slug=(.*)/; // FIXME what if there are multiple parameters
+const CARD_SPACE_SLUG_PARAMETER_NAME = 'slug';
 const previewSubdomain = 'ssr-web-preview'; // FIXME extract somewhere? derive?
 
 // escape dots for regexp
@@ -41,7 +41,7 @@ export default class AppContext extends Service implements AppContextService {
 
   get queryIsCardSpace() {
     if (!this.fastboot.isFastBoot) {
-      return cardSpaceSlugQueryRegex.test(window.location.search);
+      return this.searchParams.has(CARD_SPACE_SLUG_PARAMETER_NAME);
     }
 
     return false;
@@ -65,12 +65,16 @@ export default class AppContext extends Service implements AppContextService {
   get cardSpaceId() {
     if (this.isCardSpace) {
       if (this.queryIsCardSpace) {
-        return cardSpaceSlugQueryRegex.exec(window.location.search)![1];
+        return this.searchParams.get(CARD_SPACE_SLUG_PARAMETER_NAME)!;
       } else {
         let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
         return id;
       }
     } else return '';
+  }
+
+  get searchParams() {
+    return new URLSearchParams(window.location.search);
   }
 }
 
