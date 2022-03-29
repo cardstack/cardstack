@@ -1041,7 +1041,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:f88bffbe36a3656ca87390a82865e6cd7edc5eac347a70ac2cd5bb0805be2a59"
+content_hash = "sha256:b3bbc21db0d6f67c129969196cc1e758def88e0412e1d2dfbbc8c1a90d003c41"
 
 [metadata.files]
 "altair 4.2.0" = [
