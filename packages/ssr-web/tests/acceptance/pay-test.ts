@@ -95,7 +95,7 @@ module('Acceptance | pay', function (hooks) {
     });
   });
 
-  test('It displays merchant info correctly in a non-iOS environment', async function (assert) {
+  test('It displays merchant info correctly in a non-iOS/non-Android environment', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
 
     await waitFor(MERCHANT);
