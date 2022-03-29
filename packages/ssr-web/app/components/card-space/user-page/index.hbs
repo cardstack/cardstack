@@ -37,7 +37,12 @@
           {{#if this.hubAuthentication.isAuthenticated}}
             Authed!
           {{else}}
-            <Boxel::Button>Auth</Boxel::Button>
+            <Boxel::Button
+              @as='link-to'
+              @route='scheme-auth'
+            >
+              Auth
+            </Boxel::Button>
           {{/if}}
         </section>
       {{/if}}
