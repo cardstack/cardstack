@@ -84,10 +84,13 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let { cardSource } = this;
     let inputModules = this.analyzeFiles();
     let parentCard = await this.getParentCard(inputModules);
+
     let { modules, recompiledComponents, inheritedComponents } = await this.inheritComponents(parentCard);
     Object.assign(inputModules, modules);
+
     let fields = await this.lookupFieldsForCard(inputModules, parentCard);
     this.assertData(fields);
+
     let componentInfos = this.buildComponentInfos(inputModules, fields, recompiledComponents, inheritedComponents);
     let outputModules = await this.transformFiles(
       inputModules,
@@ -181,7 +184,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     fields: FieldsWithPlaceholders,
     recompiledComponents: RecompiledComponents,
     inheritedComponents: Partial<Record<'isolated' | 'embedded' | 'edit', ComponentInfo<GlobalRef>>>
-  ) {
+  ): ComponentInfos<LocalRef | GlobalRef> {
     let componentInfos: Partial<CompiledCard<Unsaved, LocalRef>['componentInfos']> = {};
     for (let format of FORMATS) {
       let localPath = recompiledComponents[format] ?? this.cardSource[format];
@@ -190,7 +193,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       }
       let mod = inputModules[localPath];
       if (mod.type === 'asset' || !mod.meta.component) {
-        continue;
+        throw new CardstackError(`Module that is supposed to be a component is not. Localpath: ${localPath}`);
       }
       componentInfos[format] = this.buildComponentInfo(mod, fields, mod.meta.component, defaultFieldFormat(format));
     }
