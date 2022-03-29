@@ -7,7 +7,7 @@ module.exports = function (deployTarget) {
 
   // these get more aggressive caching because they are sub-resources with fingerprinted URLs
   let s3AssetPattern =
-    '**/*.{js,png,gif,webp,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
+    '**/*.{html,js,png,gif,webp,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
 
   let ENV = {
     build: {},
@@ -131,21 +131,12 @@ module.exports = function (deployTarget) {
       filePattern:
         '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
     };
-    ENV['s3-index'] = {
-      accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
-      secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
-      bucket: process.env.S3_PREVIEW_BUCKET_NAME,
-      region: process.env.S3_PREVIEW_REGION,
-      allowOverwrite: true,
-      prefix: process.env.PR_BRANCH_NAME,
-    };
     ENV.plugins = [
       'build',
       'compress',
       'display-revisions',
       'revision-data',
       's3',
-      's3-index',
     ];
   }
 
