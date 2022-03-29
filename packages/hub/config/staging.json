@@ -2,7 +2,7 @@
   "discord": {
     "botId": "958127663577456714",
     "allowedGuilds": "584043165066199050",
-    "allowedChannels": "867588838524190762,898941895525425172"
+    "allowedChannels": "898941895525425172"
   },
   "wyre": {
     "callbackUrl": "https://hub-staging.stack.cards/callbacks/wyre"
