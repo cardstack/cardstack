@@ -103,7 +103,11 @@ export default class HubAuthentication extends Service {
   }
 
   get showAuth() {
-    return config.environment === 'development';
+    if (config.environment === 'development') {
+      return true;
+    }
+
+    return this.appContext.searchParams.has('auth');
   }
 }
 

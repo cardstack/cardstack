@@ -74,7 +74,11 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   get searchParams() {
-    return new URLSearchParams(window.location.search);
+    return new URLSearchParams(
+      this.fastboot.isFastBoot
+        ? this.fastboot.request.queryParams
+        : window.location.search
+    );
   }
 }
 
