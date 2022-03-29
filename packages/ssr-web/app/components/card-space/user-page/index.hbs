@@ -34,15 +34,19 @@
 
       {{#if this.hubAuthentication.showAuth}}
         <section class='card-space-user-page__auth'>
-          {{#if this.hubAuthentication.isAuthenticated}}
-            Authed!
+          {{#if (or this.layer2Network.isInitializing this.hubAuthentication.isInitializing)}}
+            Loading…
           {{else}}
-            <Boxel::Button
-              @as='link-to'
-              @route='scheme-auth'
-            >
-              Auth
-            </Boxel::Button>
+            {{#if this.hubAuthentication.isAuthenticated}}
+              Authed!
+            {{else}}
+              <Boxel::Button
+                @as='link-to'
+                @route='scheme-auth'
+              >
+                Auth
+              </Boxel::Button>
+            {{/if}}
           {{/if}}
         </section>
       {{/if}}
