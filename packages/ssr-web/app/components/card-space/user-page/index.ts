@@ -4,6 +4,7 @@ import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
@@ -22,6 +23,7 @@ interface CardSpaceUserPageArgs {
 }
 
 export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> {
+  @service declare hubAuthentication: HubAuthentication;
   @service('ua') declare UAService: UA;
   @tracked paymentLinkMode: PaymentLinkMode = 'link';
   @tracked address: string | null = null;

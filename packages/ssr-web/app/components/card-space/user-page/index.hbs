@@ -15,6 +15,14 @@
   <meta name='twitter:site' content='@cardstack' />
 </InHead>
 
+{{#if this.hubAuthentication.showAuth}}
+  {{#if this.hubAuthentication.isAuthenticated}}
+    Authed!
+  {{else}}
+    <Boxel::Button>Auth</Boxel::Button>
+  {{/if}}
+{{/if}}
+
 <div class="card-space-user-page"
   {{did-insert this.loadAddress}}
   style={{css-var

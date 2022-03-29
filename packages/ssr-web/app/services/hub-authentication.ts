@@ -8,6 +8,7 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '@cardstack/ssr-web/utils/browser-mocks';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import AppContext from '@cardstack/ssr-web/services/app-context';
 
 declare global {
   interface Window {
@@ -16,6 +17,7 @@ declare global {
 }
 
 export default class HubAuthentication extends Service {
+  @service declare appContext: AppContext;
   @service declare layer2Network: Layer2Network;
   @service declare fastboot: Fastboot;
 
@@ -98,6 +100,10 @@ export default class HubAuthentication extends Service {
       this.authToken = null;
       throw e;
     }
+  }
+
+  get showAuth() {
+    return config.environment === 'development';
   }
 }
 
