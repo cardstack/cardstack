@@ -281,14 +281,22 @@ function extractDecoratorArguments(
   if (!definition) {
     throw error(cardTypePath, `@${decorator} argument is not defined`);
   }
-  if (!definition.isImportDefaultSpecifier()) {
-    throw error(definition, `@${decorator} argument must come from a module default export`);
+  if (!definition.isImportDefaultSpecifier() && !definition.isClassDeclaration()) {
+    throw error(definition, `@${decorator} argument must come from a module default export or a class declaration`);
   }
 
-  let result: Pick<FieldMeta, 'cardURL' | 'typeDecoratorLocalName'> & { computed?: boolean; computeVia?: string } = {
-    cardURL: (definition.parent as t.ImportDeclaration).source.value,
-    typeDecoratorLocalName: definition.node.local.name,
-  };
+  let result: Pick<FieldMeta, 'cardURL' | 'typeDecoratorLocalName'> & { computed?: boolean; computeVia?: string };
+  if (definition.isImportDefaultSpecifier()) {
+    result = {
+      cardURL: (definition.parent as t.ImportDeclaration).source.value,
+      typeDecoratorLocalName: definition.node.local.name,
+    };
+  } else {
+    result = {
+      cardURL: '.',
+      typeDecoratorLocalName: definition.node.id.name,
+    };
+  }
 
   // second argument is the decorator options
   if (decoratorArguments.length === 2) {

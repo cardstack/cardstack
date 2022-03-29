@@ -6,13 +6,14 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import { CompiledCard, Field, Format } from './interfaces';
+import { assertIsField, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { cloneDeep } from 'lodash';
 import { classify } from './utils';
 import { augmentBadRequest } from './utils/errors';
 import { getFieldForPath } from './utils/fields';
 import { ScopeTracker } from './glimmer-scope-tracker';
+import { FieldsWithPlaceholders, FieldWithPlaceholder } from './compiler';
 
 const IN_PROCESS_ELEMENT_ESCAPE = '__';
 class InvalidFieldsUsageError extends Error {
@@ -27,7 +28,7 @@ export interface TemplateUsageMeta {
 }
 
 export interface Options {
-  fields: CompiledCard['fields'];
+  fields: FieldsWithPlaceholders;
   defaultFieldFormat: Format;
   debugPath?: string;
   importAndChooseName: ImportAndChooseName;
@@ -35,7 +36,7 @@ export interface Options {
 
 interface FieldComponent {
   type: 'fieldComponent';
-  field: Field;
+  field: FieldWithPlaceholder;
   pathForModel: string;
   fieldFullPath: string;
   expandable: boolean;
@@ -227,6 +228,10 @@ function lookupScopeVal(
   if (result.type !== 'assigned' || result.value.type !== 'fieldComponent' || tail.length === 0) {
     return result;
   }
+  // unsure if this is correct...
+  if (result.value.field.card === 'self') {
+    return { type: 'normal' };
+  }
   let field = getFieldForPath(result.value.field.card.fields, tail.join('.'));
   if (field) {
     return {
@@ -245,7 +250,7 @@ function lookupScopeVal(
 
 function handleFieldsIterator(
   node: BlockStatement,
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   scopeTracker: ScopeTracker<ScopeValue>
 ): { replacement: syntax.ASTv1.Statement[] } | undefined {
   if (!isFieldsIterator(node)) {
@@ -293,7 +298,7 @@ function handleFieldsIterator(
 
 function handlePluralFieldIterator(
   node: BlockStatement,
-  fields: CompiledCard['fields'],
+  fields: FieldsWithPlaceholders,
   state: State,
   scopeTracker: ScopeTracker<ScopeValue>
 ) {
@@ -335,7 +340,7 @@ function handlePluralFieldIterator(
 }
 
 function rewriteElementNode(options: {
-  field: Field;
+  field: FieldWithPlaceholder;
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
   state: State;
@@ -343,6 +348,11 @@ function rewriteElementNode(options: {
   format: Format;
 }): Statement[] {
   let { field, modelArgument, state, scopeTracker, format } = options;
+  if (field.card === 'self') {
+    // This will be filled in when we replace the placeholders
+    return [];
+  }
+  assertIsField(field);
 
   let { inlineHBS } = field.card.componentInfos[format];
 
