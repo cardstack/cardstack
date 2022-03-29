@@ -321,24 +321,18 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders correctly with no currency provided', async function (assert) {
-    // this is basically defaulting to SPEND
-    await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}`
-    );
+    // Don't render any amounts, esp in the URL. The wallet wants to respect
+    // user preferences for currencies when currency is not specified
+    // so we should not allow requests for amounts without currencies
+    await visit(`/pay/${network}/${merchantSafe.address}?amount=5000`);
 
-    assert
-      .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+    assert.dom(AMOUNT).doesNotExist();
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: spendAmount,
     });
     assert
       .dom(QR_CODE)
@@ -588,7 +582,7 @@ module('Acceptance | pay', function (hooks) {
     sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
+      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currency=${spendSymbol}`
     );
 
     assert
@@ -690,7 +684,7 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
     await visit(
-      `/pay/${network}/${nonexistentMerchantId}?amount=${spendAmount}&currency=${spendSymbol}`
+      `/pay/${network}/${nonexistentMerchantId}?amount=${usdAmount}&currency=${usdSymbol}`
     );
 
     await waitFor(MERCHANT_MISSING_MESSAGE);

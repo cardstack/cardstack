@@ -18,29 +18,31 @@ const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 export default class PayController extends Controller {
   @service('ua') declare UAService: UA;
   queryParams = ['amount', 'currency'];
-  @tracked amount: number = 0;
-  @tracked currency: string = 'SPD';
+  @tracked amount: number = NaN;
+  @tracked currency?: string = undefined;
 
   get canDeepLink() {
     return this.UAService.isIOS() || this.UAService.isAndroid();
   }
-  get cleanedAmounts() {
-    if (!this.isValidAmount) {
+
+  get cleanedValues() {
+    let hasValidAmount =
+      !isNaN(this.amount) &&
+      this.amount !== 0 &&
+      this.amount !== Infinity &&
+      this.amount !== -Infinity;
+    let hasValidCurrency =
+      this.currency !== undefined &&
+      isSupportedCurrency(this.currency) &&
+      this.currency !== 'DAI' &&
+      this.currency !== 'CARD' &&
+      this.currency !== 'ETH';
+
+    // because of typescript issues we need (this.currency === undefined) to be handled in this clause
+    if (this.currency === undefined || !hasValidCurrency || !hasValidAmount) {
       return {
-        amount: 0,
-        displayed: {
-          amount: '',
-          secondaryAmount: '',
-        },
-      };
-    } else if (
-      !isSupportedCurrency(this.currency) ||
-      this.currency === 'DAI' ||
-      this.currency === 'CARD' ||
-      this.currency === 'ETH'
-    ) {
-      return {
-        amount: this.amount,
+        amount: hasValidAmount ? this.amount : 0,
+        currency: this.currency, // always pass the currency in case the wallet can handle it but the DApp can't
         displayed: {
           amount: '',
           secondaryAmount: '',
@@ -50,6 +52,7 @@ export default class PayController extends Controller {
       let amount = Math.max(Math.ceil(this.amount), minSpendAmount);
       return {
         amount,
+        currency: this.currency,
         displayed: {
           amount: convertAmountToNativeDisplay(spendToUsd(amount)!, 'USD'),
         },
@@ -61,6 +64,7 @@ export default class PayController extends Controller {
       );
       return {
         amount,
+        currency: this.currency,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, 'USD'),
         },
@@ -93,16 +97,13 @@ export default class PayController extends Controller {
 
       return {
         amount,
+        currency: this.currency,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, this.currency),
           secondaryAmount: usdAmount,
         },
       };
     }
-  }
-
-  get isValidAmount() {
-    return !isNaN(this.amount) && this.amount > 0 && this.amount !== Infinity;
   }
 
   get merchantInfo() {
@@ -114,7 +115,7 @@ export default class PayController extends Controller {
       ? this.merchantInfo.name + ' requests payment'
       : 'Payment Requested';
     let paySubject =
-      this.cleanedAmounts.displayed.amount ||
+      this.cleanedValues.displayed.amount ||
       this.merchantInfo.name ||
       'Payment Request';
     return {
@@ -131,8 +132,8 @@ export default class PayController extends Controller {
     return generateMerchantPaymentUrl({
       network: this.model.network,
       merchantSafeID: this.model.merchantSafe.address,
-      currency: this.currency,
-      amount: this.cleanedAmounts.amount,
+      currency: this.cleanedValues.currency,
+      amount: this.cleanedValues.amount,
     });
   }
 
@@ -141,8 +142,8 @@ export default class PayController extends Controller {
       domain: config.universalLinkDomain,
       network: this.model.network,
       merchantSafeID: this.model.merchantSafe.address,
-      currency: this.currency,
-      amount: this.cleanedAmounts.amount,
+      currency: this.cleanedValues.currency,
+      amount: this.cleanedValues.amount,
     });
   }
 }
