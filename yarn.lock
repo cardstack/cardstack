@@ -31364,7 +31364,7 @@ web3-provider-engine@^16.0.1, web3-provider-engine@^16.0.3:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-"web3-provider-engine@github:habdelra/web3-provider-engine":
+web3-provider-engine@habdelra/web3-provider-engine:
   version "16.0.1"
   resolved "https://codeload.github.com/habdelra/web3-provider-engine/tar.gz/d9e5d9545c1af75124ca027bce5aaa84a3c4fda4"
   dependencies:
