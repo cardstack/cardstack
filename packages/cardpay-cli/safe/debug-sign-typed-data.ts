@@ -32,7 +32,7 @@ export default {
     let web3 = await getWeb3(network, getWeb3Opts(args));
     address = address ?? (await web3.eth.getAccounts())[0];
     console.log(`Signing typed data for address ${address}:
-    ${dataStr}
+    ${JSON.stringify(data, null, 2)}
     `);
 
     let signature = await signTypedData(web3, address, data);
