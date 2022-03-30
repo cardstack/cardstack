@@ -59,7 +59,7 @@ const merchantSafeWithoutInfo = createMerchantSafe({
   owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
 });
 const spendAmount = 300;
-const usdAmount = spendToUsd(spendAmount);
+const usdAmount = spendToUsd(spendAmount)!;
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 const minUsdAmount = spendToUsd(MIN_PAYMENT_AMOUNT_IN_SPEND)!;
 const lessThanMinSpendAmount = 10;
@@ -95,7 +95,7 @@ module('Acceptance | pay', function (hooks) {
     });
   });
 
-  test('It displays merchant info correctly in a non-iOS environment', async function (assert) {
+  test('It displays merchant info correctly in a non-iOS/non-Android environment', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
 
     await waitFor(MERCHANT);
@@ -167,17 +167,15 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+      .containsText(convertAmountToNativeDisplay(usdAmount, 'USD'));
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: spendAmount,
+      currency: usdSymbol,
+      amount: usdAmount,
     });
     assert
       .dom(QR_CODE)
@@ -186,18 +184,16 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders appropriate meta tags', async function (assert) {
-    const floatingSpendAmount = 279.17;
-    const roundedSpendAmount = Math.ceil(floatingSpendAmount);
     await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
+      `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
     await waitFor(MERCHANT);
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: roundedSpendAmount,
+      currency: usdSymbol,
+      amount: usdAmount,
     });
     let expectedPath = expectedUrl.substring(
       expectedUrl.indexOf(universalLinkDomain) + universalLinkDomain.length
@@ -230,10 +226,7 @@ module('Acceptance | pay', function (hooks) {
       )
       .exists();
 
-    let amountInUSD = convertAmountToNativeDisplay(
-      spendToUsd(roundedSpendAmount)!,
-      'USD'
-    );
+    let amountInUSD = convertAmountToNativeDisplay(usdAmount, 'USD');
     let description = `Use Card Wallet to pay ${amountInUSD}`;
 
     assert
@@ -272,24 +265,19 @@ module('Acceptance | pay', function (hooks) {
 
   test('it rounds floating point SPEND amounts', async function (assert) {
     const floatingSpendAmount = 279.17;
-    const roundedSpendAmount = Math.ceil(floatingSpendAmount);
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
     );
 
-    assert
-      .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(roundedSpendAmount)!, 'USD')
-      );
+    assert.dom(AMOUNT).containsText('$2.80 USD');
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: roundedSpendAmount,
+      currency: usdSymbol,
+      amount: 2.8,
     });
     assert
       .dom(QR_CODE)
@@ -311,8 +299,10 @@ module('Acceptance | pay', function (hooks) {
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: minSpendAmount,
+      currency: usdSymbol,
+      amount: Number(
+        roundAmountToNativeCurrencyDecimals(spendToUsd(minSpendAmount)!, 'USD')
+      ),
     });
     assert
       .dom(QR_CODE)
@@ -321,24 +311,18 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders correctly with no currency provided', async function (assert) {
-    // this is basically defaulting to SPEND
-    await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}`
-    );
+    // Don't render any amounts, esp in the URL. The wallet wants to respect
+    // user preferences for currencies when currency is not specified
+    // so we should not allow requests for amounts without currencies
+    await visit(`/pay/${network}/${merchantSafe.address}?amount=5000`);
 
-    assert
-      .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+    assert.dom(AMOUNT).doesNotExist();
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: spendAmount,
     });
     assert
       .dom(QR_CODE)
@@ -353,9 +337,7 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+      .containsText(convertAmountToNativeDisplay(usdAmount, 'USD'));
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
@@ -525,7 +507,7 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders correctly if amount is malformed', async function (assert) {
     await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=30a&currency=${spendSymbol}`
+      `/pay/${network}/${merchantSafe.address}?amount=30a&currency=${usdSymbol}`
     );
 
     assert.dom(AMOUNT).doesNotExist();
@@ -535,7 +517,7 @@ module('Acceptance | pay', function (hooks) {
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
+      currency: usdSymbol,
       amount: 0,
     });
     assert
@@ -549,14 +531,12 @@ module('Acceptance | pay', function (hooks) {
     sinon.stub(UAService, 'isIOS').returns(true);
 
     await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
+      `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
 
     assert
       .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+      .containsText(convertAmountToNativeDisplay(usdAmount, 'USD'));
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     // assert that the deep link view is rendered
@@ -569,16 +549,16 @@ module('Acceptance | pay', function (hooks) {
         generateMerchantPaymentUrl({
           network,
           merchantSafeID: merchantSafe.address,
-          currency: spendSymbol,
-          amount: spendAmount,
+          currency: usdSymbol,
+          amount: usdAmount,
         })
       );
     assert.dom(PAYMENT_URL).containsText(
       generateMerchantPaymentUrl({
         network,
         merchantSafeID: merchantSafe.address,
-        currency: spendSymbol,
-        amount: spendAmount,
+        currency: usdSymbol,
+        amount: usdAmount,
       })
     );
   });
@@ -588,14 +568,12 @@ module('Acceptance | pay', function (hooks) {
     sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
+      `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
 
     assert
       .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+      .containsText(convertAmountToNativeDisplay(usdAmount, 'USD'));
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     // assert that the deep link view is rendered
@@ -608,23 +586,23 @@ module('Acceptance | pay', function (hooks) {
         generateMerchantPaymentUrl({
           network,
           merchantSafeID: merchantSafe.address,
-          currency: spendSymbol,
-          amount: spendAmount,
+          currency: usdSymbol,
+          amount: usdAmount,
         })
       );
     assert.dom(PAYMENT_URL).containsText(
       generateMerchantPaymentUrl({
         network,
         merchantSafeID: merchantSafe.address,
-        currency: spendSymbol,
-        amount: spendAmount,
+        currency: usdSymbol,
+        amount: usdAmount,
       })
     );
   });
 
   test('it renders appropriate UI when merchant info is not fetched', async function (assert) {
     await visit(
-      `/pay/${network}/${merchantSafeWithoutInfo.address}?amount=${spendAmount}&currency=${spendSymbol}`
+      `/pay/${network}/${merchantSafeWithoutInfo.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
     await waitFor(MERCHANT_INFO_ADDRESS_ONLY);
 
@@ -639,17 +617,15 @@ module('Acceptance | pay', function (hooks) {
       );
     assert
       .dom(AMOUNT)
-      .containsText(
-        convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')
-      );
+      .containsText(convertAmountToNativeDisplay(usdAmount, 'USD'));
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafeWithoutInfo.address,
-      currency: spendSymbol,
-      amount: spendAmount,
+      currency: usdSymbol,
+      amount: usdAmount,
     });
     assert
       .dom(QR_CODE)
@@ -690,7 +666,7 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
     await visit(
-      `/pay/${network}/${nonexistentMerchantId}?amount=${spendAmount}&currency=${spendSymbol}`
+      `/pay/${network}/${nonexistentMerchantId}?amount=${usdAmount}&currency=${usdSymbol}`
     );
 
     await waitFor(MERCHANT_MISSING_MESSAGE);

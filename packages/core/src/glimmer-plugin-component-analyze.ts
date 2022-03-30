@@ -2,7 +2,7 @@ import * as syntax from '@glimmer/syntax';
 import { Format } from './interfaces';
 import { augmentBadRequest } from './utils/errors';
 import { ScopeTracker } from './glimmer-scope-tracker';
-import { ComponentMeta } from './babel-plugin-card-template';
+import { TemplateUsageMeta } from './analyze';
 
 export class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
@@ -14,7 +14,7 @@ export class InvalidModelUsageError extends Error {
 type HandledPathExpressions = WeakSet<syntax.ASTv1.PathExpression>;
 
 export interface Options {
-  meta: ComponentMeta;
+  usageMeta: TemplateUsageMeta;
   debugPath?: string;
 }
 
@@ -24,31 +24,23 @@ type ScopeValue =
   | { type: 'stringLiteral'; value: string }
   | { type: 'pathExpression'; value: string };
 
-export default function glimmerTemplateAnalyze(
-  source: string,
-  debugPath: string
-): Pick<ComponentMeta, 'fields' | 'model'> {
-  let output: Pick<ComponentMeta, 'fields' | 'model'> = {
-    fields: new Map(),
-    model: new Set(),
-  };
+export default function glimmerTemplateAnalyze(source: string, options: Options): void {
   try {
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardTransformPlugin(output)],
+        ast: [cardTransformPlugin(options.usageMeta)],
       },
       meta: {
-        moduleName: debugPath,
+        moduleName: options.debugPath,
       },
     });
   } catch (error: any) {
     throw augmentBadRequest(error);
   }
-  return output;
 }
 
-export function cardTransformPlugin(meta: Pick<ComponentMeta, 'fields' | 'model'>): syntax.ASTPluginBuilder {
+export function cardTransformPlugin(meta: TemplateUsageMeta): syntax.ASTPluginBuilder {
   return function transform(_env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
     let handledPathExpressions: HandledPathExpressions = new WeakSet();
     let scopeTracker = new ScopeTracker<ScopeValue>();

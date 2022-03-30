@@ -64,7 +64,7 @@ if (process.env.COMPILER) {
       await getCardForPath('thing').expect(404);
     });
 
-    it.skip("can load a simple isolated card's data", async function () {
+    it("can load a simple isolated card's data", async function () {
       let response = await getCardForPath('about').expect(200);
       expect(response.body.data.id).to.equal(`${TEST_REALM}about`);
       let componentModule = response.body.data?.meta.componentModule;
