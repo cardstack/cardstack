@@ -207,9 +207,9 @@ if (process.env.COMPILER) {
       let source = getFileCache().getModule(compiled.schemaModule.global, 'browser');
       expect(source).to.containsSource(`
         const usedFields = {
-          edit: ["lastName", "aboutMe.birthdate", "aboutMe.background"],
           isolated: ["fullName", "aboutMe.birthdate", "slowName"],
-          embedded: ["fullName"]
+          embedded: ["fullName"],
+          edit: ["lastName", "aboutMe.birthdate", "aboutMe.background"]
         }
       `);
     });
