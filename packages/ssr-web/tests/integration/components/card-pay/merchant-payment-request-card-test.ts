@@ -31,7 +31,7 @@ let merchant: MerchantInfoResource;
 const merchantAddress = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 
 module(
-  'Integration | Component | card-pay/merchant-payment-request-card',
+  'Integration | Component | merchant-payment-request-card',
   function (hooks) {
     setupRenderingTest(hooks);
 
@@ -56,7 +56,7 @@ module(
 
     test('It renders the non-deep-link view correctly with merchant display info', async function (assert) {
       await render(hbs`
-        <CardPay::MerchantPaymentRequestCard
+        <MerchantPaymentRequestCard
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -89,7 +89,7 @@ module(
 
     test('It renders the deep-link view correctly and allows toggling', async function (assert) {
       await render(hbs`
-        <CardPay::MerchantPaymentRequestCard
+        <MerchantPaymentRequestCard
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -144,7 +144,7 @@ module(
     test('It renders correctly with merchant address and failure to fetch merchant info', async function (assert) {
       merchant.errored = new Error('An error');
       await render(hbs`
-        <CardPay::MerchantPaymentRequestCard
+        <MerchantPaymentRequestCard
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -173,7 +173,7 @@ module(
     test('It renders a loading state while a merchant is loading', async function (assert) {
       merchant.loading = true;
       await render(hbs`
-        <CardPay::MerchantPaymentRequestCard
+        <MerchantPaymentRequestCard
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
