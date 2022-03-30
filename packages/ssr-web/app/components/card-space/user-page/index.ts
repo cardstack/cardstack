@@ -19,6 +19,7 @@ interface CardSpaceUserPageArgs {
     id: string;
     name: string;
     backgroundColor: string;
+    ownerAddress: string;
     textColor: string;
   };
 }
@@ -89,5 +90,11 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
       merchantSafeID: this.address as string,
       network: config.chains.layer2,
     });
+  }
+
+  get authIsForModel() {
+    return this.layer2Network.walletInfo.accounts
+      .mapBy('address')
+      .includes(this.args.model.ownerAddress);
   }
 }

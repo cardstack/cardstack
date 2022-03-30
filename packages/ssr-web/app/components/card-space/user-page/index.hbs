@@ -38,7 +38,11 @@
             Loading…
           {{else}}
             {{#if this.hubAuthentication.isAuthenticated}}
-              Authed!
+              {{#if this.authIsForModel}}
+                <span data-test-auth-for-this-space>Authed for this space</span>
+              {{else}}
+                <span data-test-auth-not-for-this-space>Authed but not for this space</span>
+              {{/if}}
             {{else}}
               <Boxel::Button
                 @as='link-to'

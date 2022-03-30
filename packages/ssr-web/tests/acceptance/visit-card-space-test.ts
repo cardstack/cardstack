@@ -13,6 +13,7 @@ import sinon from 'sinon';
 
 let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+let otherLayer2AccountAddress = '0x1000000000000000000000000000000000000000';
 let layer2Service: TestLayer2Web3Strategy;
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
@@ -71,6 +72,7 @@ module('Acceptance | visit card space', function (hooks) {
         slug: 'slug',
         color: 'blue',
         textColor: 'hotpink',
+        ownerAddress: layer2AccountAddress,
       });
 
       link = generateMerchantPaymentUrl({
@@ -208,7 +210,7 @@ module('Acceptance | visit card space', function (hooks) {
         );
     });
 
-    module('authed', async function (this: MirageTestContext) {
+    module('authed for this space', async function (this: MirageTestContext) {
       hooks.beforeEach(async function (this: MirageTestContext) {
         // this is the condition for initializing with an authenticated state
         // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
@@ -227,8 +229,33 @@ module('Acceptance | visit card space', function (hooks) {
         await visit('/');
 
         assert.dom('[data-test-connect-button]').doesNotExist();
+        assert.dom('[data-test-auth-for-this-space]').exists();
       });
     });
+
+    module(
+      'authed for another space',
+      async function (this: MirageTestContext) {
+        hooks.beforeEach(async function (this: MirageTestContext) {
+          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+          layer2Service = this.owner.lookup('service:layer2-network').strategy;
+          await layer2Service.test__simulateAccountsChanged([
+            otherLayer2AccountAddress,
+          ]);
+        });
+
+        hooks.afterEach(async function () {
+          delete window.TEST__AUTH_TOKEN;
+        });
+
+        test('it shows when auth is present', async function (assert) {
+          await visit('/');
+
+          assert.dom('[data-test-connect-button]').doesNotExist();
+          assert.dom('[data-test-auth-not-for-this-space]').exists();
+        });
+      }
+    );
   });
 
   test('renders an error for a missing slug', async function (this: MirageTestContext, assert) {
