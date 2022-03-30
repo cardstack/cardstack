@@ -50,7 +50,7 @@
     <Common::PaymentLink
       @mode={{this.paymentLinkMode}}
       @switchMode={{fn (set this "paymentLinkMode")}}
-      @image={{@image}}
+      @image={{this.cardstackLogoForQR}}
       @paymentURL={{@paymentURL}}
       @deepLinkPaymentURL={{@deepLinkPaymentURL}}
     />
