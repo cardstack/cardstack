@@ -17,9 +17,9 @@
   <meta name='twitter:image' content={{this.cardPayLogoPng}} />
 </InHead>
 
-<UniversalLinkPageLayout>
-  <UniversalLinkHeader/>
-  <UniversalLinkCard>
+<UniversalLinkPage::Layout>
+  <UniversalLinkPage::Header/>
+  <UniversalLinkPage::Card>
     <MerchantPaymentRequest
       @amount={{this.cleanedValues.displayed.amount}}
       @secondaryAmount={{this.cleanedValues.displayed.secondaryAmount}}
@@ -29,6 +29,6 @@
       @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
       @canDeepLink={{this.canDeepLink}}
     />
-  </UniversalLinkCard>
+  </UniversalLinkPage::Card>
   <Common::Footer />
-</UniversalLinkPageLayout>
+</UniversalLinkPage::Layout>
