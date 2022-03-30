@@ -1,7 +1,5 @@
 /* eslint-env node */
 
-// FIXME copypaste from web-client
-
 module.exports = function (deployTarget) {
   // these get less aggressive caching because they exist at stable URLs
   let s3PagePattern = '**/*.{html,zip,pdf,css}'; // note that fingerprinting has not been implemented in embroider yet, using less agressive caching for css for now
