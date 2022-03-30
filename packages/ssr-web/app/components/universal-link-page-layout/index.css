@@ -1,4 +1,4 @@
-.merchant-payment-request-page {
+.universal-link-page {
   --page-content-max-width: 720px;
   --degraded-service-banner-content-max-width: var(--page-content-max-width);
 
@@ -16,10 +16,4 @@
   letter-spacing: var(--boxel-lsp-lg);
   z-index: 0;
   padding: 0 var(--boxel-sp) var(--boxel-sp-xxxl) var(--boxel-sp);
-}
-
-.merchant-payment-request-page__merchant-missing-message {
-  text-align: center;
-  max-width: 40ch;
-  justify-self: center;
 }

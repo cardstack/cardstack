@@ -1,5 +1,4 @@
 import Route from '@ember/routing/route';
-import '../css/pay.css';
 import { inject as service } from '@ember/service';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
