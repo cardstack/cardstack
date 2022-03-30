@@ -155,6 +155,7 @@ export default abstract class Layer2ChainWeb3Strategy
       // if we get here when a user loads a page, then it means that the user did not have
       // a connection from local storage. We can safely say they are initialized
       this.isInitializing = false;
+      this.simpleEmitter.emit('initialized');
       this.walletConnectUri = payload.params[0];
     });
 
@@ -174,6 +175,7 @@ export default abstract class Layer2ChainWeb3Strategy
         this.disconnect();
       } finally {
         this.isInitializing = false;
+        this.simpleEmitter.emit('initialized');
       }
     });
 
