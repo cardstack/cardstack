@@ -1,4 +1,4 @@
-.merchant-payment-request-card {
+.universal-link-card {
   --horizontal-padding: var(--boxel-sp-xl);
   --section-vertical-padding: var(--boxel-sp-xl);
 
@@ -7,11 +7,11 @@
   color: var(--boxel-dark);
 }
 
-.merchant-payment-request-card__section {
+.universal-link-card__section {
   padding: var(--section-vertical-padding) 0;
 }
 
-.merchant-payment-request-card__get-card-wallet {
+.universal-link-card__get-card-wallet {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -23,18 +23,18 @@
   flex-wrap: wrap;
 }
 
-.merchant-payment-request-card__get-card-wallet .merchant-payment-request-card__card-wallet {
+.universal-link-card__get-card-wallet .universal-link-card__card-wallet {
   display: flex;
   align-items: center;
   gap: var(--boxel-sp-sm);
   flex-shrink: 0;
 }
 
-.merchant-payment-request-card__get-card-wallet .merchant-payment-request-card__card-wallet-icon {
+.universal-link-card__get-card-wallet .universal-link-card__card-wallet-icon {
   flex-shrink: 0;
 }
 
-.merchant-payment-request-card__card-wallet-text {
+.universal-link-card__card-wallet-text {
   display: flex;
   flex-direction: column;
   font-weight: 700;
@@ -43,12 +43,12 @@
   letter-spacing: 0.11px;
 }
 
-.merchant-payment-request-card__card-wallet-fine-print {
+.universal-link-card__card-wallet-fine-print {
   font-weight: 400;
 }
 
 @media only screen and (max-width: 480px) {
-  .merchant-payment-request-card {
+  .universal-link-card {
     --horizontal-padding: var(--boxel-sp-lg);
     --section-vertical-padding: var(--boxel-sp-lg);
   }
