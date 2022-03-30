@@ -36,9 +36,8 @@ jobs:
       # percy
       - run: npm install -g @percy/cli
       - name: Run tests
-        # FIXME remove
-        # env:
-        #   PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
         run: yarn test:ssr-web:percy
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v1.28
