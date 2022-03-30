@@ -2,7 +2,11 @@ const componentHeader = `import { setComponentTemplate } from '@ember/component'
 import { precompileTemplate } from '@ember/template-compilation';
 import templateOnlyComponent from '@ember/component/template-only';`;
 
-export function templateOnlyComponentTemplate(template: string, imports?: Record<string, string>): string {
+export function templateOnlyComponentTemplate(
+  template: string,
+  imports?: Record<string, string>,
+  exportName = 'default'
+): string {
   let otherImports = '';
   let options = '{ strictMode: true ';
 
@@ -17,7 +21,7 @@ export function templateOnlyComponentTemplate(template: string, imports?: Record
   return `
     ${componentHeader}
     ${otherImports}
-    export default setComponentTemplate(
+    export ${exportName === 'default' ? 'default' : `const ${exportName} = `} setComponentTemplate(
       precompileTemplate('${template}', ${options}),
       templateOnlyComponent()
     );
