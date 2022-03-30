@@ -43,7 +43,7 @@ class MockAppContext extends AppContext {
     return 'slug';
   }
 
-  // This is temporary until auth is public for all, how to remove…?
+  // TODO remove when auth button is shown for all
   get searchParams() {
     const searchParams = new URLSearchParams();
     searchParams.set('auth', 'true');
