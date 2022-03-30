@@ -34,7 +34,7 @@
 
       {{#if this.hubAuthentication.showAuth}}
         <section class='card-space-user-page__auth'>
-          {{#if (or this.layer2Network.isInitializing this.hubAuthentication.isInitializing)}}
+          {{#if this.hubAuthentication.isInitializing}}
             Loading…
           {{else}}
             {{#if this.hubAuthentication.isAuthenticated}}
