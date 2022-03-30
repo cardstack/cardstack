@@ -38,9 +38,8 @@ jobs:
       # percy
       - run: npm install -g @percy/cli
       - name: Run tests
-        # FIXME restore
-        # env:
-        #   PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
         run: yarn test:web-client:percy
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v1.28
