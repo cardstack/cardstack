@@ -3,15 +3,22 @@
   "allowedGuilds": ["584043165066199050"],
   "deploy": {
     "default": {
-      "environment": "production",
-      "ref": "main"
+      "environment": "production"
     },
     "allowedChannels": ["866667164764471346"],
     "allowedRoles": ["Engineering Team", "Cardstack Core Team"]
   },
   "github": {
     "owner": "cardstack",
-    "repo": "cardstack",
-    "default_branch": "main"
+    "repositories": [
+      {
+        "name": "cardstack"
+      },
+      {
+        "name": "card-protocol-relay-service",
+        "alias": "relay",
+        "default_branch": "master"
+      }
+    ]
   }
 }
