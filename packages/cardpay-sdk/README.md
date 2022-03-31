@@ -795,7 +795,7 @@ The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is pa
 ```ts
 interface GasEstimate {
   gasToken: string 
-  amount: string; // tokens in unit of wei
+  amount: BN 
 }
 ```
 
