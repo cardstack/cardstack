@@ -241,5 +241,37 @@ if (process.env.COMPILER) {
       await model.setData({ willBoom: 'false' });
       expect(await model.getField('boom')).to.eq('no boom');
     });
+
+    it(`can have a composite field that is the same as the card itself`, async function () {
+      await cards.create({
+        realm: realmURL,
+        id: 'vanGogh',
+        schema: 'schema.js',
+        data: {
+          name: 'Van Gogh',
+          sibling: {
+            name: 'Mango',
+          },
+        },
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Dog {
+              @contains(string) name;
+              @contains(Dog) sibling;
+            }
+          `,
+        },
+      });
+      let model = await cards.loadModel(`${realmURL}vanGogh`, 'isolated');
+      expect(model.data.sibling.name).to.equal('Mango');
+      expect(model.serialize().attributes).to.deep.equal({
+        name: 'Van Gogh',
+        sibling: {
+          name: 'Mango',
+        },
+      });
+    });
   });
 }

@@ -1,131 +1,39 @@
-import { transformSync, transformFromAstSync } from '@babel/core';
+import { transformFromAstSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
 import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { ImportUtil } from 'babel-import-util';
-import { CompiledCard, ComponentInfo, Format } from './interfaces';
+import { Format } from './interfaces';
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
-import { getFieldForPath } from './utils/fields';
 import { augmentBadRequest } from './utils/errors';
 import { CallExpression } from '@babel/types';
-import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
-import { isEmpty } from 'lodash';
-
-export interface TemplateUsageMeta {
-  model: 'self' | Set<string>;
-  fields: 'self' | Map<string, Format | 'default'>;
-}
+import { FieldsWithPlaceholders } from './compiler';
+import { ComponentMeta } from './analyze';
 
 interface TransformComponentOptions {
+  ast: t.File;
   templateSource: string;
   debugPath: string;
-  fields: CompiledCard['fields'];
+  fields: FieldsWithPlaceholders;
   defaultFieldFormat: Format;
+  meta: ComponentMeta;
   resolveImport: (relativePath: string) => string;
 }
 
 export default function (params: TransformComponentOptions): {
   source: string;
   ast: t.File;
-  usedFields: ComponentInfo['usedFields'];
-  inlineHBS: string | undefined;
 } {
   // HACK: The / resets the relative path setup, removing the cwd of the hub.
   // This allows the error module to look a lot more like the card URL.
   let debugPath = '/' + params.debugPath.replace(/^\//, '');
 
   try {
-    // this part will move into compiler's analyze phase, so it shouldn't use
-    // any knowledge of CompiledCard, shouldn't resolve imports, etc.
-    let { ast, meta } = analyzeComponent(params.templateSource, debugPath);
-
-    // This will become the semantic phase
-    let usedFields = buildUsedFieldsListFromUsageMeta(params.fields, params.defaultFieldFormat, meta);
-    let inlineHBS = canInlineHBS(meta.hasModifiedScope, meta.usage, params.fields, params.defaultFieldFormat)
-      ? meta.rawHBS
-      : undefined;
-
-    return {
-      // this part will move into the compiler's transform phase
-      ...transformComponent({ ...params, debugPath }, ast, meta),
-      usedFields,
-      inlineHBS,
-    };
+    return transformComponent({ ...params, debugPath }, params.ast, params.meta);
   } catch (e: any) {
     throw augmentBadRequest(e);
   }
-}
-
-export interface ComponentMeta {
-  usage: TemplateUsageMeta;
-  hasModifiedScope: boolean;
-  rawHBS: string | undefined;
-}
-
-interface AnalyzePluginOptions {
-  meta: ComponentMeta;
-  debugPath: string;
-}
-interface AnalyzePluginState {
-  opts: AnalyzePluginOptions;
-  insideExportDefault: boolean;
-}
-
-export function analyzeComponent(templateSource: string, debugFilename: string): { ast: t.File; meta: ComponentMeta } {
-  let meta: ComponentMeta = {
-    usage: { model: new Set(), fields: new Map() },
-    hasModifiedScope: false,
-    rawHBS: undefined,
-  };
-
-  let options: AnalyzePluginOptions = { meta, debugPath: debugFilename };
-
-  let out = transformSync(templateSource, {
-    ast: true,
-    code: false,
-    plugins: [[babelPluginComponentAnalyze, options]],
-    filename: debugFilename,
-  });
-
-  return { ast: out!.ast!, meta };
-}
-
-function babelPluginComponentAnalyze(babel: typeof Babel) {
-  let t = babel.types;
-  return {
-    visitor: {
-      Program: {
-        enter(_path: NodePath<t.Program>, state: AnalyzePluginState) {
-          state.insideExportDefault = false;
-        },
-      },
-
-      ExportDefaultDeclaration: {
-        enter(_path: NodePath, state: AnalyzePluginState) {
-          state.insideExportDefault = true;
-        },
-        exit(_path: NodePath, state: AnalyzePluginState) {
-          state.insideExportDefault = false;
-        },
-      },
-
-      CallExpression: {
-        enter(path: NodePath<CallExpression>, state: AnalyzePluginState) {
-          if (isComponentTemplateExpression(path, state)) {
-            let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
-            state.opts.meta.rawHBS = rawTemplate;
-            state.opts.meta.hasModifiedScope = !!getObjectKey(precompileTemplateOptions, 'scope', t);
-
-            glimmerTemplateAnalyze(rawTemplate, {
-              usageMeta: state.opts.meta.usage,
-              debugPath: state.opts.debugPath,
-            });
-          }
-        },
-      },
-    },
-  };
 }
 
 function transformComponent(transformOpts: TransformComponentOptions, ast: t.File, meta: ComponentMeta) {
@@ -203,17 +111,15 @@ function callExpressionEnter(path: NodePath<t.CallExpression>, state: TransformS
   updatePrecompileTemplateScopeOption(options, neededScope, t);
 }
 
-function isComponentTemplateExpression(
-  path: NodePath<t.CallExpression>,
-  state: TransformState | AnalyzePluginState
-): boolean {
+function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: TransformState): boolean {
   return (
     state.insideExportDefault &&
     path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
   );
 }
 
-function validateAndGetComponent(
+// TODO: Should this be exported from here or placed somewhere else?
+export function validateAndGetComponent(
   path: NodePath<t.CallExpression>,
   t: typeof Babel.types
 ): {
@@ -306,85 +212,4 @@ function updatePrecompileTemplateScopeOption(
   }
 
   scope.node.body.properties = scope.node.body.properties.concat(scopeVars);
-}
-
-function buildUsedFieldsListFromUsageMeta(
-  fields: CompiledCard['fields'],
-  defaultFieldFormat: Format,
-  meta: ComponentMeta
-): ComponentInfo['usedFields'] {
-  let usageMeta = meta.usage;
-  let usedFields: Set<string> = new Set();
-
-  if (usageMeta.model && usageMeta.model !== 'self') {
-    for (const fieldPath of usageMeta.model) {
-      usedFields.add(fieldPath);
-    }
-  }
-
-  if (usageMeta.fields === 'self') {
-    usedFields = new Set([...usedFields, ...Object.keys(fields)]);
-  } else {
-    for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
-      buildUsedFieldListFromComponents(
-        usedFields,
-        fieldPath,
-        fields,
-        fieldFormat === 'default' ? defaultFieldFormat : fieldFormat
-      );
-    }
-  }
-
-  return [...usedFields];
-}
-
-function buildUsedFieldListFromComponents(
-  usedFields: Set<string>,
-  fieldPath: string,
-  fields: CompiledCard['fields'],
-  format: Format,
-  prefix?: string
-): void {
-  let field = getFieldForPath(fields, fieldPath);
-
-  if (field && field.card.componentInfos[format].usedFields.length) {
-    for (const nestedFieldPath of field.card.componentInfos[format].usedFields) {
-      buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
-    }
-  } else {
-    if (prefix) {
-      usedFields.add(`${prefix}.${fieldPath}`);
-    } else {
-      usedFields.add(fieldPath);
-    }
-  }
-}
-
-function canInlineHBS(
-  hasModifiedScope: boolean,
-  usageMeta: TemplateUsageMeta,
-  fields: CompiledCard['fields'],
-  defaultFieldFormat: Format
-): boolean {
-  if (hasModifiedScope) {
-    return false;
-  }
-
-  if (isEmpty(fields)) {
-    return true;
-  }
-
-  let fieldsToInspect: [string, Format | 'default'][];
-  if (usageMeta.fields === 'self') {
-    fieldsToInspect = Object.keys(fields).map((path) => [path, defaultFieldFormat]);
-  } else {
-    fieldsToInspect = [...usageMeta.fields.entries()];
-  }
-
-  // If every field this card uses is inlinable, then this card can be inlined as well
-  return fieldsToInspect.every(([path, format]) => {
-    let field = getFieldForPath(fields, path);
-    let actualFormat: Format = format === 'default' ? defaultFieldFormat : format;
-    return !!field?.card.componentInfos[actualFormat].inlineHBS;
-  });
 }

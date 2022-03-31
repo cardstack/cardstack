@@ -226,7 +226,6 @@ export default class CardModel {
     if (this.recomputePromise !== recomputePromise) {
       return;
     }
-
     for (let field of this.schemaModule.default.loadedFields(newSchemaInstance)) {
       try {
         await this.getField(field, newSchemaInstance);
