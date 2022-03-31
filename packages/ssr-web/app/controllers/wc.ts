@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
 import config from '@cardstack/ssr-web/config/environment';
-import CardstackLogo from '@cardstack/ssr-web/images/logos/cardstack-logo.jpg';
+import CardPayLogoPng from '@cardstack/ssr-web/images/logos/card-pay-logo.png';
 
 export default class WcController extends Controller {
-  cardstackLogo = 'https://' + config.universalLinkDomain + CardstackLogo;
+  cardPayLogoPng = 'https://' + config.universalLinkDomain + CardPayLogoPng;
 }
