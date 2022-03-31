@@ -6,4 +6,13 @@ interface Command {
   execute(message: Message, args: string[]): Promise<void>;
 }
 
-export { Command };
+interface RepositoryConfig {
+  name: string;
+  alias?: string;
+  default_branch?: string;
+}
+interface WorkflowInfo {
+  id: number;
+  repository: RepositoryConfig;
+}
+export { Command, RepositoryConfig, WorkflowInfo };
