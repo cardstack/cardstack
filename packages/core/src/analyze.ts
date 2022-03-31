@@ -212,10 +212,10 @@ function storeComponentMeta(
     usage: usageMeta,
   };
 
-  meta.component = {
-    [exportName]: componentMeta,
-  };
-
+  if (!meta.component) {
+    meta.component = {};
+  }
+  meta.component[exportName] = componentMeta;
   metas.set(state.opts, meta);
 }
 

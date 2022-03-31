@@ -261,6 +261,36 @@ if (process.env.COMPILER) {
       });
     });
 
+    it('Has multiple named exports for component', async function () {
+      let template = `import { setComponentTemplate } from '@ember/component';
+      import { precompileTemplate } from '@ember/template-compilation';
+      import templateOnlyComponent from '@ember/component/template-only';
+
+      export default setComponentTemplate(
+        precompileTemplate('<h1>Hello world</h1>', { strictMode: true }), templateOnlyComponent()
+      );
+
+      export const named = setComponentTemplate(
+        precompileTemplate('<h1>Goodbye</h1>', { strictMode: true }), templateOnlyComponent()
+      );
+      `;
+
+      let { meta } = cardAnalyze(template, 'test.js');
+
+      expect(meta.component).to.deep.equal({
+        default: {
+          usage: { model: new Set(), fields: new Map() },
+          rawHBS: '<h1>Hello world</h1>',
+          hasModifiedScope: false,
+        },
+        named: {
+          usage: { model: new Set(), fields: new Map() },
+          rawHBS: '<h1>Goodbye</h1>',
+          hasModifiedScope: false,
+        },
+      });
+    });
+
     it('Understands when a card has modified the scope of a template', async function () {
       let { meta } = cardAnalyze(
         templateOnlyComponentTemplate('<FancyTool @value={{@model}} />', { FancyTool: '@org/fancy-tool/component' }),
