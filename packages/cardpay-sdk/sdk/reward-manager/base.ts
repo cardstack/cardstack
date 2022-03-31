@@ -54,6 +54,7 @@ const rewardProgramQuery = `
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
+  private rewardSafeDelegate: Contract | undefined;
 
   constructor(private layer2Web3: Web3) {}
 
@@ -472,10 +473,7 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
-    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
-      RewardSafeDelegateABI as AbiItem[],
-      rewardSafeDelegateAddress
-    );
+    let rewardSafeDelegate = await this.getRewardSafeDelegate();
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -560,6 +558,34 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
+
+  async withdrawGasEstimate(
+    rewardSafeAddress: string,
+    to: string,
+    tokenAddress: string,
+    amount: string
+  ): Promise<GasEstimate> {
+    let rewardManagerAddress = this.address();
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    let weiAmount = new BN(amount);
+    let withdraw = await (
+      await this.getRewardSafeDelegate()
+    ).methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+    let withdrawPayload = withdraw.encodeABI();
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      rewardSafeAddress,
+      rewardSafeDelegateAddress,
+      '0',
+      withdrawPayload,
+      Operation.DELEGATECALL,
+      tokenAddress
+    );
+    return {
+      gasToken: estimate.gasToken,
+      amount: gasInToken(estimate),
+    };
   }
 
   async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -993,6 +1019,17 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await getAddress('rewardManager', this.layer2Web3)
     );
     return this.rewardManager;
+  }
+  private async getRewardSafeDelegate(): Promise<Contract> {
+    if (this.rewardSafeDelegate) {
+      return this.rewardSafeDelegate;
+    }
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    this.rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
+    return this.rewardSafeDelegate;
   }
   private rewardeeRegisteredABI(): EventABI {
     return {
