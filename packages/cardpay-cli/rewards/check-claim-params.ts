@@ -3,6 +3,7 @@ import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { fromProof } from './utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
+import { fromWei } from 'web3-utils';
 
 export default {
   command: 'check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]',
@@ -50,6 +51,8 @@ export default {
     if (!amount || !token) {
       throw new Error('tokenType is not supported');
     }
+    let assets = await getSDK('Assets', web3);
+    let { symbol } = await assets.getTokenInfo(token);
     let sufficientBalanceInPool = await rewardPool.sufficientBalanceInPool(
       rewardProgramId,
       amount,
@@ -64,6 +67,8 @@ export default {
     Valid From:                ${validFrom}
     Valid To:                  ${validTo}
     Token type:                ${tokenType}
+    Token:                     ${token} 
+    Amount:                    ${fromWei(amount)} ${symbol}
     Payee/Rewardee:            ${payee}
     `);
 
