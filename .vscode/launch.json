@@ -996,7 +996,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay testnet: Gas Estimate for Withdraw From Reward Safe",
+      "name": "Cardpay testnet: Withdraw From Reward Safe Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
