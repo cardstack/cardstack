@@ -6,7 +6,7 @@ import Web3 from 'web3';
 const { fromWei } = Web3.utils;
 
 export default {
-  command: 'withdraw-from-safe-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>',
+  command: 'withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>',
   describe: 'Gas estimate for withdraw from reward safe',
   builder(yargs: Argv) {
     return yargs
