@@ -566,7 +566,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     tokenAddress: string,
     amount: string
   ): Promise<GasEstimate> {
-    let rewardManagerAddress = this.address();
+    let rewardManagerAddress = await this.address();
     let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
     let weiAmount = new BN(amount);
     let withdraw = await (
