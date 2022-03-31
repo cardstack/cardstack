@@ -5,7 +5,7 @@ import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'transfer-safe <rewardSafe> <newOwner>',
-  describe: 'Withdraw from reward safe',
+  describe: 'Transfer reward safe to a new owner',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardSafe', {
