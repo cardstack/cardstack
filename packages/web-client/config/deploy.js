@@ -111,6 +111,24 @@ module.exports = function (deployTarget) {
     ENV.cloudfront.distribution = 'E3VPNGI7F1WEW8';
   }
 
+  if (
+    deployTarget === 's3-preview-staging' ||
+    deployTarget === 's3-preview-production'
+  ) {
+    ENV.pipeline = {
+      activateOnDeploy: true,
+    };
+    ENV.s3 = {
+      accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
+      secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
+      bucket: process.env.S3_PREVIEW_BUCKET_NAME,
+      region: process.env.S3_PREVIEW_REGION,
+      prefix: process.env.PR_BRANCH_NAME,
+      filePattern: s3AssetPattern.replace('}', ',html}'),
+    };
+    ENV.plugins = ['build', 'compress', 's3'];
+  }
+
   // Note: if you need to build some configuration asynchronously, you can return
   // a promise that resolves with the ENV object instead of returning the
   // ENV object synchronously.

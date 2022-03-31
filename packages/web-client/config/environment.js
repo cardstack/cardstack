@@ -20,6 +20,18 @@ const pkg = require('../package.json');
 
 // eslint-disable-next-line no-undef
 module.exports = function (environment) {
+  const deployTarget = process.env.DEPLOY_TARGET || '';
+  let deployTargetClass = '';
+
+  // Treat preview deployments (ex s3-preview-production) akin to main deployments
+  if (deployTarget.endsWith('staging')) {
+    deployTargetClass = 'staging';
+  } else if (deployTarget.endsWith('production')) {
+    deployTargetClass = 'production';
+  }
+
+  const deployTargetClassIsProduction = deployTargetClass === 'production';
+
   let ENV = {
     modulePrefix: '@cardstack/web-client',
     environment,
@@ -27,7 +39,7 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
-      universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
+      universalLinkHostnamesByTarget[deployTargetClass] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
@@ -66,12 +78,11 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
-      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
+      layer1: deployTargetClassIsProduction ? 'eth' : 'keth',
+      layer2: deployTargetClassIsProduction ? 'xdai' : 'sokol',
     },
     features: {},
-    infuraId:
-      infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
+    infuraId: infuraIdsByTarget[deployTargetClass] ?? process.env.INFURA_ID,
     urls: {
       about: 'https://cardstack.com/cardpay',
       appStoreLink:
@@ -88,7 +99,7 @@ module.exports = function (environment) {
       '/images/icon-favicon-32x32.png',
     ].map((v) => {
       return (
-        (process.env.DEPLOY_TARGET === 'production'
+        (deployTargetClassIsProduction
           ? 'https://app.cardstack.com'
           : 'https://app-staging.stack.cards') + v
       );

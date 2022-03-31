@@ -22,7 +22,7 @@ export class RawCardSerializer {
     return this.doc;
   }
 
-  private includeCompiledMeta(compiled: CompiledCard) {
+  private includeCompiledMeta(compiled: CompiledCard, resourceStack: ResourceObject<Saved | Unsaved>[] = []) {
     if (!findIncluded(this.doc, { type: 'compiled-metas', id: compiled.url })) {
       let keysToSerialize: (keyof CompiledCard)[] = ['schemaModule', 'serializerModule', 'deps', 'componentInfos'];
       let resource = serializeResource('compiled-metas', compiled.url, compiled, keysToSerialize);
@@ -34,7 +34,7 @@ export class RawCardSerializer {
         };
       }
       resource.relationships.fields = {
-        data: Object.values(compiled.fields).map((field) => this.includeField(compiled, field)),
+        data: Object.values(compiled.fields).map((field) => this.includeField(compiled, field, resourceStack)),
       };
 
       this.doc.included.push(resource);
@@ -43,15 +43,17 @@ export class RawCardSerializer {
     return { type: 'compiled-metas', id: compiled.url };
   }
 
-  private includeField(parent: CompiledCard, field: Field) {
+  private includeField(parent: CompiledCard, field: Field, resourceStack: ResourceObject<Saved | Unsaved>[] = []) {
     let id = `${parent.url}/${field.name}`;
     if (!findIncluded(this.doc, { type: 'fields', id })) {
       let resource = serializeResource('fields', id, field, ['name', 'computed', { fieldType: 'type' }]);
-      resource.relationships ||= {};
-      resource.relationships.card = {
-        data: this.includeCompiledMeta(field.card),
-      };
-      this.doc.included.push(resource);
+      if (!resourceStack.find((r) => r.id === resource.id && r.type === resource.type)) {
+        resource.relationships ||= {};
+        resource.relationships.card = {
+          data: this.includeCompiledMeta(field.card, [...resourceStack, resource]),
+        };
+        this.doc.included.push(resource);
+      }
     }
     return { type: 'fields', id };
   }
