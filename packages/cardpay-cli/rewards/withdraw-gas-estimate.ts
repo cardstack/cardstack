@@ -7,7 +7,7 @@ const { fromWei } = Web3.utils;
 
 export default {
   command: 'withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
-  describe: 'Withdraw from reward safe',
+  describe: 'Gas estimate for withdraw from reward safe',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardSafe', {
