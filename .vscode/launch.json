@@ -1004,7 +1004,7 @@
       "args": [
         "index.ts",
         "rewards",
-        "withdraw-from-safe",
+        "withdraw-from-safe-gas-estimate",
         "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
