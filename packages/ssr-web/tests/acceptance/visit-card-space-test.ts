@@ -237,7 +237,7 @@ module('Acceptance | visit card space', function (hooks) {
     );
 
     module(
-      'authed for another space',
+      'authed but not owner',
       async function (this: MirageTestContext, hooks) {
         hooks.beforeEach(async function (this: MirageTestContext) {
           window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
