@@ -605,18 +605,11 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   }
 
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
-    let o = {};
     let assets = await getSDK('Assets', this.layer2Web3);
-    await Promise.all(
-      tokenAddresses.map(async (tokenAddress: string) => {
-        let { symbol } = await assets.getTokenInfo(tokenAddress);
-        o = {
-          ...o,
-          [tokenAddress]: symbol,
-        };
-      })
+    let entries = await Promise.all(
+      tokenAddresses.map(async (tokenAddress) => [tokenAddress, (await assets.getTokenInfo(tokenAddress)).symbol])
     );
-    return o;
+    return Object.fromEntries(entries);
   }
 
   private decodeLeaf(leaf: string): FullLeaf {
