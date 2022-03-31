@@ -90,7 +90,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
  - [`cardpay rewards register-rewardee-gas-estimate <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-rewardee-gas-estimate-prepaidcard-rewardprogramid)
  - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
- - [`cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-from-safe-rewardsafe-recipient-tokenaddress-amount)
+ - [`cardpay rewards withdraw-from-safe-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-from-safe-gas-estimate-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
  - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
@@ -897,9 +897,9 @@ Options:
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>`
+## `cardpay rewards withdraw-from-safe-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`
 
-Withdraw from reward safe
+Gas estimate for withdraw from reward safe
 
 ```
 Positionals:
