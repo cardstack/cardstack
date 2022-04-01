@@ -46,7 +46,7 @@ class MockAppContext extends AppContext {
   // TODO remove when auth button is shown for all
   get searchParams() {
     const searchParams = new URLSearchParams();
-    searchParams.set('auth', 'true');
+    searchParams.set('edit', 'true');
     return searchParams;
   }
 }

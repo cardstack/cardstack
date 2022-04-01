@@ -116,7 +116,7 @@ export default class HubAuthentication extends Service {
     }
 
     return (
-      this.appContext.searchParams.has('auth') || this.appContext.hostIsPreview
+      this.appContext.searchParams.has('edit') || this.appContext.hostIsPreview
     );
   }
 }
