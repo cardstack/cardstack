@@ -3,7 +3,7 @@ import Layer2Network from './layer2-network';
 import { inject as service } from '@ember/service';
 import config from '../config/environment';
 import { taskFor } from 'ember-concurrency-ts';
-import { task, waitForProperty, TaskGenerator } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '@cardstack/ssr-web/utils/browser-mocks';
@@ -43,7 +43,15 @@ export default class HubAuthentication extends Service {
   @reads('initializeTask.isRunning') declare isInitializing: boolean;
 
   @task *initializeTask(): TaskGenerator<void> {
-    yield waitForProperty(this.layer2Network, 'isInitializing', false);
+    yield new Promise<void>((resolve) => {
+      if (this.layer2Network.isInitializing) {
+        this.layer2Network.on('initialized', () => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
     if (yield this.hasValidAuthentication()) {
       this.isAuthenticated = true;
     } else {
