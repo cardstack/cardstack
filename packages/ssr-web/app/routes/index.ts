@@ -1,79 +1,44 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
-import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
-import config from '@cardstack/ssr-web/config/environment';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
-
-interface CardSpaceIndexRouteModel {
-  did: string;
-  id: string;
-  name: string;
-  backgroundColor: string;
-  ownerAddress: string;
-  textColor: string;
-}
+import { CardSpace } from '../resources/card-space';
+import { getOwner } from '@ember/application';
 
 export default class IndexRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
   @service declare fastboot: Fastboot;
 
-  async model(): Promise<CardSpaceIndexRouteModel> {
+  async model(): Promise<CardSpace> {
     if (this.appContext.isCardSpace) {
-      try {
-        const response = await fetch(
-          `${config.hubURL}/api/card-spaces/${this.appContext.cardSpaceId}`,
-          {
-            method: 'GET',
-            headers: {
-              Accept: 'application/vnd.api+json',
-              'Content-Type': 'application/vnd.api+json',
-            },
-          }
-        );
+      let model = await this.fetchCardSpace(this.appContext.cardSpaceId);
 
-        if (response.status === 404) {
-          if (this.fastboot.isFastBoot) {
-            this.fastboot.response.statusCode = 404;
-          }
-          throw new Error(
-            `404: Card Space not found for ${this.appContext.cardSpaceId}`
-          );
+      if (model.is404) {
+        if (this.fastboot.isFastBoot) {
+          this.fastboot.response.statusCode = 404;
         }
-
-        const cardSpaceResult: {
-          included: any[];
-        } = await response.json();
-
-        let merchant = cardSpaceResult.included?.find(
-          (v) => v.type === 'merchant-infos'
+        throw new Error(
+          `404: Card Space not found for ${this.appContext.cardSpaceId}`
         );
-        if (!merchant) {
-          if (this.fastboot.isFastBoot) {
-            this.fastboot.response.statusCode = 404;
-          }
-          throw new Error(
-            `404: Card Space not found for ${this.appContext.cardSpaceId}`
-          );
-        }
-
-        return {
-          did: merchant.attributes['did'],
-          id: merchant.attributes['slug'],
-          name: merchant.attributes['name'],
-          backgroundColor: merchant.attributes['color'],
-          ownerAddress: merchant.attributes['owner-address'],
-          textColor: merchant.attributes['text-color'],
-        };
-      } catch (e) {
-        Sentry.captureException(e);
-        throw e;
       }
+
+      return model;
     } else {
       if (this.fastboot.isFastBoot) {
         this.fastboot.response.statusCode = 404;
       }
       throw new Error("Oops! We couldn't find the page you were looking for");
     }
+  }
+
+  async fetchCardSpace(slug: string) {
+    let cardSpace = new CardSpace(getOwner(this), {
+      named: {
+        slug,
+      },
+    });
+    await cardSpace.run();
+
+    return cardSpace;
   }
 }
