@@ -248,17 +248,17 @@ export function toHex(bytes: string): string {
   return '0x' + bytes;
 }
 
+export function convertToSpend(issuingToken: Address, issuingTokenAmount: BigInt): BigInt {
+  let exchange = getExchange();
+  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
+}
+
 function usdExchangeRate(issuingToken: Address): BigDecimal {
   let exchange = getExchange();
   let exchangeInfo = exchange.exchangeRateOf(issuingToken);
   let rawRate = BigDecimal.fromString(exchangeInfo.value0.toString());
   // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
   return rawRate / BigDecimal.fromString('100000000');
-}
-
-function convertToSpend(issuingToken: Address, issuingTokenAmount: BigInt): BigInt {
-  let exchange = getExchange();
-  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
 }
 
 function getExchange(): Exchange {
