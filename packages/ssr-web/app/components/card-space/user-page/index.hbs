@@ -22,6 +22,7 @@
     card-space-text-color=@model.textColor
   }}
 >
+
   <div class="card-space-user-page__wrapper">
     <div class="card-space-user-page__header">
       <a href={{config 'urls.cardPayLink'}} target='_blank' rel='noopener noreferrer'>
@@ -30,6 +31,30 @@
         </span>
         {{svg-jar "card-pay-logo-with-text"}}
       </a>
+
+      {{#if this.hubAuthentication.showAuth}}
+        <section class='card-space-user-page__auth'>
+          {{#if this.hubAuthentication.isInitializing}}
+            Loading…
+          {{else}}
+            {{#if this.hubAuthentication.isAuthenticated}}
+              {{#if this.authIsForModel}}
+                <span data-test-auth-for-this-space>Authed for this space</span>
+              {{else}}
+                <span data-test-auth-not-for-this-space>Authed but not for this space</span>
+              {{/if}}
+            {{else}}
+              <Boxel::Button
+                @as='link-to'
+                @route='scheme-auth'
+                data-test-connect-button
+              >
+                Auth
+              </Boxel::Button>
+            {{/if}}
+          {{/if}}
+        </section>
+      {{/if}}
     </div>
 
     <div class="card-space-user-page__user-content">

@@ -3,12 +3,18 @@ import { setupApplicationTest } from 'ember-qunit';
 import { currentURL, visit } from '@ember/test-helpers';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
 import AppContext from '@cardstack/ssr-web/services/app-context';
+import TestLayer2Web3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
 import percySnapshot from '@percy/ember';
 import type { SubgraphServiceOptionals } from '@cardstack/ssr-web/services/subgraph';
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
 import sinon from 'sinon';
+
+let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
+let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+let otherLayer2AccountAddress = '0x1000000000000000000000000000000000000000';
+let layer2Service: TestLayer2Web3Strategy;
 
 class MockSubgraph extends Service implements SubgraphServiceOptionals {
   async query(
@@ -36,6 +42,13 @@ class MockAppContext extends AppContext {
   get cardSpaceId() {
     return 'slug';
   }
+
+  // TODO remove when auth button is shown for all
+  get searchParams() {
+    const searchParams = new URLSearchParams();
+    searchParams.set('edit', 'true');
+    return searchParams;
+  }
 }
 
 module('Acceptance | visit card space', function (hooks) {
@@ -59,6 +72,7 @@ module('Acceptance | visit card space', function (hooks) {
         slug: 'slug',
         color: 'blue',
         textColor: 'hotpink',
+        ownerAddress: layer2AccountAddress,
       });
 
       link = generateMerchantPaymentUrl({
@@ -107,6 +121,10 @@ module('Acceptance | visit card space', function (hooks) {
           document.documentElement
         )
         .exists();
+
+      assert
+        .dom('[data-test-connect-button]')
+        .exists('expected a connect button when not authenticated');
 
       await percySnapshot(assert);
     });
@@ -191,6 +209,56 @@ module('Acceptance | visit card space', function (hooks) {
           'We ran into an issue while generating the payment request link'
         );
     });
+
+    module(
+      'authed for this space',
+      async function (this: MirageTestContext, hooks) {
+        hooks.beforeEach(async function (this: MirageTestContext) {
+          // this is the condition for initializing with an authenticated state
+          // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
+          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+          layer2Service = this.owner.lookup('service:layer2-network').strategy;
+          await layer2Service.test__simulateAccountsChanged([
+            layer2AccountAddress,
+          ]);
+        });
+
+        hooks.afterEach(async function () {
+          delete window.TEST__AUTH_TOKEN;
+        });
+
+        test('it shows when auth is present', async function (assert) {
+          await visit('/');
+
+          assert.dom('[data-test-connect-button]').doesNotExist();
+          assert.dom('[data-test-auth-for-this-space]').exists();
+        });
+      }
+    );
+
+    module(
+      'authed but not owner',
+      async function (this: MirageTestContext, hooks) {
+        hooks.beforeEach(async function (this: MirageTestContext) {
+          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+          layer2Service = this.owner.lookup('service:layer2-network').strategy;
+          await layer2Service.test__simulateAccountsChanged([
+            otherLayer2AccountAddress,
+          ]);
+        });
+
+        hooks.afterEach(async function () {
+          delete window.TEST__AUTH_TOKEN;
+        });
+
+        test('it shows when auth is present', async function (assert) {
+          await visit('/');
+
+          assert.dom('[data-test-connect-button]').doesNotExist();
+          assert.dom('[data-test-auth-not-for-this-space]').exists();
+        });
+      }
+    );
   });
 
   test('renders an error for a missing slug', async function (this: MirageTestContext, assert) {

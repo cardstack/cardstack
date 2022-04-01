@@ -38,6 +38,10 @@ export default class AppContext extends Service implements AppContextService {
     return host;
   }
 
+  get hostIsPreview() {
+    return this.host.includes(config.previewSubdomainInfix);
+  }
+
   get queryIsCardSpace() {
     if (!this.fastboot.isFastBoot) {
       return this.searchParams.has(CARD_SPACE_SLUG_PARAMETER_NAME);
@@ -49,8 +53,7 @@ export default class AppContext extends Service implements AppContextService {
   get currentApp(): 'card-space' | 'wallet' {
     if (
       this.hostSuffixPattern.test(this.host) ||
-      (this.host.includes(config.previewSubdomainInfix) &&
-        this.queryIsCardSpace)
+      (this.hostIsPreview && this.queryIsCardSpace)
     ) {
       return 'card-space';
     } else {
@@ -74,7 +77,11 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   get searchParams() {
-    return new URLSearchParams(window.location.search);
+    return new URLSearchParams(
+      this.fastboot.isFastBoot
+        ? this.fastboot.request.queryParams
+        : window.location.search
+    );
   }
 }
 
