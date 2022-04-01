@@ -1,5 +1,4 @@
 import Route from '@ember/routing/route';
-import '../css/pay.css';
 import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';

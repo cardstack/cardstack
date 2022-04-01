@@ -1,0 +1,24 @@
+.wc-message {
+  --aspect-ratio-adjustment: clamp(20px, 15%, 100px);
+
+  min-height: min(360px, 100vh);
+  max-width: 40ch;
+  display: grid;
+  place-content: center;
+  place-items: center;
+  gap: var(--boxel-sp);
+  text-align: center;
+  margin: auto;
+  padding-top: var(--aspect-ratio-adjustment);
+  padding-bottom: var(--aspect-ratio-adjustment);
+}
+
+.wc-message__warning-icon {
+  width: 80px;
+  height: 80px;
+  margin: auto;
+}
+
+.wc-message__emphasis {
+  font-weight: bold;
+}
