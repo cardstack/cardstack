@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ssr-web",
-  "version": "0.28.28",
+  "version": "0.28.31",
   "description": "An Ember Fastboot application for SSR payment requests",
   "repository": "",
   "license": "MIT",
@@ -26,10 +26,10 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "0.28.28",
-    "@cardstack/cardpay-sdk": "0.28.28",
-    "@cardstack/did-resolver": "0.28.28",
-    "@cardstack/wc-provider": "0.28.28",
+    "@cardstack/boxel": "0.28.31",
+    "@cardstack/cardpay-sdk": "0.28.31",
+    "@cardstack/did-resolver": "0.28.31",
+    "@cardstack/wc-provider": "0.28.31",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.0",
     "@ember/test-helpers": "^2.4.0",
@@ -88,10 +88,7 @@
     "ember-cli-dependency-lint": "^2.0.1",
     "ember-cli-deploy": "^1.0.2",
     "ember-cli-deploy-build": "^2.0.0",
-    "ember-cli-deploy-cloudfront": "^3.1.0",
     "ember-cli-deploy-compress": "^0.3.2",
-    "ember-cli-deploy-display-revisions": "^2.1.2",
-    "ember-cli-deploy-revision-data": "^1.0.0",
     "ember-cli-deploy-s3": "^3.0.0",
     "ember-cli-deprecation-workflow": "^1.0.1",
     "ember-cli-dotenv": "^3.1.0",

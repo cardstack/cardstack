@@ -124,29 +124,9 @@ module.exports = function (deployTarget) {
       bucket: process.env.S3_PREVIEW_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
       prefix: process.env.PR_BRANCH_NAME,
-      filePattern:
-        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
+      filePattern: s3AssetPattern.replace('}', ',html}'),
     };
-    ENV.manifest = {
-      filePattern:
-        '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,otf,wasm,json,flac,webp}',
-    };
-    ENV['s3-index'] = {
-      accessKeyId: process.env.PREVIEW_DEPLOY_AWS_ACCESS_KEY,
-      secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
-      bucket: process.env.S3_PREVIEW_BUCKET_NAME,
-      region: process.env.S3_PREVIEW_REGION,
-      allowOverwrite: true,
-      prefix: process.env.PR_BRANCH_NAME,
-    };
-    ENV.plugins = [
-      'build',
-      'compress',
-      'display-revisions',
-      'revision-data',
-      's3',
-      's3-index',
-    ];
+    ENV.plugins = ['build', 'compress', 's3'];
   }
 
   // Note: if you need to build some configuration asynchronously, you can return

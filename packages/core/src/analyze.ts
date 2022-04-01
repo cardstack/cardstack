@@ -2,16 +2,22 @@ import type * as Babel from '@babel/core';
 import type { types as t } from '@babel/core';
 import { BabelFileResult, transformSync } from '@babel/core';
 import { NodePath } from '@babel/traverse';
-import { name, error } from './utils/babel';
+import { name, error, getObjectKey } from './utils/babel';
 import { augmentBadRequest } from './utils/errors';
 
 // @ts-ignore
 import decoratorsSyntaxPlugin from '@babel/plugin-syntax-decorators';
 // @ts-ignore
 import classPropertiesSyntaxPlugin from '@babel/plugin-syntax-class-properties';
+import { Format } from './interfaces';
+import { validateAndGetComponent } from './babel-plugin-card-template';
+import glimmerTemplateAnalyze from './glimmer-plugin-component-analyze';
 
 interface State {
-  opts: any;
+  opts: {
+    debugPath: string;
+  };
+  insideExportDefault: boolean;
 }
 
 export const VALID_FIELD_DECORATORS = {
@@ -48,10 +54,20 @@ export interface ExportMeta {
   type: t.Declaration['type'];
 }
 
+export interface TemplateUsageMeta {
+  model: 'self' | Set<string>;
+  fields: 'self' | Map<string, Format | 'default'>;
+}
+export interface ComponentMeta {
+  usage: TemplateUsageMeta;
+  hasModifiedScope: boolean;
+  rawHBS: string | undefined;
+}
 export interface FileMeta {
   exports?: ExportMeta[];
   fields: FieldsMeta;
   parent?: ParentMeta;
+  component: ComponentMeta | undefined;
 }
 
 const metas = new WeakMap<State['opts'], FileMeta>();
@@ -61,23 +77,27 @@ function getMeta(obj: State['opts']): FileMeta {
   if (!meta) {
     return {
       fields: {},
+      component: undefined,
     };
   }
   return meta;
 }
 
-export default function (source: string): {
+export default function analyzeCardModule(
+  source: string,
+  debugPath: string
+): {
   code: BabelFileResult['code'];
   ast: BabelFileResult['ast'];
   meta: FileMeta;
 } {
   let out: BabelFileResult;
-  let key = {};
+  let opts: State['opts'] = { debugPath };
   try {
     out = transformSync(source, {
       ast: true,
       plugins: [
-        [babelPluginCardFileAnalyze, key],
+        [babelPluginCardFileAnalyze, opts],
         [decoratorsSyntaxPlugin, { decoratorsBeforeExport: false }],
         classPropertiesSyntaxPlugin,
       ],
@@ -89,7 +109,7 @@ export default function (source: string): {
   return {
     code: out!.code,
     ast: out!.ast,
-    meta: getMeta(key),
+    meta: getMeta(opts),
   };
 }
 
@@ -97,43 +117,85 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
   let t = babel.types;
   return {
     visitor: {
+      Program: {
+        enter(_path: NodePath<t.Program>, state: State) {
+          state.insideExportDefault = false;
+        },
+      },
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
         if (path.node.source.value === '@cardstack/types') {
           storeDecoratorMeta(state.opts, path, t);
           path.remove();
         }
       },
-      ExportNamedDeclaration(path: NodePath<t.ExportNamedDeclaration>, state: State) {
-        switch (path.node.declaration?.type) {
-          case 'FunctionDeclaration':
+      ExportNamedDeclaration: {
+        enter(path: NodePath<t.ExportNamedDeclaration>, state: State) {
+          switch (path.node.declaration?.type) {
+            case 'FunctionDeclaration':
+              storeExportMeta(state.opts, {
+                name: name(path.node.declaration.id!, t),
+                type: path.node.declaration.type,
+              });
+              break;
+            case 'VariableDeclaration':
+              for (const dec of path.node.declaration.declarations) {
+                if (t.isIdentifier(dec.id)) {
+                  storeExportMeta(state.opts, {
+                    name: dec.id.name,
+                    type: path.node.declaration.type,
+                  });
+                }
+              }
+              break;
+          }
+        },
+        exit(_path: NodePath<t.ExportNamedDeclaration>, state: State) {
+          state.insideExportDefault = false;
+        },
+      },
+      ExportDefaultDeclaration: {
+        enter(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
+          state.insideExportDefault = true;
+          // Not sure what to do with expressions
+          if (!t.isExpression(path.node.declaration)) {
             storeExportMeta(state.opts, {
-              name: name(path.node.declaration.id!, t),
+              name: 'default',
               type: path.node.declaration.type,
             });
-            break;
-          case 'VariableDeclaration':
-            for (const dec of path.node.declaration.declarations) {
-              if (t.isIdentifier(dec.id)) {
-                storeExportMeta(state.opts, {
-                  name: dec.id.name,
-                  type: path.node.declaration.type,
-                });
-              }
-            }
-            break;
-        }
+          }
+        },
+        exit(_path: NodePath<t.ExportDefaultDeclaration>, state: State) {
+          state.insideExportDefault = false;
+        },
       },
-      ExportDefaultDeclaration(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
-        // Not sure what to do with expressions
-        if (!t.isExpression(path.node.declaration)) {
-          storeExportMeta(state.opts, {
-            name: 'default',
-            type: path.node.declaration.type,
-          });
-        }
+
+      CallExpression: {
+        enter(path: NodePath<t.CallExpression>, state: State) {
+          if (isComponentTemplateExpression(path, state)) {
+            storeComponentMeta(state, path, t);
+          }
+        },
       },
     },
   };
+}
+
+function storeComponentMeta(state: State, path: NodePath<t.CallExpression>, t: typeof Babel.types) {
+  let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
+  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
+
+  glimmerTemplateAnalyze(rawTemplate, {
+    usageMeta,
+    debugPath: state.opts.debugPath,
+  });
+
+  let meta = getMeta(state.opts);
+  meta.component = {
+    rawHBS: rawTemplate,
+    hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
+    usage: usageMeta,
+  };
+  metas.set(state.opts, meta);
 }
 
 function storeExportMeta(key: State['opts'], exportMeta: ExportMeta) {
@@ -281,14 +343,22 @@ function extractDecoratorArguments(
   if (!definition) {
     throw error(cardTypePath, `@${decorator} argument is not defined`);
   }
-  if (!definition.isImportDefaultSpecifier()) {
-    throw error(definition, `@${decorator} argument must come from a module default export`);
+  if (!definition.isImportDefaultSpecifier() && !definition.isClassDeclaration()) {
+    throw error(definition, `@${decorator} argument must come from a module default export or a class declaration`);
   }
 
-  let result: Pick<FieldMeta, 'cardURL' | 'typeDecoratorLocalName'> & { computed?: boolean; computeVia?: string } = {
-    cardURL: (definition.parent as t.ImportDeclaration).source.value,
-    typeDecoratorLocalName: definition.node.local.name,
-  };
+  let result: Pick<FieldMeta, 'cardURL' | 'typeDecoratorLocalName'> & { computed?: boolean; computeVia?: string };
+  if (definition.isImportDefaultSpecifier()) {
+    result = {
+      cardURL: (definition.parent as t.ImportDeclaration).source.value,
+      typeDecoratorLocalName: definition.node.local.name,
+    };
+  } else {
+    result = {
+      cardURL: '.',
+      typeDecoratorLocalName: definition.node.id.name,
+    };
+  }
 
   // second argument is the decorator options
   if (decoratorArguments.length === 2) {
@@ -315,4 +385,11 @@ function extractDecoratorArguments(
   }
 
   return result;
+}
+
+function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: State): boolean {
+  return (
+    state.insideExportDefault &&
+    path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
+  );
 }
