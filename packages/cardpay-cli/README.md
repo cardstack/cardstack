@@ -90,6 +90,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
  - [`cardpay rewards register-rewardee-gas-estimate <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-rewardee-gas-estimate-prepaidcard-rewardprogramid)
  - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
+ - [`cardpay rewards withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-gas-estimate-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-check-claim-params-rewardsafe-leaf-proof-acceptpartialclaim)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
@@ -895,6 +896,24 @@ Options:
   -m, --mnemonic            Phrase for mnemonic wallet  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay rewards withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`
+
+Gas estimate for withdraw from reward safe
+
+```
+Positionals:
+  rewardSafe    The address of the rewardSafe that already contains rewards  [string] [required]
+  recipient     The token recipient's address  [string] [required]
+  tokenAddress  The address of the tokens that are being transferred from reward safe  [string] [required]
+  amount        The amount of tokens to transfer (not in units of wei, but in eth)  [string] [required]
+
+Options:
+  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
