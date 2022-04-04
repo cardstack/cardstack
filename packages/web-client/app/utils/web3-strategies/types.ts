@@ -31,7 +31,8 @@ export type Layer2ChainEvent =
   | 'incorrect-chain'
   | 'correct-chain'
   | 'account-changed'
-  | 'websocket-disconnected';
+  | 'websocket-disconnected'
+  | 'initialized';
 
 export interface Web3Strategy {
   isConnected: boolean;

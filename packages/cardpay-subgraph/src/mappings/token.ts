@@ -1,5 +1,6 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
 import {
+  convertToSpend,
   makeToken,
   makeEOATransaction,
   makeEOATransactionForSafe,
@@ -15,6 +16,7 @@ import {
   MerchantDeposit,
   MerchantWithdraw,
   MerchantSafe,
+  PrepaidCard,
 } from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
@@ -36,6 +38,18 @@ export function handleTransfer(event: TransferEvent): void {
       makeEOATransactionForSafe(event, receiverSafe.id);
 
       let revenuePoolAddress = addresses.get('revenuePool') as string;
+
+      // Token transfers to prepaid cards should update the issuingTokenBalance
+      let prepaidCardEntity = PrepaidCard.load(to);
+      if (prepaidCardEntity != null && prepaidCardEntity.issuingToken == tokenAddress) {
+        let issuingToken = ERC20.bind(Address.fromString(tokenAddress));
+        prepaidCardEntity.issuingTokenBalance = issuingToken.balanceOf(Address.fromString(to));
+        prepaidCardEntity.faceValue = convertToSpend(
+          Address.fromString(tokenAddress),
+          prepaidCardEntity.issuingTokenBalance
+        );
+        prepaidCardEntity.save();
+      }
       // token transfers from the revenue pool are actually claims, so don't include
       // those as MerchantDeposits
       if (MerchantSafe.load(to) != null && from != revenuePoolAddress) {

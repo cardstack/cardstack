@@ -13,6 +13,7 @@ Router.map(function () {
   this.route('pay-missing-route', {
     path: '/pay/:*',
   });
+  this.route('wc');
   this.route('universal-auth');
   this.route('scheme-auth');
   this.route('boom');

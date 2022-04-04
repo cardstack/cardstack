@@ -21,6 +21,7 @@ declare const config: {
   locationType: string;
   rootURL: string;
   hubURL: string;
+  previewSubdomainInfix: string;
   universalLinkDomain: string;
   version: string;
   urls: UrlsOptions;

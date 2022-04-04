@@ -46,6 +46,7 @@ module.exports = function (environment) {
     rootURL: '/',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
+    previewSubdomainInfix: 'ssr-web-preview',
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
       MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,

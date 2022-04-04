@@ -12,10 +12,13 @@ import { inject as service } from '@ember/service';
 import UA from '../services/ua';
 import config from '@cardstack/ssr-web/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE as MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk';
+import CardPayLogoPng from '@cardstack/ssr-web/images/logos/card-pay-logo.png';
 
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 
 export default class PayController extends Controller {
+  cardPayLogoPng = 'https://' + config.universalLinkDomain + CardPayLogoPng;
+
   @service('ua') declare UAService: UA;
   queryParams = ['amount', 'currency'];
   @tracked amount: number = NaN;
