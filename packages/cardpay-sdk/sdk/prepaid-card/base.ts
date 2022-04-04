@@ -24,7 +24,7 @@ import {
   executeSendWithRateLock,
   Operation,
 } from '../utils/safe-utils';
-import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
@@ -106,7 +106,7 @@ export default class PrepaidCard {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(merchantSafeOrTxnHash)) {
       let txnHash = merchantSafeOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddress) {
       throw new Error('prepaidCardAddress is required');
@@ -163,7 +163,7 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
   async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -181,7 +181,7 @@ export default class PrepaidCard {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     if (!newOwner) {
@@ -255,7 +255,7 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, transferNonce);
   }
 
   async split(
@@ -279,7 +279,7 @@ export default class PrepaidCard {
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: SuccessfulTransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      let txReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      let txReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
       return {
         txReceipt,
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
@@ -370,7 +370,12 @@ export default class PrepaidCard {
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
-    let txReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    let txReceipt = await waitForTransactionConsistency(
+      this.layer2Web3,
+      gnosisResult.ethereumTx.txHash,
+      prepaidCardAddress,
+      nonce!
+    );
 
     return {
       txReceipt,
@@ -404,7 +409,7 @@ export default class PrepaidCard {
       let txnHash = safeAddressOrTxnHash;
       return {
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
-        txnReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+        txnReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash),
       };
     }
     let safeAddress = safeAddressOrTxnHash;
@@ -512,7 +517,7 @@ export default class PrepaidCard {
 
     return {
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-      txnReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash),
+      txnReceipt: await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce),
     };
   }
 
@@ -599,7 +604,7 @@ export default class PrepaidCard {
 
   private async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
-    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
       (createCardLog) => createCardLog.card
     );

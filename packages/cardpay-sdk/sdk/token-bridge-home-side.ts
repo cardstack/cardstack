@@ -12,7 +12,7 @@ import { signSafeTx } from './utils/signing-utils';
 import { query } from './utils/graphql';
 import {
   TransactionOptions,
-  waitForSubgraphIndexWithTxnReceipt,
+  waitForTransactionConsistency,
   isTransactionHash,
   waitUntilTransactionMined,
 } from './utils/general-utils';
@@ -84,7 +84,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!tokenAddress) {
@@ -146,7 +146,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
   async waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult> {
