@@ -483,7 +483,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let weiAmount = new BN(amount);
     if (weiAmount.gt(safeBalance)) {
       throw new Error(
-        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
       );
     }
 
