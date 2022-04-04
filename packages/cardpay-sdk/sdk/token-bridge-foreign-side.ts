@@ -155,10 +155,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       throw new Error(`
         relay action NOT within configured limits
 
-          minPerTx: ${fromWei(minPerTx)}
-          maxPerTx: ${fromWei(maxPerTx)}
-          totalSpentToday: ${fromWei(totalSpentPerDay)}
-          dailyLimit: ${fromWei(dailyLimit)}
+          Minimum Amount Per Tx: ${fromWei(minPerTx)}
+          Maximum Amount Per Tx: ${fromWei(maxPerTx)}
+          Total Amount Today: ${fromWei(totalSpentPerDay)}
+          Daily Amount Limit: ${fromWei(dailyLimit)}
 
       `);
     }
