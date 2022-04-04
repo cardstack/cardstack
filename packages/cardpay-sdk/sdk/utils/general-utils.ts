@@ -3,8 +3,10 @@ import type { SuccessfulTransactionReceipt } from './successful-transaction-rece
 import Web3 from 'web3';
 import { networks } from '../constants';
 import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
+import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import BN from 'bn.js';
 import { query as gqlQuery } from './graphql';
+import { AbiItem } from 'web3-utils';
 
 const POLL_INTERVAL = 500;
 
@@ -182,11 +184,59 @@ export async function waitForSubgraphIndex(
   return;
 }
 
+async function waitForSafeNonceAdvance(
+  web3: Web3,
+  safeAddress: string,
+  currentNonce: number,
+  duration = 60 * 10 * 1000
+): Promise<void> {
+  let nonce: number,
+    hasTried = false,
+    start = Date.now(),
+    safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+
+  do {
+    if (hasTried) {
+      await new Promise<void>((res) => setTimeout(() => res, POLL_INTERVAL));
+    }
+    nonce = new BN(await safe.methods.nonce().call()).toNumber();
+  } while (nonce < currentNonce + 1 && Date.now() < start + duration);
+
+  if (nonce <= currentNonce + 1) {
+    throw new Error(`Timed out waiting for safe ${safeAddress} nonce to advance to ${currentNonce + 1}`);
+  }
+}
+
 export async function waitForSubgraphIndexWithTxnReceipt(
   web3: Web3,
   txnHash: string,
+  safeAddress: string,
+  currentNonce: number,
+  duration?: number
+): Promise<SuccessfulTransactionReceipt>;
+export async function waitForSubgraphIndexWithTxnReceipt(
+  web3: Web3,
+  txnHash: string,
+  duration?: number
+): Promise<SuccessfulTransactionReceipt>;
+export async function waitForSubgraphIndexWithTxnReceipt(
+  web3: Web3,
+  txnHash: string,
+  safeAddressOrDuration: string | number | undefined,
+  currentNonce?: number,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
+  let safeAddress: string | undefined;
+  if (typeof safeAddressOrDuration === 'string') {
+    safeAddress = safeAddressOrDuration;
+  } else if (typeof safeAddressOrDuration === 'number') {
+    duration = safeAddressOrDuration;
+  }
+
+  if (safeAddress != null && currentNonce != null) {
+    await waitForSafeNonceAdvance(web3, safeAddress, currentNonce, duration);
+  }
+
   let txnReceipt = await waitUntilTransactionMined(web3, txnHash, duration);
   await waitForSubgraphIndex(txnHash, web3, duration);
   return txnReceipt;
