@@ -19,7 +19,7 @@ import {
   gasInToken,
   GasEstimate,
 } from '../utils/safe-utils';
-import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 
@@ -209,7 +209,7 @@ export default class RewardPool {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!rewardProgramId) {
@@ -271,7 +271,7 @@ export default class RewardPool {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
   async claim(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -293,7 +293,7 @@ export default class RewardPool {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!proofArray) {
@@ -431,7 +431,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
   async claimGasEstimate(
@@ -480,7 +480,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
 
@@ -561,7 +561,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
   async balances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {

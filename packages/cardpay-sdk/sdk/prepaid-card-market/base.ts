@@ -6,7 +6,7 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { ContractOptions } from 'web3-eth-contract';
-import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import {
   EventABI,
   executeSend,
@@ -92,7 +92,7 @@ export default class PrepaidCardMarket {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(fundingPrepaidCardOrTxnHash)) {
       let txnHash = fundingPrepaidCardOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardToAdd) {
       throw new Error('prepaidCardToAdd must be provided');
@@ -164,7 +164,7 @@ export default class PrepaidCardMarket {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, fundingPrepaidCard, nonce!);
   }
 
   async removeFromInventory(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -184,7 +184,7 @@ export default class PrepaidCardMarket {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(fundingPrepaidCardOrTxnHash)) {
       let txnHash = fundingPrepaidCardOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddresses) {
       throw new Error('prepaidCardAddresses must be provided');
@@ -231,7 +231,7 @@ export default class PrepaidCardMarket {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, fundingPrepaidCard, nonce!);
   }
 
   async setAsk(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -253,7 +253,7 @@ export default class PrepaidCardMarket {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardOrTxnHash)) {
       let txnHash = prepaidCardOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!sku) {
       throw new Error('sku is required');
@@ -298,12 +298,12 @@ export default class PrepaidCardMarket {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
   async getPrepaidCardFromProvisionTxnHash(txnHash: string, marketAddress?: string): Promise<PrepaidCardSafe> {
     let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
-    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
     let [event] = getParamsFromEvent(
       this.layer2Web3,

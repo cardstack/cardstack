@@ -18,7 +18,7 @@ import {
   Operation,
   gasInToken,
 } from '../utils/safe-utils';
-import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
+import { TransactionOptions, waitForTransactionConsistency, isTransactionHash } from '../utils/general-utils';
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
@@ -112,7 +112,7 @@ export default class RevenuePool {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(merchantSafeAddressOrTxnHash)) {
       let txnHash = merchantSafeAddressOrTxnHash;
-      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let merchantSafeAddress = merchantSafeAddressOrTxnHash;
     if (!tokenAddress) {
@@ -172,7 +172,7 @@ export default class RevenuePool {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, merchantSafeAddress, nonce);
   }
 
   async registerMerchant(
@@ -195,7 +195,7 @@ export default class RevenuePool {
       let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
       return {
         merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+        txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash),
       };
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
@@ -250,7 +250,7 @@ export default class RevenuePool {
     let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
     return {
       merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+      txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!),
     };
   }
 
@@ -267,7 +267,7 @@ export default class RevenuePool {
 
   private async getMerchantSafeFromTxn(txnHash: string): Promise<string> {
     let merchantManager = await getAddress('merchantManager', this.layer2Web3);
-    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createMerchantEventABI(), merchantManager)[0]
       ?.merchantSafe;
   }
