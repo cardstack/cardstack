@@ -71,6 +71,7 @@ export default class APIRouter {
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
+    apiSubrouter.get('/merchant-infos/short-id/:id', parseBody, merchantInfosRoute.getFromShortId);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);
     apiSubrouter.post('/orders', parseBody, ordersRoute.post);

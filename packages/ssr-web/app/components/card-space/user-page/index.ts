@@ -4,6 +4,8 @@ import config from '@cardstack/ssr-web/config/environment';
 import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
+import Layer2Network from '@cardstack/ssr-web/services/layer2-network';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
@@ -17,11 +19,14 @@ interface CardSpaceUserPageArgs {
     id: string;
     name: string;
     backgroundColor: string;
+    ownerAddress: string;
     textColor: string;
   };
 }
 
 export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> {
+  @service('hub-authentication') declare hubAuthentication: HubAuthentication;
+  @service declare layer2Network: Layer2Network;
   @service('ua') declare UAService: UA;
   @tracked paymentLinkMode: PaymentLinkMode = 'link';
   @tracked address: string | null = null;
@@ -85,5 +90,11 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
       merchantSafeID: this.address as string,
       network: config.chains.layer2,
     });
+  }
+
+  get authIsForModel() {
+    return this.layer2Network.walletInfo.accounts
+      .mapBy('address')
+      .includes(this.args.model.ownerAddress);
   }
 }

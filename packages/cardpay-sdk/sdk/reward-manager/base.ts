@@ -4,7 +4,7 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
+import { AbiItem, randomHex, toChecksumAddress, fromWei } from 'web3-utils';
 import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
@@ -54,6 +54,7 @@ const rewardProgramQuery = `
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
+  private rewardSafeDelegate: Contract | undefined;
 
   constructor(private layer2Web3: Web3) {}
 
@@ -472,20 +473,17 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
-    let rewardSafeDelegate = new this.layer2Web3.eth.Contract(
-      RewardSafeDelegateABI as AbiItem[],
-      rewardSafeDelegateAddress
-    );
+    let rewardSafeDelegate = await this.getRewardSafeDelegate();
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-    let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
+    let weiAmount = new BN(amount);
     if (weiAmount.gt(safeBalance)) {
       throw new Error(
-        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
       );
     }
 
@@ -514,7 +512,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
-        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
+        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     let fullSignature = await signRewardSafe(
@@ -560,6 +558,34 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
+  }
+
+  async withdrawGasEstimate(
+    rewardSafeAddress: string,
+    to: string,
+    tokenAddress: string,
+    amount: string
+  ): Promise<GasEstimate> {
+    let rewardManagerAddress = await this.address();
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    let weiAmount = new BN(amount);
+    let withdraw = await (
+      await this.getRewardSafeDelegate()
+    ).methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+    let withdrawPayload = withdraw.encodeABI();
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      rewardSafeAddress,
+      rewardSafeDelegateAddress,
+      '0',
+      withdrawPayload,
+      Operation.DELEGATECALL,
+      tokenAddress
+    );
+    return {
+      gasToken: estimate.gasToken,
+      amount: gasInToken(estimate),
+    };
   }
 
   async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -993,6 +1019,17 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await getAddress('rewardManager', this.layer2Web3)
     );
     return this.rewardManager;
+  }
+  private async getRewardSafeDelegate(): Promise<Contract> {
+    if (this.rewardSafeDelegate) {
+      return this.rewardSafeDelegate;
+    }
+    let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
+    this.rewardSafeDelegate = new this.layer2Web3.eth.Contract(
+      RewardSafeDelegateABI as AbiItem[],
+      rewardSafeDelegateAddress
+    );
+    return this.rewardSafeDelegate;
   }
   private rewardeeRegisteredABI(): EventABI {
     return {

@@ -3,11 +3,12 @@ import Layer2Network from './layer2-network';
 import { inject as service } from '@ember/service';
 import config from '../config/environment';
 import { taskFor } from 'ember-concurrency-ts';
-import { task, waitForProperty, TaskGenerator } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '@cardstack/ssr-web/utils/browser-mocks';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import AppContext from '@cardstack/ssr-web/services/app-context';
 
 declare global {
   interface Window {
@@ -16,6 +17,7 @@ declare global {
 }
 
 export default class HubAuthentication extends Service {
+  @service declare appContext: AppContext;
   @service declare layer2Network: Layer2Network;
   @service declare fastboot: Fastboot;
 
@@ -43,7 +45,15 @@ export default class HubAuthentication extends Service {
   @reads('initializeTask.isRunning') declare isInitializing: boolean;
 
   @task *initializeTask(): TaskGenerator<void> {
-    yield waitForProperty(this.layer2Network, 'isInitializing', false);
+    yield new Promise<void>((resolve) => {
+      if (this.layer2Network.isInitializing) {
+        this.layer2Network.on('initialized', () => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
     if (yield this.hasValidAuthentication()) {
       this.isAuthenticated = true;
     } else {
@@ -98,6 +108,16 @@ export default class HubAuthentication extends Service {
       this.authToken = null;
       throw e;
     }
+  }
+
+  get showAuth() {
+    if (config.environment === 'development') {
+      return true;
+    }
+
+    return (
+      this.appContext.searchParams.has('edit') || this.appContext.hostIsPreview
+    );
   }
 }
 

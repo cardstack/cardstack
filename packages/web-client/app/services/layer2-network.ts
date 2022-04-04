@@ -88,6 +88,9 @@ export default class Layer2Network
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('account-changed', this.onAccountChanged);
     this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
+    this.strategy.on('initialized', () => {
+      this.simpleEmitter.emit('initialized');
+    });
 
     taskFor(this.strategy.initializeTask)
       .perform()

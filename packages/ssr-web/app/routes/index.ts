@@ -1,5 +1,4 @@
 import Route from '@ember/routing/route';
-import '../css/pay.css';
 import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
@@ -11,6 +10,7 @@ interface CardSpaceIndexRouteModel {
   id: string;
   name: string;
   backgroundColor: string;
+  ownerAddress: string;
   textColor: string;
 }
 
@@ -62,6 +62,7 @@ export default class IndexRoute extends Route {
           id: merchant.attributes['slug'],
           name: merchant.attributes['name'],
           backgroundColor: merchant.attributes['color'],
+          ownerAddress: merchant.attributes['owner-address'],
           textColor: merchant.attributes['text-color'],
         };
       } catch (e) {

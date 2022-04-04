@@ -542,10 +542,14 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
         - name: RevenuePool
           file: ./abis/generated/RevenuePool.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -580,10 +584,14 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
         - name: RevenuePool
           file: ./abis/generated/RevenuePool.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer

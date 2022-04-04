@@ -9,6 +9,8 @@ export interface AppContextService {
   isCardSpace: boolean;
 }
 
+const CARD_SPACE_SLUG_PARAMETER_NAME = 'slug';
+
 // escape dots for regexp
 function escapeDot(str: string) {
   let result = '';
@@ -36,8 +38,27 @@ export default class AppContext extends Service implements AppContextService {
     return host;
   }
 
+  get hostIsPreview() {
+    return this.host.includes(config.previewSubdomainInfix);
+  }
+
+  get queryIsCardSpace() {
+    if (!this.fastboot.isFastBoot) {
+      return this.searchParams.has(CARD_SPACE_SLUG_PARAMETER_NAME);
+    }
+
+    return false;
+  }
+
   get currentApp(): 'card-space' | 'wallet' {
-    return this.hostSuffixPattern.test(this.host) ? 'card-space' : 'wallet';
+    if (
+      this.hostSuffixPattern.test(this.host) ||
+      (this.hostIsPreview && this.queryIsCardSpace)
+    ) {
+      return 'card-space';
+    } else {
+      return 'wallet';
+    }
   }
 
   get isCardSpace() {
@@ -46,9 +67,21 @@ export default class AppContext extends Service implements AppContextService {
 
   get cardSpaceId() {
     if (this.isCardSpace) {
-      let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
-      return id;
+      if (this.queryIsCardSpace) {
+        return this.searchParams.get(CARD_SPACE_SLUG_PARAMETER_NAME)!;
+      } else {
+        let id = this.host.replace(this.hostSuffixPattern, '') ?? '';
+        return id;
+      }
     } else return '';
+  }
+
+  get searchParams() {
+    return new URLSearchParams(
+      this.fastboot.isFastBoot
+        ? this.fastboot.request.queryParams
+        : window.location.search
+    );
   }
 }
 
