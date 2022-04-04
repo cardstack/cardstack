@@ -434,6 +434,27 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
+  async sufficientBalanceInPool(
+    rewardProgramId: string,
+    amount: BN,
+    token: string,
+    acceptPartialClaim?: boolean
+  ): Promise<any> {
+    let weiAmount = new BN(amount);
+    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
+    if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
+      if (acceptPartialClaim) {
+        // acceptPartialClaim means: if reward pool balance is less than amount,
+        // rewardee is willing sacrifice full reward and accept the entire reward pool balance
+        weiAmount = rewardPoolBalanceForRewardProgram;
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
   async claimGasEstimate(
     rewardSafeAddress: string,
     leaf: string,
@@ -612,7 +633,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return Object.fromEntries(entries);
   }
 
-  private decodeLeaf(leaf: string): FullLeaf {
+  decodeLeaf(leaf: string): FullLeaf {
     let outerObj = this.layer2Web3.eth.abi.decodeParameters(
       [
         { type: 'address', name: 'rewardProgramId' },
