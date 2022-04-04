@@ -4,7 +4,7 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
+import { AbiItem, randomHex, toChecksumAddress, fromWei } from 'web3-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
@@ -480,10 +480,10 @@ export default class RewardManager {
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-    let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
+    let weiAmount = new BN(amount);
     if (weiAmount.gt(safeBalance)) {
       throw new Error(
-        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
       );
     }
 
@@ -512,7 +512,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
-        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
+        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     let fullSignature = await signRewardSafe(
