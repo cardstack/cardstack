@@ -553,3 +553,53 @@ describe('GET /api/merchant-infos', function () {
       });
   });
 });
+
+describe('GET /api/merchant-infos/short-id/:id', function () {
+  const fullUuid = 'a7eeb098-f8d6-4926-a47b-c320b7375d6b';
+  // shortened using short-uuid, originally 'a7eeb098-f8d6-4926-a47b-c320b7375d6b'
+  // this endpoint should convert it back
+  const shortenedUuid = 'mJKhNVKyAUgScu1dysmR8R';
+  let { request, getContainer } = setupHub(this);
+
+  this.beforeEach(async function () {
+    let merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
+
+    await merchantInfoQueries.insert({
+      id: fullUuid,
+      name: 'Merchie!',
+      slug: 'slug',
+      color: 'red',
+      textColor: 'purple',
+      ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+    });
+  });
+
+  it('returns 404 if short id cannot be resolved', async function () {
+    await request()
+      .get(`/api/merchant-infos/short-id/now6HxUjmBfDwTbF76GVHz`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(404);
+  });
+
+  it('can return a merchant customization', async function () {
+    await request()
+      .get(`/api/merchant-infos/short-id/${shortenedUuid}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect({
+        meta: { network: 'sokol' },
+        data: {
+          id: fullUuid,
+          type: 'merchant-infos',
+          attributes: {
+            did: 'did:cardstack:1mmJKhNVKyAUgScu1dysmR8R728e839d5d105bff',
+            name: 'Merchie!',
+            slug: 'slug',
+            color: 'red',
+            'text-color': 'purple',
+            'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
