@@ -1,5 +1,6 @@
 import streamlit as st
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
+from cardpay_reward_programs.config import reward_token_addresses
 
 def get_rule_class():
     return MinOtherMerchantsPaid
@@ -24,7 +25,7 @@ def get_user_defined_parameters():
     user_defined_parameters = {
         "base_reward": base_reward,
         "min_other_merchants": min_other_merchants,
-        "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+        "token": reward_token_addresses["xdai"],
         "duration": 43200,
     }
     return user_defined_parameters
