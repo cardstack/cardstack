@@ -13,9 +13,17 @@ export default class CardSpaceService extends Service {
 
   model = useResource(this, CardSpace, () => ({
     named: {
-      slug: this.appContext.cardSpaceId,
+      slug: this.slug,
     },
   }));
+
+  get isActive() {
+    return this.appContext.isCardSpace;
+  }
+
+  get slug() {
+    return this.appContext.cardSpaceId;
+  }
 
   get canEdit() {
     return this.layer2Network.walletInfo.accounts
