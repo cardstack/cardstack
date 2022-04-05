@@ -816,7 +816,7 @@ Options:
 
 ## `cardpay rewards transfer-safe <rewardSafe> <newOwner>`
 
-Withdraw from reward safe
+Transfer reward safe to a new owner
 
 ```
 Positionals:
