@@ -12,7 +12,7 @@ export default class IndexRoute extends Route {
 
   async model(): Promise<CardSpace> {
     if (this.appContext.isCardSpace) {
-      let model = this.cardSpace.cardSpace;
+      let model = this.cardSpace.model;
       await model.run();
 
       if (model.is404) {

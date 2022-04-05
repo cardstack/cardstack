@@ -11,7 +11,7 @@ export default class CardSpaceService extends Service {
   @service declare fastboot: Fastboot;
   @service declare layer2Network: Layer2Network;
 
-  cardSpace = useResource(this, CardSpace, () => ({
+  model = useResource(this, CardSpace, () => ({
     named: {
       slug: this.appContext.cardSpaceId,
     },
@@ -20,7 +20,7 @@ export default class CardSpaceService extends Service {
   get canEdit() {
     return this.layer2Network.walletInfo.accounts
       .mapBy('address')
-      .includes(this.cardSpace.ownerAddress);
+      .includes(this.model.ownerAddress);
   }
 }
 
