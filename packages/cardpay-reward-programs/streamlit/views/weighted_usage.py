@@ -6,6 +6,15 @@ from cardpay_reward_programs.rules import WeightedUsage
 def get_rule_class():
     return WeightedUsage
 
+def get_core_parameters():
+    core_parameters = {
+        "start_block": 20000000,
+        "end_block": 26000000,
+        "subgraph_config_locations": {
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
+        },
+    }
+    return core_parameters
 
 def get_user_defined_parameters():
     s = st.expander(label="User defined parameters", expanded=True)
@@ -24,9 +33,6 @@ def get_user_defined_parameters():
         "transaction_factor": transaction_factor,
         "spend_factor": spend_factor,
         "token": reward_token_addresses["xdai"],
-        "subgraph_config_location": {
-            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
-        },
         "duration": 43200,
     }
     return user_defined_parameters

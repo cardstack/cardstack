@@ -38,9 +38,10 @@ payment_cycle_length = s.number_input(
 )
 
 core_parameters = {
-    "start_block": 20000000,
-    "end_block": 26000000,
-    "payment_cycle_length": int(payment_cycle_length)
+    **rule_module.get_core_parameters(),
+    **{
+        "payment_cycle_length": int(payment_cycle_length),
+        }
 }
 
 user_defined_parameters = rule_module.get_user_defined_parameters()

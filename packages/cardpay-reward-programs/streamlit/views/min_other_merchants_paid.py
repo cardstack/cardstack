@@ -4,6 +4,16 @@ from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 def get_rule_class():
     return MinOtherMerchantsPaid
 
+def get_core_parameters():
+    core_parameters = {
+        "start_block": 20000000,
+        "end_block": 26000000,
+        "subgraph_config_locations": {
+            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
+        },
+    }
+    return core_parameters
+
 def get_user_defined_parameters():
     s = st.expander(label="User defined parameters", expanded=True)
     min_other_merchants = s.number_input(
@@ -15,9 +25,6 @@ def get_user_defined_parameters():
         "base_reward": base_reward,
         "min_other_merchants": min_other_merchants,
         "token": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
-        "subgraph_config_location": {
-            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
-        },
         "duration": 43200,
     }
     return user_defined_parameters

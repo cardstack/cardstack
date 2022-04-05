@@ -2,18 +2,6 @@ import streamlit as st
 import pandas as pd
 
 
-default_core_config = {
-    "payment_cycle_length": 32768,
-    "start_block": 20000000,
-    "end_block": 26000000,
-}
-
-def read_core_config(rule):
-    r = st.expander(label="Rule config")
-    for key in default_core_config.keys():
-        r.write(f"{key}={getattr(rule,key)}")
-
-
 def slider_partition(
     start_block=24117248, end_block=25117248, default_block=24150016, type="two-end"
 ):
@@ -22,7 +10,7 @@ def slider_partition(
             "Start block - End block",
             min_value=start_block,
             max_value=end_block,
-            value=(start_block, 25000000),
+            value=(start_block, default_block),
         )
         return (start, end)
     elif type == "one_end":
