@@ -3,15 +3,17 @@ import { inject as service } from '@ember/service';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import { CardSpace } from '../resources/card-space';
-import { getOwner } from '@ember/application';
+import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 
 export default class IndexRoute extends Route {
   @service('app-context') declare appContext: AppContextService;
+  @service('card-space') declare cardSpace: CardSpaceService;
   @service declare fastboot: Fastboot;
 
   async model(): Promise<CardSpace> {
     if (this.appContext.isCardSpace) {
-      let model = await this.fetchCardSpace(this.appContext.cardSpaceId);
+      let model = this.cardSpace.cardSpace;
+      await model.run();
 
       if (model.is404) {
         if (this.fastboot.isFastBoot) {
@@ -29,16 +31,5 @@ export default class IndexRoute extends Route {
       }
       throw new Error("Oops! We couldn't find the page you were looking for");
     }
-  }
-
-  async fetchCardSpace(slug: string) {
-    let cardSpace = new CardSpace(getOwner(this), {
-      named: {
-        slug,
-      },
-    });
-    await cardSpace.run();
-
-    return cardSpace;
   }
 }
