@@ -75,7 +75,7 @@ export class HubWorker {
       // remove old notifications at midnight every day
       // 5am in utc equivalent to midnight in ny
       // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-      crontab: ['0 5 * * * remove-old-sent-notifications ?max=5', '*/5 * * * * print-queued-jobs ?max=5'].join('\n'),
+      crontab: ['0 5 * * * remove-old-sent-notifications ?max=5', '*/5 * * * * print-queued-jobs'].join('\n'),
     });
 
     runner.events.on('job:error', ({ error, job }) => {
