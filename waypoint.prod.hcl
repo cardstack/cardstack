@@ -31,6 +31,7 @@ app "hub" {
             count = 2
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
             task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/hub-prod/52cb41649112bec8/1ce6522a7998b3b4"
             }
@@ -79,6 +80,7 @@ app "hub-worker" {
             count = 2
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
             task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
@@ -120,6 +122,7 @@ app "hub-bot" {
             count = 1
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
             task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
