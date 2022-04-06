@@ -6,7 +6,6 @@ import Web3 from 'web3';
 
 const { toChecksumAddress } = Web3.utils;
 export default class CustodialWalletRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   wyre = inject('wyre');
 
   constructor() {
