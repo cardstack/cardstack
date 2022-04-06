@@ -204,7 +204,9 @@ async function waitForSafeNonceAdvance(
   } while (nonce < currentNonce + 1 && Date.now() < start + duration);
 
   if (nonce < currentNonce + 1) {
-    throw new Error(`Timed out waiting for safe ${safeAddress} nonce to advance to ${currentNonce + 1}`);
+    let msg = `Timed out waiting for safe ${safeAddress} nonce to advance to ${currentNonce + 1}`;
+    console.error(msg);
+    throw new Error(msg);
   }
 }
 
@@ -248,11 +250,22 @@ export async function waitForTransactionConsistency(
     nonce = currentNonce;
   }
 
+  let start = Date.now();
+  console.log(
+    `  waiting for txn consistency for txn=${txnHash}${safeAddress ? ', safe=' + safeAddress : ''}${
+      nonce != null ? ', nonce=' + nonce : ''
+    }`
+  );
   let txnReceipt = await waitUntilTransactionMined(web3, txnHash, duration);
+  console.log(`  txn mined for txn=${txnHash} in ${Date.now() - start}ms`);
+  start = Date.now();
   await waitForSubgraphIndex(txnHash, web3, duration);
+  console.log(`  subgraph indexed for txn=${txnHash} in ${Date.now() - start}ms`);
+  start = Date.now();
 
   if (safeAddress != null && nonce != null) {
     await waitForSafeNonceAdvance(web3, safeAddress, nonce, 10 * 1000);
+    console.log(`  nonce advanced for txn=${txnHash} safe=${safeAddress} in ${Date.now() - start}ms`);
   }
   return txnReceipt;
 }
