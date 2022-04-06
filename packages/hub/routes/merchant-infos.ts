@@ -21,7 +21,6 @@ export interface MerchantInfo {
 }
 
 export default class MerchantInfosRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',

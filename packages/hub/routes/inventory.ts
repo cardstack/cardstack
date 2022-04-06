@@ -5,7 +5,6 @@ import { inject } from '@cardstack/di';
 import qs from 'qs';
 
 export default class InventoryRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   inventory = inject('inventory');
 
   constructor() {

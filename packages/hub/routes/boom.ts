@@ -1,11 +1,9 @@
 import Koa from 'koa';
-import { inject } from '@cardstack/di';
 import packageJson from '../package.json';
 import autoBind from 'auto-bind';
 import * as Sentry from '@sentry/node';
 
 export default class BoomRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   constructor() {
     autoBind(this);
   }
