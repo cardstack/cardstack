@@ -1,20 +1,17 @@
-.not-found {
-  --boxel-dashboard-background-color: var(--boxel-purple-600);
-
-  color: white;
-}
-
 .not-found__header {
   --boxel-org-header-background-color: var(--boxel-dark);
 }
 
 .not-found__content {
-  display: flex;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
   max-width: 100vw;
-  overflow-x: hidden;
-  align-items: center;
-  flex-direction: column;
+  max-height: 100vh;
+  overflow: hidden;
+  justify-items: center;
+  justify-content: center;
   padding: min(5vh, 100px) 0;
+  text-align: center;
 }
 
 .not-found__content > * + * {
@@ -22,21 +19,24 @@
 }
 
 .not-found__big-404 {
-  font-size: max(60px, min(150px, 10vw));
+  font-size: max(40px, min(150px, 15vh));
   font-weight: 700;
 }
 
+.not-found__description {
+  max-width: 100vw;
+}
+
 .not-found__decorative-image {
-  width: 900px;
+  max-width: 900px;
+  aspect-ratio: calc(818 / 603);
+  width: 100%;
+  /* height: ; */
   min-width: 500px;
 }
 
 @media only screen and (max-width: 480px) {
   .boxel-dashboard.not-found {
     --boxel-dashboard-background-color: var(--boxel-purple-900);
-  }
-
-  .boxel-org-header.not-found__header {
-    display: none;
   }
 }
