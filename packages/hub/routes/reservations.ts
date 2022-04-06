@@ -14,7 +14,6 @@ import { service } from '@cardstack/hub/services';
 let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   web3 = inject('web3-http', { as: 'web3' });
   relay = service('relay');
   inventory = inject('inventory');

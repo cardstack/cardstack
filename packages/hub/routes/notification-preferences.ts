@@ -21,7 +21,6 @@ export interface NotificationPreference {
 }
 
 export default class NotificationPreferencesRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   notificationTypeQueries = query('notification-type', { as: 'notificationTypeQueries' });
   notificationPreferenceQueries = query('notification-preference', { as: 'notificationPreferenceQueries' });
   notificationPreferenceSerializer: NotificationPreferenceSerializer = inject('notification-preference-serializer', {

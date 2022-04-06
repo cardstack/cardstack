@@ -6,7 +6,6 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateRequiredFields } from './utils/validation';
 
 export default class PrepaidCardCustomizationsRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   prepaidCardCustomizationSerializer = inject('prepaid-card-customization-serializer', {
     as: 'prepaidCardCustomizationSerializer',
