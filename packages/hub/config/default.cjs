@@ -33,7 +33,7 @@ module.exports = {
     allowedChannels: '958136277096620084,958137087641661450',
     messageVerificationDelayMs: 1000 * 15,
   },
-  serverSecret: null,
+  authSecret: null,
   sentry: {
     dsn: null,
     enabled: false,

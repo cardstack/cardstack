@@ -5,9 +5,9 @@ import queryString from 'query-string';
 import config from 'config';
 
 function secret(): string {
-  let s = config.get('serverSecret');
+  let s = config.get('authSecret');
   if (!s || typeof s !== 'string') {
-    throw new Error('Missing ENV var SERVER_secret()');
+    throw new Error('Missing ENV var HUB_AUTH_SECRET');
   }
   return s;
 }

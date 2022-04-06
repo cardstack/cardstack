@@ -66,5 +66,5 @@
     "privateKey": "FIREBASE_PRIVATE_KEY",
     "databaseURL": "FIREBASE_DATABASE_URL"
   },
-  "serverSecret": "SERVER_SECRET"
+  "authSecret": "HUB_AUTH_SECRET"
 }
