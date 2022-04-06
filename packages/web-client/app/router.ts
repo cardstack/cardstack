@@ -16,4 +16,5 @@ Router.map(function () {
     this.route('deposit-withdrawal');
   });
   this.route('boom');
+  this.route('not-found', { path: '/*path' });
 });
