@@ -1,0 +1,35 @@
+<Boxel::Dashboard
+  @darkTheme={{true}}
+  class="not-found"
+>
+  <:header>
+    <Boxel::OrgHeader
+      @title="Card Pay"
+      @iconURL="/images/icons/card-pay-logo.svg"
+      class="not-found__header"
+    />
+  </:header>
+  <:body>
+    <div class="not-found__content">
+      <div class="not-found__big-404">
+        404
+      </div>
+      <div>
+        The page you are looking for does not exist
+      </div>
+      <Boxel::Button
+        @kind="primary"
+        @as="link-to"
+        @route="index"
+      >
+        Go back to Card Pay home
+      </Boxel::Button>
+      <img
+        class="not-found__decorative-image"
+        src="/images/illustrations/404-bg.png"
+        alt
+        role="presentation"
+      >
+    </div>
+  </:body>
+</Boxel::Dashboard>
