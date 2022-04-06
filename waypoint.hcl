@@ -30,9 +30,12 @@ app "hub" {
             cluster = "hub-staging"
             count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-            task_role_name = "hub-staging-hub_ecr_task"
+            task_role_name = "hub-staging-ecr-task"
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
+            }
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
             }
         }
 
@@ -80,8 +83,11 @@ app "hub-worker" {
             cluster = "hub-worker-staging"
             count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-            task_role_name = "hub-staging-hub_ecr_task"
+            task_role_name = "hub-staging-ecr-task"
             disable_alb = true
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+            }
         }
 
         hook {
@@ -118,8 +124,11 @@ app "hub-bot" {
             cluster = "hub-bot-staging"
             count = 1
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-            task_role_name = "hub-staging-hub_ecr_task"
+            task_role_name = "hub-staging-ecr-task"
             disable_alb = true
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+            }
         }
 
         hook {
@@ -151,13 +160,16 @@ app "hub-event-listener" {
 
   deploy {
       use "aws-ecs" {
-          region = "us-east-1"
-          memory = "512"
-          cluster = "hub-event-listener-staging"
-          count = 1
-          subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-          task_role_name = "hub-staging-hub_ecr_task"
-          disable_alb = true
+        region = "us-east-1"
+        memory = "512"
+        cluster = "hub-event-listener-staging"
+        count = 1
+        subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+        task_role_name = "hub-staging-ecr-task"
+        disable_alb = true
+        secrets = {
+            HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+        }
       }
 
       hook {
