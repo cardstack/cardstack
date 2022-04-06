@@ -1,6 +1,7 @@
 <Boxel::Dashboard
   @darkTheme={{true}}
   class="not-found"
+  data-test-not-found-page
 >
   <:body>
     <div class="not-found__content">
@@ -14,6 +15,7 @@
         @kind="primary"
         @as="link-to"
         @route="index"
+        data-test-back-home-link
       >
         Go back to Card Pay home
       </Boxel::Button>
