@@ -31,6 +31,7 @@ app "hub" {
             count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-ecr-task"
+            execution_role_name = "hub-staging-ecr-task-executor-role"
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
             }
@@ -84,6 +85,7 @@ app "hub-worker" {
             count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-ecr-task"
+            execution_role_name = "hub-staging-ecr-task-executor-role"
             disable_alb = true
             secrets = {
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
@@ -125,6 +127,7 @@ app "hub-bot" {
             count = 1
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-ecr-task"
+            execution_role_name = "hub-staging-ecr-task-executor-role"
             disable_alb = true
             secrets = {
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
@@ -166,6 +169,7 @@ app "hub-event-listener" {
         count = 1
         subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         task_role_name = "hub-staging-ecr-task"
+        execution_role_name = "hub-staging-ecr-task-executor-role"
         disable_alb = true
         secrets = {
             HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
