@@ -5,6 +5,7 @@ import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
+import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
@@ -26,6 +27,7 @@ interface CardSpaceUserPageArgs {
 
 export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> {
   @service('app-context') declare appContext: AppContextService;
+  @service('card-space') declare cardSpace: CardSpaceService;
   @service('hub-authentication') declare hubAuthentication: HubAuthentication;
   @service('ua') declare UAService: UA;
   @tracked paymentLinkMode: PaymentLinkMode = 'link';
