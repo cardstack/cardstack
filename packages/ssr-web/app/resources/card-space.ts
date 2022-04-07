@@ -67,6 +67,11 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
         },
       });
 
+      if (response.status === 404) {
+        this.is404 = true;
+        throw new Error(`404: Card Space not found for ${slug}`);
+      }
+
       const cardSpaceResult: {
         included: any[];
       } = await response.json();
