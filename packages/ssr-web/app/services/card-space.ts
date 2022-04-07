@@ -18,7 +18,7 @@ export default class CardSpaceService extends Service {
   }));
 
   get isActive() {
-    return this.appContext.isCardSpace;
+    return this.appContext.currentApp === 'card-space';
   }
 
   get slug() {
