@@ -83,6 +83,14 @@ export default class AppContext extends Service implements AppContextService {
         : window.location.search
     );
   }
+
+  getAbsolutePath(relativePath: string) {
+    if (this.fastboot.isFastBoot) {
+      return `${this.fastboot.request.protocol}://${this.host}${relativePath}`;
+    } else {
+      return `${window.location.origin}${relativePath}`;
+    }
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
