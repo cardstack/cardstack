@@ -10,17 +10,7 @@ export default class IndexRoute extends Route {
 
   async model(): Promise<CardSpace> {
     if (this.cardSpace.isActive) {
-      let model = this.cardSpace.model;
-      await model.run();
-
-      if (model.is404) {
-        if (this.fastboot.isFastBoot) {
-          this.fastboot.response.statusCode = 404;
-        }
-        throw new Error(`404: Card Space not found for ${this.cardSpace.slug}`);
-      }
-
-      return model;
+      return this.modelFor('application');
     } else {
       if (this.fastboot.isFastBoot) {
         this.fastboot.response.statusCode = 404;
