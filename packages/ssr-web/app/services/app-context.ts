@@ -83,6 +83,13 @@ export default class AppContext extends Service implements AppContextService {
         : window.location.search
     );
   }
+
+  getAbsolutePath(relativePath: string) {
+    let pathWithLeadingSlash = relativePath.startsWith('/')
+      ? relativePath
+      : `/${relativePath}`;
+    return `https://${config.universalLinkDomain}${pathWithLeadingSlash}`;
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
