@@ -86,7 +86,7 @@ export default class AppContext extends Service implements AppContextService {
 
   getAbsolutePath(relativePath: string) {
     if (this.fastboot.isFastBoot) {
-      return `${this.fastboot.request.protocol}://${this.host}${relativePath}`;
+      return `${this.fastboot.request.protocol}//${this.host}${relativePath}`;
     } else {
       return `${window.location.origin}${relativePath}`;
     }
