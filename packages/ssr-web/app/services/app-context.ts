@@ -85,7 +85,10 @@ export default class AppContext extends Service implements AppContextService {
   }
 
   getAbsolutePath(relativePath: string) {
-    return `https://${config.universalLinkDomain}${relativePath}`;
+    let pathWithLeadingSlash = relativePath.startsWith('/')
+      ? relativePath
+      : `/${relativePath}`;
+    return `https://${config.universalLinkDomain}${pathWithLeadingSlash}`;
   }
 }
 
