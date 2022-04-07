@@ -10,6 +10,7 @@ export default class WorkerClient {
 
   async addJob(identifier: string, payload?: any, spec?: TaskSpec): Promise<Job> {
     if (this.workerUtils) {
+      console.trace('Adding job', identifier, payload, spec);
       return this.workerUtils.addJob(identifier, payload, spec);
     } else {
       throw new Error('Cannot call addJob before workerUtils is ready');
