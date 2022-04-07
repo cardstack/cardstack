@@ -45,15 +45,15 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
   async run() {
     try {
       await this.fetchCardSpace(this.args.named.slug);
-      this.loading = false;
     } catch (err) {
       this.errored = err;
-      this.loading = false;
 
       if (!isStorage404(err)) {
         console.log('Exception fetching merchant info', err);
         Sentry.captureException(err);
       }
+    } finally {
+      this.loading = false;
     }
   }
 
