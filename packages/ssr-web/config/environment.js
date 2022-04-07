@@ -103,7 +103,7 @@ module.exports = function (environment) {
     },
     fastboot: {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
-        '/.+.card.space.localhost:\\d+$/',
+        '/.+.card.xyz.localhost:\\d+$/',
         '/^localhost:\\d+$/',
       ],
     },
