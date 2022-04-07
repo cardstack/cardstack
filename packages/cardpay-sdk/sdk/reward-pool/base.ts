@@ -157,7 +157,7 @@ export default class RewardPool {
         return {
           ...o,
           isValid: validFrom <= currentBlock && validTo > currentBlock,
-          amount: new BN(o.amount.toString()),
+          amount: new BN(o.amount.toLocaleString('fullwide', { useGrouping: false })),
         };
       })
     );
