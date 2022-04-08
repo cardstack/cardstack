@@ -40,6 +40,8 @@
 @media only screen and (max-width: 992px) {
   .card-space-user-page {
     padding: 0;
+    background: var(--card-space-background);
+    color: var(--card-space-text-color);
   }
 
   .card-space-user-page__wrapper {
@@ -133,4 +135,59 @@
   text-align: center;
   font-size: var(--boxel-font-size-sm);
   font-weight: 700;
+}
+
+.card-space-user-page__apps_wrapper {
+  margin-top: var(--boxel-sp-lg);
+}
+
+.card-space-user-page__apps {
+  margin: auto;
+  background: white;
+  color: var(--card-space-text-color);
+  padding: min(var(--boxel-sp-xl), 5vw);
+  border-radius: 2rem;
+  width: max(90vh, 44rem);
+  max-width: 90%;
+  display: grid;
+  grid-template: "wallet stores";
+}
+
+.card-space-user-page__apps_title {
+  text-align: center;
+  color: white;
+  font-size: var(--boxel-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding-bottom: var(--boxel-sp-xxxs);
+}
+
+.card-space-user-page__apps_wallet {
+  grid-area: wallet;
+}
+
+.card-space-user-page__apps_stores {
+  grid-area: stores;
+}
+
+@media only screen and (max-width: 992px) {
+  .card_space-user-page__apps_title {
+    color: var(--card-space-text-color);
+  }
+
+  .card-space-user-page__apps_wrapper {
+    padding: min(var(--boxel-sp-xl), 5vw);
+    background: var(--card-space-background);
+    color: var(--card-space-text-color);
+    min-width: 100%;
+    height: auto;
+    border-radius: 0;
+    aspect-ratio: unset;
+  }
+  .card-space-user-page__apps {
+    min-width: 100%;
+    border-radius: 0;
+    aspect-ratio: unset;
+    grid-template: "wallet" "stores";
+  }
 }
