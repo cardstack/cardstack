@@ -1,3 +1,7 @@
-{{page-title "Cardstack"}}
+{{page-title 'Cardstack'}}
+
+{{#if this.cardSpace.isActive}}
+  <CardSpace::UserPage @model={{this.model}} />
+{{/if}}
 
 {{outlet}}

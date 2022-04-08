@@ -1,12 +1,12 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
+import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import config from '../config/environment';
 import window from 'ember-window-mock';
 export interface AppContextService {
   currentApp: 'card-space' | 'wallet';
   cardSpaceId: string;
-  isCardSpace: boolean;
 }
 
 const CARD_SPACE_SLUG_PARAMETER_NAME = 'slug';
@@ -24,6 +24,7 @@ function escapeDot(str: string) {
 }
 
 export default class AppContext extends Service implements AppContextService {
+  @service('card-space') declare cardSpace: CardSpaceService;
   @service declare fastboot: Fastboot;
   // do not use the global or sticky flags on this or it will become stateful and
   // mess up tests
@@ -61,12 +62,8 @@ export default class AppContext extends Service implements AppContextService {
     }
   }
 
-  get isCardSpace() {
-    return this.currentApp === 'card-space';
-  }
-
   get cardSpaceId() {
-    if (this.isCardSpace) {
+    if (this.cardSpace.isActive) {
       if (this.queryIsCardSpace) {
         return this.searchParams.get(CARD_SPACE_SLUG_PARAMETER_NAME)!;
       } else {

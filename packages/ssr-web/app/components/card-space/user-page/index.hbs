@@ -38,7 +38,7 @@
             Loading…
           {{else}}
             {{#if this.hubAuthentication.isAuthenticated}}
-              {{#if this.authIsForModel}}
+              {{#if this.cardSpace.canEdit}}
                 <span data-test-auth-for-this-space>Authed for this space</span>
               {{else}}
                 <span data-test-auth-not-for-this-space>Authed but not for this space</span>
