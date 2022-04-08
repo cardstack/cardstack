@@ -41,6 +41,7 @@ import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { action } from '@ember/object';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { toWei } from 'web3-utils';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent>
@@ -335,7 +336,8 @@ export default abstract class Layer1ChainWeb3Strategy
     return tokenBridge.unlockTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       amountInWei.toString(),
-      { onTxnHash }
+      { onTxnHash },
+      { gasPrice: toWei('350000') } // FIXME this probably belongs elsewhere…? and is it even at all correct
     );
   }
 
