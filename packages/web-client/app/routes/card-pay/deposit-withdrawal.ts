@@ -34,8 +34,6 @@ const SUPPLIERS_PANEL = {
         `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
       ],
       cta: 'Withdraw Tokens',
-      isCtaDisabled: config.environment !== 'test', // TODO remove/improve as part of CS-3613
-      ctaDisabledReason: 'Withdrawal is temporarily unavailable',
     },
   ],
 };
