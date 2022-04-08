@@ -3,6 +3,7 @@ import '../../css/card-pay/deposit-withdrawal.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-summary-hero.svg';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import config from '@cardstack/web-client/config/environment';
 
 const SUPPLIERS_PANEL = {
   title: 'Easy Deposits & Withdrawals',
@@ -33,6 +34,8 @@ const SUPPLIERS_PANEL = {
         `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
       ],
       cta: 'Withdraw Tokens',
+      isCtaDisabled: config.environment !== 'test', // TODO remove/improve as part of CS-3613
+      ctaDisabledReason: 'Withdrawal is temporarily unavailable',
     },
   ],
 };
