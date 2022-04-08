@@ -1,0 +1,59 @@
+name: Manual Build Rule [cardpay-reward-programs]
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: false
+        default: staging
+      rule:
+        type: choice
+        description: Rule name
+        required: true
+        options:
+          - FlatPayment
+          - MinSpend
+          - RetroAirdrop
+          - WeightedUsage
+          - MinOtherMerchantsPaid
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up env
+        env:
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          RULE_NAME: ${{ github.event.inputs.rule }}
+        run: |
+          if [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_KEY}}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
+          elif [ "$INPUT_ENVIRONMENT" = "production" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_KEY}}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
+          else
+            echo "unrecognized environment"
+            exit 1;
+          fi
+          echo "RULE_NAME"=${RULE_NAME} >> $GITHUB_ENV
+          echo "AWS_REGION"=us-east-1 >> $GITHUB_ENV
+
+      - name: Convert rule name to image tag (snake case)
+        shell: bash
+        run: |
+          echo "IMAGE_TAG=`echo ${RULE_NAME} | sed -r 's/([A-Z])/_\L\1/g' | sed 's/^_//'`" >> $GITHUB_ENV
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR # -t <ecr_registry>/<ecr_repository>:<image_tag>
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        working-directory: ./packages/cardpay-reward-programs
+        run: |
+          docker build --build-arg rule=$RULE_NAME -t $ECR_REGISTRY/$IMAGE_TAG:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$IMAGE_TAG:$IMAGE_TAG
