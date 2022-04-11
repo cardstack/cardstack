@@ -1,0 +1,35 @@
+.edit-screen-wrapper {
+  position: fixed;
+  z-index: var(--card-space-overlay-z-index);
+}
+
+.edit-screen-wrapper__full-page-container {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: var(--boxel-light);
+  position: relative;
+}
+
+.edit-screen-wrapper__loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.edit-screen-wrapper__modal-container {
+  /*
+    these numbers are all arbitrary - they act to constrain the modal's size
+    within a certain range. similar to clamp(min, 90vh, max); but with
+    more browser support.
+
+    having predictable modal sizes means we can do layering of modals with an
+    illusion that it is navigation within the same modal.
+  */
+  max-height: min(36rem, max(90vh, 18.75rem));
+  max-width: min(36rem, max(90vw, 25rem));
+}
