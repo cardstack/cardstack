@@ -32,8 +32,8 @@ jobs:
             echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_KEY}}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
           elif [ "$INPUT_ENVIRONMENT" = "production" ]; then
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_KEY}}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_REWARDS_ECR_WRITER_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_REWARDS_ECR_WRITER_AWS_ACCESS_KEY}}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PRODUCTION_REWARDS_ECR_WRITER_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
           else
             echo "unrecognized environment"
             exit 1;
