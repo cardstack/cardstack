@@ -3,7 +3,6 @@ import '../../css/card-pay/deposit-withdrawal.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-summary-hero.svg';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import config from '@cardstack/web-client/config/environment';
 
 const SUPPLIERS_PANEL = {
   title: 'Easy Deposits & Withdrawals',
