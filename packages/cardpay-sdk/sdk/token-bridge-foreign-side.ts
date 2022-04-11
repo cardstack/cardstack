@@ -231,14 +231,17 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     const packedSignatures = prepSignaturesForExecution(signatures);
     let nextNonce = await this.getNextNonce(from);
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let executeSignatures = foreignAmb.methods.executeSignatures(encodedData, packedSignatures);
+    let data = executeSignatures.encodeABI();
+    let gas = await executeSignatures.estimateGas();
+
     return await new Promise((resolve, reject) => {
-      let data = foreignAmb.methods.executeSignatures(encodedData, packedSignatures).encodeABI();
       let tx: TransactionConfig = {
         ...contractOptions,
         from,
         to: foreignAmbAddress,
         data,
-        gas: CLAIM_BRIDGED_TOKENS_GAS_LIMIT,
+        gas,
       };
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
