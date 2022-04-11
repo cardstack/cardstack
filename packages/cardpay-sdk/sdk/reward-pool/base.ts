@@ -42,14 +42,14 @@ export interface Leaf {
   paymentCycleNumber: number;
   validFrom: number;
   validTo: number;
-  tokenType: number;
+  tokenType: string;
   payee: string;
   transferData: string;
 }
 
 export interface TokenTransferDetail {
   token: string;
-  amount: BN;
+  amount: string;
 }
 
 export interface FullLeaf extends Partial<TokenTransferDetail>, Leaf {}
@@ -153,7 +153,14 @@ export default class RewardPool {
     let currentBlock = await this.layer2Web3.eth.getBlockNumber();
     return this.addTokenSymbol(
       json['results'].map((o: any) => {
-        let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+        let { validFrom, validTo, tokenType, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+        if (amount && tokenType == '0') {
+          return {
+            ...o,
+            isValid: validFrom <= currentBlock && validTo > currentBlock,
+            amount: new BN(o.amount),
+          };
+        }
         return {
           ...o,
           isValid: validFrom <= currentBlock && validTo > currentBlock,
@@ -658,15 +665,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return 'token' in o && 'amount' in o;
   }
 
-  private decodeTransferData(tokenType: number, transferData: string): TokenTransferDetail | string {
-    if (tokenType == 0) {
+  private decodeTransferData(tokenType: string, transferData: string): TokenTransferDetail | string {
+    if (tokenType == '0') {
       // Default data
       return transferData;
     } else if (
       // ERC677 / ERC20
-      tokenType == 1 ||
+      tokenType == '1' ||
       // ERC721 (NFT)
-      tokenType == 2
+      tokenType == '2'
     ) {
       return this.layer2Web3.eth.abi.decodeParameters(
         [
