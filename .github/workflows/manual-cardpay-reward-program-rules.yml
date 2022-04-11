@@ -42,7 +42,7 @@ jobs:
           fi
           echo "RULE_NAME"=${RULE_NAME} >> $GITHUB_ENV
 
-      - name: Convert rule name to image tag (snake case)
+      - name: Convert rule name (pascal case) to image tag (snake case)
         shell: bash
         run: |
           echo "IMAGE_TAG=`echo ${RULE_NAME} | sed -r 's/([A-Z])/_\L\1/g' | sed 's/^_//'`" >> $GITHUB_ENV
