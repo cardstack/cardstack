@@ -9,6 +9,7 @@ import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import { CardSpace } from './card-spaces';
 import { query } from '@cardstack/hub/queries';
+import shortUUID from 'short-uuid';
 
 export interface MerchantInfo {
   id: string;
@@ -20,7 +21,6 @@ export interface MerchantInfo {
 }
 
 export default class MerchantInfosRoute {
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
@@ -167,6 +167,21 @@ export default class MerchantInfosRoute {
         };
       }
     }
+  }
+
+  async getFromShortId(ctx: Koa.Context) {
+    let merchantInfos = await this.merchantInfoQueries.fetch({
+      id: shortUUID().toUUID(ctx.params.id),
+    });
+
+    if (!merchantInfos.length) {
+      ctx.status = 404;
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = this.merchantInfoSerializer.serialize(merchantInfos[0]);
+    ctx.type = 'application/vnd.api+json';
   }
 }
 

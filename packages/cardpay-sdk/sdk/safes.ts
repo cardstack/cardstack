@@ -7,7 +7,7 @@ import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
 import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from './utils/general-utils';
+import { TransactionOptions, waitForTransactionConsistency, isTransactionHash } from './utils/general-utils';
 const { fromWei } = Web3.utils;
 
 export interface ISafes {
@@ -321,7 +321,7 @@ export default class Safes implements ISafes {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!tokenAddress) {
@@ -386,7 +386,7 @@ export default class Safes implements ISafes {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
   private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {

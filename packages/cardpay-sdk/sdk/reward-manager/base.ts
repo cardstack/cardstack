@@ -4,8 +4,8 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
-import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
+import { AbiItem, randomHex, toChecksumAddress, fromWei } from 'web3-utils';
+import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import {
@@ -79,7 +79,7 @@ export default class RewardManager {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
         rewardProgramId,
-        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+        txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash),
       };
     }
     if (!prepaidCardAddressOrTxnHash) {
@@ -144,7 +144,7 @@ export default class RewardManager {
 
     return {
       rewardProgramId,
-      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+      txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!),
     };
   }
 
@@ -165,7 +165,7 @@ export default class RewardManager {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
         rewardSafe: await this.getRewardSafeFromTxn(txnHash),
-        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+        txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash),
       };
     }
     if (!prepaidCardAddressOrTxnHash) {
@@ -210,7 +210,7 @@ export default class RewardManager {
 
     return {
       rewardSafe: await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash),
-      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
+      txReceipt: await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!),
     };
   }
 
@@ -244,7 +244,7 @@ export default class RewardManager {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -287,7 +287,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
   async updateRewardProgramAdmin(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -307,7 +307,7 @@ export default class RewardManager {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -359,7 +359,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
   async addRewardRule(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -379,7 +379,7 @@ export default class RewardManager {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -426,7 +426,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
   async withdraw(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async withdraw(
@@ -447,7 +447,7 @@ export default class RewardManager {
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!safeAddressOrTxnHash) {
       throw new Error('safeAddress is required');
@@ -480,10 +480,10 @@ export default class RewardManager {
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-    let weiAmount = amount ? new BN(toWei(amount)) : safeBalance;
+    let weiAmount = new BN(amount);
     if (weiAmount.gt(safeBalance)) {
       throw new Error(
-        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${amount}`
+        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
       );
     }
 
@@ -512,7 +512,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
-        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
+        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     let fullSignature = await signRewardSafe(
@@ -557,7 +557,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
   async withdrawGasEstimate(
@@ -603,7 +603,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   ): Promise<SuccessfulTransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     if (!safeAddressOrTxnHash) {
       throw new Error('safeAddress is required');
@@ -716,7 +716,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
@@ -943,7 +943,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   }
   private async getRewardSafeFromTxn(txnHash: string): Promise<any> {
     let rewardMgrAddress = await getAddress('rewardManager', this.layer2Web3);
-    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.rewardeeRegisteredABI(), rewardMgrAddress)[0]
       .rewardSafe;
   }

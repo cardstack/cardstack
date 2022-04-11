@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { toWei } from 'web3-utils';
 
 export default {
   command: 'withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
@@ -37,7 +38,7 @@ export default {
     let web3 = await getWeb3(network, getWeb3Opts(args));
     let rewardManagerAPI = await getSDK('RewardManager', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
-    await rewardManagerAPI.withdraw(rewardSafe, recipient, tokenAddress, amount, {
+    await rewardManagerAPI.withdraw(rewardSafe, recipient, tokenAddress, toWei(amount), {
       onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
     });
     console.log(`Withdraw ${amount} of ${tokenAddress} out of ${rewardSafe} to ${recipient}`);

@@ -13,7 +13,6 @@ let log = Logger('route:orders');
 
 export default class OrdersRoute {
   order = inject('order');
-  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   wyre = inject('wyre');
 

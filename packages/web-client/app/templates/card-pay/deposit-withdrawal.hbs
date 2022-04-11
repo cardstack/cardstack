@@ -34,7 +34,12 @@
               @disabled={{section.isCtaDisabled}}
               data-test-workflow-button={{section.workflow}}
             >
-              <span>{{section.cta}}</span>
+              {{!-- TODO remove/fix after CS-3613 is better handled --}}
+              {{#if section.ctaDisabledReason}}
+                <span {{tippy section.ctaDisabledReason}}>{{section.cta}}</span>
+              {{else}}
+                <span>{{section.cta}}</span>
+              {{/if}}
               {{svg-jar section.buttonIcon
                 class="card-pay-dashboard__payments-section-header-button-icon"
                 role="presentation"

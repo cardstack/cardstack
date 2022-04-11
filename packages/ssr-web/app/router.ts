@@ -7,6 +7,7 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function () {
+  this.route('edit');
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });

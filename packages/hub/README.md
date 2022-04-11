@@ -37,7 +37,7 @@ The app uses a Postgresql-based background task queue built on [graphile/worker]
 
 Below is a list of the most common environment variables that the Hub accepts:
 
-- `SERVER_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
+- `HUB_AUTH_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
 - `FIXER_API_KEY` (required for `/api/exchange-rates`) - API key for currency exchange rates, we use https://fixer.io/
 - `EXCHANGE_RATES_ALLOWED_DOMAINS` - domains from which a request to `/api/exchange-rates` is allowed
 - `HUB_AWS_ACCESS_KEY_ID`
@@ -54,7 +54,7 @@ To use the variables, create a file named `.env` in the hub's folder, and put in
 For example:
 
 ```
-SERVER_SECRET=7TmgY1xFo/WrYTnAFSvAemZtFB8wQVMd8IkoeQKBboE=
+HUB_AUTH_SECRET=7TmgY1xFo/WrYTnAFSvAemZtFB8wQVMd8IkoeQKBboE=
 AWS_PROFILE=cardstack
 ```
 

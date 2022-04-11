@@ -17,6 +17,7 @@ import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendNotificationsTask from './tasks/send-notifications';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import WyreTransferTask from './tasks/wyre-transfer';
+import PrintQueuedJobsTask from './tasks/print-queued-jobs';
 
 let dbConfig = config.get('db') as Record<string, any>;
 const log = logger('hub/worker');
@@ -65,6 +66,7 @@ export class HubWorker {
         ),
         'persist-off-chain-merchant-info': this.instantiateTask(PersistOffChainMerchantInfoTask),
         'persist-off-chain-card-space': this.instantiateTask(PersistOffChainCardSpaceTask),
+        'print-queued-jobs': this.instantiateTask(PrintQueuedJobsTask),
         'remove-old-sent-notifications': this.instantiateTask(RemoveOldSentNotificationsTask),
         'wyre-transfer': this.instantiateTask(WyreTransferTask),
         's3-put-json': s3PutJson,
@@ -73,7 +75,7 @@ export class HubWorker {
       // remove old notifications at midnight every day
       // 5am in utc equivalent to midnight in ny
       // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-      crontab: '0 5 * * * remove-old-sent-notifications ?max=5',
+      crontab: ['0 5 * * * remove-old-sent-notifications ?max=5', '*/5 * * * * print-queued-jobs'].join('\n'),
     });
 
     runner.events.on('job:error', ({ error, job }) => {

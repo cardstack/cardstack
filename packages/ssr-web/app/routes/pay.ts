@@ -7,6 +7,7 @@ import config from '../config/environment';
 import { getOwner } from '@ember/application';
 import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
+import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 
 interface PayRouteModel {
   network: string;
@@ -18,9 +19,10 @@ interface PayRouteModel {
 export default class PayRoute extends Route {
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
+  @service('card-space') declare cardSpace: CardSpaceService;
 
   beforeModel() {
-    if (this.appContext.isCardSpace) {
+    if (this.cardSpace.isActive) {
       this.transitionTo('index');
     }
   }

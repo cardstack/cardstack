@@ -30,9 +30,13 @@ app "hub" {
             cluster = "hub-prod"
             count = 2
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-            task_role_name = "hub-prod-hub_ecr_task"
+            task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/hub-prod/52cb41649112bec8/1ce6522a7998b3b4"
+            }
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
             }
         }
 
@@ -75,8 +79,12 @@ app "hub-worker" {
             cluster = "hub-worker-prod"
             count = 2
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-            task_role_name = "hub-prod-hub_ecr_task"
+            task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+            }
         }
 
         hook {
@@ -113,8 +121,12 @@ app "hub-bot" {
             cluster = "hub-bot-prod"
             count = 1
             subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-            task_role_name = "hub-prod-hub_ecr_task"
+            task_role_name = "hub-ecr-task"
+            execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+            }
         }
 
         hook {
@@ -151,8 +163,11 @@ app "hub-event-listener" {
           cluster = "hub-event-listener-prod"
           count = 1
           subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-          task_role_name = "hub-prod-hub_ecr_task"
+          task_role_name = "hub-ecr-task"
           disable_alb = true
+            secrets = {
+                HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+            }
       }
 
       hook {

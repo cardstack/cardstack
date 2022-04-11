@@ -1,14 +1,12 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
-import Fastboot from 'ember-cli-fastboot/services/fastboot';
+import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import '../css/wc.css';
-import AppContext from '../services/app-context';
 export default class WcRoute extends Route {
-  @service declare appContext: AppContext;
-  @service declare fastboot: Fastboot;
+  @service('card-space') declare cardSpace: CardSpaceService;
 
   beforeModel() {
-    if (this.appContext.isCardSpace) {
+    if (this.cardSpace.isActive) {
       this.transitionTo('index');
     }
   }

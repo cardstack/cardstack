@@ -3,8 +3,10 @@ import type { SuccessfulTransactionReceipt } from './successful-transaction-rece
 import Web3 from 'web3';
 import { networks } from '../constants';
 import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
+import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import BN from 'bn.js';
 import { query as gqlQuery } from './graphql';
+import { AbiItem } from 'web3-utils';
 
 const POLL_INTERVAL = 500;
 
@@ -182,13 +184,89 @@ export async function waitForSubgraphIndex(
   return;
 }
 
-export async function waitForSubgraphIndexWithTxnReceipt(
+async function waitForSafeNonceAdvance(
+  web3: Web3,
+  safeAddress: string,
+  currentNonce: number,
+  duration = 60 * 10 * 1000
+): Promise<void> {
+  let nonce: number,
+    hasTried = false,
+    start = Date.now(),
+    safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+
+  do {
+    if (hasTried) {
+      await new Promise<void>((res) => setTimeout(() => res, POLL_INTERVAL));
+    }
+    nonce = new BN(await safe.methods.nonce().call()).toNumber();
+    hasTried = true;
+  } while (nonce < currentNonce + 1 && Date.now() < start + duration);
+
+  if (nonce < currentNonce + 1) {
+    let msg = `Timed out waiting for safe ${safeAddress} nonce to advance to ${currentNonce + 1}`;
+    console.error(msg);
+    throw new Error(msg);
+  }
+}
+
+export async function waitForTransactionConsistency(
   web3: Web3,
   txnHash: string,
+  safeAddress: string,
+  currentNonce: number,
+  duration?: number
+): Promise<SuccessfulTransactionReceipt>;
+export async function waitForTransactionConsistency(
+  web3: Web3,
+  txnHash: string,
+  safeAddress: string,
+  currentNonce: BN,
+  duration?: number
+): Promise<SuccessfulTransactionReceipt>;
+export async function waitForTransactionConsistency(
+  web3: Web3,
+  txnHash: string,
+  duration?: number
+): Promise<SuccessfulTransactionReceipt>;
+export async function waitForTransactionConsistency(
+  web3: Web3,
+  txnHash: string,
+  safeAddressOrDuration: string | number | undefined,
+  currentNonce?: number | BN | undefined,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
+  let safeAddress: string | undefined;
+  if (typeof safeAddressOrDuration === 'string') {
+    safeAddress = safeAddressOrDuration;
+  } else if (typeof safeAddressOrDuration === 'number') {
+    duration = safeAddressOrDuration;
+  }
+
+  let nonce: number | undefined;
+  if (currentNonce != null && typeof currentNonce !== 'number') {
+    nonce = currentNonce?.toNumber();
+  } else if (currentNonce != null) {
+    nonce = currentNonce;
+  }
+
+  let start = Date.now();
+  console.log(
+    `  waiting for txn consistency for txn=${txnHash}${safeAddress ? ', safe=' + safeAddress : ''}${
+      nonce != null ? ', nonce=' + nonce : ''
+    }`
+  );
   let txnReceipt = await waitUntilTransactionMined(web3, txnHash, duration);
+  console.log(`  txn mined for txn=${txnHash} in ${Date.now() - start}ms`);
+  start = Date.now();
   await waitForSubgraphIndex(txnHash, web3, duration);
+  console.log(`  subgraph indexed for txn=${txnHash} in ${Date.now() - start}ms`);
+  start = Date.now();
+
+  if (safeAddress != null && nonce != null) {
+    await waitForSafeNonceAdvance(web3, safeAddress, nonce, 10 * 1000);
+    console.log(`  nonce advanced for txn=${txnHash} safe=${safeAddress} in ${Date.now() - start}ms`);
+  }
   return txnReceipt;
 }
 
