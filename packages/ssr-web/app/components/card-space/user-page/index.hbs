@@ -71,10 +71,6 @@
         {{@model.name}}
       </div>
 
-      <div class='card-space-user-page__description'>
-        Scan this code to pay
-      </div>
-
       <div class='card-space-user-page__url' data-test-merchant-url>
         {{@model.id}}{{config 'cardSpaceHostnameSuffix'}}
       </div>
@@ -102,31 +98,39 @@
               @cornerSquareType='extra-rounded'
               @imageMargin={{5}}
             >
-              {{#if this.canDeepLink}}
-                <div
-                  class='card-space-user-payment-link__qr-container__actions'
-                >
-                  <div
-                    class='card-space-user-payment-link__qr-container__separator'
-                  ></div>
-                  <div
-                    class='card-space-user-payment-link__qr-container__separator-or'
-                  >
-                    OR
-                  </div>
-
-                  <Boxel::Button
-                    @kind='primary-dark'
-                    @as='anchor'
-                    @size='large'
-                    href={{this.paymentURL}}
-                    data-test-payment-link-deep-link
-                  >
-                    Pay with Card Wallet
-                    {{svg-jar 'card-pay-logo' height=20}}
-                  </Boxel::Button>
+              <:before>
+                <div class='card-space-user-page__description'>
+                  Scan to Pay
                 </div>
-              {{/if}}
+              </:before>
+
+              <:default>
+                {{#if this.canDeepLink}}
+                  <div
+                    class='card-space-user-payment-link__qr-container__actions'
+                  >
+                    <div
+                      class='card-space-user-payment-link__qr-container__separator'
+                    ></div>
+                    <div
+                      class='card-space-user-payment-link__qr-container__separator-or'
+                    >
+                      OR
+                    </div>
+
+                    <Boxel::Button
+                      @kind='primary-dark'
+                      @as='anchor'
+                      @size='large'
+                      href={{this.paymentURL}}
+                      data-test-payment-link-deep-link
+                    >
+                      Pay with Card Wallet
+                      {{svg-jar 'card-pay-logo' height=20}}
+                    </Boxel::Button>
+                  </div>
+                {{/if}}
+              </:default>
             </Boxel::StyledQrCode>
           </div>
         {{/if}}

@@ -60,6 +60,9 @@
 
 .card-space-user-page__description {
   text-align: center;
+  font-size: var(--boxel-font-size-xl);
+  font-weight: 300;
+  margin-top: var(--boxel-sp-sm);
 }
 
 .card-space-user-page__title {
