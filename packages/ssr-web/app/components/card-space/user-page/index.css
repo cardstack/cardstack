@@ -35,6 +35,11 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  width: max(90vh, 44rem);
+  max-width: 90%;
+  margin: auto;
+  padding: min(var(--boxel-sp-xl), 5vw);
+  padding-top: 0;
 }
 
 @media only screen and (max-width: 992px) {
@@ -51,18 +56,6 @@
     border-radius: 0;
     aspect-ratio: unset;
   }
-}
-
-.card-space-user-page__header svg {
-  /*
-    inherit the text color so that the logo does not have contrast issues.
-    background and text color on this page are dynamic.
-  */
-  fill: currentcolor;
-}
-
-.card-space-user-page__header > a:hover {
-  color: currentcolor;
 }
 
 .card-space-user-page__description {
