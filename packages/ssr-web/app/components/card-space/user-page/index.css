@@ -177,10 +177,12 @@
     border-radius: 0;
     aspect-ratio: unset;
   }
+
   .card-space-user-page__apps {
     min-width: 100%;
     border-radius: 0;
     aspect-ratio: unset;
     grid-template: "wallet" "stores";
+    gap: min(var(--boxel-sp-xl), 5vw);
   }
 }
