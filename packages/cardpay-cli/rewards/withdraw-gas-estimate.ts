@@ -3,7 +3,7 @@ import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
-const { fromWei } = Web3.utils;
+const { fromWei, toWei } = Web3.utils;
 
 export default {
   command: 'withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>',
@@ -43,7 +43,7 @@ export default {
       rewardSafe,
       recipient,
       tokenAddress,
-      amount
+      toWei(amount)
     );
     let { symbol } = await assets.getTokenInfo(gasToken);
     console.log(`The gas estimate for withdrawing from reward safe ${rewardSafe} is ${fromWei(estimate)} ${symbol}`);
