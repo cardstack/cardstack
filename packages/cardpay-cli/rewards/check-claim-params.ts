@@ -4,6 +4,7 @@ import { fromProof } from './utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
+import BN from 'bn.js';
 
 export default {
   command: 'check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]',
@@ -55,7 +56,7 @@ export default {
     let { symbol } = await assets.getTokenInfo(token);
     let sufficientBalanceInPool = await rewardPool.sufficientBalanceInPool(
       rewardProgramId,
-      amount,
+      new BN(amount),
       token,
       acceptPartialClaim
     );
