@@ -1,0 +1,45 @@
+<div
+  class="edit-screen-wrapper"
+  ...attributes
+>
+  {{!--
+    The modal has different styling and also different event listeners.
+    We don't want to support Escape to exit editing when presentation is a page.
+    --}}
+  {{#if (not this.widthMediaQuery)}}
+    {{!--
+      don't display content until the width media query is ready because going
+      one way or the other first will result in a flash as we change from page to modal.
+    --}}
+    <div class="edit-screen-wrapper__full-page-container">
+      <div class="edit-screen-wrapper__loading">
+        <Boxel::LoadingIndicator />
+      </div>
+    </div>
+  {{else if this.showPage}}
+    <div
+      class="edit-screen-wrapper__full-page-container"
+      {{focus-trap}}
+    >
+      {{set-body-class "has-modal"}}
+      {{yield}}
+    </div>
+  {{else}}
+    <Boxel::Modal
+      @isOpen={{true}}
+      @onClose={{@back}}
+    >
+      <Boxel::CardContainer
+        class="edit-screen-wrapper__modal-container"
+        {{focus-trap
+          focusTrapOptions=(hash
+            allowOutsideClick=true
+            clickOutsideDeactivates=true
+          )
+        }}
+      >
+        {{yield}}
+      </Boxel::CardContainer>
+    </Boxel::Modal>
+  {{/if}}
+</div>

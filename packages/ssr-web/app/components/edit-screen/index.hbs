@@ -1,0 +1,22 @@
+<EditScreen::Wrapper
+  @back={{@back}}
+>
+  <div class="edit-screen-content">
+    <div class="edit-screen-content__header">
+      Header
+    </div>
+    <div class="edit-screen-content__body">
+      {{yield}}
+    </div>
+    <div class="edit-screen-content__footer">
+      <Boxel::Button {{on "click" @back}}>
+        Cancel
+      </Boxel::Button>
+      <Boxel::Button
+        @kind="primary"
+      >
+        Save
+      </Boxel::Button>
+    </div>
+  </div>
+</EditScreen::Wrapper>
