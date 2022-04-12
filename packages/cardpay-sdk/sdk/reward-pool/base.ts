@@ -443,7 +443,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async sufficientBalanceInPool(
     rewardProgramId: string,
-    amount: BN,
+    amount: string,
     token: string,
     acceptPartialClaim?: boolean
   ): Promise<any> {
