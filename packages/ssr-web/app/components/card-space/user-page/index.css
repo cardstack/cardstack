@@ -1,8 +1,6 @@
 .card-space-user-page {
   min-height: 100vh;
   width: 100%;
-  display: flex;
-  flex-direction: column;
   margin: auto;
   padding: var(--boxel-sp-lg);
   background: var(--boxel-purple-600);
@@ -12,7 +10,7 @@
   margin: auto;
   background: var(--card-space-background);
   color: var(--card-space-text-color);
-  border-radius: 2rem;
+  border-radius: 2rem 2rem 0 0;
   height: max(90vh, 44rem);
   width: max(90vh, 44rem);
   max-width: 90%;
@@ -38,21 +36,17 @@
   max-width: 90%;
   margin: auto;
   padding: min(var(--boxel-sp-xl), 5vw);
-  padding-top: 0;
 }
 
 @media only screen and (max-width: 992px) {
   .card-space-user-page {
     padding: 0;
-    background: var(--card-space-background);
     color: var(--card-space-text-color);
   }
 
   .card-space-user-page__wrapper {
-    min-height: 100vh;
     min-width: 100%;
     height: auto;
-    border-radius: 0;
     aspect-ratio: unset;
   }
 }
@@ -141,6 +135,7 @@
   background: var(--boxel-light-200);
   color: var(--card-space-text-color);
   padding: min(var(--boxel-sp-xl), 5vw);
+  border-radius: 0 0 2rem 2rem;
   width: 100%;
   display: grid;
   grid-template: "wallet stores";
@@ -169,18 +164,15 @@
   }
 
   .card-space-user-page__apps_wrapper {
-    padding: min(var(--boxel-sp-xl), 5vw);
     background: var(--card-space-background);
     color: var(--card-space-text-color);
     min-width: 100%;
     height: auto;
-    border-radius: 0;
     aspect-ratio: unset;
   }
 
   .card-space-user-page__apps {
     min-width: 100%;
-    border-radius: 0;
     aspect-ratio: unset;
     grid-template: "wallet" "stores";
     gap: min(var(--boxel-sp-xl), 5vw);
