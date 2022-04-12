@@ -154,18 +154,15 @@ export default class RewardPool {
     return this.addTokenSymbol(
       json['results'].map((o: any) => {
         let { validFrom, validTo, tokenType, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
-        if (amount && tokenType == '0') {
+        if (amount && tokenType == '1') {
           return {
             ...o,
             isValid: validFrom <= currentBlock && validTo > currentBlock,
-            amount: new BN(o.amount),
+            amount: new BN(amount),
           };
+        } else {
+          throw new Error('Cannot decode amount from leaf');
         }
-        return {
-          ...o,
-          isValid: validFrom <= currentBlock && validTo > currentBlock,
-          amount: new BN(o.amount.toLocaleString('fullwide', { useGrouping: false })),
-        };
       })
     );
   }
