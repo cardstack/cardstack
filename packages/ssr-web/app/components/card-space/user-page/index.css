@@ -153,7 +153,7 @@
   font-size: var(--boxel-font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
-  padding-bottom: var(--boxel-sp-xxxs);
+  padding-bottom: var(--boxel-sp-xs);
 }
 
 .card-space-user-page__apps_wallet {
