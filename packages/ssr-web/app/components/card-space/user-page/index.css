@@ -4,6 +4,7 @@
   margin: auto;
   padding: var(--boxel-sp-lg);
   background: var(--boxel-purple-600);
+  overflow-y: auto;
 }
 
 .card-space-user-page__wrapper {
