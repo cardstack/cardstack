@@ -241,12 +241,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
         relationships: {
           'merchant-info': {
@@ -284,12 +280,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
       },
     };
@@ -331,12 +323,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
         relationships: {
           'merchant-info': {
