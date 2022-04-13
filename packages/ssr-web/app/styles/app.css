@@ -1,3 +1,12 @@
+/*
+  we're trying to fix safari's vh problem.
+  this is here to provide a fallback for other situations
+  in case the javascript fails.
+*/
+:root {
+  --vh: 1vh;
+}
+
 html,
 body {
   height: 100%;
