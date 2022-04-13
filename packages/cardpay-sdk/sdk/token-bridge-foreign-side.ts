@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
 import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { ContractOptions } from 'web3-eth-contract';
+import { ContractOptions, Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignAMBABI from '../contracts/abi/foreign-amb';
@@ -14,6 +14,7 @@ import {
   isTransactionHash,
   waitUntilBlock,
 } from './utils/general-utils';
+const { fromWei } = Web3.utils;
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -54,6 +55,7 @@ const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 // Note:  To accommodate the fix for infura block mismatch errors (made in
 // CS-2391), we are waiting one extra block for all layer 1 transactions.
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
+  private foreignBridge: Contract | undefined;
   constructor(private layer1Web3: Web3) {}
 
   async unlockTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -143,6 +145,22 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     }
     if (!amount) {
       throw new Error('amount is required');
+    }
+    let withinLimit = await this.withinLimit(tokenAddress, amount);
+    if (!withinLimit) {
+      let maxPerTx = await this.maxPerTx(tokenAddress);
+      let minPerTx = await this.minPerTx(tokenAddress);
+      let dailyLimit = await this.dailyLimit(tokenAddress);
+      let totalSpentPerDay = await this.totalSpentPerDay(tokenAddress);
+      throw new Error(`
+        relay action NOT within configured limits
+
+          Minimum Amount Per Tx: ${fromWei(minPerTx)}
+          Maximum Amount Per Tx: ${fromWei(maxPerTx)}
+          Total Amount Today: ${fromWei(totalSpentPerDay)}
+          Daily Amount Limit: ${fromWei(dailyLimit)}
+
+      `);
     }
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridgeAddress = await getAddress('foreignBridge', this.layer1Web3);
@@ -267,6 +285,30 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
   }
 
+  async withinLimit(tokenAddress: string, amount: string): Promise<boolean> {
+    return await (await this.getForeignBridge()).methods.withinLimit(tokenAddress, amount).call();
+  }
+
+  async maxPerTx(tokenAddress: string): Promise<BN> {
+    return await (await this.getForeignBridge()).methods.maxPerTx(tokenAddress).call();
+  }
+
+  async minPerTx(tokenAddress: string): Promise<BN> {
+    return await (await this.getForeignBridge()).methods.minPerTx(tokenAddress).call();
+  }
+
+  async dailyLimit(tokenAddress: string): Promise<BN> {
+    return await (await this.getForeignBridge()).methods.dailyLimit(tokenAddress).call();
+  }
+
+  async getCurrentDay(): Promise<BN> {
+    return await (await this.getForeignBridge()).methods.getCurrentDay().call();
+  }
+  async totalSpentPerDay(tokenAddress: string): Promise<BN> {
+    let currentDay = await this.getCurrentDay();
+    return await (await this.getForeignBridge()).methods.totalSpentPerDay(tokenAddress, currentDay).call();
+  }
+
   private async getNextNonce(from?: string): Promise<BN> {
     from = from ?? (await this.layer1Web3.eth.getAccounts())[0];
     // To accommodate the fix for infura block mismatch errors (made in CS-2391), we
@@ -274,6 +316,17 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let previousBlockNumber = (await this.layer1Web3.eth.getBlockNumber()) - 1;
     let nonce = await this.layer1Web3.eth.getTransactionCount(from, previousBlockNumber);
     return new BN(String(nonce)); // EOA nonces are zero based
+  }
+
+  private async getForeignBridge(): Promise<Contract> {
+    if (this.foreignBridge) {
+      return this.foreignBridge;
+    }
+    this.foreignBridge = new this.layer1Web3.eth.Contract(
+      ForeignBridgeABI as AbiItem[],
+      await getAddress('foreignBridge', this.layer1Web3)
+    );
+    return this.foreignBridge;
   }
 }
 
