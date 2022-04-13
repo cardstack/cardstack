@@ -574,7 +574,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     ).methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let safeBalance = new BN(await token.methods.balanceOf(rewardSafeAddress).call());
-    if (safeBalance.lt(new BN(amount))) {
+    if (safeBalance.lt(weiAmount)) {
       throw new Error(
         `Reward safe does not have enough balance to withdraw. The rewardSafe safe ${rewardSafeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
