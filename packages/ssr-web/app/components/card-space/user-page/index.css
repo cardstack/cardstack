@@ -11,7 +11,7 @@
   background: var(--card-space-background);
   color: var(--card-space-text-color);
   border-radius: var(--boxel-border-radius-lg) var(--boxel-border-radius-lg) 0 0;
-  max-width: 44rem;
+  max-width: 34rem;
   display: grid;
   grid-template-columns: 100%;
   grid-template-rows: 1fr 2.5rem;
@@ -30,7 +30,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  max-width: 44rem;
+  max-width: 34rem;
   margin: auto;
   padding-bottom: var(--boxel-sp);
 }
