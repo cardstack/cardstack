@@ -4,6 +4,7 @@
 
   border-radius: inherit;
   background: var(--boxel-light);
+  height: inherit;
   max-height: inherit;
   display: grid;
   grid-template-rows: auto 1fr auto;
