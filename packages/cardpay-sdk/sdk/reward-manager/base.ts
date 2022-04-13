@@ -433,7 +433,7 @@ export default class RewardManager {
     safeAddress: string,
     to: string,
     tokenAddress: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
@@ -454,9 +454,6 @@ export default class RewardManager {
     }
     if (!tokenAddress) {
       throw new Error('tokenAddress must be provided');
-    }
-    if (!amount) {
-      throw new Error('amount must be provided');
     }
     if (!to) {
       throw new Error('to must be provided');
@@ -480,24 +477,64 @@ export default class RewardManager {
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-    let weiAmount = new BN(amount);
-    if (weiAmount.gt(safeBalance)) {
-      throw new Error(
-        `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
-      );
-    }
 
-    let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-    let withdrawPayload = withdraw.encodeABI();
-    let estimate = await gasEstimate(
-      this.layer2Web3,
-      safeAddress,
-      rewardSafeDelegateAddress,
-      '0',
-      withdrawPayload,
-      Operation.DELEGATECALL,
-      tokenAddress
-    );
+    let estimate;
+    let withdrawPayload;
+    let weiAmount;
+    if (amount) {
+      //when amount is given, we assume that amount is string in wei that has already had gasCost deducted from it
+      let weiAmount = new BN(amount);
+      if (weiAmount.gt(safeBalance)) {
+        throw new Error(
+          `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
+        );
+      }
+      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+      withdrawPayload = withdraw.encodeABI();
+      estimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        rewardSafeDelegateAddress,
+        '0',
+        withdrawPayload,
+        Operation.DELEGATECALL,
+        tokenAddress
+      );
+      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+      if (safeBalance.lt(gasCost.add(weiAmount))) {
+        throw new Error(
+          `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+            safeBalance
+          )}, amount being withdrawn is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
+        );
+      }
+    } else {
+      //when amount is NOT given, we use safeBalance - gasCost as the withdraw amount
+      //Note: gasCost is estimated with safeBalance not the actual withdraw amount
+      weiAmount = safeBalance;
+      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+      withdrawPayload = withdraw.encodeABI();
+      estimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        rewardSafeDelegateAddress,
+        '0',
+        withdrawPayload,
+        Operation.DELEGATECALL,
+        tokenAddress
+      );
+      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+      if (weiAmount.lt(gasCost)) {
+        throw new Error(
+          `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+            safeBalance
+          )}, the gas cost is ${fromWei(gasCost)}`
+        );
+      }
+      weiAmount = weiAmount.sub(gasCost);
+      withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+      withdrawPayload = withdraw.encodeABI();
+    }
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
@@ -507,14 +544,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       }
     }
 
-    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (safeBalance.lt(gasCost.add(weiAmount))) {
-      throw new Error(
-        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
-          safeBalance
-        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
-      );
-    }
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardSafeDelegateAddress,
