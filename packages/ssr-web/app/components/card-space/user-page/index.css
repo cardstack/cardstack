@@ -10,11 +10,8 @@
   margin: auto;
   background: var(--card-space-background);
   color: var(--card-space-text-color);
-  border-radius: 2rem 2rem 0 0;
-  height: max(90vh, 44rem);
-  width: max(90vh, 44rem);
-  max-width: 90%;
-  aspect-ratio: 1;
+  border-radius: var(--boxel-border-radius-lg) var(--boxel-border-radius-lg) 0 0;
+  max-width: 44rem;
   display: grid;
   grid-template-columns: 100%;
   grid-template-rows: 1fr 2.5rem;
@@ -32,22 +29,27 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: max(90vh, 44rem);
-  max-width: 90%;
+  align-items: center;
+  max-width: 44rem;
   margin: auto;
-  padding: min(var(--boxel-sp-xl), 5vw);
+  padding-bottom: var(--boxel-sp);
 }
 
 @media only screen and (max-width: 992px) {
   .card-space-user-page {
     padding: 0;
+    padding-top: min(var(--boxel-sp-xl), 5vw);
     color: var(--card-space-text-color);
+  }
+
+  .card-space-user-page__header {
+    padding-left: min(var(--boxel-sp-xl), 5vw);
+    padding-right: min(var(--boxel-sp-xl), 5vw);
   }
 
   .card-space-user-page__wrapper {
     min-width: 100%;
     height: auto;
-    aspect-ratio: unset;
   }
 }
 
@@ -60,7 +62,7 @@
 
 .card-space-user-page__title {
   text-align: center;
-  font-size: var(--boxel-font-size-xl);
+  font-size: var(--boxel-font-size-lg);
   font-weight: 600;
   max-width: 30rem;
   margin-left: auto;
@@ -72,6 +74,7 @@
 .card-space-user-page__url {
   text-align: center;
   opacity: 0.9;
+  font-size: var(--boxel-font-size-sm);
   font-weight: 700;
   letter-spacing: 1px;
   word-break: break-all;
@@ -79,7 +82,7 @@
 }
 
 .card-space-user-payment-link {
-  margin-top: var(--boxel-sp-sm);
+  margin: var(--boxel-sp) 0 var(--boxel-sp-xl) 0;
 }
 
 .card-space-user-page-payment-link__error {
@@ -93,8 +96,9 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.card-space-user-payment-link__qr {
+.card-space-user-payment-link__qr.boxel-styled-qr-code {
   max-width: 100%;
+  border-radius: var(--boxel-border-radius-lg);
 }
 
 .card-space-user-payment-link__qr-container__actions {
@@ -135,7 +139,7 @@
   background: var(--boxel-light-200);
   color: var(--card-space-text-color);
   padding: min(var(--boxel-sp-xl), 5vw);
-  border-radius: 0 0 2rem 2rem;
+  border-radius: 0 0 var(--boxel-border-radius-lg) var(--boxel-border-radius-lg);
   width: 100%;
   display: grid;
   grid-template: "wallet stores";
@@ -156,6 +160,7 @@
 
 .card-space-user-page__apps_stores {
   grid-area: stores;
+  justify-content: flex-end;
 }
 
 @media only screen and (max-width: 992px) {
@@ -168,13 +173,16 @@
     color: var(--card-space-text-color);
     min-width: 100%;
     height: auto;
-    aspect-ratio: unset;
   }
 
   .card-space-user-page__apps {
     min-width: 100%;
-    aspect-ratio: unset;
     grid-template: "wallet" "stores";
     gap: min(var(--boxel-sp-xl), 5vw);
+    justify-content: flex-start;
+  }
+
+  .card-space-user-page__apps_stores {
+    align-self: space-between;
   }
 }
