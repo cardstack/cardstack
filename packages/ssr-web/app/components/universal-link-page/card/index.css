@@ -23,30 +23,6 @@
   flex-wrap: wrap;
 }
 
-.universal-link-card__get-card-wallet .universal-link-card__card-wallet {
-  display: flex;
-  align-items: center;
-  gap: var(--boxel-sp-sm);
-  flex-shrink: 0;
-}
-
-.universal-link-card__get-card-wallet .universal-link-card__card-wallet-icon {
-  flex-shrink: 0;
-}
-
-.universal-link-card__card-wallet-text {
-  display: flex;
-  flex-direction: column;
-  font-weight: 700;
-  line-height: 1.36;
-  font-size: 0.875rem;
-  letter-spacing: 0.11px;
-}
-
-.universal-link-card__card-wallet-fine-print {
-  font-weight: 400;
-}
-
 @media only screen and (max-width: 480px) {
   .universal-link-card {
     --horizontal-padding: var(--boxel-sp-lg);

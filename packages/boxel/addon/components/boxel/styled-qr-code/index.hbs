@@ -3,6 +3,8 @@
   data-test-boxel-styled-qr-code={{@data}}
   ...attributes
 >
+  {{yield to="before"}}
+
   <div class="boxel-styled-qr-code__canvas"
     {{did-insert this.generateQrCode}}
     {{did-update this.updateQrCode @data}}

@@ -15,96 +15,137 @@
   <meta name='twitter:site' content='@cardstack' />
 </InHead>
 
-<div class="card-space-user-page"
-  {{did-insert this.loadAddress}}
-  style={{css-var
+<div
+  class='card-space-user-page'
+  style={{
+    css-var
     card-space-background=@model.backgroundColor
     card-space-text-color=@model.textColor
   }}
+  {{did-insert this.loadAddress}}
 >
+  <div class='card-space-user-page__header'>
+    <a
+      href={{config 'urls.cardPayLink'}}
+      target='_blank'
+      rel='noopener noreferrer'
+    >
+      <span class='boxel-sr-only'>
+        Open Card Pay Promotional Website
+      </span>
+      {{svg-jar 'card-pay-logo-with-text-color'}}
+    </a>
 
-  <div class="card-space-user-page__wrapper">
-    <div class="card-space-user-page__header">
-      <a href={{config 'urls.cardPayLink'}} target='_blank' rel='noopener noreferrer'>
-        <span class="boxel-sr-only">
-          Open Card Pay Promotional Website
-        </span>
-        {{svg-jar "card-pay-logo-with-text"}}
-      </a>
-
-      {{#if this.hubAuthentication.showAuth}}
-        <section class='card-space-user-page__auth'>
-          {{#if this.hubAuthentication.isInitializing}}
-            Loading…
-          {{else}}
-            {{#if this.hubAuthentication.isAuthenticated}}
-              {{#if this.cardSpace.canEdit}}
-                <span data-test-auth-for-this-space>Authed for this space</span>
-              {{else}}
-                <span data-test-auth-not-for-this-space>Authed but not for this space</span>
-              {{/if}}
+    {{#if this.hubAuthentication.showAuth}}
+      <section class='card-space-user-page__auth'>
+        {{#if this.hubAuthentication.isInitializing}}
+          Loading…
+        {{else}}
+          {{#if this.hubAuthentication.isAuthenticated}}
+            {{#if this.cardSpace.canEdit}}
+              <span data-test-auth-for-this-space>
+                Authed for this space
+              </span>
             {{else}}
-              <Boxel::Button
-                @as='link-to'
-                @route='scheme-auth'
-                data-test-connect-button
-              >
-                Auth
-              </Boxel::Button>
+              <span data-test-auth-not-for-this-space>
+                Authed but not for this space
+              </span>
             {{/if}}
+          {{else}}
+            <Boxel::Button
+              @as='link-to'
+              @route='scheme-auth'
+              @kind='secondary-dark'
+              @size='extra-small'
+              data-test-connect-button
+            >
+              Connect
+            </Boxel::Button>
           {{/if}}
-        </section>
-      {{/if}}
-    </div>
+        {{/if}}
+      </section>
+    {{/if}}
+  </div>
 
-    <div class="card-space-user-page__user-content">
-      <div class="card-space-user-page__title" data-test-merchant-name>
+  <div class='card-space-user-page__wrapper'>
+    <div class='card-space-user-page__user-content'>
+      <div class='card-space-user-page__title' data-test-merchant-name>
         {{@model.name}}
       </div>
 
-      <div class="card-space-user-page__description">
-        Scan this code to pay
-      </div>
-
-      <div class="card-space-user-page__url" data-test-merchant-url>
+      <div class='card-space-user-page__url' data-test-merchant-url>
         {{@model.id}}{{config 'cardSpaceHostnameSuffix'}}
       </div>
 
-      <div class="card-space-user-payment-link">
+      <div class='card-space-user-payment-link'>
         {{#if this.addressFetchingError}}
-          <div class="card-space-user-page-payment-link__error" data-test-address-fetching-error>
+          <div
+            class='card-space-user-page-payment-link__error'
+            data-test-address-fetching-error
+          >
             {{this.addressFetchingError}}
           </div>
         {{else}}
-
-          <div class="card-space-user-payment-link__qr-container">
+          <div class='card-space-user-payment-link__qr-container'>
             <Boxel::StyledQrCode
-              class="card-space-user-payment-link__qr"
+              class='card-space-user-payment-link__qr'
               @data={{this.paymentURL}}
               @image={{this.cardstackLogoForQR}}
               @size={{340}}
               @margin={{15}}
-              @backgroundColor="#ffffff"
-              @dotType="dots"
-              @dotColor="#000"
-              @cornerDotType="dot"
-              @cornerSquareType="extra-rounded"
+              @backgroundColor='#ffffff'
+              @dotType='dots'
+              @dotColor='#000'
+              @cornerDotType='dot'
+              @cornerSquareType='extra-rounded'
               @imageMargin={{5}}
             >
-              {{#if this.canDeepLink}}
-                <div class="card-space-user-payment-link__qr-container__actions">
-                  <div class="card-space-user-payment-link__qr-container__separator"></div>
-                  <div class="card-space-user-payment-link__qr-container__separator-or">OR</div>
-
-                  <Boxel::Button @kind="primary-dark" @as="anchor" @size="large" href={{this.paymentURL}} data-test-payment-link-deep-link>
-                    Pay with Card Wallet
-                    {{svg-jar "card-pay-logo" height=20}}
-                  </Boxel::Button>
+              <:before>
+                <div class='card-space-user-page__description'>
+                  Scan to Pay
                 </div>
-              {{/if}}
+              </:before>
+
+              <:default>
+                {{#if this.canDeepLink}}
+                  <div
+                    class='card-space-user-payment-link__qr-container__actions'
+                  >
+                    <div
+                      class='card-space-user-payment-link__qr-container__separator'
+                    ></div>
+                    <div
+                      class='card-space-user-payment-link__qr-container__separator-or'
+                    >
+                      OR
+                    </div>
+
+                    <Boxel::Button
+                      @kind='primary-dark'
+                      @as='anchor'
+                      @size='large'
+                      href={{this.paymentURL}}
+                      data-test-payment-link-deep-link
+                    >
+                      Pay with Card Wallet
+                      {{svg-jar 'card-pay-logo' height=20}}
+                    </Boxel::Button>
+                  </div>
+                {{/if}}
+              </:default>
             </Boxel::StyledQrCode>
           </div>
         {{/if}}
+      </div>
+    </div>
+
+    <div class='card-space-user-page__apps_wrapper'>
+      <div class='card-space-user-page__apps_title'>
+        Cardpay is powered by
+      </div>
+      <div class='card-space-user-page__apps'>
+        <Common::CardWalletApp class='card-space-user-page__apps_wallet' />
+        <Common::CardWalletBadges class='card-space-user-page__apps_stores' />
       </div>
     </div>
   </div>

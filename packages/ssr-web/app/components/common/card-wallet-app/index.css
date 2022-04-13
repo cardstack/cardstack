@@ -1,0 +1,23 @@
+.card-wallet-app__container {
+  display: flex;
+  align-items: center;
+  gap: var(--boxel-sp-sm);
+  flex-shrink: 0;
+}
+
+.card-wallet-app__icon {
+  flex-shrink: 0;
+}
+
+.card-wallet-app__text {
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  line-height: 1.36;
+  font-size: 0.875rem;
+  letter-spacing: 0.11px;
+}
+
+.card-wallet-app__fine-print {
+  font-weight: 400;
+}
