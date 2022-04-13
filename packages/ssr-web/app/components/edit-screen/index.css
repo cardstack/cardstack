@@ -1,0 +1,39 @@
+.edit-screen-content {
+  --edit-screen-padding-vertical: var(--boxel-sp-lg);
+  --edit-screen-padding-horizontal: var(--boxel-sp);
+
+  border-radius: inherit;
+  background: var(--boxel-light);
+  max-height: inherit;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "body" "footer";
+}
+
+.edit-screen-content__header {
+  padding: var(--boxel-sp-sm) var(--edit-screen-padding-horizontal);
+  box-shadow: 0 2px 2px rgb(0 0 0 / 15%);
+}
+
+.edit-screen-content__body {
+  padding: var(--edit-screen-padding-vertical) var(--edit-screen-padding-horizontal);
+  overflow-y: auto;
+}
+
+.edit-screen-content__footer {
+  width: 100%;
+  height: 6rem;
+  padding: 0 var(--edit-screen-padding-horizontal);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--boxel-light);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  box-shadow: 0 -2px 2px rgb(0 0 0 / 15%);
+}
+
+/* this is meant for controls to save/cancel saving form content, typically */
+.edit-screen-content__footer > * + * {
+  margin-left: var(--boxel-sp-sm);
+}
