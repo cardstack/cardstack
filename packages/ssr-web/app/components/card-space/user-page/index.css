@@ -179,10 +179,9 @@
     min-width: 100%;
     grid-template: "wallet" "stores";
     gap: min(var(--boxel-sp-xl), 5vw);
-    justify-content: flex-start;
   }
 
   .card-space-user-page__apps_stores {
-    align-self: space-between;
+    justify-content: space-between;
   }
 }
