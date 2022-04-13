@@ -505,12 +505,8 @@ describe('GET /api/merchant-infos', function () {
     // First user registers a card space with jerry merchant
     await cardSpaceQueries.insert({
       id: '255aaa5c-92d0-468b-8939-3dd2d72684c3',
-      profileName: 'Test',
       profileImageUrl: 'https://test.com/test1.png',
-      profileCoverImageUrl: 'https://test.com/test2.png',
       profileDescription: 'Test',
-      profileButtonText: 'Test',
-      profileCategory: 'Test',
       merchantId: merchantInfoId,
     });
 
