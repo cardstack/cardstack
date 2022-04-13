@@ -466,8 +466,8 @@ describe('PUT /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-description': "Satoshi's place",
-          'profile-image-url': 'https://test.com/profile.jpg',
+          'profile-description': "Satoshi's place, v2",
+          'profile-image-url': 'https://test.com/profile-v2.jpg',
           links: [{ title: 'Link1', url: 'https://test.com' }],
         },
       },
@@ -489,8 +489,8 @@ describe('PUT /api/card-spaces', function () {
           id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
           attributes: {
             did: 'did:cardstack:1csnaSutV4uMuyyJZcJ7ktsTwdec10adda76d48c7',
-            'profile-description': "Satoshi's place",
-            'profile-image-url': 'https://test.com/profile.jpg',
+            'profile-description': "Satoshi's place, v2",
+            'profile-image-url': 'https://test.com/profile-v2.jpg',
             links: [{ title: 'Link1', url: 'https://test.com' }],
           },
           relationships: {
