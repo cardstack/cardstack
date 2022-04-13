@@ -8,9 +8,6 @@ export interface MerchantInfoQueriesFilter {
   id?: string;
   slug?: string;
   ownerAddress?: string;
-  customFilter?: {
-    availableForCardSpace?: boolean;
-  };
 }
 
 export default class MerchantInfoQueries {
@@ -21,11 +18,6 @@ export default class MerchantInfoQueries {
 
     let conditions = buildConditions(filter);
     let query = `SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE ${conditions.where}`;
-
-    if (filter.customFilter?.availableForCardSpace) {
-      // Merchants that haven't been used in a card space yet
-      query += ' AND merchant_infos.id NOT IN (SELECT merchant_id FROM card_spaces WHERE merchant_id IS NOT NULL)';
-    }
 
     let queryResult = await db.query(query, conditions.values);
 
