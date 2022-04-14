@@ -14,7 +14,7 @@ example:
 
 let octokit: Octokit;
 const init = () => {
-  octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, log: console });
 };
 
 const isInAllowedChannel = (message: Message): boolean => {
