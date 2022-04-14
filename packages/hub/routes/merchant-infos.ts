@@ -46,14 +46,7 @@ export default class MerchantInfosRoute {
 
     let params: MerchantInfoQueriesFilter = {
       ownerAddress: ctx.state.userAddress,
-      customFilter: undefined,
     };
-
-    if (ctx.query.availableForCardSpace) {
-      params.customFilter = {
-        availableForCardSpace: true,
-      };
-    }
 
     let merchantInfos = await this.merchantInfoQueries.fetch(params);
 
