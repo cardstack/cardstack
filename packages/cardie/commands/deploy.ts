@@ -164,8 +164,13 @@ const execute = async (message: Message, args: string[]) => {
   try {
     await triggerWorkflowRun(workflow, environment, ref);
     const workflowRun = await getMostRecentRun(workflow, now);
-    await message.edit(`${deployMessage}\n:arrow_forward: Workflow: ${workflowRun}`);
-    console.info(`deploy: status=done app=${app} environment=${environment} ref=${ref}`);
+    if (workflowRun) {
+      await message.edit(`${deployMessage}\n:arrow_forward: Workflow: ${workflowRun}`);
+      console.info(`deploy: status=done app=${app} environment=${environment} ref=${ref}`);
+    } else {
+      console.warn('Initiated workflow but could not find the workflow run');
+      await message.edit(`${deployMessage}\n:arrow_forward: Initiated workflow but could not find the workflow run`);
+    }
   } catch (err) {
     console.error(err);
     await message.edit(`${deployMessage}\n:warning: Error: \n\`\`\`${err}\`\`\``);
