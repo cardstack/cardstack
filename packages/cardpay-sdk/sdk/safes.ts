@@ -21,7 +21,7 @@ export interface ISafes {
     safeAddress: string,
     tokenAddress: string,
     recipient: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
