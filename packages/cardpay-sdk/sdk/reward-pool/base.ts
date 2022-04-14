@@ -42,7 +42,7 @@ export interface Leaf {
   paymentCycleNumber: number;
   validFrom: number;
   validTo: number;
-  tokenType: string;
+  tokenType: number;
   payee: string;
   transferData: string;
 }
@@ -154,7 +154,7 @@ export default class RewardPool {
     return this.addTokenSymbol(
       json['results'].map((o: any) => {
         let { validFrom, validTo, tokenType, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
-        if (amount && tokenType == '1') {
+        if (amount && tokenType == 1) {
           return {
             ...o,
             isValid: validFrom <= currentBlock && validTo > currentBlock,
@@ -662,15 +662,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return 'token' in o && 'amount' in o;
   }
 
-  private decodeTransferData(tokenType: string, transferData: string): TokenTransferDetail | string {
-    if (tokenType == '0') {
+  private decodeTransferData(tokenType: number, transferData: string): TokenTransferDetail | string {
+    if (tokenType == 0) {
       // Default data
       return transferData;
     } else if (
       // ERC677 / ERC20
-      tokenType == '1' ||
+      tokenType == 1 ||
       // ERC721 (NFT)
-      tokenType == '2'
+      tokenType == 2
     ) {
       return this.layer2Web3.eth.abi.decodeParameters(
         [
