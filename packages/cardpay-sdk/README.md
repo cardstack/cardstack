@@ -67,6 +67,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
+  - [`RewardManager.withdrawGasEstimate`](#rewardmanagerwithdrawgasestimate)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
 - [`LayerOneOracle`](#layeroneoracle)
@@ -883,11 +884,29 @@ await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard , rewardProgramId, n
 
 ### `RewardManager.withdraw`
 
-The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The funds in the withdrawal will pay for the gas fees to execute the transaction. 
+The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The gas fees in the withdrawal will be paid out of the balance of the safe -- similar to `Safe.sendTokens`. 
+
+`amount` is an optional param. When included, `amount = amountOfTokensToBeWithdrawn - estimatedGasCost` -- this ensures there is balance in the safe allocated for gas. When excluded, the whole balance of the safe is expected to withdrawn which is automatically taxed for gas, .i.e the gas deduction occurs internally within the sdk function. 
 
 ```js
 let rewardManagerAPI = await getSDK(RewardManager, web3);
-await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
+await rewardManagerAPI.withdraw(rewardSafe , to, token, amount) 
+```
+
+### `RewardManager.withdrawGasEstimate`
+
+The `withdrawGasEstimate` returns a gas estimate for withdrawing a reward. When estimating gas for purpose of display, we recommend just using `amount = amountOfTokensToBeWithdrawn`. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: BN 
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.withdrawGasEstimate(rewardSafeAddress, to, tokenAddress, amount)
 ```
 
 ### `RewardManager.addRewardRule`

@@ -828,23 +828,11 @@ ALTER TABLE public.card_drop_recipients OWNER TO postgres;
 
 CREATE TABLE public.card_spaces (
     id uuid NOT NULL,
-    profile_cover_image_url text,
-    profile_name text,
     profile_image_url text,
     profile_description text,
-    profile_button_text text,
-    profile_category text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    bio_title text,
-    bio_description text,
     links json[] DEFAULT '{}'::json[] NOT NULL,
-    donation_title text,
-    donation_description text,
-    merchant_id uuid NOT NULL,
-    donation_suggestion_amount_1 integer,
-    donation_suggestion_amount_2 integer,
-    donation_suggestion_amount_3 integer,
-    donation_suggestion_amount_4 integer
+    merchant_id uuid NOT NULL
 );
 
 
@@ -901,6 +889,23 @@ CREATE TABLE public.dm_channels (
 
 
 ALTER TABLE public.dm_channels OWNER TO postgres;
+
+--
+-- Name: email_card_drop_requests; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.email_card_drop_requests (
+    id uuid NOT NULL,
+    owner_address text NOT NULL,
+    email_hash text NOT NULL,
+    verification_code text NOT NULL,
+    requested_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    claimed_at timestamp without time zone,
+    transaction_hash text
+);
+
+
+ALTER TABLE public.email_card_drop_requests OWNER TO postgres;
 
 --
 -- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
@@ -1249,6 +1254,14 @@ ALTER TABLE ONLY public.discord_bots
 
 ALTER TABLE ONLY public.dm_channels
     ADD CONSTRAINT dm_channels_pkey PRIMARY KEY (channel_id);
+
+
+--
+-- Name: email_card_drop_requests email_card_drop_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.email_card_drop_requests
+    ADD CONSTRAINT email_card_drop_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -1644,6 +1657,10 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 26	20220107151914576_rename-beta-testers-table	2022-01-28 10:20:05.090531
 27	20220119232151260_space-belongs-to-merchant	2022-01-28 10:20:05.090531
 28	20220111204952452_index-optimizations	2022-01-31 16:55:56.640815
+29	20220216104259120_allow-nulls-in-card-spaces	2022-02-25 09:32:34.996411
+30	20220301101637933_create-card-space-profiles-for-existing-merchants	2022-04-13 13:49:06.763103
+31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
+32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 \.
 
 
@@ -1651,7 +1668,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 28, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 32, true);
 
 
 --

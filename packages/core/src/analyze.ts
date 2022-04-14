@@ -17,7 +17,8 @@ interface State {
   opts: {
     debugPath: string;
   };
-  insideExportDefault: boolean;
+  insideDefaultExport: boolean;
+  insideNamedExport: boolean;
 }
 
 export const VALID_FIELD_DECORATORS = {
@@ -67,7 +68,7 @@ export interface FileMeta {
   exports?: ExportMeta[];
   fields: FieldsMeta;
   parent?: ParentMeta;
-  component: ComponentMeta | undefined;
+  component: Record<string, ComponentMeta> | undefined;
 }
 
 const metas = new WeakMap<State['opts'], FileMeta>();
@@ -119,7 +120,8 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
     visitor: {
       Program: {
         enter(_path: NodePath<t.Program>, state: State) {
-          state.insideExportDefault = false;
+          state.insideDefaultExport = false;
+          state.insideNamedExport = false;
         },
       },
       ImportDeclaration(path: NodePath<t.ImportDeclaration>, state: State) {
@@ -130,6 +132,7 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
       },
       ExportNamedDeclaration: {
         enter(path: NodePath<t.ExportNamedDeclaration>, state: State) {
+          state.insideNamedExport = true;
           switch (path.node.declaration?.type) {
             case 'FunctionDeclaration':
               storeExportMeta(state.opts, {
@@ -150,12 +153,13 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
           }
         },
         exit(_path: NodePath<t.ExportNamedDeclaration>, state: State) {
-          state.insideExportDefault = false;
+          state.insideDefaultExport = false;
+          state.insideNamedExport = false;
         },
       },
       ExportDefaultDeclaration: {
         enter(path: NodePath<t.ExportDefaultDeclaration>, state: State) {
-          state.insideExportDefault = true;
+          state.insideDefaultExport = true;
           // Not sure what to do with expressions
           if (!t.isExpression(path.node.declaration)) {
             storeExportMeta(state.opts, {
@@ -165,14 +169,21 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
           }
         },
         exit(_path: NodePath<t.ExportDefaultDeclaration>, state: State) {
-          state.insideExportDefault = false;
+          state.insideDefaultExport = false;
         },
       },
 
       CallExpression: {
         enter(path: NodePath<t.CallExpression>, state: State) {
-          if (isComponentTemplateExpression(path, state)) {
-            storeComponentMeta(state, path, t);
+          if (isComponentTemplateExpression(path)) {
+            if (state.insideDefaultExport) {
+              storeComponentMeta(state, path, t, 'default');
+            } else if (state.insideNamedExport) {
+              let { node } = path.parentPath.parentPath;
+              if (t.isVariableDeclarator(node) && t.isIdentifier(node.id)) {
+                storeComponentMeta(state, path, t, node.id.name);
+              }
+            }
           }
         },
       },
@@ -180,7 +191,12 @@ export function babelPluginCardFileAnalyze(babel: typeof Babel) {
   };
 }
 
-function storeComponentMeta(state: State, path: NodePath<t.CallExpression>, t: typeof Babel.types) {
+function storeComponentMeta(
+  state: State,
+  path: NodePath<t.CallExpression>,
+  t: typeof Babel.types,
+  exportName = 'default'
+) {
   let { options: precompileTemplateOptions, template: rawTemplate } = validateAndGetComponent(path, t);
   let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
 
@@ -190,11 +206,16 @@ function storeComponentMeta(state: State, path: NodePath<t.CallExpression>, t: t
   });
 
   let meta = getMeta(state.opts);
-  meta.component = {
+  let componentMeta = {
     rawHBS: rawTemplate,
     hasModifiedScope: !!getObjectKey(precompileTemplateOptions, 'scope', t),
     usage: usageMeta,
   };
+
+  if (!meta.component) {
+    meta.component = {};
+  }
+  meta.component[exportName] = componentMeta;
   metas.set(state.opts, meta);
 }
 
@@ -387,9 +408,6 @@ function extractDecoratorArguments(
   return result;
 }
 
-function isComponentTemplateExpression(path: NodePath<t.CallExpression>, state: State): boolean {
-  return (
-    state.insideExportDefault &&
-    path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate')
-  );
+function isComponentTemplateExpression(path: NodePath<t.CallExpression>): boolean {
+  return path.get('callee').referencesImport('@ember/template-compilation', 'precompileTemplate');
 }

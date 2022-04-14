@@ -81,12 +81,6 @@ export default class APIRouter {
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
-    apiSubrouter.post(
-      '/card-spaces/validate-profile-category',
-      parseBody,
-      cardSpacesRoute.postProfileCategoryValidation
-    );
-    apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
 
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);

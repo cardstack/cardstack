@@ -205,7 +205,7 @@ app "cardie" {
             region = "us-east-1"
             memory = "512"
             count = 1
-            cluster = "default"
+            cluster = "cardie"
             subnets = ["subnet-89968ba2"]
             task_role_name = "cardie-ecr-task"
             execution_role_name = "cardie-ecr-task-executor-role"
