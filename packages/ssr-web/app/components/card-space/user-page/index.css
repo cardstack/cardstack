@@ -165,7 +165,7 @@
 }
 
 @media only screen and (max-width: 992px) {
-  .card_space-user-page__apps_title {
+  .card_space-user-page__apps-title {
     color: var(--card-space-text-color);
   }
 
