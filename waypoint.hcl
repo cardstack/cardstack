@@ -34,6 +34,7 @@ app "hub" {
             execution_role_name = "hub-staging-ecr-task-executor-role"
             alb {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
+                ingress_port = 99
             }
             secrets = {
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
