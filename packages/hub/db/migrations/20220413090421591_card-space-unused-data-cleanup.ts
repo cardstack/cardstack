@@ -19,6 +19,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   ]);
 }
 
-export async function down(_pgm: MigrationBuilder): Promise<void> {
-  console.log("not defining down migration for card_spaces' unused fields");
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.addColumns(TABLE, {
+    bio_description: { type: 'string' },
+    bio_title: { type: 'string' },
+    donation_title: { type: 'string' },
+    donation_description: { type: 'string' },
+    donation_suggestion_amount_1: { type: 'integer' },
+    donation_suggestion_amount_2: { type: 'integer' },
+    donation_suggestion_amount_3: { type: 'integer' },
+    donation_suggestion_amount_4: { type: 'integer' },
+    profile_button_text: { type: 'string' },
+    profile_category: { type: 'string' },
+    profile_name: { type: 'string' },
+    profile_cover_image_url: { type: 'string' },
+  });
 }
