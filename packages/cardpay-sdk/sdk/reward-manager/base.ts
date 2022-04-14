@@ -605,9 +605,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let safeBalance = new BN(await token.methods.balanceOf(rewardSafeAddress).call());
     if (safeBalance.lt(weiAmount)) {
       throw new Error(
-        `Reward safe does not have enough balance to withdraw. The rewardSafe safe ${rewardSafeAddress} balance for token ${tokenAddress} is ${fromWei(
+        `Gas Estimate: Reward safe does not have enough balance to withdraw. The rewardSafe safe ${rewardSafeAddress} balance for token ${tokenAddress} is ${fromWei(
           safeBalance
-        )}, amount being claimed is ${fromWei(weiAmount)}`
+        )}, amount withdrawn is ${fromWei(weiAmount)}`
       );
     }
     let withdrawPayload = withdraw.encodeABI();
