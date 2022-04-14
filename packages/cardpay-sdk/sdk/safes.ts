@@ -289,7 +289,7 @@ export default class Safes implements ISafes {
         )}, amount to transfer ${fromWei(amount)}`
       );
     }
-    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
+    let payload = this.transferTokenPayload(tokenAddress, recipient, new BN(amount));
     let estimate = await gasEstimate(
       this.layer2Web3,
       safeAddress,
@@ -307,7 +307,7 @@ export default class Safes implements ISafes {
     safeAddress: string,
     tokenAddress: string,
     recipient: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
@@ -330,38 +330,57 @@ export default class Safes implements ISafes {
     if (!recipient) {
       throw new Error('recipient must be specified');
     }
-    if (!amount) {
-      throw new Error('amount must be specified');
-    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
-    if (safeBalance.lt(new BN(amount))) {
-      throw new Error(
-        `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
-          safeBalance.toString()
-        )}, amount to transfer ${fromWei(amount)}`
+
+    let estimate;
+    let payload;
+    let weiAmount: BN;
+    if (amount) {
+      weiAmount = new BN(amount);
+      if (safeBalance.lt(weiAmount)) {
+        throw new Error(
+          `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
+            safeBalance.toString()
+          )}, amount to transfer ${fromWei(amount)}`
+        );
+      }
+      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
+      estimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        tokenAddress,
+        '0',
+        payload,
+        Operation.CALL,
+        tokenAddress
       );
-    }
-    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
-    let estimate = await gasEstimate(
-      this.layer2Web3,
-      safeAddress,
-      tokenAddress,
-      '0',
-      payload,
-      Operation.CALL,
-      tokenAddress
-    );
-    let gasCost = gasInToken(estimate);
-    if (safeBalance.lt(new BN(amount).add(gasCost))) {
-      throw new Error(
-        `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
-          safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+      let gasCost = gasInToken(estimate);
+      if (safeBalance.lt(weiAmount.add(gasCost))) {
+        throw new Error(
+          `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
+            safeBalance.toString()
+          )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+        );
+      }
+    } else {
+      weiAmount = safeBalance;
+      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
+      estimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        tokenAddress,
+        '0',
+        payload,
+        Operation.CALL,
+        tokenAddress
       );
+      let gasCost = gasInToken(estimate);
+      weiAmount = weiAmount.sub(gasCost);
+      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
     }
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
@@ -389,7 +408,7 @@ export default class Safes implements ISafes {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
-  private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {
+  private transferTokenPayload(tokenAddress: string, recipient: string, amount: BN): string {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     return token.methods.transfer(recipient, amount).encodeABI();
   }
