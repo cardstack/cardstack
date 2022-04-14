@@ -883,11 +883,11 @@ await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard , rewardProgramId, n
 
 ### `RewardManager.withdraw`
 
-The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The funds in the withdrawal will pay for the gas fees to execute the transaction. 
+The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The funds in the withdrawal will pay for the gas fees to execute the transaction. `amount` is an optional param. When included, `amount = amountOfTokens - estimatedGasCost`. When excluded, the whole balance of the safe is expected to withdrawn and any gas estimation occurs internally within this function. 
 
 ```js
 let rewardManagerAPI = await getSDK(RewardManager, web3);
-await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
+await rewardManagerAPI.withdraw(rewardSafe , to, token, amount) 
 ```
 
 ### `RewardManager.addRewardRule`
