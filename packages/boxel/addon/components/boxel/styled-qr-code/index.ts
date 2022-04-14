@@ -31,8 +31,9 @@ class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
   @reads('args.dotType', 'square') declare dotType: DotType;
   @reads('args.margin', 0) declare margin: number;
   @reads('args.imageMargin', 0) declare imageMargin: number;
-  qrCode: any;
+  qrCode: QRCodeStyling | undefined;
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   get qrOptions() {
     return {
       width: this.size,
@@ -63,13 +64,13 @@ class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
     };
   }
 
-  @action generateQrCode(element: HTMLElement) {
+  @action generateQrCode(element: HTMLElement): void {
     this.qrCode = new QRCodeStyling(this.qrOptions);
     this.qrCode.append(element);
   }
 
-  @action updateQrCode() {
-    this.qrCode.update(this.qrOptions);
+  @action updateQrCode(): void {
+    this.qrCode?.update(this.qrOptions);
   }
 }
 
