@@ -40,7 +40,6 @@
   .card-space-user-page {
     padding: 0;
     padding-top: min(var(--boxel-sp-xl), 5vw);
-    color: var(--card-space-text-color);
   }
 
   .card-space-user-page__header {
@@ -138,7 +137,7 @@
 
 .card-space-user-page__apps {
   background: var(--boxel-light-200);
-  color: var(--card-space-text-color);
+  color: var(--boxel-dark);
   padding: min(var(--boxel-sp-xl), 5vw);
   border-radius: 0 0 var(--boxel-border-radius-lg) var(--boxel-border-radius-lg);
   width: 100%;
@@ -148,7 +147,6 @@
 
 .card-space-user-page__apps-title {
   text-align: center;
-  color: white;
   font-size: var(--boxel-font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
@@ -165,13 +163,8 @@
 }
 
 @media only screen and (max-width: 992px) {
-  .card_space-user-page__apps-title {
-    color: var(--card-space-text-color);
-  }
-
   .card-space-user-page__apps-wrapper {
     background: var(--card-space-background);
-    color: var(--card-space-text-color);
     min-width: 100%;
     height: auto;
   }
