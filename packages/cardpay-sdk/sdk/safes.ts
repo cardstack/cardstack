@@ -367,8 +367,7 @@ export default class Safes implements ISafes {
         );
       }
     } else {
-      weiAmount = safeBalance;
-      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
+      payload = this.transferTokenPayload(tokenAddress, recipient, safeBalance);
       estimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
@@ -379,7 +378,14 @@ export default class Safes implements ISafes {
         tokenAddress
       );
       let gasCost = gasInToken(estimate);
-      weiAmount = weiAmount.sub(gasCost);
+      if (safeBalance.lt(gasCost)) {
+        throw new Error(
+          `Safe does not have enough to pay for gas when transferring. The safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+            safeBalance
+          )}, the gas cost is ${fromWei(gasCost)}`
+        );
+      }
+      weiAmount = safeBalance.sub(gasCost);
       payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
     }
     if (nonce == null) {
