@@ -98,6 +98,7 @@
 
 .card-space-user-payment-link__qr.boxel-styled-qr-code {
   max-width: 100%;
+  color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius-lg);
 }
 
@@ -122,8 +123,7 @@
 
 .card-space-user-payment-link__qr-container__separator-or {
   margin: auto;
-  color: #000;
-  background: #fff;
+  background: var(--boxel-light);
   margin-top: -10px;
   width: 4rem;
   text-align: center;
