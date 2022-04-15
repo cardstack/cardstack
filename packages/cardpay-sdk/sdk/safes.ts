@@ -2,7 +2,14 @@ import Web3 from 'web3';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { ContractOptions } from 'web3-eth-contract';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation, gasInToken } from './utils/safe-utils';
+import {
+  gasEstimate,
+  executeTransaction,
+  getNextNonceFromEstimate,
+  Operation,
+  gasInToken,
+  baseGasBuffer,
+} from './utils/safe-utils';
 import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
@@ -380,6 +387,7 @@ export default class Safes implements ISafes {
         Operation.CALL,
         tokenAddress
       );
+      preEstimate.baseGas = new BN(preEstimate.baseGas).add(baseGasBuffer).toString();
       let gasCost = gasInToken(preEstimate);
       if (safeBalance.lt(gasCost)) {
         throw new Error(

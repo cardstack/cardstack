@@ -22,6 +22,7 @@ import {
   Operation,
   gasInToken,
   GasEstimate,
+  baseGasBuffer,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -520,6 +521,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
+      preEstimate.baseGas = new BN(preEstimate.baseGas).add(baseGasBuffer).toString();
       let gasCost = gasInToken(preEstimate);
       if (safeBalance.lt(gasCost)) {
         throw new Error(
