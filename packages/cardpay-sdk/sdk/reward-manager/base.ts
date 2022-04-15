@@ -482,7 +482,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let withdrawPayload;
     let weiAmount;
     if (amount) {
-      //when amount is given, we assume that amount is string in wei that has already had gasCost deducted from it
       let weiAmount = new BN(amount);
       if (weiAmount.gt(safeBalance)) {
         throw new Error(
@@ -500,7 +499,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
-      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+      let gasCost = gasInToken(estimate);
       if (safeBalance.lt(gasCost.add(weiAmount))) {
         throw new Error(
           `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
@@ -525,7 +524,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
-      let gasCost = new BN(preEstimate.safeTxGas).add(new BN(preEstimate.baseGas)).mul(new BN(preEstimate.gasPrice));
+      let gasCost = gasInToken(preEstimate);
       if (weiAmount.lt(gasCost)) {
         throw new Error(
           `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
