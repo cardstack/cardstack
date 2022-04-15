@@ -514,9 +514,8 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       weiAmount = safeBalance;
       let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
       withdrawPayload = withdraw.encodeABI();
-      // The preEstimate is used to estimate the gasCost mainly to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
-      // This is preEstimate is typically used when withdrawing full balances from a safe
-      // It is recommeended that for any preEstimate that we avoid using it
+      // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
+      // The preEstimate is typically used when withdrawing full balances from a safe
       let preEstimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
