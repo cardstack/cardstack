@@ -470,7 +470,6 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
-    let rewardSafeDelegate = await this.getRewardSafeDelegate();
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -487,8 +486,8 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
           `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
         );
       }
-      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-      withdrawPayload = withdraw.encodeABI();
+      withdrawPayload = await this.getWithdrawPayload(tokenAddress, to, weiAmount);
+
       estimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
@@ -509,8 +508,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     } else {
       //when amount is NOT given, we use safeBalance - gasCost as the withdraw amount
       //Note: gasCost is estimated with safeBalance not the actual withdraw amount
-      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, safeBalance);
-      withdrawPayload = withdraw.encodeABI();
+      let preWithdrawPayload = await this.getWithdrawPayload(tokenAddress, to, safeBalance);
       // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
       // The preEstimate is typically used when withdrawing full balances from a safe
       let preEstimate = await gasEstimate(
@@ -518,7 +516,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         safeAddress,
         rewardSafeDelegateAddress,
         '0',
-        withdrawPayload,
+        preWithdrawPayload,
         Operation.DELEGATECALL,
         tokenAddress
       );
@@ -531,8 +529,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         );
       }
       let weiAmount = safeBalance.sub(gasCost);
-      withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-      withdrawPayload = withdraw.encodeABI();
+      withdrawPayload = await this.getWithdrawPayload(tokenAddress, to, weiAmount);
       // We must still compute a new gasEstimate based upon the adjusted amount for gas
       // This is beecause the relayer will do the estimation with the same exact parameters
       // and check that the gas estimates here are at least greater than its own gas estimates
@@ -766,6 +763,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
+  }
+
+  private async getWithdrawPayload(tokenAddress: string, to: string, weiAmount: BN): Promise<string> {
+    let rewardManagerAddress = await this.address();
+    let rewardSafeDelegate = await this.getRewardSafeDelegate();
+    let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+    return withdraw.encodeABI();
   }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
