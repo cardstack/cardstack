@@ -276,3 +276,12 @@ export function gasInToken(estimate: Estimate): BN {
   let gasUnits = new BN(String(estimate.baseGas)).add(new BN(String(estimate.safeTxGas)));
   return gasUnits.mul(new BN(String(estimate.gasPrice)));
 }
+
+// In the relayer, there is a check for sufficient funds inside the safe
+// The issue with occurs when want to withdraw/transfer full balances from the safe
+// The full amount has to be deducted for gas (usually it is pre-estimated).
+// This gas is estimated and can be inaccurate so we intentionally over-estimate the gas
+// to avoid a discrepancy between gas estimation of the relayer and the sdk.
+// The number is based off empirical observation of sentry errors; the baseGas difference is usually 12
+// https://github.com/cardstack/card-protocol-relay-service/blob/master/safe.py#L303-L316
+export const baseGasBuffer: BN = new BN('30');

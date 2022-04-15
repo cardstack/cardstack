@@ -22,6 +22,7 @@ import {
   Operation,
   gasInToken,
   GasEstimate,
+  baseGasBuffer,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import BN from 'bn.js';
@@ -470,7 +471,6 @@ export default class RewardManager {
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
 
     let rewardSafeDelegateAddress = await this.getRewardSafeDelegateAddress();
-    let rewardSafeDelegate = await this.getRewardSafeDelegate();
     if (!(rewardSafeOwner == from)) {
       throw new Error(
         `Reward safe owner is NOT the signer of transaction.
@@ -480,17 +480,15 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let estimate;
     let withdrawPayload;
-    let weiAmount;
     if (amount) {
-      //when amount is given, we assume that amount is string in wei that has already had gasCost deducted from it
       let weiAmount = new BN(amount);
       if (weiAmount.gt(safeBalance)) {
         throw new Error(
           `Insufficient funds inside reward safe. safeBalance = ${fromWei(safeBalance)} and amount = ${fromWei(amount)}`
         );
       }
-      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-      withdrawPayload = withdraw.encodeABI();
+      withdrawPayload = await this.getWithdrawPayload(tokenAddress, to, weiAmount);
+
       estimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
@@ -500,7 +498,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
-      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+      let gasCost = gasInToken(estimate);
       if (safeBalance.lt(gasCost.add(weiAmount))) {
         throw new Error(
           `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
@@ -511,9 +509,32 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     } else {
       //when amount is NOT given, we use safeBalance - gasCost as the withdraw amount
       //Note: gasCost is estimated with safeBalance not the actual withdraw amount
-      weiAmount = safeBalance;
-      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-      withdrawPayload = withdraw.encodeABI();
+      let preWithdrawPayload = await this.getWithdrawPayload(tokenAddress, to, safeBalance);
+      // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
+      // The preEstimate is typically used when withdrawing full balances from a safe
+      let preEstimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        rewardSafeDelegateAddress,
+        '0',
+        preWithdrawPayload,
+        Operation.DELEGATECALL,
+        tokenAddress
+      );
+      preEstimate.baseGas = new BN(preEstimate.baseGas).add(baseGasBuffer).toString();
+      let gasCost = gasInToken(preEstimate);
+      if (safeBalance.lt(gasCost)) {
+        throw new Error(
+          `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+            safeBalance
+          )}, the gas cost is ${fromWei(gasCost)}`
+        );
+      }
+      let weiAmount = safeBalance.sub(gasCost);
+      withdrawPayload = await this.getWithdrawPayload(tokenAddress, to, weiAmount);
+      // We must still compute a new gasEstimate based upon the adjusted amount for gas
+      // This is beecause the relayer will do the estimation with the same exact parameters
+      // and check that the gas estimates here are at least greater than its own gas estimates
       estimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
@@ -523,17 +544,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
-      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-      if (weiAmount.lt(gasCost)) {
-        throw new Error(
-          `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
-            safeBalance
-          )}, the gas cost is ${fromWei(gasCost)}`
-        );
-      }
-      weiAmount = weiAmount.sub(gasCost);
-      withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
-      withdrawPayload = withdraw.encodeABI();
     }
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
@@ -755,6 +765,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
+  }
+
+  private async getWithdrawPayload(tokenAddress: string, to: string, weiAmount: BN): Promise<string> {
+    let rewardManagerAddress = await this.address();
+    let rewardSafeDelegate = await this.getRewardSafeDelegate();
+    let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+    return withdraw.encodeABI();
   }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,

@@ -2,7 +2,14 @@ import Web3 from 'web3';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { ContractOptions } from 'web3-eth-contract';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate, Operation, gasInToken } from './utils/safe-utils';
+import {
+  gasEstimate,
+  executeTransaction,
+  getNextNonceFromEstimate,
+  Operation,
+  gasInToken,
+  baseGasBuffer,
+} from './utils/safe-utils';
 import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
@@ -338,9 +345,8 @@ export default class Safes implements ISafes {
 
     let estimate;
     let payload;
-    let weiAmount: BN;
     if (amount) {
-      weiAmount = new BN(amount);
+      let weiAmount = new BN(amount);
       if (safeBalance.lt(weiAmount)) {
         throw new Error(
           `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
@@ -367,7 +373,34 @@ export default class Safes implements ISafes {
         );
       }
     } else {
-      payload = this.transferTokenPayload(tokenAddress, recipient, safeBalance);
+      //when amount is NOT given, we use safeBalance - gasCost as the transfer amount
+      //Note: gasCost is estimated with safeBalance not the actual transfer amount
+      let prePayload = this.transferTokenPayload(tokenAddress, recipient, safeBalance);
+      // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after transferring a specified amount
+      // The preEstimate is typically used when transferring full balances from a safe
+      let preEstimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        tokenAddress,
+        '0',
+        prePayload,
+        Operation.CALL,
+        tokenAddress
+      );
+      preEstimate.baseGas = new BN(preEstimate.baseGas).add(baseGasBuffer).toString();
+      let gasCost = gasInToken(preEstimate);
+      if (safeBalance.lt(gasCost)) {
+        throw new Error(
+          `Safe does not have enough to pay for gas when transferring. The safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+            safeBalance
+          )}, the gas cost is ${fromWei(gasCost)}`
+        );
+      }
+      let weiAmount = safeBalance.sub(gasCost);
+      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
+      // We must still compute a new gasEstimate based upon the adjusted amount for gas
+      // This is beecause the relayer will do the estimation with the same exact parameters
+      // and check that the gas estimates here are at least greater than its own gas estimates
       estimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
@@ -377,16 +410,6 @@ export default class Safes implements ISafes {
         Operation.CALL,
         tokenAddress
       );
-      let gasCost = gasInToken(estimate);
-      if (safeBalance.lt(gasCost)) {
-        throw new Error(
-          `Safe does not have enough to pay for gas when transferring. The safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
-            safeBalance
-          )}, the gas cost is ${fromWei(gasCost)}`
-        );
-      }
-      weiAmount = safeBalance.sub(gasCost);
-      payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
     }
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
