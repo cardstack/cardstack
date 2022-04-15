@@ -480,7 +480,6 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let estimate;
     let withdrawPayload;
-    let weiAmount: BN;
     if (amount) {
       let weiAmount = new BN(amount);
       if (weiAmount.gt(safeBalance)) {
@@ -531,7 +530,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
           )}, the gas cost is ${fromWei(gasCost)}`
         );
       }
-      weiAmount = safeBalance.sub(gasCost);
+      let weiAmount = safeBalance.sub(gasCost);
       withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
       withdrawPayload = withdraw.encodeABI();
       // We must still compute a new gasEstimate based upon the adjusted amount for gas
