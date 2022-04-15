@@ -368,7 +368,7 @@ export default class Safes implements ISafes {
     } else {
       //when amount is NOT given, we use safeBalance - gasCost as the transfer amount
       //Note: gasCost is estimated with safeBalance not the actual transfer amount
-      payload = this.transferTokenPayload(tokenAddress, recipient, safeBalance);
+      let prePayload = this.transferTokenPayload(tokenAddress, recipient, safeBalance);
       // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after transferring a specified amount
       // The preEstimate is typically used when transferring full balances from a safe
       let preEstimate = await gasEstimate(
@@ -376,7 +376,7 @@ export default class Safes implements ISafes {
         safeAddress,
         tokenAddress,
         '0',
-        payload,
+        prePayload,
         Operation.CALL,
         tokenAddress
       );
