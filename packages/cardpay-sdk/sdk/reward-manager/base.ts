@@ -480,7 +480,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
     let estimate;
     let withdrawPayload;
-    let weiAmount;
+    let weiAmount: BN;
     if (amount) {
       let weiAmount = new BN(amount);
       if (weiAmount.gt(safeBalance)) {
@@ -510,8 +510,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     } else {
       //when amount is NOT given, we use safeBalance - gasCost as the withdraw amount
       //Note: gasCost is estimated with safeBalance not the actual withdraw amount
-      weiAmount = safeBalance;
-      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
+      let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, safeBalance);
       withdrawPayload = withdraw.encodeABI();
       // The preEstimate is used to estimate the gasCost to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
       // The preEstimate is typically used when withdrawing full balances from a safe
@@ -525,14 +524,14 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         tokenAddress
       );
       let gasCost = gasInToken(preEstimate);
-      if (weiAmount.lt(gasCost)) {
+      if (safeBalance.lt(gasCost)) {
         throw new Error(
           `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
             safeBalance
           )}, the gas cost is ${fromWei(gasCost)}`
         );
       }
-      weiAmount = weiAmount.sub(gasCost);
+      weiAmount = safeBalance.sub(gasCost);
       withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
       withdrawPayload = withdraw.encodeABI();
       // We must still compute a new gasEstimate based upon the adjusted amount for gas

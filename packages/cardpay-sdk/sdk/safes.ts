@@ -338,9 +338,8 @@ export default class Safes implements ISafes {
 
     let estimate;
     let payload;
-    let weiAmount: BN;
     if (amount) {
-      weiAmount = new BN(amount);
+      let weiAmount = new BN(amount);
       if (safeBalance.lt(weiAmount)) {
         throw new Error(
           `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
@@ -389,7 +388,7 @@ export default class Safes implements ISafes {
           )}, the gas cost is ${fromWei(gasCost)}`
         );
       }
-      weiAmount = safeBalance.sub(gasCost);
+      let weiAmount = safeBalance.sub(gasCost);
       payload = this.transferTokenPayload(tokenAddress, recipient, weiAmount);
       // We must still compute a new gasEstimate based upon the adjusted amount for gas
       // This is beecause the relayer will do the estimation with the same exact parameters
