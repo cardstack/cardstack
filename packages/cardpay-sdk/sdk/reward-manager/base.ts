@@ -514,7 +514,10 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       weiAmount = safeBalance;
       let withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
       withdrawPayload = withdraw.encodeABI();
-      estimate = await gasEstimate(
+      // The preEstimate is used to estimate the gasCost mainly to check that the safeBalance has sufficient leftover to pay for gas after withdrawing a specified amount
+      // This is preEstimate is typically used when withdrawing full balances from a safe
+      // It is recommeended that for any preEstimate that we avoid using it
+      let preEstimate = await gasEstimate(
         this.layer2Web3,
         safeAddress,
         rewardSafeDelegateAddress,
@@ -523,7 +526,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         Operation.DELEGATECALL,
         tokenAddress
       );
-      let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+      let gasCost = new BN(preEstimate.safeTxGas).add(new BN(preEstimate.baseGas)).mul(new BN(preEstimate.gasPrice));
       if (weiAmount.lt(gasCost)) {
         throw new Error(
           `Reward safe does not have enough to pay for gas when withdrawing rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
@@ -534,6 +537,18 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       weiAmount = weiAmount.sub(gasCost);
       withdraw = await rewardSafeDelegate.methods.withdraw(rewardManagerAddress, tokenAddress, to, weiAmount);
       withdrawPayload = withdraw.encodeABI();
+      // We must still compute a new gasEstimate based upon the adjusted amount for gas
+      // This is beecause the relayer will do the estimation with the same exact parameters
+      // and check that the gas estimates here are at least greater than its own gas estimates
+      estimate = await gasEstimate(
+        this.layer2Web3,
+        safeAddress,
+        rewardSafeDelegateAddress,
+        '0',
+        withdrawPayload,
+        Operation.DELEGATECALL,
+        tokenAddress
+      );
     }
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
