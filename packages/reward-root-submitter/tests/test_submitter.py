@@ -265,3 +265,33 @@ def test_returns_none_when_file_empty():
     )
     root = get_root_from_file(file)
     assert root is None
+
+
+def test_ignores_non_rewards_folders():
+    s3_client = LocalS3Client(local_storage_dir="tests")
+    all_cycles = list(
+        get_all_reward_outputs(s3_client.S3Path("s3://resources/rewards_with_other_folders/"))
+    )
+    assert len(all_cycles) == 1
+    assert {
+        "file": s3_client.S3Path(
+            "s3://resources/rewards_with_other_folders/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
+        ),
+        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "payment_cycle": 24000000,
+    } in all_cycles
+
+
+def test_ignores_folders_without_parquet_results():
+    s3_client = LocalS3Client(local_storage_dir="tests")
+    all_cycles = list(
+        get_all_reward_outputs(s3_client.S3Path("s3://resources/rewards_with_missing_parquet/"))
+    )
+    assert len(all_cycles) == 1
+    assert {
+        "file": s3_client.S3Path(
+            "s3://resources/rewards_with_missing_parquet/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
+        ),
+        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "payment_cycle": 24000000,
+    } in all_cycles
