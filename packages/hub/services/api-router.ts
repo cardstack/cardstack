@@ -28,6 +28,9 @@ export default class APIRouter {
   cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
   });
+  emailCardDropRequestsRoute = inject('email-card-drop-requests-route', {
+    as: 'emailCardDropRequestsRoute',
+  });
   pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
     as: 'pushNotificationRegistrationsRoute',
   });
@@ -55,6 +58,7 @@ export default class APIRouter {
       reservationsRoute,
       inventoryRoute,
       cardSpacesRoute,
+      emailCardDropRequestsRoute,
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
@@ -78,6 +82,7 @@ export default class APIRouter {
     apiSubrouter.get('/orders/:order_id', ordersRoute.get);
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
+    apiSubrouter.get('/email-card-drop-requests', emailCardDropRequestsRoute.get);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);

@@ -90,6 +90,8 @@ import ChecklyWebhookRoute from './routes/checkly-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
 import { registerQueries } from './queries';
+import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
+import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -141,8 +143,10 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('card-space-serializer', CardSpaceSerializer);
+  registry.register('email-card-drop-request-serializer', EmailCardDropRequestSerializer);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-spaces-route', CardSpacesRoute);
+  registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
