@@ -36,6 +36,7 @@ app "hub" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/hub-prod/52cb41649112bec8/1ce6522a7998b3b4"
             }
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
             }
         }
@@ -83,6 +84,7 @@ app "hub-worker" {
             execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
             }
         }
@@ -125,6 +127,7 @@ app "hub-bot" {
             execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
             }
         }
@@ -166,6 +169,7 @@ app "hub-event-listener" {
           task_role_name = "hub-ecr-task"
           disable_alb = true
             secrets = {
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
             }
       }

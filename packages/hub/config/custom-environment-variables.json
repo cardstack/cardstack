@@ -33,7 +33,8 @@
     "callbackUrl": "WYRE_CALLBACK_URL"
   },
   "web3": {
-    "network": "NETWORK"
+    "network": "NETWORK",
+    "evmFullNodeUrl": "EVM_FULL_NODE_URL"
   },
   "walletConnect": {
     "bridge": "WALLET_CONNECT_BRIDGE",

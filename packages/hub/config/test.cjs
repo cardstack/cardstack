@@ -9,6 +9,9 @@ module.exports = {
   checkly: {
     handleWebhookRequests: true,
   },
+  web3: {
+    evmFullNodeUrl: 'https://humorme.test/abc123/',
+  },
   compiler: {
     realmsConfig: [
       {

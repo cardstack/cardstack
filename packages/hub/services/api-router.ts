@@ -10,6 +10,7 @@ import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
+  config = route('config');
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
   status = route('status');
@@ -43,6 +44,7 @@ export default class APIRouter {
   routes() {
     let {
       boomRoute,
+      config: configRoute,
       exchangeRatesRoute,
       prepaidCardColorSchemesRoute,
       prepaidCardPatternsRoute,
@@ -61,6 +63,7 @@ export default class APIRouter {
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
+    apiSubrouter.get('/config', configRoute.get);
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
