@@ -1,4 +1,3 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { CardSpace } from '../../routes/card-spaces';
 import { registry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,17 +27,6 @@ let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
   return stubUserAddress;
-}
-
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
-    return Promise.resolve({} as Job);
-  }
 }
 
 describe('GET /api/card-spaces/:slug', function () {
@@ -124,14 +112,8 @@ describe('GET /api/card-spaces/:slug', function () {
 describe('POST /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
   let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
-  });
 
   it('persists card space', async function () {
     let merchantId = uuidv4();
@@ -164,8 +146,6 @@ describe('POST /api/card-spaces', function () {
       },
     };
 
-    let resourceId = null;
-
     await request()
       .post('/api/card-spaces')
       .send(payload)
@@ -174,7 +154,6 @@ describe('POST /api/card-spaces', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
       .expect(function (res) {
-        resourceId = res.body.data.id;
         res.body.data.id = 'the-id';
         res.body.data.attributes.did = 'the-did';
       })
@@ -201,9 +180,6 @@ describe('POST /api/card-spaces', function () {
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
-
-    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-card-space');
-    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId });
   });
 
   it('returns 401 without bearer token', async function () {
@@ -360,15 +336,9 @@ describe('POST /api/card-spaces', function () {
 describe('PUT /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
-  });
 
   it('returns 404 when resource does not exist', async function () {
     await request()
