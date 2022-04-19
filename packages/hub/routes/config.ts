@@ -3,22 +3,18 @@ import autoBind from 'auto-bind';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 import config from 'config';
 
-export const DEGRADED_THRESHOLD = 10;
-
 export default class ConfigRoute {
   constructor() {
     autoBind(this);
   }
 
-  async get(ctx: Koa.Context) {
+  get(ctx: Koa.Context) {
+    let web3Config = config.get('web3');
     let body: JSONAPIDocument = {
       data: {
         type: 'config',
         attributes: {
-          web3: {
-            network: config.get('web3.network'),
-            evmFullNodeUrl: config.get('web3.evmFullNodeUrl'),
-          },
+          web3: web3Config,
         },
       },
     };

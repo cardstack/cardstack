@@ -21,6 +21,7 @@ export type { ILayerOneOracle } from './sdk/layer-one-oracle';
 export type { LayerTwoOracle as ILayerTwoOracle } from './sdk/layer-two-oracle';
 export type { IAssets } from './sdk/assets';
 export type { IHubAuth } from './sdk/hub-auth';
+export { default as HubConfig } from './sdk/hub-config';
 export type { AddressKeys } from './contracts/addresses';
 export type { TransactionOptions } from './sdk/utils/general-utils';
 

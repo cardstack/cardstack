@@ -1,10 +1,6 @@
 import config from 'config';
 import { gqlQuery } from '@cardstack/cardpay-sdk';
 
-interface Web3Config {
-  network: string;
-}
-
 export interface SKUInventory {
   askPrice: string; // in terms of the issuing token (wei)
   sku: {
@@ -37,7 +33,7 @@ export interface ProvisionedPrepaidCardSubgraph {
   };
 }
 
-const { network } = config.get('web3') as Web3Config;
+const network = config.get('web3.layer2Network') as string;
 const POLL_INTERVAL = 1000;
 const TIMEOUT = 1000 * 60 * 5;
 

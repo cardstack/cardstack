@@ -12,7 +12,7 @@ import {
   setCardDropRecipientAirdropPrepaidCard,
   setCardDropRecipientAirdropTxnHash,
 } from '../../../utils/card-drop';
-import { CardDropConfig, Web3Config } from '../../../types';
+import { CardDropConfig } from '../../../types';
 import { name as cardmeName } from '../../guild/card-drop';
 import HubBot from '../../..';
 import { assertHubBot } from '../../../utils';
@@ -22,7 +22,7 @@ export const name: Command['name'] = 'airdrop-prepaidcard:start';
 export const description: Command['description'] = 'Collect wallet information to airdrop a prepaid card - start';
 
 const { sku } = config.get('cardDrop') as CardDropConfig;
-const { network } = config.get('web3') as Web3Config;
+const network = config.get('web3.layer2Network') as string;
 const continueCommands = [`ok`, `yes`, `y`, `sure`, `okay`, `fine`, `ready`, `i'm ready`, `i am ready`]; // some helpful suggestions from github co-pilot
 const quitCommands = ['quit', 'cancel', 'no', 'nope', 'nah', 'nevermind', 'nvm', 'stop', 'exit'];
 

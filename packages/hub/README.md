@@ -46,6 +46,11 @@ Below is a list of the most common environment variables that the Hub accepts:
 - `AWS_PROFILE` - if none of the HUB*AWS*\* variables are defined, no credentials or region will be passed to the aws-sdk. This will make the aws-sdk's default behavior take effect, which includes using an AWS_PROFILE env var if it is set
 - `HUB_DATABASE_URL` - defaults in development to postgres://postgres:postgres@localhost:5432/hub_development
 - `LOG_LEVELS` - defaults to `*=info`
+- `PROVISIONER_SECRET`
+- `LAYER1_RPC_NODE_HTTPS_URL`
+- `LAYER1_RPC_NODE_WSS_URL`
+- `LAYER2_RPC_NODE_HTTPS_URL`
+- `LAYER2_RPC_NODE_WSS_URL`
 
 Search the mono-repo for `process.env` and check the config directory to see these variables referenced.
 

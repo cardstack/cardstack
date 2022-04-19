@@ -16,16 +16,15 @@ import {
 } from './types';
 import {
   networkIds,
-  getConstantByNetwork,
   getSDK,
   IHubAuth,
+  HubConfig,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
-import { getLayer2RpcWssNodeUrl } from '../features';
 import * as Sentry from '@sentry/browser';
 
 const BROADCAST_CHANNEL_MESSAGES = {
@@ -50,6 +49,7 @@ export default abstract class Layer2ChainWeb3Strategy
   defaultTokenContractAddress?: string;
   web3!: Web3;
   #hubAuthApi!: IHubAuth;
+  #hubConfigApi = new HubConfig(config.hubURL);
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -95,18 +95,13 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.web3 = new Web3();
 
-    let rpcWss = getLayer2RpcWssNodeUrl(this.networkSymbol);
+    let hubConfigResponse = yield this.#hubConfigApi.getConfig();
+    let rpcNodeHttpUrl = hubConfigResponse.web3.layer2RpcNodeWssUrl;
+    let rpcNodeWssUrl = hubConfigResponse.web3.layer2RpcNodeWssUrl;
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
-      rpc: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcNode',
-          this.networkSymbol
-        ),
-      },
-      rpcWss: {
-        [networkIds[this.networkSymbol]]: rpcWss,
-      },
+      rpc: { [networkIds[this.networkSymbol]]: rpcNodeHttpUrl },
+      rpcWss: { [networkIds[this.networkSymbol]]: rpcNodeWssUrl },
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });
 
@@ -116,7 +111,7 @@ export default abstract class Layer2ChainWeb3Strategy
         type: 'debug',
         message: 'Websocket connected',
         data: {
-          url: rpcWss,
+          url: rpcNodeWssUrl,
         },
         level: Sentry.Severity.Info,
       });
@@ -133,7 +128,7 @@ export default abstract class Layer2ChainWeb3Strategy
           code: event.code,
           reason: event.reason,
           wasClean: event.wasClean,
-          url: rpcWss,
+          url: rpcNodeWssUrl,
         },
         // unsure about 1001 since this could also happen due to server failure
         // but also can happen due to closing the tab normally

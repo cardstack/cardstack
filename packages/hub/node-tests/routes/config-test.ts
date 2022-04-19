@@ -14,8 +14,12 @@ describe('GET /api/config', function () {
           type: 'config',
           attributes: {
             web3: {
-              network: 'sokol',
-              evmFullNodeUrl: 'https://humorme.test/abc123/',
+              layer1Network: 'kovan',
+              layer1RpcNodeHttpsUrl: 'https://infuratest.test/abc123/',
+              layer1RpcNodeWssUrl: 'wss://infuratest.test/ws/abc123/',
+              layer2Network: 'sokol',
+              layer2RpcNodeHttpsUrl: 'https://humorme.test/abc123/',
+              layer2RpcNodeWssUrl: 'wss://humorme.test/abc123/',
             },
           },
         },

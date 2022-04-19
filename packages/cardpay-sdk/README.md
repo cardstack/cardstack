@@ -1064,7 +1064,6 @@ let cardOracle = await getOracle("CARD", web3);
 
 ```js
 let blockExplorer = await getConstant("blockExplorer", web3);
-let rpcNode = await getConstant("rpcNode", "sokol");
 let relayServiceURL = await getConstant("relayServiceURL", web3);
 let transactionServiceURL = await getConstant("transactionServiceURL", web3);
 ```
