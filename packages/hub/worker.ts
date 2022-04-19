@@ -9,7 +9,6 @@ import { runInitializers } from './main';
 // Tasks
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
@@ -65,7 +64,6 @@ export class HubWorker {
           PersistOffChainPrepaidCardCustomizationTask
         ),
         'persist-off-chain-merchant-info': this.instantiateTask(PersistOffChainMerchantInfoTask),
-        'persist-off-chain-card-space': this.instantiateTask(PersistOffChainCardSpaceTask),
         'print-queued-jobs': this.instantiateTask(PrintQueuedJobsTask),
         'remove-old-sent-notifications': this.instantiateTask(RemoveOldSentNotificationsTask),
         'wyre-transfer': this.instantiateTask(WyreTransferTask),

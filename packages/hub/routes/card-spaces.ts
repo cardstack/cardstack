@@ -120,10 +120,6 @@ export default class CardSpacesRoute {
       } else {
         await this.cardSpaceQueries.insert(cardSpace);
 
-        await this.workerClient.addJob('persist-off-chain-card-space', {
-          id: cardSpace.id,
-        });
-
         let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
         ctx.status = 201;
         ctx.body = serialized;
@@ -166,10 +162,6 @@ export default class CardSpacesRoute {
       };
     } else {
       await this.cardSpaceQueries.update(cardSpace);
-
-      await this.workerClient.addJob('persist-off-chain-card-space', {
-        id: cardSpace.id,
-      });
 
       let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
 

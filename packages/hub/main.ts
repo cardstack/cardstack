@@ -44,7 +44,6 @@ import OrderService from './services/order';
 import InventoryService from './services/inventory';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
@@ -133,7 +132,6 @@ export function createRegistry(): Registry {
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
-  registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
