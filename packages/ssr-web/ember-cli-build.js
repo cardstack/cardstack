@@ -4,7 +4,9 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const path = require('path');
 const concat = require('broccoli-concat');
 const webpack = require('webpack');
+const compileCSS = require('broccoli-postcss');
 const svgoUniqueId = require('svgo-unique-id');
+const viewportHeightFix = require('postcss-viewport-height-correction');
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
@@ -51,11 +53,22 @@ module.exports = function (defaults) {
 
   const { Webpack } = require('@embroider/webpack');
 
-  let appComponentsStylesTree = concat(path.join(__dirname, 'app/components'), {
-    inputFiles: ['**/*.css'],
-    outputFile: '/assets/app-components.css',
-    sourceMapConfig: { enabled: true },
-  });
+  // this tree doesn't seem to go through webpack so we have to do a separate postcss pass
+  // if we do import css into component js we might not need to do this
+  let appComponentsStylesTree = new compileCSS(
+    concat(path.join(__dirname, 'app/components'), {
+      inputFiles: ['**/*.css'],
+      outputFile: '/assets/app-components.css',
+      sourceMapConfig: { enabled: true },
+    }),
+    {
+      plugins: [
+        {
+          module: viewportHeightFix,
+        },
+      ],
+    }
+  );
 
   return require('@embroider/compat').compatBuild(app, Webpack, {
     extraPublicTrees: [appComponentsStylesTree],
@@ -102,6 +115,20 @@ module.exports = function (defaults) {
                         uniqueID: svgoUniqueId,
                       },
                     ],
+                  },
+                },
+              ],
+            },
+            // only do postcss here. we rely on embroider's built-in webpack css config for the rest
+            {
+              test: /\.css$/i,
+              use: [
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    postcssOptions: {
+                      plugins: [[viewportHeightFix]],
+                    },
                   },
                 },
               ],
