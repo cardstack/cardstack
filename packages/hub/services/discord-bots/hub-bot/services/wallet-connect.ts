@@ -6,12 +6,12 @@ import config from 'config';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { Message, buildMessageWithQRCode } from '@cardstack/discord-bot';
-import { WalletConnectConfig, Web3Config } from '../types';
+import { WalletConnectConfig } from '../types';
 
 const log = logger('services:wallet-connect');
 
 const { bridge, clientURL, clientName } = config.get('walletConnect') as WalletConnectConfig;
-const { network } = config.get('web3') as Web3Config;
+const network = config.get('web3.layer2Network') as string;
 export default class WalletConnectService {
   async getWeb3(message: Message): Promise<Web3 | undefined> {
     let provider = new WalletConnectProvider({
@@ -23,12 +23,8 @@ export default class WalletConnectService {
         name: clientName,
       },
       chainId: networkIds[network],
-      rpc: {
-        [networkIds[network]]: getConstantByNetwork('rpcNode', network),
-      },
-      rpcWss: {
-        [networkIds[network]]: getConstantByNetwork('rpcWssNode', network),
-      },
+      rpc: { [networkIds[network]]: config.get('web3.layer2RpcNodeHttpsUrl') as string },
+      rpcWss: { [networkIds[network]]: config.get('web3.layer2RpcNodeWssUrl') as string },
       bridge,
     });
 

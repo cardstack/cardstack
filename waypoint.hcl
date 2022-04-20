@@ -36,6 +36,10 @@ app "hub" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/41bc43badc8a8782/0646e09e43df280f"
             }
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
             }
         }
@@ -88,6 +92,10 @@ app "hub-worker" {
             execution_role_name = "hub-staging-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
             }
         }
@@ -130,6 +138,10 @@ app "hub-bot" {
             execution_role_name = "hub-staging-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
             }
         }
@@ -172,6 +184,10 @@ app "hub-event-listener" {
         execution_role_name = "hub-staging-ecr-task-executor-role"
         disable_alb = true
         secrets = {
+            LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+            LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+            LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+            LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
             HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
         }
       }

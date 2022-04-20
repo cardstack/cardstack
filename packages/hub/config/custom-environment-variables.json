@@ -33,7 +33,12 @@
     "callbackUrl": "WYRE_CALLBACK_URL"
   },
   "web3": {
-    "network": "NETWORK"
+    "layer1Network": "LAYER1_NETWORK",
+    "layer1RpcNodeHttpsUrl": "LAYER1_RPC_NODE_HTTPS_URL",
+    "layer1RpcNodeWssUrl": "LAYER1_RPC_NODE_WSS_URL",
+    "layer2Network": "LAYER2_NETWORK",
+    "layer2RpcNodeHttpsUrl": "LAYER2_RPC_NODE_HTTPS_URL",
+    "layer2RpcNodeWssUrl": "LAYER2_RPC_NODE_WSS_URL"
   },
   "walletConnect": {
     "bridge": "WALLET_CONNECT_BRIDGE",

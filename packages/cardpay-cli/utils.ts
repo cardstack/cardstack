@@ -1,7 +1,7 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
 import { AbstractProvider } from 'web3-core';
-import { HttpProvider, getConstant, networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { HttpProvider, networkIds, getConstantByNetwork, HubConfig } from '@cardstack/cardpay-sdk';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Options, Arguments } from 'yargs';
 /* eslint-disable @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires */
@@ -45,6 +45,21 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
 }
 
 export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
+  let rpcNodeHttpsUrl!: string;
+  let hubConfigResponse;
+  let hubUrl = process.env.HUB_URL || getConstantByNetwork('hubUrl', network);
+  let hubConfig = new HubConfig(hubUrl);
+  hubConfigResponse = await hubConfig.getConfig();
+  switch (network) {
+    case 'kovan':
+    case 'mainnet':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.layer1RpcNodeHttpsUrl as string;
+      break;
+    case 'sokol':
+    case 'xdai':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.layer2RpcNodeHttpsUrl as string;
+      break;
+  }
   switch (opts.connectionType) {
     case 'wallet-connect': {
       let provider = new WalletConnectProvider({
@@ -58,7 +73,7 @@ export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
           // we can't use OpenEthereum nodes as it was issues with modern web3
           // providers (specifically the xdai archive node that POA hosts falls
           // into this category)
-          [networkIds[network]]: getConstantByNetwork('rpcNode', network),
+          [networkIds[network]]: rpcNodeHttpsUrl,
         },
         bridge: BRIDGE,
       });
@@ -72,12 +87,12 @@ export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
           mnemonic: {
             phrase: opts.mnemonic,
           },
-          providerOrUrl: new HttpProvider(await getConstant('rpcNode', network)),
+          providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
         })
       );
     case 'trezor':
       return new Web3(
-        new TrezorWalletProvider(await getConstant('rpcNode', network), {
+        new TrezorWalletProvider(rpcNodeHttpsUrl, {
           chainId: networkIds[network],
         })
       );
