@@ -102,3 +102,30 @@ describe('GET /api/email-card-drop-requests', function () {
     });
   });
 });
+
+describe.only('POST /api/email-card-drop-requests', function () {
+  let { request, getContainer } = setupHub(this);
+
+  it('persists an email card drop request', async function () {
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(201);
+
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: '0x00000000000' }))[0];
+
+    expect(emailCardDropRequest.ownerAddress).to.equal('0x00000000000');
+  });
+});

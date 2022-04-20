@@ -1,3 +1,4 @@
+import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 interface EmailCardDropRequestClaimStatus {
@@ -7,6 +8,18 @@ interface EmailCardDropRequestClaimStatus {
 }
 
 export default class EmailCardDropRequestSerializer {
+  serialize(model: EmailCardDropRequest): JSONAPIDocument {
+    return {
+      data: {
+        type: 'email-card-drop-requests',
+        id: model.id,
+        attributes: {
+          'owner-address': model.ownerAddress,
+        },
+      },
+    } as JSONAPIDocument;
+  }
+
   serializeEmailCardDropRequestStatus(model: EmailCardDropRequestClaimStatus): JSONAPIDocument {
     return {
       data: {

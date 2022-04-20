@@ -85,7 +85,9 @@ export default class APIRouter {
     apiSubrouter.get('/orders/:order_id', ordersRoute.get);
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
+
     apiSubrouter.get('/email-card-drop-requests', emailCardDropRequestsRoute.get);
+    apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);

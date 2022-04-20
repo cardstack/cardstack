@@ -2,6 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
+import shortUuid from 'short-uuid';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -14,6 +15,8 @@ export interface EmailCardDropRequest {
 }
 
 export default class EmailCardDropRequestsRoute {
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
+
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
@@ -59,6 +62,28 @@ export default class EmailCardDropRequestsRoute {
     ctx.body = result;
     ctx.type = 'application/vnd.api+json';
     return;
+  }
+
+  async post(ctx: Koa.Context) {
+    const emailCardDropRequest: EmailCardDropRequest = {
+      id: shortUuid.uuid(),
+      ownerAddress: ctx.request.body.data.attributes['owner-address'],
+      emailHash: 'FIXME',
+      verificationCode: 'FIXME',
+      requestedAt: new Date(this.clock.now()),
+    };
+
+    let db = await this.databaseManager.getClient();
+
+    await this.databaseManager.performTransaction(db, async () => {
+      await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+    });
+
+    let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
+
+    ctx.status = 201;
+    ctx.body = serialized;
+    ctx.type = 'application/vnd.api+json';
   }
 }
 
