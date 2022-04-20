@@ -32,6 +32,7 @@ let server = new FastBootAppServer({
         return Buffer.from(str).toString('base64');
       },
       fetch,
+      URLSearchParams,
     });
   },
   // This should be false for Twitter/Linkedin according to https://github.com/ember-fastboot/ember-cli-fastboot/tree/master/packages/fastboot-app-server#twitter-and-linkedin
