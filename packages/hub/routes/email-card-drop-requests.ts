@@ -18,13 +18,14 @@ export default class EmailCardDropRequestsRoute {
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
+  clock = inject('clock');
 
   constructor() {
     autoBind(this);
   }
 
   async get(ctx: Koa.Context) {
-    let timestamp = new Date();
+    let timestamp = new Date(this.clock.now());
     let ownerAddress = ctx.request.query['eoa'] as string;
 
     let previousRequests = await this.emailCardDropRequestQueries.query({

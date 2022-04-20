@@ -1,5 +1,6 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
-import { setupHub } from '../helpers/server';
+import { Clock } from '../../services/clock';
+import { registry, setupHub } from '../helpers/server';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -18,8 +19,25 @@ let unclaimedEoa: EmailCardDropRequest = {
   requestedAt: new Date(),
 };
 
+let fakeTime = 1650440847689;
+let fakeTimeString = new Date(fakeTime).toISOString();
 describe('GET /api/email-card-drop-requests', function () {
   let { request, getContainer } = setupHub(this);
+
+  this.beforeAll(function () {
+    registry(this).register(
+      'clock',
+      class FrozenClock implements Clock {
+        now() {
+          return fakeTime;
+        }
+
+        hrNow(): bigint {
+          throw new Error('Not implemented');
+        }
+      }
+    );
+  });
 
   this.beforeEach(async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
@@ -32,11 +50,12 @@ describe('GET /api/email-card-drop-requests', function () {
       .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json');
+
     expect(response.status).to.equal(200);
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(claimedEoa.ownerAddress);
     expect(response.body.data.attributes.claimed).to.equal(true);
-    expect(response.body.data.attributes.timestamp).to.not.be.undefined;
+    expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
   it('returns false if a known EOA does not have a transaction hash recorded for its card drop request', async function () {
@@ -44,11 +63,12 @@ describe('GET /api/email-card-drop-requests', function () {
       .get(`/api/email-card-drop-requests?eoa=${unclaimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json');
+
     expect(response.status).to.equal(200);
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(unclaimedEoa.ownerAddress);
     expect(response.body.data.attributes.claimed).to.equal(false);
-    expect(response.body.data.attributes.timestamp).to.not.be.undefined;
+    expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
   it('returns false if the EOA is not in the db', async function () {
@@ -61,6 +81,6 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal('notrecorded');
     expect(response.body.data.attributes.claimed).to.equal(false);
-    expect(response.body.data.attributes.timestamp).to.not.be.undefined;
+    expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 });
