@@ -10,6 +10,11 @@ export function processGnosisProxyEvent(proxyAddress: Address, event: ethereum.E
   safeEntity.createdAt = event.block.timestamp;
 
   let safe = GnosisSafe.bind(proxyAddress);
+  let ownersResult = safe.try_getOwners();
+  if (ownersResult.reverted) {
+    log.error('Failed to get owners for safe {}', [safeAddress]);
+    return;
+  }
   let owners = safe.getOwners();
 
   for (let i = 0; i < owners.length; i++) {
