@@ -140,9 +140,7 @@ describe.only('POST /api/email-card-drop-requests', function () {
     const payload = {
       data: {
         type: 'email-card-drop-requests',
-        attributes: {
-          'owner-address': '0x00000000000',
-        },
+        attributes: {},
       },
     };
 
@@ -155,9 +153,9 @@ describe.only('POST /api/email-card-drop-requests', function () {
       .expect(201);
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: '0x00000000000' }))[0];
+    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
-    expect(emailCardDropRequest.ownerAddress).to.equal('0x00000000000');
+    expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
   });
 
   it('returns 401 without bearer token', async function () {

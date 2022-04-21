@@ -72,7 +72,7 @@ export default class EmailCardDropRequestsRoute {
 
     const emailCardDropRequest: EmailCardDropRequest = {
       id: shortUuid.uuid(),
-      ownerAddress: ctx.request.body.data.attributes['owner-address'],
+      ownerAddress: ctx.state.userAddress,
       emailHash: 'FIXME',
       verificationCode: 'FIXME',
       requestedAt: new Date(this.clock.now()),
