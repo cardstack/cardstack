@@ -1,6 +1,7 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
+import crypto from 'crypto';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -137,11 +138,13 @@ describe('POST /api/email-card-drop-requests', function () {
   let { request, getContainer } = setupHub(this);
 
   it('persists an email card drop request', async function () {
+    let email = 'valid@example.com';
+
     const payload = {
       data: {
         type: 'email-card-drop-requests',
         attributes: {
-          email: 'valid@example.com',
+          email,
         },
       },
     };
@@ -158,6 +161,12 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
+
+    let hash = crypto.createHash('sha256');
+    hash.update(email);
+    let emailHash = hash.digest('hex');
+
+    expect(emailCardDropRequest.emailHash).to.equal(emailHash);
   });
 
   it('returns 401 without bearer token', async function () {

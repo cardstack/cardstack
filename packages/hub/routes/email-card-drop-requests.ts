@@ -5,6 +5,7 @@ import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
+import crypto from 'crypto';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -73,11 +74,15 @@ export default class EmailCardDropRequestsRoute {
 
     let email = ctx.request.body.data.attributes.email;
 
+    let hash = crypto.createHash('sha256');
+    hash.update(email);
+    let emailHash = hash.digest('hex');
+
     if (isEmail(email)) {
       const emailCardDropRequest: EmailCardDropRequest = {
         id: shortUuid.uuid(),
         ownerAddress: ctx.state.userAddress,
-        emailHash: 'FIXME',
+        emailHash,
         verificationCode: 'FIXME',
         requestedAt: new Date(this.clock.now()),
       };
