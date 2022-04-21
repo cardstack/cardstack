@@ -127,7 +127,7 @@ class StubWorkerClient {
   }
 }
 
-describe.only('POST /api/email-card-drop-requests', function () {
+describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('worker-client', StubWorkerClient);
