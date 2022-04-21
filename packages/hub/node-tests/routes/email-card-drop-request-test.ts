@@ -140,7 +140,9 @@ describe('POST /api/email-card-drop-requests', function () {
     const payload = {
       data: {
         type: 'email-card-drop-requests',
-        attributes: {},
+        attributes: {
+          email: 'valid@example.com',
+        },
       },
     };
 
@@ -174,5 +176,34 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects an invalid email', async function () {
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'notanemail',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: 'Email address is not valid',
+            source: { pointer: '/data/attributes/email' },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
   });
 });

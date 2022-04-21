@@ -4,6 +4,7 @@ import { query } from '../queries';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
+import isEmail from 'validator/lib/isEmail';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -70,24 +71,41 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    const emailCardDropRequest: EmailCardDropRequest = {
-      id: shortUuid.uuid(),
-      ownerAddress: ctx.state.userAddress,
-      emailHash: 'FIXME',
-      verificationCode: 'FIXME',
-      requestedAt: new Date(this.clock.now()),
-    };
+    let email = ctx.request.body.data.attributes.email;
 
-    let db = await this.databaseManager.getClient();
+    if (isEmail(email)) {
+      const emailCardDropRequest: EmailCardDropRequest = {
+        id: shortUuid.uuid(),
+        ownerAddress: ctx.state.userAddress,
+        emailHash: 'FIXME',
+        verificationCode: 'FIXME',
+        requestedAt: new Date(this.clock.now()),
+      };
 
-    await this.databaseManager.performTransaction(db, async () => {
-      await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
-    });
+      let db = await this.databaseManager.getClient();
 
-    let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
+      await this.databaseManager.performTransaction(db, async () => {
+        await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+      });
 
-    ctx.status = 201;
-    ctx.body = serialized;
+      let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
+
+      ctx.status = 201;
+      ctx.body = serialized;
+    } else {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            detail: 'Email address is not valid',
+            source: { pointer: '/data/attributes/email' },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      };
+    }
+
     ctx.type = 'application/vnd.api+json';
   }
 }
