@@ -80,7 +80,7 @@ export default class EmailCardDropRequestsRoute {
     hash.update(email);
     let emailHash = hash.digest('hex');
 
-    let verificationCode = (crypto.randomInt(999999) + '').padStart(6, '0');
+    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
 
     if (isEmail(email)) {
       const emailCardDropRequest: EmailCardDropRequest = {
