@@ -2,6 +2,7 @@ import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
 import crypto from 'crypto';
+import { Job, TaskSpec } from 'graphile-worker';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -116,14 +117,30 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe('POST /api/email-card-drop-requests', function () {
+let jobIdentifiers: string[] = [];
+let jobPayloads: any[] = [];
+class StubWorkerClient {
+  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
+    jobIdentifiers.push(identifier);
+    jobPayloads.push(payload);
+    return Promise.resolve({} as Job);
+  }
+}
+
+describe.only('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { request, getContainer } = setupHub(this);
 
-  it('persists an email card drop request', async function () {
+  this.afterEach(async function () {
+    jobIdentifiers = [];
+    jobPayloads = [];
+  });
+
+  it('persists an email card drop request and triggers jobs', async function () {
     let email = 'valid@example.com';
 
     const payload = {
@@ -135,13 +152,18 @@ describe('POST /api/email-card-drop-requests', function () {
       },
     };
 
+    let resourceId = null;
+
     await request()
       .post('/api/email-card-drop-requests')
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .send(payload)
-      .expect(201);
+      .expect(201)
+      .expect(function (res) {
+        resourceId = res.body.data.id;
+      });
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
@@ -154,6 +176,12 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailHash = hash.digest('hex');
 
     expect(emailCardDropRequest.emailHash).to.equal(emailHash);
+
+    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
+    expect(jobPayloads).to.deep.equal([
+      { id: resourceId, email },
+      { id: resourceId, email },
+    ]);
   });
 
   it('returns 401 without bearer token', async function () {

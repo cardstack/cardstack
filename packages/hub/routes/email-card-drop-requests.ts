@@ -26,6 +26,8 @@ export default class EmailCardDropRequestsRoute {
   });
   clock = inject('clock');
 
+  workerClient = inject('worker-client', { as: 'workerClient' });
+
   constructor() {
     autoBind(this);
   }
@@ -93,6 +95,16 @@ export default class EmailCardDropRequestsRoute {
 
       await this.databaseManager.performTransaction(db, async () => {
         await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+      });
+
+      await this.workerClient.addJob('send-email-card-drop-verification', {
+        id: emailCardDropRequest.id,
+        email,
+      });
+
+      await this.workerClient.addJob('subscribe-email', {
+        id: emailCardDropRequest.id,
+        email,
       });
 
       let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
