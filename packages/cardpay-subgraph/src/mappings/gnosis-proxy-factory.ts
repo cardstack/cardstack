@@ -4,8 +4,16 @@ import { Safe, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress, makeAccount } from '../utils';
 import { Address, ethereum, log } from '@graphprotocol/graph-ts';
 
+let badSafes = new Map<string, boolean>();
+badSafes.set('0x3af12EcC0A8Ef31cc935E0B25ea445249207d21A', true);
+
 export function processGnosisProxyEvent(proxyAddress: Address, event: ethereum.Event, gnosisVer: string): void {
   let safeAddress = toChecksumAddress(proxyAddress);
+  if (badSafes.has(safeAddress)) {
+    log.error('Detected un-indexable safe address {}', [safeAddress]);
+    return;
+  }
+
   let safeEntity = new Safe(safeAddress);
   safeEntity.createdAt = event.block.timestamp;
 
