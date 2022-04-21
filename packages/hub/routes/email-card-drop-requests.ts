@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
+import { ensureLoggedIn } from './utils/auth';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -65,6 +66,10 @@ export default class EmailCardDropRequestsRoute {
   }
 
   async post(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
     const emailCardDropRequest: EmailCardDropRequest = {
       id: shortUuid.uuid(),
       ownerAddress: ctx.request.body.data.attributes['owner-address'],

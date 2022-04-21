@@ -103,7 +103,37 @@ describe('GET /api/email-card-drop-requests', function () {
   });
 });
 
+const stubNonce = 'abc:123';
+let stubAuthToken = 'def--456';
+let stubTimestamp = process.hrtime.bigint();
+
+class StubAuthenticationUtils {
+  generateNonce() {
+    return stubNonce;
+  }
+  buildAuthToken() {
+    return stubAuthToken;
+  }
+  extractVerifiedTimestamp(_nonce: string) {
+    return stubTimestamp;
+  }
+
+  validateAuthToken(encryptedAuthToken: string) {
+    return handleValidateAuthToken(encryptedAuthToken);
+  }
+}
+
+let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+function handleValidateAuthToken(encryptedString: string) {
+  expect(encryptedString).to.equal('abc123--def456--ghi789');
+  return stubUserAddress;
+}
+
 describe.only('POST /api/email-card-drop-requests', function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+  });
+
   let { request, getContainer } = setupHub(this);
 
   it('persists an email card drop request', async function () {
@@ -119,6 +149,7 @@ describe.only('POST /api/email-card-drop-requests', function () {
     await request()
       .post('/api/email-card-drop-requests')
       .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .send(payload)
       .expect(201);
@@ -127,5 +158,23 @@ describe.only('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: '0x00000000000' }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal('0x00000000000');
+  });
+
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/email-card-drop-requests')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 });
