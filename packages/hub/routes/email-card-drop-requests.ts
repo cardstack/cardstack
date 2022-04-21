@@ -122,38 +122,7 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
-
-    if (isEmail(email)) {
-      const emailCardDropRequest: EmailCardDropRequest = {
-        id: shortUuid.uuid(),
-        ownerAddress: ctx.state.userAddress,
-        emailHash,
-        verificationCode,
-        requestedAt: new Date(this.clock.now()),
-      };
-
-      let db = await this.databaseManager.getClient();
-
-      await this.databaseManager.performTransaction(db, async () => {
-        await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
-      });
-
-      await this.workerClient.addJob('send-email-card-drop-verification', {
-        id: emailCardDropRequest.id,
-        email,
-      });
-
-      await this.workerClient.addJob('subscribe-email', {
-        id: emailCardDropRequest.id,
-        email,
-      });
-
-      let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
-
-      ctx.status = 201;
-      ctx.body = serialized;
-    } else {
+    if (!isEmail(email)) {
       ctx.status = 422;
       ctx.body = {
         errors: [
@@ -165,7 +134,40 @@ export default class EmailCardDropRequestsRoute {
           },
         ],
       };
+
+      return;
     }
+
+    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
+
+    const emailCardDropRequest: EmailCardDropRequest = {
+      id: shortUuid.uuid(),
+      ownerAddress: ctx.state.userAddress,
+      emailHash,
+      verificationCode,
+      requestedAt: new Date(this.clock.now()),
+    };
+
+    let db = await this.databaseManager.getClient();
+
+    await this.databaseManager.performTransaction(db, async () => {
+      await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+    });
+
+    await this.workerClient.addJob('send-email-card-drop-verification', {
+      id: emailCardDropRequest.id,
+      email,
+    });
+
+    await this.workerClient.addJob('subscribe-email', {
+      id: emailCardDropRequest.id,
+      email,
+    });
+
+    let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
+
+    ctx.status = 201;
+    ctx.body = serialized;
   }
 }
 
