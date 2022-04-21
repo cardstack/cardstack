@@ -4,8 +4,9 @@ import { EmailCardDropRequest } from '../routes/email-card-drop-requests';
 import { buildConditions } from '../utils/queries';
 
 interface EmailCardDropRequestsQueriesFilter {
-  ownerAddress: string;
   claimedAt?: Date | string;
+  emailHash?: string;
+  ownerAddress?: string;
 }
 
 export default class EmailCardDropRequestsQueries {

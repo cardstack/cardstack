@@ -270,4 +270,49 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       });
   });
+
+  it('rejects when the email has already claimed', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let email = 'valid@example.com';
+
+    let hash = crypto.createHash('sha256');
+    hash.update(email);
+    let emailHash = hash.digest('hex');
+
+    await emailCardDropRequestsQueries.insert({
+      ownerAddress: '0xanother-address',
+      emailHash,
+      verificationCode: '123456',
+      id: '2850a954-525d-499a-a5c8-3c89192ad40e',
+      requestedAt: new Date(),
+      claimedAt: new Date(),
+    });
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email,
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            pointer: '/data/attributes/email',
+            title: 'Email has already claimed a prepaid card',
+          },
+        ],
+      });
+  });
 });

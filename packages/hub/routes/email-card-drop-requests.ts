@@ -102,6 +102,26 @@ export default class EmailCardDropRequestsRoute {
     hash.update(email);
     let emailHash = hash.digest('hex');
 
+    let claimedWithUserEmail = await this.emailCardDropRequestQueries.query({
+      emailHash,
+      claimedAt: NOT_NULL,
+    });
+
+    if (claimedWithUserEmail.length > 0) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Email has already claimed a prepaid card',
+            pointer: '/data/attributes/email',
+          },
+        ],
+      };
+
+      return;
+    }
+
     let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
 
     if (isEmail(email)) {
