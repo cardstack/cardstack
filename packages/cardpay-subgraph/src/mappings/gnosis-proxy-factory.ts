@@ -4,6 +4,10 @@ import { Safe, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress, makeAccount } from '../utils';
 import { Address, ethereum, log } from '@graphprotocol/graph-ts';
 
+// The following bad safe(s) are the confluence of this Gnosis issue:
+// https://ethereum.stackexchange.com/questions/126648/call-reverts-when-asking-a-safe-for-its-owners-gnosis-chain
+// and this graph protocol issue:
+// https://github.com/graphprotocol/graph-node/issues/3487
 let badSafes = new Map<string, boolean>();
 badSafes.set('0x3af12EcC0A8Ef31cc935E0B25ea445249207d21A', true);
 
