@@ -1,5 +1,7 @@
 import { pickBy } from 'lodash';
 
+export const NOT_NULL = '!NOT NULL!';
+
 const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
 // Takes an object with keys and values for querying and transforms them into parts
@@ -16,15 +18,22 @@ export function buildConditions(params: any, tableName?: string) {
     )
   );
 
-  let nonNullParams = pickBy(filteredParams, function (value) {
-    return value !== null;
+  let presentParams = pickBy(filteredParams, function (value) {
+    return value !== null && value !== NOT_NULL;
+  });
+  let notNullParams = pickBy(filteredParams, function (value) {
+    return value === NOT_NULL;
   });
   let nullParams = pickBy(filteredParams, function (value) {
     return value === null;
   });
 
-  let nonNullconditions = Object.keys(nonNullParams).map((key, index) => {
+  let presentConditions = Object.keys(presentParams).map((key, index) => {
     return `${tableName ? `${tableName}.` : ''}${camelToSnakeCase(key)}=$${index + 1}`;
+  });
+
+  let notNullConditions = Object.keys(notNullParams).map((key) => {
+    return `${tableName ? `${tableName}.` : ''}${camelToSnakeCase(key)} IS NOT NULL`;
   });
 
   let nullConditions = Object.keys(nullParams).map((key) => {
@@ -32,7 +41,7 @@ export function buildConditions(params: any, tableName?: string) {
   });
 
   return {
-    where: nonNullconditions.concat(nullConditions).flat().join(' AND '),
-    values: Object.values(nonNullParams),
+    where: presentConditions.concat(notNullConditions, nullConditions).flat().join(' AND '),
+    values: Object.values(presentParams),
   };
 }

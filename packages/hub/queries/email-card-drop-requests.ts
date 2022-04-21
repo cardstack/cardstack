@@ -5,6 +5,7 @@ import { buildConditions } from '../utils/queries';
 
 interface EmailCardDropRequestsQueriesFilter {
   ownerAddress: string;
+  claimedAt?: Date | string;
 }
 
 export default class EmailCardDropRequestsQueries {

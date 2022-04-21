@@ -6,6 +6,7 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
 import crypto from 'crypto';
+import { NOT_NULL } from '../utils/queries';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -74,6 +75,27 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
+    ctx.type = 'application/vnd.api+json';
+
+    let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
+      ownerAddress: ctx.state.userAddress,
+      claimedAt: NOT_NULL,
+    });
+
+    if (claimedWithUserAddress.length > 0) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Address has already claimed a prepaid card',
+          },
+        ],
+      };
+
+      return;
+    }
+
     let email = ctx.request.body.data.attributes.email;
 
     let hash = crypto.createHash('sha256');
@@ -124,8 +146,6 @@ export default class EmailCardDropRequestsRoute {
         ],
       };
     }
-
-    ctx.type = 'application/vnd.api+json';
   }
 }
 
