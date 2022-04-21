@@ -147,6 +147,7 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
+    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
 
     let hash = crypto.createHash('sha256');
     hash.update(email);

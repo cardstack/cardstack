@@ -78,12 +78,14 @@ export default class EmailCardDropRequestsRoute {
     hash.update(email);
     let emailHash = hash.digest('hex');
 
+    let verificationCode = (crypto.randomInt(999999) + '').padStart(6, '0');
+
     if (isEmail(email)) {
       const emailCardDropRequest: EmailCardDropRequest = {
         id: shortUuid.uuid(),
         ownerAddress: ctx.state.userAddress,
         emailHash,
-        verificationCode: 'FIXME',
+        verificationCode,
         requestedAt: new Date(this.clock.now()),
       };
 
