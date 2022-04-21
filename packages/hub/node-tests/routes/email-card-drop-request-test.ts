@@ -104,21 +104,7 @@ describe('GET /api/email-card-drop-requests', function () {
   });
 });
 
-const stubNonce = 'abc:123';
-let stubAuthToken = 'def--456';
-let stubTimestamp = process.hrtime.bigint();
-
 class StubAuthenticationUtils {
-  generateNonce() {
-    return stubNonce;
-  }
-  buildAuthToken() {
-    return stubAuthToken;
-  }
-  extractVerifiedTimestamp(_nonce: string) {
-    return stubTimestamp;
-  }
-
   validateAuthToken(encryptedAuthToken: string) {
     return handleValidateAuthToken(encryptedAuthToken);
   }
