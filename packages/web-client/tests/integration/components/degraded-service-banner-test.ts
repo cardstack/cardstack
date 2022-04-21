@@ -43,8 +43,8 @@ module('Integration | Component | degraded-service-banner', function (hooks) {
               name: 'Name',
               impact: 'critical',
               incident_updates: [
-                { body: 'An old error' },
                 { body: 'All systems down.' },
+                { body: 'An old error' },
               ],
             },
           ],
