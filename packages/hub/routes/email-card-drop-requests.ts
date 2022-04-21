@@ -28,6 +28,21 @@ export default class EmailCardDropRequestsRoute {
     let timestamp = new Date(this.clock.now());
     let ownerAddress = ctx.request.query['eoa'] as string;
 
+    if (!ownerAddress) {
+      ctx.status = 400;
+      ctx.body = {
+        errors: [
+          {
+            code: '400',
+            title: 'Missing required parameter: eoa',
+            detail: 'Please provide an ethereum address via the eoa query parameter',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let previousRequests = await this.emailCardDropRequestQueries.query({
       ownerAddress,
     });

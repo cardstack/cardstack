@@ -83,4 +83,22 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.attributes.claimed).to.equal(false);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
+
+  it('errors if the EOA query parameter is not provided', async function () {
+    let response = await request()
+      .get(`/api/email-card-drop-requests`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(400);
+    expect(response.body).to.deep.equal({
+      errors: [
+        {
+          code: '400',
+          title: 'Missing required parameter: eoa',
+          detail: 'Please provide an ethereum address via the eoa query parameter',
+        },
+      ],
+    });
+  });
 });
