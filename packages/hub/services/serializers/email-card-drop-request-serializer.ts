@@ -18,7 +18,7 @@ export default class EmailCardDropRequestSerializer {
           timestamp: model.timestamp.toISOString(),
         },
       },
-    } as JSONAPIDocument;
+    };
   }
 }
 
