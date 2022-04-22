@@ -9,6 +9,8 @@ export default class EmailCardDropVerifyRoute {
     as: 'emailCardDropRequestSerializer',
   });
 
+  workerClient = inject('worker-client', { as: 'workerClient' });
+
   constructor() {
     autoBind(this);
   }
@@ -30,6 +32,10 @@ export default class EmailCardDropVerifyRoute {
       ctx.body = 'You have already claimed a card drop';
     } else {
       await this.emailCardDropRequestQueries.claim(emailCardDropRequest);
+
+      await this.workerClient.addJob('drop-card', {
+        id: emailCardDropRequest.id,
+      });
 
       ctx.status = 200;
       ctx.body = 'You have verified your card drop request';

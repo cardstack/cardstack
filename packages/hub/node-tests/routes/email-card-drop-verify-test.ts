@@ -42,7 +42,12 @@ describe('GET /email-card-drop/verify', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('accepts a valid verification and marks it claimed', async function () {
+  this.afterEach(async function () {
+    jobIdentifiers = [];
+    jobPayloads = [];
+  });
+
+  it('accepts a valid verification, marks it claimed, and triggers a job to drop a card', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}`
     );
@@ -57,6 +62,13 @@ describe('GET /email-card-drop/verify', function () {
     )[0];
 
     expect(newlyClaimed.claimedAt).to.exist;
+
+    expect(jobIdentifiers).to.deep.equal(['drop-card']);
+    expect(jobPayloads).to.deep.equal([
+      {
+        id: unclaimedEoa.id,
+      },
+    ]);
   });
 
   it('rejects a verification that has been used', async function () {
@@ -66,5 +78,8 @@ describe('GET /email-card-drop/verify', function () {
 
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('You have already claimed a card drop');
+
+    expect(jobIdentifiers).to.be.empty;
+    expect(jobPayloads).to.be.empty;
   });
 });

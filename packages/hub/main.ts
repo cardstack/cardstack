@@ -93,6 +93,7 @@ import EmailCardDropRouter from './services/email-card-drop-router';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
+import DropCardTask from './tasks/drop-card';
 import SubscribeEmailTask from './tasks/subscribe-email';
 
 //@ts-ignore polyfilling fetch
@@ -135,6 +136,7 @@ export function createRegistry(): Registry {
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
   registry.register('subscribe-email', SubscribeEmailTask);
+  registry.register('drop-card', DropCardTask);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
