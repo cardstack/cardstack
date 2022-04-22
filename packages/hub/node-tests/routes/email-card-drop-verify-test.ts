@@ -1,6 +1,7 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { registry, setupHub } from '../helpers/server';
 import { Job, TaskSpec } from 'graphile-worker';
+import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -29,7 +30,7 @@ class StubWorkerClient {
   }
 }
 
-let emailCardDropRequestsQueries;
+let emailCardDropRequestsQueries: EmailCardDropRequestsQueries;
 
 describe('GET /email-card-drop/verify', function () {
   let { request, getContainer } = setupHub(this);
@@ -41,13 +42,21 @@ describe('GET /email-card-drop/verify', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('accepts a valid verification', async function () {
+  it('accepts a valid verification and marks it claimed', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}`
     );
 
     expect(response.status).to.equal(200);
     expect(response.text).to.equal('You have verified your card drop request');
+
+    let newlyClaimed = (
+      await emailCardDropRequestsQueries!.query({
+        id: unclaimedEoa.id,
+      })
+    )[0];
+
+    expect(newlyClaimed.claimedAt).to.exist;
   });
 
   it('rejects a verification that has been used', async function () {

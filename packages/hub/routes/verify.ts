@@ -29,6 +29,8 @@ export default class EmailCardDropVerifyRoute {
       ctx.status = 400;
       ctx.body = 'You have already claimed a card drop';
     } else {
+      await this.emailCardDropRequestQueries.claim(emailCardDropRequest);
+
       ctx.status = 200;
       ctx.body = 'You have verified your card drop request';
     }
