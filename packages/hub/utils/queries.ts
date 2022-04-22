@@ -1,6 +1,6 @@
 import { pickBy } from 'lodash';
 
-export const NOT_NULL = '!NOT NULL!';
+export const NOT_NULL = Symbol.for('NOT_NULL');
 
 const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
@@ -14,7 +14,7 @@ export function buildConditions(params: any, tableName?: string) {
   // Only allow nulls, strings and numbers in the params
   let filteredParams = Object.fromEntries(
     Object.entries(params).filter(
-      ([_key, value]) => value == null || typeof value === 'number' || typeof value === 'string'
+      ([_key, value]) => value == null || typeof value === 'number' || typeof value === 'string' || value === NOT_NULL
     )
   );
 
