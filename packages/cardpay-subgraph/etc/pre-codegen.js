@@ -3,7 +3,7 @@
 
 const { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync, ensureDirSync } = require('fs-extra');
 const { join, resolve } = require('path');
-const fetch = require('sync-fetch')
+const fetch = require('sync-fetch');
 const { addFilePreamble } = require('./pre-tsc-build');
 
 // This file runs before tsc compiles the rest of the mono repo so we need to
@@ -70,7 +70,7 @@ graft:
   block: ${latestBlock} # Block number
 `;
   }
-};
+}
 
 let cardpayGenesisBlock = {
   sokol: 21403252,
