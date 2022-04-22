@@ -5,7 +5,9 @@ import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
+import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
+import { NOT_NULL } from '../utils/queries';
 
 export interface EmailCardDropRequest {
   id: string;
@@ -74,44 +76,31 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let email = ctx.request.body.data.attributes.email;
+    ctx.type = 'application/vnd.api+json';
 
-    let hash = crypto.createHash('sha256');
-    hash.update(email);
-    let emailHash = hash.digest('hex');
+    let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
+      ownerAddress: ctx.state.userAddress,
+      claimedAt: NOT_NULL,
+    });
 
-    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
-
-    if (isEmail(email)) {
-      const emailCardDropRequest: EmailCardDropRequest = {
-        id: shortUuid.uuid(),
-        ownerAddress: ctx.state.userAddress,
-        emailHash,
-        verificationCode,
-        requestedAt: new Date(this.clock.now()),
+    if (claimedWithUserAddress.length > 0) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Address has already claimed a prepaid card',
+          },
+        ],
       };
 
-      let db = await this.databaseManager.getClient();
+      return;
+    }
 
-      await this.databaseManager.performTransaction(db, async () => {
-        await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
-      });
+    let email = ctx.request.body.data.attributes.email;
+    let normalizedEmail = normalizeEmail(email);
 
-      await this.workerClient.addJob('send-email-card-drop-verification', {
-        id: emailCardDropRequest.id,
-        email,
-      });
-
-      await this.workerClient.addJob('subscribe-email', {
-        id: emailCardDropRequest.id,
-        email,
-      });
-
-      let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
-
-      ctx.status = 201;
-      ctx.body = serialized;
-    } else {
+    if (!isEmail(email) || !normalizedEmail) {
       ctx.status = 422;
       ctx.body = {
         errors: [
@@ -123,9 +112,64 @@ export default class EmailCardDropRequestsRoute {
           },
         ],
       };
+
+      return;
     }
 
-    ctx.type = 'application/vnd.api+json';
+    let hash = crypto.createHash('sha256');
+    hash.update(normalizedEmail);
+    let normalizedEmailHash = hash.digest('hex');
+
+    let claimedWithUserEmail = await this.emailCardDropRequestQueries.query({
+      emailHash: normalizedEmailHash,
+      claimedAt: NOT_NULL,
+    });
+
+    if (claimedWithUserEmail.length > 0) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Email has already claimed a prepaid card',
+            pointer: '/data/attributes/email',
+          },
+        ],
+      };
+
+      return;
+    }
+
+    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
+
+    const emailCardDropRequest: EmailCardDropRequest = {
+      id: shortUuid.uuid(),
+      ownerAddress: ctx.state.userAddress,
+      emailHash: normalizedEmailHash,
+      verificationCode,
+      requestedAt: new Date(this.clock.now()),
+    };
+
+    let db = await this.databaseManager.getClient();
+
+    await this.databaseManager.performTransaction(db, async () => {
+      await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+    });
+
+    await this.workerClient.addJob('send-email-card-drop-verification', {
+      id: emailCardDropRequest.id,
+      email,
+    });
+
+    await this.workerClient.addJob('subscribe-email', {
+      id: emailCardDropRequest.id,
+      email,
+    });
+
+    let serialized = this.emailCardDropRequestSerializer.serialize(emailCardDropRequest);
+
+    ctx.status = 201;
+    ctx.body = serialized;
   }
 }
 
