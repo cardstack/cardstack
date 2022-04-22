@@ -17,7 +17,7 @@ export default class EmailCardDropRequestSerializer {
           'owner-address': model.ownerAddress,
         },
       },
-    } as JSONAPIDocument;
+    };
   }
 
   serializeEmailCardDropRequestStatus(model: EmailCardDropRequestClaimStatus): JSONAPIDocument {
