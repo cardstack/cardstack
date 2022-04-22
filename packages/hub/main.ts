@@ -91,6 +91,8 @@ import { registerServices } from '@cardstack/hub/services';
 import { registerQueries } from './queries';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
+import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
+import SubscribeEmailTask from './tasks/subscribe-email';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -130,6 +132,8 @@ export function createRegistry(): Registry {
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
+  registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
+  registry.register('subscribe-email', SubscribeEmailTask);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
