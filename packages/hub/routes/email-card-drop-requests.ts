@@ -5,6 +5,7 @@ import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
+import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
 import { NOT_NULL } from '../utils/queries';
 
@@ -97,13 +98,30 @@ export default class EmailCardDropRequestsRoute {
     }
 
     let email = ctx.request.body.data.attributes.email;
+    let normalizedEmail = normalizeEmail(email);
+
+    if (!isEmail(email) || !normalizedEmail) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            detail: 'Email address is not valid',
+            source: { pointer: '/data/attributes/email' },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      };
+
+      return;
+    }
 
     let hash = crypto.createHash('sha256');
-    hash.update(email);
-    let emailHash = hash.digest('hex');
+    hash.update(normalizedEmail);
+    let normalizedEmailHash = hash.digest('hex');
 
     let claimedWithUserEmail = await this.emailCardDropRequestQueries.query({
-      emailHash,
+      emailHash: normalizedEmailHash,
       claimedAt: NOT_NULL,
     });
 
@@ -122,28 +140,12 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    if (!isEmail(email)) {
-      ctx.status = 422;
-      ctx.body = {
-        errors: [
-          {
-            detail: 'Email address is not valid',
-            source: { pointer: '/data/attributes/email' },
-            status: '422',
-            title: 'Invalid attribute',
-          },
-        ],
-      };
-
-      return;
-    }
-
     let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
 
     const emailCardDropRequest: EmailCardDropRequest = {
       id: shortUuid.uuid(),
       ownerAddress: ctx.state.userAddress,
-      emailHash,
+      emailHash: normalizedEmailHash,
       verificationCode,
       requestedAt: new Date(this.clock.now()),
     };

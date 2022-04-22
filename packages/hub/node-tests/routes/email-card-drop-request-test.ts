@@ -274,7 +274,7 @@ describe('POST /api/email-card-drop-requests', function () {
   it('rejects when the email has already claimed', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
 
-    let email = 'valid@example.com';
+    let email = 'example@gmail.com';
 
     let hash = crypto.createHash('sha256');
     hash.update(email);
@@ -293,7 +293,7 @@ describe('POST /api/email-card-drop-requests', function () {
       data: {
         type: 'email-card-drop-requests',
         attributes: {
-          email,
+          email: email.replace('@', '+subaddress@'),
         },
       },
     };
