@@ -4,27 +4,20 @@ import { Safe, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress, makeAccount } from '../utils';
 import { Address, ethereum, log } from '@graphprotocol/graph-ts';
 
-// The following bad safe(s) are the confluence of this Gnosis issue:
-// https://ethereum.stackexchange.com/questions/126648/call-reverts-when-asking-a-safe-for-its-owners-gnosis-chain
-// and this graph protocol issue:
-// https://github.com/graphprotocol/graph-node/issues/3487
-let badSafes = new Map<string, boolean>();
-badSafes.set('0x3af12EcC0A8Ef31cc935E0B25ea445249207d21A', true);
-
 export function processGnosisProxyEvent(proxyAddress: Address, event: ethereum.Event, gnosisVer: string): void {
   let safeAddress = toChecksumAddress(proxyAddress);
-  if (badSafes.has(safeAddress)) {
-    log.error('Detected un-indexable safe address {}', [safeAddress]);
-    return;
-  }
-
   let safeEntity = new Safe(safeAddress);
   safeEntity.createdAt = event.block.timestamp;
 
   let safe = GnosisSafe.bind(proxyAddress);
+  let threshold = safe.try_getThreshold();
+  if (threshold.reverted || threshold.value.toI32() == 0) {
+    log.warning('Detected uninitialized safe: {}', [safeAddress]);
+    return;
+  }
   let ownersResult = safe.try_getOwners();
   if (ownersResult.reverted) {
-    log.error('Failed to get owners for safe {}', [safeAddress]);
+    log.warning('Failed to get owners for safe {}', [safeAddress]);
     return;
   }
   let owners = safe.getOwners();
