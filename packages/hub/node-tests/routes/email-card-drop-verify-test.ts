@@ -41,12 +41,21 @@ describe('GET /email-card-drop/verify', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('responds', async function () {
+  it('accepts a valid verification', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}`
     );
 
     expect(response.status).to.equal(200);
     expect(response.text).to.equal('You have verified your card drop request');
+  });
+
+  it('rejects a verification that has been used', async function () {
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}`
+    );
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('You have already claimed a card drop');
   });
 });

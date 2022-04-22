@@ -7,6 +7,7 @@ interface EmailCardDropRequestsQueriesFilter {
   claimedAt?: Date | Symbol;
   emailHash?: string;
   ownerAddress?: string;
+  verificationCode?: string;
 }
 
 export default class EmailCardDropRequestsQueries {

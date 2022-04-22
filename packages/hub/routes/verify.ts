@@ -14,8 +14,25 @@ export default class EmailCardDropVerifyRoute {
   }
 
   async get(ctx: Koa.Context) {
-    ctx.status = 200;
-    ctx.body = 'You have verified your card drop request';
+    // FIXME these typings!
+    let ownerAddress = ctx.request.query.eoa as string;
+    let verificationCode = ctx.request.query['verification-code'] as string;
+
+    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
+      ownerAddress,
+      verificationCode,
+    });
+
+    let emailCardDropRequest = emailCardDropRequests[0];
+
+    if (emailCardDropRequest.claimedAt) {
+      ctx.status = 400;
+      ctx.body = 'You have already claimed a card drop';
+    } else {
+      ctx.status = 200;
+      ctx.body = 'You have verified your card drop request';
+    }
+
     return;
   }
 }
