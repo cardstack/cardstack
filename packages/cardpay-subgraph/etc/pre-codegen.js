@@ -3,6 +3,7 @@
 
 const { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync, ensureDirSync } = require('fs-extra');
 const { join, resolve } = require('path');
+const fetch = require('sync-fetch')
 const { addFilePreamble } = require('./pre-tsc-build');
 
 // This file runs before tsc compiles the rest of the mono repo so we need to
@@ -22,6 +23,54 @@ if (!network) {
   process.exit(1);
 }
 let cleanNetwork = network.replace('poa-', '');
+
+
+// If there is a graphql endpoing provided
+// take the latest deployed subgraph from it
+// and use it as a base for grafting
+const existing_subgraph = process.argv.slice(3)[0];
+
+let graftingSection = "";
+if (existing_subgraph) {
+  console.log('Generating config to graft onto the latest deployment in subgraph:', existing_subgraph);
+  let response = fetch(existing_subgraph, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+      {
+        _meta {
+          deployment
+          block {
+            number
+          }
+        }
+      }`,
+      variables: {},
+    }),
+  });
+  let meta = response.json().data?._meta;
+  let latestDeployment = meta?.deployment;
+  let latestBlock = meta?.block?.number;
+  if (!latestDeployment || !latestBlock) {
+    console.error('Could not find latest deployment in subgraph');
+    process.exit(1);
+  } else {
+    console.log('Latest deployment:', latestDeployment);
+    console.log('Latest block:', latestBlock);
+    graftingSection = `
+features:
+  - grafting
+
+graft:
+  base: ${latestDeployment} # Subgraph ID of base subgraph
+  block: ${latestBlock} # Block number
+`;
+  }
+};
 
 let cardpayGenesisBlock = {
   sokol: 21403252,
@@ -140,7 +189,8 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{REWARD_POOL_ADDRESS}/g, getAddress('rewardPool', cleanNetwork))
   .replace(/{REWARD_MANAGER_ADDRESS}/g, getAddress('rewardManager', cleanNetwork))
   .replace(/{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}/g, getAddress('registerRewardProgramHandler', cleanNetwork))
-  .replace(/{REGISTER_REWARDEE_HANDLER_ADDRESS}/g, getAddress('registerRewardeeHandler', cleanNetwork));
+  .replace(/{REGISTER_REWARDEE_HANDLER_ADDRESS}/g, getAddress('registerRewardeeHandler', cleanNetwork))
+  .replace(/{GRAFTING}/g, graftingSection);
 
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
