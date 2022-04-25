@@ -1,6 +1,6 @@
 import { https } from 'firebase-functions';
 
-const MIN_VERSION = '1.0.11';
+const MIN_VERSION = '1.1.0';
 
 exports.minimumVersion = https.onRequest(async (_, res) => {
   res.status(200).send(JSON.stringify({ minVersion: MIN_VERSION }));
