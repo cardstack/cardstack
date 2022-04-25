@@ -54,6 +54,7 @@ export class HubWorker {
   async boot() {
     let runner = await runWorkers({
       logger: new Logger(workerLogFactory),
+      concurrency: 10,
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
