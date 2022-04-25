@@ -176,6 +176,7 @@ app "hub-event-listener" {
           count = 1
           subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
           task_role_name = "hub-ecr-task"
+          execution_role_name = "hub-ecr-task-executor-role"
           disable_alb = true
             secrets = {
                 LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_https_url-p9kYAu"
