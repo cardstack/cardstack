@@ -52,6 +52,14 @@ export default class PushNotificationRegistrationQueries {
     );
   }
 
+  async disable(pushClientId: string) {
+    let db = await this.databaseManager.getClient();
+
+    await db.query('UPDATE push_notification_registrations SET disabled_at = now() WHERE push_client_id = $1', [
+      pushClientId,
+    ]);
+  }
+
   async delete(model: PushNotificationRegistration) {
     let db = await this.databaseManager.getClient();
 
