@@ -3,12 +3,11 @@ import Koa from 'koa';
 import { route } from '@cardstack/hub/routes';
 
 export default class EmailCardDropRouter {
-  // FIXME this filename is too brief… had trouble with DI though
-  verify = route('verify');
+  emailCardDropVerify = route('email-card-drop-verify', { as: 'emailCardDropVerify' });
 
   routes() {
     let emailCardDropSubrouter = new Router();
-    emailCardDropSubrouter.get('/verify', this.verify.get);
+    emailCardDropSubrouter.get('/verify', this.emailCardDropVerify.get);
     emailCardDropSubrouter.all('/(.*)', notFound);
 
     let emailCardDropRouter = new Router();

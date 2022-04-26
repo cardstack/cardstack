@@ -47,6 +47,6 @@ export default class EmailCardDropVerifyRoute {
 
 declare module '@cardstack/hub/routes' {
   interface KnownRoutes {
-    verify: EmailCardDropVerifyRoute;
+    'email-card-drop-verify': EmailCardDropVerifyRoute;
   }
 }
