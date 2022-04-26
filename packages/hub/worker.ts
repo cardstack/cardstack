@@ -13,7 +13,9 @@ import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import SendEmailCardDropVerification from './tasks/send-email-card-drop-verification';
 import SendNotificationsTask from './tasks/send-notifications';
+import SubscribeEmail from './tasks/subscribe-email';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import WyreTransferTask from './tasks/wyre-transfer';
 import PrintQueuedJobsTask from './tasks/print-queued-jobs';
@@ -54,10 +56,13 @@ export class HubWorker {
   async boot() {
     let runner = await runWorkers({
       logger: new Logger(workerLogFactory),
+      concurrency: 10,
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
+        'send-email-card-drop-verification': this.instantiateTask(SendEmailCardDropVerification),
         'send-notifications': this.instantiateTask(SendNotificationsTask),
+        'subscribe-email': this.instantiateTask(SubscribeEmail),
         'notify-merchant-claim': this.instantiateTask(NotifyMerchantClaimTask),
         'notify-customer-payment': this.instantiateTask(NotifyCustomerPaymentTask),
         'persist-off-chain-prepaid-card-customization': this.instantiateTask(

@@ -31,5 +31,8 @@
     "firebase-functions-test": "^0.2.0",
     "typescript": "4.2.3"
   },
-  "private": true
+  "private": true,
+  "volta": {
+    "extends": "../../../../package.json"
+  }
 }

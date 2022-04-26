@@ -21,6 +21,9 @@ export interface PushNotificationsIdentifiers {
 }
 
 export default class SendNotificationsTask {
+  pushNotificationRegistrationQueries = query('push-notification-registration', {
+    as: 'pushNotificationRegistrationQueries',
+  });
   sentPushNotificationsQueries = query('sent-push-notifications', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
@@ -61,7 +64,17 @@ export default class SendNotificationsTask {
         token: payload.pushClientId,
       });
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
-    } catch (e) {
+    } catch (e: any) {
+      if (e.errorInfo?.code === 'messaging/registration-token-not-registered') {
+        await this.pushNotificationRegistrationQueries.disable(payload.pushClientId);
+
+        helpers.logger.info(
+          `Disabled push notification registration for ${payload.pushClientId} because Firebase rejected notification ${payload.notificationId}`
+        );
+
+        return;
+      }
+
       Sentry.captureException(e, {
         tags: {
           action: 'send-notifications',
