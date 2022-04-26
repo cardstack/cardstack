@@ -85,4 +85,14 @@ describe('GET /email-card-drop/verify', function () {
     expect(jobIdentifiers).to.be.empty;
     expect(jobPayloads).to.be.empty;
   });
+
+  it('rejects an unknown verification', async function () {
+    let response = await request().get(`/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha`);
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Code is invalid');
+
+    expect(jobIdentifiers).to.be.empty;
+    expect(jobPayloads).to.be.empty;
+  });
 });

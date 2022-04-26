@@ -27,7 +27,10 @@ export default class EmailCardDropVerifyRoute {
 
     let emailCardDropRequest = emailCardDropRequests[0];
 
-    if (emailCardDropRequest.claimedAt) {
+    if (!emailCardDropRequest) {
+      ctx.status = 400;
+      ctx.body = 'Code is invalid';
+    } else if (emailCardDropRequest.claimedAt) {
       ctx.status = 400;
       ctx.body = 'You have already claimed a card drop';
     } else {
