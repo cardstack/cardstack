@@ -95,4 +95,14 @@ describe('GET /email-card-drop/verify', function () {
     expect(jobIdentifiers).to.be.empty;
     expect(jobPayloads).to.be.empty;
   });
+
+  it('errors if the eoa query parameter is not provided', async function () {
+    let response = await request().get(`/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}`);
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('eoa is required');
+
+    expect(jobIdentifiers).to.be.empty;
+    expect(jobPayloads).to.be.empty;
+  });
 });

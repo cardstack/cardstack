@@ -16,6 +16,12 @@ export default class EmailCardDropVerifyRoute {
   }
 
   async get(ctx: Koa.Context) {
+    if (!ctx.request.query.eoa) {
+      ctx.status = 400;
+      ctx.body = 'eoa is required';
+      return;
+    }
+
     // FIXME these typings!
     let ownerAddress = ctx.request.query.eoa as string;
     let verificationCode = ctx.request.query['verification-code'] as string;
