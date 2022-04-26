@@ -22,9 +22,8 @@ export default class EmailCardDropVerifyRoute {
       return;
     }
 
-    // FIXME these typings!
     let ownerAddress = ctx.request.query.eoa as string;
-    let verificationCode = ctx.request.query['verification-code'] as string;
+    let verificationCode = (ctx.request.query['verification-code'] as string) || '';
 
     let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
       ownerAddress,
