@@ -33,10 +33,13 @@ class StubWorkerClient {
 let emailCardDropRequestsQueries: EmailCardDropRequestsQueries;
 
 describe('GET /email-card-drop/verify', function () {
+  this.beforeEach(async function () {
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+
   let { request, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    registry(this).register('worker-client', StubWorkerClient);
     emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     await emailCardDropRequestsQueries.insert(claimedEoa);
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
