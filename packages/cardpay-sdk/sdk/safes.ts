@@ -15,6 +15,7 @@ import BN from 'bn.js';
 import { query } from './utils/graphql';
 import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 import { TransactionOptions, waitForTransactionConsistency, isTransactionHash } from './utils/general-utils';
+import { Signer } from 'ethers';
 const { fromWei } = Web3.utils;
 
 export interface ISafes {
@@ -214,7 +215,7 @@ export async function viewSafe(network: 'xdai' | 'sokol', safeAddress: string): 
 }
 
 export default class Safes implements ISafes {
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async viewSafe(safeAddress: string): Promise<ViewSafeResult> {
     let {
@@ -426,7 +427,7 @@ export default class Safes implements ISafes {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from, this.layer2Signer)
     );
 
     let txnHash = result.ethereumTx.txHash;

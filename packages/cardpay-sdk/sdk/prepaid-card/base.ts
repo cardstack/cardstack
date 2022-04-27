@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
+import { Signer } from 'ethers';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
@@ -41,7 +42,7 @@ export const MAX_PREPAID_CARD_AMOUNT = 10;
 
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async priceForFaceValue(tokenAddress: string, spendFaceValue: number): Promise<string> {
     return await (await this.getPrepaidCardMgr()).methods
@@ -146,7 +147,7 @@ export default class PrepaidCard {
         spendAmount,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -223,7 +224,8 @@ export default class PrepaidCard {
       ZERO_ADDRESS,
       transferNonce,
       from,
-      prepaidCardAddress
+      prepaidCardAddress,
+      this.layer2Signer
     );
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
@@ -239,7 +241,7 @@ export default class PrepaidCard {
         previousOwnerSignature,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -355,7 +357,7 @@ export default class PrepaidCard {
         faceValues,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce,
         customizationDID
       );
@@ -506,7 +508,7 @@ export default class PrepaidCard {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from, this.layer2Signer)
     );
 
     if (typeof onTxnHash === 'function') {
