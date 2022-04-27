@@ -458,9 +458,9 @@
         "0x22d0ea6Ba8842Ae1355F842a9fAc32F035F18Ca6", // Hassan's prepaid card --feel free to use your own
         "50",
         "--network",
-        "sokol",
-        "--ethersMnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
       ]
     },
     {
