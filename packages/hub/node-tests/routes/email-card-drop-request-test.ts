@@ -24,6 +24,9 @@ let unclaimedEoa: EmailCardDropRequest = {
 
 let fakeTime = 1650440847689;
 let fakeTimeString = new Date(fakeTime).toISOString();
+
+const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
+
 describe('GET /api/email-card-drop-requests', function () {
   let { request, getContainer } = setupHub(this);
 
@@ -127,8 +130,6 @@ class StubWorkerClient {
     return Promise.resolve({} as Job);
   }
 }
-
-const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
 
 describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
