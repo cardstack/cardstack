@@ -39,7 +39,7 @@ export default class EmailCardDropVerifyRoute {
       return;
     }
 
-    // If they UPDATE didn’t update anything, find out why
+    // If the claim query doesn’t return a record, there no matching record, now determine why
 
     let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
       ownerAddress,
