@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
+import config from 'config';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
@@ -117,7 +118,7 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('authSecret'));
     hash.update(normalizedEmail);
     let normalizedEmailHash = hash.digest('hex');
 

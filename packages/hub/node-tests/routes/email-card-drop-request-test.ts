@@ -3,6 +3,7 @@ import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
+import config from 'config';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -173,7 +174,7 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('authSecret'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -191,7 +192,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'valid@example.com';
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('authSecret'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -325,7 +326,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'example@gmail.com';
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('authSecret'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
