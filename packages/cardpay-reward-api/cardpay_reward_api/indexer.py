@@ -3,7 +3,6 @@ import json
 import re
 from datetime import datetime
 
-import boto3
 import eth_abi
 import pyarrow.parquet as pq
 import requests
@@ -15,11 +14,6 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from . import crud, database, models, schemas
-
-s3 = boto3.client("s3")
-
-# rewardProgramID=0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07/paymentCycle=25650728/results.parquet
-uri = AnyPath("s3://tally-staging-reward-programs")
 
 
 class Indexer:
