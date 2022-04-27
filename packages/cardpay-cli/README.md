@@ -28,6 +28,8 @@ cd cardstack
 yarn
 cd packages/cardpay-sdk
 yarn prepack
+cd ../wc-provider
+yarn prepack
 cd ../cardpay-cli
 ```
 
