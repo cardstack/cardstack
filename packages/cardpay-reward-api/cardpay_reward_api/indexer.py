@@ -60,10 +60,10 @@ class Indexer:
     def add_root_and_proofs(self, db: Session, root, payment_list):
         print(f"Indexing {len(payment_list)} proofs for root {root['id']}")
         root = models.Root(
-            root_hash=root["id"],
-            reward_program_id=root["rewardProgram"]["id"],
-            payment_cycle=root["paymentCycle"],
-            block_number=root["blockNumber"],
+            rootHash=root["id"],
+            rewardProgramId=root["rewardProgram"]["id"],
+            paymentCycle=root["paymentCycle"],
+            blockNumber=root["blockNumber"],
             timestamp=datetime.fromtimestamp(int(root["timestamp"])),
         )
         db.add(root)
@@ -71,13 +71,16 @@ class Indexer:
         for payment in payment_list:
             token, amount = self.decode_payment(payment)
             i = models.Proof(
-                reward_program_id=payment["rewardProgramID"],
-                root_hash=payment["root"],
-                leaf=payment["leaf"],
-                payment_cycle=payment["paymentCycle"],
+                rootHash=payment["root"],
+                paymentCycle=payment["paymentCycle"],
+                tokenAddress=token,
                 payee=payment["payee"],
-                token=token,
-                proof_array=payment["proof"],
+                proofArray=payment["proof"],
+                rewardProgramId=payment["rewardProgramID"],
+                amount=amount,
+                leaf=payment["leaf"],
+                validFrom=payment["validFrom"],
+                validTo=payment["validTo"],
             )
             proofs.append(i)
         db.bulk_save_objects(proofs)
@@ -92,11 +95,11 @@ class Indexer:
     def get_last_indexed_root_block_number(self, db: Session, reward_program_id: str):
         o = (
             db.query(models.Root)
-            .filter(models.Root.reward_program_id == reward_program_id)
-            .order_by(models.Root.block_number.desc())
+            .filter(models.Root.rewardProgramId == reward_program_id)
+            .order_by(models.Root.blockNumber.desc())
             .first()
         )
-        return o.block_number if o is not None else 0
+        return o.blockNumber if o is not None else 0
 
     def get_merkle_roots(self, reward_program_id: str, block_number: int):
         query = """

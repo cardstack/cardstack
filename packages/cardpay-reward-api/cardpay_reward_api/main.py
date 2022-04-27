@@ -46,18 +46,16 @@ def param(skip: int = 0, limit: int = 100):
 @app.get("/about/")
 async def about():
     return {
-        "cardpay_version": "v0.8.5",
         "evm_full_node_url": EVM_FULL_NODE_URL,
-        "subgraph_url": "",
+        "subgraph_url": SUBGRAPH_URL,
+        "rewards_bucket": REWARDS_BUCKET,
     }
 
 
 @app.get("/merkle-proofs/{payee}", response_model=List[schemas.Proof])
 def read_proofs(
+    db: Session = Depends(get_db),
     proof_filter: dict = Depends(schemas.ProofFilter),
     param: dict = Depends(param),
-    db: Session = Depends(get_db),
 ):
-    print(db)
-    proofs = crud.get_proofs(proof_filter=proof_filter, param=param)
-    return proofs
+    return crud.get_proofs(db, proof_filter=proof_filter, param=param)

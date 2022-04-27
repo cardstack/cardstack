@@ -5,23 +5,23 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class ProofPart(BaseModel):
-    item: str
-
-
 class Proof(BaseModel):
-    rewardProgramID: str
-    root: str
+    rootHash: str
     paymentCycle: int
+    tokenAddress: str
+    payee: str
+    proofArray: List[str]
+    rewardProgramId: str
+    amount: str
+    leaf: str
     validFrom: int
     validTo: int
-    tokenType: int
-    payee: str
-    leaf: str
-    proof: List[ProofPart]
+
+    class Config:
+        orm_mode = True
 
 
 class ProofFilter(BaseModel):
-    rewardProgramID: Optional[str]
+    rewardProgramId: Optional[str]
     token: Optional[str]
     payee: str

@@ -11,20 +11,23 @@ from .database import Base
 class Proof(Base):
     __tablename__ = "proofs"
     id = Column(Integer, primary_key=True, index=True)
-    reward_program_id = Column(String)
-    root_hash = Column(String)
-    leaf = Column(String, unique=True)
-    payment_cycle = Column(Integer)
+    rootHash = Column(String)
+    paymentCycle = Column(Integer)
+    tokenAddress = Column(String)
     payee = Column(String)
-    token = Column(String)
-    proof_array = Column(MutableList.as_mutable(PickleType), default=[])
+    proofArray = Column(MutableList.as_mutable(PickleType), default=[])
+    rewardProgramId = Column(String)
+    amount = Column(String)
+    leaf = Column(String, unique=True)
+    validFrom = Column(Integer)
+    validTo = Column(Integer)
 
 
 class Root(Base):
     __tablename__ = "roots"
     id = Column(Integer, primary_key=True, index=True)
-    reward_program_id = Column(String)
-    root_hash = Column(String, unique=True)
-    payment_cycle = Column(Integer)
-    block_number = Column(Integer)
+    rewardProgramId = Column(String)
+    rootHash = Column(String, unique=True)
+    paymentCycle = Column(Integer)
+    blockNumber = Column(Integer)
     timestamp = Column(Time)
