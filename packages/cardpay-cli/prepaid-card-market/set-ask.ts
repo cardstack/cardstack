@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
@@ -33,9 +33,9 @@ export default {
       sku: string;
       askPrice: number;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let blockExplorer = await getConstant('blockExplorer', web3);
-    let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+    let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3, signer);
     let assets = await getSDK('Assets', web3);
     let skuInfo = await prepaidCardMarket.getSKUInfo(sku);
     if (!skuInfo) {

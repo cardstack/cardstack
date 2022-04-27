@@ -25,18 +25,30 @@ export function buildYargs(args: string[]) {
         type: 'string',
         description: 'Phrase for mnemonic wallet',
       },
+      ethersMnemonic: {
+        alias: 'e',
+        default: process.env.MNEMONIC_PHRASE,
+        type: 'string',
+        description: 'Phrase for mnemonic wallet using ethers.js signer',
+      },
     })
     .check((argv) => {
       if (process.env.BUILDING_README) {
         return true;
       }
-      if (!argv.mnemonic && !argv.walletConnect && !argv.trezor) {
+      if (!argv.mnemonic && !argv.ethersMnemonic && !argv.walletConnect && !argv.trezor) {
         return 'Wallet is not specified. Either specify that wallet connect or trezor should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var';
       }
       if (argv.trezor) {
         argv.connectionType = 'trezor';
         argv.walletConnect = undefined;
         argv.mnemonic = undefined;
+        return true;
+      }
+      if (argv.ethersMnemonic) {
+        argv.connectionType = 'ethers-mnemonic';
+        argv.walletConnect = undefined;
+        argv.trezor = undefined;
         return true;
       }
       if (argv.mnemonic) {

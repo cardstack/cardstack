@@ -454,13 +454,13 @@
         "index.ts",
         "prepaid-card",
         "pay-merchant",
-        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x70fdd952d8b4DC0E3E91d2e7392bdb600d637b40", // Hassan's prepaid card --feel free to use your own
-        "100",
+        "0x08a4F4fB9938940FA49A4F7dC43B2fb2cd5B3b87", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x22d0ea6Ba8842Ae1355F842a9fAc32F035F18Ca6", // Hassan's prepaid card --feel free to use your own
+        "50",
         "--network",
-        "${config:cardCli.network.l2.name}",
-        "--mnemonic",
-        "${config:cardCli.mnemonic}"
+        "sokol",
+        "--ethersMnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {

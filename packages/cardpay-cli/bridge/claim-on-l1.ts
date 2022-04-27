@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_1, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_1, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -33,7 +33,7 @@ export default {
       signatures: string[];
     };
 
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
 

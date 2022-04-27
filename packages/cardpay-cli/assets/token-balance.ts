@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_ANY, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_ANY, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getConstantByNetwork, getSDK, ERC20ABI } from '@cardstack/cardpay-sdk';
 import { AbiItem } from 'web3-utils';
@@ -22,7 +22,7 @@ export default {
       network: string;
       tokenAddress?: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let assets = await getSDK('Assets', web3);
 
     if (!tokenAddress) {

@@ -22,6 +22,7 @@ import {
 import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
+import { Signer } from 'ethers';
 
 export interface Proof {
   rootHash: string;
@@ -69,7 +70,7 @@ export type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
     const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter(
@@ -266,7 +267,7 @@ export default class RewardPool {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from, this.layer2Signer)
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
@@ -401,7 +402,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       nonce,
       rewardSafeOwner,
       safeAddress,
-      await getAddress('rewardManager', this.layer2Web3)
+      await getAddress('rewardManager', this.layer2Web3),
+      this.layer2Signer
     );
 
     let eip1271Data = createEIP1271VerifyingData(
@@ -575,7 +577,16 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, rewardPoolAddress, payload, estimate, nonce, from)
+      await signSafeTx(
+        this.layer2Web3,
+        safeAddress,
+        rewardPoolAddress,
+        payload,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
     );
 
     let txnHash = gnosisResult.ethereumTx.txHash;

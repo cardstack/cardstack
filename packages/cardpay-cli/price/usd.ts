@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_ANY, Web3Opts, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_ANY, Web3Opts, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import Web3 from 'web3';
 import { getSDK } from '@cardstack/cardpay-sdk';
@@ -29,7 +29,7 @@ export default {
       token: string;
       amount: string;
     };
-    let web3Opts = getWeb3Opts(args);
+    let web3Opts = getConnectionType(args);
     if (token.toUpperCase() === 'ETH') {
       await ethToUsdPrice(network, amount, web3Opts);
     } else {
@@ -39,7 +39,7 @@ export default {
 } as CommandModule;
 
 async function ethToUsdPrice(network: string, ethAmount: string, web3Opts: Web3Opts): Promise<void> {
-  let web3 = await getWeb3(network, web3Opts);
+  let { web3 } = await getEthereumClients(network, web3Opts);
   let ethAmountInWei = toWei(ethAmount);
   let layerOneOracle = await getSDK('LayerOneOracle', web3);
   let usdPrice = await layerOneOracle.ethToUsd(ethAmountInWei);
@@ -47,7 +47,7 @@ async function ethToUsdPrice(network: string, ethAmount: string, web3Opts: Web3O
 }
 
 async function usdPrice(network: string, token: string, amount: string, web3Opts: Web3Opts): Promise<void> {
-  let web3 = await getWeb3(network, web3Opts);
+  let { web3 } = await getEthereumClients(network, web3Opts);
   let amountInWei = toWei(amount);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
   let usdPrice = await layerTwoOracle.getUSDPrice(token, amountInWei);
