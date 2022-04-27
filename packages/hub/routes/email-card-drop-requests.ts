@@ -57,7 +57,7 @@ export default class EmailCardDropRequestsRoute {
       ownerAddress,
     });
 
-    let claimed = Boolean(previousRequests[0]?.transactionHash);
+    let claimed = Boolean(previousRequests[0]?.claimedAt);
 
     let result = this.emailCardDropRequestSerializer.serializeEmailCardDropRequestStatus({
       timestamp,

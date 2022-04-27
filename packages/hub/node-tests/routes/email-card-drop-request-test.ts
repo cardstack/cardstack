@@ -11,7 +11,6 @@ let claimedEoa: EmailCardDropRequest = {
   verificationCode: 'claimedverificationcode',
   claimedAt: new Date(),
   requestedAt: new Date(),
-  transactionHash: '0xclaimedAddressTxnHash',
 };
 let unclaimedEoa: EmailCardDropRequest = {
   id: 'b176521d-6009-41ff-8472-147a413da450',
@@ -47,7 +46,7 @@ describe('GET /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('returns true if a known EOA has a transaction hash recorded for its card drop request', async function () {
+  it('returns true if a known EOA has a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
@@ -60,7 +59,7 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
-  it('returns false if a known EOA does not have a transaction hash recorded for its card drop request', async function () {
+  it('returns false if a known EOA does not have a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${unclaimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
