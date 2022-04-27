@@ -48,12 +48,12 @@ export default class EmailCardDropVerifyRoute {
 
     // If the claim query doesn’t return a record, there no matching record, now determine why
 
-    let claimedRequests = await this.emailCardDropRequestQueries.query({
+    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
       ownerAddress,
       verificationCode,
     });
 
-    let emailCardDropRequest = claimedRequests[0];
+    let emailCardDropRequest = emailCardDropRequests[0];
 
     if (!emailCardDropRequest) {
       ctx.status = 400;
