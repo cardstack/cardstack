@@ -12,6 +12,13 @@ let claimedEoa: EmailCardDropRequest = {
   claimedAt: new Date(),
   requestedAt: new Date(),
 };
+let unclaimedEmailForClaimedEoa: EmailCardDropRequest = {
+  id: '00000000-525d-499a-a5c8-3c89192ad40e',
+  ownerAddress: '0xclaimedAddress',
+  emailHash: 'claimedhash',
+  verificationCode: 'claimedverificationcode',
+  requestedAt: new Date(),
+};
 let unclaimedEoa: EmailCardDropRequest = {
   id: 'b176521d-6009-41ff-8472-147a413da450',
   ownerAddress: '0xnotClaimedAddress',
@@ -42,6 +49,7 @@ describe('GET /api/email-card-drop-requests', function () {
 
   this.beforeEach(async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    await emailCardDropRequestsQueries.insert(unclaimedEmailForClaimedEoa);
     await emailCardDropRequestsQueries.insert(claimedEoa);
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
