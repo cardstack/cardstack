@@ -52,7 +52,7 @@ describe('GET /email-card-drop/verify', function () {
 
   it('accepts a valid verification, marks it claimed, and triggers a job to drop a card', async function () {
     let response = await request().get(
-      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}`
+      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
     );
 
     expect(response.status).to.equal(200);
@@ -76,7 +76,7 @@ describe('GET /email-card-drop/verify', function () {
 
   it('rejects a verification that has been used', async function () {
     let response = await request().get(
-      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}`
+      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}&email-hash=${claimedEoa.emailHash}`
     );
 
     expect(response.status).to.equal(400);
@@ -87,7 +87,9 @@ describe('GET /email-card-drop/verify', function () {
   });
 
   it('rejects an unknown verification', async function () {
-    let response = await request().get(`/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha`);
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha&email-hash=${claimedEoa.emailHash}`
+    );
 
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('Code is invalid');
@@ -96,11 +98,37 @@ describe('GET /email-card-drop/verify', function () {
     expect(jobPayloads).to.be.empty;
   });
 
+  it('rejects an unknown email-hash', async function () {
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=wha`
+    );
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Email is invalid');
+
+    expect(jobIdentifiers).to.be.empty;
+    expect(jobPayloads).to.be.empty;
+  });
+
   it('errors if the eoa query parameter is not provided', async function () {
-    let response = await request().get(`/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}`);
+    let response = await request().get(
+      `/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
+    );
 
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('eoa is required');
+
+    expect(jobIdentifiers).to.be.empty;
+    expect(jobPayloads).to.be.empty;
+  });
+
+  it('errors if the email-hash query parameter is not provided', async function () {
+    let response = await request().get(
+      `/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}&eoa=${unclaimedEoa.ownerAddress}`
+    );
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('email-hash is required');
 
     expect(jobIdentifiers).to.be.empty;
     expect(jobPayloads).to.be.empty;

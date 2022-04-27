@@ -22,11 +22,18 @@ export default class EmailCardDropVerifyRoute {
       return;
     }
 
+    if (!ctx.request.query['email-hash']) {
+      ctx.status = 400;
+      ctx.body = 'email-hash is required';
+      return;
+    }
+
     let ownerAddress = ctx.request.query.eoa as string;
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
+    let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
     // Optimistically mark the request as claimed to prevent stampede attack
-    let updatedRequest = await this.emailCardDropRequestQueries.claim({ ownerAddress, verificationCode });
+    let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
 
     if (updatedRequest) {
       await this.workerClient.addJob('drop-card', {
@@ -41,16 +48,19 @@ export default class EmailCardDropVerifyRoute {
 
     // If the claim query doesn’t return a record, there no matching record, now determine why
 
-    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
+    let claimedRequests = await this.emailCardDropRequestQueries.query({
       ownerAddress,
       verificationCode,
     });
 
-    let emailCardDropRequest = emailCardDropRequests[0];
+    let emailCardDropRequest = claimedRequests[0];
 
     if (!emailCardDropRequest) {
       ctx.status = 400;
       ctx.body = 'Code is invalid';
+    } else if (emailCardDropRequest.emailHash !== emailHash) {
+      ctx.status = 400;
+      ctx.body = 'Email is invalid';
     } else if (emailCardDropRequest.claimedAt) {
       ctx.status = 400;
       ctx.body = 'You have already claimed a card drop';
