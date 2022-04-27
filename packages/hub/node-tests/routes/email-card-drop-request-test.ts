@@ -175,7 +175,7 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
-    let hash = crypto.createHmac('sha256', config.get('authSecret'));
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -193,7 +193,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'valid@example.com';
 
-    let hash = crypto.createHmac('sha256', config.get('authSecret'));
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -327,7 +327,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'example@gmail.com';
 
-    let hash = crypto.createHmac('sha256', config.get('authSecret'));
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 

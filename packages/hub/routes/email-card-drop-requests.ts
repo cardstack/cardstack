@@ -118,7 +118,7 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let hash = crypto.createHmac('sha256', config.get('authSecret'));
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(normalizedEmail);
     let normalizedEmailHash = hash.digest('hex');
 

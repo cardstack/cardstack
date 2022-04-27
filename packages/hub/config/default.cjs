@@ -34,6 +34,7 @@ module.exports = {
     messageVerificationDelayMs: 1000 * 15,
   },
   authSecret: null,
+  emailHashSecret: null,
   sentry: {
     dsn: null,
     enabled: false,
