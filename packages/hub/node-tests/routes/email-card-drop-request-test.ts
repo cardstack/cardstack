@@ -128,7 +128,7 @@ class StubWorkerClient {
   }
 }
 
-const verificationCodeRegex = /^[.a-zA-Z0-9_-]{10}$/;
+const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
 
 describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
