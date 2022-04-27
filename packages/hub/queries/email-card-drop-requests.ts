@@ -76,6 +76,20 @@ export default class EmailCardDropRequestsQueries {
 
     return rows[0];
   }
+
+  async updateVerificationCode(id: string, verificationCode: string): Promise<EmailCardDropRequest> {
+    let db = await this.databaseManager.getClient();
+
+    let { rows } = await db.query(
+      `UPDATE email_card_drop_requests SET
+        verification_code = $2
+      WHERE ID = $1
+      RETURNING *`,
+      [id, verificationCode]
+    );
+
+    return rows[0];
+  }
 }
 
 declare module '@cardstack/hub/queries' {

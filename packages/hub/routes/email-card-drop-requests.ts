@@ -140,7 +140,32 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let verificationCode = (crypto.randomInt(1000000) + '').padStart(6, '0');
+    let unclaimedButExisting = await this.emailCardDropRequestQueries.query({
+      emailHash: normalizedEmailHash,
+      ownerAddress: ctx.state.userAddress,
+    });
+
+    if (unclaimedButExisting.length > 0) {
+      let existingRequest = unclaimedButExisting[0];
+      let updatedEmailCardDropRequest = await this.emailCardDropRequestQueries.updateVerificationCode(
+        existingRequest.id,
+        generateVerificationCode()
+      );
+
+      await this.workerClient.addJob('send-email-card-drop-verification', {
+        id: updatedEmailCardDropRequest.id,
+        email,
+      });
+
+      let serialized = this.emailCardDropRequestSerializer.serialize(updatedEmailCardDropRequest);
+
+      ctx.status = 200;
+      ctx.body = serialized;
+
+      return;
+    }
+
+    let verificationCode = generateVerificationCode();
 
     const emailCardDropRequest: EmailCardDropRequest = {
       id: shortUuid.uuid(),
@@ -171,6 +196,10 @@ export default class EmailCardDropRequestsRoute {
     ctx.status = 201;
     ctx.body = serialized;
   }
+}
+
+function generateVerificationCode() {
+  return (crypto.randomInt(1000000) + '').padStart(6, '0');
 }
 
 declare module '@cardstack/di' {
