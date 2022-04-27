@@ -127,6 +127,8 @@ class StubWorkerClient {
   }
 }
 
+const verificationCodeRegex = /^[.a-zA-Z0-9_-]{10}$/;
+
 describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
@@ -169,7 +171,7 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
-    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
+    expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
     let hash = crypto.createHash('sha256');
     hash.update(email);
@@ -196,7 +198,7 @@ describe('POST /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
-      verificationCode: 'xxxxxx',
+      verificationCode: 'xxxxxxyyyy',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
     });
@@ -225,7 +227,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
-    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
+    expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
     expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification']);
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email }]);
@@ -284,7 +286,7 @@ describe('POST /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash: 'abc123',
-      verificationCode: '123456',
+      verificationCode: 'I4I.FX8OUx',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
       claimedAt: new Date(),
@@ -330,7 +332,7 @@ describe('POST /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert({
       ownerAddress: '0xanother-address',
       emailHash,
-      verificationCode: '123456',
+      verificationCode: 'I4I.FX8OUx',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
       claimedAt: new Date(),
