@@ -5,7 +5,7 @@
   position: relative;
   min-height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   grid-template-columns: minmax(200px, var(--page-content-max-width));
   gap: var(--boxel-sp);
   align-items: center;
