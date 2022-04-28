@@ -22,7 +22,7 @@ export default {
       network: string;
       tokenAddress?: string;
     };
-    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let assets = await getSDK('Assets', web3);
 
     if (!tokenAddress) {
