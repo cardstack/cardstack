@@ -10,7 +10,7 @@
   gap: var(--boxel-sp);
   align-items: center;
   justify-content: center;
-  background-color: var(--boxel-purple-600);
+  background-color: var(--boxel-purple-900);
   color: var(--boxel-light);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
