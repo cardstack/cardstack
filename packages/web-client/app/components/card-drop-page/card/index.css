@@ -1,31 +1,19 @@
 .card-drop-page-card {
-  --horizontal-padding: var(--boxel-sp-xl);
-  --section-vertical-padding: var(--boxel-sp-xl);
-
   max-width: 720px;
-  padding: 0 var(--horizontal-padding);
+  padding: var(--boxel-sp-lg);
   color: var(--boxel-dark);
 }
 
 .card-drop-page-card__section {
-  padding: var(--section-vertical-padding) 0;
-}
-
-.card-drop-page-card__get-card-wallet {
+  padding: var(--boxel-sp);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--boxel-sp-sm);
-  border-bottom: 1px solid var(--boxel-light-300);
-  font-size: var(--boxel-font-size);
-  font-weight: 600;
-  line-height: calc(22 / 16);
-  flex-wrap: wrap;
+  gap: var(--boxel-sp-lg);
 }
 
 @media only screen and (max-width: 480px) {
   .card-drop-page-card {
-    --horizontal-padding: var(--boxel-sp-lg);
-    --section-vertical-padding: var(--boxel-sp-lg);
+    padding: var(--boxel-sp);
   }
 }
