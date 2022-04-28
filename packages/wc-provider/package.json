@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/wc-provider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WalletConnect provider that uses websockets rather than http",
   "author": "Aierie <michael.khor@cardstack.com>",
   "homepage": "https://github.com/cardstack/cardstack#readme",
