@@ -184,6 +184,53 @@ describe('POST /api/email-card-drop-requests', function () {
     ]);
   });
 
+  it('sends another email if a request is present but has not been claimed', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let email = 'valid@example.com';
+
+    let hash = crypto.createHash('sha256');
+    hash.update(email);
+    let emailHash = hash.digest('hex');
+
+    await emailCardDropRequestsQueries.insert({
+      ownerAddress: stubUserAddress,
+      emailHash,
+      verificationCode: 'xxxxxx',
+      id: '2850a954-525d-499a-a5c8-3c89192ad40e',
+      requestedAt: new Date(),
+    });
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email,
+        },
+      },
+    };
+
+    let resourceId = null;
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(200)
+      .expect(function (res) {
+        resourceId = res.body.data.id;
+      });
+
+    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
+
+    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
+
+    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification']);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId, email }]);
+  });
+
   it('returns 401 without bearer token', async function () {
     await request()
       .post('/api/email-card-drop-requests')
