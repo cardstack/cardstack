@@ -1,5 +1,22 @@
 <Boxel::CardContainer class='card-drop-page-card' ...attributes>
   <div class='card-drop-page-card__section'>
     {{yield}}
+
+    <h3 class='card-drop-page-card__heading'>
+      {{yield to='heading'}}
+    </h3>
+
+    <p class='card-drop-page-card__explanation'>
+      {{yield to='explanation'}}
+    </p>
+
+    <Boxel::Button
+      @as='anchor'
+      href='https://cardstack.com'
+      target='_blank'
+      rel='noopener'
+    >
+      Visit Cardstack.com
+    </Boxel::Button>
   </div>
 </Boxel::CardContainer>

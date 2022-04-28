@@ -12,6 +12,15 @@
   gap: var(--boxel-sp-lg);
 }
 
+.card-drop-page-card__heading,
+.card-drop-page-card__explanation {
+  text-align: center;
+}
+
+.card-drop-page-card__heading {
+  font-weight: 600;
+}
+
 @media only screen and (max-width: 480px) {
   .card-drop-page-card {
     padding: var(--boxel-sp);

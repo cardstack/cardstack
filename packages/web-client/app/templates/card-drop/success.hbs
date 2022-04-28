@@ -1,3 +1,23 @@
 <CardDropPage::Card @class='email-card-drop-success__container'>
-  <CardDropPage::Success />
+  <:default>
+    <CardPay::PrepaidCard
+      class='email-card-drop-success__card'
+      @issuerName='Cardstack'
+      @headerBackground='linear-gradient(139.27deg, #00EBE5 16%, #C3FC33 100%);'
+      @mockBalance={{false}}
+      @mockOptions={{false}}
+      @balance='2.00'
+      @usdBalance='2.00'
+      @address={{placeholder-address}}
+      @network={{network-display-info 'layer2' 'fullName'}}
+    />
+  </:default>
+
+  <:heading>
+    Your prepaid card is on its way!
+  </:heading>
+
+  <:explanation>
+    Soon you will receive a confirmation email to join our newsletter mailing list.
+  </:explanation>
 </CardDropPage::Card>
