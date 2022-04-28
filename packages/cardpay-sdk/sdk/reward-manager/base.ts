@@ -31,6 +31,7 @@ import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-uti
 import { ZERO_ADDRESS } from '../constants';
 import { WithSymbol, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 import { query } from '../utils/graphql';
+import { Signer } from 'ethers';
 
 export interface RewardProgramInfo {
   rewardProgramId: string;
@@ -57,7 +58,7 @@ export default class RewardManager {
   private rewardManager: Contract | undefined;
   private rewardSafeDelegate: Contract | undefined;
 
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async registerRewardProgram(
     txnHash: string
@@ -126,7 +127,7 @@ export default class RewardManager {
         rewardProgramRegistrationFees,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -192,7 +193,7 @@ export default class RewardManager {
         rewardProgramId,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -272,7 +273,7 @@ export default class RewardManager {
         rewardProgramId,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -344,7 +345,7 @@ export default class RewardManager {
         newAdmin,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -411,7 +412,7 @@ export default class RewardManager {
         blob,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -566,7 +567,8 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       nonce,
       rewardSafeOwner,
       safeAddress,
-      rewardManagerAddress
+      rewardManagerAddress,
+      this.layer2Signer
     );
 
     let eip1271Data = createEIP1271VerifyingData(
@@ -734,7 +736,8 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       nonce,
       rewardSafeOwner,
       safeAddress,
-      rewardManagerAddress
+      rewardManagerAddress,
+      this.layer2Signer
     );
 
     let eip1271Data = createEIP1271VerifyingData(

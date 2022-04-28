@@ -1,7 +1,7 @@
 /*global fetch */
 import { Argv } from 'yargs';
 import { getConstant, getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getInventoriesFromAPI } from './utils';
 import Web3 from 'web3';
@@ -38,8 +38,8 @@ export default {
       environment: string;
       provisionerSecret: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
-    let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
+    let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3, signer);
     let inventories = await getInventoriesFromAPI(web3, environment);
     let blockExplorer = await getConstant('blockExplorer', web3);
     let inventory = inventories.find((inventory) => inventory.id === sku);

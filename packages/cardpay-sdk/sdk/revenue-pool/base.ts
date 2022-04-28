@@ -24,6 +24,7 @@ import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { MerchantSafe, Safe } from '../safes';
+import { Signer } from 'ethers';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -38,7 +39,7 @@ interface RevenueTokenBalance {
 export default class RevenuePool {
   private revenuePool: Contract | undefined;
 
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async merchantRegistrationFee(): Promise<number> {
     // this is a SPEND amount which is a safe number to represent in javascript
@@ -165,7 +166,16 @@ export default class RevenuePool {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, merchantSafeAddress, revenuePoolAddress, payload, estimate, nonce, from)
+      await signSafeTx(
+        this.layer2Web3,
+        merchantSafeAddress,
+        revenuePoolAddress,
+        payload,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
     );
 
     let txnHash = gnosisResult.ethereumTx.txHash;
@@ -232,7 +242,7 @@ export default class RevenuePool {
         rateLock,
         infoDID!,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });

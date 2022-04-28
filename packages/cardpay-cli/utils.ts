@@ -1,5 +1,6 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
+import { Wallet, Signer } from 'ethers';
 import { AbstractProvider } from 'web3-core';
 import { HttpProvider, networkIds, getConstantByNetwork, HubConfig } from '@cardstack/cardpay-sdk';
 import WalletConnectProvider from '@cardstack/wc-provider';
@@ -9,10 +10,15 @@ const TrezorWalletProvider = require('trezor-cli-wallet-provider');
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
-export type ConnectionType = 'mnemonic' | 'trezor' | 'wallet-connect';
+export type ConnectionType = 'mnemonic' | 'ethers-mnemonic' | 'trezor' | 'wallet-connect';
 
 interface Web3OptsMnemonic {
   connectionType: 'mnemonic';
+  mnemonic: string;
+}
+
+interface EthersOptsMnemonic {
+  connectionType: 'ethers-mnemonic';
   mnemonic: string;
 }
 
@@ -24,9 +30,9 @@ interface Web3OptsWalletConnect {
   connectionType: 'wallet-connect';
 }
 
-export type Web3Opts = Web3OptsMnemonic | Web3OptsTrezor | Web3OptsWalletConnect;
+export type Web3Opts = Web3OptsMnemonic | Web3OptsTrezor | Web3OptsWalletConnect | EthersOptsMnemonic;
 
-export function getWeb3Opts(args: Arguments): Web3Opts {
+export function getConnectionType(args: Arguments): Web3Opts {
   switch (args.connectionType as ConnectionType) {
     case 'wallet-connect':
       return {
@@ -36,6 +42,11 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
       return {
         connectionType: 'trezor',
       } as Web3OptsTrezor;
+    case 'ethers-mnemonic':
+      return {
+        connectionType: 'ethers-mnemonic',
+        mnemonic: args.ethersMnemonic,
+      } as EthersOptsMnemonic;
     case 'mnemonic':
       return {
         connectionType: 'mnemonic',
@@ -44,7 +55,7 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
   }
 }
 
-export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
+export async function getEthereumClients(network: string, opts: Web3Opts): Promise<{ web3: Web3; signer?: Signer }> {
   let rpcNodeHttpsUrl!: string;
   let rpcNodeWssUrl!: string;
   let hubConfigResponse;
@@ -78,24 +89,41 @@ export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
         bridge: BRIDGE,
       });
       await provider.enable();
-      return new Web3(provider as unknown as AbstractProvider);
+      return { web3: new Web3(provider as unknown as AbstractProvider) };
     }
     case 'mnemonic':
-      return new Web3(
-        new HDWalletProvider({
-          chainId: networkIds[network],
-          mnemonic: {
-            phrase: opts.mnemonic,
-          },
-          providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
-        })
-      );
+      return {
+        web3: new Web3(
+          new HDWalletProvider({
+            chainId: networkIds[network],
+            mnemonic: {
+              phrase: opts.mnemonic,
+            },
+            providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
+          })
+        ),
+      };
+    case 'ethers-mnemonic':
+      return {
+        web3: new Web3(
+          new HDWalletProvider({
+            chainId: networkIds[network],
+            mnemonic: {
+              phrase: opts.mnemonic,
+            },
+            providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
+          })
+        ),
+        signer: Wallet.fromMnemonic(opts.mnemonic),
+      };
     case 'trezor':
-      return new Web3(
-        new TrezorWalletProvider(rpcNodeHttpsUrl, {
-          chainId: networkIds[network],
-        })
-      );
+      return {
+        web3: new Web3(
+          new TrezorWalletProvider(rpcNodeHttpsUrl, {
+            chainId: networkIds[network],
+          })
+        ),
+      };
   }
 }
 

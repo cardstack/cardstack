@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK, Safe } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { displaySafe } from './utils';
 
@@ -32,7 +32,7 @@ export default {
     if (safeType && !['depot', 'merchant', 'prepaid-card', 'reward'].includes(safeType)) {
       throw new Error(`Invalid safe type: ${safeType}`);
     }
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     address = address || undefined;
 
     let safesApi = await getSDK('Safes', web3);

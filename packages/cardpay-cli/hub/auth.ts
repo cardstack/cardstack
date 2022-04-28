@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -19,7 +19,7 @@ export default {
       hubRootUrl: string;
       network: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let authToken = await (await getSDK('HubAuth', web3, hubRootUrl)).authenticate();
     console.log(`Authentication token for ${hubRootUrl}: ${authToken}`);
   },
