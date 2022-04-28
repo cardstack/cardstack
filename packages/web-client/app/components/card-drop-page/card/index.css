@@ -1,4 +1,4 @@
-.universal-link-card {
+.card-drop-page-card {
   --horizontal-padding: var(--boxel-sp-xl);
   --section-vertical-padding: var(--boxel-sp-xl);
 
@@ -7,11 +7,11 @@
   color: var(--boxel-dark);
 }
 
-.universal-link-card__section {
+.card-drop-page-card__section {
   padding: var(--section-vertical-padding) 0;
 }
 
-.universal-link-card__get-card-wallet {
+.card-drop-page-card__get-card-wallet {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,7 +24,7 @@
 }
 
 @media only screen and (max-width: 480px) {
-  .universal-link-card {
+  .card-drop-page-card {
     --horizontal-padding: var(--boxel-sp-lg);
     --section-vertical-padding: var(--boxel-sp-lg);
   }

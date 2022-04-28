@@ -1,4 +1,4 @@
-.universal-link-header {
+.card-drop-page-header {
   --boxel-org-header-background-color: none;
   --card-pay-logo-size: 2.5rem;
   --card-pay-logo-position: left center;
@@ -6,7 +6,7 @@
   margin-top: var(--boxel-sp);
 }
 
-.universal-link-header__links {
+.card-drop-page-header__links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -16,7 +16,7 @@
   letter-spacing: 0.02em;
 }
 
-.universal-link-header__hamburger {
+.card-drop-page-header__hamburger {
   --hamburger-menu-logo-size: var(--card-pay-logo-size);
   --hamburger-menu-logo-position: var(--card-pay-logo-position);
   --hamburger-menu-padding: var(--boxel-sp);
@@ -24,21 +24,21 @@
   display: none;
 }
 
-.universal-link-header__degraded-service-banner--small {
+.card-drop-page-header__degraded-service-banner--small {
   display: none;
 }
 
 @media only screen and (max-width: 480px) {
-  .universal-link-header__links,
-  .universal-link-header__degraded-service-banner--regular {
+  .card-drop-page-header__links,
+  .card-drop-page-header__degraded-service-banner--regular {
     display: none;
   }
 
-  .universal-link-header__hamburger {
+  .card-drop-page-header__hamburger {
     display: initial;
   }
 
-  .universal-link-header__degraded-service-banner--small {
+  .card-drop-page-header__degraded-service-banner--small {
     display: flex;
     margin-top: var(--boxel-sp-xs);
   }
