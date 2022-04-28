@@ -27,7 +27,7 @@ export function buildYargs(args: string[]) {
       },
       ethersMnemonic: {
         alias: 'e',
-        default: process.env.MNEMONIC_PHRASE,
+        default: process.env.ETHERS_MNEMONIC_PHRASE,
         type: 'string',
         description: 'Phrase for mnemonic wallet using ethers.js signer',
       },
