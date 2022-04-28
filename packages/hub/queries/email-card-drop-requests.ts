@@ -4,12 +4,15 @@ import { EmailCardDropRequest } from '../routes/email-card-drop-requests';
 import { buildConditions } from '../utils/queries';
 
 interface EmailCardDropRequestsQueriesFilter {
+  id?: string;
   claimedAt?: Date | Symbol;
   emailHash?: string;
   ownerAddress?: string;
+  verificationCode?: string;
 }
 
 export default class EmailCardDropRequestsQueries {
+  clock = inject('clock');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest> {
@@ -50,6 +53,28 @@ export default class EmailCardDropRequestsQueries {
         transactionHash: row['transaction_hash'],
       };
     });
+  }
+
+  async claim({
+    ownerAddress,
+    verificationCode,
+  }: {
+    ownerAddress: string;
+    verificationCode: string;
+  }): Promise<EmailCardDropRequest> {
+    let db = await this.databaseManager.getClient();
+
+    let { rows } = await db.query(
+      `
+        UPDATE email_card_drop_requests
+        SET claimed_at = $1
+        WHERE owner_address = $2 AND verification_code = $3 AND claimed_at IS NULL
+        RETURNING *
+      `,
+      [new Date(this.clock.now()), ownerAddress, verificationCode]
+    );
+
+    return rows[0];
   }
 }
 

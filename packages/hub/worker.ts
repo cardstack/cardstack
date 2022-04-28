@@ -11,6 +11,7 @@ import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-cha
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import DropCardTask from './tasks/drop-card';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendEmailCardDropVerification from './tasks/send-email-card-drop-verification';
@@ -60,6 +61,7 @@ export class HubWorker {
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
+        'drop-card': this.instantiateTask(DropCardTask),
         'send-email-card-drop-verification': this.instantiateTask(SendEmailCardDropVerification),
         'send-notifications': this.instantiateTask(SendNotificationsTask),
         'subscribe-email': this.instantiateTask(SubscribeEmail),
