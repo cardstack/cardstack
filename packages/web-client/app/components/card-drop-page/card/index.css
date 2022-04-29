@@ -25,4 +25,9 @@
   .card-drop-page-card {
     padding: var(--boxel-sp);
   }
+
+  /* TODO is there a way to scale this dynamically and preserve aspect ratio? */
+  .card-drop-page-card .prepaid-card {
+    transform: scale(0.75);
+  }
 }
