@@ -8,6 +8,10 @@
       },
       "region": "HUB_AWS_REGION"
     },
+    "ses": {
+      "supportEmail": "HUB_AWS_SES_SUPPORT_EMAIL",
+      "region": "HUB_AWS_SES_REGION"
+    },
     "accountId": "HUB_AWS_ACCOUNT_ID"
   },
   "db": {
