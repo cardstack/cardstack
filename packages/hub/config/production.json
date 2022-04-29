@@ -10,6 +10,9 @@
     "allowedGuilds": "584043165066199050",
     "allowedChannels": "898954606242054185"
   },
+  "emailCardDrop": {
+    "verificationUrl": "https://hub.cardstack.com/email-card-drop/verify"
+  },
   "web3": {
     "layer1Network": "mainnet",
     "layer2Network": "xdai"
