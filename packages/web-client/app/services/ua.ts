@@ -23,6 +23,10 @@ export default class UA extends Service {
   isAndroid() {
     return this.uaParser.getOS().name === 'Android';
   }
+
+  get isMobile() {
+    return this.isIOS() || this.isAndroid();
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.

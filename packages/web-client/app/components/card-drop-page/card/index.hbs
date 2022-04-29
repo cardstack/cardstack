@@ -10,13 +10,25 @@
       {{yield to='explanation'}}
     </p>
 
-    <Boxel::Button
-      @as='anchor'
-      href='https://cardstack.com'
-      target='_blank'
-      rel='noopener'
-    >
-      Visit Cardstack.com
-    </Boxel::Button>
+    {{#if this.ua.isMobile}}
+      <Boxel::Button
+        @as='anchor'
+        @kind='primary'
+        @href={{concat 'https://' (config 'universalLinkDomain') '/FIXME'}}
+        target='_blank'
+        rel='noopener'
+      >
+        Open Card Wallet
+      </Boxel::Button>
+    {{else}}
+      <Boxel::Button
+        @as='anchor'
+        href='https://cardstack.com'
+        target='_blank'
+        rel='noopener'
+      >
+        Visit Cardstack.com
+      </Boxel::Button>
+    {{/if}}
   </div>
 </Boxel::CardContainer>
