@@ -71,5 +71,6 @@
     "privateKey": "FIREBASE_PRIVATE_KEY",
     "databaseURL": "FIREBASE_DATABASE_URL"
   },
-  "authSecret": "HUB_AUTH_SECRET"
+  "authSecret": "HUB_AUTH_SECRET",
+  "emailHashSalt": "HUB_EMAIL_HASH_SALT"
 }

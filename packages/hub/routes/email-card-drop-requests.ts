@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
+import config from 'config';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
@@ -7,6 +8,7 @@ import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
 import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
+import cryptoRandomString from 'crypto-random-string';
 import { NOT_NULL } from '../utils/queries';
 
 export interface EmailCardDropRequest {
@@ -116,7 +118,7 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(normalizedEmail);
     let normalizedEmailHash = hash.digest('hex');
 
@@ -199,7 +201,7 @@ export default class EmailCardDropRequestsRoute {
 }
 
 function generateVerificationCode() {
-  return (crypto.randomInt(1000000) + '').padStart(6, '0');
+  return cryptoRandomString({ length: 10, type: 'url-safe' });
 }
 
 declare module '@cardstack/di' {

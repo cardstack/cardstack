@@ -70,9 +70,11 @@ export default class EmailCardDropRequestsQueries {
   }
 
   async claim({
+    emailHash,
     ownerAddress,
     verificationCode,
   }: {
+    emailHash: string;
     ownerAddress: string;
     verificationCode: string;
   }): Promise<EmailCardDropRequest> {
@@ -82,10 +84,14 @@ export default class EmailCardDropRequestsQueries {
       `
         UPDATE email_card_drop_requests
         SET claimed_at = $1
-        WHERE owner_address = $2 AND verification_code = $3 AND claimed_at IS NULL
+        WHERE
+          email_hash = $2 AND
+          owner_address = $3 AND
+          verification_code = $4 AND
+          claimed_at IS NULL
         RETURNING *
       `,
-      [new Date(this.clock.now()), ownerAddress, verificationCode]
+      [new Date(this.clock.now()), emailHash, ownerAddress, verificationCode]
     );
 
     return rows[0];

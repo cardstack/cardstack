@@ -3,6 +3,7 @@ import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
+import config from 'config';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -29,6 +30,9 @@ let unclaimedEoa: EmailCardDropRequest = {
 
 let fakeTime = 1650440847689;
 let fakeTimeString = new Date(fakeTime).toISOString();
+
+const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
+
 describe('GET /api/email-card-drop-requests', function () {
   let { request, getContainer } = setupHub(this);
 
@@ -176,9 +180,9 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
-    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
+    expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -196,14 +200,14 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'valid@example.com';
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
-      verificationCode: 'xxxxxx',
+      verificationCode: 'xxxxxxyyyy',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
     });
@@ -232,7 +236,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
-    expect(emailCardDropRequest.verificationCode).to.match(/^\d{6}$/);
+    expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
     expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification']);
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email }]);
@@ -291,7 +295,7 @@ describe('POST /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash: 'abc123',
-      verificationCode: '123456',
+      verificationCode: 'I4I.FX8OUx',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
       claimedAt: new Date(),
@@ -330,14 +334,14 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let email = 'example@gmail.com';
 
-    let hash = crypto.createHash('sha256');
+    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
     await emailCardDropRequestsQueries.insert({
       ownerAddress: '0xanother-address',
       emailHash,
-      verificationCode: '123456',
+      verificationCode: 'I4I.FX8OUx',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(),
       claimedAt: new Date(),
