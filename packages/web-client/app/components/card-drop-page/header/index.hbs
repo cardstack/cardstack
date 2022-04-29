@@ -1,16 +1,4 @@
-{{!
-  control via css whether we want to show a degraded service banner
-  on top (big screens) or below (small screens) when there is an incident.
-  showing on top is to be aligned with behaviour on other large screens on web
-  showing below is because it respects the navbar + the hamburger menu pattern
-  where the x is at the same spot as the hamburger.
-  hence this must use the same breakpoint as the hamburger
-}}
 <div ...attributes>
-  <Common::DegradedServiceBanner
-    @size='regular'
-    class='card-drop-page-header__degraded-service-banner--regular'
-  />
   <Boxel::OrgHeader
     class='card-drop-page-header'
     @iconURL={{this.cardPayLogo}}
@@ -21,9 +9,5 @@
       boxel-org-header-logo-position='var(--card-pay-logo-position)'
       boxel-org-header-padding='0'
     }}
-  />
-  <Common::DegradedServiceBanner
-    @size='small'
-    class='card-drop-page-header__degraded-service-banner--small'
   />
 </div>
