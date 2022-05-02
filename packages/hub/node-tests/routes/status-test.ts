@@ -107,7 +107,7 @@ describe('GET /api/status', function () {
               status: 'operational',
               subgraphBlockNumber: 19492428,
             },
-            'exchange-rates': {
+            exchangeRates: {
               status: 'operational',
               lastFetched: exchangeRatesLastFetched,
             },
@@ -135,7 +135,7 @@ describe('GET /api/status', function () {
               status: 'degraded',
               subgraphBlockNumber: 19492419,
             },
-            'exchange-rates': {
+            exchangeRates: {
               status: 'operational',
               lastFetched: exchangeRatesLastFetched,
             },
@@ -163,7 +163,7 @@ describe('GET /api/status', function () {
               status: 'unknown',
               subgraphBlockNumber: null,
             },
-            'exchange-rates': {
+            exchangeRates: {
               status: 'operational',
               lastFetched: exchangeRatesLastFetched,
             },
@@ -199,7 +199,7 @@ describe('GET /api/status', function () {
               status: 'unknown',
               subgraphBlockNumber: 19492428,
             },
-            'exchange-rates': {
+            exchangeRates: {
               status: 'operational',
               lastFetched: exchangeRatesLastFetched,
             },
@@ -234,7 +234,7 @@ describe('GET /api/status', function () {
               status: 'operational',
               subgraphBlockNumber: 19492428,
             },
-            'exchange-rates': {
+            exchangeRates: {
               status: 'unknown',
               lastFetched: exchangeRatesLastFetched,
             },
