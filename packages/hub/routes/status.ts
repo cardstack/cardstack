@@ -9,6 +9,7 @@ export const DEGRADED_THRESHOLD = 10;
 export default class StatusRoute {
   subgraph = inject('subgraph');
   web3 = inject('web3-http', { as: 'web3' });
+  exchangeRates = inject('exchange-rates', { as: 'exchangeRates' });
 
   constructor() {
     autoBind(this);
@@ -40,17 +41,35 @@ export default class StatusRoute {
       });
     }
 
-    let status;
-    let details;
+    let subgraphStatus;
+    let subgraphStatusDetails;
 
     if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
-      status = 'operational';
+      subgraphStatus = 'operational';
     } else if (!rpcBlockNumber || !subgraphBlockNumber) {
-      details = 'Error checking status';
-      status = 'unknown';
+      subgraphStatusDetails = 'Error checking status';
+      subgraphStatus = 'unknown';
     } else {
-      details = 'Experiencing slow service';
-      status = 'degraded';
+      subgraphStatusDetails = 'Experiencing slow service';
+      subgraphStatus = 'degraded';
+    }
+
+    let exchangeRatesValue = null;
+    try {
+      exchangeRatesValue = await this.exchangeRates.fetchExchangeRates();
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'status-route',
+        },
+      });
+    }
+    let exchangeRatesLastFetched = this.exchangeRates.lastFetched;
+    let exchangeRatesStatus = 'unknown';
+    if (exchangeRatesValue && exchangeRatesLastFetched) {
+      exchangeRatesStatus = 'operational';
+    } else if (!exchangeRatesValue) {
+      exchangeRatesStatus = 'unknown';
     }
 
     let body: JSONAPIDocument = {
@@ -58,16 +77,20 @@ export default class StatusRoute {
         type: 'status',
         attributes: {
           subgraph: {
-            status,
+            status: subgraphStatus,
             subgraphBlockNumber,
             rpcBlockNumber,
+          },
+          'exchange-rates': {
+            status: exchangeRatesStatus,
+            lastFetched: exchangeRatesLastFetched,
           },
         },
       },
     };
 
-    if (details) {
-      body.data.attributes.subgraph.details = details;
+    if (subgraphStatusDetails) {
+      body.data.attributes.subgraph.details = subgraphStatusDetails;
     }
 
     ctx.status = 200;
