@@ -9,5 +9,8 @@
   },
   "sentry": {
     "enabled": true
+  },
+  "webClient": {
+    "url": "https://app-staging.stack.cards"
   }
 }
