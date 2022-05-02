@@ -81,7 +81,7 @@ export default class StatusRoute {
             subgraphBlockNumber,
             rpcBlockNumber,
           },
-          'exchange-rates': {
+          exchangerates: {
             status: exchangeRatesStatus,
             lastFetched: exchangeRatesLastFetched,
           },
