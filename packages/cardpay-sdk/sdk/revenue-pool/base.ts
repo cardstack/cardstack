@@ -100,7 +100,7 @@ export default class RevenuePool {
   async claim(
     merchantSafeAddress: string,
     tokenAddress: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
@@ -119,22 +119,25 @@ export default class RevenuePool {
     if (!tokenAddress) {
       throw new Error('tokenAddress is required');
     }
-    if (!amount) {
-      throw new Error('amount is required');
-    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
-    if (unclaimedBalance.lt(new BN(amount))) {
-      throw new Error(
-        `Merchant safe does not have enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
-          unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount)}`
-      );
+    let weiAmount;
+    if (amount) {
+      weiAmount = new BN(amount);
+      if (unclaimedBalance.lt(weiAmount)) {
+        throw new Error(
+          `Merchant safe does not have enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
+            unclaimedBalance
+          )}, amount being claimed is ${fromWei(amount)}`
+        );
+      }
+    } else {
+      weiAmount = unclaimedBalance;
     }
-    let payload = revenuePool.methods.claimRevenue(tokenAddress, amount).encodeABI();
+    let payload = revenuePool.methods.claimRevenue(tokenAddress, weiAmount).encodeABI();
     let estimate = await gasEstimate(
       this.layer2Web3,
       merchantSafeAddress,
@@ -145,10 +148,10 @@ export default class RevenuePool {
       tokenAddress
     );
     let gasCost = gasInToken(estimate);
-    if (new BN(amount).lt(gasCost)) {
+    if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Revenue claim is not enough to cover the gas cost. The revenue amount to be claimed is ${fromWei(
-          amount
+          fromWei(weiAmount)
         )}, the gas cost is ${fromWei(gasCost)}`
       );
     }

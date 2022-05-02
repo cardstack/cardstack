@@ -5,7 +5,7 @@ import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { toWei } from 'web3-utils';
 
 export default {
-  command: 'claim-revenue <merchantSafe> <tokenAddress> <amount>',
+  command: 'claim-revenue <merchantSafe> <tokenAddress> [amount]',
   describe: 'Claim merchant revenue earned from prepaid card payments',
   builder(yargs: Argv) {
     return yargs
@@ -17,7 +17,7 @@ export default {
         type: 'string',
         description: 'The address of the tokens that are being claimed as revenue',
       })
-      .positional('amount', {
+      .option('amount', {
         type: 'string',
         description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
       })
@@ -28,19 +28,25 @@ export default {
       network: string;
       merchantSafe: string;
       tokenAddress: string;
-      amount: string;
+      amount?: string;
     };
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let revenuePool = await getSDK('RevenuePool', web3, signer);
     let assets = await getSDK('Assets', web3);
     let { symbol } = await assets.getTokenInfo(tokenAddress);
-    let weiAmount = toWei(amount);
-    console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafe}`);
-
     let blockExplorer = await getConstant('blockExplorer', web3);
-    await revenuePool.claim(merchantSafe, tokenAddress, weiAmount, {
-      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-    });
+    if (amount) {
+      let weiAmount = toWei(amount);
+      console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafe}`);
+      await revenuePool.claim(merchantSafe, tokenAddress, weiAmount, {
+        onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      });
+    } else {
+      console.log(`Claiming ALL ${symbol} in revenue for merchant safe ${merchantSafe}`);
+      await revenuePool.claim(merchantSafe, tokenAddress, undefined, {
+        onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      });
+    }
     console.log('done');
   },
 } as CommandModule;
