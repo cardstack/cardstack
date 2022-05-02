@@ -79,6 +79,15 @@ module.exports = {
     clientURL: 'https://app.cardstack.com',
     clientName: 'Cardstack',
   },
+  webClient: {
+    url: 'https://app.cardstack.com',
+    paths: {
+      cardDrop: {
+        alreadyClaimed: '/card-drop/already-claimed',
+        success: '/card-drop/success',
+      },
+    },
+  },
   web3storage: {
     token: null,
   },
