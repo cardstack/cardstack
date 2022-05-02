@@ -2,6 +2,10 @@ import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests
 import { registry, setupHub } from '../helpers/server';
 import { Job, TaskSpec } from 'graphile-worker';
 import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
+import config from 'config';
+
+const { url: webClientUrl } = config.get('webClient');
+const { alreadyClaimed, success } = config.get('webClient.paths.cardDrop');
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -50,13 +54,10 @@ describe('GET /email-card-drop/verify', function () {
     jobPayloads = [];
   });
 
-  it('accepts a valid verification, marks it claimed, and triggers a job to drop a card', async function () {
+  it('accepts a valid verification, marks it claimed, triggers a job to drop a card, and redirects to a success page', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
     );
-
-    expect(response.status).to.equal(200);
-    expect(response.text).to.equal('You have verified your card drop request');
 
     let newlyClaimed = (
       await emailCardDropRequestsQueries!.query({
@@ -72,18 +73,21 @@ describe('GET /email-card-drop/verify', function () {
         id: unclaimedEoa.id,
       },
     ]);
+
+    expect(response.status).to.equal(302);
+    expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
   });
 
-  it('rejects a verification that has been used', async function () {
+  it('rejects a verification that has been used and redirects to an already-claimed page', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}&email-hash=${claimedEoa.emailHash}`
     );
 
-    expect(response.status).to.equal(400);
-    expect(response.text).to.equal('You have already claimed a card drop');
-
     expect(jobIdentifiers).to.be.empty;
     expect(jobPayloads).to.be.empty;
+
+    expect(response.status).to.equal(302);
+    expect(response.headers['location']).to.equal(`${webClientUrl}${alreadyClaimed}`);
   });
 
   it('rejects an unknown verification', async function () {

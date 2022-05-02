@@ -2,6 +2,10 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
+import config from 'config';
+
+const { url: webClientUrl } = config.get('webClient');
+const { alreadyClaimed, success } = config.get('webClient.paths.cardDrop');
 
 export default class EmailCardDropVerifyRoute {
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -40,9 +44,7 @@ export default class EmailCardDropVerifyRoute {
         id: updatedRequest.id,
       });
 
-      ctx.status = 200;
-      ctx.body = 'You have verified your card drop request';
-
+      ctx.redirect(`${webClientUrl}${success}`);
       return;
     }
 
@@ -62,8 +64,8 @@ export default class EmailCardDropVerifyRoute {
       ctx.status = 400;
       ctx.body = 'Email is invalid';
     } else if (emailCardDropRequest.claimedAt) {
-      ctx.status = 400;
-      ctx.body = 'You have already claimed a card drop';
+      ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
+      return;
     }
 
     return;
