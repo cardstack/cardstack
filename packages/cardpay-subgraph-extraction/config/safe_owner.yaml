@@ -1,0 +1,32 @@
+base: &base
+  name: safe_owner
+  tables:
+    safe_owner:
+      column_mappings:
+        created_at:
+          created_at_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: created_at_uint64_valid
+        ownership_changed_at:
+          ownership_changed_at_uint64:
+            default: 0
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: ownership_changed_at_uint64_valid
+      partition_sizes:
+      - 524288
+      - 131072
+      - 16384
+      - 1024
+      - 64
+  version: 0.0.1
+
+staging:
+  <<: *base
+  subgraph: habdelra/cardpay-sokol
+
+production:
+  <<: *base
+  subgraph: habdelra/cardpay-xdai
