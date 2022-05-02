@@ -260,6 +260,36 @@ describe('POST /api/email-card-drop-requests', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('rejects if the rate limit has been triggered', async function () {
+    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
+    await emailCardDropStateQueries.update(true);
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'Rate limit has been triggered',
+          },
+        ],
+      });
+  });
+
   it('rejects an invalid email', async function () {
     const payload = {
       data: {

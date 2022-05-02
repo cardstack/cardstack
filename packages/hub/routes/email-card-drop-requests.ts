@@ -28,6 +28,7 @@ export default class EmailCardDropRequestsRoute {
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
+  emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -75,6 +76,14 @@ export default class EmailCardDropRequestsRoute {
 
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    if (await this.emailCardDropStateQueries.read()) {
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
+      };
       return;
     }
 
