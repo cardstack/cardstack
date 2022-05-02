@@ -21617,6 +21617,11 @@ jquery@^3.4.1, jquery@^3.5.0, jquery@^3.5.1:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
   integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
 
+js-hcl-parser@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/js-hcl-parser/-/js-hcl-parser-1.0.1.tgz#846e1a169a1fdacb7bb76317b8ef452d9c6a3711"
+  integrity sha512-fCs/gex31g5FYiXItz6UJBJpKnQoRE7+B3yVv6YqPKce9/k/a0QlJXjoicfvt8jGLy8CHKJ641RXe93xSZCM7A==
+
 js-sha3@0.5.7, js-sha3@^0.5.7:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.5.7.tgz#0d4ffd8002d5333aabaf4a23eed2f6374c9f28e7"

@@ -1,0 +1,25 @@
+name: Check secrets
+description: verify that waypoint.hcl-requested secrets are accessible via policy
+
+inputs:
+  waypoint_config_file:
+    description: Waypoint config file to check
+    required: false
+    default: 'waypoint.hcl'
+
+runs:
+  using: composite
+  steps:
+    - name: Install apt packages
+      shell: bash
+      run: |
+        sudo apt-get install awscli jq
+
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Check access to secrets specified in ${{ inputs.waypoint_config_file }}
+      run: yarn check:waypoint-secrets ${{ inputs.waypoint_config_file }}
+      shell: bash
