@@ -53,7 +53,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay did resolve <did>`](#cardpay-did-resolve-did)
  - [`cardpay did resolve-aka <did>`](#cardpay-did-resolve-aka-did)
  - [`cardpay hub auth <hubRootUrl>`](#cardpay-hub-auth-hubrooturl)
- - [`cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-merchantsafe-tokenaddress-amount)
+ - [`cardpay merchant claim-revenue <merchantSafe> <tokenAddress> [amount]`](#cardpay-merchant-claim-revenue-merchantsafe-tokenaddress-amount)
  - [`cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-gas-estimate-merchantsafe-tokenaddress-amount)
  - [`cardpay merchant register <fundingCard> <infoDID>`](#cardpay-merchant-register-fundingcard-infodid)
  - [`cardpay merchant revenue-balances <merchantSafe>`](#cardpay-merchant-revenue-balances-merchantsafe)
@@ -110,10 +110,11 @@ Positionals:
   tokenAddress  The address of the token to get the balance of. Defaults to native token for network  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay bridge await-to-l1 <fromBlock> <txnHash>`
@@ -126,10 +127,11 @@ Positionals:
   txnHash    Layer 2 transaction hash of the bridging transaction  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge await-to-l2 <fromBlock> [recipient]`
@@ -142,10 +144,11 @@ Positionals:
   recipient  Layer 2 address that is the owner of the bridged tokens, defaults to wallet address  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge claim-on-l1 <messageId> <encodedData> <signatures..>`
@@ -159,10 +162,11 @@ Positionals:
   signatures   The bridge validator signatures received from bridging (obtained from `cardpay bridge await-to-l1`)  [array] [required] [default: []]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
 ## `cardpay bridge to-l1 <safeAddress> <amount> <tokenAddress> <receiver>`
@@ -177,10 +181,11 @@ Positionals:
   receiver      Layer 1 address to receive the bridged tokens  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay bridge to-l2 <amount> <tokenAddress> [receiver]`
@@ -194,10 +199,11 @@ Positionals:
   receiver      Layer 2 address to be the owner of L2 safe, defaults to same as L1 address  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
 ## `cardpay bridge withdrawal-limits <token>`
@@ -209,10 +215,11 @@ Positionals:
   token  The layer 2 CPXD token address of the token being withdrawn  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay did resolve <did>`
@@ -224,9 +231,10 @@ Positionals:
   did  The DID to decode  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
       --network  [required]
 ```
 
@@ -239,9 +247,10 @@ Positionals:
   did  The DID to decode  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
       --network  [required]
 ```
 
@@ -254,13 +263,14 @@ Positionals:
   hubRootUrl  The URL of the hub server to authenticate with  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay merchant claim-revenue <merchantSafe> <tokenAddress> <amount>`
+## `cardpay merchant claim-revenue <merchantSafe> <tokenAddress> [amount]`
 
 Claim merchant revenue earned from prepaid card payments
 
@@ -268,13 +278,14 @@ Claim merchant revenue earned from prepaid card payments
 Positionals:
   merchantSafe  The address of the merchant's safe whose revenue balance is being claimed  [string] [required]
   tokenAddress  The address of the tokens that are being claimed as revenue  [string] [required]
-  amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --amount          The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`
@@ -288,10 +299,11 @@ Positionals:
   amount        The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant register <fundingCard> <infoDID>`
@@ -304,10 +316,11 @@ Positionals:
   infoDID      The DID string that can be resolved to a DID document representing the merchant's information  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay merchant revenue-balances <merchantSafe>`
@@ -319,10 +332,11 @@ Positionals:
   merchantSafe  The address of the merchant's safe whose balances are to be viewed  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>`
@@ -337,12 +351,13 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-      --force          Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
-      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --force           Force the prepaid card to be created even when the DAI rate is not snapped to USD  [boolean] [default: false]
+      --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card creation-gas-fee <tokenAddress>`
@@ -354,10 +369,11 @@ Positionals:
   tokenAddress  The token address of the token that will be used to pay for the prepaid card  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card pay-merchant <merchantSafe> <prepaidCard> <spendAmount>`
@@ -371,11 +387,12 @@ Positionals:
   spendAmount   The amount to send to the merchant in units of SPEND  [number] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-      --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card payment-limits`
@@ -384,10 +401,11 @@ Get the minimum and maximum prepaid card payment limits in SPEND
 
 ```
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card price-for-face-value <tokenAddress> <spendFaceValue>`
@@ -400,10 +418,11 @@ Positionals:
   spendFaceValue  The desired face value in SPEND for the prepaid card  [number] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card split <prepaidCard> <customizationDID> <faceValues..>`
@@ -417,11 +436,12 @@ Positionals:
   faceValues        A list of face values (separated by spaces) in units of § SPEND to create  [number] [required] [default: []]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -f, --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card split-equally <prepaidCard> <faceValue> <quantity>`
@@ -435,11 +455,12 @@ Positionals:
   quantity     The amount of prepaid cards to create  [number] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -f, --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card transfer <prepaidCard> <newOwner>`
@@ -452,11 +473,12 @@ Positionals:
   newOwner     The address of the new owner  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -f, --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market add <fundingCard> <prepaidCard>`
@@ -469,10 +491,11 @@ Positionals:
   prepaidCard  The prepaid card to add to the inventory  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market inventory <sku>`
@@ -484,10 +507,11 @@ Positionals:
   sku  The SKU to obtain inventory for  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market inventories <environment>`
@@ -499,10 +523,11 @@ Positionals:
   environment  The environment to query  [string] [required] [choices: "staging", "production"]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market provision <sku> <recipient> <environment> <secret>`
@@ -517,10 +542,11 @@ Positionals:
   secret       The "provisioner secret" phrase to enable provisioning  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`
@@ -533,10 +559,11 @@ Positionals:
   prepaidCards  A list of prepaid cards (separated by spaces) to remove from inventory  [array] [required] [default: []]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`
@@ -550,10 +577,11 @@ Positionals:
   askPrice     The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU  [number] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay prepaid-card-market sku-info <sku>`
@@ -565,10 +593,11 @@ Positionals:
   sku  The SKU to obtain details for  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay price eth <token> [amount]`
@@ -581,10 +610,11 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay price updated-at <token>`
@@ -596,10 +626,11 @@ Positionals:
   token  The token symbol (without the .CPXD suffix)  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay price usd <token> [amount]`
@@ -612,10 +643,11 @@ Positionals:
   amount  The amount of the specified token (*not* in units of wei, but in eth)  [string] [default: "1"]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "xdai", "mainnet"]
 ```
 
 ## `cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`
@@ -630,10 +662,11 @@ Positionals:
   amount           The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`
@@ -647,10 +680,11 @@ Positionals:
   blob             Hex encoding of rule blob  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin create-program <prepaidCard> <admin>`
@@ -663,10 +697,11 @@ Positionals:
   prepaidCard  The address of the prepaid card that is being used to pay the reward program registration fee  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin lock <fundingCard> <rewardProgramId>`
@@ -679,10 +714,11 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`
@@ -697,10 +733,11 @@ Positionals:
   amount           The amount of tokens to recover into safe  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards admin set-admin <fundingCard> <rewardProgramId> <newAdmin>`
@@ -714,10 +751,11 @@ Positionals:
   newAdmin         The EOA admin of reward program  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
@@ -734,6 +772,7 @@ Options:
   -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic            Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic      Phrase for mnemonic wallet using ethers.js signer  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -750,6 +789,7 @@ Options:
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic         Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
       --rewardProgramId  The reward program id.  [string]
       --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
       --isValidOnly      Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo  [boolean]
@@ -762,10 +802,11 @@ List reward programs
 
 ```
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards pool-balances <rewardProgramId>`
@@ -777,10 +818,11 @@ Positionals:
   rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards register <prepaidCard> <rewardProgramId>`
@@ -793,11 +835,12 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -f, --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards reward-balances <address>`
@@ -812,6 +855,7 @@ Options:
   -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic         Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
       --rewardProgramId  The reward program id.  [string]
   -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -826,10 +870,11 @@ Positionals:
   newOwner    The address of the new owner  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> [amount]`
@@ -843,11 +888,12 @@ Positionals:
   tokenAddress  The address of the tokens that are being transferred from reward safe  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-      --amount         The amount of tokens to transfer (not in units of wei, but in eth)  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --amount          The amount of tokens to transfer (not in units of wei, but in eth)  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards view <rewardProgramId>`
@@ -859,10 +905,11 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards register-rewardee-gas-estimate <prepaidCard> <rewardProgramId>`
@@ -875,11 +922,12 @@ Positionals:
   rewardProgramId  Reward program id  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -f, --from           The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -f, --from            The signing EOA. Defaults to the first derived EOA of the specified mnemonic  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
@@ -896,6 +944,7 @@ Options:
   -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic            Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic      Phrase for mnemonic wallet using ethers.js signer  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -912,10 +961,11 @@ Positionals:
   amount        The amount of tokens to transfer (not in units of wei, but in eth)  [string] [required]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
@@ -932,6 +982,7 @@ Options:
   -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic            Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic      Phrase for mnemonic wallet using ethers.js signer  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
@@ -946,10 +997,11 @@ Positionals:
   safeType  The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`
@@ -961,13 +1013,14 @@ Positionals:
   safeAddress  The address of the safe that is sending the tokens  [string]
   token        The token address of the tokens to transfer from the safe  [string]
   recipient    The token recipient's address  [string]
-  amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --amount          The amount of tokens to transfer (not in units of wei, but in eth)  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`
@@ -982,10 +1035,11 @@ Positionals:
   amount       The amount of tokens to transfer (not in units of wei, but in eth)  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe view [safeAddress]`
@@ -997,10 +1051,11 @@ Positionals:
   safeAddress  The address of the safe to view  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 ## `cardpay safe debug-sign-typed-data [data] [address]`
@@ -1013,10 +1068,11 @@ Positionals:
   address  (optional) The address of the signer, defaults to the first HD derived path for the seed  [string]
 
 Options:
-  -w, --walletConnect  A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor         A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic       Phrase for mnemonic wallet  [string]
-  -n, --network        The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
 <!-- END CLI DOCS GENERATED BY yarn command-docs -->
