@@ -85,6 +85,10 @@ export default class StatusRoute {
             status: exchangeRatesStatus,
             lastFetched: exchangeRatesLastFetched,
           },
+          'exchange-rates': {
+            status: exchangeRatesStatus,
+            lastFetched: exchangeRatesLastFetched,
+          },
         },
       },
     };
