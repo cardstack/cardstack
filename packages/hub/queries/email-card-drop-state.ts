@@ -22,7 +22,7 @@ export default class EmailCardDropStateQueries {
   async update(rateLimited: boolean) {
     let db = await this.databaseManager.getClient();
 
-    // Insert if empty, update but only if the block number is higher
+    // Insert if empty, update otherwise
     await db.query(
       `
       INSERT INTO ${EMAIL_CARD_DROP_STATE_TABLE} (id, rate_limited)
@@ -30,10 +30,7 @@ export default class EmailCardDropStateQueries {
 
       ON CONFLICT (id)
       DO UPDATE SET
-        rate_limited = GREATEST(
-          $2,
-          (SELECT rate_limited FROM ${EMAIL_CARD_DROP_STATE_TABLE} WHERE id = 1)
-        ),
+        rate_limited = $2,
         updated_at = NOW()
       `,
       [1, rateLimited]
