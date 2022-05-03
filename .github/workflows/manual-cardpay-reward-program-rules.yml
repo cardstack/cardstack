@@ -17,6 +17,7 @@ on:
           - RetroAirdrop
           - WeightedUsage
           - MinOtherMerchantsPaid
+          - SafeOwnership
 
 jobs:
   build:
