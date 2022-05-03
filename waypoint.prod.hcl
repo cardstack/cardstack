@@ -41,6 +41,8 @@ app "hub" {
                 LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
                 LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_wss_url-BXGFlG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+                HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_hub_email_card_drop_rate_limit_count-mdtxRC"
+                HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_hub_email_card_drop_rate_limit_period_minutes-m71GVI"
                 HUB_EMAIL_HASH_SALT = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_email_hash_salt-6j6HZV"
             }
         }
