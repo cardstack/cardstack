@@ -9,6 +9,7 @@ import isEmail from 'validator/lib/isEmail';
 import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
 import cryptoRandomString from 'crypto-random-string';
+import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
 
 export interface EmailCardDropRequest {
@@ -93,6 +94,13 @@ export default class EmailCardDropRequestsRoute {
     let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
 
     if (countOfRecentClaims >= count) {
+      Sentry.captureException('Rate limit has been triggered', {
+        level: Sentry.Severity.Critical,
+        tags: {
+          action: 'email-card-drop-requests',
+        },
+      });
+
       await this.emailCardDropStateQueries.update(true);
 
       ctx.status = 503;

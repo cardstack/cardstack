@@ -5,6 +5,11 @@ import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
 import shortUUID from 'short-uuid';
+import sentryTestkit from 'sentry-testkit';
+import * as Sentry from '@sentry/node';
+import waitFor from '../utils/wait-for';
+
+const { testkit, sentryTransport } = sentryTestkit();
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -141,6 +146,15 @@ class StubWorkerClient {
 
 describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
+    testkit.reset();
+
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('worker-client', StubWorkerClient);
   });
@@ -332,6 +346,17 @@ describe('POST /api/email-card-drop-requests', function () {
     let limited = await emailCardDropStateQueries.read();
 
     expect(limited).to.equal(true);
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    let sentryReport = testkit.reports()[0];
+
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'email-card-drop-requests',
+    });
+
+    expect(sentryReport.level).to.equal('critical');
+    expect(sentryReport.error?.message).to.equal('Rate limit has been triggered');
   });
 
   it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
