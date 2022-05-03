@@ -4,6 +4,7 @@ import { registry, setupHub } from '../helpers/server';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
+import shortUUID from 'short-uuid';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -288,6 +289,49 @@ describe('POST /api/email-card-drop-requests', function () {
           },
         ],
       });
+  });
+
+  it('rejects and triggers the rate limit if enough drops have happened in the interval', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+
+    for (let i = 0; i <= count; i++) {
+      let claim = Object.assign({}, claimedEoa);
+      claim.claimedAt = new Date(Date.now() - periodMinutes * 60 * 1000);
+      claim.id = shortUUID.uuid();
+      await emailCardDropRequestsQueries.insert(claim);
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'Rate limit has been triggered',
+          },
+        ],
+      });
+
+    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
+    let limited = await emailCardDropStateQueries.read();
+
+    expect(limited).to.equal(true);
   });
 
   it('rejects an invalid email', async function () {

@@ -79,6 +79,8 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
+    ctx.type = 'application/vnd.api+json';
+
     if (await this.emailCardDropStateQueries.read()) {
       ctx.status = 503;
       ctx.body = {
@@ -87,7 +89,18 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    ctx.type = 'application/vnd.api+json';
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+    let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
+
+    if (countOfRecentClaims >= count) {
+      await this.emailCardDropStateQueries.update(true);
+
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
+      };
+      return;
+    }
 
     let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
       ownerAddress: ctx.state.userAddress,

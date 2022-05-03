@@ -55,6 +55,19 @@ export default class EmailCardDropRequestsQueries {
     });
   }
 
+  async claimedInLastMinutes(minutes: number): Promise<EmailCardDropRequest[]> {
+    let db = await this.databaseManager.getClient();
+
+    let { rows } = await db.query(
+      `
+        SELECT COUNT(*) FROM email_card_drop_requests
+        WHERE claimed_at > NOW() - interval '${minutes} minutes'
+      `
+    );
+
+    return rows[0].count;
+  }
+
   async updateVerificationCode(id: string, verificationCode: string): Promise<EmailCardDropRequest> {
     let db = await this.databaseManager.getClient();
 
