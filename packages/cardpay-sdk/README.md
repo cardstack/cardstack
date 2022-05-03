@@ -727,6 +727,8 @@ The parameters to this function are:
 - The token address of the tokens the merchant is claiming
 - The amount of tokens that are being claimed as a string in units of `wei`
 
+`amount` is an optional param. When `amount` is excluded, the entire `revenueBalance` of a merchant safe is claimed.
+
 ```ts
 let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
 ```
