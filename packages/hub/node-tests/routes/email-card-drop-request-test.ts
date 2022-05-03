@@ -334,6 +334,36 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(limited).to.equal(true);
   });
 
+  it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+
+    for (let i = 0; i <= count * 2; i++) {
+      let claim = Object.assign({}, claimedEoa);
+      claim.claimedAt = new Date(Date.now() - 2 * periodMinutes * 60 * 1000);
+      claim.id = shortUUID.uuid();
+      await emailCardDropRequestsQueries.insert(claim);
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(201);
+  });
+
   it('rejects an invalid email', async function () {
     const payload = {
       data: {
