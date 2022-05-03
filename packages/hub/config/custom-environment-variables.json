@@ -56,9 +56,8 @@
     "sku": "CARD_DROP_SKU",
     "email": {
       "rateLimit": {
-        "count": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT",
-        "periodMinutes": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES",
-        "fixme": "FIXME_ABOVE_NEEDED_IN_WAYPOINT_ETC"
+        "count": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT", "__format": "number"},
+        "periodMinutes": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES", "__format": "number"}
       }
     }
   },
