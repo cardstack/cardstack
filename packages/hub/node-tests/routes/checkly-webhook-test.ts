@@ -18,7 +18,7 @@ class StubStatuspageApi {
   }
 }
 
-describe('POST /api/checkly-webhook', async function () {
+describe('POST /callbacks/checkly', async function () {
   this.beforeEach(function () {
     createdIncident = null;
     resolvedIncident = null;

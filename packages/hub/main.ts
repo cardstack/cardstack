@@ -84,8 +84,10 @@ import WyreTransferTask from './tasks/wyre-transfer';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
+import PagerdutyApi from './services/pagerduty-api';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
+import PagerdutyIncidentsWebhookRoute from './routes/pagerduty-incidents-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
 import { registerQueries } from './queries';
@@ -95,6 +97,7 @@ import EmailCardDropRequestSerializer from './services/serializers/email-card-dr
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
 import DropCardTask from './tasks/drop-card';
 import SubscribeEmailTask from './tasks/subscribe-email';
+import DiscordPostTask from './tasks/discord-post';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -137,6 +140,7 @@ export function createRegistry(): Registry {
   registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
   registry.register('subscribe-email', SubscribeEmailTask);
   registry.register('drop-card', DropCardTask);
+  registry.register('discord-post', DiscordPostTask);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
@@ -173,8 +177,10 @@ export function createRegistry(): Registry {
   registry.register('wyre-prices-route', WyrePricesRoute);
   registry.register('wyre-transfer', WyreTransferTask);
   registry.register('web3-storage', Web3Storage);
+  registry.register('pagerduty-api', PagerdutyApi);
   registry.register('statuspage-api', StatuspageApi);
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
+  registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
 
   if (process.env.COMPILER) {
