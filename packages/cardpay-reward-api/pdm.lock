@@ -70,7 +70,7 @@ requires_python = ">=3.7"
 summary = "pathlib-style classes for cloud storage services"
 dependencies = [
     "boto3",
-    "cloudpathlib",
+    "cloudpathlib>=0.7.1",
 ]
 
 [[package]]
@@ -168,7 +168,7 @@ requires_python = ">=3.6.1"
 summary = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 dependencies = [
     "email-validator<2.0.0,>=1.1.1",
-    "fastapi",
+    "fastapi>=0.75.1",
     "itsdangerous<3.0.0,>=1.1.0",
     "jinja2<4.0.0,>=2.11.2",
     "orjson<4.0.0,>=3.2.1",
@@ -397,8 +397,7 @@ summary = "HTTP library with thread-safe connection pooling, file post, and more
 
 [[package]]
 name = "uvicorn"
-version = "0.17.6"
-requires_python = ">=3.7"
+version = "0.15.0"
 summary = "The lightning-fast ASGI server."
 dependencies = [
     "asgiref>=3.4.0",
@@ -416,7 +415,7 @@ dependencies = [
     "colorama>=0.4; sys_platform == \"win32\"",
     "httptools==0.2.*",
     "python-dotenv>=0.13",
-    "uvicorn",
+    "uvicorn<0.16.0,>=0.12.0",
     "uvloop!=0.15.0,!=0.15.1,>=0.14.0; sys_platform != \"win32\" and (sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\")",
     "watchgod>=0.6",
     "websockets>=9.1",
@@ -445,7 +444,7 @@ summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:c55f4ad9877e0e40c94bcda8dc7c273797111bcff4e0c3ed5f156800737a331e"
+content_hash = "sha256:6abe8b0e8e3b6fa13b479c96cdf91c5943f61953a6e478269d97a05e105e5e4f"
 
 [metadata.files]
 "anyio 3.5.0" = [
@@ -965,10 +964,6 @@ content_hash = "sha256:c55f4ad9877e0e40c94bcda8dc7c273797111bcff4e0c3ed5f1568007
 "urllib3 1.26.9" = [
     {file = "urllib3-1.26.9-py2.py3-none-any.whl", hash = "sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14"},
     {file = "urllib3-1.26.9.tar.gz", hash = "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"},
-]
-"uvicorn 0.17.6" = [
-    {file = "uvicorn-0.17.6-py3-none-any.whl", hash = "sha256:19e2a0e96c9ac5581c01eb1a79a7d2f72bb479691acd2b8921fce48ed5b961a6"},
-    {file = "uvicorn-0.17.6.tar.gz", hash = "sha256:5180f9d059611747d841a4a4c4ab675edf54c8489e97f96d0583ee90ac3bfc23"},
 ]
 "uvicorn 0.15.0" = [
     {file = "uvicorn-0.15.0-py3-none-any.whl", hash = "sha256:17f898c64c71a2640514d4089da2689e5db1ce5d4086c2d53699bf99513421c1"},
