@@ -95,9 +95,9 @@ export default class EmailCardDropRequestsRoute {
 
     if (countOfRecentClaims >= count) {
       Sentry.captureException('Rate limit has been triggered', {
-        level: Sentry.Severity.Critical,
+        level: Sentry.Severity.Fatal,
         tags: {
-          action: 'email-card-drop-requests',
+          event: 'email-card-drop-rate-limit-reached',
         },
       });
 

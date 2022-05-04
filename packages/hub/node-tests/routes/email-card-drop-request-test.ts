@@ -352,10 +352,10 @@ describe('POST /api/email-card-drop-requests', function () {
     let sentryReport = testkit.reports()[0];
 
     expect(sentryReport.tags).to.deep.equal({
-      action: 'email-card-drop-requests',
+      event: 'email-card-drop-rate-limit-reached',
     });
 
-    expect(sentryReport.level).to.equal('critical');
+    expect(sentryReport.level).to.equal('fatal');
     expect(sentryReport.error?.message).to.equal('Rate limit has been triggered');
   });
 
