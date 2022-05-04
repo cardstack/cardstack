@@ -94,7 +94,7 @@ export default class EmailCardDropRequestsRoute {
     let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
 
     if (countOfRecentClaims >= count) {
-      Sentry.captureException('Rate limit has been triggered', {
+      Sentry.captureException(new Error('Rate limit has been triggered'), {
         level: Sentry.Severity.Fatal,
         tags: {
           event: 'email-card-drop-rate-limit-reached',
@@ -105,7 +105,7 @@ export default class EmailCardDropRequestsRoute {
 
       ctx.status = 503;
       ctx.body = {
-        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
+        errors: [{ status: '503', title: 'Card drop rate limit has been triggered' }],
       };
       return;
     }
