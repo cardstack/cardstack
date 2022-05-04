@@ -32,6 +32,7 @@ module.exports = {
     allowedGuilds: '958136276559753266',
     allowedChannels: '958136277096620084,958137087641661450',
     messageVerificationDelayMs: 1000 * 15,
+    onCallInternalWebhook: null,
   },
   authSecret: null,
   emailHashSalt: null,
@@ -94,5 +95,8 @@ module.exports = {
   statuspage: {
     apiKey: null,
     pageId: null,
+  },
+  pagerDuty: {
+    token: null,
   },
 };

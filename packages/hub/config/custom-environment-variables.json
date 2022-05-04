@@ -20,7 +20,8 @@
     "cordeBotToken": "CORDE_BOT_TOKEN",
     "commandPrefix": "CARDBOT_COMMAND_PREFIX",
     "allowedGuilds": "CARDBOT_ALLOWED_GUILDS",
-    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS"
+    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS",
+    "onCallInternalWebhook": "DISCORD_ON_CALL_INTERNAL_WEBHOOK"
   },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
@@ -57,6 +58,9 @@
   },
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"
+  },
+  "pagerduty": {
+    "token": "PAGERDUTY_TOKEN"
   },
   "statuspage": {
     "pageId": "STATUSPAGE_PAGE_ID",
