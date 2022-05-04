@@ -356,7 +356,7 @@ describe('POST /api/email-card-drop-requests', function () {
     });
 
     expect(sentryReport.level).to.equal('fatal');
-    expect(sentryReport.error?.message).to.equal('Rate limit has been triggered');
+    expect(sentryReport.error?.message).to.equal('Card drop rate limit has been triggered');
   });
 
   it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
