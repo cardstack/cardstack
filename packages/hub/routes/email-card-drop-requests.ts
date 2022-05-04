@@ -94,6 +94,7 @@ export default class EmailCardDropRequestsRoute {
     let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
 
     if (countOfRecentClaims >= count) {
+      // The rate limit flag must be manually cleared by updating the database
       Sentry.captureException(new Error('Card drop rate limit has been triggered'), {
         level: Sentry.Severity.Fatal,
         tags: {
