@@ -22,9 +22,9 @@ export const CONTRACT_EVENTS = [
     taskName: 'notify-merchant-claim',
   },
   {
-    abiName: 'prepaid-card-manager',
-    contractName: 'prepaidCardManager' as AddressKeys,
-    eventName: 'TransferredPrepaidCard', // FIXME this is not the correct event, as the actual event does not yet exist
+    abiName: 'prepaid-card-market-v2',
+    contractName: 'prepaidCardMarketV2' as AddressKeys,
+    eventName: 'PrepaidCardProvisioned',
     taskName: 'notify-prepaid-card-drop',
   },
 ];
