@@ -9,6 +9,7 @@ import isEmail from 'validator/lib/isEmail';
 import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
 import cryptoRandomString from 'crypto-random-string';
+import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
 
 export interface EmailCardDropRequest {
@@ -28,6 +29,7 @@ export default class EmailCardDropRequestsRoute {
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
+  emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -79,6 +81,35 @@ export default class EmailCardDropRequestsRoute {
     }
 
     ctx.type = 'application/vnd.api+json';
+
+    if (await this.emailCardDropStateQueries.read()) {
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
+      };
+      return;
+    }
+
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+    let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
+
+    if (countOfRecentClaims >= count) {
+      // The rate limit flag must be manually cleared by updating the database
+      Sentry.captureException(new Error('Card drop rate limit has been triggered'), {
+        level: Sentry.Severity.Fatal,
+        tags: {
+          event: 'email-card-drop-rate-limit-reached',
+        },
+      });
+
+      await this.emailCardDropStateQueries.update(true);
+
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
+      };
+      return;
+    }
 
     let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
       ownerAddress: ctx.state.userAddress,

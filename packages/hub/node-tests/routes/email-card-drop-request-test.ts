@@ -4,6 +4,12 @@ import { registry, setupHub } from '../helpers/server';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
+import shortUUID from 'short-uuid';
+import sentryTestkit from 'sentry-testkit';
+import * as Sentry from '@sentry/node';
+import waitFor from '../utils/wait-for';
+
+const { testkit, sentryTransport } = sentryTestkit();
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -140,6 +146,15 @@ class StubWorkerClient {
 
 describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
+    Sentry.init({
+      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+
+    testkit.reset();
+
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('worker-client', StubWorkerClient);
   });
@@ -258,6 +273,120 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects if the rate limit has been triggered', async function () {
+    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
+    await emailCardDropStateQueries.update(true);
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'Rate limit has been triggered',
+          },
+        ],
+      });
+  });
+
+  it('rejects and triggers the rate limit if enough drops have happened in the interval', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+
+    for (let i = 0; i <= count; i++) {
+      let claim = Object.assign({}, claimedEoa);
+      claim.claimedAt = new Date(Date.now() - periodMinutes * 60 * 1000);
+      claim.id = shortUUID.uuid();
+      await emailCardDropRequestsQueries.insert(claim);
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'Rate limit has been triggered',
+          },
+        ],
+      });
+
+    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
+    let limited = await emailCardDropStateQueries.read();
+
+    expect(limited).to.equal(true);
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    let sentryReport = testkit.reports()[0];
+
+    expect(sentryReport.tags).to.deep.equal({
+      event: 'email-card-drop-rate-limit-reached',
+    });
+
+    expect(sentryReport.level).to.equal('fatal');
+    expect(sentryReport.error?.message).to.equal('Card drop rate limit has been triggered');
+  });
+
+  it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+
+    for (let i = 0; i <= count * 2; i++) {
+      let claim = Object.assign({}, claimedEoa);
+      claim.claimedAt = new Date(Date.now() - 2 * periodMinutes * 60 * 1000);
+      claim.id = shortUUID.uuid();
+      await emailCardDropRequestsQueries.insert(claim);
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(201);
   });
 
   it('rejects an invalid email', async function () {

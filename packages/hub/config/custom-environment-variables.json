@@ -54,7 +54,13 @@
     "provisionerSecret": "PROVISIONER_SECRET"
   },
   "cardDrop": {
-    "sku": "CARD_DROP_SKU"
+    "sku": "CARD_DROP_SKU",
+    "email": {
+      "rateLimit": {
+        "count": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT", "__format": "number"},
+        "periodMinutes": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES", "__format": "number"}
+      }
+    }
   },
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"

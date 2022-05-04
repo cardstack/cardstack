@@ -908,6 +908,20 @@ CREATE TABLE public.email_card_drop_requests (
 ALTER TABLE public.email_card_drop_requests OWNER TO postgres;
 
 --
+-- Name: email_card_drop_state; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.email_card_drop_state (
+    id integer DEFAULT 1 NOT NULL,
+    rate_limited boolean NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT email_card_drop_state_singleton CHECK ((id = 1))
+);
+
+
+ALTER TABLE public.email_card_drop_state OWNER TO postgres;
+
+--
 -- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1262,6 +1276,14 @@ ALTER TABLE ONLY public.dm_channels
 
 ALTER TABLE ONLY public.email_card_drop_requests
     ADD CONSTRAINT email_card_drop_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_card_drop_state email_card_drop_state_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.email_card_drop_state
+    ADD CONSTRAINT email_card_drop_state_pkey PRIMARY KEY (id);
 
 
 --
@@ -1661,6 +1683,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 30	20220301101637933_create-card-space-profiles-for-existing-merchants	2022-04-13 13:49:06.763103
 31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
+33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
 \.
 
 
@@ -1668,7 +1691,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 32, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 33, true);
 
 
 --
