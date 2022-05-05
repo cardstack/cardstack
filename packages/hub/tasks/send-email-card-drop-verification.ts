@@ -1,5 +1,4 @@
 import { Helpers } from 'graphile-worker';
-// Load the AWS SDK for Node.js
 import config from 'config';
 import { query } from '@cardstack/hub/queries';
 import { inject } from '@cardstack/di';
@@ -30,7 +29,8 @@ export default class SendEmailCardDropVerification {
     const params = new URLSearchParams();
     params.append('eoa', request.ownerAddress);
     params.append('verification-code', request.verificationCode);
-    const verificationLink = config.get('emailCardDrop.verificationUrl') + '?' + params.toString(); // get from db and append to config
+    params.append('email-hash', request.emailHash);
+    const verificationLink = config.get('emailCardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
 
