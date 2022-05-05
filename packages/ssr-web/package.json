@@ -109,7 +109,6 @@
     "ember-focus-trap": "^0.6.0",
     "ember-head": "^0.1.0",
     "ember-load-initializers": "^2.1.2",
-    "ember-maybe-import-regenerator": "^0.1.6",
     "ember-named-blocks-polyfill": "^0.2.4",
     "ember-page-title": "^6.2.1",
     "ember-qunit": "^5.1.4",
