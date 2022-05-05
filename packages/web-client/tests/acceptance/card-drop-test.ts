@@ -9,6 +9,6 @@ module('Acceptance | card-drop', function (hooks) {
   test('it shows a success message', async function (assert) {
     assert.expect(0);
     await visit('/card-drop/success');
-    await percySnapshot(assert);
+    await percySnapshot(assert, { widths: [375, 1280] });
   });
 });
