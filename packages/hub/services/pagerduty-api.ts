@@ -24,7 +24,7 @@ export default class PagerdutyApi {
 
   async fetchIncident(incidentId: string): Promise<PagerdutyIncident> {
     let apiResponse: APIResponse = await this.apiClient.get(`/incidents/${incidentId}`);
-    return apiResponse.resource as PagerdutyIncident;
+    return apiResponse.data.incident as PagerdutyIncident;
   }
 }
 
