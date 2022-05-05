@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi_utils.tasks import repeat_every
@@ -59,3 +60,9 @@ def read_proofs(
     param: dict = Depends(param),
 ):
     return crud.get_proofs(db, proof_filter=proof_filter, param=param)
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "cardpay_reward_api.main:app", host="0.0.0.0", port=8000, log_level="info"
+    )
