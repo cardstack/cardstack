@@ -24,7 +24,7 @@ export default class UA extends Service {
     return this.uaParser.getOS().name === 'Android';
   }
 
-  get isMobile() {
+  get canInstallWallet() {
     return this.isIOS() || this.isAndroid();
   }
 }

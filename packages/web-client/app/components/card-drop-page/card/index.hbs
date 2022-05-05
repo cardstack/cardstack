@@ -10,7 +10,7 @@
       {{yield to='explanation'}}
     </p>
 
-    {{#if this.ua.isMobile}}
+    {{#if this.ua.canInstallWallet}}
       <Boxel::Button
         @as='anchor'
         @kind='primary'
