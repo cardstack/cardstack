@@ -8,7 +8,6 @@ authors = [
 license-expression = "MIT"
 dependencies = [
     "fastapi[all]>=0.75.1",
-    "typing>=3.7.4.3",
     "SQLAlchemy>=1.4.35",
     "psycopg2>=2.9.3",
     "pyarrow>=7.0.0",
@@ -33,3 +32,4 @@ build-backend = "pdm.pep517.api"
 [tool.pdm.scripts]
 main = "uvicorn cardpay_reward_api.main:app"
 dev = "uvicorn cardpay_reward_api.main:app --reload"
+test = "python -m cardpay_reward_api.main"
