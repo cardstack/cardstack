@@ -13,6 +13,10 @@ module.exports = {
       region: 'ap-southeast-1',
       roleChain: ['prod:storage-bucket-writer-role'],
     },
+    ses: {
+      supportEmail: 'support@cardstack.com', // the support email is listed on both staging and prod as a verified SES identity
+      region: 'us-east-1', // staging uses us-east-1. prod uses eu-west-1
+    },
     accountId: '680542703984',
     prodAccountId: '120317779495',
   },
