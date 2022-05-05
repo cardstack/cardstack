@@ -2,6 +2,7 @@ import { Helpers } from 'graphile-worker';
 import config from 'config';
 import { query } from '@cardstack/hub/queries';
 import { inject } from '@cardstack/di';
+import * as Sentry from '@sentry/node';
 
 export default class SendEmailCardDropVerification {
   email = inject('email');
@@ -51,8 +52,12 @@ export default class SendEmailCardDropVerification {
       helpers.logger.error((e as Error).toString());
       if ((e as Error).stack) helpers.logger.error((e as Error).stack!);
 
-      // TODO: Sentry alerts for errors + maybe adding to suppression list
-      // https://docs.aws.amazon.com/ses/latest/dg/troubleshoot-error-messages.html
+      Sentry.captureException(e, {
+        tags: {
+          event: 'send-email-card-drop-verification',
+        },
+      });
+      throw e;
     }
   }
 }
