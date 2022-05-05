@@ -1,0 +1,34 @@
+<Boxel::CardContainer class='card-drop-page-card' ...attributes>
+  <div class='card-drop-page-card__section'>
+    {{yield}}
+
+    <h3 class='card-drop-page-card__heading'>
+      {{yield to='heading'}}
+    </h3>
+
+    <p class='card-drop-page-card__explanation'>
+      {{yield to='explanation'}}
+    </p>
+
+    {{#if this.ua.canInstallWallet}}
+      <Boxel::Button
+        @as='anchor'
+        @kind='primary'
+        @href={{concat 'https://' (config 'universalLinkDomain') '/FIXME'}}
+        target='_blank'
+        rel='noopener'
+      >
+        Open Card Wallet
+      </Boxel::Button>
+    {{else}}
+      <Boxel::Button
+        @as='anchor'
+        href='https://cardstack.com'
+        target='_blank'
+        rel='noopener'
+      >
+        Visit Cardstack.com
+      </Boxel::Button>
+    {{/if}}
+  </div>
+</Boxel::CardContainer>

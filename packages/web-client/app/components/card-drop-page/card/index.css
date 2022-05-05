@@ -1,0 +1,32 @@
+.card-drop-page-card {
+  max-width: 720px;
+  padding: var(--boxel-sp-lg);
+  color: var(--boxel-dark);
+}
+
+.card-drop-page-card__section {
+  padding: var(--boxel-sp);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--boxel-sp-lg);
+}
+
+.card-drop-page-card__heading,
+.card-drop-page-card__explanation {
+  text-align: center;
+}
+
+.card-drop-page-card__heading {
+  font-weight: 600;
+}
+
+@media only screen and (max-width: 480px) {
+  .card-drop-page-card {
+    padding: var(--boxel-sp);
+  }
+
+  .card-drop-page-card .prepaid-card {
+    transform: scale(0.75);
+  }
+}

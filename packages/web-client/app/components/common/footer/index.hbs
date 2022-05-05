@@ -12,10 +12,12 @@
       </a>
     </div>
 
-    <Boxel::Button @kind="secondary-dark" @as="anchor" href="https://discord.gg/cardstack">
-      {{svg-jar "discord-logo-color" class="cardstack-footer__discord-icon"}}
-      Join us on Discord
-    </Boxel::Button>
+    {{#unless @hideDiscord}}
+      <Boxel::Button @kind="secondary-dark" @as="anchor" href="https://discord.gg/cardstack">
+        {{svg-jar "discord-logo-color" class="cardstack-footer__discord-icon"}}
+        Join us on Discord
+      </Boxel::Button>
+    {{/unless}}
   </div>
   <div class="cardstack-footer__section cardstack-footer__section--bottom">
     <div class="cardstack-footer__fine-print">
@@ -26,23 +28,25 @@
         Cardstack® is a registered trademark.
       </span>
     </div>
-    <div class="cardstack-footer__socials">
-      <a href="https://twitter.com/cardstack" target="_blank" rel="noopener noreferrer" >
-        <span class="boxel-sr-only">Cardstack Twitter</span>
-        {{svg-jar "twitter-logo" class="cardstack-footer__social-icon"}}
-      </a>
-      <a href="https://telegram.me/cardstack" target="_blank" rel="noopener noreferrer" >
-        <span class="boxel-sr-only">Cardstack Telegram</span>
-        {{svg-jar "telegram-logo" class="cardstack-footer__social-icon"}}
-      </a>
-      <a href="https://github.com/cardstack/cardstack" target="_blank" rel="noopener noreferrer" >
-        <span class="boxel-sr-only">Cardstack Monorepo</span>
-        {{svg-jar "github-logo" class="cardstack-footer__social-icon"}}
-      </a>
-      <a href="https://medium.com/cardstack" target="_blank" rel="noopener noreferrer" >
-        <span class="boxel-sr-only">Cardstack Medium</span>
-        {{svg-jar "medium-logo" class="cardstack-footer__social-icon"}}
-      </a>
-    </div>
+    {{#unless @hideSocials}}
+      <div class="cardstack-footer__socials">
+        <a href="https://twitter.com/cardstack" target="_blank" rel="noopener noreferrer" >
+          <span class="boxel-sr-only">Cardstack Twitter</span>
+          {{svg-jar "twitter-logo" class="cardstack-footer__social-icon"}}
+        </a>
+        <a href="https://telegram.me/cardstack" target="_blank" rel="noopener noreferrer" >
+          <span class="boxel-sr-only">Cardstack Telegram</span>
+          {{svg-jar "telegram-logo" class="cardstack-footer__social-icon"}}
+        </a>
+        <a href="https://github.com/cardstack/cardstack" target="_blank" rel="noopener noreferrer" >
+          <span class="boxel-sr-only">Cardstack Monorepo</span>
+          {{svg-jar "github-logo" class="cardstack-footer__social-icon"}}
+        </a>
+        <a href="https://medium.com/cardstack" target="_blank" rel="noopener noreferrer" >
+          <span class="boxel-sr-only">Cardstack Medium</span>
+          {{svg-jar "medium-logo" class="cardstack-footer__social-icon"}}
+        </a>
+      </div>
+    {{/unless}}
   </div>
 </footer>
