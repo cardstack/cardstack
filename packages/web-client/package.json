@@ -187,7 +187,7 @@
     "web3-providers-ws": "^1.5.1"
   },
   "resolutions": {
-    "ember-test-selectors": "^5.0.0"
+    "ember-test-selectors": "^6.0.0"
   },
   "config": {
     "access": "public"
