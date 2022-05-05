@@ -63,9 +63,12 @@ export default class EmailCardDropRequestsRoute {
 
     let claimed = previousRequests.some((request) => Boolean(request?.claimedAt));
 
+    let rateLimited = await this.emailCardDropStateQueries.read();
+
     let result = this.emailCardDropRequestSerializer.serializeEmailCardDropRequestStatus({
       timestamp,
       ownerAddress,
+      rateLimited,
       claimed,
     });
 
