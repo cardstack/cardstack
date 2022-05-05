@@ -1,4 +1,4 @@
-import { PutSuppressedDestinationCommand, SendEmailCommand, SESv2Client } from '@aws-sdk/client-sesv2';
+import { SendEmailCommand, SESv2Client } from '@aws-sdk/client-sesv2';
 import config from 'config';
 
 /**
@@ -39,21 +39,6 @@ export default class Email {
       })
     );
   }
-
-  /**
-   * Use this to add bad email addresses to our account level suppression list
-   * so we don't send emails to them and damage our sender reputation
-   */
-  async addToSuppressionList(email: string, reason: 'BOUNCE' | 'COMPLAINT') {
-    await this.client.send(
-      new PutSuppressedDestinationCommand({
-        EmailAddress: email,
-        Reason: reason,
-      })
-    );
-  }
-
-  // TODO: add a utility to identify if an error is AWS telling us the email bounced
 }
 
 declare module '@cardstack/di' {
