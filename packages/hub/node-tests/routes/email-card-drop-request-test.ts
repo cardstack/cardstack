@@ -73,8 +73,22 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.status).to.equal(200);
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(claimedEoa.ownerAddress);
+    expect(response.body.data.attributes['rate-limited']).to.equal(false);
     expect(response.body.data.attributes.claimed).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
+  });
+
+  it('reports if the rate limit has been reached', async function () {
+    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
+    await emailCardDropStateQueries.update(true);
+
+    let response = await request()
+      .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(200);
+    expect(response.body.data.attributes['rate-limited']).to.equal(true);
   });
 
   it('returns false if a known EOA does not have a claim timestamp for its card drop request', async function () {
