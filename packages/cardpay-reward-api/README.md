@@ -8,7 +8,10 @@
 
     pdm run main
     docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+    or 
     brew services list
+    
+    and
     pdm run test
     
     
