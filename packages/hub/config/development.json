@@ -4,7 +4,7 @@
       "roleChain": ["hub-local-dev", "prod:storage-bucket-writer-role"]
     }
   },
-  "emailCardDrop": {
+  "cardDrop": {
     "verificationUrl": "http://localhost:3000/email-card-drop/verify"
   },
   "compiler": {

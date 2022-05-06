@@ -35,7 +35,7 @@ export default class SendEmailCardDropVerification {
     params.append('eoa', request.ownerAddress);
     params.append('verification-code', request.verificationCode);
     params.append('email-hash', request.emailHash);
-    const verificationLink = config.get('emailCardDrop.verificationUrl') + '?' + params.toString();
+    const verificationLink = config.get('cardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
 

@@ -10,9 +10,6 @@
     "allowedGuilds": "584043165066199050",
     "allowedChannels": "898954606242054185"
   },
-  "emailCardDrop": {
-    "verificationUrl": "https://hub.cardstack.com/email-card-drop/verify"
-  },
   "web3": {
     "layer1Network": "mainnet",
     "layer2Network": "xdai"
@@ -25,6 +22,7 @@
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
   },
   "cardDrop": {
-    "sku": "0xa749b13a8b8a0ee736e3dde0a1a02658bc1cad6641d50849009a707ace79ce17"
+    "sku": "0xa749b13a8b8a0ee736e3dde0a1a02658bc1cad6641d50849009a707ace79ce17",
+    "verificationUrl": "https://hub.cardstack.com/email-card-drop/verify"
   }
 }

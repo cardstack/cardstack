@@ -86,7 +86,7 @@ describe('SendEmailCardDropVerificationTask', function () {
     params.append('eoa', cardDropRequest.ownerAddress);
     params.append('verification-code', cardDropRequest.verificationCode);
     params.append('email-hash', cardDropRequest.emailHash);
-    let link = config.get('emailCardDrop.verificationUrl') + '?' + params.toString();
+    let link = 'https://card-drop-email.test/email-card-drop/verify' + '?' + params.toString();
 
     await task.perform({ email: 'anyone@test.test', id: cardDropRequest.id }, helpers);
 
