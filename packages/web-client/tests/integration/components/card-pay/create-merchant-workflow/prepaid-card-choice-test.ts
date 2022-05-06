@@ -90,12 +90,12 @@ module(
     });
 
     async function selectPrepaidCard(cardAddress: string) {
-      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown]`);
       await waitFor(
-        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin [data-test-card-picker-dropdown-option="${cardAddress}"]`
       );
       await click(
-        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${cardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin [data-test-card-picker-dropdown-option="${cardAddress}"]`
       );
     }
 
@@ -123,7 +123,7 @@ module(
         .dom(`[data-test-boxel-card-picker-dropdown]`)
         .containsText('Select Card');
 
-      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown]`);
       await waitFor(
         `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );

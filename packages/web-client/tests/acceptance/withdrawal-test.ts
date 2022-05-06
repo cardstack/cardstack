@@ -175,21 +175,23 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(`${post} [data-test-choose-balance-from-safe]`)
       .hasText(`DEPOT ${depotAddress}`);
 
-    await click(
-      '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
-    );
+    await click('[data-test-safe-chooser-dropdown]');
     assert
-      .dom('[data-test-safe-chooser-dropdown] li:nth-child(1)')
+      .dom(
+        '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(1)'
+      )
       .containsText(depotAddress);
     assert
-      .dom('[data-test-safe-chooser-dropdown] li:nth-child(2)')
+      .dom(
+        '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
+      )
       .containsText(merchantAddress);
 
-    await click('[data-test-safe-chooser-dropdown] li:nth-child(2)');
-
     await click(
-      '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
+      '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
     );
+
+    await click('[data-test-balance-chooser-dropdown]');
     assert
       .dom(`${post} li:nth-child(1) [data-test-balance-display-name]`)
       .containsText('DAI.CPXD');
@@ -197,7 +199,9 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(`${post} li:nth-child(2) [data-test-balance-display-name]`)
       .containsText('CARD.CPXD');
 
-    await click('[data-test-balance-chooser-dropdown] li:nth-child(2)');
+    await click(
+      '[data-test-balance-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
+    );
 
     await click(
       `${post} [data-test-withdrawal-choose-balance] [data-test-boxel-button]`

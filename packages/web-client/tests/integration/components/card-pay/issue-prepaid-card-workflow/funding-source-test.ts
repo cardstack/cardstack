@@ -160,9 +160,7 @@ module(
             @frozen={{this.frozen}}
           />
         `);
-        await click(
-          '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
-        );
+        await click('[data-test-safe-chooser-dropdown]');
         assert.dom('.ember-power-select-options li').exists({ count: 2 });
       });
 
