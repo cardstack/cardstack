@@ -18,6 +18,7 @@ for expected_env in [
     "EVM_NODE_URL",
     "SUBGRAPH_URL",
     "REWARDS_BUCKET",
+    "PORT",
 ]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
@@ -25,6 +26,7 @@ for expected_env in [
 EVM_FULL_NODE_URL = os.environ.get("EVM_FULL_NODE_URL")
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
+PORT = int(os.environ.get("PORT"))
 
 app = FastAPI()
 
@@ -64,5 +66,5 @@ def read_proofs(
 
 if __name__ == "__main__":
     uvicorn.run(
-        "cardpay_reward_api.main:app", host="0.0.0.0", port=8000, log_level="info"
+        "cardpay_reward_api.main:app", host="0.0.0.0", port=PORT, log_level="info"
     )
