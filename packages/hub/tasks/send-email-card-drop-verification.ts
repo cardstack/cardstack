@@ -21,10 +21,14 @@ export default class SendEmailCardDropVerification {
       })
     )[0];
 
-    if (!request.ownerAddress || !request.verificationCode) {
-      throw new Error(
-        `Cannot create verification link due to missing owner address or verification code for request ${payload.id}`
-      );
+    if (!request) {
+      let e = new Error(`Unable to find card drop request with id ${payload.id}`);
+      Sentry.captureException(e, {
+        tags: {
+          event: 'send-email-card-drop-verification',
+        },
+      });
+      return;
     }
 
     const params = new URLSearchParams();
