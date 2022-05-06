@@ -419,10 +419,9 @@ app "reward-api" {
             task_role_name = "reward-api-staging-ecr-task"
             execution_role_name = "reward-api-staging-ecr-task-executor-role"
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/73c44ff9af65d863"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/8994c0bdf9038937"
             }
             secrets = {
-                EVM_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
             }
         }
