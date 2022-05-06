@@ -391,6 +391,7 @@ app "reward-api" {
             ENVIRONMENT = "staging"
             REWARDS_BUCKET="s3://tally-staging-reward-programs"
             SUBGRAPH_URL="https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-sokol"
+            PORT=443
         }
     }
 
@@ -421,7 +422,7 @@ app "reward-api" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/73c44ff9af65d863"
             }
             secrets = {
-                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUC"
+                EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
             }
         }
