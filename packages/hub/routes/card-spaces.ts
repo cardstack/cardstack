@@ -128,6 +128,59 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
+  async patch(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let cardSpaceId = ctx.params.id;
+    let cardSpace = (await this.cardSpaceQueries.query({ id: cardSpaceId }))[0] as CardSpace;
+
+    if (cardSpace) {
+      if (ctx.state.userAddress !== cardSpace.merchantOwnerAddress) {
+        ctx.status = 403;
+        return;
+      }
+    }
+
+    if (!cardSpace) {
+      ctx.status = 404;
+      return;
+    }
+
+    let attributes = ctx.request.body.data.attributes;
+
+    if (attributes['profile-description']) {
+      cardSpace.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
+    }
+
+    if (attributes['profile-image-url']) {
+      cardSpace.profileImageUrl = this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']);
+    }
+
+    if (attributes['links']) {
+      cardSpace.links = ctx.request.body.data.attributes['links'];
+    }
+
+    let errors = await this.cardSpaceValidator.validate(cardSpace);
+    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
+
+    if (hasErrors) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: serializeErrors(errors),
+      };
+    } else {
+      await this.cardSpaceQueries.update(cardSpace);
+
+      let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
+
+      ctx.status = 200;
+      ctx.body = serialized;
+    }
+    ctx.type = 'application/vnd.api+json';
+  }
+
   async put(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;

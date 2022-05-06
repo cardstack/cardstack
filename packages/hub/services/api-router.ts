@@ -90,6 +90,7 @@ export default class APIRouter {
     apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
+    apiSubrouter.patch('/card-spaces/:id', parseBody, cardSpacesRoute.patch);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
 
