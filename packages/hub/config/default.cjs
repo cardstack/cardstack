@@ -27,9 +27,6 @@ module.exports = {
     'ignore-pattern': 'README.md|.*\\.d\\.ts',
     'check-order': false,
   },
-  emailCardDrop: {
-    verificationUrl: null,
-  },
   discord: {
     botId: '958127663577456714',
     botToken: null,
@@ -87,6 +84,7 @@ module.exports = {
         periodMinutes: null,
       },
     },
+    verificationUrl: null,
   },
   walletConnect: {
     bridge: 'https://safe-walletconnect.gnosis.io/',
