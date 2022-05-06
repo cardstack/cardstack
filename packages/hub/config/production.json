@@ -1,6 +1,10 @@
 {
   "aws": {
-    "accountId": "120317779495"
+    "accountId": "120317779495",
+    "ses": {
+      "supportEmail": "support@cardstack.com",
+      "region": "eu-west-1"
+    }
   },
   "sentry": {
     "enabled": true
