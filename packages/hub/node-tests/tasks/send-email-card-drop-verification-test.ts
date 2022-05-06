@@ -35,7 +35,7 @@ function makeMockJob(taskIdentifier: string): Job {
   };
 }
 
-let helpers: Helpers = makeJobHelpers({}, makeMockJob('remove-old-sent-notifications'), {
+let helpers: Helpers = makeJobHelpers({}, makeMockJob('send-email-card-drop-verification'), {
   withPgClient: async () => {
     throw new Error('not implemented');
   },
