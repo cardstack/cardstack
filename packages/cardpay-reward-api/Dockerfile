@@ -11,6 +11,5 @@ RUN pdm install --prod --no-lock --no-editable
 
 ENV PYTHONPATH=/project/__pypackages__/3.9/lib
 COPY . /project
-WORKDIR /project
 
 CMD ["python", "-m", "cardpay_reward_api.main"]
