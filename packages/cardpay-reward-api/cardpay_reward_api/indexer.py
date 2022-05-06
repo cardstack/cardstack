@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import json
 import re
 from datetime import datetime
@@ -39,13 +38,17 @@ class Indexer:
             )
             if len(new_roots) > 0:
                 for root in sorted(new_roots, key=lambda x: x["blockNumber"]):
-                    s3_path = (
+                    file_name = (
                         storage_location
                         + f"/rewardProgramID={reward_program_id}/paymentCycle={root['paymentCycle']}/results.parquet"
                     )
-                    payment_table = pq.read_table(s3_path)
-                    payment_list = payment_table.to_pylist()
-                    self.add_root_and_proofs(db, root, payment_list)
+                    s3_path = AnyPath(file_name)
+                    if s3_path.exists():
+                        payment_table = pq.read_table(s3_path)
+                        payment_list = payment_table.to_pylist()
+                        self.add_root_and_proofs(db, root, payment_list)
+                    else:
+                        print(f"{file_name} does not exist within s3")
                 db.commit()
             else:
                 print("Skipping indexing: No new roots")
