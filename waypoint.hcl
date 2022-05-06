@@ -390,8 +390,7 @@ app "reward-api" {
         env = {
             ENVIRONMENT = "staging"
             REWARDS_BUCKET="s3://tally-staging-reward-programs"
-            SUBGRAPH_URL="https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-sokol"
-            PORT=443
+            SUBGRAPH_URL="https://graph-staging.cardstack.com/subgraphs/name/habdelra/cardpay-sokol"
         }
     }
 
