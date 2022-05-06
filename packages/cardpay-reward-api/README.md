@@ -16,12 +16,15 @@
     
     # run 
     pdm run main
+    
+    # look at db
+    psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
 
 Visit `localhost:8000/docs`
     
 ## Env 
     
-        SUBGRAPH_URL=https://graph-staging.cardstack.com/subgraphs/name/habdelra/cardpay-sokol
+        SUBGRAPH_URL=https://graph-staging.stack.cards.com/subgraphs/name/habdelra/cardpay-sokol
     REWARDS_BUCKET=s3://tally-staging-reward-programs
     DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres
 
