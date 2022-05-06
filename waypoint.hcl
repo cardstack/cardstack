@@ -411,6 +411,7 @@ app "reward-api" {
 
     deploy {
         use "aws-ecs" {
+            service_port = 8000
             region = "us-east-1"
             memory = "512"
             cluster = "reward-api-staging"
