@@ -426,5 +426,14 @@ app "reward-api" {
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
             }
         }
+
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/fix-listener.mjs", "reward-api-staging.stack.cards", "reward-api-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+        }
     }
 }
