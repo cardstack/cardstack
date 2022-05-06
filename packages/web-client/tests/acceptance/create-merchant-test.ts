@@ -192,9 +192,7 @@ module('Acceptance | create merchant', function (hooks) {
     post = postableSel(2, 2);
     await waitFor(post);
 
-    await click(
-      `${post} [data-test-boxel-card-picker-dropdown]`
-    );
+    await click(`${post} [data-test-boxel-card-picker-dropdown]`);
     await waitFor(
       `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
     );

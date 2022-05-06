@@ -26,8 +26,8 @@ module.exports = function (defaults) {
     // Add options here
     'ember-power-select': { theme: false },
     sassOptions: {
-      implementation: nodeSass
-    }
+      implementation: nodeSass,
+    },
   });
 
   let dummyComponentStylesTree = concat(
