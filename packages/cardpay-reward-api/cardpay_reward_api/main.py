@@ -50,6 +50,13 @@ async def about():
     }
 
 
+@app.get("/")
+async def root():
+    return {
+        "status": "ok"
+    }
+
+
 @app.get("/merkle-proofs/{payee}", response_model=List[schemas.Proof])
 def read_proofs(
     db: Session = Depends(get_db),
