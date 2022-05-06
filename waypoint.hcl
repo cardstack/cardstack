@@ -386,7 +386,8 @@ app "reward-api" {
             region = "us-east-1"
             memory = "512"
             cluster = "reward-api-staging"
-            count = 1
+            count = 2
+            subnets = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
             task_role_name = "reward-api-staging-ecr-task"
             execution_role_name = "reward-api-staging-ecr-task-executor-role"
             alb {
