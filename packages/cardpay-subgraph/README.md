@@ -44,7 +44,7 @@ The process of building the subgraph is two-fold. To begin make sure you are in 
 cd packages/cardpay-subgraph
 ```
 
-1. The first step is to generate assembly script files based on the subgraph definition file and the graphql schema:
+1. The first step is to generate assembly script files based on the subgraph definition file and the graphql schema (note: for faster deploys using grafting, see the grafting section below)):
     ```
     yarn codegen
     ```
@@ -87,3 +87,42 @@ or
 ```
 yarn sokol-blue-status
 ```
+
+
+### Grafting
+
+Each time we deploy to a graph node we need to re-index the subgraph from scratch. 
+
+For the some deploys, and particularly for hotfixes, the broad structure will not change and a large amount of work will be repeated to reindex.
+
+This gets progressively longer as each day there is more data to process.
+
+Subgraph supports a process called grafting where the data for an existing subgraph is used for everything up to a set block, then the new subgraph code is used beyond that point.
+
+As this does not reprocess the old data, there are restrictions on the type of updates that can be performed with this
+
+> The grafted subgraph can use a GraphQL schema that is not identical to the one of the base subgraph, but merely compatible with it. It has to be a valid subgraph schema in its own right but may deviate from the base subgraph's schema in the following ways:
+
+> * It adds or removes entity types
+
+> * It removes attributes from entity types
+
+> * It adds nullable attributes to entity types
+
+> * It turns non-nullable attributes into nullable attributes
+
+> * It adds values to enums
+
+> * It adds or removes interfaces
+
+> * It changes for which entity types an interface is implemented
+
+https://thegraph.com/docs/en/developer/create-subgraph-hosted/#grafting-onto-existing-subgraphs
+
+If grafting is appropriate, there is a helper for each node at the codegen stage. Instead of `yarn codegen` for the production green node run 
+
+    yarn codegen-graft-xdai-green
+
+This will get the latest deployment ID and the last successful block number for you. The yaml file produced *must* be used to deploy onto this specific node.
+
+Rolling back to an earlier block is possible, just modify the `block` in the `graft` top level definition in `subgraph.yaml`.

@@ -13,7 +13,7 @@ export default class MerchantInfoSerializer {
 
     const result = {
       meta: {
-        network: config.get('web3.network'),
+        network: config.get('web3.layer2Network'),
       },
       data: {
         id: model.id,

@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { signTypedData } from '@cardstack/cardpay-sdk';
 
@@ -29,13 +29,13 @@ export default {
       address?: string;
     };
     let data = JSON.parse(dataStr);
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     address = address ?? (await web3.eth.getAccounts())[0];
     console.log(`Signing typed data for address ${address}:
     ${JSON.stringify(data, null, 2)}
     `);
 
-    let signature = await signTypedData(web3, address, data);
+    let signature = await signTypedData(signer ?? web3, address, data);
     console.log(`Signature for the typed data is: ${signature}`);
   },
 } as CommandModule;

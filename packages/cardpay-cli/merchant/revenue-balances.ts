@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 import { fromWei } from 'web3-utils';
@@ -20,7 +20,7 @@ export default {
       network: string;
       merchantSafe: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let revenuePool = await getSDK('RevenuePool', web3);
     let balanceInfo = await revenuePool.balances(merchantSafe);
     console.log(`Merchant revenue balance for merchant safe ${merchantSafe}:`);

@@ -65,7 +65,7 @@ export default class PrepaidCardCustomizationSerializer {
     };
     let result = {
       meta: {
-        network: config.get('web3.network'),
+        network: config.get('web3.layer2Network'),
       },
       data,
     } as JSONAPIDocument;

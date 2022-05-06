@@ -86,8 +86,7 @@ export default class DegradedServiceDetector extends Service {
         return +new Date(b.started_at) - +new Date(a.started_at);
       })[0];
 
-    let lastUpdate =
-      incident.incident_updates[incident.incident_updates.length - 1];
+    let lastUpdate = incident.incident_updates[0];
 
     return {
       status: incident.status,

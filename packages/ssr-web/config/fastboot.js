@@ -11,6 +11,7 @@ module.exports = function (/* environment */) {
         // has to be done here instead of assigning global.fetch
         // because the server runs the ember app within a sandbox
         fetch,
+        URLSearchParams,
       });
     },
   };

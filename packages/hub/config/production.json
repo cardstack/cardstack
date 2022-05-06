@@ -11,7 +11,8 @@
     "allowedChannels": "898954606242054185"
   },
   "web3": {
-    "network": "xdai"
+    "layer1Network": "mainnet",
+    "layer2Network": "xdai"
   },
   "checkly": {
     "handleWebhookRequests": true

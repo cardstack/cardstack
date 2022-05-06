@@ -8,19 +8,19 @@ import Logger from '@cardstack/logger';
 let log = Logger('service:relay');
 
 interface Web3Config {
-  network: string;
+  layer2Network: string;
 }
 interface RelayServiceConfig {
   provisionerSecret: string;
 }
 
 const { toChecksumAddress } = Web3.utils;
-const { network } = config.get('web3') as Web3Config;
+const web3config = config.get('web3') as Web3Config;
 const { provisionerSecret } = config.get('relay') as RelayServiceConfig;
 
 export default class RelayService {
   async isAvailable(): Promise<boolean> {
-    let relayUrl = `${getConstantByNetwork('relayServiceURL', network)}/v1/about/`;
+    let relayUrl = `${getConstantByNetwork('relayServiceURL', web3config.layer2Network)}/v1/about/`;
     try {
       let response = await fetch(relayUrl);
       if (!response.ok) {
@@ -34,7 +34,7 @@ export default class RelayService {
   }
 
   async provisionPrepaidCard(userAddress: string, sku: string): Promise<string> {
-    let relayUrl = getConstantByNetwork('relayServiceURL', network);
+    let relayUrl = getConstantByNetwork('relayServiceURL', web3config.layer2Network);
     if (!provisionerSecret) {
       throw new Error(`Could not provision prepaid card because relay.provisionerSecret config is not set.`);
     }

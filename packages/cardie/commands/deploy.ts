@@ -102,9 +102,13 @@ const listWorkflowRuns = async (workflow: WorkflowInfo, status: ListWorkflowRuns
   return respond.data.workflow_runs;
 };
 
+const delayMs = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const getMostRecentRun = async (workflow: WorkflowInfo, now: Date) => {
   let workflowRuns: string[] = [];
-  while (workflowRuns.length === 0) {
+  let attempts = 0;
+  while (workflowRuns.length === 0 && attempts <= 10) {
+    attempts++;
     const respond = await Promise.all([
       listWorkflowRuns(workflow, 'queued'),
       listWorkflowRuns(workflow, 'in_progress'),
@@ -115,6 +119,9 @@ const getMostRecentRun = async (workflow: WorkflowInfo, now: Date) => {
         return t.getTime() > now.getTime();
       })
       .map((workflowRun) => workflowRun.html_url);
+    if (workflowRuns.length === 0) {
+      await delayMs(500);
+    }
   }
   return workflowRuns[0];
 };
@@ -157,8 +164,13 @@ const execute = async (message: Message, args: string[]) => {
   try {
     await triggerWorkflowRun(workflow, environment, ref);
     const workflowRun = await getMostRecentRun(workflow, now);
-    await message.edit(`${deployMessage}\n:arrow_forward: Workflow: ${workflowRun}`);
-    console.info(`deploy: status=done app=${app} environment=${environment} ref=${ref}`);
+    if (workflowRun) {
+      await message.edit(`${deployMessage}\n:arrow_forward: Workflow: ${workflowRun}`);
+      console.info(`deploy: status=done app=${app} environment=${environment} ref=${ref}`);
+    } else {
+      console.warn('Initiated workflow but could not find the workflow run');
+      await message.edit(`${deployMessage}\n:arrow_forward: Initiated workflow but could not find the workflow run`);
+    }
   } catch (err) {
     console.error(err);
     await message.edit(`${deployMessage}\n:warning: Error: \n\`\`\`${err}\`\`\``);

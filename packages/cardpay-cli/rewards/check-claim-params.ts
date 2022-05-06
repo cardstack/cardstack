@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { fromProof } from './utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
@@ -37,7 +37,7 @@ export default {
       proof: string;
       acceptPartialClaim: boolean;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let rewardManager = await getSDK('RewardManager', web3);
     let proofArray = fromProof(proof);

@@ -50,11 +50,11 @@ import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
+import { HubConfig } from '@cardstack/cardpay-sdk';
 import { IAssets } from '@cardstack/cardpay-sdk';
 import { PrepaidCard } from '@cardstack/cardpay-sdk';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
-import { getLayer2RpcWssNodeUrl } from '../features';
 import * as Sentry from '@sentry/browser';
 
 const BROADCAST_CHANNEL_MESSAGES = {
@@ -75,6 +75,7 @@ export default abstract class Layer2ChainWeb3Strategy
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
   simpleEmitter = new SimpleEmitter();
+  hubConfig = new HubConfig(config.hubURL);
 
   defaultTokenSymbol: BridgedTokenSymbol;
   bridgedDaiTokenSymbol: BridgedTokenSymbol;
@@ -158,18 +159,13 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.web3 = new Web3();
 
-    let rpcWss = getLayer2RpcWssNodeUrl(this.networkSymbol);
+    let hubConfig = yield this.hubConfig.getConfig();
+    let rpcHttpNode = hubConfig.web3.layer2RpcNodeHttpsUrl;
+    let rpcWssNode = hubConfig.web3.layer2RpcNodeWssUrl;
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
-      rpc: {
-        [networkIds[this.networkSymbol]]: getConstantByNetwork(
-          'rpcNode',
-          this.networkSymbol
-        ),
-      },
-      rpcWss: {
-        [networkIds[this.networkSymbol]]: rpcWss,
-      },
+      rpc: { [networkIds[this.networkSymbol]]: rpcHttpNode },
+      rpcWss: { [networkIds[this.networkSymbol]]: rpcWssNode },
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });
 
@@ -179,7 +175,7 @@ export default abstract class Layer2ChainWeb3Strategy
         type: 'debug',
         message: 'Websocket connected',
         data: {
-          url: rpcWss,
+          url: rpcWssNode,
         },
         level: Sentry.Severity.Info,
       });
@@ -196,7 +192,7 @@ export default abstract class Layer2ChainWeb3Strategy
           code: event.code,
           reason: event.reason,
           wasClean: event.wasClean,
-          url: rpcWss,
+          url: rpcWssNode,
         },
         // unsure about 1001 since this could also happen due to server failure
         // but also can happen due to closing the tab normally

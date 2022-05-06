@@ -27,6 +27,39 @@ jobs:
       - run: yarn --prefer-offline
       - run: yarn lint
 
+  check_secrets:
+    name: Check Secret Access
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Check access to secrets specified in waypoint.hcl
+        uses: ./.github/actions/check-secrets
+        with:
+          waypoint_config_file: waypoint.hcl
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
+      - name: Check access to secrets specified in waypoint.prod.hcl
+        uses: ./.github/actions/check-secrets
+        with:
+          waypoint_config_file: waypoint.prod.hcl
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}
+          
   test_all_but_web_client:
     name: hub, did-resolver Build/Test
     needs: lint

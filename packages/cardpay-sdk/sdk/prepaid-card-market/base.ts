@@ -25,9 +25,10 @@ import { ZERO_ADDRESS } from '../constants';
 import { PrepaidCardSafe } from '../safes';
 import { getSDK } from '../version-resolver';
 import { MAX_PREPAID_CARD_AMOUNT } from '../prepaid-card/base';
+import { Signer } from 'ethers';
 
 export default class PrepaidCardMarket {
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async getInventory(sku: string, marketAddress?: string): Promise<PrepaidCardSafe[]> {
     let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
@@ -125,7 +126,8 @@ export default class PrepaidCardMarket {
       ZERO_ADDRESS,
       transferNonce,
       from,
-      prepaidCardToAdd
+      prepaidCardToAdd,
+      this.layer2Signer
     );
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, fundingPrepaidCard, async (rateLock) => {
       let payload = await this.getAddToInventoryPayload(
@@ -148,7 +150,7 @@ export default class PrepaidCardMarket {
         marketAddress!,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, fundingPrepaidCard, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, fundingPrepaidCard, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -215,7 +217,7 @@ export default class PrepaidCardMarket {
         marketAddress!,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, fundingPrepaidCard, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, fundingPrepaidCard, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });
@@ -280,7 +282,7 @@ export default class PrepaidCardMarket {
         marketAddress!,
         rateLock,
         payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
         nonce
       );
     });

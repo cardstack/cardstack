@@ -16,6 +16,7 @@ import {
   isTransactionHash,
   waitUntilTransactionMined,
 } from './utils/general-utils';
+import { Signer } from 'ethers';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -50,7 +51,7 @@ const bridgedTokensQuery = `
 `;
 
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
-  constructor(private layer2Web3: Web3) {}
+  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async getWithdrawalLimits(tokenAddress: string): Promise<{ min: string; max: string }> {
     let homeBridge = new this.layer2Web3.eth.Contract(
@@ -138,7 +139,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from, this.layer2Signer)
     );
 
     let txnHash = result.ethereumTx.txHash;

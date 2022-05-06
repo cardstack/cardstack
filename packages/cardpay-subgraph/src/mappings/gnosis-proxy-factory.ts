@@ -10,6 +10,16 @@ export function processGnosisProxyEvent(proxyAddress: Address, event: ethereum.E
   safeEntity.createdAt = event.block.timestamp;
 
   let safe = GnosisSafe.bind(proxyAddress);
+  let threshold = safe.try_getThreshold();
+  if (threshold.reverted || threshold.value.toI32() == 0) {
+    log.warning('Detected uninitialized safe: {}', [safeAddress]);
+    return;
+  }
+  let ownersResult = safe.try_getOwners();
+  if (ownersResult.reverted) {
+    log.warning('Failed to get owners for safe {}', [safeAddress]);
+    return;
+  }
   let owners = safe.getOwners();
 
   for (let i = 0; i < owners.length; i++) {

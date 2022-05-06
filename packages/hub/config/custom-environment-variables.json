@@ -8,6 +8,10 @@
       },
       "region": "HUB_AWS_REGION"
     },
+    "ses": {
+      "supportEmail": "HUB_AWS_SES_SUPPORT_EMAIL",
+      "region": "HUB_AWS_SES_REGION"
+    },
     "accountId": "HUB_AWS_ACCOUNT_ID"
   },
   "db": {
@@ -20,7 +24,8 @@
     "cordeBotToken": "CORDE_BOT_TOKEN",
     "commandPrefix": "CARDBOT_COMMAND_PREFIX",
     "allowedGuilds": "CARDBOT_ALLOWED_GUILDS",
-    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS"
+    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS",
+    "onCallInternalWebhook": "DISCORD_ON_CALL_INTERNAL_WEBHOOK"
   },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
@@ -33,7 +38,12 @@
     "callbackUrl": "WYRE_CALLBACK_URL"
   },
   "web3": {
-    "network": "NETWORK"
+    "layer1Network": "LAYER1_NETWORK",
+    "layer1RpcNodeHttpsUrl": "LAYER1_RPC_NODE_HTTPS_URL",
+    "layer1RpcNodeWssUrl": "LAYER1_RPC_NODE_WSS_URL",
+    "layer2Network": "LAYER2_NETWORK",
+    "layer2RpcNodeHttpsUrl": "LAYER2_RPC_NODE_HTTPS_URL",
+    "layer2RpcNodeWssUrl": "LAYER2_RPC_NODE_WSS_URL"
   },
   "walletConnect": {
     "bridge": "WALLET_CONNECT_BRIDGE",
@@ -48,10 +58,19 @@
     "provisionerSecret": "PROVISIONER_SECRET"
   },
   "cardDrop": {
-    "sku": "CARD_DROP_SKU"
+    "sku": "CARD_DROP_SKU",
+    "email": {
+      "rateLimit": {
+        "count": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT", "__format": "number"},
+        "periodMinutes": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES", "__format": "number"}
+      }
+    }
   },
   "web3storage": {
     "token": "WEB3_STORAGE_TOKEN"
+  },
+  "pagerduty": {
+    "token": "PAGERDUTY_TOKEN"
   },
   "statuspage": {
     "pageId": "STATUSPAGE_PAGE_ID",
@@ -66,5 +85,6 @@
     "privateKey": "FIREBASE_PRIVATE_KEY",
     "databaseURL": "FIREBASE_DATABASE_URL"
   },
-  "authSecret": "HUB_AUTH_SECRET"
+  "authSecret": "HUB_AUTH_SECRET",
+  "emailHashSalt": "HUB_EMAIL_HASH_SALT"
 }

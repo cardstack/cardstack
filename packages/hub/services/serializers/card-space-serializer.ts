@@ -13,28 +13,16 @@ export default class CardSpaceSerializer {
 
     const result = {
       meta: {
-        network: config.get('web3.network'),
+        network: config.get('web3.layer2Network'),
       },
       data: {
         id: model.id,
         type: 'card-spaces',
         attributes: {
           did,
-          'profile-name': model.profileName,
           'profile-description': model.profileDescription,
-          'profile-category': model.profileCategory,
           'profile-image-url': model.profileImageUrl,
-          'profile-cover-image-url': model.profileCoverImageUrl,
-          'profile-button-text': model.profileButtonText,
-          'bio-title': model.bioTitle,
-          'bio-description': model.bioDescription,
           links: model.links,
-          'donation-title': model.donationTitle,
-          'donation-description': model.donationDescription,
-          'donation-suggestion-amount-1': model.donationSuggestionAmount1,
-          'donation-suggestion-amount-2': model.donationSuggestionAmount2,
-          'donation-suggestion-amount-3': model.donationSuggestionAmount3,
-          'donation-suggestion-amount-4': model.donationSuggestionAmount4,
         },
         relationships: {
           'merchant-info': {

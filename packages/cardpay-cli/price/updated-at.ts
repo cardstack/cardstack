@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_ANY, getWeb3Opts, Web3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_ANY, getConnectionType, Web3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { getSDK } from '@cardstack/cardpay-sdk';
 
@@ -21,7 +21,7 @@ export default {
       network: string;
       token: string;
     };
-    let web3Opts = getWeb3Opts(args);
+    let web3Opts = getConnectionType(args);
     if (token.toUpperCase() === 'ETH') {
       await layer1PriceOracleUpdatedAt(network, web3Opts);
     } else {
@@ -31,14 +31,14 @@ export default {
 } as CommandModule;
 
 export async function layer1PriceOracleUpdatedAt(network: string, web3Opts: Web3Opts): Promise<void> {
-  let web3 = await getWeb3(network, web3Opts);
+  let { web3 } = await getEthereumClients(network, web3Opts);
   let layerOneOracle = await getSDK('LayerOneOracle', web3);
   let date = await layerOneOracle.getEthToUsdUpdatedAt();
   console.log(`The ETH / USD rate was last updated at ${date.toString()}`);
 }
 
 export async function layer2PriceOracleUpdatedAt(network: string, token: string, web3Opts: Web3Opts): Promise<void> {
-  let web3 = await getWeb3(network, web3Opts);
+  let { web3 } = await getEthereumClients(network, web3Opts);
   let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
   let date = await layerTwoOracle.getUpdatedAt(token);
   console.log(`The ${token} rate was last updated at ${date.toString()}`);

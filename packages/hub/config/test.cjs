@@ -6,8 +6,25 @@ module.exports = {
     useTransactionalRollbacks: true,
   },
   authSecret: '2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=',
+  cardDrop: {
+    email: {
+      rateLimit: {
+        count: 10,
+        periodMinutes: 10,
+      },
+    },
+  },
+  emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
     handleWebhookRequests: true,
+  },
+  web3: {
+    layer1Network: 'kovan',
+    layer1RpcNodeHttpsUrl: 'https://infuratest.test/abc123/',
+    layer1RpcNodeWssUrl: 'wss://infuratest.test/ws/abc123/',
+    layer2Network: 'sokol',
+    layer2RpcNodeHttpsUrl: 'https://humorme.test/abc123/',
+    layer2RpcNodeWssUrl: 'wss://humorme.test/abc123/',
   },
   compiler: {
     realmsConfig: [

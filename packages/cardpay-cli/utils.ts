@@ -1,18 +1,24 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
+import { Wallet, Signer } from 'ethers';
 import { AbstractProvider } from 'web3-core';
-import { HttpProvider, getConstant, networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import { HttpProvider, networkIds, getConstantByNetwork, HubConfig } from '@cardstack/cardpay-sdk';
+import WalletConnectProvider from '@cardstack/wc-provider';
 import { Options, Arguments } from 'yargs';
 /* eslint-disable @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires */
 const TrezorWalletProvider = require('trezor-cli-wallet-provider');
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
-export type ConnectionType = 'mnemonic' | 'trezor' | 'wallet-connect';
+export type ConnectionType = 'mnemonic' | 'ethers-mnemonic' | 'trezor' | 'wallet-connect';
 
 interface Web3OptsMnemonic {
   connectionType: 'mnemonic';
+  mnemonic: string;
+}
+
+interface EthersOptsMnemonic {
+  connectionType: 'ethers-mnemonic';
   mnemonic: string;
 }
 
@@ -24,9 +30,9 @@ interface Web3OptsWalletConnect {
   connectionType: 'wallet-connect';
 }
 
-export type Web3Opts = Web3OptsMnemonic | Web3OptsTrezor | Web3OptsWalletConnect;
+export type Web3Opts = Web3OptsMnemonic | Web3OptsTrezor | Web3OptsWalletConnect | EthersOptsMnemonic;
 
-export function getWeb3Opts(args: Arguments): Web3Opts {
+export function getConnectionType(args: Arguments): Web3Opts {
   switch (args.connectionType as ConnectionType) {
     case 'wallet-connect':
       return {
@@ -36,6 +42,11 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
       return {
         connectionType: 'trezor',
       } as Web3OptsTrezor;
+    case 'ethers-mnemonic':
+      return {
+        connectionType: 'ethers-mnemonic',
+        mnemonic: args.ethersMnemonic,
+      } as EthersOptsMnemonic;
     case 'mnemonic':
       return {
         connectionType: 'mnemonic',
@@ -44,7 +55,25 @@ export function getWeb3Opts(args: Arguments): Web3Opts {
   }
 }
 
-export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
+export async function getEthereumClients(network: string, opts: Web3Opts): Promise<{ web3: Web3; signer?: Signer }> {
+  let rpcNodeHttpsUrl!: string;
+  let rpcNodeWssUrl!: string;
+  let hubConfigResponse;
+  let hubUrl = process.env.HUB_URL || getConstantByNetwork('hubUrl', network);
+  let hubConfig = new HubConfig(hubUrl);
+  hubConfigResponse = await hubConfig.getConfig();
+  switch (network) {
+    case 'kovan':
+    case 'mainnet':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.layer1RpcNodeHttpsUrl as string;
+      rpcNodeWssUrl = hubConfigResponse.web3.layer1RpcNodeWssUrl as string;
+      break;
+    case 'sokol':
+    case 'xdai':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.layer2RpcNodeHttpsUrl as string;
+      rpcNodeWssUrl = hubConfigResponse.web3.layer2RpcNodeWssUrl as string;
+      break;
+  }
   switch (opts.connectionType) {
     case 'wallet-connect': {
       let provider = new WalletConnectProvider({
@@ -54,33 +83,47 @@ export async function getWeb3(network: string, opts: Web3Opts): Promise<Web3> {
           icons: [],
           name: 'Cardstack - Cardpay CLI',
         },
-        rpc: {
-          // we can't use OpenEthereum nodes as it was issues with modern web3
-          // providers (specifically the xdai archive node that POA hosts falls
-          // into this category)
-          [networkIds[network]]: getConstantByNetwork('rpcNode', network),
-        },
+        chainId: networkIds[network],
+        rpc: { [networkIds[network]]: rpcNodeHttpsUrl },
+        rpcWss: { [networkIds[network]]: rpcNodeWssUrl },
         bridge: BRIDGE,
       });
       await provider.enable();
-      return new Web3(provider as unknown as AbstractProvider);
+      return { web3: new Web3(provider as unknown as AbstractProvider) };
     }
     case 'mnemonic':
-      return new Web3(
-        new HDWalletProvider({
-          chainId: networkIds[network],
-          mnemonic: {
-            phrase: opts.mnemonic,
-          },
-          providerOrUrl: new HttpProvider(await getConstant('rpcNode', network)),
-        })
-      );
+      return {
+        web3: new Web3(
+          new HDWalletProvider({
+            chainId: networkIds[network],
+            mnemonic: {
+              phrase: opts.mnemonic,
+            },
+            providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
+          })
+        ),
+      };
+    case 'ethers-mnemonic':
+      return {
+        web3: new Web3(
+          new HDWalletProvider({
+            chainId: networkIds[network],
+            mnemonic: {
+              phrase: opts.mnemonic,
+            },
+            providerOrUrl: new HttpProvider(rpcNodeHttpsUrl),
+          })
+        ),
+        signer: Wallet.fromMnemonic(opts.mnemonic),
+      };
     case 'trezor':
-      return new Web3(
-        new TrezorWalletProvider(await getConstant('rpcNode', network), {
-          chainId: networkIds[network],
-        })
-      );
+      return {
+        web3: new Web3(
+          new TrezorWalletProvider(rpcNodeHttpsUrl, {
+            chainId: networkIds[network],
+          })
+        ),
+      };
   }
 }
 

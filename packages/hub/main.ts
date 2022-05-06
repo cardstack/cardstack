@@ -44,7 +44,6 @@ import OrderService from './services/order';
 import InventoryService from './services/inventory';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
@@ -85,11 +84,21 @@ import WyreTransferTask from './tasks/wyre-transfer';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
+import PagerdutyApi from './services/pagerduty-api';
 import StatuspageApi from './services/statuspage-api';
 import ChecklyWebhookRoute from './routes/checkly-webhook';
+import PagerdutyIncidentsWebhookRoute from './routes/pagerduty-incidents-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
 import { registerQueries } from './queries';
+import EmailCardDropRouter from './services/email-card-drop-router';
+import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
+import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
+import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
+import DropCardTask from './tasks/drop-card';
+import SubscribeEmailTask from './tasks/subscribe-email';
+import DiscordPostTask from './tasks/discord-post';
+import Email from './services/email';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -129,11 +138,15 @@ export function createRegistry(): Registry {
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
+  registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
+  registry.register('subscribe-email', SubscribeEmailTask);
+  registry.register('drop-card', DropCardTask);
+  registry.register('discord-post', DiscordPostTask);
+  registry.register('email', Email);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
-  registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
@@ -141,8 +154,10 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('card-space-serializer', CardSpaceSerializer);
+  registry.register('email-card-drop-request-serializer', EmailCardDropRequestSerializer);
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-spaces-route', CardSpacesRoute);
+  registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
@@ -164,8 +179,11 @@ export function createRegistry(): Registry {
   registry.register('wyre-prices-route', WyrePricesRoute);
   registry.register('wyre-transfer', WyreTransferTask);
   registry.register('web3-storage', Web3Storage);
+  registry.register('pagerduty-api', PagerdutyApi);
   registry.register('statuspage-api', StatuspageApi);
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
+  registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
+  registry.register('email-card-drop-router', EmailCardDropRouter);
 
   if (process.env.COMPILER) {
     registry.register(
@@ -194,6 +212,7 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
+  private emailCardDropRouter = inject('email-card-drop-router', { as: 'emailCardDropRouter' });
   private healthCheck = service('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
   private cardRoutes: KnownRoutes['card-routes'] | undefined;
@@ -220,6 +239,7 @@ export class HubServer {
     app.use(this.devProxy.middleware());
     app.use(this.apiRouter.routes());
     app.use(this.callbacksRouter.routes());
+    app.use(this.emailCardDropRouter.routes());
     app.use(this.uploadRouter.routes());
 
     if (this.cardRoutes) {

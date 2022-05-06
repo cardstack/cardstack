@@ -13,6 +13,10 @@ module.exports = {
       region: 'ap-southeast-1',
       roleChain: ['prod:storage-bucket-writer-role'],
     },
+    ses: {
+      supportEmail: 'support@cardstack.com', // the support email is listed on both staging and prod as a verified SES identity
+      region: 'us-east-1', // staging uses us-east-1. prod uses eu-west-1
+    },
     accountId: '680542703984',
     prodAccountId: '120317779495',
   },
@@ -32,8 +36,10 @@ module.exports = {
     allowedGuilds: '958136276559753266',
     allowedChannels: '958136277096620084,958137087641661450',
     messageVerificationDelayMs: 1000 * 15,
+    onCallInternalWebhook: null,
   },
   authSecret: null,
+  emailHashSalt: null,
   sentry: {
     dsn: null,
     enabled: false,
@@ -63,15 +69,35 @@ module.exports = {
     provisionerSecret: null,
   },
   web3: {
-    network: 'sokol',
+    layer1Network: 'kovan',
+    layer1RpcNodeHttpsUrl: null,
+    layer1RpcNodeWssUrl: null,
+    layer2Network: 'sokol',
+    layer2RpcNodeHttpsUrl: null,
+    layer2RpcNodeWssUrl: null,
   },
   cardDrop: {
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
+    email: {
+      rateLimit: {
+        count: null,
+        periodMinutes: null,
+      },
+    },
   },
   walletConnect: {
     bridge: 'https://safe-walletconnect.gnosis.io/',
     clientURL: 'https://app.cardstack.com',
     clientName: 'Cardstack',
+  },
+  webClient: {
+    url: 'https://app.cardstack.com',
+    paths: {
+      cardDrop: {
+        alreadyClaimed: '/card-drop/already-claimed',
+        success: '/card-drop/success',
+      },
+    },
   },
   web3storage: {
     token: null,
@@ -79,5 +105,8 @@ module.exports = {
   statuspage: {
     apiKey: null,
     pageId: null,
+  },
+  pagerDuty: {
+    token: null,
   },
 };

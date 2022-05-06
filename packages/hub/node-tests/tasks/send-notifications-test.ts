@@ -7,6 +7,7 @@ import SentPushNotificationsQueries from '../../queries/sent-push-notifications'
 import waitFor from '../utils/wait-for';
 import * as Sentry from '@sentry/node';
 import sentryTestkit from 'sentry-testkit';
+import shortUUID from 'short-uuid';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
@@ -68,6 +69,19 @@ class ErroredFirebasePushNotifications {
 
   send() {
     throw new Error(ErroredFirebasePushNotifications.message);
+  }
+}
+
+class EntityNotFoundFirebasePushNotifications {
+  send() {
+    let error = {
+      message: 'Entity not found',
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found',
+      },
+    };
+    throw error;
   }
 }
 
@@ -209,6 +223,35 @@ describe('SendNotificationsTask firebase errors', function () {
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
     });
+  });
+});
+
+describe('SendNotificationsTask requested entity not found', function () {
+  let { getContainer } = setupHub(this);
+
+  it('should disable the push notification registration', async function () {
+    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
+      type: 'query',
+    });
+
+    await pushNotificationRegistrationQueries.upsert({
+      id: shortUUID.uuid(),
+      pushClientId: newlyAddedNotification.pushClientId,
+      ownerAddress: 'existing-owner-address',
+      disabledAt: null,
+    });
+
+    registry(this).register('firebase-push-notifications', EntityNotFoundFirebasePushNotifications);
+    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    await subject.perform(newlyAddedNotification, helpers);
+
+    let records = await pushNotificationRegistrationQueries.query({
+      ownerAddress: 'existing-owner-address',
+      pushClientId: newlyAddedNotification.pushClientId,
+    });
+
+    expect(records.length).to.equal(1);
+    expect(records[0].disabledAt).to.exist;
   });
 });
 

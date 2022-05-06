@@ -206,7 +206,11 @@
     "Ondori",
     "Neblio",
     "Particl",
-    "FIBOS"
+    "FIBOS",
+    "airdrop",
+    "claim",
+    "token",
+    "wallet"
     ],
   "companies": [
     "Walmart",
@@ -1606,6 +1610,7 @@
     "hdsupply",
     "healthnet",
     "help",
+    "helpdesk",
     "henryschein",
     "hertz",
     "hess",
@@ -1960,6 +1965,7 @@
     "secure",
     "sempra",
     "seo",
+    "security",
     "server",
     "service",
     "services",

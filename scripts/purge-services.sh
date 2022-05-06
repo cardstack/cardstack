@@ -17,6 +17,6 @@ if [ "$(echo $SERVICE_LIST | wc -w)" -gt "$COUNT" ]; then
   for SERVICE in ${SORTED[@]:$COUNT}; do
     CMD="aws ecs delete-service --cluster $CLUSTER --service $SERVICE --force"
     echo "$CMD"
-    $CMD
+    $CMD || { echo "Failed to delete service $CLUSTER/$SERVICE"; }
   done
 fi

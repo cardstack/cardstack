@@ -289,5 +289,10 @@ module.exports = {
       module: /node_modules\/hash-stream-validation\/index\.js/,
       message: /Can't resolve 'fast-crc32c'/,
     },
+    {
+      // trying to dynamically import to check whether a module is available
+      module: /node_modules\/@aws-sdk\/util-user-agent-node/,
+      message: /Module not found: Error: Can't resolve 'aws-crt'/,
+    },
   ],
 };

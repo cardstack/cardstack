@@ -46,14 +46,7 @@ export default class MerchantInfosRoute {
 
     let params: MerchantInfoQueriesFilter = {
       ownerAddress: ctx.state.userAddress,
-      customFilter: undefined,
     };
-
-    if (ctx.query.availableForCardSpace) {
-      params.customFilter = {
-        availableForCardSpace: true,
-      };
-    }
 
     let merchantInfos = await this.merchantInfoQueries.fetch(params);
 
@@ -106,21 +99,15 @@ export default class MerchantInfosRoute {
     };
 
     let db = await this.databaseManager.getClient();
-    let merchantInfoId, cardSpaceId;
+    let merchantInfoId;
 
     await this.databaseManager.performTransaction(db, async () => {
       merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
-      cardSpaceId = (
-        await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db)
-      ).id;
+      await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
     });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
       id: merchantInfoId,
-    });
-
-    await this.workerClient.addJob('persist-off-chain-card-space', {
-      id: cardSpaceId,
     });
 
     let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);

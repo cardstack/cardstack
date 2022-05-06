@@ -10,6 +10,7 @@ import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
   boomRoute = inject('boom-route', { as: 'boomRoute' });
+  config = route('config');
   exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute = inject('session-route', { as: 'sessionRoute' });
   status = route('status');
@@ -28,6 +29,9 @@ export default class APIRouter {
   cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
   });
+  emailCardDropRequestsRoute = inject('email-card-drop-requests-route', {
+    as: 'emailCardDropRequestsRoute',
+  });
   pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
     as: 'pushNotificationRegistrationsRoute',
   });
@@ -43,6 +47,7 @@ export default class APIRouter {
   routes() {
     let {
       boomRoute,
+      config: configRoute,
       exchangeRatesRoute,
       prepaidCardColorSchemesRoute,
       prepaidCardPatternsRoute,
@@ -55,12 +60,14 @@ export default class APIRouter {
       reservationsRoute,
       inventoryRoute,
       cardSpacesRoute,
+      emailCardDropRequestsRoute,
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
+    apiSubrouter.get('/config', configRoute.get);
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
@@ -79,14 +86,11 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
 
+    apiSubrouter.get('/email-card-drop-requests', emailCardDropRequestsRoute.get);
+    apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
+
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
-    apiSubrouter.post(
-      '/card-spaces/validate-profile-category',
-      parseBody,
-      cardSpacesRoute.postProfileCategoryValidation
-    );
-    apiSubrouter.post('/card-spaces/validate-profile-name', parseBody, cardSpacesRoute.postProfileNameValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
 
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);

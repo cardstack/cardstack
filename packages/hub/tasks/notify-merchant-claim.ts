@@ -45,7 +45,7 @@ query($txn: String!) {
 }
 `;
 
-const { network } = config.get('web3') as { network: 'sokol' | 'xdai' };
+const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
 
 export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');
@@ -56,11 +56,15 @@ export default class NotifyMerchantClaim {
   });
 
   async perform(payload: string) {
-    await this.cardpay.waitForSubgraphIndex(payload, network);
+    await this.cardpay.waitForSubgraphIndex(payload, web3Config.layer2Network);
 
-    let queryResult: MerchantClaimsQueryResult = await this.cardpay.gqlQuery(network, merchantClaimsQuery, {
-      txn: payload,
-    });
+    let queryResult: MerchantClaimsQueryResult = await this.cardpay.gqlQuery(
+      web3Config.layer2Network,
+      merchantClaimsQuery,
+      {
+        txn: payload,
+      }
+    );
 
     let result = queryResult?.data?.merchantClaims?.[0];
 
@@ -105,14 +109,14 @@ export default class NotifyMerchantClaim {
         merchantId: result.merchantSafe.id,
       }),
       ownerAddress,
-      network,
+      network: web3Config.layer2Network,
     };
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
         sendBy: parseInt(result.timestamp) * 1000 + MERCHANT_CLAIM_EXPIRY_TIME,
         notificationId: generateContractEventNotificationId({
-          network,
+          network: web3Config.layer2Network,
           ownerAddress,
           transactionHash: payload,
           pushClientId,

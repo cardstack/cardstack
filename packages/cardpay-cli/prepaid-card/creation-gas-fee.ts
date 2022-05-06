@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { fromWei, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
@@ -19,7 +19,7 @@ export default {
       network: string;
       tokenAddress: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let prepaidCard = await getSDK('PrepaidCard', web3);
     let weiAmount = await prepaidCard.gasFee(tokenAddress);
     console.log(`The gas fee for a new prepaid card in units of this token is ${fromWei(weiAmount)}`);

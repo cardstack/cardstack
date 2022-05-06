@@ -195,7 +195,12 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
       if (mod.type === 'asset' || !mod.meta.component) {
         throw new CardstackError(`Module that is supposed to be a component is not. Localpath: ${localPath}`);
       }
-      componentInfos[format] = this.buildComponentInfo(mod, fields, mod.meta.component, defaultFieldFormat(format));
+      componentInfos[format] = this.buildComponentInfo(
+        mod,
+        fields,
+        mod.meta.component.default,
+        defaultFieldFormat(format)
+      );
     }
 
     Object.assign(componentInfos, inheritedComponents);
@@ -529,7 +534,7 @@ export class Compiler<Identity extends Saved | Unsaved = Saved> {
     let componentTransformResult = transformCardComponent({
       ast: mod.ast,
       templateSource: mod.source,
-      meta: mod.meta.component!,
+      meta: mod.meta.component!.default,
       debugPath: debugPath(this.cardSource.realm, this.cardSource.id, mod.localPath),
       fields,
       defaultFieldFormat: defaultFieldFormat(format),

@@ -36,7 +36,16 @@ app "hub" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/hub-prod/52cb41649112bec8/1ce6522a7998b3b4"
             }
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_https_url-p9kYAu"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_wss_url-cTukZK"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_wss_url-BXGFlG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+                HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_email_card_drop_rate_limit_count-mdtxRC"
+                HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_email_card_drop_rate_limit_period_minutes-m71GVI"
+                HUB_EMAIL_HASH_SALT = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_email_hash_salt-6j6HZV"
+                DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
+                PAGERDUTY_TOKEN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
             }
         }
 
@@ -83,7 +92,13 @@ app "hub-worker" {
             execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_https_url-p9kYAu"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_wss_url-cTukZK"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_wss_url-BXGFlG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+                DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
+                PAGERDUTY_TOKEN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
             }
         }
 
@@ -125,7 +140,13 @@ app "hub-bot" {
             execution_role_name = "hub-ecr-task-executor-role"
             disable_alb = true
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_https_url-p9kYAu"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_wss_url-cTukZK"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_wss_url-BXGFlG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+                DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
+                PAGERDUTY_TOKEN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
             }
         }
 
@@ -164,9 +185,16 @@ app "hub-event-listener" {
           count = 1
           subnets = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
           task_role_name = "hub-ecr-task"
+          execution_role_name = "hub-ecr-task-executor-role"
           disable_alb = true
             secrets = {
+                LAYER1_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_https_url-p9kYAu"
+                LAYER1_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_infura_wss_url-cTukZK"
+                LAYER2_RPC_NODE_HTTPS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+                LAYER2_RPC_NODE_WSS_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_wss_url-BXGFlG"
                 HUB_AUTH_SECRET = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
+                DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
+                PAGERDUTY_TOKEN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
             }
       }
 

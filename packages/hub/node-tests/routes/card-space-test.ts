@@ -1,4 +1,3 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { CardSpace } from '../../routes/card-spaces';
 import { registry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,17 +29,6 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-let lastAddedJobIdentifier: string | undefined;
-let lastAddedJobPayload: any | undefined;
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    lastAddedJobIdentifier = identifier;
-    lastAddedJobPayload = payload;
-    return Promise.resolve({} as Job);
-  }
-}
-
 describe('GET /api/card-spaces/:slug', function () {
   let { request, getContainer } = setupHub(this);
 
@@ -60,12 +48,8 @@ describe('GET /api/card-spaces/:slug', function () {
     const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
     const cardSpace: CardSpace = {
       id,
-      profileName: 'Satoshi Nakamoto',
       profileDescription: "Satoshi's place",
-      profileCategory: 'entertainment',
       profileImageUrl: 'https://test.com/test1.png',
-      profileCoverImageUrl: 'https://test.com/test2.png',
-      profileButtonText: 'Visit this Space',
       merchantId,
     };
 
@@ -85,19 +69,8 @@ describe('GET /api/card-spaces/:slug', function () {
           id,
           attributes: {
             did: 'did:cardstack:1csqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
-            'profile-name': 'Satoshi Nakamoto',
             'profile-description': "Satoshi's place",
-            'profile-category': 'entertainment',
-            'profile-cover-image-url': 'https://test.com/test2.png',
-            'profile-button-text': 'Visit this Space',
-            'bio-description': null,
-            'bio-title': null,
-            'donation-description': null,
-            'donation-suggestion-amount-1': null,
-            'donation-suggestion-amount-2': null,
-            'donation-suggestion-amount-3': null,
-            'donation-suggestion-amount-4': null,
-            'donation-title': null,
+            'profile-image-url': 'https://test.com/test1.png',
             links: [],
           },
           relationships: {
@@ -139,14 +112,8 @@ describe('GET /api/card-spaces/:slug', function () {
 describe('POST /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
   let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
-  });
 
   it('persists card space', async function () {
     let merchantId = uuidv4();
@@ -165,12 +132,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
         relationships: {
           'merchant-info': {
@@ -183,8 +146,6 @@ describe('POST /api/card-spaces', function () {
       },
     };
 
-    let resourceId = null;
-
     await request()
       .post('/api/card-spaces')
       .send(payload)
@@ -193,7 +154,6 @@ describe('POST /api/card-spaces', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
       .expect(function (res) {
-        resourceId = res.body.data.id;
         res.body.data.id = 'the-id';
         res.body.data.attributes.did = 'the-did';
       })
@@ -206,12 +166,8 @@ describe('POST /api/card-spaces', function () {
           id: 'the-id',
           attributes: {
             did: 'the-did',
-            'profile-name': 'Satoshi Nakamoto',
             'profile-description': "Satoshi's place",
-            'profile-category': 'entertainment',
             'profile-image-url': 'https://test.com/test1.png',
-            'profile-cover-image-url': 'https://test.com/test2.png',
-            'profile-button-text': 'Visit this Space',
           },
           relationships: {
             'merchant-info': {
@@ -224,9 +180,6 @@ describe('POST /api/card-spaces', function () {
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
-
-    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-card-space');
-    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId });
   });
 
   it('returns 401 without bearer token', async function () {
@@ -264,12 +217,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
         relationships: {
           'merchant-info': {
@@ -307,12 +256,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
       },
     };
@@ -354,12 +299,8 @@ describe('POST /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
         },
         relationships: {
           'merchant-info': {
@@ -392,183 +333,12 @@ describe('POST /api/card-spaces', function () {
   });
 });
 
-describe('POST /api/card-spaces/validate-profile-category', async function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-  });
-  let { request } = setupHub(this);
-
-  it('returns no category errors when category is valid', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-category`)
-      .send({ data: { attributes: { 'profile-category': 'yes' } } })
-      .set('Authorization', 'Bearer: abc123--def456--ghi789') // FIXME note colon, and below
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns an error when category name is profane', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-category`)
-      .send({ data: { attributes: { 'profile-category': "fuck this isn't valid" } } })
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [
-          {
-            status: '422',
-            title: 'Invalid attribute',
-            source: {
-              pointer: `/data/attributes/profile-category`,
-            },
-            detail: 'Category is not allowed',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns category errors when category is invalid', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-category`)
-      .send({ data: { attributes: { 'profile-category': '123456789012345678901234567890123456789012345678901' } } })
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [
-          {
-            status: '422',
-            title: 'Invalid attribute',
-            source: { pointer: `/data/attributes/profile-category` },
-            detail: 'Max length is 50',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns 401 without bearer token', async function () {
-    await request()
-      .post('/api/card-spaces/validate-profile-category')
-      .send({})
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(401)
-      .expect({
-        errors: [
-          {
-            status: '401',
-            title: 'No valid auth token',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-});
-
-describe('POST /api/card-spaces/validate-profile-name', async function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
-  });
-  let { request } = setupHub(this);
-
-  it('returns no url errors when profile name is available', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-name`)
-      .send({ data: { attributes: { 'profile-name': 'Valid Profile Name' } } })
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns an error when profile name is profane', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-name`)
-      .send({ data: { attributes: { 'profile-name': "fuck this isn't valid" } } })
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [
-          {
-            status: '422',
-            title: 'Invalid attribute',
-            source: {
-              pointer: `/data/attributes/profile-name`,
-            },
-            detail: 'Display name is not allowed',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns an error when profile name is too long', async function () {
-    await request()
-      .post(`/api/card-spaces/validate-profile-name`)
-      .send({
-        data: { attributes: { 'profile-name': 'morethanfiftymorethanfiftymorethanfiftymorethanfiftymorethanfifty' } },
-      })
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        errors: [
-          {
-            status: '422',
-            title: 'Invalid attribute',
-            source: {
-              pointer: `/data/attributes/profile-name`,
-            },
-            detail: 'Max length is 50',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns 401 without bearer token', async function () {
-    await request()
-      .post('/api/card-spaces')
-      .send({})
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(401)
-      .expect({
-        errors: [
-          {
-            status: '401',
-            title: 'No valid auth token',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-});
-
 describe('PUT /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
-  });
 
   it('returns 404 when resource does not exist', async function () {
     await request()
@@ -596,10 +366,11 @@ describe('PUT /api/card-spaces', function () {
 
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
-    await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, merchant_id) VALUES($1, $2, $3, $4, $5, $6)',
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'Test', 'Test', 'Visit this Space', merchantId]
-    );
+    await db.query('INSERT INTO card_spaces(id, profile_description, merchant_id) VALUES($1, $2, $3)', [
+      'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+      'Test',
+      merchantId,
+    ]);
 
     await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
@@ -645,34 +416,17 @@ describe('PUT /api/card-spaces', function () {
     });
 
     await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, profile_image_url, profile_cover_image_url, merchant_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-      [
-        'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
-        'Satoshi Nakamoto',
-        "Satoshi's place",
-        'entertainment',
-        'Visit this Space',
-        'https://test.com/profile.jpg',
-        'https://test.com/cover.jpg',
-        merchantId,
-      ]
+      'INSERT INTO card_spaces(id, profile_description, profile_image_url, merchant_id) VALUES($1, $2, $3, $4)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', "Satoshi's place", 'https://test.com/profile.jpg', merchantId]
     );
 
     let payload = {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
-          'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
-          'profile-image-url': 'https://test.com/profile.jpg',
-          'profile-cover-image-url': 'https://test.com/cover.jpg',
-          'profile-button-text': 'Visit this Space',
-          'bio-title': 'Innovator',
-          'bio-description': "I'm a wealthy industrialist and philanthropist, and a bicyclist.",
+          'profile-description': "Satoshi's place, v2",
+          'profile-image-url': 'https://test.com/profile-v2.jpg',
           links: [{ title: 'Link1', url: 'https://test.com' }],
-          'donation-title': 'The Human Fund',
-          'donation-description': 'A donation will be made in your name to the Human Fund',
         },
       },
     };
@@ -693,17 +447,9 @@ describe('PUT /api/card-spaces', function () {
           id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
           attributes: {
             did: 'did:cardstack:1csnaSutV4uMuyyJZcJ7ktsTwdec10adda76d48c7',
-            'profile-name': 'Satoshi Nakamoto',
-            'profile-description': "Satoshi's place",
-            'profile-category': 'entertainment',
-            'profile-image-url': 'https://test.com/profile.jpg',
-            'profile-cover-image-url': 'https://test.com/cover.jpg',
-            'profile-button-text': 'Visit this Space',
-            'bio-title': 'Innovator',
-            'bio-description': "I'm a wealthy industrialist and philanthropist, and a bicyclist.",
+            'profile-description': "Satoshi's place, v2",
+            'profile-image-url': 'https://test.com/profile-v2.jpg',
             links: [{ title: 'Link1', url: 'https://test.com' }],
-            'donation-title': 'The Human Fund',
-            'donation-description': 'A donation will be made in your name to the Human Fund',
           },
           relationships: {
             'merchant-info': {
@@ -735,23 +481,18 @@ describe('PUT /api/card-spaces', function () {
       textColor: 'red',
     });
 
-    await db.query(
-      'INSERT INTO card_spaces(id, profile_name, profile_description, profile_category, profile_button_text, merchant_id) VALUES($1, $2, $3, $4, $5, $6)',
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'Test', 'Test', 'Visit this Space', merchantId]
-    );
+    await db.query('INSERT INTO card_spaces(id, profile_description, merchant_id) VALUES($1, $2, $3)', [
+      'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+      'Test',
+      merchantId,
+    ]);
 
     let payload = {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-name': 'Satoshi Nakamoto',
           'profile-description': "Satoshi's place",
-          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'profile-cover-image-url': 'https://test.com/test2.png',
-          'profile-button-text': 'Visit this Space',
-          'bio-title': 'Innovator',
-          'bio-description': "I'm a wealthy industrialist and philanthropist, and a bicyclist.",
           links: [
             {
               title: 'very long long long long much too long string for a link title',
@@ -759,9 +500,6 @@ describe('PUT /api/card-spaces', function () {
             },
             { title: '', url: 'invalid' },
           ],
-          'donation-title': 'The Human Fund',
-          'donation-description': 'A donation will be made in your name to the Human Fund',
-          'donation-suggestion-amount-1': 'a million',
         },
       },
     };
@@ -792,12 +530,6 @@ describe('PUT /api/card-spaces', function () {
             title: 'Invalid attribute',
             source: { pointer: `/data/attributes/links/1/url` },
             detail: 'Invalid URL',
-          },
-          {
-            status: '422',
-            title: 'Invalid attribute',
-            source: { pointer: `/data/attributes/donation-suggestion-amount-1` },
-            detail: 'Must be an integer',
           },
         ],
       })

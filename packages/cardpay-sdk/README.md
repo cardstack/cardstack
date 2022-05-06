@@ -67,6 +67,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
+  - [`RewardManager.withdrawGasEstimate`](#rewardmanagerwithdrawgasestimate)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
 - [`LayerOneOracle`](#layeroneoracle)
@@ -389,8 +390,10 @@ This method is invoked with the following parameters:
 - the address of the gnosis safe
 - the address of the token contract
 - the address of the recipient
-- the amount of tokens to send as a string in units of `wei`
+- optionally,  amount of tokens to send as a string in units of `wei`
 - optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
+
+`amount` is an optional param. When `amount` is included, one must ensure that there is sufficient balance leftover to pay for gas of the transaction, .i.e `safeBalance < amount - estimatedGasCost`. The scenario which this occurs is when the user specifies `amount` that is close to `safeBalance`. The client should make this check.  When `amount` is excluded, the whole balance of the safe is withdrawn which is automatically taxed for gas, .i.e the gas deduction occurs internally within the sdk function. It is recommended when the client expects to withdraw the "max" balance that it doesn't specify `amount`. 
 
 ```js
 let cardCpxd = await getAddress('cardCpxd', web3);
@@ -403,6 +406,7 @@ let result = await safes.sendTokens(
 ```
 
 This method returns a promise for a web3 transaction receipt.
+
 
 ### `Safes.setSupplierInfoDID`
 This call will allow a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.
@@ -723,6 +727,8 @@ The parameters to this function are:
 - The token address of the tokens the merchant is claiming
 - The amount of tokens that are being claimed as a string in units of `wei`
 
+`amount` is an optional param. When `amount` is excluded, the entire `revenueBalance` of a merchant safe is claimed.
+
 ```ts
 let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
 ```
@@ -883,11 +889,29 @@ await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard , rewardProgramId, n
 
 ### `RewardManager.withdraw`
 
-The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The funds in the withdrawal will pay for the gas fees to execute the transaction. 
+The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The gas fees in the withdrawal will be paid out of the balance of the safe -- similar to `Safe.sendTokens`. 
+
+`amount` is an optional param. When `amount` is included, one must ensure that there is sufficient balance leftover to pay for gas of the transaction, .i.e `safeBalance < amount - estimatedGasCost`. The scenario which this occurs is when the user specifies `amount` that is close to `safeBalance`. The client should make this check. When `amount` is excluded, the whole balance of the safe is withdrawn which is automatically taxed for gas, .i.e the gas deduction occurs internally within the sdk function. It is recommended when the client expects to withdraw the "max" balance that it doesn't specify `amount`. 
 
 ```js
 let rewardManagerAPI = await getSDK(RewardManager, web3);
-await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
+await rewardManagerAPI.withdraw(rewardSafe , to, token, amount) 
+```
+
+### `RewardManager.withdrawGasEstimate`
+
+The `withdrawGasEstimate` returns a gas estimate for withdrawing a reward. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: BN 
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.withdrawGasEstimate(rewardSafeAddress, to, tokenAddress, amount)
 ```
 
 ### `RewardManager.addRewardRule`
@@ -1042,7 +1066,6 @@ let cardOracle = await getOracle("CARD", web3);
 
 ```js
 let blockExplorer = await getConstant("blockExplorer", web3);
-let rpcNode = await getConstant("rpcNode", "sokol");
 let relayServiceURL = await getConstant("relayServiceURL", web3);
 let transactionServiceURL = await getConstant("transactionServiceURL", web3);
 ```

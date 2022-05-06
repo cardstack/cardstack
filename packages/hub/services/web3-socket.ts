@@ -1,19 +1,13 @@
 import Web3 from 'web3';
 import config from 'config';
 import Logger from '@cardstack/logger';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import * as Sentry from '@sentry/node';
 
-interface Web3Config {
-  network: string;
-}
-
 let log = Logger('service:web3-socket');
-const { network } = config.get('web3') as Web3Config;
 
 export default class Web3SocketService {
   web3: Web3 | undefined;
-  rpcURL = getConstantByNetwork('rpcWssNode', network);
+  rpcURL = config.get('web3.layer2RpcNodeWssUrl') as string;
 
   getInstance() {
     if (!this.web3) {

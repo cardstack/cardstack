@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { Proof, getSDK, WithSymbol } from '@cardstack/cardpay-sdk';
 import groupBy from 'lodash/groupBy';
@@ -36,7 +36,7 @@ export default {
       tokenAddress?: string;
       isValidOnly?: boolean;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
     const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
     if (isValidOnly) {

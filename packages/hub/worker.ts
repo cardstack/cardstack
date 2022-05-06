@@ -9,12 +9,15 @@ import { runInitializers } from './main';
 // Tasks
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
-import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import DiscordPostTask from './tasks/discord-post';
+import DropCardTask from './tasks/drop-card';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import SendEmailCardDropVerification from './tasks/send-email-card-drop-verification';
 import SendNotificationsTask from './tasks/send-notifications';
+import SubscribeEmail from './tasks/subscribe-email';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
 import WyreTransferTask from './tasks/wyre-transfer';
 import PrintQueuedJobsTask from './tasks/print-queued-jobs';
@@ -55,17 +58,21 @@ export class HubWorker {
   async boot() {
     let runner = await runWorkers({
       logger: new Logger(workerLogFactory),
+      concurrency: 10,
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
+        'discord-post': this.instantiateTask(DiscordPostTask),
+        'drop-card': this.instantiateTask(DropCardTask),
+        'send-email-card-drop-verification': this.instantiateTask(SendEmailCardDropVerification),
         'send-notifications': this.instantiateTask(SendNotificationsTask),
+        'subscribe-email': this.instantiateTask(SubscribeEmail),
         'notify-merchant-claim': this.instantiateTask(NotifyMerchantClaimTask),
         'notify-customer-payment': this.instantiateTask(NotifyCustomerPaymentTask),
         'persist-off-chain-prepaid-card-customization': this.instantiateTask(
           PersistOffChainPrepaidCardCustomizationTask
         ),
         'persist-off-chain-merchant-info': this.instantiateTask(PersistOffChainMerchantInfoTask),
-        'persist-off-chain-card-space': this.instantiateTask(PersistOffChainCardSpaceTask),
         'print-queued-jobs': this.instantiateTask(PrintQueuedJobsTask),
         'remove-old-sent-notifications': this.instantiateTask(RemoveOldSentNotificationsTask),
         'wyre-transfer': this.instantiateTask(WyreTransferTask),

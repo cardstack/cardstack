@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { getWeb3, NETWORK_OPTION_LAYER_2, getWeb3Opts } from '../utils';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { ContractOptions } from 'web3-eth-contract';
 
@@ -46,9 +46,9 @@ export default {
       customizationDID?: string;
       from?: string;
     };
-    let web3 = await getWeb3(network, getWeb3Opts(args));
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
 
-    let prepaidCard = await getSDK('PrepaidCard', web3);
+    let prepaidCard = await getSDK('PrepaidCard', web3, signer);
     let blockExplorer = await getConstant('blockExplorer', web3);
     let assets = await getSDK('Assets', web3);
     let { symbol } = await assets.getTokenInfo(tokenAddress);

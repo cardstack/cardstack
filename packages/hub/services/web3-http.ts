@@ -3,13 +3,6 @@
 import Web3 from 'web3';
 import config from 'config';
 import Logger from '@cardstack/logger';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
-
-interface Web3Config {
-  network: string;
-}
-
-const { network } = config.get('web3') as Web3Config;
 let log = Logger('service:web3-http');
 
 export default class Web3HttpService {
@@ -17,14 +10,14 @@ export default class Web3HttpService {
 
   getInstance() {
     if (!this.web3) {
-      let rpcURL = getConstantByNetwork('rpcNode', network);
+      let rpcURL = config.get('web3.layer2RpcNodeHttpsUrl') as string;
       this.web3 = new Web3(rpcURL);
     }
     return this.web3;
   }
 
   async isAvailable(): Promise<boolean> {
-    let rpcURL = getConstantByNetwork('rpcNode', network);
+    let rpcURL = config.get('web3.layer2RpcNodeHttpsUrl') as string;
     try {
       let response = await fetch(rpcURL, {
         method: 'POST',
