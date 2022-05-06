@@ -17,14 +17,12 @@ models.Base.metadata.create_all(bind=engine)
 for expected_env in [
     "SUBGRAPH_URL",
     "REWARDS_BUCKET",
-    "PORT",
 ]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
 
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
-PORT = int(os.environ.get("PORT"))
 
 app = FastAPI()
 
