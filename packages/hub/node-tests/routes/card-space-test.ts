@@ -333,7 +333,7 @@ describe('POST /api/card-spaces', function () {
   });
 });
 
-describe.only('PATCH /api/card-spaces', function () {
+describe('PATCH /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
