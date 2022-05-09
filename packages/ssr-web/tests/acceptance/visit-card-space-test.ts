@@ -265,7 +265,7 @@ module('Acceptance | visit card space', function (hooks) {
     await visit('/');
 
     assert
-      .dom('[data-test-error]')
+      .dom('[data-test-profile-not-found]')
       .includesText("We can't find the profile you're looking for");
   });
 
