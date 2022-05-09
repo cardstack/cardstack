@@ -265,8 +265,8 @@ module('Acceptance | visit card space', function (hooks) {
     await visit('/');
 
     assert
-      .dom('[data-test-error]')
-      .includesText('404: Card Space not found for slug');
+      .dom('[data-test-profile-not-found]')
+      .includesText("We couldn't find the profile you're looking for");
   });
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {

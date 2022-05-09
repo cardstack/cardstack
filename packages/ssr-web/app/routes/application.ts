@@ -17,7 +17,14 @@ export default class ApplicationRoute extends Route {
         if (this.fastboot.isFastBoot) {
           this.fastboot.response.statusCode = 404;
         }
-        throw new Error(`404: Card Space not found for ${this.cardSpace.slug}`);
+        let e = new Error(
+          `404: Card Space not found for ${this.cardSpace.slug}`
+        );
+
+        // @ts-ignore
+        e.isMissingCardSpace = true;
+
+        throw e;
       }
 
       return model;
