@@ -109,6 +109,20 @@ export default class EmailCardDropRequestsQueries {
 
     return rows[0];
   }
+
+  async updateTransactionHash(id: string, transactionHash: string): Promise<EmailCardDropRequest> {
+    let db = await this.databaseManager.getClient();
+
+    let { rows } = await db.query(
+      `UPDATE email_card_drop_requests SET
+        transaction_hash = $2
+      WHERE ID = $1
+      RETURNING *`,
+      [id, transactionHash]
+    );
+
+    return rows[0];
+  }
 }
 
 declare module '@cardstack/hub/queries' {

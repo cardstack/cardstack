@@ -57,6 +57,10 @@ export default class RelayService {
     let body = await response.json();
     return body.txHash;
   }
+
+  async provisionPrepaidCardV2(_userAddress: string, _sku: string): Promise<string> {
+    return Promise.reject(new Error('FIXME not implemented'));
+  }
 }
 
 declare module '@cardstack/hub/services' {
