@@ -28,10 +28,16 @@ describe('wyre-transfer-task', function () {
   let provisionedSku = 'sku';
   let mockTxnHash = '0x456';
   let provisionPrepaidCardCalls = 0;
+  let provisioningShouldError = false;
 
   class StubRelayService {
     async provisionPrepaidCardV2(userAddress: string, requestedSku: string) {
       provisionPrepaidCardCalls++;
+
+      if (provisioningShouldError) {
+        throw new Error('provisioning should error');
+      }
+
       provisionedAddress = userAddress;
       provisionedSku = requestedSku;
       return Promise.resolve(mockTxnHash);
@@ -41,6 +47,7 @@ describe('wyre-transfer-task', function () {
   this.beforeEach(async function () {
     registry(this).register('relay', StubRelayService, { type: 'service' });
     provisionPrepaidCardCalls = 0;
+    provisioningShouldError = false;
 
     Sentry.init({
       dsn: DUMMY_DSN,
@@ -93,5 +100,29 @@ describe('wyre-transfer-task', function () {
     expect(testkit.reports()[0].tags).to.deep.equal({
       action: 'drop-card',
     });
+  });
+
+  it('logs an error when the relay server call fails', async function () {
+    provisioningShouldError = true;
+
+    let task = (await getContainer().lookup('drop-card')) as DropCardTask;
+
+    await task.perform({
+      id: unclaimedEoa.id,
+    });
+
+    expect(provisionPrepaidCardCalls).to.equal(1);
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].error?.message).to.equal('provisioning should error');
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'drop-card',
+    });
+
+    let requests = await emailCardDropRequestQueries.query({ id: unclaimedEoa.id });
+    let request = requests[0];
+
+    expect(request.transactionHash).to.be.null;
   });
 });
