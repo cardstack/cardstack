@@ -266,7 +266,7 @@ module('Acceptance | visit card space', function (hooks) {
 
     assert
       .dom('[data-test-profile-not-found]')
-      .includesText("We can't find the profile you're looking for");
+      .includesText("We couldn't find the profile you're looking for");
   });
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {
