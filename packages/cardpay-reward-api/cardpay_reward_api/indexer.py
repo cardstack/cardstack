@@ -6,6 +6,7 @@ import eth_abi
 import pyarrow.parquet as pq
 import requests
 from cloudpathlib import AnyPath
+from eth_utils import to_checksum_address
 from fastapi import Depends
 from hexbytes import HexBytes
 from pyarrow import fs
@@ -70,7 +71,7 @@ class Indexer:
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
-                tokenAddress=token,
+                tokenAddress=to_checksum_address(token),
                 payee=payment["payee"],
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],

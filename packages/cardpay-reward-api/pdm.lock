@@ -140,6 +140,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethereum-utils"
+version = "0.6.2"
+summary = "Common utility functions for ethereum codebases."
+
+[[package]]
 name = "fastapi"
 version = "0.75.1"
 requires_python = ">=3.6.1"
@@ -372,12 +377,6 @@ requires_python = ">=3.5"
 summary = "List processing tools and functional utilities"
 
 [[package]]
-name = "typing"
-version = "3.7.4.3"
-requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-summary = "Type Hints for Python"
-
-[[package]]
 name = "typing-extensions"
 version = "4.1.1"
 requires_python = ">=3.6"
@@ -444,7 +443,7 @@ summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:6abe8b0e8e3b6fa13b479c96cdf91c5943f61953a6e478269d97a05e105e5e4f"
+content_hash = "sha256:5067348c64d19e15a145b4aba93019d6509ce64058959147f0c4ee0661853627"
 
 [metadata.files]
 "anyio 3.5.0" = [
@@ -509,6 +508,10 @@ content_hash = "sha256:6abe8b0e8e3b6fa13b479c96cdf91c5943f61953a6e478269d97a05e1
 "eth-utils 1.10.0" = [
     {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
     {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
+]
+"ethereum-utils 0.6.2" = [
+    {file = "ethereum_utils-0.6.2-py3-none-any.whl", hash = "sha256:c07d02aaedeb2805c28b04d9b65790c1a61575d8e8b337886c23b6a543077923"},
+    {file = "ethereum-utils-0.6.2.tar.gz", hash = "sha256:8642b92582fd474780481104f8dc2d6d9841bf03e9ca05e2fc176acb051c7940"},
 ]
 "fastapi 0.75.1" = [
     {file = "fastapi-0.75.1-py3-none-any.whl", hash = "sha256:f46f8fc81261c2bd956584114da9da98c84e2410c807bc2487532dabf55e7ab8"},
@@ -906,10 +909,6 @@ content_hash = "sha256:6abe8b0e8e3b6fa13b479c96cdf91c5943f61953a6e478269d97a05e1
 "toolz 0.11.2" = [
     {file = "toolz-0.11.2-py3-none-any.whl", hash = "sha256:a5700ce83414c64514d82d60bcda8aabfde092d1c1a8663f9200c07fdcc6da8f"},
     {file = "toolz-0.11.2.tar.gz", hash = "sha256:6b312d5e15138552f1bda8a4e66c30e236c831b612b2bf0005f8a1df10a4bc33"},
-]
-"typing 3.7.4.3" = [
-    {file = "typing-3.7.4.3-py2-none-any.whl", hash = "sha256:283d868f5071ab9ad873e5e52268d611e851c870a2ba354193026f2dfb29d8b5"},
-    {file = "typing-3.7.4.3.tar.gz", hash = "sha256:1187fb9c82fd670d10aa07bbb6cfcfe4bdda42d6fab8d5134f04e8c4d0b71cc9"},
 ]
 "typing-extensions 4.1.1" = [
     {file = "typing_extensions-4.1.1-py3-none-any.whl", hash = "sha256:21c85e0fe4b9a155d0799430b0ad741cdce7e359660ccbd8b530613e8df88ce2"},
