@@ -77,13 +77,13 @@ module(
         )
         .exists();
 
-      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown]`);
       await waitFor(
-        `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+        `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
       assert
         .dom(
-          `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option]`
+          `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin [data-test-card-picker-dropdown-option]`
         )
         .exists({ count: 2 });
       assert
@@ -94,14 +94,14 @@ module(
     });
 
     test('it disables and fades out cards with insufficient balance', async function (assert) {
-      await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+      await click(`[data-test-boxel-card-picker-dropdown]`);
       await waitFor(
         `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
       );
 
       assert
         .dom(
-          `[data-test-boxel-card-picker-dropdown] [data-test-card-picker-dropdown-option]`
+          `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin [data-test-card-picker-dropdown-option]`
         )
         .exists({ count: 2 });
       assert
@@ -109,7 +109,7 @@ module(
         .exists({ count: 1 });
       assert
         .dom(
-          `[data-test-boxel-card-picker-dropdown] li:nth-of-type(2)[aria-disabled="true"]`
+          `[data-test-boxel-card-picker-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-of-type(2)[aria-disabled="true"]`
         )
         .exists();
       assert

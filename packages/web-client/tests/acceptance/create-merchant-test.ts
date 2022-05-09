@@ -43,7 +43,7 @@ function milestoneCompletedSel(milestoneIndex: number): string {
 }
 
 async function selectPrepaidCard(cardAddress: string) {
-  await click(`[data-test-boxel-card-picker-dropdown] > [role="button"]`);
+  await click(`[data-test-boxel-card-picker-dropdown]`);
   await waitFor(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
   await click(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
 }
@@ -192,9 +192,7 @@ module('Acceptance | create merchant', function (hooks) {
     post = postableSel(2, 2);
     await waitFor(post);
 
-    await click(
-      `${post} [data-test-boxel-card-picker-dropdown] > [role="button"]`
-    );
+    await click(`${post} [data-test-boxel-card-picker-dropdown]`);
     await waitFor(
       `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
     );

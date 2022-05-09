@@ -104,9 +104,7 @@ module(
           '[data-test-balance-chooser-dropdown] [data-test-balance-display-name]'
         )
         .containsText('DAI.CPXD');
-      await click(
-        '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
-      );
+      await click('[data-test-balance-chooser-dropdown]');
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
@@ -122,9 +120,7 @@ module(
         )
         .containsText('CARD.CPXD');
 
-      await click(
-        '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
-      );
+      await click('[data-test-safe-chooser-dropdown]');
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
@@ -141,9 +137,7 @@ module(
           'changing the safe updates the balance for the chosen token'
         );
 
-      await click(
-        '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
-      );
+      await click('[data-test-balance-chooser-dropdown]');
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
@@ -229,9 +223,7 @@ module(
           '[data-test-balance-chooser-dropdown] [data-test-balance-display-name]'
         )
         .containsText('DAI.CPXD');
-      await click(
-        '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
-      );
+      await click('[data-test-balance-chooser-dropdown]');
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
