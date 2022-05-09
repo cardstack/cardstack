@@ -84,6 +84,7 @@ module.exports = {
         periodMinutes: null,
       },
     },
+    verificationUrl: null,
   },
   walletConnect: {
     bridge: 'https://safe-walletconnect.gnosis.io/',

@@ -13,6 +13,7 @@ module.exports = {
         periodMinutes: 10,
       },
     },
+    verificationUrl: 'https://card-drop-email.test/email-card-drop/verify',
   },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {

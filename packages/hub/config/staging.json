@@ -4,6 +4,9 @@
     "allowedGuilds": "584043165066199050",
     "allowedChannels": "898941895525425172"
   },
+  "cardDrop": {
+    "verificationUrl": "https://hub-staging.stack.cards/email-card-drop/verify"
+  },
   "wyre": {
     "callbackUrl": "https://hub-staging.stack.cards/callbacks/wyre"
   },
