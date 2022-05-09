@@ -23,6 +23,7 @@ import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } 
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
+import { query } from '../utils/graphql';
 
 export interface Proof {
   rootHash: string;
@@ -133,7 +134,8 @@ export default class RewardPool {
       url.searchParams.append('token_address', tokenAddress);
     }
     let knownClaimedStr = knownClaimed ? knownClaimed.toString() : 'false';
-    url.searchParams.append('known_claimed', knownClaimedStr);
+    console.log(knownClaimedStr);
+    // url.searchParams.append('known_claimed', knownClaimedStr);
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
@@ -152,8 +154,9 @@ export default class RewardPool {
     let currentBlock = await this.layer2Web3.eth.getBlockNumber();
     let rewardTokens = await this.getRewardTokens();
     let res: Proof[] = [];
+    let claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     json.map((o: any) => {
-      if (rewardTokens.includes(o.tokenAddress)) {
+      if (rewardTokens.includes(o.tokenAddress) && !claimedLeafs.includes(o.leaf)) {
         let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
         res.push({
           ...o,
@@ -162,6 +165,38 @@ export default class RewardPool {
       }
     });
     return this.addTokenSymbol(res);
+  }
+
+  async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
+    let claimsQuery;
+    if (rewardProgramId) {
+      claimsQuery = `
+      query {
+          rewardeeClaims(where:{
+            rewardee: ${payee},
+            rewardProgram: ${rewardProgramId} 
+          } ){
+            leaf
+          }
+      }
+    `;
+    } else {
+      claimsQuery = `
+      query {
+          rewardeeClaims(where:{
+            rewardee: ${payee},
+          } ){
+            leaf
+          }
+      }
+    `;
+    }
+    let {
+      data: { rewardeeClaims },
+    } = await query(this.layer2Web3, claimsQuery);
+    return rewardeeClaims.reduce((accum: string[], o: any) => {
+      return [...accum, o.leaf];
+    }, []);
   }
 
   async rewardTokenBalance(
