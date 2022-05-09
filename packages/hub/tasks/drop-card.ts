@@ -1,7 +1,10 @@
 import { query } from '@cardstack/hub/queries';
 import { service } from '@cardstack/hub/services';
+import Logger from '@cardstack/logger';
 import config from 'config';
 import * as Sentry from '@sentry/node';
+
+let log = Logger('task:drop-card');
 
 export default class DropCard {
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -22,10 +25,13 @@ export default class DropCard {
     }
 
     try {
+      log.info(`Provisioning prepaid card for ${request.ownerAddress}`);
       let transactionHash = await this.relay.provisionPrepaidCardV2(request.ownerAddress, config.get('cardDrop.sku'));
 
+      log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
       await this.emailCardDropRequestQueries.updateTransactionHash(requestId, transactionHash);
-    } catch (e) {
+    } catch (e: any) {
+      log.error(`Error provisioning prepaid card: ${e.toString()}`);
       Sentry.captureException(e, {
         tags: {
           action: 'drop-card',
