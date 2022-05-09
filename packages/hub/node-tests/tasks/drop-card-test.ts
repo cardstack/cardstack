@@ -4,8 +4,14 @@ import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { CardDropConfig } from '../../services/discord-bots/hub-bot/types';
 import config from 'config';
+import * as Sentry from '@sentry/node';
+import sentryTestkit from 'sentry-testkit';
+import waitFor from '../utils/wait-for';
 
 const { sku } = config.get('cardDrop') as CardDropConfig;
+
+const { testkit, sentryTransport } = sentryTestkit();
+const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
 let unclaimedEoa: EmailCardDropRequest = {
   id: 'b176521d-6009-41ff-8472-147a413da450',
@@ -35,6 +41,14 @@ describe('wyre-transfer-task', function () {
   this.beforeEach(async function () {
     registry(this).register('relay', StubRelayService, { type: 'service' });
     provisionPrepaidCardCalls = 0;
+
+    Sentry.init({
+      dsn: DUMMY_DSN,
+      release: 'test',
+      tracesSampleRate: 1,
+      transport: sentryTransport,
+    });
+    testkit.reset();
   });
 
   let { getContainer } = setupHub(this);
@@ -59,5 +73,25 @@ describe('wyre-transfer-task', function () {
     let request = requests[0];
 
     expect(request.transactionHash).to.equal(mockTxnHash);
+  });
+
+  it('logs an error and does not call the relay service when the request is not found', async function () {
+    let task = (await getContainer().lookup('drop-card')) as DropCardTask;
+    let nonexistentUuid = '9abdd42e-abcc-4ce2-b4f8-e6a04efdc5ec';
+
+    await task.perform({
+      id: nonexistentUuid,
+    });
+
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
+    await waitFor(() => testkit.reports().length > 0);
+
+    expect(testkit.reports()[0].error?.message).to.equal(
+      `Could not find email card drop request with id ${nonexistentUuid}`
+    );
+    expect(testkit.reports()[0].tags).to.deep.equal({
+      action: 'drop-card',
+    });
   });
 });
