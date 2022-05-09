@@ -44,3 +44,4 @@ build-backend = "pdm.pep517.api"
 
 [tool.pdm.scripts]
 explore_rules = "streamlit run streamlit/explore.py --server.port 8501 --global.developmentMode false"
+inspect_results = "streamlit run streamlit/inspect_results.py --server.port 8501 --global.developmentMode false"
