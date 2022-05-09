@@ -21,7 +21,7 @@ runs:
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
     - name: Deploy reward submitter
-      run: waypoint up -app=reward-api -prune-retain=0 -plain
+      run: waypoint up -app=reward-api -prune-retain=1 -plain
       shell: bash
       env:
         WAYPOINT_SERVER_TLS: '1'
