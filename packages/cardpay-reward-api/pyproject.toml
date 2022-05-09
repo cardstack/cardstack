@@ -19,6 +19,7 @@ dependencies = [
     "eth-abi>=2.1.1",
     "uvicorn>=0.15.0",
     "eth-utils>=1.10.0",
+    "eth-hash[pycryptodome]>=0.3.2",
 ]
 requires-python = ">=3.9"
 
