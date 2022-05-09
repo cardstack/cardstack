@@ -1,0 +1,42 @@
+.profile-not-found {
+  --profile-not-found-background-color: var(--boxel-purple-600);
+
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  max-width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  justify-items: center;
+  justify-content: center;
+  padding: min(5vh, 100px) 0;
+  text-align: center;
+  background-color: var(--profile-not-found-background-color, inherit);
+  color: var(--boxel-light, inherit);
+  font: var(--boxel-font);
+}
+
+.profile-not-found > * + * {
+  margin-top: var(--boxel-sp);
+}
+
+.profile-not-found__big-404 {
+  font-size: max(2.5rem, min(9rem, 15vh));
+  font-weight: 700;
+}
+
+.profile-not-found__description {
+  max-width: 100vw;
+}
+
+.profile-not-found__decorative-image {
+  max-width: 900px;
+  aspect-ratio: calc(818 / 603);
+  width: 100%;
+  min-width: 500px;
+}
+
+@media only screen and (max-width: 480px) {
+  .profile-not-found {
+    --not-found-background-color: var(--boxel-purple-900);
+  }
+}
