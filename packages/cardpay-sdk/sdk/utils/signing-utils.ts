@@ -272,7 +272,17 @@ export async function signTypedData(web3OrSigner: Web3 | Signer, account: string
     if (attempts > 0) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    if (web3OrSigner instanceof Web3) {
+    if (Signer.isSigner(web3OrSigner)) {
+      let signer = web3OrSigner;
+      let {
+        types: { SafeTx },
+        domain,
+        message,
+      } = data;
+      let types = { SafeTx };
+      //@ts-ignore the _signTypedData method is unfortunately not typed
+      signature = await signer._signTypedData(domain, types, message);
+    } else {
       let web3 = web3OrSigner;
       signature = await new Promise((resolve, reject) => {
         let provider = web3.currentProvider;
@@ -299,16 +309,6 @@ export async function signTypedData(web3OrSigner: Web3 | Signer, account: string
           }
         );
       });
-    } else {
-      let signer = web3OrSigner;
-      let {
-        types: { SafeTx },
-        domain,
-        message,
-      } = data;
-      let types = { SafeTx };
-      //@ts-ignore the _signTypedData method is unfortunately not typed
-      signature = await signer._signTypedData(domain, types, message);
     }
   } while (signature == null && attempts++ < 50);
   if (!signature) {
