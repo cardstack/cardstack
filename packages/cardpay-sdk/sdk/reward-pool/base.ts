@@ -152,16 +152,18 @@ export default class RewardPool {
       throw new Error(await response.text());
     }
     let currentBlock = await this.layer2Web3.eth.getBlockNumber();
-    return this.addTokenSymbol(
-      json['results'].map((o: any) => {
+    let rewardTokens = await this.getRewardTokens();
+    let res: Proof[] = [];
+    json.map((o: any) => {
+      if (rewardTokens.includes(o.tokenAddress)) {
         let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
-        return {
+        res.push({
           ...o,
           isValid: validFrom <= currentBlock && validTo > currentBlock,
-          amount: new BN(o.amount.toLocaleString('fullwide', { useGrouping: false })),
-        };
-      })
-    );
+        });
+      }
+    });
+    return this.addTokenSymbol(res);
   }
 
   async rewardTokenBalance(
@@ -638,8 +640,14 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
 
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
     let assets = await getSDK('Assets', this.layer2Web3);
+    let rewardTokens = await this.getRewardTokens();
     let entries = await Promise.all(
-      tokenAddresses.map(async (tokenAddress) => [tokenAddress, (await assets.getTokenInfo(tokenAddress)).symbol])
+      tokenAddresses.map(async (tokenAddress) => {
+        if (!rewardTokens.includes(tokenAddress)) {
+          throw new Error(`Reward token ${tokenAddress} not recognized by sdk`);
+        }
+        return [tokenAddress, (await assets.getTokenInfo(tokenAddress)).symbol];
+      })
     );
     return Object.fromEntries(entries);
   }
@@ -707,6 +715,11 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       await getAddress('rewardPool', this.layer2Web3)
     );
     return this.rewardPool;
+  }
+  private async getRewardTokens(): Promise<string[]> {
+    let cardTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
+    let daiTokenAddress = await getAddress('daiCpxd', this.layer2Web3);
+    return [cardTokenAddress, daiTokenAddress];
   }
 }
 
