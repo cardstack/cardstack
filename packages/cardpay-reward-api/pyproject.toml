@@ -18,7 +18,7 @@ dependencies = [
     "python-dotenv>=0.20.0",
     "eth-abi>=2.1.1",
     "uvicorn>=0.15.0",
-    "ethereum-utils>=0.6.2",
+    "eth-utils>=1.10.0",
 ]
 requires-python = ">=3.9"
 

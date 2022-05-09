@@ -140,11 +140,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ethereum-utils"
-version = "0.6.2"
-summary = "Common utility functions for ethereum codebases."
-
-[[package]]
 name = "fastapi"
 version = "0.75.1"
 requires_python = ">=3.6.1"
@@ -443,7 +438,7 @@ summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:5067348c64d19e15a145b4aba93019d6509ce64058959147f0c4ee0661853627"
+content_hash = "sha256:792498474d15e39eb474e4971a674b97df3fdc53ccb0d99ac676fb3d5543fc88"
 
 [metadata.files]
 "anyio 3.5.0" = [
@@ -508,10 +503,6 @@ content_hash = "sha256:5067348c64d19e15a145b4aba93019d6509ce64058959147f0c4ee066
 "eth-utils 1.10.0" = [
     {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
     {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
-]
-"ethereum-utils 0.6.2" = [
-    {file = "ethereum_utils-0.6.2-py3-none-any.whl", hash = "sha256:c07d02aaedeb2805c28b04d9b65790c1a61575d8e8b337886c23b6a543077923"},
-    {file = "ethereum-utils-0.6.2.tar.gz", hash = "sha256:8642b92582fd474780481104f8dc2d6d9841bf03e9ca05e2fc176acb051c7940"},
 ]
 "fastapi 0.75.1" = [
     {file = "fastapi-0.75.1-py3-none-any.whl", hash = "sha256:f46f8fc81261c2bd956584114da9da98c84e2410c807bc2487532dabf55e7ab8"},
