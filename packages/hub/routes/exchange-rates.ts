@@ -22,10 +22,11 @@ export default class ExchangeRatesRoute {
   }
 
   async get(ctx: Koa.Context) {
-    if (
-      config.get('hubEnvironment') === 'development' ||
-      (ctx.headers.origin && allowedDomains.includes(ctx.headers.origin))
-    ) {
+    const hasValidAuthToken = ctx.state.userAddress;
+    const isAllowedDomain = ctx.headers.origin && allowedDomains.includes(ctx.headers.origin);
+    const isDevelopment = config.get('hubEnvironment') === 'development';
+
+    if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
       let exchangeRates = await this.exchangeRatesService.fetchExchangeRates();
       if (!exchangeRates?.success) {
         let detail = exchangeRates?.error
