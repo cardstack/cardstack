@@ -7,7 +7,7 @@ import './load-dotenv';
 import config from 'config';
 
 import Koa from 'koa';
-import { environment, httpLogging, errorMiddleware } from './middleware';
+import { httpLogging, errorMiddleware } from './middleware';
 import cors from '@koa/cors';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
@@ -231,7 +231,6 @@ export class HubServer {
   get app(): Koa<Koa.DefaultState, Koa.Context> {
     let app = new Koa<Koa.DefaultState, Koa.Context>()
       .use(errorMiddleware)
-      .use(environment)
       .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
       .use(httpLogging);
 
