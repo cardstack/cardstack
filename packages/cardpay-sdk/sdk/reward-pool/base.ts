@@ -30,8 +30,6 @@ export interface Proof {
   tokenAddress: string;
   payee: string;
   proofArray: string[];
-  timestamp: string;
-  blockNumber: number;
   rewardProgramId: string;
   amount: BN;
   leaf: string;
