@@ -23,6 +23,10 @@ Launch the exploratory streamlit based interface:
 
     pdm run explore_rules
 
+Decode and inspect payment list 
+
+    pdm run inpect_results 
+
 ## Docker
 
 Each individual program can be built by specifying the rule class name as a build argument, for example:
