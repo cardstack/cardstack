@@ -23,7 +23,7 @@ let unclaimedEoa: EmailCardDropRequest = {
 
 let emailCardDropRequestQueries: EmailCardDropRequestsQueries;
 
-describe('wyre-transfer-task', function () {
+describe('drop-card-task', function () {
   let provisionedAddress = '0x123';
   let provisionedSku = 'sku';
   let mockTxnHash = '0x456';
