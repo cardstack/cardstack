@@ -1,4 +1,4 @@
-import { query } from '../queries';
+import { query } from '@cardstack/hub/queries';
 import { service } from '@cardstack/hub/services';
 import config from 'config';
 import * as Sentry from '@sentry/node';
