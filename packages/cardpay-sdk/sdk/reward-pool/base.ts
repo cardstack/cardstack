@@ -173,8 +173,8 @@ export default class RewardPool {
       claimsQuery = `
       query {
           rewardeeClaims(where:{
-            rewardee: ${payee},
-            rewardProgram: ${rewardProgramId} 
+            rewardee: "${payee}",
+            rewardProgram: "${rewardProgramId}" 
           } ){
             leaf
           }
@@ -184,7 +184,7 @@ export default class RewardPool {
       claimsQuery = `
       query {
           rewardeeClaims(where:{
-            rewardee: ${payee},
+            rewardee: "${payee}",
           } ){
             leaf
           }
