@@ -337,6 +337,7 @@ app "reward-submit" {
             }
         }
     }
+}
 
 app "reward-api" {
     path = "./packages/cardpay-reward-api"
@@ -395,5 +396,4 @@ app "reward-api" {
         }
     }
 
-}
 }
