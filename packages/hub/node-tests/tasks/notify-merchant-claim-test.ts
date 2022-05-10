@@ -5,11 +5,7 @@ import NotifyMerchantClaim, {
   MERCHANT_CLAIM_EXPIRY_TIME,
 } from '../../tasks/notify-merchant-claim';
 import { expect } from 'chai';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
-
-const { testkit, sentryTransport } = sentryTestkit();
+import { fetchSentryReport, setupSentry } from '../helpers/sentry';
 
 type TransactionInformation = MerchantClaimsQueryResult['data']['merchantClaims'][number];
 
@@ -69,6 +65,8 @@ class StubNotificationPreferenceService {
 }
 
 describe('NotifyMerchantClaimTask', function () {
+  setupSentry(this);
+
   this.beforeEach(function () {
     mockData.value = undefined;
     merchantInfoShouldError = false;
@@ -139,13 +137,6 @@ describe('NotifyMerchantClaimTask', function () {
   });
 
   it('omits the merchant name and logs an error when fetching it fails', async function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
     merchantInfoShouldError = true;
     mockData.value = {
       timestamp: '0',
@@ -201,9 +192,9 @@ describe('NotifyMerchantClaimTask', function () {
       },
     ]);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await fetchSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'notify-merchant-claim',
     });
   });

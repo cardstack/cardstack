@@ -1,15 +1,11 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
+import { fetchSentryReport, setupSentry } from '../helpers/sentry';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
 import shortUUID from 'short-uuid';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
-
-const { testkit, sentryTransport } = sentryTestkit();
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -159,16 +155,9 @@ class StubWorkerClient {
 }
 
 describe('POST /api/email-card-drop-requests', function () {
+  setupSentry(this);
+
   this.beforeEach(function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
-    testkit.reset();
-
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('worker-client', StubWorkerClient);
   });
@@ -361,9 +350,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     expect(limited).to.equal(true);
 
-    await waitFor(() => testkit.reports().length > 0);
-
-    let sentryReport = testkit.reports()[0];
+    let sentryReport = await fetchSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'email-card-drop-rate-limit-reached',

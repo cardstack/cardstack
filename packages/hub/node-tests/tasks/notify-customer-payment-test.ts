@@ -2,11 +2,7 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
-
-const { testkit, sentryTransport } = sentryTestkit();
+import { fetchSentryReport, setupSentry } from '../helpers/sentry';
 
 type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
 
@@ -65,6 +61,8 @@ class StubNotificationPreferenceService {
 }
 
 describe('NotifyCustomerPaymentTask', function () {
+  setupSentry(this);
+
   this.beforeEach(function () {
     mockData.value = undefined;
     merchantInfoShouldError = false;
@@ -174,13 +172,6 @@ describe('NotifyCustomerPaymentTask', function () {
   });
 
   it('omits the merchant name and logs an error when fetching it fails', async function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
     merchantInfoShouldError = true;
     mockData.value = {
       id: 'the-transaction-hash',
@@ -273,9 +264,9 @@ describe('NotifyCustomerPaymentTask', function () {
       },
     ]);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await fetchSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'notify-customer-payment',
     });
   });

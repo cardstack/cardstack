@@ -1,14 +1,10 @@
 import { Job, TaskSpec } from 'graphile-worker';
 import { expect } from 'chai';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
+import { fetchSentryReport, setupSentry } from '../helpers/sentry';
 import Web3 from 'web3';
 
 import { setupHub, registry } from '../helpers/server';
 import { HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
-
-const { testkit, sentryTransport } = sentryTestkit();
 
 class StubContracts {
   handlers: Record<any, any> = {};
@@ -71,16 +67,9 @@ class StubWorkerClient {
 describe('ContractSubscriptionEventHandler', function () {
   let { getContainer } = setupHub(this);
 
+  setupSentry(this);
+
   this.beforeEach(async function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
-    testkit.reset();
-
     registry(this).register('contracts', StubContracts);
     registry(this).register('web3-socket', StubWeb3);
     registry(this).register('worker-client', StubWorkerClient);
@@ -134,13 +123,13 @@ describe('ContractSubscriptionEventHandler', function () {
     let error = new Error('Mock CustomerPayment error');
     this.contracts.handlers.CustomerPayment(error);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await fetchSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'contract-subscription-event-handler',
     });
 
-    expect(testkit.reports()[0].error?.message).to.equal(error.message);
+    expect(sentryReport.error?.message).to.equal(error.message);
   });
 
   it('handles a MerchantClaim event and persists the latest block', async function () {
@@ -162,12 +151,12 @@ describe('ContractSubscriptionEventHandler', function () {
     let error = new Error('Mock MerchantClaim error');
     this.contracts.handlers.MerchantClaim(error);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await fetchSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'contract-subscription-event-handler',
     });
 
-    expect(testkit.reports()[0].error?.message).to.equal(error.message);
+    expect(sentryReport.error?.message).to.equal(error.message);
   });
 });
