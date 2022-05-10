@@ -8,7 +8,7 @@
     "verificationUrl": "https://hub-staging.stack.cards/email-card-drop/verify"
   },
   "mailchimp": {
-    "serverPrefix": "us-8",
+    "serverPrefix": "us8",
     "newsletterListId": "c2b7a36f2d"
   },
   "wyre": {

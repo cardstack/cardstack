@@ -11,7 +11,7 @@
     "routeCard": "https://demo.com/routes"
   },
   "mailchimp": {
-    "serverPrefix": "us-8",
+    "serverPrefix": "us8",
     "newsletterListId": "c2b7a36f2d"
   },
   "discord": {

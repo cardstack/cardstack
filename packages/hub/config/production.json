@@ -15,7 +15,7 @@
     "allowedChannels": "898954606242054185"
   },
   "mailchimp": {
-    "serverPrefix": "us-8",
+    "serverPrefix": "us8",
     "newsletterListId": "f2fe559998"
   },
   "web3": {
