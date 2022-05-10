@@ -27,6 +27,11 @@
     "allowedChannels": "CARDBOT_ALLOWED_CHANNELS",
     "onCallInternalWebhook": "DISCORD_ON_CALL_INTERNAL_WEBHOOK"
   },
+  "mailchimp": {
+    "apiKey": "MAILCHIMP_API_KEY",
+    "serverPrefix": "MAILCHIMP_SERVER_PREFIX",
+    "newsletterListId": "MAILCHIMP_NEWSLETTER_LIST_ID"
+  },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
     "environment": "HUB_ENVIRONMENT"
