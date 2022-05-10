@@ -337,4 +337,37 @@ app "reward-submit" {
             }
         }
     }
+
+    deploy {
+        use "aws-ecs" {
+            service_port = 8000
+            region = "us-east-1"
+            memory = "512"
+            cluster = "reward-api-production"
+            count = 2
+            subnets = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
+            task_role_name = "reward-api-production-ecr-task"
+            execution_role_name = "reward-api-production-ecr-task-executor-role"
+            alb {
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/reward-api-production/5f7e90a12d3fcc49/66800e87a3d1da29"
+            }
+            secrets = {
+                DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
+            }
+        }
+
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
+        }
+
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/fix-listener.mjs", "reward-api.cardstack.com", "reward-api"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+        }
+    }
 }
