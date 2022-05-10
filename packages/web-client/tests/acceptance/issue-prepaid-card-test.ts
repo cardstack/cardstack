@@ -321,17 +321,21 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
       .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
 
-    await click(
-      '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
-    );
+    await click('[data-test-safe-chooser-dropdown]');
     assert
-      .dom('[data-test-safe-chooser-dropdown] li:nth-child(1)')
+      .dom(
+        '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(1)'
+      )
       .containsText(otherMerchantSafe.address);
     assert
-      .dom('[data-test-safe-chooser-dropdown] li:nth-child(2)')
+      .dom(
+        '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
+      )
       .containsText(merchantSafe.address);
 
-    await click('[data-test-safe-chooser-dropdown] li:nth-child(2)');
+    await click(
+      '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
+    );
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );

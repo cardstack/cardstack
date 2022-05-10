@@ -128,7 +128,7 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
-  async put(ctx: Koa.Context) {
+  async patch(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
@@ -148,9 +148,19 @@ export default class CardSpacesRoute {
       return;
     }
 
-    cardSpace.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
-    cardSpace.profileImageUrl = this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']);
-    cardSpace.links = ctx.request.body.data.attributes['links'];
+    let attributes = ctx.request.body.data.attributes;
+
+    if (attributes['profile-description']) {
+      cardSpace.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
+    }
+
+    if (attributes['profile-image-url']) {
+      cardSpace.profileImageUrl = this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']);
+    }
+
+    if (attributes['links']) {
+      cardSpace.links = ctx.request.body.data.attributes['links'];
+    }
 
     let errors = await this.cardSpaceValidator.validate(cardSpace);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;

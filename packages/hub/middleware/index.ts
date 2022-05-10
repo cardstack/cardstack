@@ -6,11 +6,6 @@ const serverLog = logger('hub/server');
 
 export { default as errorMiddleware } from './error';
 
-export async function environment(ctx: Koa.Context, next: Koa.Next) {
-  ctx.environment = process.env.NODE_ENV || 'development';
-  return next();
-}
-
 export async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
   serverLog.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
   await next();

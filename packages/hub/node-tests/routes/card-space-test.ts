@@ -333,7 +333,7 @@ describe('POST /api/card-spaces', function () {
   });
 });
 
-describe('PUT /api/card-spaces', function () {
+describe('PATCH /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
@@ -342,7 +342,7 @@ describe('PUT /api/card-spaces', function () {
 
   it('returns 404 when resource does not exist', async function () {
     await request()
-      .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -373,7 +373,7 @@ describe('PUT /api/card-spaces', function () {
     ]);
 
     await request()
-      .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -383,7 +383,7 @@ describe('PUT /api/card-spaces', function () {
 
   it('returns 401 without bearer token', async function () {
     await request()
-      .post('/api/card-spaces')
+      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -399,7 +399,7 @@ describe('PUT /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('updates the resource', async function () {
+  it('updates the specified fields of the resource', async function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     let merchantId = uuidv4();
@@ -424,15 +424,13 @@ describe('PUT /api/card-spaces', function () {
       data: {
         type: 'card-spaces',
         attributes: {
-          'profile-description': "Satoshi's place, v2",
-          'profile-image-url': 'https://test.com/profile-v2.jpg',
-          links: [{ title: 'Link1', url: 'https://test.com' }],
+          links: [{ title: 'Link1', url: 'https://test.com/something' }],
         },
       },
     };
 
     await request()
-      .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -447,9 +445,9 @@ describe('PUT /api/card-spaces', function () {
           id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
           attributes: {
             did: 'did:cardstack:1csnaSutV4uMuyyJZcJ7ktsTwdec10adda76d48c7',
-            'profile-description': "Satoshi's place, v2",
-            'profile-image-url': 'https://test.com/profile-v2.jpg',
-            links: [{ title: 'Link1', url: 'https://test.com' }],
+            'profile-description': "Satoshi's place",
+            'profile-image-url': 'https://test.com/profile.jpg',
+            links: [{ title: 'Link1', url: 'https://test.com/something' }],
           },
           relationships: {
             'merchant-info': {
@@ -505,7 +503,7 @@ describe('PUT /api/card-spaces', function () {
     };
 
     await request()
-      .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')

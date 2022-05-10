@@ -5,6 +5,7 @@ module.exports = {
     url: 'postgres://postgres:postgres@localhost:5432/hub_test',
     useTransactionalRollbacks: true,
   },
+  hubEnvironment: 'test',
   authSecret: '2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=',
   cardDrop: {
     email: {
@@ -13,6 +14,7 @@ module.exports = {
         periodMinutes: 10,
       },
     },
+    verificationUrl: 'https://card-drop-email.test/email-card-drop/verify',
   },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
