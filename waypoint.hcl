@@ -427,6 +427,11 @@ app "reward-api" {
         }
 
         hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
+        }
+
+        hook {
             when    = "after"
             command = ["node", "./scripts/fix-listener.mjs", "reward-api-staging.stack.cards", "reward-api-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
