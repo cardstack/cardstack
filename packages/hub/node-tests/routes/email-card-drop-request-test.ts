@@ -207,10 +207,7 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(emailCardDropRequest.emailHash).to.equal(emailHash);
 
     expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
-    expect(jobPayloads).to.deep.equal([
-      { id: resourceId, email },
-      { id: resourceId, email },
-    ]);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId, email }, { email }]);
   });
 
   it('sends another email if a request is present but has not been claimed', async function () {
