@@ -338,6 +338,30 @@ app "reward-submit" {
         }
     }
 
+app "reward-api" {
+    path = "./packages/cardpay-reward-api"
+
+    config {
+        env = {
+            ENVIRONMENT = "production"
+            REWARDS_BUCKET="s3://tally-production-reward-programs"
+            SUBGRAPH_URL="https://graph.cardstack/subgraphs/name/habdelra/cardpay-xdai"
+        }
+    }
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "reward-api"
+                tag        = "latest"
+            }
+        }
+    }
     deploy {
         use "aws-ecs" {
             service_port = 8000
@@ -370,4 +394,6 @@ app "reward-submit" {
             command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
         }
     }
+
+}
 }
