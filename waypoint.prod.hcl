@@ -388,7 +388,7 @@ app "reward-api" {
 
         hook {
             when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api-production"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
         hook {
             when    = "after"
