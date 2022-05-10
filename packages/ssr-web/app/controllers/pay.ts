@@ -29,6 +29,7 @@ export default class PayController extends Controller {
   }
 
   get cleanedValues() {
+    let isCurrencySPD = this.currency === 'SPD';
     let hasValidAmount =
       !isNaN(this.amount) &&
       this.amount !== 0 &&
@@ -36,7 +37,7 @@ export default class PayController extends Controller {
       this.amount !== -Infinity;
     let hasValidCurrency =
       this.currency !== undefined &&
-      isSupportedCurrency(this.currency) &&
+      (isSupportedCurrency(this.currency) || isCurrencySPD) &&
       this.currency !== 'DAI' &&
       this.currency !== 'CARD' &&
       this.currency !== 'ETH';
@@ -51,7 +52,7 @@ export default class PayController extends Controller {
           secondaryAmount: '',
         },
       };
-    } else if (this.currency === 'SPD') {
+    } else if (isCurrencySPD) {
       let amount = Number(
         roundAmountToNativeCurrencyDecimals(
           spendToUsd(Math.max(this.amount, minSpendAmount))!,
