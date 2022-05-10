@@ -28,9 +28,7 @@
     "onCallInternalWebhook": "DISCORD_ON_CALL_INTERNAL_WEBHOOK"
   },
   "mailchimp": {
-    "apiKey": "MAILCHIMP_API_KEY",
-    "serverPrefix": "MAILCHIMP_SERVER_PREFIX",
-    "newsletterListId": "MAILCHIMP_NEWSLETTER_LIST_ID"
+    "apiKey": "MAILCHIMP_API_KEY"
   },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
