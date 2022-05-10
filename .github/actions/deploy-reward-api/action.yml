@@ -20,7 +20,7 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
-    - name: Deploy reward submitter
+    - name: Deploy reward api
       run: waypoint up -app=reward-api -prune-retain=1 -plain
       shell: bash
       env:
