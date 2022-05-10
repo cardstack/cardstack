@@ -374,7 +374,7 @@ app "reward-api" {
             task_role_name = "reward-api-production-ecr-task"
             execution_role_name = "reward-api-production-ecr-task-executor-role"
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/reward-api-production/5f7e90a12d3fcc49/66800e87a3d1da29"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/reward-api-production/5f7e90a12d3fcc49/92eb36208936ff22"
             }
             secrets = {
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
@@ -383,12 +383,12 @@ app "reward-api" {
 
         hook {
             when    = "before"
-            command = ["./scripts/purge-services.sh", "reward-api, "waypoint-reward-api", "2"] # need this to purge old ecs services
+            command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
         }
 
         hook {
             when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "reward-api.cardstack.com", "reward-api"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
         hook {
             when    = "after"
