@@ -383,7 +383,7 @@ app "reward-api" {
 
         hook {
             when    = "before"
-            command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
+            command = ["./scripts/purge-services.sh", "reward-api, "waypoint-reward-api", "2"] # need this to purge old ecs services
         }
 
         hook {
