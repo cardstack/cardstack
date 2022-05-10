@@ -133,9 +133,6 @@ export default class RewardPool {
     if (tokenAddress) {
       url.searchParams.append('token_address', tokenAddress);
     }
-    let knownClaimedStr = knownClaimed ? knownClaimed.toString() : 'false';
-    console.log(knownClaimedStr);
-    // url.searchParams.append('known_claimed', knownClaimedStr);
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
@@ -154,20 +151,34 @@ export default class RewardPool {
     let currentBlock = await this.layer2Web3.eth.getBlockNumber();
     let rewardTokens = await this.getRewardTokens();
     let res: Proof[] = [];
-    let claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
+    let claimedLeafs: string[];
+    if (knownClaimed) {
+      claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
+    }
     json.map((o: any) => {
-      if (rewardTokens.includes(o.tokenAddress) && !claimedLeafs.includes(o.leaf)) {
-        let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
-        res.push({
-          ...o,
-          isValid: validFrom <= currentBlock && validTo > currentBlock,
-        });
+      if (rewardTokens.includes(o.tokenAddress)) {
+        // filters for known reward tokens
+        if (knownClaimed && !claimedLeafs.includes(o.leaf)) {
+          // filters for proofs has not been claimed
+          let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+          res.push({
+            ...o,
+            isValid: validFrom <= currentBlock && validTo > currentBlock,
+          });
+        } else {
+          let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+          res.push({
+            ...o,
+            isValid: validFrom <= currentBlock && validTo > currentBlock,
+          });
+        }
       }
     });
     return this.addTokenSymbol(res);
   }
 
   async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
+    // Subgraph has a max pagination of 100. TODO paginate proofs
     let claimsQuery;
     if (rewardProgramId) {
       claimsQuery = `
