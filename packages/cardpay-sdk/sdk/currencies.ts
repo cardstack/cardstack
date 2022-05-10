@@ -5,7 +5,6 @@ enum CryptoCurrency {
 }
 
 enum NativeCurrency {
-  SPD = 'SPD',
   USD = 'USD',
   EUR = 'EUR',
   GBP = 'GBP',
@@ -76,17 +75,6 @@ const cryptoCurrencies: Record<CryptoCurrency, CurrencyInfo> = {
 };
 
 const nativeCurrencies: Record<NativeCurrency, CurrencyInfo> = {
-  SPD: {
-    alignment: 'left',
-    assetLimit: 1,
-    currency: 'SPD',
-    decimals: 0,
-    label: 'SPEND',
-    mask: '[099999999999]',
-    placeholder: '0',
-    smallThreshold: 1,
-    symbol: '§',
-  },
   USD: {
     alignment: 'left',
     assetLimit: 1,
