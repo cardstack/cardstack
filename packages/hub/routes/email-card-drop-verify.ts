@@ -1,11 +1,16 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { query } from '../queries';
+import { service } from '@cardstack/hub/services';
 import { inject } from '@cardstack/di';
+import Logger from '@cardstack/logger';
 import config from 'config';
+import * as Sentry from '@sentry/node';
+
+let log = Logger('route:email-card-drop-verify');
 
 const { url: webClientUrl } = config.get('webClient');
-const { alreadyClaimed, success } = config.get('webClient.paths.cardDrop');
+const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
 
 export default class EmailCardDropVerifyRoute {
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -13,6 +18,7 @@ export default class EmailCardDropVerifyRoute {
     as: 'emailCardDropRequestSerializer',
   });
 
+  relay = service('relay');
   workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -40,12 +46,29 @@ export default class EmailCardDropVerifyRoute {
     let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
 
     if (updatedRequest) {
-      await this.workerClient.addJob('drop-card', {
-        id: updatedRequest.id,
-      });
+      try {
+        log.info(`Provisioning prepaid card for ${updatedRequest.ownerAddress}`);
+        let transactionHash = await this.relay.provisionPrepaidCardV2(
+          updatedRequest.ownerAddress,
+          config.get('cardDrop.sku')
+        );
 
-      ctx.redirect(`${webClientUrl}${success}`);
-      return;
+        log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
+        await this.emailCardDropRequestQueries.updateTransactionHash(updatedRequest.id, transactionHash);
+
+        ctx.redirect(`${webClientUrl}${success}`);
+        return;
+      } catch (e: any) {
+        log.error(`Error provisioning prepaid card: ${e.toString()}`);
+        Sentry.captureException(e, {
+          tags: {
+            action: 'drop-card',
+          },
+        });
+
+        ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
+        return;
+      }
     }
 
     // If the claim query doesn’t return a record, there no matching record, now determine why

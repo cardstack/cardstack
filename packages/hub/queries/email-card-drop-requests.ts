@@ -42,17 +42,7 @@ export default class EmailCardDropRequestsQueries {
     const query = `SELECT * FROM email_card_drop_requests WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
-    return queryResult.rows.map((row) => {
-      return {
-        id: row['id'],
-        ownerAddress: row['owner_address'],
-        emailHash: row['email_hash'],
-        verificationCode: row['verification_code'],
-        claimedAt: row['claimed_at'],
-        requestedAt: row['requested_at'],
-        transactionHash: row['transaction_hash'],
-      };
-    });
+    return queryResult.rows.map(mapRowToObject);
   }
 
   async claimedInLastMinutes(minutes: number): Promise<EmailCardDropRequest[]> {
@@ -79,7 +69,7 @@ export default class EmailCardDropRequestsQueries {
       [id, verificationCode]
     );
 
-    return rows[0];
+    return mapRowToObject(rows[0])!;
   }
 
   async claim({
@@ -90,7 +80,7 @@ export default class EmailCardDropRequestsQueries {
     emailHash: string;
     ownerAddress: string;
     verificationCode: string;
-  }): Promise<EmailCardDropRequest> {
+  }): Promise<EmailCardDropRequest | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -107,10 +97,10 @@ export default class EmailCardDropRequestsQueries {
       [new Date(this.clock.now()), emailHash, ownerAddress, verificationCode]
     );
 
-    return rows[0];
+    return rows[0] ? mapRowToObject(rows[0]) : null;
   }
 
-  async updateTransactionHash(id: string, transactionHash: string): Promise<EmailCardDropRequest> {
+  async updateTransactionHash(id: string, transactionHash: string): Promise<EmailCardDropRequest | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -121,8 +111,20 @@ export default class EmailCardDropRequestsQueries {
       [id, transactionHash]
     );
 
-    return rows[0];
+    return rows[0] ? mapRowToObject(rows[0]) : null;
   }
+}
+
+function mapRowToObject(row: any) {
+  return {
+    id: row['id'],
+    ownerAddress: row['owner_address'],
+    emailHash: row['email_hash'],
+    verificationCode: row['verification_code'],
+    claimedAt: row['claimed_at'],
+    requestedAt: row['requested_at'],
+    transactionHash: row['transaction_hash'],
+  };
 }
 
 declare module '@cardstack/hub/queries' {

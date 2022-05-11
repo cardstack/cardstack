@@ -96,6 +96,7 @@ module.exports = {
     paths: {
       cardDrop: {
         alreadyClaimed: '/card-drop/already-claimed',
+        error: '/card-drop/error',
         success: '/card-drop/success',
       },
     },

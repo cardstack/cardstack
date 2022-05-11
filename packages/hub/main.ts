@@ -95,7 +95,6 @@ import EmailCardDropRouter from './services/email-card-drop-router';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
-import DropCardTask from './tasks/drop-card';
 import SubscribeEmailTask from './tasks/subscribe-email';
 import DiscordPostTask from './tasks/discord-post';
 import Email from './services/email';
@@ -140,7 +139,6 @@ export function createRegistry(): Registry {
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
   registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
   registry.register('subscribe-email', SubscribeEmailTask);
-  registry.register('drop-card', DropCardTask);
   registry.register('discord-post', DiscordPostTask);
   registry.register('email', Email);
   registry.register('order', OrderService);
