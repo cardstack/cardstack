@@ -387,10 +387,10 @@ app "reward-api" {
             command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
         }
 
-        hook {
-            when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api-production"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-        }
+        # hook {
+        #     when    = "after"
+        #     command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api-production"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        # }
         hook {
             when    = "after"
             command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
