@@ -13,7 +13,7 @@ export default class SubscribeEmail {
       helpers.logger.error(JSON.stringify(e, null, 2));
       Sentry.captureException(e, {
         tags: {
-          event: 'subscribe-email',
+          action: 'subscribe-email',
         },
       });
       throw e;
