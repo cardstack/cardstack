@@ -108,7 +108,7 @@ class Indexer:
                     blockNumber_gt: %d
                 },
                 orderBy: blockNumber,
-                orderDirection: desc
+                orderDirection: asc
             ){
                 id
                 blockNumber
