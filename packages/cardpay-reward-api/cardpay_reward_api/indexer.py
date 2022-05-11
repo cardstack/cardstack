@@ -1,4 +1,3 @@
-import json
 import re
 from datetime import datetime
 
@@ -144,7 +143,7 @@ class Indexer:
                 json={"query": query},
             )
             if r.ok:
-                json_data = json.loads(r.text)
+                json_data = r.json()
                 return json_data["data"]
             else:
                 raise (r.raise_for_status())
