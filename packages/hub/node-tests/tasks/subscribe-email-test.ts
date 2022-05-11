@@ -87,7 +87,7 @@ describe('SubscribeEmailTask', function () {
     let sentryReport = testkit.reports()[0];
     expect(sentryReport.error?.message).to.equal('intentional error during test');
     expect(sentryReport.tags).to.deep.equal({
-      event: 'subscribe-email',
+      action: 'subscribe-email',
     });
   });
 });
