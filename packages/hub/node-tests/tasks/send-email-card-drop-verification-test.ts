@@ -1,16 +1,12 @@
 import { Helpers, Job } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import SendEmailCardDropVerification from '../../tasks/send-email-card-drop-verification';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 import config from 'config';
 import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
-
-const { testkit, sentryTransport } = sentryTestkit();
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
@@ -65,15 +61,10 @@ describe('SendEmailCardDropVerificationTask', function () {
   });
 
   let { getContainer } = setupHub(this);
+  setupSentry(this);
   this.beforeEach(async function () {
     StubEmail.shouldThrow = false;
     StubEmail.lastSent = null;
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
     let cardDropQueries = (await getContainer().lookup('email-card-drop-requests', {
       type: 'query',
     })) as EmailCardDropRequestsQueries;
@@ -104,9 +95,8 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent).to.equal(null);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    let sentryReport = testkit.reports()[0];
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',
     });
@@ -124,9 +114,8 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent).to.equal(null);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    let sentryReport = testkit.reports()[0];
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',
     });

@@ -1,17 +1,14 @@
 import Web3SocketService from '../../services/web3-socket';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
+import { setupSentry, waitForSentryReport, waitForSentryReports } from '../helpers/sentry';
 import { server as WebsocketServer } from 'websocket';
 import http from 'http';
-
-const { testkit, sentryTransport } = sentryTestkit();
-const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
 describe('Web3Socket', function () {
   let subject: Web3SocketService;
   let wsServer: WebsocketServer;
   let httpServer: http.Server;
+
+  setupSentry(this);
 
   this.beforeEach(function () {
     httpServer = http.createServer(function (_, response) {
@@ -27,13 +24,6 @@ describe('Web3Socket', function () {
     });
     subject = new Web3SocketService();
     subject.rpcURL = 'ws://localhost:8545';
-    Sentry.init({
-      dsn: DUMMY_DSN,
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-    testkit.reset();
   });
   this.afterEach(async function () {
     (subject.web3?.currentProvider as any)?.disconnect?.();
@@ -48,9 +38,7 @@ describe('Web3Socket', function () {
 
     expect(() => subject.getInstance()).to.throw('mock web3 initialization failure');
 
-    await waitFor(() => testkit.reports().length > 0);
-
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect((await waitForSentryReport()).tags).to.deep.equal({
       action: 'web3-socket-connection',
     });
   });
@@ -70,10 +58,9 @@ describe('Web3Socket', function () {
     });
     provider.emit(provider.ERROR, new Error('A test error'));
 
-    await waitFor(() => testkit.reports().length > 0);
-
-    expect(testkit.reports()[0].error?.message).to.equal('A test error');
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    let sentryReport = await waitForSentryReport();
+    expect(sentryReport.error?.message).to.equal('A test error');
+    expect(sentryReport.tags).to.deep.equal({
       action: 'web3-socket-connection',
     });
   });
@@ -97,13 +84,11 @@ describe('Web3Socket', function () {
       wasClean: false,
     });
 
-    await waitFor(() => {
-      return !!testkit.reports().length;
-    }, 15000);
+    let sentryReports = await waitForSentryReports(150000);
 
-    let testCaseReport = testkit
-      .reports()
-      .find((v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing')!;
+    let testCaseReport = sentryReports.find(
+      (v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing'
+    )!;
     expect(testCaseReport?.extra?.__serialized__).to.deep.equal({
       code: 1000,
       reason: 'Testing',
