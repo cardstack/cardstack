@@ -346,7 +346,7 @@ app "reward-api" {
         env = {
             ENVIRONMENT = "production"
             REWARDS_BUCKET="s3://tally-production-reward-programs"
-            SUBGRAPH_URL="https://graph.cardstack/subgraphs/name/habdelra/cardpay-xdai"
+            SUBGRAPH_URL="https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
         }
     }
 
