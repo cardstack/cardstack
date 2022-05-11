@@ -5,6 +5,18 @@
 import client from '@mailchimp/mailchimp_marketing';
 import config from 'config';
 
+/**
+ * # CONVENIENCES SCRIPTS WHILE DEVELOPING/DEBUGGING MAILCHIMP THINGS
+ *
+ * 1. check what the current list looks like (remove the fields option if you want all the data):
+ *    client.lists.getListMembersInfo(listId, {fields: ['members.email_address', 'members.status', 'members.last_changed']}).then(v => console.log(v))
+ *
+ * 2. remove an email from the list:
+ *    client.lists.deleteListMember(listId, email);
+ *
+ * 3. unsubscribe an email
+ *    client.lists.setListMember(listId, email, { status: 'unsubscribed' });
+ */
 export default class Mailchimp {
   client = client;
   newsletterListId = config.get('mailchimp.newsletterListId') as string;
@@ -40,7 +52,7 @@ export default class Mailchimp {
   async subscribe(email: string) {
     if (await this.isSubscribed(email)) return;
 
-    // this adds an audience member if they aren't already in the list,
+    // this adds a list member if they aren't already in the list,
     // and updates the existing one if they do exist
     await client.lists.setListMember(this.newsletterListId, email, {
       email_address: email,
