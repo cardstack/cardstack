@@ -5,6 +5,7 @@ const { Webpack } = require('@embroider/webpack');
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
 const concat = require('broccoli-concat');
 const path = require('path');
+const nodeSass = require('node-sass');
 
 // const { maybeEmbroider } = require('@embroider/test-setup');
 // return maybeEmbroider(app);
@@ -24,6 +25,9 @@ module.exports = function (defaults) {
 
     // Add options here
     'ember-power-select': { theme: false },
+    sassOptions: {
+      implementation: nodeSass,
+    },
   });
 
   let dummyComponentStylesTree = concat(

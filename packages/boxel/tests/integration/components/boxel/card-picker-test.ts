@@ -70,7 +70,7 @@ module('Integration | Component | CardPicker', function (hooks) {
     assert.dom('[data-test-boxel-card-picker]').exists();
     assert.dom('[data-test-boxel-card-picker-selected-card]').doesNotExist();
 
-    await click('[data-test-boxel-card-picker-dropdown] > [role="button"]');
+    await click('[data-test-boxel-card-picker-dropdown]');
     assert
       .dom('.ember-power-select-option[aria-selected="false"]')
       .exists({ count: 5 });
@@ -89,7 +89,7 @@ module('Integration | Component | CardPicker', function (hooks) {
       )
       .hasText(card.name);
 
-    await click('[data-test-boxel-card-picker-dropdown] > [role="button"]');
+    await click('[data-test-boxel-card-picker-dropdown]');
     assert.dom('[data-option-index="0"]').hasAttribute('aria-selected', 'true');
     assert
       .dom('.ember-power-select-option[aria-selected="false"]')
@@ -106,7 +106,7 @@ module('Integration | Component | CardPicker', function (hooks) {
       )
       .hasText(card1.description);
 
-    await click('[data-test-boxel-card-picker-dropdown] > [role="button"]');
+    await click('[data-test-boxel-card-picker-dropdown]');
     assert
       .dom('[data-option-index="0"]')
       .hasAttribute('aria-selected', 'false');
@@ -114,7 +114,7 @@ module('Integration | Component | CardPicker', function (hooks) {
   });
 
   test('it does not select disabled items', async function (assert) {
-    await click('[data-test-boxel-card-picker-dropdown] > [role="button"]');
+    await click('[data-test-boxel-card-picker-dropdown]');
     assert
       .dom('.ember-power-select-option[aria-disabled="true"]')
       .exists({ count: 2 });

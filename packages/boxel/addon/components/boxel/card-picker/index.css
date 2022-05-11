@@ -19,16 +19,6 @@
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
   z-index: 1;
-}
-
-.boxel-card-picker__dropdown .ember-basic-dropdown-content-wormhole-origin {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-}
-
-.boxel-card-picker__dropdown > .ember-power-select-trigger {
   padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs) var(--boxel-sp);
   background: url("/@cardstack/boxel/images/icons/caret-down.svg") right var(--boxel-sp) center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
@@ -37,7 +27,14 @@
   transition: border-color var(--boxel-transition);
 }
 
-.boxel-card-picker__dropdown--selected > .ember-power-select-trigger {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.boxel-card-picker__dropdown--selected {
   padding: var(--boxel-sp-xxxs) var(--boxel-sp);
   background-image: none;
   border-radius: 100px;
@@ -45,12 +42,12 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.boxel-card-picker__dropdown > .ember-power-select-trigger:hover {
+.boxel-card-picker__dropdown:hover {
   border-color: var(--boxel-dark);
   cursor: pointer;
 }
 
-.boxel-card-picker__dropdown .ember-basic-dropdown-content {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content {
   position: relative;
   width: 100%;
   background-color: var(--boxel-light);
@@ -60,15 +57,15 @@
   z-index: 1;
 }
 
-.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
 }
 
-.boxel-card-picker__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
-.boxel-card-picker__dropdown .ember-power-select-options {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-options {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -78,7 +75,7 @@
   overflow-y: auto;
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option {
   padding: var(--boxel-sp) var(--boxel-sp-xxxl);
   background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
   background-repeat: no-repeat;
@@ -86,29 +83,29 @@
   background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option + .ember-power-select-option {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option + .ember-power-select-option {
   border-top: 1px solid var(--boxel-light-400);
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option[aria-selected="true"] {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-selected="true"] {
   background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
 }
 
 /* stylelint-disable-next-line max-line-length */
-.boxel-card-picker__dropdown .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
   cursor: pointer;
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option[aria-current="true"] {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-current="true"] {
   background-color: var(--boxel-purple-100);
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option[aria-disabled="true"] {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-disabled="true"] {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option--no-matches-message {
+.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option--no-matches-message {
   background-image: none;
 }
 
