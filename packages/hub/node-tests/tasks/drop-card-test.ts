@@ -4,14 +4,9 @@ import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { CardDropConfig } from '../../services/discord-bots/hub-bot/types';
 import config from 'config';
-import * as Sentry from '@sentry/node';
-import sentryTestkit from 'sentry-testkit';
-import waitFor from '../utils/wait-for';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 const { sku } = config.get('cardDrop') as CardDropConfig;
-
-const { testkit, sentryTransport } = sentryTestkit();
-const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
 let unclaimedEoa: EmailCardDropRequest = {
   id: 'b176521d-6009-41ff-8472-147a413da450',
@@ -44,18 +39,12 @@ describe('drop-card-task', function () {
     }
   }
 
+  setupSentry(this);
+
   this.beforeEach(async function () {
     registry(this).register('relay', StubRelayService, { type: 'service' });
     provisionPrepaidCardCalls = 0;
     provisioningShouldError = false;
-
-    Sentry.init({
-      dsn: DUMMY_DSN,
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-    testkit.reset();
   });
 
   let { getContainer } = setupHub(this);
@@ -92,12 +81,10 @@ describe('drop-card-task', function () {
 
     expect(provisionPrepaidCardCalls).to.equal(0);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].error?.message).to.equal(
-      `Could not find email card drop request with id ${nonexistentUuid}`
-    );
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.error?.message).to.equal(`Could not find email card drop request with id ${nonexistentUuid}`);
+    expect(sentryReport.tags).to.deep.equal({
       action: 'drop-card',
     });
   });
@@ -113,10 +100,10 @@ describe('drop-card-task', function () {
 
     expect(provisionPrepaidCardCalls).to.equal(1);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].error?.message).to.equal('provisioning should error');
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.error?.message).to.equal('provisioning should error');
+    expect(sentryReport.tags).to.deep.equal({
       action: 'drop-card',
     });
 
