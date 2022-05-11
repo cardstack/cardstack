@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 
 import uvicorn
@@ -12,6 +13,9 @@ from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
 from .indexer import Indexer
 
 load_dotenv()
+
+LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
+logging.basicConfig(level=LOGLEVEL)
 
 models.Base.metadata.create_all(bind=engine)
 for expected_env in [
@@ -28,14 +32,14 @@ app = FastAPI()
 
 
 @app.on_event("startup")
-@repeat_every(seconds=60)  # 1 hour
+@repeat_every(seconds=5)
 def index_root_task() -> None:
     sessionmaker = get_fastapi_sessionmaker()
     with sessionmaker.context_session() as db:
         try:
             Indexer(SUBGRAPH_URL).run(db=db, storage_location=REWARDS_BUCKET)
         except Exception as e:
-            print(e)
+            raise(e)
 
 
 def param(skip: int = 0, limit: int = 100):

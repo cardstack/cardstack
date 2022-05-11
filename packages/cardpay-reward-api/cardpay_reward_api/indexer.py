@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import logging
 
 import eth_abi
 import pyarrow.parquet as pq
@@ -13,6 +14,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from . import crud, database, models, schemas
+
 
 
 class Indexer:
@@ -29,10 +31,10 @@ class Indexer:
             last_submitted_root_block_number = self.get_last_indexed_root_block_number(
                 db, reward_program_id
             )
-            print(
+            logging.info(
                 f"Indexing reward program {reward_program_id} since block {last_submitted_root_block_number}"
             )
-            print("===Start===")
+            logging.info("===Start===")
             new_roots = self.get_merkle_roots(
                 reward_program_id, last_submitted_root_block_number
             )
@@ -48,14 +50,14 @@ class Indexer:
                         payment_list = payment_table.to_pylist()
                         self.add_root_and_proofs(db, root, payment_list)
                     else:
-                        print(f"{file_name} does not exist within s3")
+                        logging.info(f"{file_name} does not exist within s3")
                 db.commit()
             else:
-                print("Skipping indexing: No new roots")
-            print("===Done===")
+                logging.info("Skipping indexing: No new roots")
+            logging.info("===Done===")
 
     def add_root_and_proofs(self, db: Session, root, payment_list):
-        print(f"Indexing {len(payment_list)} proofs for root {root['id']}")
+        logging.info(f"Indexing {len(payment_list)} proofs for root {root['id']}")
         root = models.Root(
             rootHash=root["id"],
             rewardProgramId=root["rewardProgram"]["id"],
@@ -148,7 +150,7 @@ class Indexer:
             else:
                 raise (r.raise_for_status())
         except requests.exceptions.ConnectionError:
-            print("Connection error during query subgraph")
+            logging.warn("Connection error during query subgraph")
         except Exception as e:
-            print("Error when querying subgraph")
+            logging.warn("Error when querying subgraph")
             raise (e)
