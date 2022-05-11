@@ -4,7 +4,7 @@ import SendNotifications, { PushNotificationData } from '../../tasks/send-notifi
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import shortUUID from 'short-uuid';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
@@ -173,7 +173,7 @@ describe('SendNotificationsTask deduplication errors', async function () {
     });
     expect(notificationSent).equal(true);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'send-notifications-deduplication',
@@ -197,7 +197,7 @@ describe('SendNotificationsTask firebase errors', function () {
       ErroredFirebasePushNotifications.message
     );
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'send-notifications',
@@ -256,7 +256,7 @@ describe('SendNotificationsTask expired notifications', function () {
     expect(lastSentData).to.equal(undefined);
     expect(notificationSent).to.equal(false);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.error?.message).to.equal('Notification is too old to send');
     expect(sentryReport.tags).to.deep.equal({

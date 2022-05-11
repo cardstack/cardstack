@@ -1,7 +1,7 @@
 import { Helpers, Job } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import SendEmailCardDropVerification from '../../tasks/send-email-card-drop-verification';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
@@ -95,7 +95,7 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent).to.equal(null);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',
@@ -114,7 +114,7 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent).to.equal(null);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',

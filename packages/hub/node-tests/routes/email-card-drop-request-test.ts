@@ -1,7 +1,7 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import crypto from 'crypto';
 import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
@@ -350,7 +350,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     expect(limited).to.equal(true);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'email-card-drop-rate-limit-reached',

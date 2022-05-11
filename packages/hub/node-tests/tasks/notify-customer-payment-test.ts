@@ -2,7 +2,7 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
 
@@ -264,7 +264,7 @@ describe('NotifyCustomerPaymentTask', function () {
       },
     ]);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'notify-customer-payment',

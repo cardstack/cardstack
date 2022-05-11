@@ -5,7 +5,7 @@ import NotifyMerchantClaim, {
   MERCHANT_CLAIM_EXPIRY_TIME,
 } from '../../tasks/notify-merchant-claim';
 import { expect } from 'chai';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 type TransactionInformation = MerchantClaimsQueryResult['data']['merchantClaims'][number];
 
@@ -192,7 +192,7 @@ describe('NotifyMerchantClaimTask', function () {
       },
     ]);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'notify-merchant-claim',

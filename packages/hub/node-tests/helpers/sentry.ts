@@ -21,12 +21,12 @@ export function setupSentry(context: Suite) {
   });
 }
 
-export async function fetchSentryReport() {
+export async function waitForSentryReport() {
   await waitFor(() => testkit.reports().length > 0);
   return testkit.reports()[0];
 }
 
-export async function fetchSentryReports(timeout: number) {
+export async function waitForSentryReports(timeout: number) {
   await waitFor(() => {
     return !!testkit.reports().length;
   }, timeout);

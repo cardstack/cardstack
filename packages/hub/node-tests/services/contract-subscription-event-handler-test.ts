@@ -1,6 +1,6 @@
 import { Job, TaskSpec } from 'graphile-worker';
 import { expect } from 'chai';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import Web3 from 'web3';
 
 import { setupHub, registry } from '../helpers/server';
@@ -123,7 +123,7 @@ describe('ContractSubscriptionEventHandler', function () {
     let error = new Error('Mock CustomerPayment error');
     this.contracts.handlers.CustomerPayment(error);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'contract-subscription-event-handler',
@@ -151,7 +151,7 @@ describe('ContractSubscriptionEventHandler', function () {
     let error = new Error('Mock MerchantClaim error');
     this.contracts.handlers.MerchantClaim(error);
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'contract-subscription-event-handler',

@@ -1,5 +1,5 @@
 import Web3SocketService from '../../services/web3-socket';
-import { fetchSentryReport, fetchSentryReports, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport, waitForSentryReports } from '../helpers/sentry';
 import { server as WebsocketServer } from 'websocket';
 import http from 'http';
 
@@ -38,7 +38,7 @@ describe('Web3Socket', function () {
 
     expect(() => subject.getInstance()).to.throw('mock web3 initialization failure');
 
-    expect((await fetchSentryReport()).tags).to.deep.equal({
+    expect((await waitForSentryReport()).tags).to.deep.equal({
       action: 'web3-socket-connection',
     });
   });
@@ -58,7 +58,7 @@ describe('Web3Socket', function () {
     });
     provider.emit(provider.ERROR, new Error('A test error'));
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
     expect(sentryReport.error?.message).to.equal('A test error');
     expect(sentryReport.tags).to.deep.equal({
       action: 'web3-socket-connection',
@@ -84,7 +84,7 @@ describe('Web3Socket', function () {
       wasClean: false,
     });
 
-    let sentryReports = await fetchSentryReports(150000);
+    let sentryReports = await waitForSentryReports(150000);
 
     let testCaseReport = sentryReports.find(
       (v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing'

@@ -1,5 +1,5 @@
 import { registry, setupHub } from '../helpers/server';
-import { fetchSentryReport, setupSentry } from '../helpers/sentry';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 let stubWeb3Available = true;
 
@@ -161,7 +161,7 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
@@ -197,7 +197,7 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
@@ -232,7 +232,7 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let sentryReport = await fetchSentryReport();
+    let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
