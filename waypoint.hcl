@@ -402,7 +402,7 @@ app "reward-api" {
         registry {
             use "aws-ecr" {
                 region     = "us-east-1"
-                repository = "reward-api"
+                repository = "reward-api-staging"
                 tag        = "latest"
             }
         }
