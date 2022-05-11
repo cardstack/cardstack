@@ -1,0 +1,23 @@
+<CardDropPage::Card>
+  <:heading>
+    Whoops!
+  </:heading>
+
+  <:explanation>
+    <p>
+      An error occurred attempting to provision a prepaid card.
+    </p>
+
+    <p data-test-error-message>
+      {{this.message}}
+    </p>
+
+    <Boxel::Button
+      @kind='secondary'
+      @as='anchor'
+      @href={{config 'urls.mailToSupportUrl'}}
+    >
+      Contact Cardstack Support
+    </Boxel::Button>
+  </:explanation>
+</CardDropPage::Card>
