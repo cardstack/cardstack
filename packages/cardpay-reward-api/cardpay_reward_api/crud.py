@@ -18,6 +18,6 @@ def get_proofs(db: Session, proof_filter: schemas.ProofFilter, param):
             models.Proof.rewardProgramId == proof_filter.rewardProgramId
         )
     if proof_filter.token is not None:
-        query = query.filter(models.Proof.token == proof_filter.token)
+        query = query.filter(models.Proof.tokenAddress == proof_filter.token)
 
     return query.offset(param["skip"]).limit(param["limit"]).all()
