@@ -7,13 +7,16 @@ const { testkit, sentryTransport } = sentryTestkit();
 const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
 export function setupSentry(context: Suite) {
-  context.beforeEach(function () {
+  context.beforeAll(function () {
     Sentry.init({
       dsn: DUMMY_DSN,
       release: 'test',
       tracesSampleRate: 1,
       transport: sentryTransport,
     });
+  });
+
+  context.beforeEach(function () {
     testkit.reset();
   });
 }
