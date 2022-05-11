@@ -128,10 +128,10 @@ export default class RewardPool {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
-      url.searchParams.append('reward_program_id', rewardProgramId);
+      url.searchParams.append('rewardProgramId', rewardProgramId);
     }
     if (tokenAddress) {
-      url.searchParams.append('token_address', tokenAddress);
+      url.searchParams.append('token', tokenAddress);
     }
     if (offset) {
       url.searchParams.append('offset', offset.toString());
@@ -214,7 +214,7 @@ export default class RewardPool {
 
   async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
     // Subgraph has a max pagination of 100. TODO paginate proofs
-    let paginateSize = 2;
+    let paginateSize = 100;
     let i = 0;
     let done = false;
     let leafs: string[] = [];
