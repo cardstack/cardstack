@@ -152,13 +152,13 @@ export default class RewardPool {
     let rewardTokens = await this.getRewardTokens();
     let res: Proof[] = [];
     let claimedLeafs: string[];
-    if (knownClaimed) {
+    if (!knownClaimed) {
       claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     }
     json.map((o: any) => {
       if (rewardTokens.includes(o.tokenAddress)) {
         // filters for known reward tokens
-        if (knownClaimed && !claimedLeafs.includes(o.leaf)) {
+        if (!knownClaimed && !claimedLeafs.includes(o.leaf)) {
           // filters for proofs has not been claimed
           let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
           res.push({
@@ -177,37 +177,64 @@ export default class RewardPool {
     return this.addTokenSymbol(res);
   }
 
-  async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
-    // Subgraph has a max pagination of 100. TODO paginate proofs
-    let claimsQuery;
+  claimsQuery(payee: string, rewardProgramId?: string, skip = 0): string {
     if (rewardProgramId) {
-      claimsQuery = `
+      return `
       query {
-          rewardeeClaims(where:{
-            rewardee: "${payee}",
-            rewardProgram: "${rewardProgramId}" 
-          } ){
+          rewardeeClaims(
+            where:{
+              rewardee: "${payee}",
+              rewardProgram: "${rewardProgramId}" 
+            }, 
+            skip: ${skip},
+            orderBy: blockNumber, 
+            orderDirection: asc
+          ){
             leaf
           }
       }
     `;
     } else {
-      claimsQuery = `
+      return `
       query {
-          rewardeeClaims(where:{
-            rewardee: "${payee}",
-          } ){
+          rewardeeClaims(
+            where:{
+              rewardee: "${payee}"
+            },
+            skip: ${skip}
+            orderBy: blockNumber, 
+            orderDirection: asc
+          ){
             leaf
           }
       }
     `;
     }
-    let {
-      data: { rewardeeClaims },
-    } = await query(this.layer2Web3, claimsQuery);
-    return rewardeeClaims.reduce((accum: string[], o: any) => {
-      return [...accum, o.leaf];
-    }, []);
+  }
+
+  async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
+    // Subgraph has a max pagination of 100. TODO paginate proofs
+    let paginateSize = 2;
+    let i = 0;
+    let done = false;
+    let leafs: string[] = [];
+    while (!done) {
+      let queryStr = this.claimsQuery(payee, rewardProgramId, i * paginateSize);
+      let res = await query(this.layer2Web3, queryStr);
+      if (res.data.rewardeeClaims.length != 0) {
+        let {
+          data: { rewardeeClaims },
+        } = res;
+        let new_leafs = rewardeeClaims.reduce((accum: string[], o: any) => {
+          return [...accum, o.leaf];
+        }, []);
+        leafs = leafs.concat(new_leafs);
+        i++;
+      } else {
+        done = true;
+      }
+    }
+    return leafs;
   }
 
   async rewardTokenBalance(
