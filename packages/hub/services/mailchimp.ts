@@ -4,6 +4,9 @@
 // @ts-ignore
 import client from '@mailchimp/mailchimp_marketing';
 import config from 'config';
+import logger from '@cardstack/logger';
+
+const mailchimpLog = logger('hub/mailchimp');
 
 /**
  * # CONVENIENCES SCRIPTS WHILE DEVELOPING/DEBUGGING MAILCHIMP THINGS
@@ -20,17 +23,34 @@ import config from 'config';
 export default class Mailchimp {
   client = client;
   newsletterListId = config.get('mailchimp.newsletterListId') as string;
+  _missingItems: string[] = [];
 
   constructor() {
-    client.setConfig({
-      apiKey: config.get('mailchimp.apiKey'),
-      server: config.get('mailchimp.serverPrefix'),
+    let apiKey = config.get('mailchimp.apiKey');
+    let server = config.get('mailchimp.serverPrefix');
+    if (!apiKey) {
+      this._missingItems.push('API key');
+    }
+    if (!this.newsletterListId) {
+      this._missingItems.push('list ID');
+    }
+    if (!server) {
+      this._missingItems.push('server prefix');
+    }
+
+    if (config.get('hubEnvironment') !== 'development' && this._missingItems.length) {
+      throw new Error(`Missing essential configuration for mailchimp: ${this._missingItems}`);
+    }
+
+    this.client.setConfig({
+      apiKey,
+      server,
     });
   }
 
   private async isSubscribed(email: string) {
     try {
-      let member: { status: string } = await client.lists.getListMember(this.newsletterListId, email, {
+      let member: { status: string } = await this.client.lists.getListMember(this.newsletterListId, email, {
         fields: ['status'],
       });
       return member.status === 'subscribed';
@@ -50,6 +70,17 @@ export default class Mailchimp {
    * If email has never been subscribed, send confirmation email.
    */
   async subscribe(email: string) {
+    if (this._missingItems.length) {
+      if (config.get('hubEnvironment') === 'development') {
+        mailchimpLog.warn(
+          `Skipping mailchimp subscribe step for email "${email}" because of missing configuration: ${this._missingItems}`
+        );
+        return;
+      } else {
+        throw new Error(`Missing essential configuration for mailchimp: ${this._missingItems}`);
+      }
+    }
+
     if (await this.isSubscribed(email)) return;
 
     // this adds a list member if they aren't already in the list,
