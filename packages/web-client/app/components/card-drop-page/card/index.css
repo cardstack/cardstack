@@ -21,8 +21,8 @@
   font-weight: 600;
 }
 
-.card-drop-page-card__explanation p {
-  margin-bottom: var(--boxel-sp-lg);
+.card-drop-page-card__explanation p + p {
+  margin-top: var(--boxel-sp-lg);
 }
 
 @media only screen and (max-width: 480px) {
