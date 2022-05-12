@@ -11,4 +11,11 @@ module('Acceptance | card-drop', function (hooks) {
     await visit('/card-drop/success');
     await percySnapshot(assert, { widths: [375, 1280] });
   });
+
+  test('it shows an error message', async function (assert) {
+    await visit('/card-drop/error?message=something');
+    await percySnapshot(assert, { widths: [375, 1280] });
+
+    assert.dom('[data-test-error-message]').hasText('something');
+  });
 });

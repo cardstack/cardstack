@@ -21,6 +21,10 @@
   font-weight: 600;
 }
 
+.card-drop-page-card__explanation p + p {
+  margin-top: var(--boxel-sp-lg);
+}
+
 @media only screen and (max-width: 480px) {
   .card-drop-page-card {
     padding: var(--boxel-sp);
