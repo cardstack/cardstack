@@ -216,7 +216,8 @@ export default class RewardPool {
   }
 
   async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
-    // Subgraph has a max pagination of 100. TODO paginate proofs
+    //PLEASE DO NOT CHANGE THIS.
+    //Subgraph has a max pagination of 100
     let paginateSize = 100;
     let i = 0;
     let done = false;
