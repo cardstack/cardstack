@@ -63,6 +63,7 @@ export default class EmailCardDropVerifyRoute {
         Sentry.captureException(e, {
           tags: {
             action: 'drop-card',
+            alert: 'web-team',
           },
         });
 

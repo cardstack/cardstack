@@ -149,6 +149,7 @@ describe('GET /email-card-drop/verify', function () {
     expect(sentryReport.error?.message).to.equal('provisioning should error');
     expect(sentryReport.tags).to.deep.equal({
       action: 'drop-card',
+      alert: 'web-team',
     });
   });
 
