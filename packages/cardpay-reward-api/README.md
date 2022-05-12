@@ -1,7 +1,7 @@
 # Cardpay reward api
 
 The cardpay reward api performs:
-- indexing of proofs (runs every 5s) into an rds db. The indexer is stateless, blowing away the tables in the db will recover all necessary state for the proofs. 
+- indexing of proofs (runs every 5s) into an rds db. The indexer is meant to be stateless; blowing away the tables in the db will recover all necessary state for the proofs. 
 - exposes an api to access proofs.
 
 ## Setup
@@ -19,7 +19,7 @@ The cardpay reward api performs:
     
     
     # run 
-    pdm run main
+    pdm run main # if you want watch changes, use pdm run dev
     
     # look at db
     psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
