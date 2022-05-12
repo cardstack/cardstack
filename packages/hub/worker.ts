@@ -12,7 +12,6 @@ import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import DiscordPostTask from './tasks/discord-post';
-import DropCardTask from './tasks/drop-card';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendEmailCardDropVerification from './tasks/send-email-card-drop-verification';
@@ -63,7 +62,6 @@ export class HubWorker {
       taskList: {
         boom: boom,
         'discord-post': this.instantiateTask(DiscordPostTask),
-        'drop-card': this.instantiateTask(DropCardTask),
         'send-email-card-drop-verification': this.instantiateTask(SendEmailCardDropVerification),
         'send-notifications': this.instantiateTask(SendNotificationsTask),
         'subscribe-email': this.instantiateTask(SubscribeEmail),
