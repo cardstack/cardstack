@@ -15,7 +15,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-
 def get_fastapi_sessionmaker() -> FastAPISessionMaker:
     """This function could be replaced with a global variable if preferred"""
     return FastAPISessionMaker(DB_STRING)

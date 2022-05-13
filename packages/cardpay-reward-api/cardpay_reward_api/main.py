@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from . import crud, models, schemas
 from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
 from .indexer import Indexer
+from .config import config
 
 load_dotenv()
 
@@ -21,15 +22,16 @@ models.Base.metadata.create_all(bind=engine)
 for expected_env in [
     "SUBGRAPH_URL",
     "REWARDS_BUCKET",
+    "ENVIRONMENT",
 ]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
 
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
+ENVIRONMENT = os.environ.get("ENVIRONMENT")
 
 app = FastAPI()
-
 
 @app.on_event("startup")
 @repeat_every(seconds=5)
@@ -37,7 +39,7 @@ def index_root_task() -> None:
     sessionmaker = get_fastapi_sessionmaker()
     with sessionmaker.context_session() as db:
         try:
-            Indexer(SUBGRAPH_URL).run(db=db, storage_location=REWARDS_BUCKET)
+            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]).run(db=db, storage_location=REWARDS_BUCKET)
         except Exception as e:
             raise(e)
 
@@ -51,6 +53,7 @@ async def about():
     return {
         "subgraph_url": SUBGRAPH_URL,
         "rewards_bucket": REWARDS_BUCKET,
+        "environment": ENVIRONMENT,
     }
 
 

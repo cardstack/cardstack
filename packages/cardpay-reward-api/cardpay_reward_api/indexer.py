@@ -18,13 +18,15 @@ from . import crud, database, models, schemas
 
 
 class Indexer:
-    def __init__(self, subgraph_url):
+    def __init__(self, subgraph_url, archived_reward_programs):
         self.subgraph_url = subgraph_url
+        self.archived_reward_programs = archived_reward_programs
 
     def run(self, db: Session, storage_location):
         reward_program_ids = [o["id"] for o in self.get_reward_programs()]
         for reward_program_id in reward_program_ids:
-            self.index_for_program(db, reward_program_id, storage_location)
+            if reward_program_id not in archived_reward_programs:
+                self.index_for_program(db, reward_program_id, storage_location)
 
     def index_for_program(self, db: Session, reward_program_id, storage_location):
         with db.begin():
