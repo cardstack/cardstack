@@ -89,7 +89,6 @@ export default [
     type: 'event',
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: 'address',
@@ -105,12 +104,10 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -126,12 +123,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: 'address',
@@ -147,12 +142,10 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -173,12 +166,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'cardpayVersion',
     outputs: [
@@ -188,12 +179,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'decimals',
     outputs: [
@@ -203,12 +192,10 @@ export default [
         type: 'uint8',
       },
     ],
-    payable: false,
     stateMutability: 'pure',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'getMinters',
     outputs: [
@@ -218,12 +205,10 @@ export default [
         type: 'address[]',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -233,12 +218,10 @@ export default [
     ],
     name: 'initialize',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'isOwner',
     outputs: [
@@ -248,12 +231,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -274,12 +255,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'name',
     outputs: [
@@ -289,12 +268,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'pure',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'owner',
     outputs: [
@@ -304,12 +281,10 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -325,21 +300,17 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -355,12 +326,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'symbol',
     outputs: [
@@ -370,12 +339,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'pure',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'totalSupply',
     outputs: [
@@ -385,12 +352,10 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -400,12 +365,10 @@ export default [
     ],
     name: 'transferOwnership',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'versionManager',
     outputs: [
@@ -415,7 +378,6 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
