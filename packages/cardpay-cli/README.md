@@ -72,6 +72,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`](#cardpay-prepaid-card-market-remove-fundingcard-prepaidcards..)
  - [`cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-set-ask-fundingcard-sku-askprice)
  - [`cardpay prepaid-card-market sku-info <sku>`](#cardpay-prepaid-card-market-sku-info-sku)
+ - [`cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`](#cardpay-prepaid-card-market-v2-add-sku-fundingcard-issuersafe-facevalue-customizationdid-issuingtoken)
  - [`cardpay price eth <token> [amount]`](#cardpay-price-eth-token-amount)
  - [`cardpay price updated-at <token>`](#cardpay-price-updated-at-token)
  - [`cardpay price usd <token> [amount]`](#cardpay-price-usd-token-amount)
@@ -591,6 +592,26 @@ Get the details for the prepaid cards available in the market contract for the s
 ```
 Positionals:
   sku  The SKU to obtain details for  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`
+
+Add a SKU
+
+```
+Positionals:
+  fundingCard       The prepaid card used to pay for gas for the txn  [string] [required]
+  issuerSafe        The address of the issuer safe  [string] [required]
+  faceValue         The face value for the new prepaid cards  [number] [required]
+  customizationDID  The DID string that represents the prepaid card customization  [string] [required]
+  issuingToken      The address of the issuing token  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
