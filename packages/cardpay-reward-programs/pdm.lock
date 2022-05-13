@@ -177,7 +177,7 @@ requires_python = ">=3.6"
 summary = "pathlib-style classes for cloud storage services"
 dependencies = [
     "boto3",
-    "cloudpathlib",
+    "cloudpathlib>=0.7.0",
 ]
 
 [[package]]
@@ -886,7 +886,7 @@ dependencies = [
 
 [[package]]
 name = "streamlit"
-version = "1.8.0"
+version = "1.9.0"
 requires_python = ">=3.6"
 summary = "The fastest way to build data apps in Python"
 dependencies = [
@@ -894,7 +894,7 @@ dependencies = [
     "attrs",
     "blinker",
     "cachetools>=4.0",
-    "click>=7.0",
+    "click<8.1,>=7.0",
     "gitpython!=3.1.19",
     "importlib-metadata>=1.4",
     "numpy",
@@ -1041,7 +1041,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:b3bbc21db0d6f67c129969196cc1e758def88e0412e1d2dfbbc8c1a90d003c41"
+content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a237644105"
 
 [metadata.files]
 "altair 4.2.0" = [
@@ -1922,9 +1922,9 @@ content_hash = "sha256:b3bbc21db0d6f67c129969196cc1e758def88e0412e1d2dfbbc8c1a90
     {file = "stack_data-0.2.0-py3-none-any.whl", hash = "sha256:999762f9c3132308789affa03e9271bbbe947bf78311851f4d485d8402ed858e"},
     {file = "stack_data-0.2.0.tar.gz", hash = "sha256:45692d41bd633a9503a5195552df22b583caf16f0b27c4e58c98d88c8b648e12"},
 ]
-"streamlit 1.8.0" = [
-    {file = "streamlit-1.8.0-py2.py3-none-any.whl", hash = "sha256:ec7ad95b7ee3583b48fd71156e4834f477af771bb40de00cd1a4c7c470de45bb"},
-    {file = "streamlit-1.8.0.tar.gz", hash = "sha256:effa58274a1f9618bdc269b391ddfc8f83ce9f9e9c28eef86907c9d1e5464792"},
+"streamlit 1.9.0" = [
+    {file = "streamlit-1.9.0-py2.py3-none-any.whl", hash = "sha256:dd7718147cfc8eb4c5a18b36b67a36de37454e7fe49ac72470ad2a43771aef13"},
+    {file = "streamlit-1.9.0.tar.gz", hash = "sha256:543c809843b0561f5aa3850af2e90f7a6df17c80906b09ab76bab498846e6797"},
 ]
 "terminado 0.13.3" = [
     {file = "terminado-0.13.3-py3-none-any.whl", hash = "sha256:874d4ea3183536c1782d13c7c91342ef0cf4e5ee1d53633029cbc972c8760bd8"},

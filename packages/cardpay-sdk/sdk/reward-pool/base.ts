@@ -23,6 +23,7 @@ import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } 
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
+import { query } from '../utils/graphql';
 
 export interface Proof {
   rootHash: string;
@@ -30,8 +31,6 @@ export interface Proof {
   tokenAddress: string;
   payee: string;
   proofArray: string[];
-  timestamp: string;
-  blockNumber: number;
   rewardProgramId: string;
   amount: BN;
   leaf: string;
@@ -129,13 +128,11 @@ export default class RewardPool {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
-      url.searchParams.append('reward_program_id', rewardProgramId);
+      url.searchParams.append('rewardProgramId', rewardProgramId);
     }
     if (tokenAddress) {
-      url.searchParams.append('token_address', tokenAddress);
+      url.searchParams.append('token', tokenAddress);
     }
-    let knownClaimedStr = knownClaimed ? knownClaimed.toString() : 'false';
-    url.searchParams.append('known_claimed', knownClaimedStr);
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
@@ -152,16 +149,96 @@ export default class RewardPool {
       throw new Error(await response.text());
     }
     let currentBlock = await this.layer2Web3.eth.getBlockNumber();
-    return this.addTokenSymbol(
-      json['results'].map((o: any) => {
-        let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
-        return {
-          ...o,
-          isValid: validFrom <= currentBlock && validTo > currentBlock,
-          amount: new BN(o.amount.toLocaleString('fullwide', { useGrouping: false })),
-        };
-      })
-    );
+    let rewardTokens = await this.getRewardTokens();
+    let res: Proof[] = [];
+    let claimedLeafs: string[];
+    if (!knownClaimed) {
+      claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
+    }
+    json.map((o: any) => {
+      if (rewardTokens.includes(o.tokenAddress)) {
+        // filters for known reward tokens
+        if (!knownClaimed) {
+          // proofs not claimed yet
+          if (!claimedLeafs.includes(o.leaf)) {
+            // filters for proofs has not been claimed
+            let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+            res.push({
+              ...o,
+              isValid: validFrom <= currentBlock && validTo > currentBlock,
+            });
+          }
+        } else {
+          let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+          res.push({
+            ...o,
+            isValid: validFrom <= currentBlock && validTo > currentBlock,
+          });
+        }
+      }
+    });
+    return this.addTokenSymbol(res);
+  }
+
+  claimsQuery(payee: string, rewardProgramId?: string, skip = 0): string {
+    if (rewardProgramId) {
+      return `
+      query {
+          rewardeeClaims(
+            where:{
+              rewardee: "${payee}",
+              rewardProgram: "${rewardProgramId}" 
+            }, 
+            skip: ${skip},
+            orderBy: blockNumber, 
+            orderDirection: asc
+          ){
+            leaf
+          }
+      }
+    `;
+    } else {
+      return `
+      query {
+          rewardeeClaims(
+            where:{
+              rewardee: "${payee}"
+            },
+            skip: ${skip}
+            orderBy: blockNumber, 
+            orderDirection: asc
+          ){
+            leaf
+          }
+      }
+    `;
+    }
+  }
+
+  async getClaimedLeafs(payee: string, rewardProgramId?: string): Promise<string[]> {
+    //PLEASE DO NOT CHANGE THIS.
+    //Subgraph has a max pagination of 100
+    let paginateSize = 100;
+    let i = 0;
+    let done = false;
+    let leafs: string[] = [];
+    while (!done) {
+      let queryStr = this.claimsQuery(payee, rewardProgramId, i * paginateSize);
+      let res = await query(this.layer2Web3, queryStr);
+      if (res.data.rewardeeClaims.length != 0) {
+        let {
+          data: { rewardeeClaims },
+        } = res;
+        let new_leafs = rewardeeClaims.reduce((accum: string[], o: any) => {
+          return [...accum, o.leaf];
+        }, []);
+        leafs = leafs.concat(new_leafs);
+        i++;
+      } else {
+        done = true;
+      }
+    }
+    return leafs;
   }
 
   async rewardTokenBalance(
@@ -638,8 +715,14 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
 
   async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
     let assets = await getSDK('Assets', this.layer2Web3);
+    let rewardTokens = await this.getRewardTokens();
     let entries = await Promise.all(
-      tokenAddresses.map(async (tokenAddress) => [tokenAddress, (await assets.getTokenInfo(tokenAddress)).symbol])
+      tokenAddresses.map(async (tokenAddress) => {
+        if (!rewardTokens.includes(tokenAddress)) {
+          throw new Error(`Reward token ${tokenAddress} not recognized by sdk`);
+        }
+        return [tokenAddress, (await assets.getTokenInfo(tokenAddress)).symbol];
+      })
     );
     return Object.fromEntries(entries);
   }
@@ -707,6 +790,11 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
       await getAddress('rewardPool', this.layer2Web3)
     );
     return this.rewardPool;
+  }
+  private async getRewardTokens(): Promise<string[]> {
+    let cardTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
+    let daiTokenAddress = await getAddress('daiCpxd', this.layer2Web3);
+    return [cardTokenAddress, daiTokenAddress];
   }
 }
 

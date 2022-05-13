@@ -20,8 +20,7 @@ dependencies = [
     "pysha3>=1.0.2",
     "duckdb>=0.3.2",
     "python-dotenv>=0.19.2",
-    "future-fstrings>=1.2.0",
-]
+    "future-fstrings>=1.2.0"]
 requires-python = ">=3.9"
 license = {text = "MIT"}
 
@@ -30,7 +29,7 @@ Homepage = ""
 [tool.pdm]
 [project.optional-dependencies]
 explore = [
-    "streamlit>=1.8.0"
+    "streamlit>=1.9.0"
 ]
 [tool.pdm.dev-dependencies]
 dev = [
@@ -42,5 +41,8 @@ dev = [
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
 
+
+
 [tool.pdm.scripts]
 explore_rules = "streamlit run streamlit/explore.py --server.port 8501 --global.developmentMode false"
+inspect_results = "streamlit run streamlit/inspect_results.py --server.port 8501 --global.developmentMode false"

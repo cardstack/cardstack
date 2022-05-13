@@ -382,3 +382,62 @@ app "reward-submit" {
         }
     }
 }
+
+app "reward-api" {
+    path = "./packages/cardpay-reward-api"
+
+    config {
+        env = {
+            ENVIRONMENT = "staging"
+            REWARDS_BUCKET="s3://tally-staging-reward-programs"
+            SUBGRAPH_URL="https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
+        }
+    }
+
+    build {
+        use "docker" {
+          dockerfile = "Dockerfile"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "reward-api-staging"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            service_port = 8000
+            region = "us-east-1"
+            memory = "512"
+            cluster = "reward-api-staging"
+            count = 2
+            subnets = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
+            task_role_name = "reward-api-staging-ecr-task"
+            execution_role_name = "reward-api-staging-ecr-task-executor-role"
+            alb {
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/8994c0bdf9038937"
+            }
+            secrets = {
+                DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+            }
+        }
+
+        hook {
+            when    = "before"
+            command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
+        }
+
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/fix-listener.mjs", "reward-api-staging.stack.cards", "reward-api-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
+        hook {
+            when    = "after"
+            command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+        }
+    }
+}

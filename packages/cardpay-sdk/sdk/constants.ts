@@ -25,7 +25,7 @@ const SOKOL = {
   name: 'Sokol',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
-  tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
+  tallyServiceURL: 'https://reward-api-staging.stack.cards',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 };
 const KOVAN = {
@@ -76,7 +76,7 @@ const XDAI = {
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-  tallyServiceURL: 'https://tally-service.stack.cards/api/v1',
+  tallyServiceURL: 'https://reward-api-production.cardstack.com',
 };
 
 type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
