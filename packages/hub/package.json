@@ -48,6 +48,7 @@
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
+    "@mailchimp/mailchimp_marketing": "^3.0.75",
     "@pagerduty/pdjs": "^2.2.4",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",

@@ -7,6 +7,10 @@
   "cardDrop": {
     "verificationUrl": "https://hub-staging.stack.cards/email-card-drop/verify"
   },
+  "mailchimp": {
+    "serverPrefix": "us8",
+    "newsletterListId": "c2b7a36f2d"
+  },
   "wyre": {
     "callbackUrl": "https://hub-staging.stack.cards/callbacks/wyre"
   },
