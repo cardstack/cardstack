@@ -26,6 +26,7 @@ export default class SendEmailCardDropVerification {
       Sentry.captureException(e, {
         tags: {
           event: 'send-email-card-drop-verification',
+          alert: 'web-team',
         },
       });
       return;
@@ -59,6 +60,7 @@ export default class SendEmailCardDropVerification {
       Sentry.captureException(e, {
         tags: {
           event: 'send-email-card-drop-verification',
+          alert: 'web-team',
         },
       });
       throw e;

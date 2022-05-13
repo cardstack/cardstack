@@ -99,6 +99,7 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',
+      alert: 'web-team',
     });
     expect(sentryReport.error?.message).to.equal(`Unable to find card drop request with id ${nonexistentId}`);
   });
@@ -118,6 +119,7 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(sentryReport.tags).to.deep.equal({
       event: 'send-email-card-drop-verification',
+      alert: 'web-team',
     });
   });
 });
