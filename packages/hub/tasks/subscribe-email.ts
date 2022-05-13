@@ -14,6 +14,7 @@ export default class SubscribeEmail {
       Sentry.captureException(e, {
         tags: {
           action: 'subscribe-email',
+          alert: 'web-team',
         },
       });
       throw e;
