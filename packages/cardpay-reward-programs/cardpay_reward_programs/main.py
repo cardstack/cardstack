@@ -10,11 +10,9 @@ from cloudpathlib import AnyPath, S3Client
 from .payment_tree import PaymentTree
 from .utils import write_parquet_file
 
-
 cached_client = S3Client(
     local_cache_dir=".cache",
-    boto3_session=Session(
-    ),
+    boto3_session=Session(),
 )
 cached_client.set_as_default_client()
 
@@ -33,18 +31,16 @@ def run_reward_program(
     """
     with open(AnyPath(parameters_file), "r") as stream:
         parameters = json.load(stream)
-    
+
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
             rule = subclass(parameters["core"], parameters["user_defined"])
-    payment_list = rule.run(parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"])
+    payment_list = rule.run(
+        parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"]
+    )
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
-
-
-def cli():
-    typer.run(run_reward_program)
 
 
 if __name__ == "__main__":
