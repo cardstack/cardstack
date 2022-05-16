@@ -53,22 +53,15 @@ app "hub" {
       }
     }
 
-    /*
-        hook {
-            when    = "before"
-            command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
-        }
+    hook {
+      when    = "before"
+      command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
+    }
 
-        hook {
-            when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "hub-staging.stack.cards", "hub-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-        }
-
-        hook {
-            when    = "after"
-            command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
-        }
-        */
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
+    }
   }
 }
 
@@ -339,21 +332,15 @@ app "ssr-web" {
       }
     }
 
-    /*
-        hook {
-            when    = "before"
-            command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
-        }
+    hook {
+      when    = "before"
+      command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
+    }
 
-        hook {
-            when    = "after"
-            command = ["node", "./scripts/fix-listener.mjs", "wallet-staging.stack.cards", "ssr-web-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-        }
-        hook {
-            when    = "after"
-            command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
-        }
-        */
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
+    }
   }
 }
 
