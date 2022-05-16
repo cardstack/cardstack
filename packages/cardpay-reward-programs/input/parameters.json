@@ -5,17 +5,16 @@
     "end_block": 26000000,
     "subgraph_config_locations": {
       "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/"
-    }
-  },
+}
+},
   "run": {
-    "reward_program_id": "0x0000000000000000000000000000000000000000",
-    "payment_cycle": 24032768
+    "reward_program_id":"0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
+    "payment_cycle": 26641412
   },
-  "user_defined": {
-    "token": "0x52031d287Bb58E26A379A7Fec2c84acB",
-    "base_reward": 5,
-    "transaction_factor": 2,
-    "spend_factor": 2,
-    "duration": 43200
+"user_defined": {
+  "reward_per_user": 10000000000000000000,
+  "token": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+  "duration": 777600,
+  "accounts": ["0x159ADe032073d930E85f95AbBAB9995110c43C71"]
   }
 }
