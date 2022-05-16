@@ -380,7 +380,8 @@ app "reward-api" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:listener/app/reward-api-production/5f7e90a12d3fcc49/92eb36208936ff22"
             }
             secrets = {
-                DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
+                DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7",
+                SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
             }
         }
 
