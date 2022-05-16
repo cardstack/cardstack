@@ -5,7 +5,7 @@
   min-height: var(--field-height);
 }
 
-.balance-chooser-dropdown > .ember-power-select-trigger {
+.balance-chooser-dropdown .ember-power-select-trigger {
   background: url("/images/icons/caret-dropdown.svg") right 1.125rem center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
@@ -13,7 +13,7 @@
   transition: border-color var(--boxel-transition);
 }
 
-.balance-chooser-dropdown > .ember-power-select-trigger:hover {
+.balance-chooser-dropdown .ember-power-select-trigger:hover {
   border-color: var(--boxel-dark);
   cursor: pointer;
 }
