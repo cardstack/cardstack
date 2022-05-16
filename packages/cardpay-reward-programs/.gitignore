@@ -8,3 +8,5 @@ __pycache__
 .env
 output/
 .cache
+.pdm.toml
+__pypackages__
