@@ -35,7 +35,7 @@ app = FastAPI()
 
 
 @app.on_event("startup")
-@repeat_every(seconds=5)
+@repeat_every(seconds=5, raise_exceptions=True)
 def index_root_task() -> None:
     sessionmaker = get_fastapi_sessionmaker()
     with sessionmaker.context_session() as db:
@@ -44,7 +44,7 @@ def index_root_task() -> None:
                 db=db, storage_location=REWARDS_BUCKET
             )
         except Exception as e:
-            raise (e)
+            logging.error(e)
 
 
 def param(skip: int = 0, limit: int = 100):
