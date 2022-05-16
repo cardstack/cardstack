@@ -42,8 +42,8 @@ Each individual program can be built by specifying the rule class name as a buil
 ```
 
 ```
-      docker run -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack-prod --rm -it flat_payment:latest /host/parameters.json /host/
-      docker run --platform=linux/amd64 -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack-prod --rm -it flat_payment:latest /host/parameters.json /host/ # for an m1 laptop
+      docker run -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack --rm -it flat_payment:latest /host/parameters.json /host/
+      docker run --platform=linux/amd64 -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack --rm -it flat_payment:latest /host/parameters.json /host/ # for an m1 laptop
 ```
 
 ```
