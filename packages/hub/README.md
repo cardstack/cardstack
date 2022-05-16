@@ -52,8 +52,9 @@ Below is a list of the most common environment variables that the Hub accepts:
 - `LAYER1_RPC_NODE_WSS_URL`
 - `LAYER2_RPC_NODE_HTTPS_URL`
 - `LAYER2_RPC_NODE_WSS_URL`
+- `MAILCHIMP_API_KEY`
 
-Search the mono-repo for `process.env` and check the config directory to see these variables referenced.
+Search the mono-repo for `process.env` and check the `custom-environment-variables.json` file in the config directory to see these variables referenced.
 
 To use the variables, create a file named `.env` in the hub's folder, and put in the variables you want to use.
 

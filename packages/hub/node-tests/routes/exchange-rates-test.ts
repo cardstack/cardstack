@@ -23,6 +23,16 @@ const mockExchangeRatesResponse = {
   },
 } as FixerSuccessResponse;
 
+class StubAuthenticationUtils {
+  validateAuthToken(encryptedAuthToken: string) {
+    return handleValidateAuthToken(encryptedAuthToken);
+  }
+}
+
+let handleValidateAuthToken = function (_encryptedAuthToken: string) {
+  return '';
+};
+
 function stubExchangeRates(context: Mocha.Suite) {
   let fetchExchangeRates: () => Promise<FixerSuccessResponse | FixerFailureResponse | undefined> = function () {
     return Promise.resolve(mockExchangeRatesResponse);
@@ -48,6 +58,10 @@ describe('GET /api/exchange-rates', function () {
   let { setFetchExchangeRates } = stubExchangeRates(this);
   let { request } = setupHub(this);
 
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+  });
+
   it('does not fetch exchange rates for an incorrect origin', async function () {
     await request()
       .get(`/api/exchange-rates`)
@@ -66,12 +80,54 @@ describe('GET /api/exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('does not fetch exchange rates if no origin and auth token', async function () {
+    await request()
+      .get(`/api/exchange-rates`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(403)
+      .expect({
+        errors: [
+          {
+            status: '403',
+            title: 'Not allowed',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('fetches exchange rates for an accepted origin', async function () {
     await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
+      .expect(200)
+      .expect({
+        data: {
+          type: 'exchange-rates',
+          attributes: {
+            base: mockExchangeRatesResponse.base,
+            rates: mockExchangeRatesResponse.rates,
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('fetches exchange rates with a valid auth token but no origin', async function () {
+    let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+    handleValidateAuthToken = (encryptedString: string) => {
+      expect(encryptedString).to.equal('abc123--def456--ghi789');
+      return stubUserAddress;
+    };
+
+    await request()
+      .get(`/api/exchange-rates`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .expect(200)
       .expect({
         data: {

@@ -1,11 +1,12 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { registry, setupHub } from '../helpers/server';
-import { Job, TaskSpec } from 'graphile-worker';
 import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 import config from 'config';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
+const { sku } = config.get('cardDrop');
 const { url: webClientUrl } = config.get('webClient');
-const { alreadyClaimed, success } = config.get('webClient.paths.cardDrop');
+const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -24,21 +25,35 @@ let unclaimedEoa: EmailCardDropRequest = {
   requestedAt: new Date(),
 };
 
-let jobIdentifiers: string[] = [];
-let jobPayloads: any[] = [];
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    jobIdentifiers.push(identifier);
-    jobPayloads.push(payload);
-    return Promise.resolve({} as Job);
-  }
-}
-
 let emailCardDropRequestsQueries: EmailCardDropRequestsQueries;
 
 describe('GET /email-card-drop/verify', function () {
+  let provisionedAddress = '0x123';
+  let provisionedSku = 'sku';
+  let mockTxnHash = '0x456';
+  let provisionPrepaidCardCalls = 0;
+  let provisioningShouldError = false;
+
+  class StubRelayService {
+    async provisionPrepaidCardV2(userAddress: string, requestedSku: string) {
+      provisionPrepaidCardCalls++;
+
+      if (provisioningShouldError) {
+        throw new Error('provisioning should error');
+      }
+
+      provisionedAddress = userAddress;
+      provisionedSku = requestedSku;
+      return Promise.resolve(mockTxnHash);
+    }
+  }
+
+  setupSentry(this);
+
   this.beforeEach(async function () {
-    registry(this).register('worker-client', StubWorkerClient);
+    registry(this).register('relay', StubRelayService, { type: 'service' });
+    provisionPrepaidCardCalls = 0;
+    provisioningShouldError = false;
   });
 
   let { request, getContainer } = setupHub(this);
@@ -49,12 +64,7 @@ describe('GET /email-card-drop/verify', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  this.afterEach(async function () {
-    jobIdentifiers = [];
-    jobPayloads = [];
-  });
-
-  it('accepts a valid verification, marks it claimed, triggers a job to drop a card, and redirects to a success page', async function () {
+  it('accepts a valid verification, marks it claimed, calls the relay service, and redirects to a success page', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
     );
@@ -63,16 +73,14 @@ describe('GET /email-card-drop/verify', function () {
       await emailCardDropRequestsQueries!.query({
         id: unclaimedEoa.id,
       })
-    )[0];
+    )[0]!;
 
     expect(newlyClaimed.claimedAt).to.exist;
+    expect(newlyClaimed.transactionHash).to.equal(mockTxnHash);
 
-    expect(jobIdentifiers).to.deep.equal(['drop-card']);
-    expect(jobPayloads).to.deep.equal([
-      {
-        id: unclaimedEoa.id,
-      },
-    ]);
+    expect(provisionPrepaidCardCalls).to.equal(1);
+    expect(provisionedAddress).to.equal(unclaimedEoa.ownerAddress);
+    expect(provisionedSku).to.equal(sku);
 
     expect(response.status).to.equal(302);
     expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
@@ -83,8 +91,7 @@ describe('GET /email-card-drop/verify', function () {
       `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}&email-hash=${claimedEoa.emailHash}`
     );
 
-    expect(jobIdentifiers).to.be.empty;
-    expect(jobPayloads).to.be.empty;
+    expect(provisionPrepaidCardCalls).to.equal(0);
 
     expect(response.status).to.equal(302);
     expect(response.headers['location']).to.equal(`${webClientUrl}${alreadyClaimed}`);
@@ -95,11 +102,10 @@ describe('GET /email-card-drop/verify', function () {
       `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha&email-hash=${claimedEoa.emailHash}`
     );
 
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('Code is invalid');
-
-    expect(jobIdentifiers).to.be.empty;
-    expect(jobPayloads).to.be.empty;
   });
 
   it('rejects an unknown email-hash', async function () {
@@ -107,11 +113,44 @@ describe('GET /email-card-drop/verify', function () {
       `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=wha`
     );
 
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('Email is invalid');
+  });
 
-    expect(jobIdentifiers).to.be.empty;
-    expect(jobPayloads).to.be.empty;
+  it('redirects with the error if the relay call fails', async function () {
+    provisioningShouldError = true;
+
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
+    );
+
+    let newlyClaimed = (
+      await emailCardDropRequestsQueries!.query({
+        id: unclaimedEoa.id,
+      })
+    )[0]!;
+
+    expect(newlyClaimed.claimedAt).to.exist;
+    expect(newlyClaimed.transactionHash).to.be.null;
+
+    expect(provisionPrepaidCardCalls).to.equal(1);
+    expect(provisionedAddress).to.equal(unclaimedEoa.ownerAddress);
+    expect(provisionedSku).to.equal(sku);
+
+    expect(response.status).to.equal(302);
+    expect(response.headers['location']).to.equal(
+      `${webClientUrl}${error}?message=${encodeURIComponent(new Error('provisioning should error').toString())}`
+    );
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal('provisioning should error');
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'drop-card',
+      alert: 'web-team',
+    });
   });
 
   it('errors if the eoa query parameter is not provided', async function () {
@@ -119,11 +158,10 @@ describe('GET /email-card-drop/verify', function () {
       `/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}&email-hash=${unclaimedEoa.emailHash}`
     );
 
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('eoa is required');
-
-    expect(jobIdentifiers).to.be.empty;
-    expect(jobPayloads).to.be.empty;
   });
 
   it('errors if the email-hash query parameter is not provided', async function () {
@@ -131,10 +169,9 @@ describe('GET /email-card-drop/verify', function () {
       `/email-card-drop/verify?verification-code=${unclaimedEoa.verificationCode}&eoa=${unclaimedEoa.ownerAddress}`
     );
 
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
     expect(response.status).to.equal(400);
     expect(response.text).to.equal('email-hash is required');
-
-    expect(jobIdentifiers).to.be.empty;
-    expect(jobPayloads).to.be.empty;
   });
 });

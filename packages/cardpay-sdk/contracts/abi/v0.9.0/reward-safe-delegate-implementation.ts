@@ -11,6 +11,31 @@ export default [
       {
         indexed: false,
         internalType: 'address',
+        name: 'oldOwner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'RewardSafeTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'rewardSafe',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
         name: 'token',
         type: 'address',
       },
@@ -25,7 +50,6 @@ export default [
     type: 'event',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -50,12 +74,10 @@ export default [
     ],
     name: 'swapOwner',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -80,7 +102,6 @@ export default [
     ],
     name: 'withdraw',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
