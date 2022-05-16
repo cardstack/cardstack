@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from typing import List, Optional
 
 import uvicorn
@@ -9,9 +9,9 @@ from fastapi_utils.tasks import repeat_every
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
+from .config import config
 from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
 from .indexer import Indexer
-from .config import config
 
 load_dotenv()
 
@@ -33,15 +33,18 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT")
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 @repeat_every(seconds=5)
 def index_root_task() -> None:
     sessionmaker = get_fastapi_sessionmaker()
     with sessionmaker.context_session() as db:
         try:
-            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]).run(db=db, storage_location=REWARDS_BUCKET)
+            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]["archived_reward_programs"]).run(
+                db=db, storage_location=REWARDS_BUCKET
+            )
         except Exception as e:
-            raise(e)
+            raise (e)
 
 
 def param(skip: int = 0, limit: int = 100):
@@ -59,9 +62,7 @@ async def about():
 
 @app.get("/")
 async def root():
-    return {
-        "status": "ok"
-    }
+    return {"status": "ok"}
 
 
 @app.get("/merkle-proofs/{payee}", response_model=List[schemas.Proof])
