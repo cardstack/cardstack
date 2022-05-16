@@ -25,7 +25,6 @@ export default [
     type: 'event',
   },
   {
-    constant: true,
     inputs: [],
     name: 'actionDispatcher',
     outputs: [
@@ -35,12 +34,10 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'cardpayVersion',
     outputs: [
@@ -50,42 +47,23 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
-        name: 'sender',
+        name: 'owner',
         type: 'address',
       },
     ],
     name: 'initialize',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'isOwner',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
     inputs: [
       {
         internalType: 'address payable',
@@ -94,7 +72,7 @@ export default [
       },
       {
         internalType: 'uint256',
-        name: '',
+        name: 'amount',
         type: 'uint256',
       },
       {
@@ -111,12 +89,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'owner',
     outputs: [
@@ -126,12 +102,10 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'prepaidCardManagerAddress',
     outputs: [
@@ -141,21 +115,17 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -186,12 +156,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'tokenManagerAddress',
     outputs: [
@@ -201,12 +169,10 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
@@ -216,12 +182,10 @@ export default [
     ],
     name: 'transferOwnership',
     outputs: [],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'versionManager',
     outputs: [
@@ -231,7 +195,6 @@ export default [
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },

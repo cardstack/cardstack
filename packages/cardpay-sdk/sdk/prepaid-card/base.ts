@@ -42,7 +42,7 @@ export const MAX_PREPAID_CARD_AMOUNT = 10;
 
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
-  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
+  constructor(protected layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async priceForFaceValue(tokenAddress: string, spendFaceValue: number): Promise<string> {
     return await (await this.getPrepaidCardMgr()).methods
@@ -577,7 +577,7 @@ export default class PrepaidCard {
     return this.prepaidCardManager;
   }
 
-  private async getCreateCardPayload(
+  protected async getCreateCardPayload(
     owner: string,
     tokenAddress: string,
     issuingTokenAmounts: BN[],
@@ -597,8 +597,16 @@ export default class PrepaidCard {
         prepaidCardManagerAddress,
         sum,
         this.layer2Web3.eth.abi.encodeParameters(
-          ['address', 'uint256[]', 'uint256[]', 'string', 'address'],
-          [owner, issuingTokenAmounts, spendAmounts.map((i) => i.toString()), customizationDID, marketAddress]
+          ['address', 'uint256[]', 'uint256[]', 'string', 'address', 'address', 'address'],
+          [
+            owner,
+            issuingTokenAmounts,
+            spendAmounts.map((i) => i.toString()),
+            customizationDID,
+            marketAddress,
+            ZERO_ADDRESS,
+            ZERO_ADDRESS,
+          ]
         )
       )
       .encodeABI();

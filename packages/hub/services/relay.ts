@@ -57,6 +57,31 @@ export default class RelayService {
     let body = await response.json();
     return body.txHash;
   }
+
+  async provisionPrepaidCardV2(userAddress: string, sku: string): Promise<string> {
+    let relayUrl = getConstantByNetwork('relayServiceURL', web3config.layer2Network);
+    if (!provisionerSecret) {
+      throw new Error(`Could not provision prepaid card because relay.provisionerSecret config is not set.`);
+    }
+    let response = await fetch(`${relayUrl}/v2/prepaid-card/provision/${sku}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: provisionerSecret,
+      },
+      body: JSON.stringify({
+        owner: toChecksumAddress(userAddress),
+      }),
+    });
+    if (!response.ok) {
+      let body = await response.text();
+      throw new Error(
+        `Could not provision prepaid card v2 for customer ${userAddress}, sku ${sku}, received ${response.status} from relay server: ${body}`
+      );
+    }
+    let body = await response.json();
+    return body.txHash;
+  }
 }
 
 declare module '@cardstack/hub/services' {

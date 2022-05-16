@@ -1,18 +1,18 @@
-import os
 import logging
+import os
 from typing import List, Optional
 
-import uvicorn
 import sentry_sdk
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi_utils.tasks import repeat_every
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
+from .config import config
 from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
 from .indexer import Indexer
-from .config import config
 
 load_dotenv()
 
@@ -35,26 +35,27 @@ SENTRY_DSN = os.environ.get("SENTRY_DSN")
 
 app = FastAPI()
 
-if(SENTRY_DSN is not None):
+if SENTRY_DSN is not None:
     sentry_sdk.init(
-    SENTRY_DSN,
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-)
+        SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+    )
 
 
 @app.on_event("startup")
-@repeat_every(seconds=5)
+@repeat_every(seconds=5, raise_exceptions=True)
 def index_root_task() -> None:
     sessionmaker = get_fastapi_sessionmaker()
     with sessionmaker.context_session() as db:
         try:
-            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]).run(db=db, storage_location=REWARDS_BUCKET)
+            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]["archived_reward_programs"]).run(
+                db=db, storage_location=REWARDS_BUCKET
+            )
         except Exception as e:
-            raise(e)
+            logging.error(e)
 
 
 def param(skip: int = 0, limit: int = 100):
@@ -72,9 +73,7 @@ async def about():
 
 @app.get("/")
 async def root():
-    return {
-        "status": "ok"
-    }
+    return {"status": "ok"}
 
 
 @app.get("/merkle-proofs/{payee}", response_model=List[schemas.Proof])

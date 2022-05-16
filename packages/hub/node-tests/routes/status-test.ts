@@ -1,9 +1,5 @@
 import { registry, setupHub } from '../helpers/server';
-import sentryTestkit from 'sentry-testkit';
-import * as Sentry from '@sentry/node';
-import waitFor from '../utils/wait-for';
-
-const { testkit, sentryTransport } = sentryTestkit();
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 let stubWeb3Available = true;
 
@@ -69,16 +65,9 @@ class StubExchangeRates {
 }
 
 describe('GET /api/status', function () {
+  setupSentry(this);
+
   this.beforeEach(function () {
-    Sentry.init({
-      dsn: 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-
-    testkit.reset();
-
     registry(this).register('exchange-rates', StubExchangeRates);
     registry(this).register('subgraph', StubSubgraph);
     registry(this).register('web3-http', StubWeb3);
@@ -172,13 +161,13 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
     });
 
-    expect(testkit.reports()[0].error?.message).to.equal('Mock subgraph error');
+    expect(sentryReport.error?.message).to.equal('Mock subgraph error');
   });
 
   it('reports degraded status when web3 throws an error', async function () {
@@ -208,13 +197,13 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
     });
 
-    expect(testkit.reports()[0].error?.message).to.equal('Mock Web3 error');
+    expect(sentryReport.error?.message).to.equal('Mock Web3 error');
   });
 
   it('reports unknown status when exchangeRates service throws an error', async function () {
@@ -243,12 +232,12 @@ describe('GET /api/status', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'status-route',
     });
 
-    expect(testkit.reports()[0].error?.message).to.equal('Mock exchange rates error');
+    expect(sentryReport.error?.message).to.equal('Mock exchange rates error');
   });
 });

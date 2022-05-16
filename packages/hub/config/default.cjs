@@ -38,6 +38,11 @@ module.exports = {
     messageVerificationDelayMs: 1000 * 15,
     onCallInternalWebhook: null,
   },
+  mailchimp: {
+    apiKey: null,
+    serverPrefix: null,
+    newsletterListId: null,
+  },
   authSecret: null,
   emailHashSalt: null,
   sentry: {
@@ -96,6 +101,7 @@ module.exports = {
     paths: {
       cardDrop: {
         alreadyClaimed: '/card-drop/already-claimed',
+        error: '/card-drop/error',
         success: '/card-drop/success',
       },
     },

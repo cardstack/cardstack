@@ -1,6 +1,5 @@
 export default [
   {
-    constant: true,
     inputs: [],
     name: 'daiPrice',
     outputs: [
@@ -15,12 +14,10 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'decimals',
     outputs: [
@@ -30,12 +27,10 @@ export default [
         type: 'uint8',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'description',
     outputs: [
@@ -45,12 +40,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'ethPrice',
     outputs: [
@@ -65,12 +58,23 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
+    inputs: [],
+    name: 'isSnappedToUSD',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'usdPrice',
     outputs: [
@@ -85,7 +89,6 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },

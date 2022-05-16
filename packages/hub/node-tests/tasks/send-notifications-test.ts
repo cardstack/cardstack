@@ -4,9 +4,7 @@ import SendNotifications, { PushNotificationData } from '../../tasks/send-notifi
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
-import waitFor from '../utils/wait-for';
-import * as Sentry from '@sentry/node';
-import sentryTestkit from 'sentry-testkit';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import shortUUID from 'short-uuid';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
@@ -139,17 +137,9 @@ describe('SendNotificationsTask', function () {
 describe('SendNotificationsTask deduplication errors', async function () {
   let { getContainer } = setupHub(this);
 
-  const { testkit, sentryTransport } = sentryTestkit();
+  setupSentry(this);
 
   this.beforeEach(async function () {
-    Sentry.init({
-      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-    testkit.reset();
-
     registry(this).register(
       'sent-push-notifications',
       class ErroredSentPushNotificationsQueries {
@@ -183,9 +173,9 @@ describe('SendNotificationsTask deduplication errors', async function () {
     });
     expect(notificationSent).equal(true);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'send-notifications-deduplication',
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
@@ -197,16 +187,7 @@ describe('SendNotificationsTask deduplication errors', async function () {
 describe('SendNotificationsTask firebase errors', function () {
   let { getContainer } = setupHub(this);
 
-  const { testkit, sentryTransport } = sentryTestkit();
-
-  this.beforeEach(async function () {
-    Sentry.init({
-      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-  });
+  setupSentry(this);
 
   it('should throw if sending a notification fails, and still log to sentry', async function () {
     registry(this).register('firebase-push-notifications', ErroredFirebasePushNotifications);
@@ -216,9 +197,9 @@ describe('SendNotificationsTask firebase errors', function () {
       ErroredFirebasePushNotifications.message
     );
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.tags).to.deep.equal({
       action: 'send-notifications',
       notificationId: newlyAddedNotification.notificationId,
       notificationType: newlyAddedNotification.notificationType,
@@ -259,16 +240,9 @@ describe('SendNotificationsTask expired notifications', function () {
   let { getContainer } = setupHub(this);
   let subject: SendNotifications;
 
-  const { testkit, sentryTransport } = sentryTestkit();
+  setupSentry(this);
 
   this.beforeEach(async function () {
-    Sentry.init({
-      dsn: 'https://SendNotificationsTaskErrors@sentry.io/000001',
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
-    });
-    testkit.reset();
     lastSentData = undefined;
     notificationSent = false;
     registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
@@ -282,10 +256,10 @@ describe('SendNotificationsTask expired notifications', function () {
     expect(lastSentData).to.equal(undefined);
     expect(notificationSent).to.equal(false);
 
-    await waitFor(() => testkit.reports().length > 0);
+    let sentryReport = await waitForSentryReport();
 
-    expect(testkit.reports()[0].error?.message).to.equal('Notification is too old to send');
-    expect(testkit.reports()[0].tags).to.deep.equal({
+    expect(sentryReport.error?.message).to.equal('Notification is too old to send');
+    expect(sentryReport.tags).to.deep.equal({
       action: 'send-notifications',
       notificationId: expiredNotification.notificationId,
       notificationType: expiredNotification.notificationType,

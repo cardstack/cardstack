@@ -1,6 +1,6 @@
+import logging
 import re
 from datetime import datetime
-import logging
 
 import eth_abi
 import pyarrow.parquet as pq
@@ -16,7 +16,6 @@ from sqlalchemy.orm import Session
 from . import crud, database, models, schemas
 
 
-
 class Indexer:
     def __init__(self, subgraph_url, archived_reward_programs):
         self.subgraph_url = subgraph_url
@@ -25,7 +24,7 @@ class Indexer:
     def run(self, db: Session, storage_location):
         reward_program_ids = [o["id"] for o in self.get_reward_programs()]
         for reward_program_id in reward_program_ids:
-            if reward_program_id not in archived_reward_programs:
+            if reward_program_id not in self.archived_reward_programs:
                 self.index_for_program(db, reward_program_id, storage_location)
 
     def index_for_program(self, db: Session, reward_program_id, storage_location):
@@ -79,7 +78,7 @@ class Indexer:
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],
                 amount=amount,
-                leaf="0x"+payment["leaf"],
+                leaf="0x" + payment["leaf"],
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
             )
