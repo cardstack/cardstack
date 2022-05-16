@@ -425,7 +425,7 @@ app "reward-api" {
             }
             secrets = {
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU",
-                SENTRY_DSN = ""
+                SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
             }
         }
 

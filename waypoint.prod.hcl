@@ -381,7 +381,7 @@ app "reward-api" {
             }
             secrets = {
                 DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7",
-                SENTRY_DSN = ""
+                SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
             }
         }
 
