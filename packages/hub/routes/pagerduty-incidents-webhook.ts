@@ -4,12 +4,11 @@ import { inject } from '@cardstack/di';
 import PagerdutyApi from '../services/pagerduty-api';
 import Logger from '@cardstack/logger';
 
-const SUPPORTED_EVENT_TYPES = [
-  'incident.acknowledged',
-  'incident.resolved',
-  'incident.triggered',
-  'incident.unacknowledged',
-];
+const SUPPORTED_EVENT_TYPES = {
+  'incident.acknowledged': '🕵🏼‍♀️ Incident acknowledged',
+  'incident.resolved': '✅ Incident resolved',
+  'incident.triggered': '🚨 Incident triggered',
+};
 
 let log = Logger('pagerduty-incidents-webhook');
 
@@ -22,9 +21,9 @@ export default class PagerdutyIncidentsWebhookRoute {
   }
 
   async post(ctx: Koa.Context) {
-    let eventType = ctx.request.body.event?.event_type;
+    let eventType = ctx.request.body.event?.event_type as keyof typeof SUPPORTED_EVENT_TYPES | undefined;
     log.info('Received pagerduty webhook', eventType);
-    if (!SUPPORTED_EVENT_TYPES.includes(eventType)) {
+    if (!eventType || !Object.keys(SUPPORTED_EVENT_TYPES).includes(eventType)) {
       log.info(`Skipping handling PagerDuty request, unsupported event type ${eventType}`);
       ctx.status = 422;
       ctx.body = 'Unsupported event type';
@@ -44,7 +43,7 @@ export default class PagerdutyIncidentsWebhookRoute {
 
     await this.workerClient.addJob('discord-post', {
       channel: 'on-call-internal',
-      message: `${eventType}: ${incident.title} (${incident.html_url})`,
+      message: `${SUPPORTED_EVENT_TYPES[eventType]}: ${incident.title} (${incident.html_url})`,
     });
 
     ctx.status = 200;
