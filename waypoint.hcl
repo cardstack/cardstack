@@ -425,13 +425,15 @@ app "reward-api" {
       execution_role_name = "reward-api-staging-ecr-task-executor-role"
 
       alb {
-        listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/8994c0bdf9038937"
+        certificate = "arn:aws:acm:us-east-1:680542703984:certificate/b8ba590b-e901-4e52-8a79-dcf3c8d8e48a"
       }
 
       secrets = {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
       }
     }
+
+    /*
 
     hook {
       when    = "before"
@@ -440,12 +442,9 @@ app "reward-api" {
 
     hook {
       when    = "after"
-      command = ["node", "./scripts/fix-listener.mjs", "reward-api-staging.stack.cards", "reward-api-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-    }
-
-    hook {
-      when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
     }
+
+    */
   }
 }
