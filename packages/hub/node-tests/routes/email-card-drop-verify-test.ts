@@ -24,6 +24,13 @@ let unclaimedEoa: EmailCardDropRequest = {
   verificationCode: 'unclaimedverificationcode',
   requestedAt: new Date(),
 };
+let unclaimedButExpiredEoa: EmailCardDropRequest = {
+  id: 'b6507a8e-086f-4d76-9e6d-4e8c7606a749',
+  ownerAddress: '0xunclaimedButExpiredAddress',
+  emailHash: 'unclaimedButExpiredhash',
+  verificationCode: 'unclaimedButExpiredverificationcode',
+  requestedAt: new Date(Date.now() - 61 * 60 * 1000),
+};
 let unclaimedEoaWithClaimedEmailHash: EmailCardDropRequest = {
   id: 'f0847258-9326-4e08-8043-f9def30c6359',
   ownerAddress: '0xnotClaimedAddress2',
@@ -91,6 +98,18 @@ describe('GET /email-card-drop/verify', function () {
 
     expect(response.status).to.equal(302);
     expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
+  });
+
+  it('rejects an expired verification link', async function () {
+    await emailCardDropRequestsQueries.insert(unclaimedButExpiredEoa);
+
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedButExpiredEoa.ownerAddress}&verification-code=${unclaimedButExpiredEoa.verificationCode}&email-hash=${unclaimedButExpiredEoa.emailHash}`
+    );
+
+    expect(provisionPrepaidCardCalls).to.equal(0);
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Verification link is expired');
   });
 
   it('rejects a used email hash', async function () {

@@ -61,6 +61,12 @@ export default class EmailCardDropVerifyRoute {
       return;
     }
 
+    if (emailCardDropRequest.isExpired) {
+      ctx.status = 400;
+      ctx.body = 'Verification link is expired';
+      return;
+    }
+
     if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
       ctx.status = 400;
       ctx.body = 'Invalid verification link';
