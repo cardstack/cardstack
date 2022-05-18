@@ -177,7 +177,6 @@ export default class EmailCardDropRequestsRoute {
     }
 
     let unclaimedButExisting = await this.emailCardDropRequestQueries.query({
-      emailHash: normalizedEmailHash,
       ownerAddress: ctx.state.userAddress,
     });
 
