@@ -32,6 +32,17 @@ export default class SendEmailCardDropVerification {
       return;
     }
 
+    if (request.isExpired) {
+      let e = new Error(`Request with ${payload.id} expired before sending verification link`);
+      Sentry.captureException(e, {
+        tags: {
+          event: 'send-email-card-drop-verification',
+          alert: 'web-team',
+        },
+      });
+      return;
+    }
+
     const params = new URLSearchParams();
     params.append('eoa', request.ownerAddress);
     params.append('verification-code', request.verificationCode);
