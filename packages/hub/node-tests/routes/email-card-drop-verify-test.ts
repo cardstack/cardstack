@@ -105,7 +105,7 @@ describe('GET /email-card-drop/verify', function () {
     expect(provisionPrepaidCardCalls).to.equal(0);
 
     expect(response.status).to.equal(400);
-    expect(response.text).to.equal('Code is invalid');
+    expect(response.text).to.equal('Invalid verification link');
   });
 
   it('rejects an unknown email-hash', async function () {
@@ -116,7 +116,7 @@ describe('GET /email-card-drop/verify', function () {
     expect(provisionPrepaidCardCalls).to.equal(0);
 
     expect(response.status).to.equal(400);
-    expect(response.text).to.equal('Email is invalid');
+    expect(response.text).to.equal('Invalid verification link');
   });
 
   it('redirects with the error if the relay call fails', async function () {
