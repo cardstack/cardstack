@@ -45,7 +45,7 @@ export default class EmailCardDropRequestsQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT * FROM email_card_drop_requests WHERE ${conditions.where}`;
+    const query = `SELECT ${RETURN_VALUE} FROM email_card_drop_requests WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map(mapRowToObject);
