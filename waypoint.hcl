@@ -433,8 +433,6 @@ app "reward-api" {
       }
     }
 
-    /*
-
     hook {
       when    = "before"
       command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
@@ -444,7 +442,5 @@ app "reward-api" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
     }
-
-    */
   }
 }
