@@ -64,18 +64,24 @@ export default class EmailCardDropRequestsQueries {
     return rows[0].count;
   }
 
-  async updateVerificationCode(
+  async refreshRequest(
     id: string,
-    verificationCode: string
+    values: {
+      verificationCode: string;
+      emailHash: string;
+      requestedAt: Date;
+    }
   ): Promise<EmailCardDropRequest & { isExpired: boolean }> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
       `UPDATE email_card_drop_requests SET
-        verification_code = $2
+        verification_code = $2,
+        email_hash = $3,
+        requested_at = $4
       WHERE ID = $1
       RETURNING ${RETURN_VALUE}`,
-      [id, verificationCode]
+      [id, values.verificationCode, values.emailHash, values.requestedAt]
     );
 
     return mapRowToObject(rows[0])!;

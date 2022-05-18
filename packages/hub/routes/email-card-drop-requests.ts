@@ -182,10 +182,11 @@ export default class EmailCardDropRequestsRoute {
 
     if (unclaimedButExisting.length > 0) {
       let existingRequest = unclaimedButExisting[0];
-      let updatedEmailCardDropRequest = await this.emailCardDropRequestQueries.updateVerificationCode(
-        existingRequest.id,
-        generateVerificationCode()
-      );
+      let updatedEmailCardDropRequest = await this.emailCardDropRequestQueries.refreshRequest(existingRequest.id, {
+        verificationCode: generateVerificationCode(),
+        emailHash: normalizedEmailHash,
+        requestedAt: new Date(this.clock.now()),
+      });
 
       await this.workerClient.addJob('send-email-card-drop-verification', {
         id: updatedEmailCardDropRequest.id,

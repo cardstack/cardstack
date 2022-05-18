@@ -32,6 +32,15 @@ let unclaimedEoa: EmailCardDropRequest = {
 
 let fakeTime = 1650440847689;
 let fakeTimeString = new Date(fakeTime).toISOString();
+class FrozenClock implements Clock {
+  now() {
+    return fakeTime;
+  }
+
+  hrNow(): bigint {
+    throw new Error('Not implemented');
+  }
+}
 
 const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
 
@@ -39,18 +48,7 @@ describe('GET /api/email-card-drop-requests', function () {
   let { request, getContainer } = setupHub(this);
 
   this.beforeAll(function () {
-    registry(this).register(
-      'clock',
-      class FrozenClock implements Clock {
-        now() {
-          return fakeTime;
-        }
-
-        hrNow(): bigint {
-          throw new Error('Not implemented');
-        }
-      }
-    );
+    registry(this).register('clock', FrozenClock);
   });
 
   this.beforeEach(async function () {
@@ -160,6 +158,7 @@ describe('POST /api/email-card-drop-requests', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('worker-client', StubWorkerClient);
+    registry(this).register('clock', FrozenClock);
   });
 
   let { request, getContainer } = setupHub(this);
@@ -214,24 +213,27 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
 
     let email = 'valid@example.com';
+    let email2 = 'second.valid.email@example.com';
 
     let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
+    let emailHash2 = crypto.createHmac('sha256', config.get('emailHashSalt')).update(email2).digest('hex');
 
+    let insertionTimeInMs = fakeTime - 50 * 60 * 1000;
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
       verificationCode: 'xxxxxxyyyy',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
-      requestedAt: new Date(),
+      requestedAt: new Date(insertionTimeInMs),
     });
 
     const payload = {
       data: {
         type: 'email-card-drop-requests',
         attributes: {
-          email,
+          email: email2,
         },
       },
     };
@@ -252,9 +254,12 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
+    expect(emailCardDropRequest.verificationCode).to.not.equal('xxxxxxyyyy');
+    expect(emailCardDropRequest.emailHash).to.equal(emailHash2);
+    expect(Number(emailCardDropRequest.requestedAt)).to.equal(fakeTime);
 
     expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification']);
-    expect(jobPayloads).to.deep.equal([{ id: resourceId, email }]);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId, email: email2 }]);
   });
 
   it('returns 401 without bearer token', async function () {
