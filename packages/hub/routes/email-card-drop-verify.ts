@@ -103,6 +103,9 @@ export default class EmailCardDropVerifyRoute {
         ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
         return;
       }
+    } else {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
     }
   }
 }
