@@ -21,7 +21,7 @@ export default class EmailCardDropRequestsQueries {
   clock = inject('clock');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest> {
+  async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest & { isExpired: boolean }> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -40,7 +40,7 @@ export default class EmailCardDropRequestsQueries {
     return rows[0];
   }
 
-  async query(filter: EmailCardDropRequestsQueriesFilter): Promise<EmailCardDropRequest[]> {
+  async query(filter: EmailCardDropRequestsQueriesFilter): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 
     const conditions = buildConditions(filter);
@@ -51,7 +51,7 @@ export default class EmailCardDropRequestsQueries {
     return queryResult.rows.map(mapRowToObject);
   }
 
-  async claimedInLastMinutes(minutes: number): Promise<EmailCardDropRequest[]> {
+  async claimedInLastMinutes(minutes: number): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -64,7 +64,10 @@ export default class EmailCardDropRequestsQueries {
     return rows[0].count;
   }
 
-  async updateVerificationCode(id: string, verificationCode: string): Promise<EmailCardDropRequest> {
+  async updateVerificationCode(
+    id: string,
+    verificationCode: string
+  ): Promise<EmailCardDropRequest & { isExpired: boolean }> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -86,7 +89,7 @@ export default class EmailCardDropRequestsQueries {
     emailHash: string;
     ownerAddress: string;
     verificationCode: string;
-  }): Promise<EmailCardDropRequest | null> {
+  }): Promise<(EmailCardDropRequest & { isExpired: boolean }) | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -106,7 +109,10 @@ export default class EmailCardDropRequestsQueries {
     return rows[0] ? mapRowToObject(rows[0]) : null;
   }
 
-  async updateTransactionHash(id: string, transactionHash: string): Promise<EmailCardDropRequest | null> {
+  async updateTransactionHash(
+    id: string,
+    transactionHash: string
+  ): Promise<(EmailCardDropRequest & { isExpired: boolean }) | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -130,7 +136,7 @@ function mapRowToObject(row: any) {
     claimedAt: row['claimed_at'],
     requestedAt: row['requested_at'],
     transactionHash: row['transaction_hash'],
-    isExpired: row['is_expired'],
+    isExpired: row['is_expired'] as boolean,
   };
 }
 
