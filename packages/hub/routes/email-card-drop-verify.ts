@@ -43,6 +43,25 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
+    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
+      ownerAddress,
+    });
+
+    // this eoa has already claimed
+    if (emailCardDropRequests.filter((v) => v.claimedAt).length) {
+      ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
+      return;
+    }
+
+    if (
+      !emailCardDropRequests.filter((v) => v.verificationCode === verificationCode && v.emailHash === emailHash).length
+    ) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    // eoa has not claimed, but this email has already claimed
     if (
       (
         await this.emailCardDropRequestQueries.query({
@@ -85,28 +104,6 @@ export default class EmailCardDropVerifyRoute {
         return;
       }
     }
-
-    // If the claim query doesn’t return a record, there no matching record, now determine why
-
-    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
-      ownerAddress,
-      verificationCode,
-    });
-
-    let emailCardDropRequest = emailCardDropRequests[0];
-
-    if (!emailCardDropRequest) {
-      ctx.status = 400;
-      ctx.body = 'Code is invalid';
-    } else if (emailCardDropRequest.emailHash !== emailHash) {
-      ctx.status = 400;
-      ctx.body = 'Email is invalid';
-    } else if (emailCardDropRequest.claimedAt) {
-      ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
-      return;
-    }
-
-    return;
   }
 }
 
