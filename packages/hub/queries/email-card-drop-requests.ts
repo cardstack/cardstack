@@ -11,6 +11,12 @@ interface EmailCardDropRequestsQueriesFilter {
   verificationCode?: string;
 }
 
+const IS_NOT_OLD = `requested_at > now() - interval '60 minutes'`;
+const IS_OLD = `requested_at <= now() - interval '60 minutes'`;
+const IS_EXPIRED = `${IS_OLD} AND claimed_at IS NULL`;
+const IS_CLAIMABLE_REQUEST = `${IS_NOT_OLD} AND claimed_at IS NULL`;
+const RETURN_VALUE = `*, (${IS_EXPIRED}) as is_expired`;
+
 export default class EmailCardDropRequestsQueries {
   clock = inject('clock');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -19,7 +25,7 @@ export default class EmailCardDropRequestsQueries {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
-      'INSERT INTO email_card_drop_requests (id, owner_address, email_hash, verification_code, requested_at, claimed_at, transaction_hash) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      `INSERT INTO email_card_drop_requests (id, owner_address, email_hash, verification_code, requested_at, claimed_at, transaction_hash) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING ${RETURN_VALUE}`,
       [
         model.id,
         model.ownerAddress,
@@ -65,7 +71,7 @@ export default class EmailCardDropRequestsQueries {
       `UPDATE email_card_drop_requests SET
         verification_code = $2
       WHERE ID = $1
-      RETURNING *`,
+      RETURNING ${RETURN_VALUE}`,
       [id, verificationCode]
     );
 
@@ -91,8 +97,8 @@ export default class EmailCardDropRequestsQueries {
           email_hash = $2 AND
           owner_address = $3 AND
           verification_code = $4 AND
-          claimed_at IS NULL
-        RETURNING *
+          ${IS_CLAIMABLE_REQUEST}
+        RETURNING ${RETURN_VALUE}
       `,
       [new Date(this.clock.now()), emailHash, ownerAddress, verificationCode]
     );
@@ -107,7 +113,7 @@ export default class EmailCardDropRequestsQueries {
       `UPDATE email_card_drop_requests SET
         transaction_hash = $2
       WHERE ID = $1
-      RETURNING *`,
+      RETURNING ${RETURN_VALUE}`,
       [id, transactionHash]
     );
 
@@ -124,6 +130,7 @@ function mapRowToObject(row: any) {
     claimedAt: row['claimed_at'],
     requestedAt: row['requested_at'],
     transactionHash: row['transaction_hash'],
+    isExpired: row['is_expired'],
   };
 }
 
