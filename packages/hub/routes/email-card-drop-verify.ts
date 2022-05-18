@@ -43,19 +43,25 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
-    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
-      ownerAddress,
-    });
+    let emailCardDropRequest = (
+      await this.emailCardDropRequestQueries.query({
+        ownerAddress,
+      })
+    )[0];
+
+    if (!emailCardDropRequest) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
 
     // this eoa has already claimed
-    if (emailCardDropRequests.filter((v) => v.claimedAt).length) {
+    if (emailCardDropRequest.claimedAt) {
       ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
       return;
     }
 
-    if (
-      !emailCardDropRequests.filter((v) => v.verificationCode === verificationCode && v.emailHash === emailHash).length
-    ) {
+    if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
       ctx.status = 400;
       ctx.body = 'Invalid verification link';
       return;
