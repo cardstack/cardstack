@@ -24,6 +24,13 @@ let unclaimedEoa: EmailCardDropRequest = {
   verificationCode: 'unclaimedverificationcode',
   requestedAt: new Date(),
 };
+let unclaimedEoaWithClaimedEmailHash: EmailCardDropRequest = {
+  id: 'f0847258-9326-4e08-8043-f9def30c6359',
+  ownerAddress: '0xnotClaimedAddress2',
+  emailHash: 'claimedhash',
+  verificationCode: 'unclaimedverificationcode2',
+  requestedAt: new Date(),
+};
 
 let emailCardDropRequestsQueries: EmailCardDropRequestsQueries;
 
@@ -84,6 +91,19 @@ describe('GET /email-card-drop/verify', function () {
 
     expect(response.status).to.equal(302);
     expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
+  });
+
+  it('rejects a used email hash', async function () {
+    await emailCardDropRequestsQueries.insert(unclaimedEoaWithClaimedEmailHash);
+
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoaWithClaimedEmailHash.ownerAddress}&verification-code=${unclaimedEoaWithClaimedEmailHash.verificationCode}&email-hash=${unclaimedEoaWithClaimedEmailHash.emailHash}`
+    );
+
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Email has already been used to claim a prepaid card');
   });
 
   it('rejects a verification that has been used and redirects to an already-claimed page', async function () {
