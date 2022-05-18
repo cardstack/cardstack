@@ -6,6 +6,7 @@ import { inject } from '@cardstack/di';
 import Logger from '@cardstack/logger';
 import config from 'config';
 import * as Sentry from '@sentry/node';
+import { NOT_NULL } from '../utils/queries';
 
 let log = Logger('route:email-card-drop-verify');
 
@@ -41,6 +42,19 @@ export default class EmailCardDropVerifyRoute {
     let ownerAddress = ctx.request.query.eoa as string;
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
+
+    if (
+      (
+        await this.emailCardDropRequestQueries.query({
+          emailHash,
+          claimedAt: NOT_NULL,
+        })
+      ).length
+    ) {
+      ctx.status = 400;
+      ctx.body = 'Email has already been used to claim a prepaid card';
+      return;
+    }
 
     // Optimistically mark the request as claimed to prevent stampede attack
     let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
