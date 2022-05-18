@@ -99,7 +99,7 @@ describe('GET /email-card-drop/verify', function () {
 
   it('rejects an unknown verification', async function () {
     let response = await request().get(
-      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha&email-hash=${claimedEoa.emailHash}`
+      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=wha&email-hash=${unclaimedEoa.emailHash}`
     );
 
     expect(provisionPrepaidCardCalls).to.equal(0);
