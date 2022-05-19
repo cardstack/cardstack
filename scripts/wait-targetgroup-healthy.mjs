@@ -33,14 +33,18 @@ while(true) {
 
   const targetHealthStates = healthCheck.TargetHealthDescriptions.map((target) => target.TargetHealth.State)
 
-  if (targetHealthStates.includes('healthy')) break;
-
-  else if (targetHealthStates.includes('unhealthy')) throw "target(s) are unhealthy"
-
-  else if (targetHealthStates.includes('initial')) console.log('target is initializing')
-
-  else throw "unexpected health state"
+  if (targetHealthStates.includes('healthy')) {
+    console.log(`targetgroup is now healthy`)
+    break;
+  } else if (targetHealthStates.includes('unhealthy')) {
+    const count = targetHealthStates.filter((target) => target === 'unhealthy').length;
+    throw `${count} target(s) are unhealthy`;
+  } else if (targetHealthStates.includes('initial')) {
+    const count = targetHealthStates.filter((target) => target === 'initial').length;
+    console.log(`${count} target(s) are initializing`);
+  } else {
+    throw 'unexpected health state'
+  }
 
   await new Promise((res) => setTimeout(res, 1000));
 }
-console.log(`targetgroup is now healthy`)

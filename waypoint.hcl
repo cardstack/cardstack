@@ -62,9 +62,7 @@ app "hub" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
     }
-  }
 
-  release {
     hook {
       when    = "before"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
@@ -350,11 +348,9 @@ app "ssr-web" {
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
     */
-  }
 
-  release {
     hook {
-      when    = "before"
+      when    = "after"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
     }
   }
@@ -448,9 +444,7 @@ app "reward-api" {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
       }
     }
-  }
 
-  release {
     hook {
       when    = "before"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
