@@ -224,7 +224,7 @@ describe('POST /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
-      verificationCode: 'xxxxxxyyyy',
+      verificationCode: 'x',
       id: '2850a954-525d-499a-a5c8-3c89192ad40e',
       requestedAt: new Date(insertionTimeInMs),
     });
@@ -254,7 +254,7 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
-    expect(emailCardDropRequest.verificationCode).to.not.equal('xxxxxxyyyy');
+    expect(emailCardDropRequest.verificationCode).to.not.equal('x');
     expect(emailCardDropRequest.emailHash).to.equal(emailHash2);
     expect(Number(emailCardDropRequest.requestedAt)).to.equal(fakeTime);
 
