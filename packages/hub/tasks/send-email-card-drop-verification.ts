@@ -33,7 +33,7 @@ export default class SendEmailCardDropVerification {
     }
 
     if (request.isExpired) {
-      let e = new Error(`Request with ${payload.id} expired before sending verification link`);
+      let e = new Error(`Request with id ${payload.id} expired before sending verification link`);
       Sentry.captureException(e, {
         tags: {
           event: 'send-email-card-drop-verification',

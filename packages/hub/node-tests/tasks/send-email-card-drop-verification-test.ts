@@ -126,7 +126,7 @@ describe('SendEmailCardDropVerificationTask', function () {
       alert: 'web-team',
     });
     expect(sentryReport.error?.message).to.equal(
-      `Request with ${expiredCardDropRequest.id} expired before sending verification link`
+      `Request with id ${expiredCardDropRequest.id} expired before sending verification link`
     );
   });
 
