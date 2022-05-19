@@ -37,7 +37,7 @@ while(true) {
 
   const targetHealthStates = healthCheck.TargetHealthDescriptions.map((target) => target.TargetHealth.State)
 
-  if (targetHealthStates.length > 0) {
+  if (targetHealthStates.length === 0) {
     const message = "no targets in target group"
     if (message !== lastMessage) {
       console.log(message);
