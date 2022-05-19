@@ -6,21 +6,25 @@
       {{#each @model.panel.sections as |section|}}
         <CardPay::DashboardPanel::Section @section={{section}} class="card-pay-dashboard__payments-column-1">
           <:cta>
-            <Boxel::Button
-              {{on "click" (fn this.transitionToWorkflow section.workflow)}}
-              @kind="primary"
-              @size="touch"
-              @disabled={{section.isCtaDisabled}}
-              data-test-workflow-button={{section.workflow}}
-            >
-              {{section.cta}}
-            </Boxel::Button>
+            {{#unless this.merchantSafes.length}}
+              <Boxel::Button
+                {{on "click" (fn this.transitionToWorkflow section.workflow)}}
+                @kind="primary"
+                @size="touch"
+                @disabled={{section.isCtaDisabled}}
+                data-test-workflow-button={{section.workflow}}
+              >
+                {{section.cta}}
+              </Boxel::Button>
+            {{/unless}}
           </:cta>
           <:disclaimer>
             {{#if (eq section.workflow "create-business")}}
-              Payment profiles are on-chain. We charge a nominal
-              <span class="card-pay-dashboard__payments-fee">$1 USD</span>
-              setup fee to offset gas and other administrative costs. You can use a prepaid card in your account to cover this fee.
+              {{#unless this.merchantSafes.length}}
+                Payment profiles are on-chain. We charge a nominal
+                <span class="card-pay-dashboard__payments-fee">$1 USD</span>
+                setup fee to offset gas and other administrative costs. You can use a prepaid card in your account to cover this fee.
+              {{/unless}}
             {{/if}}
           </:disclaimer>
         </CardPay::DashboardPanel::Section>
@@ -51,19 +55,21 @@
       <header class="card-pay-dashboard__payments-section-header">
         <h3 class="card-pay-dashboard__payments-title">Payment Profiles</h3>
         {{#let @model.panel.sections.[0] as |section|}}
-          <Boxel::Button
-            {{on "click" (fn this.transitionToWorkflow section.workflow)}}
-            @kind="secondary-dark"
-            @size="small"
-            @disabled={{section.isCtaDisabled}}
-            data-test-workflow-button={{section.workflow}}
-          >
-            <span>{{section.cta}}</span>
-            {{svg-jar "plus"
-              class="card-pay-dashboard__payments-section-header-button-icon"
-              role="presentation"
-            }}
-          </Boxel::Button>
+          {{#unless this.merchantSafes.length}}
+            <Boxel::Button
+              {{on "click" (fn this.transitionToWorkflow section.workflow)}}
+              @kind="secondary-dark"
+              @size="small"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              <span>{{section.cta}}</span>
+              {{svg-jar "plus"
+                class="card-pay-dashboard__payments-section-header-button-icon"
+                role="presentation"
+              }}
+            </Boxel::Button>
+          {{/unless}}
         {{/let}}
       </header>
       <section class="card-pay-dashboard__payments-cards">
