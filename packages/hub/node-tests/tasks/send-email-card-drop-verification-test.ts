@@ -93,6 +93,11 @@ describe('SendEmailCardDropVerificationTask', function () {
     expect(StubEmail.lastSent.from).to.equal(config.get('aws.ses.supportEmail'));
     expect(StubEmail.lastSent.text).to.contain(link);
     expect(StubEmail.lastSent.html).to.contain(link);
+
+    let durationString = `${config.get('cardDrop.email.expiryMinutes')} minutes`;
+
+    expect(StubEmail.lastSent.text).to.contain(durationString);
+    expect(StubEmail.lastSent.html).to.contain(durationString);
   });
 
   it('fails silently if the row does not exist', async function () {

@@ -3,6 +3,7 @@ import config from 'config';
 import { query } from '@cardstack/hub/queries';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
+import { formatDuration } from 'date-fns'
 
 export default class SendEmailCardDropVerification {
   email = inject('email');
@@ -50,10 +51,11 @@ export default class SendEmailCardDropVerification {
     const verificationLink = config.get('cardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
+    const expirationMinutes = config.get('cardDrop.email.expiryMinutes') as number;
 
     const emailTitle = 'Claim your Card Drop';
-    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a>`;
-    const emailBodyText = `This is your verification link: ${verificationLink}`;
+    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a> It will expire in ${formatDuration({minutes: expirationMinutes})}.`;
+    const emailBodyText = `This is your verification link: ${verificationLink} It will expire in ${formatDuration({minutes: expirationMinutes})}.`;
 
     try {
       await this.email.send({
