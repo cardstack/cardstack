@@ -10,6 +10,11 @@ function execute(command, options) {
     .trim();
 }
 
+setTimeout(() => {
+  console.error('timeout after 5 minutes');
+  process.exit(1);
+}, 5 * 60 * 1000);
+
 const loadBalancerName = `waypoint-ecs-${appName}`;
 const loadBalancersJson = execute(`aws elbv2 describe-load-balancers --names ${loadBalancerName}`);
 const loadBalancerArn = JSON.parse(loadBalancersJson).LoadBalancers[0].LoadBalancerArn;
@@ -25,25 +30,33 @@ const targetGroup = JSON.parse(targetGroupJson).TargetGroups[0];
 const targetGroupName = targetGroup.TargetGroupName;
 
 console.log(`checking target health: ${targetGroupName}`);
+let lastMessage
 while(true) {
   const healthCheckJson = execute(`aws elbv2 describe-target-health --target-group-arn ${targetGroupArn}`);
   const healthCheck = JSON.parse(healthCheckJson);
 
-
   const targetHealthStates = healthCheck.TargetHealthDescriptions.map((target) => target.TargetHealth.State)
 
-  if (healthCheck.TargetHealthDescriptions.length <= 0) {
-    console.log("no targets in target group")
+  if (targetHealthStates.length > 0) {
+    const message = "no targets in target group"
+    if (message !== lastMessage) {
+      console.log(message);
+      lastMessage = message;
+    }
   } else if (targetHealthStates.includes('healthy')) {
     console.log(`targetgroup is now healthy`)
     break;
   } else if (targetHealthStates.includes('unhealthy')) {
     const count = targetHealthStates.filter((target) => target === 'unhealthy').length;
-    throw `${count} target(s) are unhealthy`;
+    throw `${count} target(s) unhealthy`;
   } else if (targetHealthStates.includes('initial')) {
     const count = targetHealthStates.filter((target) => target === 'initial').length;
-    console.log(`${count} target(s) are initializing`);
-  } else {
+    const message = `${count} target(s) initializing`;
+    if (message !== lastMessage) {
+      console.log(message);
+      lastMessage = message;
+    }
+  } else if (targetHealthStates.length > 0) {
     throw 'unexpected health state'
   }
 
