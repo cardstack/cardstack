@@ -337,7 +337,6 @@ app "ssr-web" {
       }
     }
 
-    /*
     hook {
       when    = "before"
       command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
@@ -347,7 +346,6 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
-    */
 
     hook {
       when    = "after"
