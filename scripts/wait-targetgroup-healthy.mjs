@@ -10,7 +10,7 @@ function execute(command, options) {
     .trim();
 }
 
-setTimeout(() => {
+const timeout = setTimeout(() => {
   console.error('timeout after 5 minutes');
   process.exit(1);
 }, 5 * 60 * 1000);
@@ -62,3 +62,4 @@ while(true) {
 
   await new Promise((res) => setTimeout(res, 1000));
 }
+clearTimeout(timeout)
