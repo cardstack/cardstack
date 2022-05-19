@@ -57,11 +57,6 @@ app "hub" {
       when    = "before"
       command = ["./scripts/purge-services.sh", "hub-prod", "waypoint-hub", "2"] # need this to purge old ecs services
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/fix-listener.mjs", "hub.cardstack.com", "hub-prod"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-    }
   }
 }
 
@@ -300,11 +295,6 @@ app "ssr-web" {
       when    = "before"
       command = ["./scripts/purge-services.sh", "ssr-web-prod", "waypoint-ssr-web", "2"] # need this to purge old ecs services
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/fix-listener.mjs", "wallet.cardstack.com", "ssr-web-prod"] # need this until https://github.com/hashicorp/waypoint/issues/1568
-    }
   }
 }
 
@@ -400,11 +390,6 @@ app "reward-api" {
     hook {
       when    = "before"
       command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/fix-listener.mjs", "reward-api-production.cardstack.com", "reward-api-production"] # need this until https://github.com/hashicorp/waypoint/issues/1568
     }
 
     hook {
