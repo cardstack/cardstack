@@ -307,7 +307,7 @@ app "ssr-web" {
   release {
     hook {
       when    = "before"
-      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
     }
   }
 }
@@ -415,7 +415,7 @@ app "reward-api" {
   release {
     hook {
       when    = "before"
-      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
     }
   }
 }

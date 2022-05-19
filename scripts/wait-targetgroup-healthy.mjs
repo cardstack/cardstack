@@ -24,14 +24,23 @@ const targetGroupJson = execute(`aws elbv2 describe-target-groups --target-group
 const targetGroup = JSON.parse(targetGroupJson).TargetGroups[0];
 const targetGroupName = targetGroup.TargetGroupName;
 
-let healthy = false;
-console.log(`waiting for target group to become healthy: ${targetGroupName}`);
-while(!healthy) {
+console.log(`checking target health: ${targetGroupName}`);
+while(true) {
   const healthCheckJson = execute(`aws elbv2 describe-target-health --target-group-arn ${targetGroupArn}`);
   const healthCheck = JSON.parse(healthCheckJson);
-  healthy = healthCheck.TargetHealthDescriptions.some((target) => target.TargetHealth.State === 'healthy');
 
-  if (!healthy) await new Promise((res) => setTimeout(res, 1000));
+  if (healthCheck.TargetHealthDescriptions.length <= 0) throw "no targets in target group"
+
+  const targetHealthStates = healthCheck.TargetHealthDescriptions.map((target) => target.TargetHealth.State)
+
+  if (targetHealthStates.includes('healthy')) break;
+
+  else if (targetHealthStates.includes('unhealthy')) throw "target(s) are unhealthy"
+
+  else if (targetHealthStates.includes('initial')) console.log('target is initializing')
+
+  else throw "unexpected health state"
+
+  await new Promise((res) => setTimeout(res, 1000));
 }
-
 console.log(`targetgroup is now healthy`)
