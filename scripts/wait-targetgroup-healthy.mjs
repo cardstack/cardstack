@@ -29,11 +29,12 @@ while(true) {
   const healthCheckJson = execute(`aws elbv2 describe-target-health --target-group-arn ${targetGroupArn}`);
   const healthCheck = JSON.parse(healthCheckJson);
 
-  if (healthCheck.TargetHealthDescriptions.length <= 0) throw "no targets in target group"
 
   const targetHealthStates = healthCheck.TargetHealthDescriptions.map((target) => target.TargetHealth.State)
 
-  if (targetHealthStates.includes('healthy')) {
+  if (healthCheck.TargetHealthDescriptions.length <= 0) {
+    console.log("no targets in target group")
+  } else if (targetHealthStates.includes('healthy')) {
     console.log(`targetgroup is now healthy`)
     break;
   } else if (targetHealthStates.includes('unhealthy')) {
