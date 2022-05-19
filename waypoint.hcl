@@ -63,6 +63,13 @@ app "hub" {
       command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
     }
   }
+
+  release {
+    hook {
+      when    = "before"
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
+  }
 }
 
 app "hub-worker" {
@@ -342,6 +349,13 @@ app "ssr-web" {
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
   }
+
+  release {
+    hook {
+      when    = "before"
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
+  }
 }
 
 app "reward-submit" {
@@ -432,15 +446,12 @@ app "reward-api" {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
       }
     }
+  }
 
+  release {
     hook {
       when    = "before"
-      command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
     }
   }
 }

@@ -58,6 +58,13 @@ app "hub" {
       command = ["./scripts/purge-services.sh", "hub-prod", "waypoint-hub", "2"] # need this to purge old ecs services
     }
   }
+
+  release {
+    hook {
+      when    = "before"
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
+  }
 }
 
 app "hub-worker" {
@@ -296,6 +303,13 @@ app "ssr-web" {
       command = ["./scripts/purge-services.sh", "ssr-web-prod", "waypoint-ssr-web", "2"] # need this to purge old ecs services
     }
   }
+
+  release {
+    hook {
+      when    = "before"
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
+  }
 }
 
 app "reward-submit" {
@@ -395,6 +409,13 @@ app "reward-api" {
     hook {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+    }
+  }
+
+  release {
+    hook {
+      when    = "before"
+      command = ["./scripts/wait-targetgroup-healthy.mjs", "hub"]
     }
   }
 }
