@@ -258,8 +258,8 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(emailCardDropRequest.emailHash).to.equal(emailHash2);
     expect(Number(emailCardDropRequest.requestedAt)).to.equal(fakeTime);
 
-    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification']);
-    expect(jobPayloads).to.deep.equal([{ id: resourceId, email: email2 }]);
+    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
+    expect(jobPayloads).to.deep.equal([{ id: resourceId, email: email2 }, { email: email2 }]);
   });
 
   it('returns 401 without bearer token', async function () {

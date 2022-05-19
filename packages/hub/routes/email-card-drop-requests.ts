@@ -193,6 +193,22 @@ export default class EmailCardDropRequestsRoute {
         email,
       });
 
+      await this.workerClient.addJob(
+        'subscribe-email',
+        { email },
+        // for the most part, Mailchimp errors will not be retriable
+        // because of that we limit maxAttempts to 1
+        // this prevents us from retrying where we cannot do anything
+        // and also leaves dead jobs in the db that we can check later
+        // this should be supplemented by the Mailchimp errors being sent
+        // to Sentry and having appropriate alerts, especially for rate limiting
+        // could consider permanently failing the job from within conditionally, instead. probably as a utility function?
+        // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/sql/000004.sql#L122-L126
+        {
+          maxAttempts: 1,
+        }
+      );
+
       let serialized = this.emailCardDropRequestSerializer.serialize(updatedEmailCardDropRequest);
 
       ctx.status = 200;
