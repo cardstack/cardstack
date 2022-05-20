@@ -346,9 +346,13 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
+  }
+
+  release {
+    use "aws-ecs" {}
 
     hook {
-      when    = "after"
+      when    = "before"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
     }
   }
