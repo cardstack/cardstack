@@ -246,17 +246,20 @@ describe('POST /api/email-card-drop-requests', function () {
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .send(payload)
-      .expect(200)
+      .expect(201)
       .expect(function (res) {
         resourceId = res.body.data.id;
       });
 
-    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
+    let allRequests = await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress });
+    let latestRequest = await emailCardDropRequestsQueries.latestRequest(stubUserAddress);
 
-    expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
-    expect(emailCardDropRequest.verificationCode).to.not.equal('x');
-    expect(emailCardDropRequest.emailHash).to.equal(emailHash2);
-    expect(Number(emailCardDropRequest.requestedAt)).to.equal(fakeTime);
+    expect(allRequests.length).to.equal(2);
+    expect(allRequests.find((v) => v.id === '2850a954-525d-499a-a5c8-3c89192ad40e')).to.not.be.undefined;
+    expect(latestRequest.id).to.not.equal('2850a954-525d-499a-a5c8-3c89192ad40e');
+    expect(latestRequest.verificationCode).to.match(verificationCodeRegex);
+    expect(latestRequest.emailHash).to.equal(emailHash2);
+    expect(Number(latestRequest.requestedAt)).to.equal(fakeTime);
 
     expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email: email2 }, { email: email2 }]);
