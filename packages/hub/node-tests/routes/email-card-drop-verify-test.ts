@@ -7,6 +7,7 @@ import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 const { sku } = config.get('cardDrop');
 const { url: webClientUrl } = config.get('webClient');
 const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -36,7 +37,7 @@ let unclaimedButExpiredEoa: EmailCardDropRequest = {
   ownerAddress: '0xunclaimedButExpiredAddress',
   emailHash: 'unclaimedButExpiredhash',
   verificationCode: 'unclaimedButExpiredverificationcode',
-  requestedAt: new Date(Date.now() - 61 * 60 * 1000),
+  requestedAt: new Date(Date.now() - (emailVerificationLinkExpiryMinutes + 1) * 60 * 1000),
 };
 let unclaimedEoaWithClaimedEmailHash: EmailCardDropRequest = {
   id: 'f0847258-9326-4e08-8043-f9def30c6359',

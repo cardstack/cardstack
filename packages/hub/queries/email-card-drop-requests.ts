@@ -2,6 +2,7 @@ import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { EmailCardDropRequest } from '../routes/email-card-drop-requests';
 import { buildConditions } from '../utils/queries';
+import config from 'config';
 
 interface EmailCardDropRequestsQueriesFilter {
   id?: string;
@@ -11,7 +12,9 @@ interface EmailCardDropRequestsQueriesFilter {
   verificationCode?: string;
 }
 
-const IS_OLD = `requested_at <= now() - interval '60 minutes'`;
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes');
+
+const IS_OLD = `requested_at <= now() - interval '${emailVerificationLinkExpiryMinutes} minutes'`;
 const IS_EXPIRED = `${IS_OLD} AND claimed_at IS NULL`;
 const RETURN_VALUE = `*, (${IS_EXPIRED}) as is_expired`;
 
