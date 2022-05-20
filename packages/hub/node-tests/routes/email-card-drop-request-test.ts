@@ -336,6 +336,48 @@ describe('POST /api/email-card-drop-requests', function () {
       });
   });
 
+  it('rejects with 503 when getQuantity is less than active reservations', async function () {
+    mockPrepaidCardQuantity = 5;
+
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeInMs = fakeTime - 50 * 60 * 1000;
+
+    for (let i = 0; i < mockPrepaidCardQuantity + 1; i++) {
+      await emailCardDropRequestsQueries.insert({
+        ownerAddress: stubUserAddress,
+        emailHash: 'other-email-hash',
+        verificationCode: 'x',
+        id: `2850a954-525d-499a-a5c8-3c89192ad40${i}`,
+        requestedAt: new Date(insertionTimeInMs),
+      });
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'There are no prepaid cards available',
+          },
+        ],
+      });
+  });
+
   it('rejects with 503 when the contract is paused', async function () {
     mockPrepaidCardMarketContractPaused = true;
 

@@ -99,7 +99,10 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    if ((await prepaidCardMarketV2.getQuantity(cardDropSku)) === 0) {
+    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
+    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
+
+    if (quantityAvailable <= activeReservations) {
       ctx.status = 503;
       ctx.body = {
         errors: [{ status: '503', title: 'There are no prepaid cards available' }],
