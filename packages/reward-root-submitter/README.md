@@ -43,7 +43,7 @@ Create a .env file with the following contents, adding in the private key and th
 
 Now running
 
-    python -m reward_root_submission.main
+    python -m reward_root_submitter.main
 
 will enter a 60 second loop that will submit the merkle root for all rewards that have been calculated.
 
@@ -55,11 +55,11 @@ You can run black to format the code with
 
 You can build the docker image locally with
 
-    docker build -t reward_root_submission .
+    docker build -t reward_root_submitter .
 
 And run the image with
 
-    docker run --network host -v $HOME/.aws/:/root/.aws -v `pwd`/.env:/project/.env --rm -it reward_root_submission
+    docker run --network host -v $HOME/.aws/:/root/.aws -v `pwd`/.env:/project/.env --rm -it reward_root_submitter
 
 ## Updating ABIs
 
