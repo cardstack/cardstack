@@ -209,7 +209,7 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email }, { email }]);
   });
 
-  it('sends another email if a request is present but has not been claimed', async function () {
+  it('persists a new request for a given EOA and runs jobs if a request is present but has not been claimed', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
 
     let email = 'valid@example.com';
