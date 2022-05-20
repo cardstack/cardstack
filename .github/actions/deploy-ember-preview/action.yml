@@ -6,7 +6,7 @@ inputs:
     description: Deployment environment
     required: true
   package:
-    descrption: Name of the package to deploy
+    description: Name of the package to deploy
     required: true
     default: web-client
 
