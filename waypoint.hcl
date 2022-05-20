@@ -340,10 +340,12 @@ app "ssr-web" {
       }
     }
 
+    /*
     hook {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
+    */
   }
 }
 
