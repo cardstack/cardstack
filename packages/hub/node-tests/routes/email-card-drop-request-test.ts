@@ -229,6 +229,8 @@ describe('POST /api/email-card-drop-requests', function () {
       requestedAt: new Date(insertionTimeInMs),
     });
 
+    expect((await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress })).length).to.equal(1);
+
     const payload = {
       data: {
         type: 'email-card-drop-requests',
