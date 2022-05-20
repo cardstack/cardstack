@@ -64,7 +64,7 @@ app "hub" {
     }
 
     hook {
-      when    = "before"
+      when    = "after"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
     }
   }
@@ -346,13 +346,9 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
-  }
-
-  release {
-    use "" {}
 
     hook {
-      when    = "before"
+      when    = "after"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
     }
   }
@@ -448,7 +444,7 @@ app "reward-api" {
     }
 
     hook {
-      when    = "before"
+      when    = "after"
       command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
     }
   }
