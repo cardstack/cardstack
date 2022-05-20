@@ -8,10 +8,9 @@ authors = [
 dependencies = [
     "cloudpathlib[s3]>=0.7.0",
     "python-dotenv>=0.19.2",
-    "web3>=5.28.0",
     "pyarrow>=7.0.0",
     "schedule>=1.1.0",
-]
+    "sentry-sdk>=1.5.12"]
 requires-python = ">=3.9"
 license = {text = "MIT"}
 
@@ -25,8 +24,11 @@ dev = [
     "pytest>=7.0.1",
     "black>=22.1.0",
     "isort>=5.10.1",
-    "web3[tester]>=5.28.0",
+    "web3[eth-tester]>=5.29.1",
+    "eth-tester>=0.6.0b6",
+    "py-evm>=0.5.0a1",
 ]
+
 [tool.pdm.scripts]
 fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"
 fork_sokol = "ganache-cli  --fork https://sokol-archive.blockscout.com/"
