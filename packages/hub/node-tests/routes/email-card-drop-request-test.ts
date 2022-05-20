@@ -153,6 +153,7 @@ class StubWorkerClient {
   }
 }
 
+let mockPrepaidCardMarketContractPaused = false;
 let mockPrepaidCardQuantity = 100;
 
 class StubCardpaySDK {
@@ -161,6 +162,7 @@ class StubCardpaySDK {
       case 'PrepaidCardMarketV2':
         return Promise.resolve({
           getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+          isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
         });
       default:
         throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
@@ -177,6 +179,7 @@ describe('POST /api/email-card-drop-requests', function () {
     registry(this).register('worker-client', StubWorkerClient);
     registry(this).register('clock', FrozenClock);
 
+    mockPrepaidCardMarketContractPaused = false;
     mockPrepaidCardQuantity = 100;
   });
 
@@ -328,6 +331,35 @@ describe('POST /api/email-card-drop-requests', function () {
           {
             status: '503',
             title: 'There are no prepaid cards available',
+          },
+        ],
+      });
+  });
+
+  it('rejects with 503 when the contract is paused', async function () {
+    mockPrepaidCardMarketContractPaused = true;
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'The prepaid card market contract is paused',
           },
         ],
       });
