@@ -3,3 +3,4 @@
 __pycache__
 .env
 __pypackages__
+.pdm.toml

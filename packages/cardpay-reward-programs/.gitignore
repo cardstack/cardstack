@@ -8,3 +8,6 @@ __pycache__
 .env
 output/
 .cache
+.pdm.toml
+__pypackages__
+input/results.parquet
