@@ -10,7 +10,7 @@ module.exports = {
   cardDrop: {
     email: {
       rateLimit: {
-        count: 10,
+        count: 100,
         periodMinutes: 10,
       },
     },

@@ -180,7 +180,7 @@ describe('POST /api/email-card-drop-requests', function () {
     registry(this).register('clock', FrozenClock);
 
     mockPrepaidCardMarketContractPaused = false;
-    mockPrepaidCardQuantity = 100;
+    mockPrepaidCardQuantity = 50;
   });
 
   let { request, getContainer } = setupHub(this);
@@ -191,6 +191,22 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('persists an email card drop request and triggers jobs', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeInMs = fakeTime - 50 * 60 * 1000;
+
+    // Create no-longer-active reservations
+
+    for (let i = 0; i < mockPrepaidCardQuantity + 1; i++) {
+      await emailCardDropRequestsQueries.insert({
+        ownerAddress: '0xother',
+        emailHash: 'other-email-hash',
+        verificationCode: 'x',
+        id: shortUUID.uuid(),
+        requestedAt: new Date(insertionTimeInMs),
+        claimedAt: new Date(),
+      });
+    }
+
     let email = 'valid@example.com';
 
     const payload = {
@@ -215,7 +231,6 @@ describe('POST /api/email-card-drop-requests', function () {
         resourceId = res.body.data.id;
       });
 
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
