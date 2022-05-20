@@ -11,10 +11,8 @@ interface EmailCardDropRequestsQueriesFilter {
   verificationCode?: string;
 }
 
-const IS_NOT_OLD = `requested_at > now() - interval '60 minutes'`;
 const IS_OLD = `requested_at <= now() - interval '60 minutes'`;
 const IS_EXPIRED = `${IS_OLD} AND claimed_at IS NULL`;
-const IS_CLAIMABLE_REQUEST = `${IS_NOT_OLD} AND claimed_at IS NULL`;
 const RETURN_VALUE = `*, (${IS_EXPIRED}) as is_expired`;
 
 export default class EmailCardDropRequestsQueries {
@@ -100,32 +98,19 @@ export default class EmailCardDropRequestsQueries {
     return mapRowToObject(rows[0])!;
   }
 
-  async claim({
-    emailHash,
-    ownerAddress,
-    verificationCode,
-  }: {
-    emailHash: string;
-    ownerAddress: string;
-    verificationCode: string;
-  }): Promise<(EmailCardDropRequest & { isExpired: boolean }) | null> {
+  async claim(id: string): Promise<void> {
     let db = await this.databaseManager.getClient();
 
-    let { rows } = await db.query(
+    await db.query(
       `
         UPDATE email_card_drop_requests
         SET claimed_at = $1
-        WHERE
-          email_hash = $2 AND
-          owner_address = $3 AND
-          verification_code = $4 AND
-          ${IS_CLAIMABLE_REQUEST}
-        RETURNING ${RETURN_VALUE}
+        WHERE id=$2
       `,
-      [new Date(this.clock.now()), emailHash, ownerAddress, verificationCode]
+      [new Date(this.clock.now()), id]
     );
 
-    return rows[0] ? mapRowToObject(rows[0]) : null;
+    return;
   }
 
   async updateTransactionHash(

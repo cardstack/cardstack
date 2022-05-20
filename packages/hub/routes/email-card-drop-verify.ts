@@ -90,36 +90,31 @@ export default class EmailCardDropVerifyRoute {
     }
 
     // Optimistically mark the request as claimed to prevent stampede attack
-    let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
+    await this.emailCardDropRequestQueries.claim(emailCardDropRequest.id);
 
-    if (updatedRequest) {
-      try {
-        log.info(`Provisioning prepaid card for ${updatedRequest.ownerAddress}`);
-        let transactionHash = await this.relay.provisionPrepaidCardV2(
-          updatedRequest.ownerAddress,
-          config.get('cardDrop.sku')
-        );
+    try {
+      log.info(`Provisioning prepaid card for ${emailCardDropRequest.ownerAddress}`);
+      let transactionHash = await this.relay.provisionPrepaidCardV2(
+        emailCardDropRequest.ownerAddress,
+        config.get('cardDrop.sku')
+      );
 
-        log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
-        await this.emailCardDropRequestQueries.updateTransactionHash(updatedRequest.id, transactionHash);
+      log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
+      await this.emailCardDropRequestQueries.updateTransactionHash(emailCardDropRequest.id, transactionHash);
 
-        ctx.redirect(`${webClientUrl}${success}`);
-        return;
-      } catch (e: any) {
-        log.error(`Error provisioning prepaid card: ${e.toString()}`);
-        Sentry.captureException(e, {
-          tags: {
-            action: 'drop-card',
-            alert: 'web-team',
-          },
-        });
+      ctx.redirect(`${webClientUrl}${success}`);
+      return;
+    } catch (e: any) {
+      log.error(`Error provisioning prepaid card: ${e.toString()}`);
+      Sentry.captureException(e, {
+        tags: {
+          action: 'drop-card',
+          alert: 'web-team',
+        },
+      });
 
-        ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
-        return;
-      }
-    } else {
-      ctx.status = 400;
-      ctx.body = 'Invalid verification link';
+      ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
+      return;
     }
   }
 }
