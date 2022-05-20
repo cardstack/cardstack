@@ -65,6 +65,19 @@ export default class EmailCardDropRequestsQueries {
     return queryResult.rows.map(mapRowToObject)[0];
   }
 
+  // TODO does this cover everything? 🤔
+  async activeReservations() {
+    let db = await this.databaseManager.getClient();
+    const query = `
+      SELECT COUNT(*)
+      FROM  email_card_drop_requests AS t1
+      WHERE requested_at=(SELECT MAX(requested_at) FROM email_card_drop_requests WHERE t1.owner_address=email_card_drop_requests.owner_address)
+    `;
+
+    const queryResult = await db.query(query);
+    return queryResult.rows[0].count;
+  }
+
   async claimedInLastMinutes(minutes: number): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 
