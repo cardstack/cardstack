@@ -121,7 +121,7 @@ describe('POST /callbacks/pagerduty-incidents', async function () {
     expect(jobPayloads).to.deep.equal([
       {
         channel: 'on-call-internal',
-        message: 'incident.triggered: A little bump in the road (https://acme.pagerduty.com/incidents/PGR0VU2)',
+        message: '🚨 Incident triggered: A little bump in the road (https://acme.pagerduty.com/incidents/PGR0VU2)',
       },
     ]);
   });
