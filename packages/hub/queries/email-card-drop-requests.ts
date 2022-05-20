@@ -71,7 +71,9 @@ export default class EmailCardDropRequestsQueries {
     const query = `
       SELECT COUNT(*)
       FROM  email_card_drop_requests AS t1
-      WHERE requested_at=(SELECT MAX(requested_at) FROM email_card_drop_requests WHERE t1.owner_address=email_card_drop_requests.owner_address)
+      WHERE
+        requested_at=(SELECT MAX(requested_at) FROM email_card_drop_requests WHERE t1.owner_address=email_card_drop_requests.owner_address)
+        AND claimed_at IS NULL
     `;
 
     const queryResult = await db.query(query);
