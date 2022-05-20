@@ -2,7 +2,7 @@
 set -e
 
 CLUSTER=$1
-TASK_DEFINITION=${2:-waypoint-hub}
+TASK_DEFINITION=$2
 COUNT=${3:-2}
 
 if [ -z "$CLUSTER" ] || [ -z "$TASK_DEFINITION" ]; then
@@ -17,6 +17,6 @@ if [ "$(echo $SERVICE_LIST | wc -w)" -gt "$COUNT" ]; then
   for SERVICE in ${SORTED[@]:$COUNT}; do
     CMD="aws ecs delete-service --cluster $CLUSTER --service $SERVICE --force"
     echo "$CMD"
-    $CMD || { echo "Failed to delete service $CLUSTER/$SERVICE"; }
+    $CMD &> /tmp/purge-services.log || { echo "Failed to delete service $CLUSTER/$SERVICE"; cat /tmp/purge-service.log }
   done
 fi
