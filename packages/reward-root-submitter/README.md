@@ -21,6 +21,10 @@ Restart your shell after this.
 To install the dependencies, run
 
     pdm install -d
+    
+To run test, run 
+
+    pdm run pytest tests 
 
 ## Running locally
 
@@ -79,3 +83,13 @@ You can release a new version on staging by running the following command in the
      waypoint up -app=reward-submit -prune-retain=0
 
 This will remove the previous deployment, build the docker image and deploy a new service.
+
+## Issues running on M1
+
+If you use an m1 (arm64 architecture) you may encounter errors when sub-dependencies do not have arm64 distribution.
+
+One way to resolve this is to follow [here](https://towardsdatascience.com/how-to-use-manage-multiple-python-versions-on-an-apple-silicon-m1-mac-d69ee6ed0250). The solution is to use Rosetta for `x86` terminal emulation. After doing so, you will have a separate pdm installation in `/usr/local/bin` 
+
+
+
+
