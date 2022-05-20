@@ -349,7 +349,7 @@ app "ssr-web" {
   }
 
   release {
-    use "aws-ecs" {}
+    use "" {}
 
     hook {
       when    = "before"
