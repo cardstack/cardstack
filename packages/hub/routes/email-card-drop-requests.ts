@@ -91,7 +91,13 @@ export default class EmailCardDropRequestsRoute {
 
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
-    // FIXME check isPaused also
+    if (await prepaidCardMarketV2.isPaused()) {
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'The prepaid card market contract is paused' }],
+      };
+      return;
+    }
 
     if ((await prepaidCardMarketV2.getQuantity(cardDropSku)) === 0) {
       ctx.status = 503;
