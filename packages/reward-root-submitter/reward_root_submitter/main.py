@@ -12,6 +12,16 @@ load_dotenv()  # take environment variables from .env
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 logging.basicConfig(level=LOGLEVEL)
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+if SENTRY_DSN is not None:
+    sentry_sdk.init(
+        SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        environment=ENVIRONMENT,
+    )
 
 
 def run_all():
