@@ -153,13 +153,31 @@ class StubWorkerClient {
   }
 }
 
+let mockPrepaidCardQuantity = 100;
+
+class StubCardpaySDK {
+  getSDK(sdk: string) {
+    switch (sdk) {
+      case 'PrepaidCardMarketV2':
+        return Promise.resolve({
+          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+        });
+      default:
+        throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
+    }
+  }
+}
+
 describe('POST /api/email-card-drop-requests', function () {
   setupSentry(this);
 
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('cardpay', StubCardpaySDK);
     registry(this).register('worker-client', StubWorkerClient);
     registry(this).register('clock', FrozenClock);
+
+    mockPrepaidCardQuantity = 100;
   });
 
   let { request, getContainer } = setupHub(this);
@@ -284,6 +302,35 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects with 503 when getQuantity is zero', async function () {
+    mockPrepaidCardQuantity = 0;
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'There are no prepaid cards available',
+          },
+        ],
+      });
   });
 
   it('rejects if the rate limit has been triggered', async function () {
