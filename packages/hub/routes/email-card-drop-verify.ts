@@ -43,33 +43,15 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
-    let emailCardDropRequest = (
-      await this.emailCardDropRequestQueries.query({
-        ownerAddress,
-      })
-    )[0];
-
-    if (!emailCardDropRequest) {
-      ctx.status = 400;
-      ctx.body = 'Invalid verification link';
-      return;
-    }
-
-    // this eoa has already claimed
-    if (emailCardDropRequest.claimedAt) {
+    if (
+      (
+        await this.emailCardDropRequestQueries.query({
+          ownerAddress,
+          claimedAt: NOT_NULL,
+        })
+      ).length
+    ) {
       ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
-      return;
-    }
-
-    if (emailCardDropRequest.isExpired) {
-      ctx.status = 400;
-      ctx.body = 'Verification link is expired';
-      return;
-    }
-
-    if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
-      ctx.status = 400;
-      ctx.body = 'Invalid verification link';
       return;
     }
 
@@ -84,6 +66,26 @@ export default class EmailCardDropVerifyRoute {
     ) {
       ctx.status = 400;
       ctx.body = 'Email has already been used to claim a prepaid card';
+      return;
+    }
+
+    let emailCardDropRequest = await this.emailCardDropRequestQueries.latestRequest(ownerAddress);
+
+    if (!emailCardDropRequest) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    if (emailCardDropRequest.isExpired) {
+      ctx.status = 400;
+      ctx.body = 'Verification link is expired';
+      return;
+    }
+
+    if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
       return;
     }
 

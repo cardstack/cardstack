@@ -51,6 +51,19 @@ export default class EmailCardDropRequestsQueries {
     return queryResult.rows.map(mapRowToObject);
   }
 
+  async latestRequest(ownerAddress: string) {
+    let db = await this.databaseManager.getClient();
+    const query = `
+      SELECT ${RETURN_VALUE}
+      FROM  email_card_drop_requests AS t1
+      WHERE owner_address=$1 AND requested_at=(SELECT MAX(requested_at) FROM email_card_drop_requests WHERE t1.owner_address=email_card_drop_requests.owner_address)
+    `;
+
+    const queryResult = await db.query(query, [ownerAddress]);
+
+    return queryResult.rows.map(mapRowToObject)[0];
+  }
+
   async claimedInLastMinutes(minutes: number): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 

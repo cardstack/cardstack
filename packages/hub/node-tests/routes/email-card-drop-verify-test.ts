@@ -24,6 +24,13 @@ let unclaimedEoa: EmailCardDropRequest = {
   verificationCode: 'unclaimedverificationcode',
   requestedAt: new Date(),
 };
+let unclaimedEoaOlderEntry: EmailCardDropRequest = {
+  id: '6f1579d7-be47-4260-9629-702c4e2a7182',
+  ownerAddress: unclaimedEoa.ownerAddress,
+  emailHash: 'unclaimedhash',
+  verificationCode: 'OLD_unclaimedverificationcode',
+  requestedAt: new Date(Number(unclaimedEoa.requestedAt) - 1000),
+};
 let unclaimedButExpiredEoa: EmailCardDropRequest = {
   id: 'b6507a8e-086f-4d76-9e6d-4e8c7606a749',
   ownerAddress: '0xunclaimedButExpiredAddress',
@@ -76,6 +83,7 @@ describe('GET /email-card-drop/verify', function () {
     emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     await emailCardDropRequestsQueries.insert(claimedEoa);
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
+    await emailCardDropRequestsQueries.insert(unclaimedEoaOlderEntry);
   });
 
   it('accepts a valid verification, marks it claimed, calls the relay service, and redirects to a success page', async function () {
@@ -98,6 +106,14 @@ describe('GET /email-card-drop/verify', function () {
 
     expect(response.status).to.equal(302);
     expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
+  });
+
+  it('rejects older verification link', async function () {
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoaOlderEntry.ownerAddress}&verification-code=${unclaimedEoaOlderEntry.verificationCode}&email-hash=${unclaimedEoaOlderEntry.emailHash}`
+    );
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Invalid verification link');
   });
 
   it('rejects an expired verification link', async function () {
