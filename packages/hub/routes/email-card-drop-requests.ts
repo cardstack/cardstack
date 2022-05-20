@@ -12,6 +12,8 @@ import cryptoRandomString from 'crypto-random-string';
 import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
 
+const cardDropSku = config.get('cardDrop.sku') as string;
+
 export interface EmailCardDropRequest {
   id: string;
   ownerAddress: string;
@@ -23,6 +25,7 @@ export interface EmailCardDropRequest {
 }
 
 export default class EmailCardDropRequestsRoute {
+  cardpay = inject('cardpay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -32,6 +35,7 @@ export default class EmailCardDropRequestsRoute {
   emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
+  web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -84,6 +88,18 @@ export default class EmailCardDropRequestsRoute {
     }
 
     ctx.type = 'application/vnd.api+json';
+
+    let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
+
+    // FIXME check isPaused also
+
+    if ((await prepaidCardMarketV2.getQuantity(cardDropSku)) === 0) {
+      ctx.status = 503;
+      ctx.body = {
+        errors: [{ status: '503', title: 'There are no prepaid cards available' }],
+      };
+      return;
+    }
 
     if (await this.emailCardDropStateQueries.read()) {
       ctx.status = 503;
