@@ -35,6 +35,7 @@ app "hub" {
       execution_role_name = "hub-staging-ecr-task-executor-role"
 
       alb {
+        subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/f7de489d-e9fc-4191-8b85-efab3eda9a7f"
       }
 
@@ -334,6 +335,7 @@ app "ssr-web" {
       task_role_name = "ssr-web-staging-ecr-task"
 
       alb {
+        subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
       }
     }
@@ -432,6 +434,7 @@ app "reward-api" {
       execution_role_name = "reward-api-ecs-task-execution"
 
       alb {
+        subnets     = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/b8ba590b-e901-4e52-8a79-dcf3c8d8e48a"
       }
 
