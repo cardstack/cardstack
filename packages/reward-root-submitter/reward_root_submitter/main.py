@@ -10,6 +10,16 @@ from web3 import Web3
 from .submitter import RootSubmitter
 
 load_dotenv()  # take environment variables from .env
+for expected_env in [
+    "EVM_FULL_NODE_URL",
+    "OWNER",
+    "OWNER_PRIVATE_KEY",
+    "REWARD_POOL_ADDRESS",
+    "REWARD_PROGRAM_OUTPUT",
+    "ENVIRONMENT",
+]:
+    if expected_env not in os.environ:
+        raise ValueError(f"Missing environment variable {expected_env}")
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -21,21 +31,11 @@ if SENTRY_DSN is not None:
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-        environment=ENVIRONMENT,
+        environment=os.environ.get("ENVIRONMENT"),
     )
 
 
 def run_all():
-
-    for expected_env in [
-        "EVM_FULL_NODE_URL",
-        "OWNER",
-        "OWNER_PRIVATE_KEY",
-        "REWARD_POOL_ADDRESS",
-        "REWARD_PROGRAM_OUTPUT",
-    ]:
-        if expected_env not in os.environ:
-            raise ValueError(f"Missing environment variable {expected_env}")
 
     submitter = RootSubmitter(
         Web3(Web3.HTTPProvider(os.getenv("EVM_FULL_NODE_URL"))),
