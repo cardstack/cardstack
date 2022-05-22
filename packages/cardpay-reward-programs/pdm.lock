@@ -864,6 +864,15 @@ version = "1.8.0"
 summary = "Send file to trash natively under Mac OS X, Windows and Linux."
 
 [[package]]
+name = "sentry-sdk"
+version = "1.5.12"
+summary = "Python client for Sentry (https://sentry.io)"
+dependencies = [
+    "certifi",
+    "urllib3>=1.10.0",
+]
+
+[[package]]
 name = "setuptools"
 version = "61.2.0"
 requires_python = ">=3.7"
@@ -1056,7 +1065,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:5d3d141892163c3c87e841ffc8ba246462c3be0719926e6dc2e259d75270b8f7"
+content_hash = "sha256:d93f50878847a62e6618833276cbe53bdd8c8d4fe6cc2518af3f32cdb651c4cb"
 
 [metadata.files]
 "altair 4.2.0" = [
@@ -1924,6 +1933,10 @@ content_hash = "sha256:5d3d141892163c3c87e841ffc8ba246462c3be0719926e6dc2e259d75
 "send2trash 1.8.0" = [
     {file = "Send2Trash-1.8.0-py3-none-any.whl", hash = "sha256:f20eaadfdb517eaca5ce077640cb261c7d2698385a6a0f072a4a5447fd49fa08"},
     {file = "Send2Trash-1.8.0.tar.gz", hash = "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d"},
+]
+"sentry-sdk 1.5.12" = [
+    {file = "sentry_sdk-1.5.12-py2.py3-none-any.whl", hash = "sha256:778b53f0a6c83b1ee43d3b7886318ba86d975e686cb2c7906ccc35b334360be1"},
+    {file = "sentry-sdk-1.5.12.tar.gz", hash = "sha256:259535ba66933eacf85ab46524188c84dcb4c39f40348455ce15e2c0aca68863"},
 ]
 "setuptools 61.2.0" = [
     {file = "setuptools-61.2.0-py3-none-any.whl", hash = "sha256:8f4813dd6a4d6cc17bde85fb2e635fe19763f96efbb0ddf5575562e5ee0bc47a"},
