@@ -21,7 +21,7 @@ dependencies = [
     "duckdb>=0.3.2",
     "python-dotenv>=0.19.2",
     "future-fstrings>=1.2.0"]
-requires-python = ">=3.9"
+requires-python = ">=3.9, <3.11"
 license = {text = "MIT"}
 
 [project.urls]
@@ -29,7 +29,8 @@ Homepage = ""
 [tool.pdm]
 [project.optional-dependencies]
 explore = [
-    "streamlit>=1.9.0"
+    "streamlit>=1.9.0",
+    "hexbytes>=0.2.2",
 ]
 [tool.pdm.dev-dependencies]
 dev = [
@@ -40,6 +41,8 @@ dev = [
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
+
+
 
 
 
