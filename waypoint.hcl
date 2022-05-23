@@ -396,7 +396,6 @@ app "reward-api" {
       ENVIRONMENT    = "staging"
       REWARDS_BUCKET = "s3://tally-staging-reward-programs"
       SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
     }
   }
 
@@ -431,6 +430,7 @@ app "reward-api" {
 
       secrets = {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
       }
     }
 
