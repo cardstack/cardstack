@@ -32,6 +32,17 @@ export default class SendEmailCardDropVerification {
       return;
     }
 
+    if (request.isExpired) {
+      let e = new Error(`Request with id ${payload.id} expired before sending verification link`);
+      Sentry.captureException(e, {
+        tags: {
+          event: 'send-email-card-drop-verification',
+          alert: 'web-team',
+        },
+      });
+      return;
+    }
+
     const params = new URLSearchParams();
     params.append('eoa', request.ownerAddress);
     params.append('verification-code', request.verificationCode);
@@ -39,10 +50,11 @@ export default class SendEmailCardDropVerification {
     const verificationLink = config.get('cardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
+    const expirationMinutes = config.get('cardDrop.email.expiryMinutes') as number;
 
     const emailTitle = 'Claim your Card Drop';
-    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a>`;
-    const emailBodyText = `This is your verification link: ${verificationLink}`;
+    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a> It will expire in ${expirationMinutes} minutes.`;
+    const emailBodyText = `This is your verification link: ${verificationLink} It will expire in ${expirationMinutes} minutes.`;
 
     try {
       await this.email.send({

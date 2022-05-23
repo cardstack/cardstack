@@ -8,6 +8,8 @@ import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests
 import config from 'config';
 import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
+
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
   const createdAt = new Date(Date.now() - 12345678);
@@ -54,6 +56,13 @@ const cardDropRequest: EmailCardDropRequest = {
   verificationCode: 'unclaimedverificationcode',
   requestedAt: new Date(),
 };
+const expiredCardDropRequest: EmailCardDropRequest = {
+  id: 'f0535b7a-743b-4cda-aec2-1acaa1757582',
+  ownerAddress: '0xexpiredAddress2',
+  emailHash: 'expiredhash2',
+  verificationCode: 'expiredverificationcode2',
+  requestedAt: new Date(Date.now() - (emailVerificationLinkExpiryMinutes + 1) * 60 * 1000),
+};
 
 describe('SendEmailCardDropVerificationTask', function () {
   this.beforeAll(function () {
@@ -69,6 +78,7 @@ describe('SendEmailCardDropVerificationTask', function () {
       type: 'query',
     })) as EmailCardDropRequestsQueries;
     await cardDropQueries.insert(cardDropRequest);
+    await cardDropQueries.insert(expiredCardDropRequest);
   });
 
   it('sends an email that contains the verification link', async function () {
@@ -85,6 +95,11 @@ describe('SendEmailCardDropVerificationTask', function () {
     expect(StubEmail.lastSent.from).to.equal(config.get('aws.ses.supportEmail'));
     expect(StubEmail.lastSent.text).to.contain(link);
     expect(StubEmail.lastSent.html).to.contain(link);
+
+    let durationString = `${emailVerificationLinkExpiryMinutes} minutes`;
+
+    expect(StubEmail.lastSent.text).to.contain(durationString);
+    expect(StubEmail.lastSent.html).to.contain(durationString);
   });
 
   it('fails silently if the row does not exist', async function () {
@@ -102,6 +117,24 @@ describe('SendEmailCardDropVerificationTask', function () {
       alert: 'web-team',
     });
     expect(sentryReport.error?.message).to.equal(`Unable to find card drop request with id ${nonexistentId}`);
+  });
+
+  it('fails silently if the verification link is expired', async function () {
+    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+
+    await task.perform({ email: 'anyone@test.test', id: expiredCardDropRequest.id }, helpers);
+
+    expect(StubEmail.lastSent).to.equal(null);
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.tags).to.deep.equal({
+      event: 'send-email-card-drop-verification',
+      alert: 'web-team',
+    });
+    expect(sentryReport.error?.message).to.equal(
+      `Request with id ${expiredCardDropRequest.id} expired before sending verification link`
+    );
   });
 
   it('reports emailing errors to Sentry with the correct tag, then rethrows', async function () {

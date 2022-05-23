@@ -176,31 +176,6 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let unclaimedButExisting = await this.emailCardDropRequestQueries.query({
-      emailHash: normalizedEmailHash,
-      ownerAddress: ctx.state.userAddress,
-    });
-
-    if (unclaimedButExisting.length > 0) {
-      let existingRequest = unclaimedButExisting[0];
-      let updatedEmailCardDropRequest = await this.emailCardDropRequestQueries.updateVerificationCode(
-        existingRequest.id,
-        generateVerificationCode()
-      );
-
-      await this.workerClient.addJob('send-email-card-drop-verification', {
-        id: updatedEmailCardDropRequest.id,
-        email,
-      });
-
-      let serialized = this.emailCardDropRequestSerializer.serialize(updatedEmailCardDropRequest);
-
-      ctx.status = 200;
-      ctx.body = serialized;
-
-      return;
-    }
-
     let verificationCode = generateVerificationCode();
 
     const emailCardDropRequest: EmailCardDropRequest = {

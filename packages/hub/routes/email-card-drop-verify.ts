@@ -43,21 +43,15 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
-    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
-      ownerAddress,
-    });
-
-    // this eoa has already claimed
-    if (emailCardDropRequests.filter((v) => v.claimedAt).length) {
-      ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
-      return;
-    }
-
     if (
-      !emailCardDropRequests.filter((v) => v.verificationCode === verificationCode && v.emailHash === emailHash).length
+      (
+        await this.emailCardDropRequestQueries.query({
+          ownerAddress,
+          claimedAt: NOT_NULL,
+        })
+      ).length
     ) {
-      ctx.status = 400;
-      ctx.body = 'Invalid verification link';
+      ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
       return;
     }
 
@@ -75,37 +69,52 @@ export default class EmailCardDropVerifyRoute {
       return;
     }
 
-    // Optimistically mark the request as claimed to prevent stampede attack
-    let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
+    let emailCardDropRequest = await this.emailCardDropRequestQueries.latestRequest(ownerAddress);
 
-    if (updatedRequest) {
-      try {
-        log.info(`Provisioning prepaid card for ${updatedRequest.ownerAddress}`);
-        let transactionHash = await this.relay.provisionPrepaidCardV2(
-          updatedRequest.ownerAddress,
-          config.get('cardDrop.sku')
-        );
-
-        log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
-        await this.emailCardDropRequestQueries.updateTransactionHash(updatedRequest.id, transactionHash);
-
-        ctx.redirect(`${webClientUrl}${success}`);
-        return;
-      } catch (e: any) {
-        log.error(`Error provisioning prepaid card: ${e.toString()}`);
-        Sentry.captureException(e, {
-          tags: {
-            action: 'drop-card',
-            alert: 'web-team',
-          },
-        });
-
-        ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
-        return;
-      }
-    } else {
+    if (!emailCardDropRequest) {
       ctx.status = 400;
       ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    if (emailCardDropRequest.isExpired) {
+      ctx.status = 400;
+      ctx.body = 'Verification link is expired';
+      return;
+    }
+
+    if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    // Optimistically mark the request as claimed to prevent stampede attack
+    await this.emailCardDropRequestQueries.claim(emailCardDropRequest.id);
+
+    try {
+      log.info(`Provisioning prepaid card for ${emailCardDropRequest.ownerAddress}`);
+      let transactionHash = await this.relay.provisionPrepaidCardV2(
+        emailCardDropRequest.ownerAddress,
+        config.get('cardDrop.sku')
+      );
+
+      log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
+      await this.emailCardDropRequestQueries.updateTransactionHash(emailCardDropRequest.id, transactionHash);
+
+      ctx.redirect(`${webClientUrl}${success}`);
+      return;
+    } catch (e: any) {
+      log.error(`Error provisioning prepaid card: ${e.toString()}`);
+      Sentry.captureException(e, {
+        tags: {
+          action: 'drop-card',
+          alert: 'web-team',
+        },
+      });
+
+      ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
+      return;
     }
   }
 }

@@ -2,6 +2,7 @@ import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { EmailCardDropRequest } from '../routes/email-card-drop-requests';
 import { buildConditions } from '../utils/queries';
+import config from 'config';
 
 interface EmailCardDropRequestsQueriesFilter {
   id?: string;
@@ -11,15 +12,21 @@ interface EmailCardDropRequestsQueriesFilter {
   verificationCode?: string;
 }
 
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes');
+
+const IS_OLD = `requested_at <= now() - interval '${emailVerificationLinkExpiryMinutes} minutes'`;
+const IS_EXPIRED = `${IS_OLD} AND claimed_at IS NULL`;
+const RETURN_VALUE = `*, (${IS_EXPIRED}) as is_expired`;
+
 export default class EmailCardDropRequestsQueries {
   clock = inject('clock');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest> {
+  async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest & { isExpired: boolean }> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
-      'INSERT INTO email_card_drop_requests (id, owner_address, email_hash, verification_code, requested_at, claimed_at, transaction_hash) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      `INSERT INTO email_card_drop_requests (id, owner_address, email_hash, verification_code, requested_at, claimed_at, transaction_hash) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING ${RETURN_VALUE}`,
       [
         model.id,
         model.ownerAddress,
@@ -34,18 +41,31 @@ export default class EmailCardDropRequestsQueries {
     return rows[0];
   }
 
-  async query(filter: EmailCardDropRequestsQueriesFilter): Promise<EmailCardDropRequest[]> {
+  async query(filter: EmailCardDropRequestsQueriesFilter): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT * FROM email_card_drop_requests WHERE ${conditions.where}`;
+    const query = `SELECT ${RETURN_VALUE} FROM email_card_drop_requests WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map(mapRowToObject);
   }
 
-  async claimedInLastMinutes(minutes: number): Promise<EmailCardDropRequest[]> {
+  async latestRequest(ownerAddress: string) {
+    let db = await this.databaseManager.getClient();
+    const query = `
+      SELECT ${RETURN_VALUE}
+      FROM  email_card_drop_requests AS t1
+      WHERE owner_address=$1 AND requested_at=(SELECT MAX(requested_at) FROM email_card_drop_requests WHERE t1.owner_address=email_card_drop_requests.owner_address)
+    `;
+
+    const queryResult = await db.query(query, [ownerAddress]);
+
+    return queryResult.rows.map(mapRowToObject)[0];
+  }
+
+  async claimedInLastMinutes(minutes: number): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
@@ -58,56 +78,32 @@ export default class EmailCardDropRequestsQueries {
     return rows[0].count;
   }
 
-  async updateVerificationCode(id: string, verificationCode: string): Promise<EmailCardDropRequest> {
+  async claim(id: string): Promise<void> {
     let db = await this.databaseManager.getClient();
 
-    let { rows } = await db.query(
-      `UPDATE email_card_drop_requests SET
-        verification_code = $2
-      WHERE ID = $1
-      RETURNING *`,
-      [id, verificationCode]
-    );
-
-    return mapRowToObject(rows[0])!;
-  }
-
-  async claim({
-    emailHash,
-    ownerAddress,
-    verificationCode,
-  }: {
-    emailHash: string;
-    ownerAddress: string;
-    verificationCode: string;
-  }): Promise<EmailCardDropRequest | null> {
-    let db = await this.databaseManager.getClient();
-
-    let { rows } = await db.query(
+    await db.query(
       `
         UPDATE email_card_drop_requests
         SET claimed_at = $1
-        WHERE
-          email_hash = $2 AND
-          owner_address = $3 AND
-          verification_code = $4 AND
-          claimed_at IS NULL
-        RETURNING *
+        WHERE id=$2
       `,
-      [new Date(this.clock.now()), emailHash, ownerAddress, verificationCode]
+      [new Date(this.clock.now()), id]
     );
 
-    return rows[0] ? mapRowToObject(rows[0]) : null;
+    return;
   }
 
-  async updateTransactionHash(id: string, transactionHash: string): Promise<EmailCardDropRequest | null> {
+  async updateTransactionHash(
+    id: string,
+    transactionHash: string
+  ): Promise<(EmailCardDropRequest & { isExpired: boolean }) | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
       `UPDATE email_card_drop_requests SET
         transaction_hash = $2
       WHERE ID = $1
-      RETURNING *`,
+      RETURNING ${RETURN_VALUE}`,
       [id, transactionHash]
     );
 
@@ -124,6 +120,7 @@ function mapRowToObject(row: any) {
     claimedAt: row['claimed_at'],
     requestedAt: row['requested_at'],
     transactionHash: row['transaction_hash'],
+    isExpired: row['is_expired'] as boolean,
   };
 }
 
