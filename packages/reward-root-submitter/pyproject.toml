@@ -24,10 +24,8 @@ dev = [
     "pytest>=7.0.1",
     "black>=22.1.0",
     "isort>=5.10.1",
-    "web3[eth-tester]>=5.29.1",
     "eth-tester>=0.6.0b6",
-    "py-evm>=0.5.0a1",
-]
+    "py-evm>=0.5.0a1"]
 
 [tool.pdm.scripts]
 fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"
