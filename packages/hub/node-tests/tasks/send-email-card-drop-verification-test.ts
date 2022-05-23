@@ -8,6 +8,8 @@ import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests
 import config from 'config';
 import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
+
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
   const createdAt = new Date(Date.now() - 12345678);
@@ -59,7 +61,7 @@ const expiredCardDropRequest: EmailCardDropRequest = {
   ownerAddress: '0xexpiredAddress2',
   emailHash: 'expiredhash2',
   verificationCode: 'expiredverificationcode2',
-  requestedAt: new Date(Date.now() - 61 * 60 * 1000),
+  requestedAt: new Date(Date.now() - (emailVerificationLinkExpiryMinutes + 1) * 60 * 1000),
 };
 
 describe('SendEmailCardDropVerificationTask', function () {
@@ -93,6 +95,11 @@ describe('SendEmailCardDropVerificationTask', function () {
     expect(StubEmail.lastSent.from).to.equal(config.get('aws.ses.supportEmail'));
     expect(StubEmail.lastSent.text).to.contain(link);
     expect(StubEmail.lastSent.html).to.contain(link);
+
+    let durationString = `${emailVerificationLinkExpiryMinutes} minutes`;
+
+    expect(StubEmail.lastSent.text).to.contain(durationString);
+    expect(StubEmail.lastSent.html).to.contain(durationString);
   });
 
   it('fails silently if the row does not exist', async function () {
