@@ -14,7 +14,7 @@ If you want to build as it would be used in production, you can install without 
 
 ## Run and Test
 
-    python -m cardpay_reward_programs.main
+    pdm run python -m cardpay_reward_programs.main
     pdm run pytest tests
 
 ## Explore
