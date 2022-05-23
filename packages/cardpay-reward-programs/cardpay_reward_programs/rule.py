@@ -14,7 +14,9 @@ class Rule(ABC):
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
-    def set_core_parameters(self, payment_cycle_length, start_block, end_block, subgraph_config_locations):
+    def set_core_parameters(
+        self, payment_cycle_length, start_block, end_block, subgraph_config_locations
+    ):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
         self.end_block = end_block
@@ -30,9 +32,13 @@ class Rule(ABC):
     def sql(self, table_query):
         raise NotImplementedError
 
-    def _get_table_query(self, config_name, table_name, min_partition: int, max_partition: int):
+    def _get_table_query(
+        self, config_name, table_name, min_partition: int, max_partition: int
+    ):
         config_location = self.subgraph_config_locations[config_name]
-        local_files = get_files(config_location, table_name, min_partition, max_partition)
+        local_files = get_files(
+            config_location, table_name, min_partition, max_partition
+        )
         return f"parquet_scan({local_files})"
 
     def run_query(self, table_query, vars):
@@ -47,6 +53,6 @@ class Rule(ABC):
     @staticmethod
     def get_summary(payment_list):
         return {
-                "total_reward": [payment_list["amount"].sum()],
-                "unique_payee": [len(pd.unique(payment_list["payee"]))],
-            }
+            "total_reward": [payment_list["amount"].sum()],
+            "unique_payee": [len(pd.unique(payment_list["payee"]))],
+        }

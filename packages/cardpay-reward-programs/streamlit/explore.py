@@ -1,7 +1,7 @@
 import streamlit as st
 from boto3.session import Session
-from cloudpathlib import S3Client
 from cardpay_reward_programs.rules import *
+from cloudpathlib import S3Client
 from views import min_other_merchants_paid, min_spend, weighted_usage
 from views.utils import *
 
@@ -14,13 +14,10 @@ st.header("Rule Configurator")
 rules_modules = {
     "min_spend": min_spend,
     "min_other_merchants_paid": min_other_merchants_paid,
-    "weighted_usage": weighted_usage
+    "weighted_usage": weighted_usage,
 }
 
-view_functions = {
-    "single": view_single,
-    "multiple": view_multiple
-}
+view_functions = {"single": view_single, "multiple": view_multiple}
 
 rule_module_name = st.sidebar.selectbox("Rule", rules_modules.keys())
 rule_module = rules_modules[rule_module_name]
@@ -40,7 +37,10 @@ payment_cycle_length = s.number_input(
 core_parameters = {
     "start_block": 20000000,
     "end_block": 26000000,
-    "payment_cycle_length": int(payment_cycle_length)
+    "payment_cycle_length": int(payment_cycle_length),
+    "subgraph_config_locations": {
+        "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/"
+    },
 }
 
 user_defined_parameters = rule_module.get_user_defined_parameters()

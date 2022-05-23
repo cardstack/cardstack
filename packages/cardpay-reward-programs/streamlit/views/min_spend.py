@@ -19,9 +19,6 @@ def get_user_defined_parameters():
         "base_reward": base_reward,
         "min_spend": min_spend,
         "token": reward_token_addresses["xdai"],
-        "subgraph_config_location": {
-            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data//data/prepaid_card_payments/0.0.3/"
-        },
         "duration": 43200,
     }
     return user_defined_parameters
