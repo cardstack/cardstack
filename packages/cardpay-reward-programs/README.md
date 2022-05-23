@@ -14,7 +14,7 @@ If you want to build as it would be used in production, you can install without 
 
 ## Run and Test
 
-    RULE=< Rule Name > pdm run python -m cardpay_reward_programs.main
+    RULE=<Rule Name> pdm run python -m cardpay_reward_programs.main
     RULE=WeightedUsage pdm run python -m cardpay_reward_programs.main
     pdm run pytest tests
 
