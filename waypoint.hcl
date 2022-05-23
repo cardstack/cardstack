@@ -383,6 +383,7 @@ app "reward-submit" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
         OWNER             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
     }
   }
@@ -425,22 +426,18 @@ app "reward-api" {
       execution_role_name = "reward-api-staging-ecr-task-executor-role"
 
       alb {
-        listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/reward-api-staging/1dec044c2a54a8b5/8994c0bdf9038937"
+        certificate = "arn:aws:acm:us-east-1:680542703984:certificate/b8ba590b-e901-4e52-8a79-dcf3c8d8e48a"
       }
 
       secrets = {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
       }
     }
 
     hook {
       when    = "before"
       command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/fix-listener.mjs", "reward-api-staging.stack.cards", "reward-api-staging"] # need this until https://github.com/hashicorp/waypoint/issues/1568
     }
 
     hook {

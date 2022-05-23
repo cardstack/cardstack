@@ -20,6 +20,10 @@
   margin-left: var(--boxel-sp-xs);
 }
 
+.card-pay-dashboard__payments-section-header-no-profile-creation {
+  font-size: var(--boxel-font-size-sm);
+}
+
 .card-pay-dashboard__payments-cards {
   display: grid;
   gap: var(--boxel-sp-xl) var(--boxel-sp);

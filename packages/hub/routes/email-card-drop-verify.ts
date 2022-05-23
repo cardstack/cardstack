@@ -6,6 +6,7 @@ import { inject } from '@cardstack/di';
 import Logger from '@cardstack/logger';
 import config from 'config';
 import * as Sentry from '@sentry/node';
+import { NOT_NULL } from '../utils/queries';
 
 let log = Logger('route:email-card-drop-verify');
 
@@ -42,57 +43,79 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
-    // Optimistically mark the request as claimed to prevent stampede attack
-    let updatedRequest = await this.emailCardDropRequestQueries.claim({ emailHash, ownerAddress, verificationCode });
-
-    if (updatedRequest) {
-      try {
-        log.info(`Provisioning prepaid card for ${updatedRequest.ownerAddress}`);
-        let transactionHash = await this.relay.provisionPrepaidCardV2(
-          updatedRequest.ownerAddress,
-          config.get('cardDrop.sku')
-        );
-
-        log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
-        await this.emailCardDropRequestQueries.updateTransactionHash(updatedRequest.id, transactionHash);
-
-        ctx.redirect(`${webClientUrl}${success}`);
-        return;
-      } catch (e: any) {
-        log.error(`Error provisioning prepaid card: ${e.toString()}`);
-        Sentry.captureException(e, {
-          tags: {
-            action: 'drop-card',
-            alert: 'web-team',
-          },
-        });
-
-        ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
-        return;
-      }
-    }
-
-    // If the claim query doesn’t return a record, there no matching record, now determine why
-
-    let emailCardDropRequests = await this.emailCardDropRequestQueries.query({
-      ownerAddress,
-      verificationCode,
-    });
-
-    let emailCardDropRequest = emailCardDropRequests[0];
-
-    if (!emailCardDropRequest) {
-      ctx.status = 400;
-      ctx.body = 'Code is invalid';
-    } else if (emailCardDropRequest.emailHash !== emailHash) {
-      ctx.status = 400;
-      ctx.body = 'Email is invalid';
-    } else if (emailCardDropRequest.claimedAt) {
+    if (
+      (
+        await this.emailCardDropRequestQueries.query({
+          ownerAddress,
+          claimedAt: NOT_NULL,
+        })
+      ).length
+    ) {
       ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
       return;
     }
 
-    return;
+    // eoa has not claimed, but this email has already claimed
+    if (
+      (
+        await this.emailCardDropRequestQueries.query({
+          emailHash,
+          claimedAt: NOT_NULL,
+        })
+      ).length
+    ) {
+      ctx.status = 400;
+      ctx.body = 'Email has already been used to claim a prepaid card';
+      return;
+    }
+
+    let emailCardDropRequest = await this.emailCardDropRequestQueries.latestRequest(ownerAddress);
+
+    if (!emailCardDropRequest) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    if (emailCardDropRequest.isExpired) {
+      ctx.status = 400;
+      ctx.body = 'Verification link is expired';
+      return;
+    }
+
+    if (!(emailCardDropRequest.verificationCode === verificationCode && emailCardDropRequest.emailHash === emailHash)) {
+      ctx.status = 400;
+      ctx.body = 'Invalid verification link';
+      return;
+    }
+
+    // Optimistically mark the request as claimed to prevent stampede attack
+    await this.emailCardDropRequestQueries.claim(emailCardDropRequest.id);
+
+    try {
+      log.info(`Provisioning prepaid card for ${emailCardDropRequest.ownerAddress}`);
+      let transactionHash = await this.relay.provisionPrepaidCardV2(
+        emailCardDropRequest.ownerAddress,
+        config.get('cardDrop.sku')
+      );
+
+      log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
+      await this.emailCardDropRequestQueries.updateTransactionHash(emailCardDropRequest.id, transactionHash);
+
+      ctx.redirect(`${webClientUrl}${success}`);
+      return;
+    } catch (e: any) {
+      log.error(`Error provisioning prepaid card: ${e.toString()}`);
+      Sentry.captureException(e, {
+        tags: {
+          action: 'drop-card',
+          alert: 'web-team',
+        },
+      });
+
+      ctx.redirect(`${webClientUrl}${error}?message=${encodeURIComponent(e.toString())}`);
+      return;
+    }
   }
 }
 

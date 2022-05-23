@@ -71,7 +71,7 @@ summary = "Specifications for callback functions passed in to an API"
 [[package]]
 name = "beautifulsoup4"
 version = "4.10.0"
-requires_python = ">3.0.0"
+requires_python = ">=3.6.0"
 summary = "Screen-scraping library"
 dependencies = [
     "soupsieve>1.2",
@@ -87,17 +87,16 @@ dependencies = [
     "mypy-extensions>=0.4.3",
     "pathspec>=0.9.0",
     "platformdirs>=2",
-    "tomli>=1.1.0",
+    "tomli>=1.1.0; python_version < \"3.11\"",
     "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
 [[package]]
 name = "bleach"
 version = "4.1.0"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "An easy safelist-based HTML-sanitizing tool."
 dependencies = [
-    "packaging",
     "six>=1.9.0",
     "webencodings",
 ]
@@ -113,14 +112,14 @@ version = "1.21.22"
 requires_python = ">= 3.6"
 summary = "The AWS SDK for Python"
 dependencies = [
-    "botocore<1.25.0,>=1.24.22",
+    "botocore<1.27.0,>=1.26.5",
     "jmespath<2.0.0,>=0.7.1",
     "s3transfer<0.6.0,>=0.5.0",
 ]
 
 [[package]]
 name = "botocore"
-version = "1.24.22"
+version = "1.26.5"
 requires_python = ">= 3.6"
 summary = "Low-level, data-driven core of boto 3."
 dependencies = [
@@ -138,6 +137,7 @@ summary = "Extensible memoizing collections and decorators"
 [[package]]
 name = "certifi"
 version = "2021.10.8"
+requires_python = ">=3.6"
 summary = "Python package for providing Mozilla's CA Bundle."
 
 [[package]]
@@ -157,7 +157,7 @@ summary = "The Real First Universal Charset Detector. Open, modern and actively 
 [[package]]
 name = "click"
 version = "8.0.4"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "Composable command line interface toolkit"
 dependencies = [
     "colorama; platform_system == \"Windows\"",
@@ -166,14 +166,14 @@ dependencies = [
 [[package]]
 name = "cloudpathlib"
 version = "0.7.0"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "pathlib-style classes for cloud storage services"
 
 [[package]]
 name = "cloudpathlib"
 version = "0.7.0"
 extras = ["s3"]
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "pathlib-style classes for cloud storage services"
 dependencies = [
     "boto3",
@@ -230,11 +230,11 @@ summary = "Discover and load entry points from installed packages."
 [[package]]
 name = "eth-abi"
 version = "2.1.1"
-requires_python = ">=3.6, <4"
+requires_python = ">=3.7, <4"
 summary = "eth_abi: Python utilities for working with Ethereum ABI definitions, especially encoding and decoding"
 dependencies = [
-    "eth-typing<3.0.0,>=2.0.0",
-    "eth-utils<2.0.0,>=1.2.0",
+    "eth-typing<4.0.0,>=3.0.0",
+    "eth-utils<3.0.0,>=2.0.0",
     "parsimonious<0.9.0,>=0.8.0",
 ]
 
@@ -246,19 +246,19 @@ summary = "eth-hash: The Ethereum hashing function, keccak256, sometimes (errone
 
 [[package]]
 name = "eth-typing"
-version = "2.3.0"
-requires_python = ">=3.5, <4"
+version = "3.0.0"
+requires_python = ">=3.6, <3.11"
 summary = "eth-typing: Common type annotations for ethereum python packages"
 
 [[package]]
 name = "eth-utils"
-version = "1.10.0"
-requires_python = ">=3.5,!=3.5.2,<4"
+version = "2.0.0"
+requires_python = ">=3.6,<4"
 summary = "eth-utils: Common utility functions for python code that interacts with Ethereum"
 dependencies = [
     "cytoolz<1.0.0,>=0.10.1; implementation_name == \"cpython\"",
     "eth-hash<0.4.0,>=0.3.1",
-    "eth-typing<3.0.0,>=2.2.1",
+    "eth-typing<4.0.0,>=3.0.0",
     "toolz<1,>0.8.2; implementation_name == \"pypy\"",
 ]
 
@@ -266,6 +266,11 @@ dependencies = [
 name = "executing"
 version = "0.8.3"
 summary = "Get the currently executing AST node of a frame, and other information"
+
+[[package]]
+name = "fastjsonschema"
+version = "2.15.3"
+summary = "Fastest Python implementation of JSON schema"
 
 [[package]]
 name = "future-fstrings"
@@ -290,6 +295,12 @@ summary = "GitPython is a python library used to interact with Git repositories"
 dependencies = [
     "gitdb<5,>=4.0.1",
 ]
+
+[[package]]
+name = "hexbytes"
+version = "0.2.2"
+requires_python = ">=3.6, <4"
+summary = "hexbytes: Python `bytes` subclass that decodes hex, with a readable console output"
 
 [[package]]
 name = "idna"
@@ -318,14 +329,15 @@ requires_python = ">=3.7"
 summary = "IPython Kernel for Jupyter"
 dependencies = [
     "appnope; platform_system == \"Darwin\"",
-    "debugpy<2.0,>=1.0.0",
+    "debugpy>=1.0",
     "ipython>=7.23.1",
-    "jupyter-client<8.0",
-    "matplotlib-inline<0.2.0,>=0.1.0",
+    "jupyter-client>=6.1.12",
+    "matplotlib-inline>=0.1",
     "nest-asyncio",
+    "packaging",
     "psutil",
-    "tornado<7.0,>=4.2",
-    "traitlets<6.0,>=5.1.0",
+    "tornado>=6.1",
+    "traitlets>=5.1.0",
 ]
 
 [[package]]
@@ -411,22 +423,22 @@ dependencies = [
 [[package]]
 name = "jupyter-client"
 version = "7.1.2"
-requires_python = ">=3.6.1"
+requires_python = ">=3.7"
 summary = "Jupyter protocol implementation and client libraries"
 dependencies = [
     "entrypoints",
-    "jupyter-core>=4.6.0",
-    "nest-asyncio>=1.5",
-    "python-dateutil>=2.1",
-    "pyzmq>=13",
-    "tornado>=4.1",
+    "jupyter-core>=4.9.2",
+    "nest-asyncio>=1.5.4",
+    "python-dateutil>=2.8.2",
+    "pyzmq>=22.3",
+    "tornado>=6.0",
     "traitlets",
 ]
 
 [[package]]
 name = "jupyter-core"
 version = "4.9.2"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "Jupyter core package. A base package on which Jupyter projects rely."
 dependencies = [
     "pywin32>=1.0; sys_platform == \"win32\" and platform_python_implementation != \"PyPy\"",
@@ -436,10 +448,8 @@ dependencies = [
 [[package]]
 name = "jupyterlab-pygments"
 version = "0.1.2"
+requires_python = ">=3.7"
 summary = "Pygments theme using JupyterLab CSS variables"
-dependencies = [
-    "pygments<3,>=2.4.1",
-]
 
 [[package]]
 name = "jupyterlab-widgets"
@@ -504,19 +514,21 @@ version = "6.4.4"
 requires_python = ">=3.7"
 summary = "Converting Jupyter Notebooks"
 dependencies = [
+    "MarkupSafe>=2.0",
     "beautifulsoup4",
     "bleach",
     "defusedxml",
     "entrypoints>=0.2.2",
-    "jinja2>=2.4",
-    "jupyter-core",
+    "jinja2>=3.0",
+    "jupyter-core>=4.7",
     "jupyterlab-pygments",
     "mistune<2,>=0.8.1",
-    "nbclient<0.6.0,>=0.5.0",
-    "nbformat>=4.4",
+    "nbclient>=0.5.0",
+    "nbformat>=5.1",
+    "packaging",
     "pandocfilters>=1.4.1",
     "pygments>=2.4.1",
-    "testpath",
+    "tinycss2",
     "traitlets>=5.0",
 ]
 
@@ -526,9 +538,10 @@ version = "5.2.0"
 requires_python = ">=3.7"
 summary = "The Jupyter Notebook format"
 dependencies = [
-    "jsonschema!=2.5.0,>=2.4",
+    "fastjsonschema",
+    "jsonschema>=2.6",
     "jupyter-core",
-    "traitlets>=4.1",
+    "traitlets>=5.1",
 ]
 
 [[package]]
@@ -540,7 +553,7 @@ summary = "Patch asyncio to allow nested event loops"
 [[package]]
 name = "notebook"
 version = "6.4.10"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "A web-based notebook environment for interactive computing"
 dependencies = [
     "Send2Trash>=1.8.0",
@@ -664,13 +677,13 @@ dependencies = [
 [[package]]
 name = "protobuf"
 version = "3.19.4"
-requires_python = ">=3.5"
+requires_python = ">=3.7"
 summary = "Protocol Buffers"
 
 [[package]]
 name = "psutil"
 version = "5.9.0"
-requires_python = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 summary = "Cross-platform lib for process and system monitoring in Python."
 
 [[package]]
@@ -720,7 +733,7 @@ dependencies = [
 [[package]]
 name = "pygments"
 version = "2.11.2"
-requires_python = ">=3.5"
+requires_python = ">=3.6"
 summary = "Pygments is a syntax highlighting package written in Python."
 
 [[package]]
@@ -732,8 +745,8 @@ summary = "A development tool to measure, monitor and analyze the memory behavio
 [[package]]
 name = "pyparsing"
 version = "3.0.7"
-requires_python = ">=3.6"
-summary = "Python parsing module"
+requires_python = ">=3.6.8"
+summary = "pyparsing module - Classes and methods to define and execute parsing grammars"
 
 [[package]]
 name = "pyrsistent"
@@ -851,6 +864,15 @@ version = "1.8.0"
 summary = "Send file to trash natively under Mac OS X, Windows and Linux."
 
 [[package]]
+name = "sentry-sdk"
+version = "1.5.12"
+summary = "Python client for Sentry (https://sentry.io)"
+dependencies = [
+    "certifi",
+    "urllib3>=1.10.0",
+]
+
+[[package]]
 name = "setuptools"
 version = "61.2.0"
 requires_python = ">=3.7"
@@ -923,14 +945,17 @@ summary = "Tornado websocket backend for the Xterm.js Javascript terminal emulat
 dependencies = [
     "ptyprocess; os_name != \"nt\"",
     "pywinpty>=1.1.0; os_name == \"nt\"",
-    "tornado>=4",
+    "tornado>=6.1.0",
 ]
 
 [[package]]
-name = "testpath"
-version = "0.6.0"
-requires_python = ">= 3.5"
-summary = "Test utilities for code working with files and commands"
+name = "tinycss2"
+version = "1.1.1"
+requires_python = ">=3.6"
+summary = "A tiny CSS parser"
+dependencies = [
+    "webencodings>=0.4",
+]
 
 [[package]]
 name = "toml"
@@ -960,7 +985,7 @@ summary = "Tornado is a Python web framework and asynchronous networking library
 name = "traitlets"
 version = "5.1.1"
 requires_python = ">=3.7"
-summary = "Traitlets Python configuration system"
+summary = ""
 
 [[package]]
 name = "typer"
@@ -974,8 +999,8 @@ dependencies = [
 [[package]]
 name = "typing-extensions"
 version = "4.1.1"
-requires_python = ">=3.6"
-summary = "Backported and Experimental Type Hints for Python 3.6+"
+requires_python = ">=3.7"
+summary = "Backported and Experimental Type Hints for Python 3.7+"
 
 [[package]]
 name = "tzdata"
@@ -1006,7 +1031,6 @@ requires_python = ">=3.4"
 summary = "Python Data Validation for Humans™."
 dependencies = [
     "decorator>=3.4.0",
-    "six>=1.4.0",
 ]
 
 [[package]]
@@ -1041,7 +1065,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a237644105"
+content_hash = "sha256:d93f50878847a62e6618833276cbe53bdd8c8d4fe6cc2518af3f32cdb651c4cb"
 
 [metadata.files]
 "altair 4.2.0" = [
@@ -1139,9 +1163,9 @@ content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a23
     {file = "boto3-1.21.22-py3-none-any.whl", hash = "sha256:a56e34d8dc3390006a6d7ae5373f357917932045e874c82de2736f3b42c02b10"},
     {file = "boto3-1.21.22.tar.gz", hash = "sha256:334f14ffbd89ddd15090e90b32e4fcea73d83b60b19ca2737a9264fd44096f35"},
 ]
-"botocore 1.24.22" = [
-    {file = "botocore-1.24.22-py3-none-any.whl", hash = "sha256:e812604653c635c78431b3dd168d3fc04e8c3514839226814c999336d5e59ea0"},
-    {file = "botocore-1.24.22.tar.gz", hash = "sha256:92ba8afeda48f5d2467811d87df401d703a25191f82882994d8d09a7d8b5b965"},
+"botocore 1.26.5" = [
+    {file = "botocore-1.26.5-py3-none-any.whl", hash = "sha256:805db3ecf85ff89edfb6788f862b87426f990e3e6383ef3fca3076f7659a5454"},
+    {file = "botocore-1.26.5.tar.gz", hash = "sha256:32541873924e3ff0ad95f02dc331e9f278721a3b864a4e2a8d514346b2598ce5"},
 ]
 "cachetools 5.0.0" = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
@@ -1302,17 +1326,21 @@ content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a23
     {file = "eth_hash-0.3.2-py3-none-any.whl", hash = "sha256:de7385148a8e0237ba1240cddbc06d53f56731140f8593bdb8429306f6b42271"},
     {file = "eth-hash-0.3.2.tar.gz", hash = "sha256:3f40cecd5ead88184aa9550afc19d057f103728108c5102f592f8415949b5a76"},
 ]
-"eth-typing 2.3.0" = [
-    {file = "eth_typing-2.3.0-py3-none-any.whl", hash = "sha256:b7fa58635c1cb0cbf538b2f5f1e66139575ea4853eac1d6000f0961a4b277422"},
-    {file = "eth-typing-2.3.0.tar.gz", hash = "sha256:39cce97f401f082739b19258dfa3355101c64390914c73fe2b90012f443e0dc7"},
+"eth-typing 3.0.0" = [
+    {file = "eth_typing-3.0.0-py3-none-any.whl", hash = "sha256:fb96f5eaa844b8be7727d590a54a952a42e5021426f98074b06b23ae43de5867"},
+    {file = "eth-typing-3.0.0.tar.gz", hash = "sha256:079e4c41e98cf2635d3830a99f3cbd7b1d73d2368464d4493c002bece545184a"},
 ]
-"eth-utils 1.10.0" = [
-    {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
-    {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
+"eth-utils 2.0.0" = [
+    {file = "eth_utils-2.0.0-py3-none-any.whl", hash = "sha256:209dc12255398f2a88f12de78f338b974861f9aefa981af5b68a5d102c9b2043"},
+    {file = "eth-utils-2.0.0.tar.gz", hash = "sha256:32f50edb14c5be0c4f0e8c2e6117286ccc5dfda21d170f358add554a048398e3"},
 ]
 "executing 0.8.3" = [
     {file = "executing-0.8.3-py2.py3-none-any.whl", hash = "sha256:d1eef132db1b83649a3905ca6dd8897f71ac6f8cac79a7e58a1a09cf137546c9"},
     {file = "executing-0.8.3.tar.gz", hash = "sha256:c6554e21c6b060590a6d3be4b82fb78f8f0194d809de5ea7df1c093763311501"},
+]
+"fastjsonschema 2.15.3" = [
+    {file = "fastjsonschema-2.15.3-py3-none-any.whl", hash = "sha256:ddb0b1d8243e6e3abb822bd14e447a89f4ab7439342912d590444831fa00b6a0"},
+    {file = "fastjsonschema-2.15.3.tar.gz", hash = "sha256:0a572f0836962d844c1fc435e200b2e4f4677e4e6611a2e3bdd01ba697c275ec"},
 ]
 "future-fstrings 1.2.0" = [
     {file = "future_fstrings-1.2.0-py2.py3-none-any.whl", hash = "sha256:90e49598b553d8746c4dc7d9442e0359d038c3039d802c91c0a55505da318c63"},
@@ -1325,6 +1353,10 @@ content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a23
 "gitpython 3.1.27" = [
     {file = "GitPython-3.1.27-py3-none-any.whl", hash = "sha256:5b68b000463593e05ff2b261acff0ff0972df8ab1b70d3cdbd41b546c8b8fc3d"},
     {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
+]
+"hexbytes 0.2.2" = [
+    {file = "hexbytes-0.2.2-py3-none-any.whl", hash = "sha256:ef53c37ea9f316fff86fcb1df057b4c6ba454da348083e972031bbf7bc9c3acc"},
+    {file = "hexbytes-0.2.2.tar.gz", hash = "sha256:a5881304d186e87578fb263a85317c808cf130e1d4b3d37d30142ab0f7898d03"},
 ]
 "idna 3.3" = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1902,6 +1934,10 @@ content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a23
     {file = "Send2Trash-1.8.0-py3-none-any.whl", hash = "sha256:f20eaadfdb517eaca5ce077640cb261c7d2698385a6a0f072a4a5447fd49fa08"},
     {file = "Send2Trash-1.8.0.tar.gz", hash = "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d"},
 ]
+"sentry-sdk 1.5.12" = [
+    {file = "sentry_sdk-1.5.12-py2.py3-none-any.whl", hash = "sha256:778b53f0a6c83b1ee43d3b7886318ba86d975e686cb2c7906ccc35b334360be1"},
+    {file = "sentry-sdk-1.5.12.tar.gz", hash = "sha256:259535ba66933eacf85ab46524188c84dcb4c39f40348455ce15e2c0aca68863"},
+]
 "setuptools 61.2.0" = [
     {file = "setuptools-61.2.0-py3-none-any.whl", hash = "sha256:8f4813dd6a4d6cc17bde85fb2e635fe19763f96efbb0ddf5575562e5ee0bc47a"},
     {file = "setuptools-61.2.0.tar.gz", hash = "sha256:c3d4e2ab578fbf83775755cd76dae73627915a22832cf4ea5de895978767833b"},
@@ -1930,9 +1966,9 @@ content_hash = "sha256:2d10a917d7249d0bcaace3353ec88036297c023d86eff244adbb03a23
     {file = "terminado-0.13.3-py3-none-any.whl", hash = "sha256:874d4ea3183536c1782d13c7c91342ef0cf4e5ee1d53633029cbc972c8760bd8"},
     {file = "terminado-0.13.3.tar.gz", hash = "sha256:94d1cfab63525993f7d5c9b469a50a18d0cdf39435b59785715539dd41e36c0d"},
 ]
-"testpath 0.6.0" = [
-    {file = "testpath-0.6.0-py3-none-any.whl", hash = "sha256:8ada9f80a2ac6fb0391aa7cdb1a7d11cfa8429f693eda83f74dde570fe6fa639"},
-    {file = "testpath-0.6.0.tar.gz", hash = "sha256:2f1b97e6442c02681ebe01bd84f531028a7caea1af3825000f52345c30285e0f"},
+"tinycss2 1.1.1" = [
+    {file = "tinycss2-1.1.1-py3-none-any.whl", hash = "sha256:fe794ceaadfe3cf3e686b22155d0da5780dd0e273471a51846d0a02bc204fec8"},
+    {file = "tinycss2-1.1.1.tar.gz", hash = "sha256:b2e44dd8883c360c35dd0d1b5aad0b610e5156c2cb3b33434634e539ead9d8bf"},
 ]
 "toml 0.10.2" = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

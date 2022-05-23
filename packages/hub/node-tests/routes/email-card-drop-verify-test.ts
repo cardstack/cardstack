@@ -7,6 +7,7 @@ import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 const { sku } = config.get('cardDrop');
 const { url: webClientUrl } = config.get('webClient');
 const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
+const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -22,6 +23,27 @@ let unclaimedEoa: EmailCardDropRequest = {
   ownerAddress: '0xnotClaimedAddress',
   emailHash: 'unclaimedhash',
   verificationCode: 'unclaimedverificationcode',
+  requestedAt: new Date(),
+};
+let unclaimedEoaOlderEntry: EmailCardDropRequest = {
+  id: '6f1579d7-be47-4260-9629-702c4e2a7182',
+  ownerAddress: unclaimedEoa.ownerAddress,
+  emailHash: 'unclaimedhash',
+  verificationCode: 'OLD_unclaimedverificationcode',
+  requestedAt: new Date(Number(unclaimedEoa.requestedAt) - 1000),
+};
+let unclaimedButExpiredEoa: EmailCardDropRequest = {
+  id: 'b6507a8e-086f-4d76-9e6d-4e8c7606a749',
+  ownerAddress: '0xunclaimedButExpiredAddress',
+  emailHash: 'unclaimedButExpiredhash',
+  verificationCode: 'unclaimedButExpiredverificationcode',
+  requestedAt: new Date(Date.now() - (emailVerificationLinkExpiryMinutes + 1) * 60 * 1000),
+};
+let unclaimedEoaWithClaimedEmailHash: EmailCardDropRequest = {
+  id: 'f0847258-9326-4e08-8043-f9def30c6359',
+  ownerAddress: '0xnotClaimedAddress2',
+  emailHash: 'claimedhash',
+  verificationCode: 'unclaimedverificationcode2',
   requestedAt: new Date(),
 };
 
@@ -62,6 +84,7 @@ describe('GET /email-card-drop/verify', function () {
     emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     await emailCardDropRequestsQueries.insert(claimedEoa);
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
+    await emailCardDropRequestsQueries.insert(unclaimedEoaOlderEntry);
   });
 
   it('accepts a valid verification, marks it claimed, calls the relay service, and redirects to a success page', async function () {
@@ -86,6 +109,39 @@ describe('GET /email-card-drop/verify', function () {
     expect(response.headers['location']).to.equal(`${webClientUrl}${success}`);
   });
 
+  it('rejects older verification link', async function () {
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoaOlderEntry.ownerAddress}&verification-code=${unclaimedEoaOlderEntry.verificationCode}&email-hash=${unclaimedEoaOlderEntry.emailHash}`
+    );
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Invalid verification link');
+  });
+
+  it('rejects an expired verification link', async function () {
+    await emailCardDropRequestsQueries.insert(unclaimedButExpiredEoa);
+
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedButExpiredEoa.ownerAddress}&verification-code=${unclaimedButExpiredEoa.verificationCode}&email-hash=${unclaimedButExpiredEoa.emailHash}`
+    );
+
+    expect(provisionPrepaidCardCalls).to.equal(0);
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Verification link is expired');
+  });
+
+  it('rejects a used email hash', async function () {
+    await emailCardDropRequestsQueries.insert(unclaimedEoaWithClaimedEmailHash);
+
+    let response = await request().get(
+      `/email-card-drop/verify?eoa=${unclaimedEoaWithClaimedEmailHash.ownerAddress}&verification-code=${unclaimedEoaWithClaimedEmailHash.verificationCode}&email-hash=${unclaimedEoaWithClaimedEmailHash.emailHash}`
+    );
+
+    expect(provisionPrepaidCardCalls).to.equal(0);
+
+    expect(response.status).to.equal(400);
+    expect(response.text).to.equal('Email has already been used to claim a prepaid card');
+  });
+
   it('rejects a verification that has been used and redirects to an already-claimed page', async function () {
     let response = await request().get(
       `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=${claimedEoa.verificationCode}&email-hash=${claimedEoa.emailHash}`
@@ -99,13 +155,13 @@ describe('GET /email-card-drop/verify', function () {
 
   it('rejects an unknown verification', async function () {
     let response = await request().get(
-      `/email-card-drop/verify?eoa=${claimedEoa.ownerAddress}&verification-code=wha&email-hash=${claimedEoa.emailHash}`
+      `/email-card-drop/verify?eoa=${unclaimedEoa.ownerAddress}&verification-code=wha&email-hash=${unclaimedEoa.emailHash}`
     );
 
     expect(provisionPrepaidCardCalls).to.equal(0);
 
     expect(response.status).to.equal(400);
-    expect(response.text).to.equal('Code is invalid');
+    expect(response.text).to.equal('Invalid verification link');
   });
 
   it('rejects an unknown email-hash', async function () {
@@ -116,7 +172,7 @@ describe('GET /email-card-drop/verify', function () {
     expect(provisionPrepaidCardCalls).to.equal(0);
 
     expect(response.status).to.equal(400);
-    expect(response.text).to.equal('Email is invalid');
+    expect(response.text).to.equal('Invalid verification link');
   });
 
   it('redirects with the error if the relay call fails', async function () {
