@@ -4,7 +4,7 @@ from audioop import mul
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import reward_token_addresses
+from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import FlatPayment
 
 from .fixture import indexed_data
@@ -33,7 +33,7 @@ def rule(request):
     }
     user_config = {
         "reward_per_user": reward_per_user,
-        "token": reward_token_addresses["xdai"],
+        "token": config["staging"]["tokens"]["card"],
         "duration": 43200,
         "accounts": accounts,
     }

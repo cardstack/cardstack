@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-from cardpay_reward_programs.config import (default_payment_list,
-                                            reward_token_addresses)
+from cardpay_reward_programs.config import default_payment_list
 from cardpay_reward_programs.rule import Rule
 
 

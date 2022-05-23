@@ -2,7 +2,7 @@ import itertools
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import reward_token_addresses
+from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 
 from .fixture import indexed_data
@@ -32,7 +32,7 @@ def rule(request):
     user_config = {
         "base_reward": 10,
         "min_other_merchants": min_other_merchants,
-        "token": reward_token_addresses["xdai"],
+        "token": config["staging"]["tokens"]["card"],
         "duration": 43200,
     }
     return MinOtherMerchantsPaid(core_config, user_config)
