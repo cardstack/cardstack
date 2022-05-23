@@ -20,9 +20,7 @@ cached_client = S3Client(
 )
 cached_client.set_as_default_client()
 
-for expected_env in [
-    "ENVIRONMENT",
-]:
+for expected_env in ["ENVIRONMENT"]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
 
