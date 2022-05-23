@@ -1,20 +1,41 @@
 import json
 import os
 
+import sentry_sdk
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
 from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
+from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
 from .utils import write_parquet_file
+
+load_dotenv()
 
 cached_client = S3Client(
     local_cache_dir=".cache",
     boto3_session=Session(),
 )
 cached_client.set_as_default_client()
+
+for expected_env in [
+    "ENVIRONMENT",
+]:
+    if expected_env not in os.environ:
+        raise ValueError(f"Missing environment variable {expected_env}")
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+if SENTRY_DSN is not None:
+    sentry_sdk.init(
+        SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        environment=os.environ.get("ENVIRONMENT"),
+    )
 
 
 def run_reward_program(
