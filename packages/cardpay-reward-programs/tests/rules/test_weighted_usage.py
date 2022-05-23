@@ -2,7 +2,7 @@ import itertools
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import reward_token_addresses
+from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import WeightedUsage
 
 from .fixture import indexed_data
@@ -35,7 +35,7 @@ def rule(request):
         "base_reward": 10,
         "transaction_factor": transaction_factor,
         "spend_factor": spend_factor,
-        "token": reward_token_addresses["xdai"],
+        "token": config["staging"]["tokens"]["card"],
         "duration": 43200,
     }
     return WeightedUsage(core_config, user_config)

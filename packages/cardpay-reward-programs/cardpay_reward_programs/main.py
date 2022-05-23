@@ -1,22 +1,39 @@
 import json
 import os
 
+import sentry_sdk
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
 from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
+from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
 from .utils import write_parquet_file
 
+load_dotenv()
 
 cached_client = S3Client(
     local_cache_dir=".cache",
-    boto3_session=Session(
-    ),
+    boto3_session=Session(),
 )
 cached_client.set_as_default_client()
+
+for expected_env in ["ENVIRONMENT"]:
+    if expected_env not in os.environ:
+        raise ValueError(f"Missing environment variable {expected_env}")
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+if SENTRY_DSN is not None:
+    sentry_sdk.init(
+        SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        environment=os.environ.get("ENVIRONMENT"),
+    )
 
 
 def run_reward_program(
@@ -33,18 +50,16 @@ def run_reward_program(
     """
     with open(AnyPath(parameters_file), "r") as stream:
         parameters = json.load(stream)
-    
+
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
             rule = subclass(parameters["core"], parameters["user_defined"])
-    payment_list = rule.run(parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"])
+    payment_list = rule.run(
+        parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"]
+    )
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
-
-
-def cli():
-    typer.run(run_reward_program)
 
 
 if __name__ == "__main__":
