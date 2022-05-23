@@ -1,4 +1,0 @@
-docker
-boto3
-cloudpathlib[s3]
-typer

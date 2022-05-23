@@ -11,7 +11,13 @@ class RewardProgram():
     processed_cycles = set()
     last_update_block = 0
 
-    def __init__(self, result_file_root, reward_program_id, subgraph_url, subgraph_extract_location=None) -> None:
+    def __init__(self, reward_program_id, w3, reward_manager_address, subgraph_url, result_file_root, subgraph_extract_location=None) -> None:
+        self.w3 = w3
+        with open(f"abis/RewardManager.json") as contract_file:
+            contract = json.load(contract_file)
+        self.reward_manager = self.w3.eth.contract(
+            address=reward_manager_address, abi=contract["abi"]
+        )
         self.reward_program_id = reward_program_id
         self.subgraph_url = subgraph_url
         self.reward_program_output_location = AnyPath(result_file_root).joinpath(
@@ -60,7 +66,6 @@ class RewardProgram():
         except Exception as e:
             logging.warn("Error when querying subgraph")
             raise (e)
-        pass
 
 
     def get_latest_data_block(self, rule):
@@ -78,9 +83,9 @@ class RewardProgram():
         return latest_block
 
     def is_locked(self):
-        return False
+        return self.reward_manager.caller.rewardProgramLocked(self.reward_program_id)
 
-    def get_processable_payment_cycles(self, rule):
+    def get_all_payment_cycles(self, rule):
         """
         Return a set of payment cycles that are valid for this program
         and have not been processed yet, but where the data is available
@@ -98,33 +103,43 @@ class RewardProgram():
             end_block = min(core_config["end_block"], latest_data_block)
         print(core_config, latest_data_block)
         payment_cycle_length = core_config["payment_cycle_length"]
-        return set(range(start_block, end_block, payment_cycle_length)) - self.processed_cycles
+        return set(range(start_block, end_block, payment_cycle_length))
 
 
-    def get_rule(self):
-        return {
-            "core": {
-                "payment_cycle_length": 1000,
-                "start_block": 26636000,
-                "end_block": 26640000,
-                "docker_image": '680542703984.dkr.ecr.us-east-1.amazonaws.com/flat_payment:latest',
-                "subgraph_config_locations": {
-                    "prepaid_card": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/"
-                }
-            },
-            "user_defined": {
-                "token": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
-                "duration": 518400,
-                "reward_per_user": "1000000000000000000",
-                "accounts": [
-                "0xF93944cF3638d2089B31F07E244a11380a5D0Ff3",
-                ]
-            }
-        }
+    def get_rules(self):
+        rule_blob = json.loads(self.reward_manager.caller.rule(self.reward_program_id))
+        print(rule_blob)
+        if type(rule_blob) == list:
+            yield from rule_blob
+        else:
+            yield rule_blob
+        return 
+
+
+    def raise_on_payment_cycle_overlap(self, rules):
+        """
+        Given a list of rules, raise an exception if there are overlapping
+        payment cycles.
+
+        For example, with two rules
+        1. A rule that starts on block 0, ends on block 200 and runs every 10 blocks
+        2. A rule that starts on block 20, ends on block 70 and runs every 20 blocks
+
+        There would be a clash for payment cycles 20, 40, 60
+        """
+        current_cycles = set()
+        for rule in rules:
+            rule_cycles = self.get_all_payment_cycles(rule)
+            if rule_cycles.intersection(current_cycles):
+                raise Exception(f"Reward program {self.reward_program_id} has overlapping payment cycles {rule_cycles.intersection(current_cycles)}")
+            current_cycles.update(rule_cycles)
 
 
     def run(self, payment_cycle, rule):
-        print(f"Running {payment_cycle}")
+        """
+        Trigger a job in AWS batch for a single payment cycle and single rule
+        """
+        logging.info(f"Running {payment_cycle} for {self.reward_program_id}")
         submission_data = deepcopy(rule)
         docker_image = submission_data["core"]["docker_image"]
         del submission_data["core"]["docker_image"]
@@ -143,16 +158,17 @@ class RewardProgram():
         return job
 
     def run_all(self) -> None:
+        """
+        Run all rules for all payment cycles that can be processed at this time
+        """
+        logging.info(f"Running all for {self.reward_program_id}")
         if self.is_locked():
+            logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
-        rule = self.get_rule()
-        processable_payment_cycles = self.get_processable_payment_cycles(rule)
-        for payment_cycle in sorted(processable_payment_cycles):
-            self.run(payment_cycle, rule)
+        rules = list(self.get_rules())
+        self.raise_on_payment_cycle_overlap(rules)
+        for rule in rules:
+            processable_payment_cycles = self.get_all_payment_cycles(rule) - self.processed_cycles
+            for payment_cycle in sorted(processable_payment_cycles):
+                self.run(payment_cycle, rule)
 
-
-if __name__ == "__main__":
-    program = RewardProgram("s3://tally-staging-reward-programs/","0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07", "https://graph-staging-green.stack.cards/subgraphs/name/habdelra/cardpay-sokol")#, "/home/ian/projects/cardstack/packages/cardpay-subgraph-extraction/data/rewards/0.0.2")
-    print(program.last_update_block, program.processed_cycles)
-    print(program.get_processable_payment_cycles(program.get_rule()))
-    print(program.run_all())
