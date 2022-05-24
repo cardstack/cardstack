@@ -7,6 +7,7 @@ import schedule
 import logging
 import time
 from dotenv import load_dotenv
+
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
@@ -26,7 +27,7 @@ for expected_env in [
     "REWARD_MANAGER_ADDRESS",
     "REWARDS_BUCKET",
     "REWARD_RUNNER_APPROVED_PROGRAMS",
-    "SUBGRAPH_URL"
+    "SUBGRAPH_URL",
 ]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
@@ -37,32 +38,44 @@ EVM_FULL_NODE_URL = os.environ.get("EVM_FULL_NODE_URL")
 REWARD_RUNNER_APPROVED_PROGRAMS = os.environ.get("REWARD_RUNNER_APPROVED_PROGRAMS")
 REWARD_MANAGER_ADDRESS = os.environ.get("REWARD_MANAGER_ADDRESS")
 REWARDS_SUBGRAPH_EXTRACTION = os.environ.get("REWARDS_SUBGRAPH_EXTRACTION")
-REWARD_RUNNER_UPDATE_FREQUENCY = int(os.environ.get("REWARD_RUNNER_UPDATE_FREQUENCY", 600))
+REWARD_RUNNER_UPDATE_FREQUENCY = int(
+    os.environ.get("REWARD_RUNNER_UPDATE_FREQUENCY", 600)
+)
 
 
 def safe_run(reward_program):
     try:
         reward_program.run_all()
     except Exception as e:
-        logging.error(f"Error running reward program {reward_program.reward_program_id}, {e}")
+        logging.error(
+            f"Error running reward program {reward_program.reward_program_id}, {e}"
+        )
 
-def main(): 
+
+def main():
     w3 = Web3(Web3.HTTPProvider(EVM_FULL_NODE_URL))
     for reward_program_id in REWARD_RUNNER_APPROVED_PROGRAMS.split(","):
         reward_program_id = reward_program_id.strip()
-        reward_program = RewardProgram(reward_program_id, w3, REWARD_MANAGER_ADDRESS, SUBGRAPH_URL, REWARDS_BUCKET)#, REWARDS_SUBGRAPH_EXTRACTION)
+        reward_program = RewardProgram(
+            reward_program_id,
+            w3,
+            REWARD_MANAGER_ADDRESS,
+            SUBGRAPH_URL,
+            REWARDS_BUCKET,
+            REWARDS_SUBGRAPH_EXTRACTION,
+        )
         logging.info(
             f"Setting regular processing every {REWARD_RUNNER_UPDATE_FREQUENCY} seconds for {reward_program_id}"
         )
         schedule.every(REWARD_RUNNER_UPDATE_FREQUENCY).seconds.do(
-            safe_run,
-            reward_program=reward_program
+            safe_run, reward_program=reward_program
         )
         schedule.run_all()
     # Go into an infinite loop
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
