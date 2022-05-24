@@ -25,12 +25,6 @@ import { SuccessfulTransactionReceipt } from '../utils/successful-transaction-re
 export default class PrepaidCardMarketV2 {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
-  // FIXME remove when implemented
-  async getQuantity(sku: string): Promise<number> {
-    console.log(`Not implemented; sku: ${sku}`);
-    return 0;
-  }
-
   async isPaused(marketAddress?: string): Promise<boolean> {
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarketV2', this.layer2Web3));
     let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
