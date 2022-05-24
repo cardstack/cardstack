@@ -285,4 +285,109 @@ export default class PrepaidCardMarketV2 {
     let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
     return await contract.methods.getSKU(issuer, token, faceValue, customizationDID).call();
   }
+
+  async setAsk(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async setAsk(
+    prepaidCard: string,
+    sku: string,
+    askPrice: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async setAsk(
+    prepaidCardOrTxnHash: string,
+    sku?: string,
+    askPrice?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    if (isTransactionHash(prepaidCardOrTxnHash)) {
+      let txnHash = prepaidCardOrTxnHash;
+      return await waitForTransactionConsistency(this.layer2Web3, txnHash);
+    }
+    if (!sku) {
+      throw new Error('sku is required');
+    }
+    if (!askPrice) {
+      throw new Error('askPrice is required');
+    }
+    let prepaidCardAddress = prepaidCardOrTxnHash;
+    let marketAddress = await getAddress('prepaidCardMarketV2', this.layer2Web3);
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getSetAskPayload(prepaidCardAddress, sku, askPrice, marketAddress!, rateLock);
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
+        }
+      }
+      return await this.executeSetAsk(
+        prepaidCardAddress,
+        sku,
+        askPrice,
+        marketAddress!,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from, this.layer2Signer),
+        nonce
+      );
+    });
+
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for setAsk from prepaid card ${prepaidCardAddress} for sku ${sku} with askPrice ${fromWei(
+          askPrice
+        )} (in units of issuing token for prepaid card)`
+      );
+    }
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
+  }
+
+  private async getSetAskPayload(
+    prepaidCardAddress: string,
+    sku: string,
+    askPrice: string,
+    marketAddress: string,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      0,
+      rate,
+      'setPrepaidCardAsk',
+      this.layer2Web3.eth.abi.encodeParameters(['bytes32', 'uint256', 'address'], [sku, askPrice, marketAddress])
+    );
+  }
+
+  private async executeSetAsk(
+    prepaidCardAddress: string,
+    sku: string,
+    askPrice: string,
+    marketAddress: string,
+    rate: string,
+    payload: SendPayload,
+    signatures: Signature[],
+    nonce: BN
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      0,
+      rate,
+      payload,
+      'setPrepaidCardAsk',
+      this.layer2Web3.eth.abi.encodeParameters(['bytes32', 'uint256', 'address'], [sku, askPrice, marketAddress]),
+      signatures,
+      nonce
+    );
+  }
 }
