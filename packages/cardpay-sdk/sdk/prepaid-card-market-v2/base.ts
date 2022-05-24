@@ -177,9 +177,6 @@ export default class PrepaidCardMarketV2 {
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarketV2', this.layer2Web3));
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
-
-    contract.methods.addSKU(issuerSafe, faceValue, customizationDID, token).call();
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getAddSKUPayload(
@@ -281,5 +278,11 @@ export default class PrepaidCardMarketV2 {
     let marketAddress = await getAddress('prepaidCardMarketV2', this.layer2Web3);
     let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
     return await contract.methods.getQuantity(sku).call();
+  }
+
+  async getSKU(issuer: string, token: string, faceValue: number, customizationDID: string): Promise<number> {
+    let marketAddress = await getAddress('prepaidCardMarketV2', this.layer2Web3);
+    let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
+    return await contract.methods.getSKU(issuer, token, faceValue, customizationDID).call();
   }
 }
