@@ -245,6 +245,36 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email }, { email }]);
   });
 
+  it('sends an alert to web-team if getQuantity drops below notifyWhenQuantityBelow', async function () {
+    let notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
+    mockPrepaidCardQuantity = notifyWhenQuantityBelow - 1;
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload);
+
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal(`Prepaid card quantity (${mockPrepaidCardQuantity}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`);
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'drop-card',
+      alert: 'web-team',
+    });
+  });
+
   it('persists a new request for a given EOA and runs jobs if a request is present but has not been claimed', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
 
@@ -294,6 +324,9 @@ describe('POST /api/email-card-drop-requests', function () {
 
     expect(allRequests.length).to.equal(2);
     expect(allRequests.find((v) => v.id === '2850a954-525d-499a-a5c8-3c89192ad40e')).to.not.be.undefined;
+
+    console.log('allrequests', allRequests);
+
     expect(latestRequest.id).to.not.equal('2850a954-525d-499a-a5c8-3c89192ad40e');
     expect(latestRequest.verificationCode).to.match(verificationCodeRegex);
     expect(latestRequest.emailHash).to.equal(emailHash2);
