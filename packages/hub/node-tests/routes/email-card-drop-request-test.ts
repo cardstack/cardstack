@@ -364,7 +364,6 @@ describe('POST /api/email-card-drop-requests', function () {
         verificationCode: 'x',
         id: `2850a954-525d-499a-a5c8-3c89192ad40${i}`,
         requestedAt: new Date(insertionTimeInMs),
-        claimedAt: undefined,
       });
     }
 
