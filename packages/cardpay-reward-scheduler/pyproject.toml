@@ -19,12 +19,19 @@ dependencies = [
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "black>=22.3.0",
+]
 [tool.pdm]
 [[tool.pdm.source]]
 name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+
+[tool.pdm.dev-dependencies]
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
