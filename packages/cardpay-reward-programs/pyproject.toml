@@ -29,7 +29,6 @@ license = {text = "MIT"}
 [project.urls]
 Homepage = ""
 
-[project.optional-dependencies]
 [tool.pdm]
 [tool.pdm.dev-dependencies]
 dev = [
