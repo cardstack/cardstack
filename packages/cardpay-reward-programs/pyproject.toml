@@ -49,7 +49,8 @@ build-backend = "pdm.pep517.api"
 # Read scripts
 explore_rules = "streamlit run streamlit/explore.py --server.port 8501 --global.developmentMode false"
 inspect_results = "streamlit run streamlit/inspect_results.py --server.port 8501 --global.developmentMode false"
-airdrop_info= "python -m cardpay_reward_programs.airdrop_info"
+claim_info= "python scripts/claim_info.py"
+prepaid_cards_less_gas = "python scripts/prepaid_cards_less_gas.py"
 
 # Write script (Please be carefu)
 flat_drop = "python -m cardpay_reward_programs.flat_drop"
