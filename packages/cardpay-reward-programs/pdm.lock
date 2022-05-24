@@ -112,14 +112,14 @@ version = "1.21.22"
 requires_python = ">= 3.6"
 summary = "The AWS SDK for Python"
 dependencies = [
-    "botocore<1.27.0,>=1.26.5",
+    "botocore<1.27.0,>=1.26.6",
     "jmespath<2.0.0,>=0.7.1",
     "s3transfer<0.6.0,>=0.5.0",
 ]
 
 [[package]]
 name = "botocore"
-version = "1.26.5"
+version = "1.26.6"
 requires_python = ">= 3.6"
 summary = "Low-level, data-driven core of boto 3."
 dependencies = [
@@ -295,12 +295,6 @@ summary = "GitPython is a python library used to interact with Git repositories"
 dependencies = [
     "gitdb<5,>=4.0.1",
 ]
-
-[[package]]
-name = "hexbytes"
-version = "0.2.2"
-requires_python = ">=3.6, <4"
-summary = "hexbytes: Python `bytes` subclass that decodes hex, with a readable console output"
 
 [[package]]
 name = "idna"
@@ -1065,7 +1059,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:d93f50878847a62e6618833276cbe53bdd8c8d4fe6cc2518af3f32cdb651c4cb"
+content_hash = "sha256:269da5a5fbe71c04dbeeb1ec6c6565ae955ca6862ba22321fea9b8562c8ebbbe"
 
 [metadata.files]
 "altair 4.2.0" = [
@@ -1163,9 +1157,9 @@ content_hash = "sha256:d93f50878847a62e6618833276cbe53bdd8c8d4fe6cc2518af3f32cdb
     {file = "boto3-1.21.22-py3-none-any.whl", hash = "sha256:a56e34d8dc3390006a6d7ae5373f357917932045e874c82de2736f3b42c02b10"},
     {file = "boto3-1.21.22.tar.gz", hash = "sha256:334f14ffbd89ddd15090e90b32e4fcea73d83b60b19ca2737a9264fd44096f35"},
 ]
-"botocore 1.26.5" = [
-    {file = "botocore-1.26.5-py3-none-any.whl", hash = "sha256:805db3ecf85ff89edfb6788f862b87426f990e3e6383ef3fca3076f7659a5454"},
-    {file = "botocore-1.26.5.tar.gz", hash = "sha256:32541873924e3ff0ad95f02dc331e9f278721a3b864a4e2a8d514346b2598ce5"},
+"botocore 1.26.6" = [
+    {file = "botocore-1.26.6-py3-none-any.whl", hash = "sha256:2846ee4a548462ba6db70125bea1542b4ed39793240aabc62ddf96fb6ec7e4d1"},
+    {file = "botocore-1.26.6.tar.gz", hash = "sha256:ce3fb008ffb041d142cf3949b13529e8dc9a0db5f2ec0e86b159f10f2b56a46e"},
 ]
 "cachetools 5.0.0" = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
@@ -1353,10 +1347,6 @@ content_hash = "sha256:d93f50878847a62e6618833276cbe53bdd8c8d4fe6cc2518af3f32cdb
 "gitpython 3.1.27" = [
     {file = "GitPython-3.1.27-py3-none-any.whl", hash = "sha256:5b68b000463593e05ff2b261acff0ff0972df8ab1b70d3cdbd41b546c8b8fc3d"},
     {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
-]
-"hexbytes 0.2.2" = [
-    {file = "hexbytes-0.2.2-py3-none-any.whl", hash = "sha256:ef53c37ea9f316fff86fcb1df057b4c6ba454da348083e972031bbf7bc9c3acc"},
-    {file = "hexbytes-0.2.2.tar.gz", hash = "sha256:a5881304d186e87578fb263a85317c808cf130e1d4b3d37d30142ab0f7898d03"},
 ]
 "idna 3.3" = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
