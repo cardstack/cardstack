@@ -6,6 +6,15 @@ from hexbytes import HexBytes
 from web3 import Web3
 
 
+NULL_HEX = HexBytes(
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+)
+
+EMPTY_MARKER_HEX = HexBytes(
+    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+)
+
+
 def safe_regex_group_search(regex, string, group):
     """
     Returns None in the case of a missing group
