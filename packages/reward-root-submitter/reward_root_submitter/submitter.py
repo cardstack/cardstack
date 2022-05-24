@@ -7,7 +7,7 @@ from cloudpathlib import AnyPath
 from eth_utils import to_wei
 from hexbytes import HexBytes
 
-from .utils import get_all_reward_outputs, get_root_from_file
+from .utils import get_all_reward_outputs, get_root_from_file, NULL_HEX, EMPTY_MARKER_HEX
 
 
 class RootSubmitter:
@@ -61,9 +61,7 @@ class RootSubmitter:
             reward_program_id, payment_cycle
         )
         # This is like a null check, unsubmitted roots are blank
-        if existing_root != HexBytes(
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ):
+        if existing_root != NULL_HEX:
             # If it exists, and it's the same as before, it's safe and expected to just skip on
             if existing_root == root:
                 logging.info(
@@ -108,6 +106,7 @@ class RootSubmitter:
                 if root is not None:
                     self.submit_root(reward_program_id, payment_cycle, root)
                 else:
+                    self.submit_root(reward_program_id, payment_cycle, EMPTY_MARKER_HEX)
                     logging.info(
-                        f"No root found for reward program {reward_program_id} payment cycle {payment_cycle}"
+                        f"No root found for reward program {reward_program_id} payment cycle {payment_cycle}, submitted marker"
                     )
