@@ -256,8 +256,7 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailHash = hash.digest('hex');
     let emailHash2 = crypto.createHmac('sha256', config.get('emailHashSalt')).update(email2).digest('hex');
 
-    // FIXME is there something off with this…?
-    let insertionTimeInMs = fakeTime - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
+    let insertionTimeInMs = fakeTime - 60 * 1000;
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
