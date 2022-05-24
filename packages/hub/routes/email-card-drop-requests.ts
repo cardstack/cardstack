@@ -11,6 +11,9 @@ import crypto from 'crypto';
 import cryptoRandomString from 'crypto-random-string';
 import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
+import logger from '@cardstack/logger';
+
+const log = logger('hub/email-card-drop-requests');
 
 const cardDropSku = config.get('cardDrop.sku') as string;
 const notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
@@ -103,6 +106,8 @@ export default class EmailCardDropRequestsRoute {
 
     let quantityIsBelowNotificationThreshold = quantityAvailable < notifyWhenQuantityBelow;
     let notificationHasNotBeenSentRecently = !lastNotifiedOnQuantity || lastNotifiedOnQuantity < (Date.now() - millisToWaitBeforeNotifying);
+
+    log.trace(`${cardDropSku} has ${quantityAvailable} available, notification threshold is ${notifyWhenQuantityBelow}`);
 
     if (quantityIsBelowNotificationThreshold && notificationHasNotBeenSentRecently) {
       Sentry.captureException(new Error(`Prepaid card quantity (${quantityAvailable}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`), {
