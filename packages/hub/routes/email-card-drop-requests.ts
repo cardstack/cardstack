@@ -92,30 +92,18 @@ export default class EmailCardDropRequestsRoute {
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
     if (await prepaidCardMarketV2.isPaused()) {
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'The prepaid card market contract is paused' }],
-      };
-      return;
+      return respondWith503(ctx, 'The prepaid card market contract is paused');
     }
 
     let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
     let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
 
     if (quantityAvailable <= activeReservations) {
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'There are no prepaid cards available' }],
-      };
-      return;
+      return respondWith503(ctx, 'There are no prepaid cards available');
     }
 
     if (await this.emailCardDropStateQueries.read()) {
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
-      };
-      return;
+      return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
     let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
@@ -132,11 +120,7 @@ export default class EmailCardDropRequestsRoute {
 
       await this.emailCardDropStateQueries.update(true);
 
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
-      };
-      return;
+      return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
     let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
@@ -247,6 +231,13 @@ export default class EmailCardDropRequestsRoute {
 
 function generateVerificationCode() {
   return cryptoRandomString({ length: 10, type: 'url-safe' });
+}
+
+function respondWith503(ctx: Koa.Context, message: string) {
+  ctx.status = 503;
+  ctx.body = {
+    errors: [{ status: '503', title: message }],
+  };
 }
 
 declare module '@cardstack/di' {
