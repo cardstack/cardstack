@@ -20,6 +20,7 @@ config = {
         },
         "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "rewards_bucket": "s3://tally-staging-reward-programs",
+        "subgraph": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
     },
     "production": {
         "tokens": {
@@ -27,5 +28,6 @@ config = {
         },
         "reward_program": "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185",
         "rewards_bucket": "s3://tally-production-reward-programs",
+        "subgraph_url": "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai",
     },
 }
