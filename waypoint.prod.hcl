@@ -57,6 +57,11 @@ app "hub" {
       when    = "before"
       command = ["./scripts/purge-services.sh", "hub-prod", "waypoint-hub", "2"] # need this to purge old ecs services
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
   }
 }
 
@@ -295,6 +300,11 @@ app "ssr-web" {
       when    = "before"
       command = ["./scripts/purge-services.sh", "ssr-web-prod", "waypoint-ssr-web", "2"] # need this to purge old ecs services
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
+    }
   }
 }
 
@@ -397,6 +407,11 @@ app "reward-api" {
     hook {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
     }
   }
 }

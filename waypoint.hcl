@@ -62,6 +62,11 @@ app "hub" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
   }
 }
 
@@ -341,6 +346,11 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
+    }
   }
 }
 
@@ -436,13 +446,8 @@ app "reward-api" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
     }
   }
 }
