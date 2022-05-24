@@ -49,7 +49,7 @@ def get_all_reward_outputs(root: AnyPath):
         )
         if (
             web3.isChecksumAddress(reward_program_id)
-            and result_file.exists()
+            and result_file.is_file() # checks existence & is not a folder
             and (payment_cycle or "").isdigit()
         ):
             yield {
