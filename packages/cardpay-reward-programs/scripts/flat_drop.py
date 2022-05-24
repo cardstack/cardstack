@@ -4,15 +4,18 @@ import os
 
 import pyarrow.parquet as pq
 from boto3.session import Session
+from cardpay_reward_programs.config import config
+from cardpay_reward_programs.payment_tree import PaymentTree
+from cardpay_reward_programs.rules import FlatPayment
 from cardpay_reward_programs.rules.flat_payment import FlatPayment
+from cardpay_reward_programs.utils import (write_parameters_file,
+                                           write_parquet_file)
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 from web3 import Web3
 
-from .config import config
-from .payment_tree import PaymentTree
-from .rules import FlatPayment
-from .utils import write_parameters_file, write_parquet_file
+# ATTENTION!
+# Please ensure EVM_FULL_NODE_URL corresponds to the ENVIRONMENT
 
 load_dotenv()
 cached_client = S3Client(
@@ -21,7 +24,7 @@ cached_client = S3Client(
 )
 cached_client.set_as_default_client()
 
-reward_amount = 1_000000000000000000  # 1 eth
+reward_amount = 1_000_000_000_000_000_000  # 1 eth
 
 for expected_env in ["EVM_FULL_NODE_URL", "ENVIRONMENT"]:
     if expected_env not in os.environ:
@@ -56,7 +59,9 @@ def flat_drop():
     rewards_bucket = config[env]["rewards_bucket"]
     output_location = f"{rewards_bucket}/rewardProgramID={reward_program_id}/paymentCycle={payment_cycle}"
 
-    print(f"Writing flat drop to {output_location}")
+    print(
+        f"Writing flat drop of {len(user_defined_parameters['accounts'])} accounts to {output_location}"
+    )
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
     output_path = AnyPath(output_location)
