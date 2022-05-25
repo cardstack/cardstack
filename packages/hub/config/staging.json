@@ -6,7 +6,6 @@
   },
   "cardDrop": {
     "sku": "0x18367eee0b96d5f6e46e172ee78585d22f464884e27e7e843031c03a05af16d2",
-    "FIXME": "remove the above?",
     "verificationUrl": "https://hub-staging.stack.cards/email-card-drop/verify"
   },
   "mailchimp": {
