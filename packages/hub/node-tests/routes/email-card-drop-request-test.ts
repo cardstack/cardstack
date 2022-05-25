@@ -192,7 +192,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
   it('persists an email card drop request and triggers jobs', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let insertionTimeInMs = Date.now() - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
+    let insertionTimeBeyondExpiry = Date.now() - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
 
     // Create no-longer-active reservations
 
@@ -202,7 +202,7 @@ describe('POST /api/email-card-drop-requests', function () {
         emailHash: `other-email-hash-${i}`,
         verificationCode: 'x',
         id: shortUUID.uuid(),
-        requestedAt: new Date(insertionTimeInMs),
+        requestedAt: new Date(insertionTimeBeyondExpiry),
       });
     }
 
@@ -356,7 +356,7 @@ describe('POST /api/email-card-drop-requests', function () {
     mockPrepaidCardQuantity = 5;
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let insertionTimeInMs = Date.now() - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
+    let insertionTimeBeforeExpiry = Date.now() - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
 
     for (let i = 0; i < mockPrepaidCardQuantity + 1; i++) {
       await emailCardDropRequestsQueries.insert({
@@ -364,7 +364,7 @@ describe('POST /api/email-card-drop-requests', function () {
         emailHash: `other-email-hash-${i}`,
         verificationCode: 'x',
         id: `2850a954-525d-499a-a5c8-3c89192ad40${i}`,
-        requestedAt: new Date(insertionTimeInMs),
+        requestedAt: new Date(insertionTimeBeforeExpiry),
       });
     }
 
