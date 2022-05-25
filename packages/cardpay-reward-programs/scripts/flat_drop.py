@@ -24,7 +24,7 @@ cached_client = S3Client(
 )
 cached_client.set_as_default_client()
 
-reward_amount = 1_000_000_000_000_000_000  # 1 eth
+reward_amount = 10_000_000_000_000_000_000  # 10 eth
 
 for expected_env in ["EVM_FULL_NODE_URL", "ENVIRONMENT"]:
     if expected_env not in os.environ:
