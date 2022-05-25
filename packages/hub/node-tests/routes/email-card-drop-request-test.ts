@@ -265,10 +265,11 @@ describe('POST /api/email-card-drop-requests', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .send(payload);
 
-
     let sentryReport = await waitForSentryReport();
 
-    expect(sentryReport.error?.message).to.equal(`Prepaid card quantity (${mockPrepaidCardQuantity}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`);
+    expect(sentryReport.error?.message).to.equal(
+      `Prepaid card quantity (${mockPrepaidCardQuantity}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+    );
     expect(sentryReport.tags).to.deep.equal({
       action: 'drop-card',
       alert: 'web-team',
