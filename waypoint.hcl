@@ -449,7 +449,7 @@ app "reward-api" {
 
 
 
-app "cardpay-reward-scheduler" {
+app "reward-sched" {
   path = "./packages/cardpay-reward-scheduler"
 
   config {
@@ -483,7 +483,7 @@ app "cardpay-reward-scheduler" {
       region              = "us-east-1"
       memory              = "512"
       cluster             = "cardpay-reward-scheduler-staging"
-      count               = 2
+      count               = 1
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-programs-scheduler-ecr-task"
       execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
@@ -491,6 +491,16 @@ app "cardpay-reward-scheduler" {
       secrets = {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
+    }
+
+    hook {
+      when    = "before"
+      command = ["./scripts/purge-services.sh", "cardpay-reward-scheduler-staging", "waypoint-reward-sched", "1"] # need this to purge old ecs services
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/purge-target-groups.mjs", "reward-sched"]
     }
   }
 }
