@@ -325,7 +325,6 @@ describe('POST /api/email-card-drop-requests', function () {
 
     expect(allRequests.length).to.equal(2);
     expect(allRequests.find((v) => v.id === '2850a954-525d-499a-a5c8-3c89192ad40e')).to.not.be.undefined;
-
     expect(latestRequest.id).to.not.equal('2850a954-525d-499a-a5c8-3c89192ad40e');
     expect(latestRequest.verificationCode).to.match(verificationCodeRegex);
     expect(latestRequest.emailHash).to.equal(emailHash2);
