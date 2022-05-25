@@ -80,6 +80,15 @@
   outline: transparent;
 }
 
+.boxel-expandable-banner__details[open]:focus-within {
+  outline: var(--boxel-outline);
+  outline-offset: -4px;
+}
+
+.boxel-expandable-banner__details[open]:focus-within .boxel-expandable-banner__summary:focus {
+  outline: none;
+}
+
 /* style our custom markers */
 .boxel-expandable-banner__summary-marker::before {
   display: block;
