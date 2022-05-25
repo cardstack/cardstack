@@ -26,7 +26,7 @@ for expected_env in [
     "EVM_FULL_NODE_URL",
     "REWARD_MANAGER_ADDRESS",
     "REWARDS_BUCKET",
-    "REWARD_RUNNER_APPROVED_PROGRAMS",
+    "REWARD_SCHEDULER_APPROVED_PROGRAMS",
     "SUBGRAPH_URL",
 ]:
     if expected_env not in os.environ:
@@ -35,11 +35,11 @@ for expected_env in [
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
 EVM_FULL_NODE_URL = os.environ.get("EVM_FULL_NODE_URL")
-REWARD_RUNNER_APPROVED_PROGRAMS = os.environ.get("REWARD_RUNNER_APPROVED_PROGRAMS")
+REWARD_SCHEDULER_APPROVED_PROGRAMS = os.environ.get("REWARD_SCHEDULER_APPROVED_PROGRAMS")
 REWARD_MANAGER_ADDRESS = os.environ.get("REWARD_MANAGER_ADDRESS")
 REWARDS_SUBGRAPH_EXTRACTION = os.environ.get("REWARDS_SUBGRAPH_EXTRACTION")
-REWARD_RUNNER_UPDATE_FREQUENCY = int(
-    os.environ.get("REWARD_RUNNER_UPDATE_FREQUENCY", 600)
+REWARD_SCHEDULER_UPDATE_FREQUENCY = int(
+    os.environ.get("REWARD_SCHEDULER_UPDATE_FREQUENCY", 600)
 )
 
 
@@ -54,7 +54,7 @@ def safe_run(reward_program):
 
 def main():
     w3 = Web3(Web3.HTTPProvider(EVM_FULL_NODE_URL))
-    for reward_program_id in REWARD_RUNNER_APPROVED_PROGRAMS.split(","):
+    for reward_program_id in REWARD_SCHEDULER_APPROVED_PROGRAMS.split(","):
         reward_program_id = reward_program_id.strip()
         reward_program = RewardProgram(
             reward_program_id,
@@ -65,9 +65,9 @@ def main():
             REWARDS_SUBGRAPH_EXTRACTION,
         )
         logging.info(
-            f"Setting regular processing every {REWARD_RUNNER_UPDATE_FREQUENCY} seconds for {reward_program_id}"
+            f"Setting regular processing every {REWARD_SCHEDULER_UPDATE_FREQUENCY} seconds for {reward_program_id}"
         )
-        schedule.every(REWARD_RUNNER_UPDATE_FREQUENCY).seconds.do(
+        schedule.every(REWARD_SCHEDULER_UPDATE_FREQUENCY).seconds.do(
             safe_run, reward_program=reward_program
         )
         schedule.run_all()
