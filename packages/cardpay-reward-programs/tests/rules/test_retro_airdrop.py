@@ -1,9 +1,8 @@
 import itertools
-from audioop import mul
 
 import pandas as pd
 import pytest
-from cardpay_reward_programs.config import reward_token_addresses
+from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import RetroAirdrop
 
 from .fixture import indexed_data
@@ -37,7 +36,7 @@ def rule(request):
     }
     user_config = {
         "total_reward": total_reward,
-        "token": reward_token_addresses["xdai"],
+        "token": config["staging"]["tokens"]["card"],
         "duration": 43200,
         "start_snapshot_block": 23592960,
         "end_snapshot_block": 24859648,
@@ -191,7 +190,7 @@ class TestRetroAirdropSingle:
         }
         user_config = {
             "total_reward": 1_000_000_000_000,
-            "token": reward_token_addresses["xdai"],
+            "token": config["staging"]["tokens"]["card"],
             "duration": 43200,
             "start_snapshot_block": 23592960,
             "end_snapshot_block": 24859648,

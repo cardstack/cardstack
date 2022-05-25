@@ -62,6 +62,11 @@ app "hub" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+    }
   }
 }
 
@@ -341,6 +346,11 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
+    }
   }
 }
 
@@ -383,6 +393,7 @@ app "reward-submit" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
         OWNER             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
     }
   }
@@ -430,17 +441,13 @@ app "reward-api" {
 
       secrets = {
         DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
       }
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "reward-api-staging", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
+      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
     }
   }
 }

@@ -8,9 +8,7 @@ class MinSpend(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(MinSpend, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(
-        self, min_spend, base_reward, token, duration
-    ):
+    def set_user_defined_parameters(self, min_spend, base_reward, token, duration):
         self.min_spend = min_spend
         self.base_reward = base_reward
         self.token = token
@@ -18,20 +16,18 @@ class MinSpend(Rule):
 
     def sql(self, table_query):
         return f"""
-        select 
+        select
         prepaid_card_owner as payee,
         sum(spend_amount_uint64) as total_spent
 
         from {table_query}
-        where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer 
-        
+        where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer
+
         group by prepaid_card_owner
         having(total_spent) >= $3::integer
         """
 
-    def df_to_payment_list(
-        self, df, payment_cycle, reward_program_id
-    ):
+    def df_to_payment_list(self, df, payment_cycle, reward_program_id):
         if df.empty:
             return default_payment_list.copy()
         new_df = df.copy()
@@ -40,14 +36,21 @@ class MinSpend(Rule):
         new_df["validFrom"] = payment_cycle
         new_df["validTo"] = payment_cycle + self.duration
         new_df["token"] = self.token
-        new_df["amount"] = np.where(new_df["total_spent"] > self.min_spend, self.base_reward, 0)
+        new_df["amount"] = np.where(
+            new_df["total_spent"] > self.min_spend, self.base_reward, 0
+        )
         new_df = new_df.drop(["total_spent"], axis=1)
         return new_df[new_df["amount"] > 0].reset_index()
 
     def run(self, payment_cycle: int, reward_program_id: str):
-        start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
+        start_block, end_block = (
+            payment_cycle - self.payment_cycle_length,
+            payment_cycle,
+        )
         vars = [start_block, end_block, self.min_spend]
-        table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
+        table_query = self._get_table_query(
+            "prepaid_card_payment", "prepaid_card_payment", start_block, end_block
+        )
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "total_spent"])
         else:

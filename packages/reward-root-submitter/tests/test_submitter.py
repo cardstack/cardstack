@@ -212,7 +212,6 @@ def test_submits_all_roots(w3, reward_pool, deploy_address, deploy_key):
         "tests/resources/reward_output",
     )
     submitter.submit_all_roots()
-    # There is no root for  "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd" / 24098304
     for reward_program_id in reward_programs():
         for payment_cycle in [24000000, 24065536]:
             assert reward_pool.caller.payeeRoots(
@@ -220,6 +219,22 @@ def test_submits_all_roots(w3, reward_pool, deploy_address, deploy_key):
             ) != HexBytes(
                 "0x0000000000000000000000000000000000000000000000000000000000000000"
             )
+
+
+def test_submits_FF_for_empty_file(w3, reward_pool, deploy_address, deploy_key):
+    submitter = RootSubmitter(
+        w3,
+        deploy_address,
+        deploy_key,
+        reward_pool.address,
+        "tests/resources/reward_output",
+    )
+    empty_file_program_id = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
+    empty_file_cycle = 24098304
+    submitter.submit_all_roots()
+    assert reward_pool.caller.payeeRoots(
+        empty_file_program_id, empty_file_cycle
+    ) == HexBytes("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 
 
 def test_can_find_all_payment_cycles():
@@ -265,3 +280,37 @@ def test_returns_none_when_file_empty():
     )
     root = get_root_from_file(file)
     assert root is None
+
+
+def test_ignores_non_rewards_folders():
+    s3_client = LocalS3Client(local_storage_dir="tests")
+    all_cycles = list(
+        get_all_reward_outputs(
+            s3_client.S3Path("s3://resources/rewards_with_other_folders/")
+        )
+    )
+    assert len(all_cycles) == 1
+    assert {
+        "file": s3_client.S3Path(
+            "s3://resources/rewards_with_other_folders/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
+        ),
+        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "payment_cycle": 24000000,
+    } in all_cycles
+
+
+def test_ignores_folders_without_parquet_results():
+    s3_client = LocalS3Client(local_storage_dir="tests")
+    all_cycles = list(
+        get_all_reward_outputs(
+            s3_client.S3Path("s3://resources/rewards_with_missing_parquet/")
+        )
+    )
+    assert len(all_cycles) == 1
+    assert {
+        "file": s3_client.S3Path(
+            "s3://resources/rewards_with_missing_parquet/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
+        ),
+        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
+        "payment_cycle": 24000000,
+    } in all_cycles

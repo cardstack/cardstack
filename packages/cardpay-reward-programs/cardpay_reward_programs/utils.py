@@ -91,8 +91,8 @@ def write_parquet_file(file_location, table):
     # and upload directly
     if isinstance(file_location, CloudPath):
         with tempfile.TemporaryDirectory() as temp_dir:
-            pq_file_location = AnyPath(temp_dir).joinpath("data.parquet")
+            pq_file_location = AnyPath(temp_dir) / "results.parquet"
             pq.write_table(table, pq_file_location)
-            file_location.joinpath("data.parquet").upload_from(pq_file_location)
+            file_location.joinpath("results.parquet").upload_from(pq_file_location)
     else:
         pq.write_table(table, file_location / "results.parquet")

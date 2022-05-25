@@ -31,6 +31,7 @@ const FAILURE_REASONS = {
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   INSUFFICIENT_PREPAID_CARD_BALANCE: 'INSUFFICIENT_PREPAID_CARD_BALANCE',
   NO_PREPAID_CARD: 'NO_PREPAID_CARD',
+  HAS_PROFILE: 'HAS_PROFILE',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
@@ -100,30 +101,35 @@ class CreateMerchantWorkflow extends Workflow {
 
             let hasPrepaidCardWithSufficientBalance = false;
             let hasPrepaidCard = false;
+            let hasProfile = false;
             for (let safe of layer2Network.safes.value) {
               hasPrepaidCard = safe.type === 'prepaid-card' || hasPrepaidCard;
               hasPrepaidCardWithSufficientBalance =
-                safe.type === 'prepaid-card' &&
-                safe.spendFaceValue >= merchantRegistrationFee;
-
-              if (hasPrepaidCardWithSufficientBalance) {
-                break;
+                hasPrepaidCardWithSufficientBalance ||
+                (safe.type === 'prepaid-card' &&
+                  safe.spendFaceValue >= merchantRegistrationFee);
+              hasProfile = hasProfile || safe.type === 'merchant';
+              if (hasProfile) {
+                return {
+                  success: false,
+                  reason: FAILURE_REASONS.HAS_PROFILE,
+                };
               }
             }
 
-            if (hasPrepaidCardWithSufficientBalance) {
+            if (!hasPrepaidCard) {
               return {
-                success: true,
+                success: false,
+                reason: FAILURE_REASONS.NO_PREPAID_CARD,
               };
-            } else if (hasPrepaidCard) {
+            } else if (!hasPrepaidCardWithSufficientBalance) {
               return {
                 success: false,
                 reason: FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE,
               };
             } else {
               return {
-                success: false,
-                reason: FAILURE_REASONS.NO_PREPAID_CARD,
+                success: true,
               };
             }
           },
@@ -231,6 +237,11 @@ class CreateMerchantWorkflow extends Workflow {
       message: 'You are no longer authenticated. Please restart the workflow.',
     }),
     conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.HAS_PROFILE,
+      message:
+        'You already have a payment profile. You can not create another one with this account.',
+    }),
+    conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
       message:
         'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.',
@@ -244,6 +255,14 @@ class CreateMerchantWorkflow extends Workflow {
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+    }),
+
+    new WorkflowCard({
+      componentName:
+        'card-pay/create-merchant-workflow/has-profile-cancelation',
+      includeIf() {
+        return this.workflow?.cancelationReason === FAILURE_REASONS.HAS_PROFILE;
+      },
     }),
     ...standardCancelationPostables(),
   ]);

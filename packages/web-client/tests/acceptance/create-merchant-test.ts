@@ -24,6 +24,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
 import {
   createDepotSafe,
+  createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
@@ -488,6 +489,45 @@ module('Acceptance | create merchant', function (hooks) {
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
     });
+  });
+
+  test('it cancels the workflow if there is already a profile in this EOA', async function (assert) {
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
+      }),
+      createMerchantSafe({}),
+    ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+    await visit('/card-pay/payments?flow=create-business');
+    assert
+      .dom(
+        '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+      )
+      .containsText(layer2AccountAddress)
+      .isVisible();
+
+    await settled();
+
+    assert
+      .dom('[data-test-postable="0"][data-test-cancelation]')
+      .containsText(
+        `You already have a payment profile. You can not create another one with this account.`
+      );
+    assert
+      .dom('[data-test-has-profile-cancelation]')
+      .containsText('Workflow canceled');
+    assert
+      .dom('[data-test-has-profile-cancelation-cta]')
+      .containsText('Close Workflow');
+
+    await click('[data-test-has-profile-cancelation-cta]');
+
+    assert.dom('[data-test-create-merchant-workflow]').doesNotExist();
   });
 
   test('it cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {

@@ -14,7 +14,8 @@ If you want to build as it would be used in production, you can install without 
 
 ## Run and Test
 
-    python -m cardpay_reward_programs.main
+    RULE=<Rule Name> pdm run python -m cardpay_reward_programs.main
+    RULE=WeightedUsage pdm run python -m cardpay_reward_programs.main
     pdm run pytest tests
 
 ## Explore
@@ -32,3 +33,7 @@ Decode and inspect payment list
 Each individual program can be built by specifying the rule class name as a build argument, for example:
 
     docker build --build-arg rule=FlatPayment -t flat_payment .
+
+    docker run -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack --rm -it flat_payment:latest /host/parameters.json /host/
+    
+If you are using an m1 laptop, you should add `--platform=linux/amd64` flag.

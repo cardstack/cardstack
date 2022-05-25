@@ -11,6 +11,7 @@ dependencies = [
     "web3>=5.28.0",
     "pyarrow>=7.0.0",
     "schedule>=1.1.0",
+    "sentry-sdk>=1.5.12",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}

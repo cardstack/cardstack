@@ -2,6 +2,7 @@ import logging
 import os
 from typing import List, Optional
 
+import sentry_sdk
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
@@ -30,8 +31,19 @@ for expected_env in [
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
 ENVIRONMENT = os.environ.get("ENVIRONMENT")
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
 
 app = FastAPI()
+
+if SENTRY_DSN is not None:
+    sentry_sdk.init(
+        SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        environment=ENVIRONMENT,
+    )
 
 
 @app.on_event("startup")

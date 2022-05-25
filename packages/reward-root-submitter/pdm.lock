@@ -126,7 +126,7 @@ requires_python = ">=3.6"
 summary = "pathlib-style classes for cloud storage services"
 dependencies = [
     "boto3",
-    "cloudpathlib",
+    "cloudpathlib>=0.7.0",
 ]
 
 [[package]]
@@ -193,7 +193,7 @@ extras = ["pycryptodome"]
 requires_python = ">=3.5, <4"
 summary = "eth-hash: The Ethereum hashing function, keccak256, sometimes (erroneously) called sha3"
 dependencies = [
-    "eth-hash",
+    "eth-hash<1.0.0,>=0.2.0",
     "pycryptodome<4,>=3.6.6",
 ]
 
@@ -204,7 +204,7 @@ extras = ["pysha3"]
 requires_python = ">=3.5, <4"
 summary = "eth-hash: The Ethereum hashing function, keccak256, sometimes (erroneously) called sha3"
 dependencies = [
-    "eth-hash",
+    "eth-hash<1.0.0,>=0.1.4",
     "pysha3<2.0.0,>=1.0.0",
 ]
 
@@ -262,7 +262,7 @@ summary = "Tools for testing Ethereum applications."
 dependencies = [
     "eth-hash[pycryptodome]<1.0.0,>=0.1.4; implementation_name == \"pypy\"",
     "eth-hash[pysha3]<1.0.0,>=0.1.4; implementation_name == \"cpython\"",
-    "eth-tester",
+    "eth-tester==v0.6.0-beta.6",
     "py-evm==0.5.0a3",
 ]
 
@@ -580,6 +580,15 @@ requires_python = ">=2.7"
 summary = "A library implementing the 'SemVer' scheme."
 
 [[package]]
+name = "sentry-sdk"
+version = "1.5.12"
+summary = "Python client for Sentry (https://sentry.io)"
+dependencies = [
+    "certifi",
+    "urllib3>=1.10.0",
+]
+
+[[package]]
 name = "setuptools"
 version = "60.9.3"
 requires_python = ">=3.7"
@@ -669,7 +678,7 @@ summary = "Web3.py"
 dependencies = [
     "eth-tester[py-evm]==v0.6.0-beta.6",
     "py-geth<4,>=3.7.0",
-    "web3",
+    "web3>=5.28.0",
 ]
 
 [[package]]
@@ -690,7 +699,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:44e3db4597fe6b5d347967723b1534716e6041f84226c9f4c82d61f76b165871"
+content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73eef5e40"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -1301,6 +1310,10 @@ content_hash = "sha256:44e3db4597fe6b5d347967723b1534716e6041f84226c9f4c82d61f76
 "semantic-version 2.9.0" = [
     {file = "semantic_version-2.9.0-py2.py3-none-any.whl", hash = "sha256:db2504ab37902dd2c9876ece53567aa43a5b2a417fbe188097b2048fff46da3d"},
     {file = "semantic_version-2.9.0.tar.gz", hash = "sha256:abf54873553e5e07a6fd4d5f653b781f5ae41297a493666b59dcf214006a12b2"},
+]
+"sentry-sdk 1.5.12" = [
+    {file = "sentry_sdk-1.5.12-py2.py3-none-any.whl", hash = "sha256:778b53f0a6c83b1ee43d3b7886318ba86d975e686cb2c7906ccc35b334360be1"},
+    {file = "sentry-sdk-1.5.12.tar.gz", hash = "sha256:259535ba66933eacf85ab46524188c84dcb4c39f40348455ce15e2c0aca68863"},
 ]
 "setuptools 60.9.3" = [
     {file = "setuptools-60.9.3-py3-none-any.whl", hash = "sha256:e4f30b9f84e5ab3decf945113119649fec09c1fc3507c6ebffec75646c56e62b"},
