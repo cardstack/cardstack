@@ -120,7 +120,7 @@ export default class EmailCardDropRequestsRoute {
         {
           tags: {
             action: 'drop-card',
-            alert: 'web-team',
+            alert: 'prepaid-card-supply',
           },
         }
       );
