@@ -105,7 +105,7 @@ export default class EmailCardDropRequestsRoute {
     let supplyIsBelowNotificationThreshold = (quantityAvailable - activeReservations) < notifyWhenQuantityBelow;
 
     log.trace(
-      `${cardDropSku} has ${quantityAvailable} available, notification threshold is ${notifyWhenQuantityBelow}`
+      `${cardDropSku} has ${quantityAvailable} available and ${activeReservations} reserved, notification threshold is ${notifyWhenQuantityBelow}`
     );
 
     if (supplyIsBelowNotificationThreshold ) {
