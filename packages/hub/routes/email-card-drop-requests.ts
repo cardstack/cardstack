@@ -18,9 +18,6 @@ const log = logger('hub/email-card-drop-requests');
 const cardDropSku = config.get('cardDrop.sku') as string;
 const notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
 
-let lastNotifiedOnQuantity: number | undefined = undefined;
-const millisToWaitBeforeNotifying = 30 * 60 * 1000;
-
 export interface EmailCardDropRequest {
   id: string;
   ownerAddress: string;
@@ -105,14 +102,12 @@ export default class EmailCardDropRequestsRoute {
     let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
 
     let quantityIsBelowNotificationThreshold = quantityAvailable < notifyWhenQuantityBelow;
-    let notificationHasNotBeenSentRecently =
-      !lastNotifiedOnQuantity || lastNotifiedOnQuantity < Date.now() - millisToWaitBeforeNotifying;
 
     log.trace(
       `${cardDropSku} has ${quantityAvailable} available, notification threshold is ${notifyWhenQuantityBelow}`
     );
 
-    if (quantityIsBelowNotificationThreshold && notificationHasNotBeenSentRecently) {
+    if (quantityIsBelowNotificationThreshold ) {
       Sentry.captureException(
         new Error(
           `Prepaid card quantity (${quantityAvailable}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
@@ -124,8 +119,6 @@ export default class EmailCardDropRequestsRoute {
           },
         }
       );
-
-      lastNotifiedOnQuantity = Date.now();
     }
 
     let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
