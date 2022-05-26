@@ -49,7 +49,7 @@ describe('NotifyPrepaidCardDropTask', function () {
     addedJobPayloads = [];
   });
 
-  it('adds a send-notifications job', async function () {
+  it('adds send-notifications jobs', async function () {
     let task = (await getContainer().lookup('notify-prepaid-card-drop')) as NotifyPrepaidCardDrop;
 
     await task.perform({ ownerAddress: 'eoa-address', transactionHash: 'a' });
