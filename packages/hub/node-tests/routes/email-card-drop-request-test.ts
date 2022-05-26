@@ -272,7 +272,7 @@ describe('POST /api/email-card-drop-requests', function () {
     );
     expect(sentryReport.tags).to.deep.equal({
       action: 'drop-card',
-      alert: 'web-team',
+      alert: 'prepaid-card-supply',
     });
   });
 
