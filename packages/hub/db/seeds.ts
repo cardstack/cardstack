@@ -129,6 +129,7 @@ async function loadNotificationTypes(db: Client) {
   let rows = [
     ['10b75b75-b855-42eb-893e-d223995b8872', 'merchant_claim', 'enabled'],
     ['1137c2b1-fb2e-45d2-9f62-d365b989d151', 'customer_payment', 'enabled'],
+    ['27fbf982-2fed-4f96-b730-0a71964d3370', 'prepaid_card_drop', 'enabled'],
   ];
   let sql = pgFormat(query, rows);
   console.log(sql);
