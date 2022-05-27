@@ -24,7 +24,7 @@ export default class NotifyPrepaidCardDrop {
 
     let pushClientIdsForNotification = await this.notificationPreferenceService.getEligiblePushClientIds(
       ownerAddress,
-      'customer_payment'
+      'prepaid_card_drop'
     );
 
     for (const pushClientId of pushClientIdsForNotification) {
