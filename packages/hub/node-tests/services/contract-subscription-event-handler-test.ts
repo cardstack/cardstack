@@ -31,7 +31,7 @@ class StubContracts {
       };
     }
 
-    return null;
+    throw new Error(`Unmocked contract ${contractName}`);
   }
 }
 
