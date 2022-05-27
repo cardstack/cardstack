@@ -5,11 +5,13 @@ import BN from 'bn.js';
 import { ContractOptions } from 'web3-eth-contract';
 import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import {
+  EventABI,
   executeSend,
   executeSendWithRateLock,
   executeTransaction,
   gasEstimate,
   getNextNonceFromEstimate,
+  getParamsFromEvent,
   getSendPayload,
   GnosisExecTx,
   Operation,
@@ -389,5 +391,55 @@ export default class PrepaidCardMarketV2 {
       signatures,
       nonce
     );
+  }
+
+  async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
+    let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
+    let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
+    return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
+      (createCardLog) => createCardLog.card
+    );
+  }
+
+  private createPrepaidCardEventABI(): EventABI {
+    return {
+      topic: this.layer2Web3.eth.abi.encodeEventSignature(
+        'CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)'
+      ),
+      abis: [
+        {
+          type: 'address',
+          name: 'supplier',
+        },
+        {
+          type: 'address',
+          name: 'card',
+        },
+        {
+          type: 'address',
+          name: 'token',
+        },
+        {
+          type: 'address',
+          name: 'createdFromDepot',
+        },
+        {
+          type: 'uint256',
+          name: 'issuingTokenAmount',
+        },
+        {
+          type: 'uint256',
+          name: 'spendAmount',
+        },
+        {
+          type: 'uint256',
+          name: 'gasFeeCollected',
+        },
+        {
+          type: 'string',
+          name: 'customizationDID',
+        },
+      ],
+    };
   }
 }
