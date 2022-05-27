@@ -1,24 +1,11 @@
 import { Job, TaskSpec } from 'graphile-worker';
-import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
-import NotifyPrepaidCardDrop, { PREPAID_CARD_DROP_EXPIRY_TIME } from '../../tasks/notify-prepaid-card-drop';
+import NotifyPrepaidCardDrop from '../../tasks/notify-prepaid-card-drop';
 import { expect } from 'chai';
 import { setupSentry } from '../helpers/sentry';
 
 let addedJobIdentifiers: string[] = [];
 let addedJobPayloads: string[] = [];
-
-let fakeTime = 1650440847689;
-
-class FrozenClock implements Clock {
-  now() {
-    return fakeTime;
-  }
-
-  hrNow(): bigint {
-    throw new Error('Not implemented');
-  }
-}
 
 class StubNotificationPreferenceService {
   async getEligiblePushClientIds(_ownerAddress: string, _notificationType: string) {
@@ -38,7 +25,6 @@ describe('NotifyPrepaidCardDropTask', function () {
   setupSentry(this);
 
   this.beforeEach(function () {
-    registry(this).register('clock', FrozenClock);
     registry(this).register('notification-preference-service', StubNotificationPreferenceService);
     registry(this).register('worker-client', StubWorkerClient);
   });
@@ -66,7 +52,6 @@ describe('NotifyPrepaidCardDropTask', function () {
         },
         notificationType: 'prepaid_card_drop',
         pushClientId: '123',
-        sendBy: fakeTime + PREPAID_CARD_DROP_EXPIRY_TIME,
       },
       {
         notificationBody: 'You were issued a new prepaid card!',
@@ -78,7 +63,6 @@ describe('NotifyPrepaidCardDropTask', function () {
         },
         notificationType: 'prepaid_card_drop',
         pushClientId: '456',
-        sendBy: fakeTime + PREPAID_CARD_DROP_EXPIRY_TIME,
       },
     ]);
   });
