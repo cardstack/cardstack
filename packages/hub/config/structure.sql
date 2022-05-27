@@ -1684,6 +1684,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
+36	20220527195553987_add-prepaid-notification-type	2022-05-27 15:09:36.826839
 \.
 
 
@@ -1691,7 +1692,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 33, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 36, true);
 
 
 --
