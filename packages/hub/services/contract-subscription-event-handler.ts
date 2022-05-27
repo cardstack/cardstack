@@ -24,7 +24,7 @@ export const CONTRACT_EVENTS = [
     taskName: 'notify-merchant-claim',
   },
   {
-    abiName: 'prepaid-card-market-v2',
+    abiName: 'prepaid-card-market-v-2',
     contractName: 'prepaidCardMarketV2' as AddressKeys,
     eventName: 'PrepaidCardProvisioned',
     taskName: 'notify-prepaid-card-drop',
