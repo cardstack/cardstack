@@ -5,12 +5,9 @@ import WorkerClient from '../services/worker-client';
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
 
-export const PREPAID_CARD_DROP_EXPIRY_TIME = 30 * 60 * 1000;
-
 const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
 
 export default class NotifyPrepaidCardDrop {
-  clock = inject('clock');
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
     as: 'notificationPreferenceService',
   });
@@ -32,7 +29,6 @@ export default class NotifyPrepaidCardDrop {
 
     for (const pushClientId of pushClientIdsForNotification) {
       let notification: PushNotificationData = {
-        sendBy: this.clock.now() + PREPAID_CARD_DROP_EXPIRY_TIME,
         notificationId: generateContractEventNotificationId({
           network: web3Config.layer2Network,
           ownerAddress,
@@ -48,7 +44,6 @@ export default class NotifyPrepaidCardDrop {
       await this.workerClient.addJob('send-notifications', notification, {
         jobKey: notification.notificationId,
         jobKeyMode: 'preserve_run_at',
-        maxAttempts: 8, // 8th attempt is estimated to run at 28 mins. https://github.com/graphile/worker#exponential-backoff
       });
     }
   }
