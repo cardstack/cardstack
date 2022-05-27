@@ -8,7 +8,8 @@ let addedJobIdentifiers: string[] = [];
 let addedJobPayloads: string[] = [];
 
 class StubNotificationPreferenceService {
-  async getEligiblePushClientIds(_ownerAddress: string, _notificationType: string) {
+  async getEligiblePushClientIds(_ownerAddress: string, notificationType: string) {
+    expect(notificationType).to.equal('prepaid_card_drop');
     return ['123', '456'];
   }
 }
