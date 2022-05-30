@@ -9,7 +9,6 @@ import { Signature } from './signing-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
-// import ActionDispatcherABI from '../../contracts/abi/v0.9.0/action-dispatcher';
 
 export interface EventABI {
   topic: string;
