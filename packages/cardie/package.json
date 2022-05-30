@@ -8,12 +8,17 @@
     "start": "ts-node server.ts"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "engines": {
+    "node": "^14.0.0"
+  },
   "dependencies": {
     "@octokit/openapi-types": "^9.4.0",
     "@octokit/rest": "^18.7.1",
+    "@types/node": "14.14.35",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
-    "ts-node": "^10.3.0"
+    "ts-node": "^10.3.0",
+    "typescript": "4.2.3"
   }
 }
