@@ -10,7 +10,7 @@ describe('ContractsService', function () {
   for (const contractUsageInfo of CONTRACT_EVENTS) {
     for (const protocolVersion of protocolVersions) {
       if (
-        contractUsageInfo.contractStartVersion &&
+        !contractUsageInfo.contractStartVersion ||
         semverGte(protocolVersion, contractUsageInfo.contractStartVersion)
       ) {
         it(`getContract retrieves a web3 Contract instance for ${contractUsageInfo.abiName} contract version ${protocolVersion}`, async function () {
