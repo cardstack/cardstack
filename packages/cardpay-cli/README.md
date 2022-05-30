@@ -72,7 +72,12 @@ yarn cardpay safe list --walletConnect
  - [`cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`](#cardpay-prepaid-card-market-remove-fundingcard-prepaidcards..)
  - [`cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-set-ask-fundingcard-sku-askprice)
  - [`cardpay prepaid-card-market sku-info <sku>`](#cardpay-prepaid-card-market-sku-info-sku)
+ - [`cardpay prepaid-card-market-v2 add-tokens <issuerSafe> <issuer> <token> <amount>`](#cardpay-prepaid-card-market-v2-add-tokens-issuersafe-issuer-token-amount)
  - [`cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`](#cardpay-prepaid-card-market-v2-add-sku-fundingcard-issuersafe-facevalue-customizationdid-issuingtoken)
+ - [`cardpay prepaid-card-market-v2 get-quantity <sku>`](#cardpay-prepaid-card-market-v2-get-quantity-sku)
+ - [`cardpay prepaid-card-market-v2 get-sku <issuer> <token> <faceValue> <customizationDID>`](#cardpay-prepaid-card-market-v2-get-sku-issuer-token-facevalue-customizationdid)
+ - [`cardpay prepaid-card-market-v2 set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-v2-set-ask-fundingcard-sku-askprice)
+ - [`cardpay prepaid-card-market-v2 provision <sku> <recipient> <environment> <provisionerSecret>`](#cardpay-prepaid-card-market-v2-provision-sku-recipient-environment-provisionersecret)
  - [`cardpay price eth <token> [amount]`](#cardpay-price-eth-token-amount)
  - [`cardpay price updated-at <token>`](#cardpay-price-updated-at-token)
  - [`cardpay price usd <token> [amount]`](#cardpay-price-usd-token-amount)
@@ -601,6 +606,25 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
+## `cardpay prepaid-card-market-v2 add-tokens <issuerSafe> <issuer> <token> <amount>`
+
+Add tokens to the contract
+
+```
+Positionals:
+  issuerSafe  The safe address used to fund the transfer to the contract  [string] [required]
+  issuer      The address of the issuer  [string] [required]
+  token       The address of the token  [string] [required]
+  amount      How many tokens to transfer  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
 ## `cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`
 
 Add a SKU
@@ -612,6 +636,78 @@ Positionals:
   faceValue         The face value for the new prepaid cards  [number] [required]
   customizationDID  The DID string that represents the prepaid card customization  [string] [required]
   issuingToken      The address of the issuing token  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market-v2 get-quantity <sku>`
+
+Get quantity of available cards for a SKU
+
+```
+Positionals:
+  sku  Prepaid card's SKU  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market-v2 get-sku <issuer> <token> <faceValue> <customizationDID>`
+
+Get the SKU hash
+
+```
+Positionals:
+  issuer            Issuer's address  [string] [required]
+  token             Token's address  [string] [required]
+  faceValue         Face value in SPEND  [number] [required]
+  customizationDID  DID string that represents the prepaid card customization  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market-v2 set-ask <fundingCard> <sku> <askPrice>`
+
+Set the asking price for a SKU. The ask price is in units of eth in the issuing token for prepaid cards within the SKU
+
+```
+Positionals:
+  fundingCard  The prepaid card used to pay for gas for the txn  [string] [required]
+  sku          The SKU whose ask price is being set  [string] [required]
+  askPrice     The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU  [number] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
+```
+
+## `cardpay prepaid-card-market-v2 provision <sku> <recipient> <environment> <provisionerSecret>`
+
+Provision a prepaid card to an EOA
+
+```
+Positionals:
+  sku                The sku of the prepaid card to provision  [string] [required]
+  recipient          The address of the recipient of the prepaid card  [string] [required]
+  environment        The environment in which to provision the prepaid card (staging or production)  [string] [required]
+  provisionerSecret  The "provisioner secret" phrase to enable provisioning  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
