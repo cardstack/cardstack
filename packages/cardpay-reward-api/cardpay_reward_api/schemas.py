@@ -2,7 +2,8 @@
 
 from typing import List, Optional
 
-from pydantic import BaseModel
+from hexbytes import HexBytes
+from pydantic import BaseModel, validator
 
 
 class Proof(BaseModel):
@@ -16,6 +17,14 @@ class Proof(BaseModel):
     leaf: str
     validFrom: int
     validTo: int
+
+    @validator("leaf", pre=True)
+    def leaf_as_hex_string(cls, v):
+        return HexBytes(v).hex()
+
+    @validator("proofArray", pre=True, each_item=True)
+    def proof_as_hex_string(cls, v):
+        return HexBytes(v).hex()
 
     class Config:
         orm_mode = True
