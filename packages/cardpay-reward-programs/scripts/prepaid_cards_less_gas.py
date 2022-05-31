@@ -5,22 +5,16 @@ import os
 
 import pandas as pd
 import requests
+import typer
 from cardpay_reward_programs.config import config
 from dotenv import load_dotenv
+from scripts.utils import Environment
 
-load_dotenv()
-for expected_env in ["ENVIRONMENT"]:
-    if expected_env not in os.environ:
-        raise ValueError(f"Missing environment variable {expected_env}")
-env = os.getenv("ENVIRONMENT")
-
-
-subgraph_url = config[env]["subgraph_url"]
-token_address = config[env]["tokens"]["dai"]
 token_balance_in_wei = 50_000_000_000_000_000  # 0.05 dai
 
 
-def query(skip: int):
+def query(env: str, skip: int):
+    token_address = config[env]["tokens"]["dai"]
     return """
     {
     prepaidCards(
@@ -41,11 +35,12 @@ def query(skip: int):
     )
 
 
-def call(skip: int):
+def call(env: str, skip: int):
     print(f"Skipping {skip}")
+    subgraph_url = config[env]["subgraph_url"]
     r = requests.post(
         subgraph_url,
-        json={"query": query(skip)},
+        json={"query": query(env, skip)},
     )
     if r.ok:
         json_data = json.loads(r.text)
@@ -53,20 +48,26 @@ def call(skip: int):
         return data["prepaidCards"]
 
 
-def get_prepaid_cards_less_gas():
+def get_prepaid_cards_less_gas(
+    env: Environment = Environment.staging,
+    csv: bool = typer.Argument(default=False, help="output csv file"),
+):
+    env = env.value
     paginate_size = 100
     res = []
 
     i = 0
-    while c := call(i * paginate_size):
+    while c := call(env, i * paginate_size):
         if len(c) == 0:
             break
         res = res + c
         i = i + 1
     print(f"Number of prepaid cards with too little gas: {len(res)}")
     df = pd.DataFrame(res)
-    df.to_csv("prepaid_card_less_gas.csv", index=False)
+
+    if csv:
+        df.to_csv("prepaid_card_less_gas.csv", index=False)
 
 
 if __name__ == "__main__":
-    get_prepaid_cards_less_gas()
+    typer.run(get_prepaid_cards_less_gas)
