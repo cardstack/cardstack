@@ -73,25 +73,27 @@ def flat_drop(
     else:
         with open(parameters_file_path) as f:
             params = json.load(f)
-    existing_root = reward_contract.caller.payeeRoots(
-        params["run"]["reward_program_id"], params["run"]["payment_cycle"]
-    )
-    if existing_root != NULL_HEX or existing_root == EMPTY_MARKER_HEX:
-        raise Exception(
-            f"Root has already been taken for payment cycle {params['run']['payment_cycle']}"
-        )
-
     rule = FlatPayment(params["core"], params["user_defined"])
     payment_list = rule.run(
         params["run"]["payment_cycle"], params["run"]["reward_program_id"]
     )
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
+    existing_root = reward_contract.caller.payeeRoots(
+        params["run"]["reward_program_id"], params["run"]["payment_cycle"]
+    )
+    if (
+        existing_root != tree.get_hex_root()
+        or existing_root != NULL_HEX
+        or existing_root == EMPTY_MARKER_HEX
+    ):
+        raise Exception(
+            f"Root has already been taken for payment cycle {params['run']['payment_cycle']}"
+        )
 
     rewards_bucket = config[env]["rewards_bucket"]
     output_location = f"{rewards_bucket}/rewardProgramID={params['run']['reward_program_id']}/paymentCycle={params['run']['payment_cycle']}"
     output_path = AnyPath(output_location)
-
     print(
         f"Writing flat drop of {len(params['user_defined']['accounts'])} accounts to {output_location}"
     )
