@@ -17,7 +17,16 @@ from cardpay_reward_programs.utils import (write_parameters_file,
                                            write_parquet_file)
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
+from hexbytes import HexBytes
 from web3 import Web3
+
+NULL_HEX = HexBytes(
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+)
+
+EMPTY_MARKER_HEX = HexBytes(
+    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+)
 
 
 class Environment(str, Enum):
@@ -48,6 +57,9 @@ def flat_drop(
     )["SecretString"]
     # Make sure evm node corresponds to the environment
     w3 = Web3(Web3.HTTPProvider(evm_full_node_url))
+    reward_contract = self.w3.eth.contract(
+        address=config[env]["contracts"]["reward_pool"], abi=contract["abi"]
+    )
 
     if parameters_file_path is None:
 
@@ -73,10 +85,17 @@ def flat_drop(
     else:
         with open(parameters_file_path) as f:
             params = json.load(f)
+    existing_root = self.reward_contract.caller.payeeRoots(
+        params["run"]["reward_program_id"], params["run"]["payment_cycle"]
+    )
+    if existing_root == NULL_HEX or existing_root == EMPTY_MARKER_HEX:
+        raise Exception(
+            f"Root has already been taken for payment cycle {params['run']['payment_cycle']}"
+        )
 
     rule = FlatPayment(params["core"], params["user_defined"])
     payment_list = rule.run(
-        params["run"]["payment_cycle"], params["run"]["payment_cycle"]
+        params["run"]["payment_cycle"], params["run"]["reward_program_id"]
     )
     tree = PaymentTree(payment_list.to_dict("records"))
     table = tree.as_arrow()
