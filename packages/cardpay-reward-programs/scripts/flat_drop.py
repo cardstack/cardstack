@@ -2,7 +2,6 @@
 
 import json
 import os
-from enum import Enum
 from typing import Optional
 
 import boto3
@@ -18,30 +17,17 @@ from cardpay_reward_programs.utils import (write_parameters_file,
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 from hexbytes import HexBytes
+from scripts.utils import EMPTY_MARKER_HEX, NULL_HEX, Environment
 from web3 import Web3
-
-NULL_HEX = HexBytes(
-    "0x0000000000000000000000000000000000000000000000000000000000000000"
-)
-
-EMPTY_MARKER_HEX = HexBytes(
-    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-)
-
-
-class Environment(str, Enum):
-    staging = "staging"
-    production = "production"
 
 
 def flat_drop(
-    env: Environment = typer.Argument(
-        default=Environment.staging, help="staging or production"
-    ),
+    env: Environment = Environment.staging,
     parameters_file_path: Optional[str] = typer.Argument(
         None, help="file path to parameters file"
     ),
 ):
+    env = env.value
     reward_amount = 10_000_000_000_000_000_000  # 10 eth
     default_accounts = ["0x159ADe032073d930E85f95AbBAB9995110c43C71"]
 
@@ -57,8 +43,10 @@ def flat_drop(
     )["SecretString"]
     # Make sure evm node corresponds to the environment
     w3 = Web3(Web3.HTTPProvider(evm_full_node_url))
-    reward_contract = self.w3.eth.contract(
-        address=config[env]["contracts"]["reward_pool"], abi=contract["abi"]
+    with open(f"scripts/abis/RewardPool.json") as contract_file:
+        abi_file = json.load(contract_file)
+    reward_contract = w3.eth.contract(
+        address=config[env]["contracts"]["reward_pool"], abi=abi_file["abi"]
     )
 
     if parameters_file_path is None:
@@ -85,10 +73,10 @@ def flat_drop(
     else:
         with open(parameters_file_path) as f:
             params = json.load(f)
-    existing_root = self.reward_contract.caller.payeeRoots(
+    existing_root = reward_contract.caller.payeeRoots(
         params["run"]["reward_program_id"], params["run"]["payment_cycle"]
     )
-    if existing_root == NULL_HEX or existing_root == EMPTY_MARKER_HEX:
+    if existing_root != NULL_HEX or existing_root == EMPTY_MARKER_HEX:
         raise Exception(
             f"Root has already been taken for payment cycle {params['run']['payment_cycle']}"
         )
@@ -101,7 +89,7 @@ def flat_drop(
     table = tree.as_arrow()
 
     rewards_bucket = config[env]["rewards_bucket"]
-    output_location = f"{rewards_bucket}/rewardProgramID={reward_program_id}/paymentCycle={payment_cycle}"
+    output_location = f"{rewards_bucket}/rewardProgramID={params['run']['reward_program_id']}/paymentCycle={params['run']['payment_cycle']}"
     output_path = AnyPath(output_location)
 
     print(
