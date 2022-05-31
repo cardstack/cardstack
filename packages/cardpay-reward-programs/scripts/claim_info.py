@@ -5,21 +5,14 @@ import os
 
 import pandas as pd
 import requests
+import typer
 from cardpay_reward_programs.config import config
 from dotenv import load_dotenv
 from eth_abi import decode_abi
 from hexbytes import HexBytes
+from scripts.utils import Environment
 from web3 import Web3
 
-load_dotenv()
-for expected_env in ["ENVIRONMENT"]:
-    if expected_env not in os.environ:
-        raise ValueError(f"Missing environment variable {expected_env}")
-env = os.getenv("ENVIRONMENT")
-
-subgraph_url = config[env]["subgraph_url"]
-card_token = config[env]["tokens"]["card"]
-reward_program_id = config[env]["reward_program"]
 program_payment_cycle = 21294676
 
 
@@ -34,7 +27,9 @@ def decode_transfer_data(transfer_data):
     return decode_abi(["address", "uint256"], transfer_data)
 
 
-def query(skip: int):
+def query(env: str, skip: int):
+    card_token = config[env]["tokens"]["card"]
+    reward_program_id = config[env]["reward_program"]
     return """
     {
     rewardeeClaims(
@@ -55,11 +50,12 @@ def query(skip: int):
     )
 
 
-def call(skip: int):
+def call(env: str, skip: int):
     print(f"Skipping {skip}")
+    subgraph_url = config[env]["subgraph_url"]
     r = requests.post(
         subgraph_url,
-        json={"query": query(skip)},
+        json={"query": query(env, skip)},
     )
     if r.ok:
         json_data = json.loads(r.text)
@@ -67,17 +63,20 @@ def call(skip: int):
         return data["rewardeeClaims"]
 
 
-def get_claim_info():
+def get_claim_info(
+    env: Environment = Environment.staging,
+):
     """
-    Get info on ewardee claims for a particular payment cycle
+    Get info on rewardee claims for a particular payment cycle
     """
+    env = env.value
     paginate_size = 100
 
     res = []
     total = 0
 
     i = 0
-    while c := call(i * paginate_size):
+    while c := call(env, i * paginate_size):
         for o in c:
             (_, payment_cycle, _, _, _, _, transfer_data) = decode_leaf(
                 HexBytes(o["leaf"])
@@ -93,4 +92,4 @@ def get_claim_info():
 
 
 if __name__ == "__main__":
-    get_claim_info()
+    typer.run(get_claim_info)
