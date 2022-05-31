@@ -65,6 +65,7 @@ export class ContractSubscriptionEventHandler {
             `Received ${contractEvent.contractName} event (block number ${event.blockNumber})`,
             event.transactionHash
           );
+          log.info(JSON.stringify(event, null, 2));
 
           await this.latestEventBlockQueries.update(event.blockNumber);
           this.workerClient.addJob(contractEvent.taskName, event.transactionHash);
