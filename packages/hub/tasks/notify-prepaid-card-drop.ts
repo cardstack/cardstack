@@ -13,7 +13,9 @@ export default class NotifyPrepaidCardDrop {
   });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
-  async perform({ transactionHash, ownerAddress }: { transactionHash: string; ownerAddress: string }) {
+  async perform(event: any) {
+    let transactionHash = event.transactionHash;
+    let ownerAddress = event.returnValues.owner;
     let notificationBody = 'You were issued a new prepaid card!';
 
     let notificationData = {

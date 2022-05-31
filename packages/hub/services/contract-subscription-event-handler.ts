@@ -68,7 +68,8 @@ export class ContractSubscriptionEventHandler {
           log.info(JSON.stringify(event, null, 2));
 
           await this.latestEventBlockQueries.update(event.blockNumber);
-          this.workerClient.addJob(contractEvent.taskName, event.transactionHash);
+          // FIXME the below change will break tests
+          this.workerClient.addJob(contractEvent.taskName, event);
         }
       });
     }

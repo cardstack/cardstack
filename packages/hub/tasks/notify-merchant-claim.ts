@@ -55,7 +55,8 @@ export default class NotifyMerchantClaim {
     as: 'notificationPreferenceService',
   });
 
-  async perform(payload: string) {
+  async perform(event: any) {
+    let payload = event.transactionHash;
     await this.cardpay.waitForSubgraphIndex(payload, web3Config.layer2Network);
 
     let queryResult: MerchantClaimsQueryResult = await this.cardpay.gqlQuery(

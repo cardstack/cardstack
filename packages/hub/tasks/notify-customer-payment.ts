@@ -91,7 +91,8 @@ export default class NotifyCustomerPayment {
     as: 'notificationPreferenceService',
   });
 
-  async perform(payload: string) {
+  async perform(event: any) {
+    let payload = event.transactionHash;
     await this.cardpay.waitForSubgraphIndex(payload, network);
 
     let queryResult: PrepaidCardPaymentsQueryResult = await this.cardpay.gqlQuery(network, prepaidCardPaymentsQuery, {
