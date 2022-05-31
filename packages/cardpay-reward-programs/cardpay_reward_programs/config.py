@@ -22,6 +22,7 @@ config = {
         "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "rewards_bucket": "s3://tally-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
+        "contracts": {"reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"},
     },
     "production": {
         "tokens": {
@@ -31,5 +32,6 @@ config = {
         "reward_program": "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185",
         "rewards_bucket": "s3://tally-production-reward-programs",
         "subgraph_url": "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai",
+        "contracts": {"reward_pool": "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"},
     },
 }
