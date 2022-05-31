@@ -3,16 +3,20 @@ name: CI [web-client]
 on:
   pull_request:
     paths:
-      - 'packages/web-client/**'
-      - 'packages/boxel/**'
-      - 'packages/cardpay-sdk/**'
-      - 'packages/did-resolver/**'
-      - 'packages/wc-provider/**'
-      - 'packages/test-support/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/pr-web-client.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/web-client/**"
+      - "packages/boxel/**"
+      - "packages/cardpay-sdk/**"
+      - "packages/did-resolver/**"
+      - "packages/wc-provider/**"
+      - "packages/test-support/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/pr-web-client.yml"
+      - "package.json"
+      - "yarn.lock"
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   test:
@@ -45,7 +49,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'web-client test results'
+          check_name: "web-client test results"
           files: ci-xml-test-results/web-client.xml
 
   check-if-requires-preview:
@@ -73,11 +77,14 @@ jobs:
     needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/web-client
+          aws-region: us-east-1
       - name: Deploy web-client preview
         uses: ./.github/actions/deploy-web-client-preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
@@ -95,11 +102,14 @@ jobs:
     needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/web-client
+          aws-region: us-east-1
       - name: Deploy web-client preview
         uses: ./.github/actions/deploy-web-client-preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}

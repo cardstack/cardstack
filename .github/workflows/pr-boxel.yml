@@ -2,12 +2,15 @@ name: CI [boxel]
 
 on:
   pull_request:
-    branches: [main]
     paths:
-      - 'packages/boxel/**'
-      - '.github/workflows/pr-boxel.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/boxel/**"
+      - ".github/workflows/pr-boxel.yml"
+      - "package.json"
+      - "yarn.lock"
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   test:
@@ -75,11 +78,13 @@ jobs:
         run: yarn test:boxel:percy
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/boxel
+          aws-region: us-east-1
       - name: Deploy preview
         run: yarn deploy:boxel:preview
-        env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
 
   comment-on-boxel-pr:
     name: Comment on PR
