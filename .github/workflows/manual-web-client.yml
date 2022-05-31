@@ -8,6 +8,10 @@ on:
         required: false
         default: production
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
