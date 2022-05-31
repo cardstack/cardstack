@@ -7,7 +7,7 @@ import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
 import Safes from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
-import { PrepaidCardMarketV2, prepaidCardMarketV2Meta } from './prepaid-card-market-v2';
+import { PrepaidCardMarketV2, prepaidCardMarketV2Meta } from './prepaid-card-market-v-2';
 import Assets from './assets';
 import LayerOneOracle from './layer-one-oracle';
 import TokenBridgeHomeSide from './token-bridge-home-side';

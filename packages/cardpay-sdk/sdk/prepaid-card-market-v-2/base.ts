@@ -18,11 +18,12 @@ import {
   SendPayload,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
-import { getAddress } from '../..';
+
 import { ZERO_ADDRESS } from '../constants';
 import { Signer } from 'ethers';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
+import { getAddress } from '../..';
 
 export default class PrepaidCardMarketV2 {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}

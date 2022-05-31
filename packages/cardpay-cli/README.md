@@ -72,12 +72,12 @@ yarn cardpay safe list --walletConnect
  - [`cardpay prepaid-card-market remove <fundingCard> <prepaidCards..>`](#cardpay-prepaid-card-market-remove-fundingcard-prepaidcards..)
  - [`cardpay prepaid-card-market set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-set-ask-fundingcard-sku-askprice)
  - [`cardpay prepaid-card-market sku-info <sku>`](#cardpay-prepaid-card-market-sku-info-sku)
- - [`cardpay prepaid-card-market-v2 add-tokens <issuerSafe> <issuer> <token> <amount>`](#cardpay-prepaid-card-market-v2-add-tokens-issuersafe-issuer-token-amount)
- - [`cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`](#cardpay-prepaid-card-market-v2-add-sku-fundingcard-issuersafe-facevalue-customizationdid-issuingtoken)
- - [`cardpay prepaid-card-market-v2 get-quantity <sku>`](#cardpay-prepaid-card-market-v2-get-quantity-sku)
- - [`cardpay prepaid-card-market-v2 get-sku <issuer> <token> <faceValue> <customizationDID>`](#cardpay-prepaid-card-market-v2-get-sku-issuer-token-facevalue-customizationdid)
- - [`cardpay prepaid-card-market-v2 set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-v2-set-ask-fundingcard-sku-askprice)
- - [`cardpay prepaid-card-market-v2 provision <sku> <recipient> <environment> <provisionerSecret>`](#cardpay-prepaid-card-market-v2-provision-sku-recipient-environment-provisionersecret)
+ - [`cardpay prepaid-card-market-v-2 add-tokens <issuerSafe> <issuer> <token> <amount>`](#cardpay-prepaid-card-market-v-2-add-tokens-issuersafe-issuer-token-amount)
+ - [`cardpay prepaid-card-market-v-2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`](#cardpay-prepaid-card-market-v-2-add-sku-fundingcard-issuersafe-facevalue-customizationdid-issuingtoken)
+ - [`cardpay prepaid-card-market-v-2 get-quantity <sku>`](#cardpay-prepaid-card-market-v-2-get-quantity-sku)
+ - [`cardpay prepaid-card-market-v-2 get-sku <issuer> <token> <faceValue> <customizationDID>`](#cardpay-prepaid-card-market-v-2-get-sku-issuer-token-facevalue-customizationdid)
+ - [`cardpay prepaid-card-market-v-2 set-ask <fundingCard> <sku> <askPrice>`](#cardpay-prepaid-card-market-v-2-set-ask-fundingcard-sku-askprice)
+ - [`cardpay prepaid-card-market-v-2 provision <sku> <recipient> <environment> <provisionerSecret>`](#cardpay-prepaid-card-market-v-2-provision-sku-recipient-environment-provisionersecret)
  - [`cardpay price eth <token> [amount]`](#cardpay-price-eth-token-amount)
  - [`cardpay price updated-at <token>`](#cardpay-price-updated-at-token)
  - [`cardpay price usd <token> [amount]`](#cardpay-price-usd-token-amount)
@@ -606,7 +606,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 add-tokens <issuerSafe> <issuer> <token> <amount>`
+## `cardpay prepaid-card-market-v-2 add-tokens <issuerSafe> <issuer> <token> <amount>`
 
 Add tokens to the contract
 
@@ -625,7 +625,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`
+## `cardpay prepaid-card-market-v-2 add-sku <fundingCard> <issuerSafe> <faceValue> <customizationDID> <issuingToken>`
 
 Add a SKU
 
@@ -645,7 +645,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 get-quantity <sku>`
+## `cardpay prepaid-card-market-v-2 get-quantity <sku>`
 
 Get quantity of available cards for a SKU
 
@@ -661,7 +661,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 get-sku <issuer> <token> <faceValue> <customizationDID>`
+## `cardpay prepaid-card-market-v-2 get-sku <issuer> <token> <faceValue> <customizationDID>`
 
 Get the SKU hash
 
@@ -680,7 +680,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 set-ask <fundingCard> <sku> <askPrice>`
+## `cardpay prepaid-card-market-v-2 set-ask <fundingCard> <sku> <askPrice>`
 
 Set the asking price for a SKU. The ask price is in units of eth in the issuing token for prepaid cards within the SKU
 
@@ -698,7 +698,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "xdai"]
 ```
 
-## `cardpay prepaid-card-market-v2 provision <sku> <recipient> <environment> <provisionerSecret>`
+## `cardpay prepaid-card-market-v-2 provision <sku> <recipient> <environment> <provisionerSecret>`
 
 Provision a prepaid card to an EOA
 

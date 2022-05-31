@@ -6,7 +6,7 @@ import getSKU from './get-sku';
 import setAsk from './set-ask';
 import provision from './provision';
 
-export const command = 'prepaid-card-market-v2 <command>';
+export const command = 'prepaid-card-market-v-2 <command>';
 export const desc = 'Commands to interact with prepaid card market';
 
 export const builder = function (yargs: Argv) {
