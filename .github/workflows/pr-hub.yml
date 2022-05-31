@@ -2,7 +2,6 @@ name: CI [hub]
 
 on:
   pull_request:
-    branches: [main]
     paths:
       - 'packages/hub/**'
       - 'packages/cardpay-sdk/**'

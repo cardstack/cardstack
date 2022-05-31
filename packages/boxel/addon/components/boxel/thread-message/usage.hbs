@@ -89,26 +89,25 @@
   </:example>
 </Freestyle::Usage>
 
-<FreestyleAnnotation>
-  <p>
-    The examples with embedded cards below are using the <code>@fullWidth</code> argument to
-    have access to the full-width content area. Smaller cards have a left margin the size of
-    <code>var(--boxel-thread-message-margin-left)</code> css variable for alignment.
-  </p>
-  <p>
-    Using the <code>@fullWidth</code> argument:
-    <ul>
-      <li>Allows the content to have access to the full-width content area</li>
-      <li>Adds spacing between the timestamp and the content</li>
-      <li>Vertically centers the timestamp in relation to the avatar</li>
-    </ul>
-  </p>
-  <p>
-    (Note: The messages below also have custom css applied which restricts their max-width. See <code>usage.css</code> file.)
-  </p>
-</FreestyleAnnotation>
-
 <Freestyle::Usage @slug="with-cards">
+  <:description>
+    <p>
+      These examples with embedded cards are using the <code>@fullWidth</code> argument to
+      have access to the full-width content area. Smaller cards have a left margin the size of
+      <code>var(--boxel-thread-message-margin-left)</code> css variable for alignment.
+    </p>
+    <p>
+      Using the <code>@fullWidth</code> argument:
+      <ul>
+        <li>Allows the content to have access to the full-width content area</li>
+        <li>Adds spacing between the timestamp and the content</li>
+        <li>Vertically centers the timestamp in relation to the avatar</li>
+      </ul>
+    </p>
+    <p>
+      (Note: The messages below also have custom css applied which restricts their max-width. See <code>usage.css</code> file.)
+    </p>
+  </:description>
   <:example>
     <div class="thread-message-usage">
       <Boxel::ThreadMessage

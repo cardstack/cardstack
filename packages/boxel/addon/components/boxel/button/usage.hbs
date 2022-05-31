@@ -1,76 +1,3 @@
-<FreestyleAnnotation>
-  <h2>Button</h2>
-    Depending on the value of `@as`, the button will accept different arguments.
-    <table class="usage-button-explanation">
-      <tbody>
-        <tr>
-        <td>
-          <code>
-            @as
-          </code>
-        </td>
-        <td>
-          Accepted arguments
-        </td>
-        <td>
-          Used for
-        </td>
-      </tr>
-      <tr>
-        <td>
-          button
-        </td>
-        <td>
-          <ul>
-            <li><code>@size</code></li>
-            <li><code>@kind</code></li>
-            <li><code>@disabled</code></li>
-            <li><code>@loading</code></li>
-          </ul>
-        </td>
-        <td>
-          Actions
-        </td>
-      </tr>
-        <tr>
-        <td>
-          anchor
-        </td>
-        <td>
-          <ul>
-            <li><code>@size</code></li>
-            <li><code>@kind</code></li>
-            <li><code>@disabled</code></li>
-            <li><code>@href</code></li>
-          </ul>
-        </td>
-        <td>
-          Any navigation, e.g. external CTA
-        </td>
-      </tr>
-      <tr>
-        <td>
-          link-to
-        </td>
-        <td>
-          <ul>
-            <li><code>@size</code></li>
-            <li><code>@kind</code></li>
-            <li><code>@disabled</code></li>
-            <li><code>@route</code></li>
-            <li><code>@models</code></li>
-            <li><code>@query</code></li>
-          </ul>
-          <br>
-          <code>@route, @models,</code> and <code>@query</code> are passed to <code>LinkTo</code> directly
-        </td>
-        <td>
-          Navigation within the app
-        </td>
-      </tr>
-      </tbody>
-    </table>
-</FreestyleAnnotation>
 <Freestyle::Usage @name="Button">
   <:example>
     <div class={{cn "usage-button-centers-component" usage-button-dark-mode-background=(eq this.kind "secondary-dark")}}>
@@ -156,6 +83,78 @@
     />
     <Args.Yield @description="Contents of the button" />
   </:api>
+  <:description>
+    Depending on the value of `@as`, the button will accept different arguments.
+    <table class="usage-button-explanation">
+      <tbody>
+        <tr>
+        <td>
+          <code>
+            @as
+          </code>
+        </td>
+        <td>
+          Accepted arguments
+        </td>
+        <td>
+          Used for
+        </td>
+      </tr>
+      <tr>
+        <td>
+          button
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@loading</code></li>
+          </ul>
+        </td>
+        <td>
+          Actions
+        </td>
+      </tr>
+        <tr>
+        <td>
+          anchor
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@href</code></li>
+          </ul>
+        </td>
+        <td>
+          Any navigation, e.g. external CTA
+        </td>
+      </tr>
+      <tr>
+        <td>
+          link-to
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@route</code></li>
+            <li><code>@models</code></li>
+            <li><code>@query</code></li>
+          </ul>
+          <br>
+          <code>@route, @models,</code> and <code>@query</code> are passed to <code>LinkTo</code> directly
+        </td>
+        <td>
+          Navigation within the app
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </:description>
 </Freestyle::Usage>
 
 <Freestyle::Usage @name="LinkTo button" @description="This button links you to the media registry page">
