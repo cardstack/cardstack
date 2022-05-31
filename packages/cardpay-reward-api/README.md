@@ -6,7 +6,13 @@ The cardpay reward api performs:
 
 ## Setup
 
+
     pdm install
+
+## Test
+
+    pdm run pytest tests
+
 
 ## Run
 
