@@ -111,7 +111,7 @@ export default class EmailCardDropRequestsRoute {
     if (supplyIsBelowNotificationThreshold ) {
       Sentry.captureException(
         new Error(
-          `Prepaid card quantity (${quantityAvailable}) less reservations (${activeReservations}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+          `Prepaid card quantity (${quantityAvailable}) less reservations (${activeReservations}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}. Read more at https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop`
         ),
         {
           tags: {
