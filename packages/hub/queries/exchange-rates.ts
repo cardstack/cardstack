@@ -4,35 +4,34 @@ import { inject } from '@cardstack/di';
 export default class ExchangeRatesQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async insert(from: string, to: string, rate: number): Promise<void> {
+  async insert(from: string, to: string, rate: number, date: string): Promise<void> {
     let db = await this.databaseManager.getClient();
 
     await db.query(
       `
         INSERT INTO exchange_rates (date, exchange, from_symbol, to_symbol, rate)
         VALUES(
-          now(),
           $1,
           $2,
           $3,
-          $4
+          $4,
+          $5
         )
       `,
-      ['FIXME-exchange', from, to, rate]
+      [date, 'FIXME-exchange', from, to, rate]
     );
   }
 
-  async select(from: string, to: string): Promise<number | null> {
+  async select(from: string, to: string, date: string): Promise<number | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
       `
         SELECT rate FROM exchange_rates
-        WHERE from_symbol=$1 AND to_symbol=$2
-        ORDER BY date DESC
+        WHERE from_symbol=$1 AND to_symbol=$2 AND date=$3
         LIMIT 1
       `,
-      [from, to]
+      [from, to, date]
     );
 
     if (rows.length) {

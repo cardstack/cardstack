@@ -10,6 +10,9 @@ describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
   let { getContainer } = setupHub(this);
 
   it('fetches the rates when they are not cached and caches them', async function () {
+    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01');
+
     let mockResponse: CryptoCompareSuccessResponse = {
       BTC: {
         USD: 432.18,
@@ -23,19 +26,18 @@ describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
     }
 
     let subject = await getContainer().instantiate(PatchedExchangeRatesService);
-    let result = await subject.fetchCryptoCompareExchangeRates();
+    let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
     // TODO should these be strings or numbers?
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
 
-    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
-    let cachedValue = await exchangeRates.select('BTC', 'USD');
+    let cachedValue = await exchangeRates.select('BTC', 'USD', '2022-06-01');
     expect(cachedValue).equal(432.18);
   });
 
   it('returns the cached rates when they exist', async function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'USD', 1919);
+    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01');
 
     let mockResponse: CryptoCompareSuccessResponse = {
       BTC: {
@@ -50,7 +52,7 @@ describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
     }
 
     let subject = await getContainer().instantiate(PatchedExchangeRatesService);
-    let result = await subject.fetchCryptoCompareExchangeRates();
+    let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
     expect(result).deep.equal({
       BTC: {

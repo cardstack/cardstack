@@ -132,20 +132,24 @@ export default class ExchangeRatesService {
     ).json();
   }
 
-  async fetchCryptoCompareExchangeRates(): Promise<CryptoCompareSuccessResponse | undefined> {
-    let cachedValue = await this.exchangeRates.select('BTC', 'USD');
+  async fetchCryptoCompareExchangeRates(
+    from: string,
+    to: string,
+    date: string
+  ): Promise<CryptoCompareSuccessResponse | undefined> {
+    let cachedValue = await this.exchangeRates.select(from, to, date);
 
     if (cachedValue) {
       return {
-        BTC: {
-          USD: cachedValue,
+        [from]: {
+          [to]: cachedValue,
         },
       };
     }
     let result = await this.requestExchangeRatesFromCryptoCompare();
 
     if (result) {
-      await this.exchangeRates.insert('BTC', 'USD', result.BTC.USD);
+      await this.exchangeRates.insert(from, to, result[from][to], date);
     }
 
     return result;
