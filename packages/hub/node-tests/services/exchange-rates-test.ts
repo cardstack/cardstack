@@ -11,7 +11,7 @@ describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
 
   this.beforeEach(async function () {});
 
-  it('fetches the rates when they are not cached', async function () {
+  it('fetches the rates when they are not cached and caches them', async function () {
     let mockResponse: CryptoCompareSuccessResponse = {
       BTC: {
         USD: 432.18,
@@ -29,6 +29,10 @@ describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
 
     // TODO should these be strings or numbers?
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
+
+    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    let cachedValue = await exchangeRates.select('BTC', 'USD');
+    expect(cachedValue).equal(432.18);
   });
 
   it('returns the cached rates when they exist', async function () {

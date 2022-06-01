@@ -144,6 +144,10 @@ export default class ExchangeRatesService {
     }
     let result = await this.requestExchangeRatesFromCryptoCompare();
 
+    if (result) {
+      await this.exchangeRates.insert('BTC', 'USD', result.BTC.USD);
+    }
+
     return result;
   }
 }
