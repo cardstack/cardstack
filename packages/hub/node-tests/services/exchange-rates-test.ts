@@ -6,7 +6,7 @@ import ExchangeRatesService, {
 
 import { setupHub } from '../helpers/server';
 
-describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
+describe('CryptoCompareFIXMEExchangeRatesService', function () {
   let { getContainer } = setupHub(this);
 
   it('fetches the rates when they are not cached and caches them', async function () {
