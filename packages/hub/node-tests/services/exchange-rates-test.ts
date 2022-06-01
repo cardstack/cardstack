@@ -9,8 +9,6 @@ import { setupHub } from '../helpers/server';
 describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
   let { getContainer } = setupHub(this);
 
-  this.beforeEach(async function () {});
-
   it('fetches the rates when they are not cached and caches them', async function () {
     let mockResponse: CryptoCompareSuccessResponse = {
       BTC: {
