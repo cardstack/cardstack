@@ -77,7 +77,7 @@ class Indexer:
                 payee=payment["payee"],
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],
-                amount=amount,
+                amount=str(amount),
                 leaf=payment["leaf"],
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
