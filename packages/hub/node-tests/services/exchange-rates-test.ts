@@ -1,4 +1,62 @@
-import ExchangeRatesService, { FixerFailureResponse, FixerSuccessResponse } from '../../services/exchange-rates';
+import ExchangeRatesService, {
+  CryptoCompareSuccessResponse,
+  FixerFailureResponse,
+  FixerSuccessResponse,
+} from '../../services/exchange-rates';
+
+import { setupHub } from '../helpers/server';
+
+describe.only('CryptoCompareFIXMEExchangeRatesService', function () {
+  let { getContainer } = setupHub(this);
+
+  this.beforeEach(async function () {});
+
+  it('fetches the rates when they are not cached', async function () {
+    let mockResponse: CryptoCompareSuccessResponse = {
+      BTC: {
+        USD: 432.18,
+      },
+    };
+
+    class PatchedExchangeRatesService extends ExchangeRatesService {
+      async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse> {
+        return mockResponse;
+      }
+    }
+
+    let subject = await getContainer().instantiate(PatchedExchangeRatesService);
+    let result = await subject.fetchCryptoCompareExchangeRates();
+
+    // TODO should these be strings or numbers?
+    expect(result).deep.equal({ BTC: { USD: 432.18 } });
+  });
+
+  it('returns the cached rates when they exist', async function () {
+    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    await exchangeRates.insert('BTC', 'USD', 1919);
+
+    let mockResponse: CryptoCompareSuccessResponse = {
+      BTC: {
+        USD: 432.18,
+      },
+    };
+
+    class PatchedExchangeRatesService extends ExchangeRatesService {
+      async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse> {
+        return mockResponse;
+      }
+    }
+
+    let subject = await getContainer().instantiate(PatchedExchangeRatesService);
+    let result = await subject.fetchCryptoCompareExchangeRates();
+
+    expect(result).deep.equal({
+      BTC: {
+        USD: 1919,
+      },
+    });
+  });
+});
 
 describe('ExchangeRatesService', function () {
   it('hits the cache if the cache is valid', async function () {

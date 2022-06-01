@@ -2,6 +2,8 @@
 import config from 'config';
 import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
 import * as Sentry from '@sentry/node';
+import autoBind from 'auto-bind';
+import { query } from '../queries';
 
 const currencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
 const INTERVAL = 1000 * 60 * 60;
@@ -25,10 +27,24 @@ export interface FixerFailureResponse {
   };
 }
 
+export interface CryptoCompareSuccessResponse {
+  [currencyCode: string]: convertedCurrency;
+}
+
+export interface convertedCurrency {
+  [currencyCode: string]: number;
+}
+
 export default class ExchangeRatesService {
   interval: number = INTERVAL;
   lastFetched = 0;
   cachedValue: FixerSuccessResponse | undefined = undefined;
+
+  exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
+
+  constructor() {
+    autoBind(this);
+  }
 
   private get apiKey() {
     return config.get('exchangeRates.apiKey') as string;
@@ -108,6 +124,27 @@ export default class ExchangeRatesService {
 
   get cacheIsValid() {
     return Boolean(Number(new Date()) - this.lastFetched <= this.interval && this.cachedValue);
+  }
+
+  async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse | undefined> {
+    return await (
+      await fetch(`https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=${currencySymbols.join(',')}`)
+    ).json();
+  }
+
+  async fetchCryptoCompareExchangeRates(): Promise<CryptoCompareSuccessResponse | undefined> {
+    let cachedValue = await this.exchangeRates.select('BTC', 'USD');
+
+    if (cachedValue) {
+      return {
+        BTC: {
+          USD: cachedValue,
+        },
+      };
+    }
+    let result = await this.requestExchangeRatesFromCryptoCompare();
+
+    return result;
   }
 }
 
