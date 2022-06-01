@@ -126,9 +126,12 @@ export default class ExchangeRatesService {
     return Boolean(Number(new Date()) - this.lastFetched <= this.interval && this.cachedValue);
   }
 
-  async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse | undefined> {
+  async requestExchangeRatesFromCryptoCompare(
+    from: string,
+    to: string
+  ): Promise<CryptoCompareSuccessResponse | undefined> {
     return await (
-      await fetch(`https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=${currencySymbols.join(',')}`)
+      await fetch(`https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}`)
     ).json();
   }
 
@@ -146,7 +149,7 @@ export default class ExchangeRatesService {
         },
       };
     }
-    let result = await this.requestExchangeRatesFromCryptoCompare();
+    let result = await this.requestExchangeRatesFromCryptoCompare(from, to);
 
     if (result) {
       await this.exchangeRates.insert(from, to, result[from][to], date);
