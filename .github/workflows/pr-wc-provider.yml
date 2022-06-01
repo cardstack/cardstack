@@ -2,12 +2,11 @@ name: CI [wc-provider]
 
 on:
   pull_request:
-    branches: [main]
     paths:
-      - 'packages/wc-provider/**'
-      - 'packages/eslint-config/**'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/wc-provider/**"
+      - "packages/eslint-config/**"
+      - "package.json"
+      - "yarn.lock"
 
 jobs:
   test:

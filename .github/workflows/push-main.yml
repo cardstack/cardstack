@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   lint:
     name: Lint All
@@ -43,23 +50,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
+      - name: Configure staging AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/waypoint
+          aws-region: us-east-1
       - name: Check access to secrets specified in waypoint.hcl
         uses: ./.github/actions/check-secrets
         with:
           waypoint_config_file: waypoint.hcl
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
+      - name: Configure prod AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/waypoint
+          aws-region: us-east-1
       - name: Check access to secrets specified in waypoint.prod.hcl
         uses: ./.github/actions/check-secrets
         with:
           waypoint_config_file: waypoint.prod.hcl
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}
-          
+
   test_all_but_web_client:
     name: hub, did-resolver Build/Test
     needs: lint
@@ -141,13 +150,13 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'web-client test results'
+          check_name: "web-client test results"
           files: ci-xml-test-results/web-client.xml
       - name: Publish ssr-web test results
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'ssr-web test results'
+          check_name: "ssr-web test results"
           files: ci-xml-test-results/ssr-web.xml
 
   change_check:
@@ -219,12 +228,14 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/waypoint
+          aws-region: us-east-1
       - name: Deploy hub
         uses: ./.github/actions/deploy-hub
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
@@ -262,11 +273,14 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/web-client
+          aws-region: us-east-1
       - name: Deploy web-client
         uses: ./.github/actions/deploy-web-client
         env:
-          EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
@@ -305,13 +319,15 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/waypoint
+          aws-region: us-east-1
       - name: Deploy ssr-web
         uses: ./.github/actions/deploy-ssr-web
         env:
           HUB_URL: https://hub-staging.stack.cards
-          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
@@ -352,6 +368,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/boxel
+          aws-region: us-east-1
       - name: Deploy preview
         run: yarn deploy:boxel
         env:
@@ -359,8 +380,24 @@ jobs:
           S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
           S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
           S3_PREVIEW_REGION: us-east-1
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+      - name: Send success notification to Discord
+        if: ${{ success() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :checkered_flag: **boxel** [main] has been successfully deployed to *staging*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **boxel** [main] has failed to deploy to *staging*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   deploy-cardie:
     name: Deploy cardie via waypoint
@@ -376,12 +413,14 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/waypoint
+          aws-region: us-east-1
       - name: Deploy cardie
         uses: ./.github/actions/deploy-cardie
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
