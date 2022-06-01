@@ -6,7 +6,7 @@ on:
       environment:
         description: Deployment environment
         required: false
-        default: production
+        default: staging
 
 jobs:
   deploy:
