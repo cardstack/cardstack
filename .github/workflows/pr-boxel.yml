@@ -50,7 +50,6 @@ jobs:
         with:
           files: |
             ^packages/boxel
-            ^.github/workflows/pr-boxel.yml
 
   deploy-boxel-preview:
     name: Deploy a preview to S3

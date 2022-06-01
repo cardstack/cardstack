@@ -68,7 +68,6 @@ jobs:
         with:
           files: |
             ^packages/ssr-web
-            ^.github/workflows/pr-ssr-web.yml
 
   deploy-ssr-preview-staging:
     name: Deploy a ssr-web staging preview to S3

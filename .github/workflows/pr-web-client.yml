@@ -70,7 +70,6 @@ jobs:
         with:
           files: |
             ^packages/web-client
-            ^.github/workflows/pr-web-client.yml
 
   deploy-web-client-preview-staging:
     name: Deploy a staging preview to S3
