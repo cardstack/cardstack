@@ -124,12 +124,14 @@ describe('ContractSubscriptionEventHandler', function () {
 
   for (const contractEventConfiguration of CONTRACT_EVENTS) {
     it(`handles a ${contractEventConfiguration} event and persists the latest block`, async function () {
-      await this.contracts.handlers[contractEventConfiguration.eventName](null, {
+      let contractEvent = {
         blockNumber: 500,
         transactionHash: '0x123',
-      });
+      };
 
-      expect(this.workerClient.jobs).to.deep.equal([[contractEventConfiguration.taskName, '0x123']]);
+      await this.contracts.handlers[contractEventConfiguration.eventName](null, contractEvent);
+
+      expect(this.workerClient.jobs).to.deep.equal([[contractEventConfiguration.taskName, contractEvent]]);
       expect(await this.latestEventBlockQueries.read()).to.equal(500);
     });
 
