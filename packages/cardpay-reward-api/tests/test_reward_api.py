@@ -7,26 +7,17 @@ from cardpay_reward_api.main import app
 from cardpay_reward_api.models import Root
 from fastapi.testclient import TestClient
 
-from .fixtures import engine, override_get_db
-from .mocks import merkle_roots, reward_programs
+from .fixtures import engine, override_get_db, roots_for_program
+from .mocks import reward_programs
 from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
                     validate_proof_response_fields)
 
-SUBGRAPH_URL = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
 REWARDS_BUCKET = "s3://tally-staging-reward-programs"
-DB_STRING = "postgresql://postgres@localhost:5432/postgres"
-ENVIRONMENT = "staging"
+ENVIRONMENT = "local"
 
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
-
-
-def roots_for_program(reward_program_id, payment_cycle):
-    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
-        return merkle_roots
-    else:
-        return []
 
 
 @pytest.fixture(scope="module")
@@ -54,7 +45,7 @@ def indexer(monkeymodule):
         ),
     )
     monkeymodule.setattr(Indexer, "get_reward_programs", lambda x: reward_programs)
-    return Indexer(SUBGRAPH_URL, [])
+    return Indexer(None, [])
 
 
 @pytest.fixture(scope="module")
@@ -65,6 +56,7 @@ def mock_db(monkeymodule, indexer):
     indexer.run(db, REWARDS_BUCKET)
     yield db
     # teardown
+    # https://stackoverflow.com/questions/67255653/how-to-set-up-and-tear-down-a-database-between-tests-in-fastapi
     Base.metadata.drop_all(bind=engine)  # drop tables
 
 
