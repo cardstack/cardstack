@@ -51,13 +51,13 @@ def indexer(monkeymodule):
 @pytest.fixture(scope="module")
 def mock_db(monkeymodule, indexer):
     # setup
-    Base.metadata.create_all(bind=engine)  # create tables
+    Base.metadata.create_all(bind=engine)
     db = next(override_get_db())
     indexer.run(db, REWARDS_BUCKET)
     yield db
     # teardown
     # https://stackoverflow.com/questions/67255653/how-to-set-up-and-tear-down-a-database-between-tests-in-fastapi
-    Base.metadata.drop_all(bind=engine)  # drop tables
+    Base.metadata.drop_all(bind=engine)
 
 
 def test_read_roots(mock_db):
