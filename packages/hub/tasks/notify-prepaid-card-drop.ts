@@ -4,6 +4,7 @@ import NotificationPreferenceService from '../services/push-notifications/prefer
 import WorkerClient from '../services/worker-client';
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
+import { EventData } from 'web3-eth-contract';
 
 const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
 
@@ -13,8 +14,9 @@ export default class NotifyPrepaidCardDrop {
   });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
-  async perform({ transactionHash, ownerAddress }: { transactionHash: string; ownerAddress: string }) {
+  async perform(event: EventData) {
     let notificationBody = 'You were issued a new prepaid card!';
+    let ownerAddress = event.returnValues.owner;
 
     let notificationData = {
       notificationType: 'prepaid_card_drop',
@@ -32,7 +34,7 @@ export default class NotifyPrepaidCardDrop {
         notificationId: generateContractEventNotificationId({
           network: web3Config.layer2Network,
           ownerAddress,
-          transactionHash,
+          transactionHash: event.transactionHash,
           pushClientId,
         }),
         pushClientId,
