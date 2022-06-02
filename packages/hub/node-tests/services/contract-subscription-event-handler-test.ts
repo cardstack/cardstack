@@ -113,9 +113,10 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('handles a CustomerPayment event and persists the latest block', async function () {
-    await this.contracts.handlers.CustomerPayment(null, { blockNumber: 500, transactionHash: '0x123' });
+    let contractEvent = { blockNumber: 500, transactionHash: '0x123' };
+    await this.contracts.handlers.CustomerPayment(null, contractEvent);
 
-    expect(this.workerClient.jobs).to.deep.equal([['notify-customer-payment', '0x123']]);
+    expect(this.workerClient.jobs).to.deep.equal([['notify-customer-payment', contractEvent]]);
     expect(await this.latestEventBlockQueries.read()).to.equal(500);
   });
 
@@ -133,17 +134,20 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('handles a MerchantClaim event and persists the latest block', async function () {
+    let contractEvent = { blockNumber: 1234, transactionHash: '0x123' };
+
     await this.latestEventBlockQueries.update(2324);
     await this.subject.setupContractEventSubscriptions();
-    await this.contracts.handlers.MerchantClaim(null, { blockNumber: 1234, transactionHash: '0x123' });
+    await this.contracts.handlers.MerchantClaim(null, contractEvent);
 
     expect(await this.latestEventBlockQueries.read()).to.equal(2324);
   });
 
   it('ignores a block number that is lower than the persisted one', async function () {
-    await this.contracts.handlers.MerchantClaim(null, { blockNumber: 2324, transactionHash: '0x123' });
+    let contractEvent = { blockNumber: 2324, transactionHash: '0x123' };
+    await this.contracts.handlers.MerchantClaim(null, contractEvent);
 
-    expect(this.workerClient.jobs).to.deep.equal([['notify-merchant-claim', '0x123']]);
+    expect(this.workerClient.jobs).to.deep.equal([['notify-merchant-claim', contractEvent]]);
     expect(await this.latestEventBlockQueries.read()).to.equal(2324);
   });
 
