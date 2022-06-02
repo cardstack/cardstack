@@ -4,7 +4,7 @@ import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import Web3 from 'web3';
 
 import { setupHub, registry } from '../helpers/server';
-import { HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
+import { CONTRACT_EVENTS, HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
 
 class StubContracts {
   handlers: Record<any, any> = {};
@@ -29,9 +29,18 @@ class StubContracts {
           },
         },
       };
+    } else if (contractName == 'prepaidCardMarketV2') {
+      return {
+        events: {
+          PrepaidCardProvisioned: (config: any, callback: Function) => {
+            this.options.PrepaidCardProvisioned = config;
+            this.handlers.PrepaidCardProvisioned = callback;
+          },
+        },
+      };
     }
 
-    return null;
+    throw new Error(`Unmocked contract ${contractName}`);
   }
 }
 
@@ -87,6 +96,7 @@ describe('ContractSubscriptionEventHandler', function () {
   it('starts the event listeners with an empty config', async function () {
     expect(this.contracts.options.CustomerPayment).to.deep.equal({});
     expect(this.contracts.options.MerchantClaim).to.deep.equal({});
+    expect(this.contracts.options.PrepaidCardProvisioned).to.deep.equal({});
   });
 
   it('starts the event listeners with a fromBlock when the latest block has been persisted', async function () {
@@ -94,8 +104,9 @@ describe('ContractSubscriptionEventHandler', function () {
 
     await this.subject.setupContractEventSubscriptions();
 
-    expect(this.contracts.options.CustomerPayment).to.deep.equal({ fromBlock: 1234 });
-    expect(this.contracts.options.MerchantClaim).to.deep.equal({ fromBlock: 1234 });
+    for (const contractOptionName in this.contracts.options) {
+      expect(this.contracts.options[contractOptionName]).to.deep.equal({ fromBlock: 1234 });
+    }
   });
 
   it('starts the event listener with the most-recently-available block when the latest block is more than 10000 ahead of the persisted block', async function () {
@@ -104,44 +115,39 @@ describe('ContractSubscriptionEventHandler', function () {
 
     await this.subject.setupContractEventSubscriptions();
 
-    expect(this.contracts.options.CustomerPayment).to.deep.equal({
-      fromBlock: web3BlockNumber - HISTORIC_BLOCKS_AVAILABLE + 1,
-    });
-    expect(this.contracts.options.MerchantClaim).to.deep.equal({
-      fromBlock: web3BlockNumber - HISTORIC_BLOCKS_AVAILABLE + 1,
-    });
+    for (const contractOptionName in this.contracts.options) {
+      expect(this.contracts.options[contractOptionName]).to.deep.equal({
+        fromBlock: web3BlockNumber - HISTORIC_BLOCKS_AVAILABLE + 1,
+      });
+    }
   });
 
-  it('handles a CustomerPayment event and persists the latest block', async function () {
-    let contractEvent = { blockNumber: 500, transactionHash: '0x123' };
-    await this.contracts.handlers.CustomerPayment(null, contractEvent);
+  for (const contractEventConfiguration of CONTRACT_EVENTS) {
+    it(`handles a ${contractEventConfiguration} event and persists the latest block`, async function () {
+      let contractEvent = {
+        blockNumber: 500,
+        transactionHash: '0x123',
+      };
 
-    expect(this.workerClient.jobs).to.deep.equal([['notify-customer-payment', contractEvent]]);
-    expect(await this.latestEventBlockQueries.read()).to.equal(500);
-  });
+      await this.contracts.handlers[contractEventConfiguration.eventName](null, contractEvent);
 
-  it('logs an error when receiving a CustomerPayment error', async function () {
-    let error = new Error('Mock CustomerPayment error');
-    this.contracts.handlers.CustomerPayment(error);
-
-    let sentryReport = await waitForSentryReport();
-
-    expect(sentryReport.tags).to.deep.equal({
-      action: 'contract-subscription-event-handler',
+      expect(this.workerClient.jobs).to.deep.equal([[contractEventConfiguration.taskName, contractEvent]]);
+      expect(await this.latestEventBlockQueries.read()).to.equal(500);
     });
 
-    expect(sentryReport.error?.message).to.equal(error.message);
-  });
+    it(`logs an error from ${contractEventConfiguration.eventName}`, async function () {
+      let error = new Error(`Mock ${contractEventConfiguration.eventName} error`);
+      this.contracts.handlers[contractEventConfiguration.eventName](error);
 
-  it('handles a MerchantClaim event and persists the latest block', async function () {
-    let contractEvent = { blockNumber: 1234, transactionHash: '0x123' };
+      let sentryReport = await waitForSentryReport();
 
-    await this.latestEventBlockQueries.update(2324);
-    await this.subject.setupContractEventSubscriptions();
-    await this.contracts.handlers.MerchantClaim(null, contractEvent);
+      expect(sentryReport.tags).to.deep.equal({
+        action: 'contract-subscription-event-handler',
+      });
 
-    expect(await this.latestEventBlockQueries.read()).to.equal(2324);
-  });
+      expect(sentryReport.error?.message).to.equal(error.message);
+    });
+  }
 
   it('ignores a block number that is lower than the persisted one', async function () {
     let contractEvent = { blockNumber: 2324, transactionHash: '0x123' };
@@ -149,18 +155,5 @@ describe('ContractSubscriptionEventHandler', function () {
 
     expect(this.workerClient.jobs).to.deep.equal([['notify-merchant-claim', contractEvent]]);
     expect(await this.latestEventBlockQueries.read()).to.equal(2324);
-  });
-
-  it('logs an error when receiving a MerchantClaim error', async function () {
-    let error = new Error('Mock MerchantClaim error');
-    this.contracts.handlers.MerchantClaim(error);
-
-    let sentryReport = await waitForSentryReport();
-
-    expect(sentryReport.tags).to.deep.equal({
-      action: 'contract-subscription-event-handler',
-    });
-
-    expect(sentryReport.error?.message).to.equal(error.message);
   });
 });
