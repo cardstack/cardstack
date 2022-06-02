@@ -51,12 +51,11 @@ extra_one_merkle_roots_without_s3 = [
     },
 ]
 
-# not in use
-extra_one_merkle_roots_lower_payment_cycle = [
+extra_one_merkle_roots_old_file = [
     {
         "id": "0x8c7ce5f0740ab9003ed71008ba516421ff337590ca2805e4275897b4674ee598",
-        "blockNumber": "5",
-        "paymentCycle": "1",
+        "blockNumber": "26779206",
+        "paymentCycle": "26779200",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1663927740",
     },

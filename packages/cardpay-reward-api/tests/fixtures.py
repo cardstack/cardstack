@@ -6,8 +6,7 @@ from cardpay_reward_api.indexer import Indexer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .mocks import (extra_one_merkle_roots,
-                    extra_one_merkle_roots_lower_payment_cycle,
+from .mocks import (extra_one_merkle_roots, extra_one_merkle_roots_old_file,
                     extra_one_merkle_roots_without_s3, merkle_roots,
                     other_merkle_roots, reward_programs)
 
@@ -77,7 +76,19 @@ def extra_one_merkle_roots_without_s3(reward_program_id, payment_cycle):
     models get_merkle_roots
     """
     if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
-        return extra_one_merkle_roots_without_s3
+        return extra_one_merkle_roots_old_file
+    if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
+        return []
+    else:
+        return []
+
+
+def extra_one_merkle_roots_old_file_written(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return extra_one_merkle_roots_old_file
     if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
         return []
     else:

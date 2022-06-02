@@ -9,8 +9,10 @@ from cardpay_reward_api.indexer import Indexer
 from cardpay_reward_api.main import app
 from cardpay_reward_api.models import Proof, Root
 from fastapi.testclient import TestClient
+from sqlalchemy import exc
 
 from .fixtures import (engine, extra_one_merkle_roots_for_program,
+                       extra_one_merkle_roots_old_file_written,
                        extra_one_merkle_roots_without_s3, indexer,
                        override_get_db)
 from .mocks import merkle_roots, reward_programs
@@ -83,15 +85,30 @@ def test_should_not_index_new_root_without_s3(indexer, mock_db, monkeypatch):
     with mock_db.begin():
         roots = mock_db.query(Root).all()
         proofs = mock_db.query(Proof).all()
-    assert len(roots) == 4
-    assert len(proofs) == 41
-    with mock_db.begin():
-        o = (
+        block_number = (
             mock_db.query(Root)
             .filter(
                 Root.rewardProgramId == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
             )
             .order_by(Root.blockNumber.desc())
             .first()
-        )
-    assert o.blockNumber == 26778059
+        ).blockNumber
+    assert len(roots) == 4
+    assert len(proofs) == 41
+    assert block_number == 26778059
+
+
+@pytest.mark.parametrize("indexer", [[]], indirect=["indexer"])
+def test_should_not_index_root_with_old_file_written(indexer, mock_db, monkeypatch):
+    indexer.run(mock_db, REWARDS_BUCKET)
+    monkeypatch.setattr(
+        Indexer,
+        "get_merkle_roots",
+        lambda _, reward_program_id, payment_cycle: extra_one_merkle_roots_old_file_written(
+            reward_program_id, payment_cycle
+        ),
+    )
+    with pytest.raises(
+        exc.IntegrityError, match=r". UNIQUE constraint failed: proofs.leaf"
+    ):
+        indexer.run(mock_db, REWARDS_BUCKET)
