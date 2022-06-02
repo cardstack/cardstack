@@ -54,7 +54,13 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
     this.blockCount = 1;
     let blockNumber = transactionReceipt.blockNumber;
     while (this.blockCount <= this.totalBlockCount) {
-      yield this.layer2Network.getBlockConfirmation(blockNumber++);
+      // the expected block time for a single block on Gnosis chain is 10-20s.
+      // we are only incrementing block by 1, so giving 120s is already a fair amount of time
+      // if it times out even then, the user probably needs to refresh
+      yield this.layer2Network.getBlockConfirmation(
+        blockNumber++,
+        2 * 60 * 1000
+      );
       this.blockCount++;
     }
   }
