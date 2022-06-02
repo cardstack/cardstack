@@ -28,6 +28,6 @@ class Root(Base):
     id = Column(Integer, primary_key=True, index=True)
     rewardProgramId = Column(String)
     rootHash = Column(String, unique=True)
-    paymentCycle = Column(Integer)
+    paymentCycle = Column(Integer, unique=True)
     blockNumber = Column(Integer)
     timestamp = Column(DateTime)
