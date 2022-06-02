@@ -2,12 +2,13 @@
 
 import pytest
 from cardpay_reward_api.database import Base
+from cardpay_reward_api.indexer import Indexer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# https://fastapi.tiangolo.com/advanced/testing-database/
+from .mocks import merkle_roots, reward_programs
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"  # using store in memory
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -23,20 +24,29 @@ def override_get_db():
     finally:
         db.close()
 
-    # @patch.object(Indexer, "get_merkle_roots", side_effect=roots_for_program)
-    # @patch.object(Indexer, "get_reward_programs", return_value=reward_programs)
-    #
 
-
-# Base.metadata.drop_all(
-#     bind=engine
-# )  # drop all tables that have been created (https://stackoverflow.com/questions/67255653/how-to-set-up-and-tear-down-a-database-between-tests-in-fastapi)
-# Base.metadata.create_all(bind=engine)
-
-
-# https://stackoverflow.com/questions/67255653/how-to-set-up-and-tear-down-a-database-between-tests-in-fastapi
 @pytest.fixture()
 def test_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture()
+def indexer(request, monkeypatch):
+    monkeypatch.setattr(
+        Indexer,
+        "get_merkle_roots",
+        lambda a, reward_program_id, payment_cycle: roots_for_program(
+            reward_program_id, payment_cycle
+        ),
+    )
+    monkeypatch.setattr(Indexer, "get_reward_programs", lambda x: reward_programs)
+    return Indexer(None, request.param)
+
+
+def roots_for_program(reward_program_id, payment_cycle):
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return merkle_roots
+    else:
+        return []
