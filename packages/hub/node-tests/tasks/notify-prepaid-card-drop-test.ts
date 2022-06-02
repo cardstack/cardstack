@@ -3,6 +3,7 @@ import { registry, setupHub } from '../helpers/server';
 import NotifyPrepaidCardDrop from '../../tasks/notify-prepaid-card-drop';
 import { expect } from 'chai';
 import { setupSentry } from '../helpers/sentry';
+import { EventData } from 'web3-eth-contract';
 
 let addedJobIdentifiers: string[] = [];
 let addedJobPayloads: string[] = [];
@@ -39,7 +40,7 @@ describe('NotifyPrepaidCardDropTask', function () {
   it('adds send-notifications jobs', async function () {
     let task = (await getContainer().lookup('notify-prepaid-card-drop')) as NotifyPrepaidCardDrop;
 
-    await task.perform({ ownerAddress: 'eoa-address', transactionHash: 'a' });
+    await task.perform({ returnValues: { owner: 'eoa-address' }, transactionHash: 'a' } as unknown as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
