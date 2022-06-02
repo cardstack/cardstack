@@ -1,7 +1,9 @@
-import { execSync as exec } from 'child_process';
+import hcl from 'js-hcl-parser';
+import fs from 'fs';
+import { execSync } from 'child_process';
 
 function execute(command, options) {
-  return exec(command, options ?? {})
+  return execSync(command, options ?? {})
     .toString()
     .trim();
 }
@@ -9,6 +11,15 @@ function execute(command, options) {
 function stripArnPrefix(value) {
   const arnPrefixPattern = /^.*\//;
   return value.replace(arnPrefixPattern, '');
+}
+
+function findCluster(waypointConfigFilePath, appName) {
+  const waypointHcl = fs.readFileSync(waypointConfigFilePath, 'utf8');
+  const waypointJson = hcl.parse(waypointHcl);
+  const waypointConfig = JSON.parse(waypointJson);
+  const waypointApp = waypointConfig.app.find((app) => Object.keys(app)[0] == appName);
+  const cluster = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].cluster;
+  return cluster;
 }
 
 function listServices(cluster, appName) {
@@ -88,7 +99,9 @@ function waitTargetInService(service) {
 function main() {
   console.log('\n» Waiting for service and target group to be ready...');
 
-  const [cluster, appName] = process.argv.slice(2);
+  const [appName, ...extraArgs] = process.argv.slice(2);
+  const waypointConfigFilePath = extraArgs.length > 0 ? extraArgs[0] : 'waypoint.hcl';
+  const cluster = findCluster(waypointConfigFilePath, appName);
   const services = listServices(cluster, appName);
   const service = findService(services, appName, cluster);
 
