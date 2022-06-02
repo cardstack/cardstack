@@ -133,7 +133,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     };
   }
 
-  async getBlockConfirmation(_blockNumber: TxnBlockNumber): Promise<void> {
+  async getBlockConfirmation(
+    _blockNumber: TxnBlockNumber,
+    _duration?: number
+  ): Promise<void> {
     if (this.test__autoResolveBlockConfirmations) {
       return Promise.resolve();
     } else {

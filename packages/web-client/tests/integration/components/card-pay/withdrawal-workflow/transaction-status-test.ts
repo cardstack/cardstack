@@ -195,5 +195,43 @@ module(
 
       assert.ok(onComplete.notCalled);
     });
+
+    test('It shows an appropriate error message if block confirmations time out', async function (assert) {
+      assert.ok(onComplete.notCalled);
+
+      sinon
+        .stub(layer2Service, 'awaitBridgedToLayer1')
+        .throws(
+          new Error(
+            'Desired block number did not appear after waiting for 120 seconds'
+          )
+        );
+
+      await render(hbs`
+        <CardPay::WithdrawalWorkflow::TransactionStatus
+          @onComplete={{this.onComplete}}
+          @isComplete={{this.isComplete}}
+          @onIncomplete={{this.onIncomplete}}
+          @workflowSession={{this.workflowSession}}
+          @frozen={{this.frozen}}
+        />
+      `);
+
+      assert.dom(`[data-test-bridge-explorer-button]`).doesNotExist();
+      assert
+        .dom('[data-test-action-card-title-icon-name="success-bordered"]')
+        .doesNotExist();
+
+      assert
+        .dom('[data-test-withdrawal-bridging-failed]')
+        .containsText('Failed');
+      assert
+        .dom('[data-test-withdrawal-transaction-status-error]')
+        .containsText(
+          `It took too long to confirm your transaction, this could be caused by network issues. Please refresh this tab - you'll be brought back to this step in the workflow and we'll try to confirm it again. If that doesn't work, please contact Cardstack support.`
+        );
+
+      assert.ok(onComplete.notCalled);
+    });
   }
 );
