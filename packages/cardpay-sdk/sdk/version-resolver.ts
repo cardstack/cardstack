@@ -7,6 +7,7 @@ import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
 import Safes from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
+import { PrepaidCardMarketV2, prepaidCardMarketV2Meta } from './prepaid-card-market-v-2';
 import Assets from './assets';
 import LayerOneOracle from './layer-one-oracle';
 import TokenBridgeHomeSide from './token-bridge-home-side';
@@ -23,6 +24,7 @@ export type SDK =
   | 'LayerTwoOracle'
   | 'PrepaidCard'
   | 'PrepaidCardMarket'
+  | 'PrepaidCardMarketV2'
   | 'RevenuePool'
   | 'Safes'
   | 'HubAuth'
@@ -43,6 +45,8 @@ export type MapReturnType<T> = T extends 'Assets'
   ? PrepaidCard
   : T extends 'PrepaidCardMarket'
   ? PrepaidCardMarket
+  : T extends 'PrepaidCardMarketV2'
+  ? PrepaidCardMarketV2
   : T extends 'RevenuePool'
   ? RevenuePool
   : T extends 'RewardPool'
@@ -128,6 +132,9 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       break;
     case 'PrepaidCardMarket':
       apiClass = await resolveApiVersion(prepaidCardMarketMeta, web3);
+      break;
+    case 'PrepaidCardMarketV2':
+      apiClass = await resolveApiVersion(prepaidCardMarketV2Meta, web3);
       break;
     case 'RevenuePool':
       apiClass = await resolveApiVersion(revenuePoolMeta, web3);
