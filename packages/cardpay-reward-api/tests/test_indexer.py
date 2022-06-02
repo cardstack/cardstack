@@ -7,7 +7,7 @@ import pytest
 from cardpay_reward_api.database import Base, get_db
 from cardpay_reward_api.indexer import Indexer
 from cardpay_reward_api.main import app
-from cardpay_reward_api.models import Root
+from cardpay_reward_api.models import Proof, Root
 from fastapi.testclient import TestClient
 
 from .fixtures import (engine, extra_one_merkle_roots_for_program, indexer,
@@ -36,19 +36,21 @@ def mock_db():
 
 
 @pytest.mark.parametrize(
-    "indexer, n_roots",
-    [([], 3), (["0x5E4E148baae93424B969a0Ea67FF54c315248BbA"], 0)],
+    "indexer, n_roots,n_proofs",
+    [([], 3, 41), (["0x5E4E148baae93424B969a0Ea67FF54c315248BbA"], 0, 0)],
     indirect=["indexer"],
 )
-def test_index_only_archived_reward_program(indexer, n_roots, mock_db):
+def test_index_only_archived_reward_program(indexer, n_roots, n_proofs, mock_db):
     indexer.run(mock_db, REWARDS_BUCKET)
     roots = mock_db.query(Root).all()
+    proofs = mock_db.query(Proof).all()
 
     assert len(roots) == n_roots
+    assert len(proofs) == n_proofs
 
 
 @pytest.mark.parametrize("indexer", [[]], indirect=["indexer"])
-def test_index_from_last_payment_cycle(indexer, mock_db, monkeypatch):
+def test_second_run_indexer(indexer, mock_db, monkeypatch):
     indexer.run(mock_db, REWARDS_BUCKET)
     with mock_db.begin():
         roots = mock_db.query(Root).all()
