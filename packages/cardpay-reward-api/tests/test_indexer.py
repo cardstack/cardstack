@@ -48,7 +48,6 @@ def test_index_only_archived_reward_program(indexer, n_roots, n_proofs, mock_db)
         proofs = mock_db.query(Proof).all()
     assert len(roots) == n_roots
     assert len(proofs) == n_proofs
-    print(len(proofs))
 
 
 @pytest.mark.parametrize(
@@ -84,5 +83,15 @@ def test_should_not_index_new_root_without_s3(indexer, mock_db, monkeypatch):
     with mock_db.begin():
         roots = mock_db.query(Root).all()
         proofs = mock_db.query(Proof).all()
-    print(len(roots))
-    print(len(proofs))
+    assert len(roots) == 4
+    assert len(proofs) == 41
+    with mock_db.begin():
+        o = (
+            mock_db.query(Root)
+            .filter(
+                Root.rewardProgramId == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
+            )
+            .order_by(Root.blockNumber.desc())
+            .first()
+        )
+    assert o.blockNumber == 26778059
