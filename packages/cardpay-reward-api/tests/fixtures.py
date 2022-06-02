@@ -37,11 +37,11 @@ def indexer(request, monkeypatch):
     monkeypatch.setattr(
         Indexer,
         "get_merkle_roots",
-        lambda a, reward_program_id, payment_cycle: roots_for_program(
+        lambda _, reward_program_id, payment_cycle: roots_for_program(
             reward_program_id, payment_cycle
         ),
     )
-    monkeypatch.setattr(Indexer, "get_reward_programs", lambda x: reward_programs)
+    monkeypatch.setattr(Indexer, "get_reward_programs", lambda _: reward_programs)
     return Indexer(None, request.param)
 
 

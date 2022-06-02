@@ -56,7 +56,7 @@ def test_index_from_last_payment_cycle(indexer, mock_db, monkeypatch):
     monkeypatch.setattr(
         Indexer,
         "get_merkle_roots",
-        lambda a, reward_program_id, payment_cycle: extra_one_merkle_roots_for_program(
+        lambda _, reward_program_id, payment_cycle: extra_one_merkle_roots_for_program(
             reward_program_id, payment_cycle
         ),
     )
