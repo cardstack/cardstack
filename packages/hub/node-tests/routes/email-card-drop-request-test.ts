@@ -397,16 +397,16 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       });
 
-      let sentryReport = await waitForSentryReport();
+    let sentryReport = await waitForSentryReport();
 
-      expect(sentryReport.error?.message).to.equal(
-        `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${mockPrepaidCardQuantity}) less reservations (${reservationCount}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
-      );
-      expect(sentryReport.tags).to.deep.equal({
-        action: 'drop-card',
-        alert: 'prepaid-card-supply',
-      });
+    expect(sentryReport.error?.message).to.equal(
+      `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${mockPrepaidCardQuantity}) less reservations (${reservationCount}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+    );
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'drop-card',
+      alert: 'prepaid-card-supply',
     });
+  });
 
   it('rejects with 503 when the contract is paused', async function () {
     mockPrepaidCardMarketContractPaused = true;

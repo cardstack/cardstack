@@ -102,13 +102,13 @@ export default class EmailCardDropRequestsRoute {
     let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
     let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
 
-    let supplyIsBelowNotificationThreshold = (quantityAvailable - activeReservations) < notifyWhenQuantityBelow;
+    let supplyIsBelowNotificationThreshold = quantityAvailable - activeReservations < notifyWhenQuantityBelow;
 
     log.info(
       `${cardDropSku} has ${quantityAvailable} available and ${activeReservations} reserved, notification threshold is ${notifyWhenQuantityBelow}`
     );
 
-    if (supplyIsBelowNotificationThreshold ) {
+    if (supplyIsBelowNotificationThreshold) {
       Sentry.captureException(
         new Error(
           `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${quantityAvailable}) less reservations (${activeReservations}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
@@ -121,7 +121,6 @@ export default class EmailCardDropRequestsRoute {
         }
       );
     }
-
 
     if (quantityAvailable <= activeReservations) {
       return respondWith503(ctx, 'There are no prepaid cards available');
