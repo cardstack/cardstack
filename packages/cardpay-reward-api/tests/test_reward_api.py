@@ -64,8 +64,8 @@ def mock_db(monkeymodule, indexer):
     db = next(override_get_db())
     indexer.run(db, REWARDS_BUCKET)
     yield db
-    Base.metadata.drop_all(bind=engine)  # drop tables
     # teardown
+    Base.metadata.drop_all(bind=engine)  # drop tables
 
 
 def test_read_roots(mock_db):
