@@ -32,8 +32,45 @@ extra_one_merkle_roots = [
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1653927315",
     },
+    {
+        "id": "0x58c510692db536c594237b69c9f3826df7de51b2162cd85c5ce241be2a874a7b",
+        "blockNumber": "26779109",
+        "paymentCycle": "26779104",
+        "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
+        "timestamp": "1653927740",
+    },
 ]
 
+extra_one_merkle_roots_without_s3 = [
+    {
+        "id": "0x8c7ce5f0740ab9003ed71008ba516421ff337590ca2805e4275897b4674ee598",
+        "blockNumber": "27000001",
+        "paymentCycle": "27000000",
+        "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
+        "timestamp": "1663927740",
+    },
+]
+
+# not in use
+extra_one_merkle_roots_lower_payment_cycle = [
+    {
+        "id": "0x8c7ce5f0740ab9003ed71008ba516421ff337590ca2805e4275897b4674ee598",
+        "blockNumber": "5",
+        "paymentCycle": "1",
+        "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
+        "timestamp": "1663927740",
+    },
+]
+
+other_merkle_roots = [
+    {
+        "id": "0x31157fc28d6a747ebf9a9bbebb54052295bf1e18e79bea6337de2beaf688ad8d",
+        "blockNumber": "26729082",
+        "paymentCycle": "26722587",
+        "rewardProgram": {"id": "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07"},
+        "timestamp": "1653387365",
+    }
+]
 
 reward_programs = [
     {"id": "0x0A4c62c8616342Fc3C5390c4e55aD26DeE694b0F"},

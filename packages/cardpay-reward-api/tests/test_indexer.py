@@ -10,7 +10,8 @@ from cardpay_reward_api.main import app
 from cardpay_reward_api.models import Proof, Root
 from fastapi.testclient import TestClient
 
-from .fixtures import (engine, extra_one_merkle_roots_for_program, indexer,
+from .fixtures import (engine, extra_one_merkle_roots_for_program,
+                       extra_one_merkle_roots_without_s3, indexer,
                        override_get_db)
 from .mocks import merkle_roots, reward_programs
 from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
@@ -37,24 +38,24 @@ def mock_db():
 
 @pytest.mark.parametrize(
     "indexer, n_roots,n_proofs",
-    [([], 3, 41), (["0x5E4E148baae93424B969a0Ea67FF54c315248BbA"], 0, 0)],
+    [([], 4, 41), (["0x5E4E148baae93424B969a0Ea67FF54c315248BbA"], 1, 0)],
     indirect=["indexer"],
 )
 def test_index_only_archived_reward_program(indexer, n_roots, n_proofs, mock_db):
     indexer.run(mock_db, REWARDS_BUCKET)
-    roots = mock_db.query(Root).all()
-    proofs = mock_db.query(Proof).all()
-
-    assert len(roots) == n_roots
-    assert len(proofs) == n_proofs
-
-
-@pytest.mark.parametrize("indexer", [[]], indirect=["indexer"])
-def test_second_run_indexer(indexer, mock_db, monkeypatch):
-    indexer.run(mock_db, REWARDS_BUCKET)
     with mock_db.begin():
         roots = mock_db.query(Root).all()
-    assert len(roots) == 3
+        proofs = mock_db.query(Proof).all()
+    assert len(roots) == n_roots
+    assert len(proofs) == n_proofs
+    print(len(proofs))
+
+
+@pytest.mark.parametrize(
+    "indexer", [["0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07"]], indirect=["indexer"]
+)
+def test_index_new_root(indexer, mock_db, monkeypatch):
+    indexer.run(mock_db, REWARDS_BUCKET)
     monkeypatch.setattr(
         Indexer,
         "get_merkle_roots",
@@ -65,4 +66,23 @@ def test_second_run_indexer(indexer, mock_db, monkeypatch):
     indexer.run(mock_db, REWARDS_BUCKET)
     with mock_db.begin():
         roots = mock_db.query(Root).all()
-    assert len(roots) == 4
+        proofs = mock_db.query(Proof).all()
+    assert len(roots) == 5
+    assert len(proofs) == 44
+
+
+@pytest.mark.parametrize("indexer", [[]], indirect=["indexer"])
+def test_should_not_index_new_root_without_s3(indexer, mock_db, monkeypatch):
+    indexer.run(mock_db, REWARDS_BUCKET)
+    monkeypatch.setattr(
+        Indexer,
+        "get_merkle_roots",
+        lambda _, reward_program_id, payment_cycle: extra_one_merkle_roots_without_s3(
+            reward_program_id, payment_cycle
+        ),
+    )
+    with mock_db.begin():
+        roots = mock_db.query(Root).all()
+        proofs = mock_db.query(Proof).all()
+    print(len(roots))
+    print(len(proofs))
