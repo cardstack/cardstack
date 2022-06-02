@@ -22,6 +22,7 @@ class Indexer:
         self.archived_reward_programs = archived_reward_programs
 
     def run(self, db: Session, storage_location):
+        print("Running indexer")
         reward_program_ids = [o["id"] for o in self.get_reward_programs()]
         for reward_program_id in reward_program_ids:
             if reward_program_id not in self.archived_reward_programs:
@@ -62,8 +63,8 @@ class Indexer:
         root = models.Root(
             rootHash=root["id"],
             rewardProgramId=root["rewardProgram"]["id"],
-            paymentCycle=root["paymentCycle"],
-            blockNumber=root["blockNumber"],
+            paymentCycle=int(root["paymentCycle"]),
+            blockNumber=int(root["blockNumber"]),
             timestamp=datetime.fromtimestamp(int(root["timestamp"])),
         )
         db.add(root)
