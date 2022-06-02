@@ -22,12 +22,15 @@ import { TransactionReceipt } from 'web3-core';
 const A_WHILE = config.environment === 'test' ? 1 : 1000 * 60 * 2;
 
 class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
+  TIMEOUT_ERROR = 'TIMEOUT_ERROR';
+  NON_TIMEOUT_ERROR = 'NON_TIMEOUT_ERROR';
+
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
   @tracked blockCount = 0;
   @tracked completedCount = 1;
-  @tracked error = false;
+  @tracked error: this['TIMEOUT_ERROR'] | this['NON_TIMEOUT_ERROR'] | undefined;
 
   @tracked showSlowBridgingMessage = false;
 
@@ -88,7 +91,15 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
       console.error('Failed to complete bridging to layer 1');
       console.error(e);
       Sentry.captureException(e);
-      this.error = true;
+      if (
+        e.message.startsWith(
+          'Desired block number did not appear after waiting'
+        )
+      ) {
+        this.error = this.TIMEOUT_ERROR;
+      } else {
+        this.error = this.NON_TIMEOUT_ERROR;
+      }
       this.blockCount = 0;
     }
   }
