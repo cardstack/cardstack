@@ -109,6 +109,6 @@ def test_should_not_index_root_with_old_file_written(indexer, mock_db, monkeypat
         ),
     )
     with pytest.raises(
-        exc.IntegrityError, match=r". UNIQUE constraint failed: proofs.leaf"
+        exc.IntegrityError, match=r".* UNIQUE constraint failed: proofs.leaf"
     ):
         indexer.run(mock_db, REWARDS_BUCKET)
