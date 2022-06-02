@@ -12,7 +12,7 @@ from .mocks import reward_programs
 from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
                     validate_proof_response_fields)
 
-REWARDS_BUCKET = "s3://tally-staging-reward-programs"
+REWARDS_BUCKET = "tests/resources"
 ENVIRONMENT = "local"
 
 app.dependency_overrides[get_db] = override_get_db

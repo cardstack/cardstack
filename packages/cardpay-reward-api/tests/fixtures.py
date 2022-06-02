@@ -6,7 +6,7 @@ from cardpay_reward_api.indexer import Indexer
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .mocks import merkle_roots, reward_programs
+from .mocks import extra_one_merkle_roots, merkle_roots, reward_programs
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -46,7 +46,20 @@ def indexer(request, monkeypatch):
 
 
 def roots_for_program(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
     if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
         return merkle_roots
+    else:
+        return []
+
+
+def extra_one_merkle_roots_for_program(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return extra_one_merkle_roots
     else:
         return []
