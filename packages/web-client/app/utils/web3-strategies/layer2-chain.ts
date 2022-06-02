@@ -491,10 +491,13 @@ export default abstract class Layer2ChainWeb3Strategy
     )}/tx/${txnHash}`;
   }
 
-  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+  async getBlockConfirmation(
+    blockNumber: TxnBlockNumber,
+    duration?: number
+  ): Promise<void> {
     if (!this.web3)
       throw new Error('Cannot get block confirmations without web3');
-    return await waitUntilBlock(this.web3, blockNumber);
+    return await waitUntilBlock(this.web3, blockNumber, duration);
   }
 
   async getBlockHeight(): Promise<BN> {
