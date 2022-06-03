@@ -6,26 +6,51 @@ import ExchangeRatesService, {
 
 import { setupHub } from '../helpers/server';
 
+interface CryptoCompareSuccessResponsesByDate {
+  [date: string]: CryptoCompareSuccessResponse;
+}
+
 describe('CryptoCompareFIXMEExchangeRatesService', function () {
   let { getContainer } = setupHub(this);
+  let subject: ExchangeRatesService;
+
+  this.beforeEach(async function () {
+    let mockResponses = {
+      1654041600000: {
+        BTC: {
+          USD: 432.18,
+        },
+      },
+    } as CryptoCompareSuccessResponsesByDate;
+
+    class PatchedExchangeRatesService extends ExchangeRatesService {
+      async requestExchangeRatesFromCryptoCompare(
+        from: string,
+        to: string,
+        dateString: string
+      ): Promise<CryptoCompareSuccessResponse> {
+        let date = Date.parse(dateString);
+        let exchangeRate = mockResponses[date][from][to];
+
+        if (!exchangeRate) {
+          throw new Error(`No exchange rate found for ${from} to ${to}`);
+        }
+
+        return {
+          [from]: {
+            [to]: exchangeRate,
+          },
+        };
+      }
+    }
+
+    subject = await getContainer().instantiate(PatchedExchangeRatesService);
+  });
 
   it('fetches the rates when they are not cached and caches them', async function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01');
 
-    let mockResponse: CryptoCompareSuccessResponse = {
-      BTC: {
-        USD: 432.18,
-      },
-    };
-
-    class PatchedExchangeRatesService extends ExchangeRatesService {
-      async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse> {
-        return mockResponse;
-      }
-    }
-
-    let subject = await getContainer().instantiate(PatchedExchangeRatesService);
     let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
     // TODO should these be strings or numbers?
@@ -39,19 +64,6 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01');
 
-    let mockResponse: CryptoCompareSuccessResponse = {
-      BTC: {
-        USD: 432.18,
-      },
-    };
-
-    class PatchedExchangeRatesService extends ExchangeRatesService {
-      async requestExchangeRatesFromCryptoCompare(): Promise<CryptoCompareSuccessResponse> {
-        return mockResponse;
-      }
-    }
-
-    let subject = await getContainer().instantiate(PatchedExchangeRatesService);
     let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
     expect(result).deep.equal({
