@@ -129,21 +129,25 @@ export default class ExchangeRatesService {
   async requestExchangeRatesFromCryptoCompare(
     from: string,
     to: string,
-    dateString: string
+    dateString: string,
+    exchange = 'CCCAGG' // FIXME how deep should this optionality go?
   ): Promise<CryptoCompareSuccessResponse | undefined> {
     let timestamp = Date.parse(dateString);
 
     return await (
-      await fetch(`https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}`)
+      await fetch(
+        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}&e=${exchange}`
+      )
     ).json();
   }
 
   async fetchCryptoCompareExchangeRates(
     from: string,
     to: string,
-    date: string
+    date: string,
+    exchange = 'CCCAGG'
   ): Promise<CryptoCompareSuccessResponse | undefined> {
-    let cachedValue = await this.exchangeRates.select(from, to, date);
+    let cachedValue = await this.exchangeRates.select(from, to, date, exchange);
 
     if (cachedValue) {
       return {
@@ -152,10 +156,10 @@ export default class ExchangeRatesService {
         },
       };
     }
-    let result = await this.requestExchangeRatesFromCryptoCompare(from, to, date);
+    let result = await this.requestExchangeRatesFromCryptoCompare(from, to, date, exchange);
 
     if (result) {
-      await this.exchangeRates.insert(from, to, result[from][to], date);
+      await this.exchangeRates.insert(from, to, result[from][to], date, exchange);
     }
 
     return result;

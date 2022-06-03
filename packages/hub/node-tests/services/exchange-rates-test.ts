@@ -6,6 +6,10 @@ import ExchangeRatesService, {
 
 import { setupHub } from '../helpers/server';
 
+interface CryptoCompareSuccessResponsesByExchange {
+  [exchange: string]: CryptoCompareSuccessResponsesByDate;
+}
+
 interface CryptoCompareSuccessResponsesByDate {
   [date: string]: CryptoCompareSuccessResponse;
 }
@@ -16,21 +20,31 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
 
   this.beforeEach(async function () {
     let mockResponses = {
-      1654041600000: {
-        BTC: {
-          USD: 432.18,
+      CCCAGG: {
+        1654041600000: {
+          BTC: {
+            USD: 432.18,
+          },
         },
       },
-    } as CryptoCompareSuccessResponsesByDate;
+      kucoin: {
+        1654041600000: {
+          CARD: {
+            USDT: 0.002059,
+          },
+        },
+      },
+    } as CryptoCompareSuccessResponsesByExchange;
 
     class PatchedExchangeRatesService extends ExchangeRatesService {
       async requestExchangeRatesFromCryptoCompare(
         from: string,
         to: string,
-        dateString: string
+        dateString: string,
+        exchange = 'CCCAGG'
       ): Promise<CryptoCompareSuccessResponse> {
         let date = Date.parse(dateString);
-        let exchangeRate = mockResponses[date][from][to];
+        let exchangeRate = mockResponses[exchange][date][from][to];
 
         if (!exchangeRate) {
           throw new Error(`No exchange rate found for ${from} to ${to}`);
@@ -49,7 +63,7 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
 
   it('fetches the rates when they are not cached and caches them', async function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01');
+    await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01', 'CCCAGG');
 
     let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
@@ -62,7 +76,7 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
 
   it('returns the cached rates when they exist', async function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01');
+    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', 'CCCAGG');
 
     let result = await subject.fetchCryptoCompareExchangeRates('BTC', 'USD', '2022-06-01');
 
@@ -71,6 +85,19 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
         USD: 1919,
       },
     });
+  });
+
+  it('fetches the rates from another exchange when they are not cached and caches them', async function () {
+    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    await exchangeRates.insert('CARD', 'USDT', 1919, '2022-05-01', 'kucoin');
+    await exchangeRates.insert('CARD', 'USDT', 1870, '2022-06-01', 'CCCAGG');
+
+    let result = await subject.fetchCryptoCompareExchangeRates('CARD', 'USDT', '2022-06-01', 'kucoin');
+
+    expect(result).deep.equal({ CARD: { USDT: 0.002059 } });
+
+    let cachedValue = await exchangeRates.select('CARD', 'USDT', '2022-06-01', 'kucoin');
+    expect(cachedValue).equal(0.002059);
   });
 });
 
