@@ -47,6 +47,9 @@ class DepositWorkflow extends Workflow {
   milestones = [
     new Milestone({
       title: MILESTONE_TITLES[0],
+      editableIf(session) {
+        return !session.getValue('unlockTxnHash');
+      },
       postables: [
         new WorkflowMessage({
           message: 'Hi there, we’re happy to see you!',
@@ -85,6 +88,9 @@ class DepositWorkflow extends Workflow {
     }),
     new Milestone({
       title: MILESTONE_TITLES[1],
+      editableIf(session) {
+        return !session.getValue('unlockTxnHash');
+      },
       postables: [
         new NetworkAwareWorkflowMessage({
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
@@ -125,6 +131,9 @@ class DepositWorkflow extends Workflow {
         new WorkflowCard({
           cardName: 'TXN_SETUP',
           componentName: 'card-pay/deposit-workflow/transaction-setup',
+          editableIf(session) {
+            return !session.getValue('unlockTxnHash');
+          },
         }),
         new WorkflowMessage({
           message: 'How many tokens would you like to deposit?',
