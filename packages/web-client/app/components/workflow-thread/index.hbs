@@ -40,7 +40,7 @@
         <WorkflowThread::Postable
           @postable={{postable}}
           @previous={{object-at milestone.visiblePostables (dec j)}}
-          @frozen={{this.frozen}}
+          @frozen={{or this.frozen (not milestone.isEditable) (not postable.isEditable)}}
           @index={{j}}
           data-test-milestone={{i}}
         />

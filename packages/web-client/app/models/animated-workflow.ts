@@ -22,6 +22,7 @@ class AnimatedMilestone {
   model: Milestone;
   @reads('model.completedDetail') declare completedDetail: string;
   @reads('model.title') declare title: string;
+  @reads('model.isEditable') declare isEditable: boolean;
   @tracked isCompletionRevealed = false;
   @reads('postableCollection.visiblePostables')
   declare visiblePostables: WorkflowPostable[];

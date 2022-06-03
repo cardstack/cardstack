@@ -92,4 +92,36 @@ module('Unit | WorkflowCard model', function (hooks) {
     subject.onIncomplete();
     assert.equal(subject.isComplete, false);
   });
+
+  test('isEditable is true by default', function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+    });
+    assert.equal(subject.isEditable, true);
+  });
+
+  test('isEditable is false if editableIf returns false', function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+      editableIf() {
+        return false;
+      },
+    });
+    subject.setWorkflow(new WorkflowStub(this.owner));
+    assert.equal(subject.isEditable, false);
+  });
+
+  test('isEditable is true if editableIf returns true', function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+      editableIf() {
+        return true;
+      },
+    });
+    subject.setWorkflow(new WorkflowStub(this.owner));
+    assert.equal(subject.isEditable, true);
+  });
 });
