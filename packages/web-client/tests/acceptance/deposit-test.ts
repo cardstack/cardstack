@@ -44,6 +44,7 @@ module('Acceptance | deposit', function (hooks) {
   setupMirage(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
+    let ctaButtonsBeforeUnlock: Record<string, string> = {};
     await visit('/card-pay/deposit-withdrawal');
     assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
@@ -64,9 +65,8 @@ module('Acceptance | deposit', function (hooks) {
 
     post = postableSel(0, 3);
     await click(`${post} [data-test-wallet-option="metamask"]`);
-    await click(
-      `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
-    );
+    ctaButtonsBeforeUnlock.mainnetConnection = `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`;
+    await click(ctaButtonsBeforeUnlock.mainnetConnection);
 
     assert.dom(post).containsText(`Connect your ${c.layer1.fullName} wallet`);
 
@@ -153,6 +153,12 @@ module('Acceptance | deposit', function (hooks) {
 
     await settled();
 
+    ctaButtonsBeforeUnlock.layer2Connection = `${postableSel(
+      1,
+      2
+    )} [data-test-layer-2-wallet-disconnect-button]`;
+    assert.dom(ctaButtonsBeforeUnlock.layer2Connection).exists();
+
     assert
       .dom(milestoneCompletedSel(1))
       .containsText(`${c.layer2.fullName} wallet connected`);
@@ -164,10 +170,9 @@ module('Acceptance | deposit', function (hooks) {
     post = postableSel(2, 1);
 
     // transaction-setup card
+    ctaButtonsBeforeUnlock.transactionSetup = `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`;
     await waitFor(`${post} [data-test-balance="DAI"]`);
-    await click(
-      `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
-    );
+    await click(ctaButtonsBeforeUnlock.transactionSetup);
     assert
       .dom(
         `${post} [data-test-deposit-transaction-setup-from-balance="DAI"] [data-test-balance-display-amount]`
@@ -207,8 +212,16 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).doesNotExist();
 
+    for (let item in ctaButtonsBeforeUnlock) {
+      assert.dom(ctaButtonsBeforeUnlock[item]).isNotDisabled();
+    }
+
     layer1Service.test__simulateUnlockTxnHash();
     await settled();
+
+    for (let item in ctaButtonsBeforeUnlock) {
+      assert.dom(ctaButtonsBeforeUnlock[item]).isDisabled();
+    }
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).exists();
 

@@ -85,4 +85,51 @@ module('Unit | Milestone model', function (hooks) {
       assert.strictEqual(subject.workflow, workflow);
     });
   });
+
+  module('editable state', function () {
+    let author: Participant;
+    let postable1: WorkflowPostable;
+
+    hooks.beforeEach(function () {
+      author = { name: 'cardbot' };
+      postable1 = new WorkflowPostable(author);
+      (postable1 as any).name = 'postable1';
+      (postable1 as any).name = 'postable1';
+    });
+
+    test('isEditable is true by default', function (assert) {
+      let subject = new Milestone({
+        title: 'First Milestone',
+        postables: [postable1],
+        completedDetail: 'First in da bag',
+      });
+      assert.equal(subject.isEditable, true);
+    });
+
+    test('isEditable is false if editableIf returns false', function (assert) {
+      let subject = new Milestone({
+        title: 'First Milestone',
+        postables: [postable1],
+        completedDetail: 'First in da bag',
+        editableIf() {
+          return false;
+        },
+      });
+      subject.setWorkflow(new WorkflowStub(this.owner));
+      assert.equal(subject.isEditable, false);
+    });
+
+    test('isEditable is true if editableIf returns true', function (assert) {
+      let subject = new Milestone({
+        title: 'First Milestone',
+        postables: [postable1],
+        completedDetail: 'First in da bag',
+        editableIf() {
+          return true;
+        },
+      });
+      subject.setWorkflow(new WorkflowStub(this.owner));
+      assert.equal(subject.isEditable, true);
+    });
+  });
 });
