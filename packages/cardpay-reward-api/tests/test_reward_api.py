@@ -63,7 +63,7 @@ def mock_db(monkeymodule, indexer):
 def test_read_roots(mock_db):
     roots = mock_db.query(Root).all()
     check_duplicates_for_roots(roots)
-    assert len(roots) == 3
+    assert len(roots) == 4
 
 
 def test_read_proofs(mock_db):
