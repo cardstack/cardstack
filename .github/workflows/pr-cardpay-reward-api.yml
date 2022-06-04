@@ -29,6 +29,6 @@ jobs:
           pdm install -d
       - name: Test with pytest
         env:
-          DB_STRING: ""
+          DB_STRING: "sqlite:///./test.db"
         run: |
           pdm run -s pytest tests
