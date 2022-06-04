@@ -4,9 +4,9 @@
 from datetime import datetime
 
 import pytest
-from cardpay_reward_api.database import Base, get_db
+from cardpay_reward_api.database import Base
 from cardpay_reward_api.indexer import Indexer
-from cardpay_reward_api.main import app
+from cardpay_reward_api.main import app, get_db
 from cardpay_reward_api.models import Proof, Root
 from fastapi.testclient import TestClient
 from sqlalchemy import exc

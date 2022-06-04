@@ -6,12 +6,13 @@ import sentry_sdk
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi_utils.session import FastAPISessionMaker
 from fastapi_utils.tasks import repeat_every
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 from . import crud, models, schemas
 from .config import config
-from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
 from .indexer import Indexer
 
 load_dotenv()
@@ -19,11 +20,12 @@ load_dotenv()
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL)
 
-models.Base.metadata.create_all(bind=engine)
+
 for expected_env in [
     "SUBGRAPH_URL",
     "REWARDS_BUCKET",
     "ENVIRONMENT",
+    "DB_STRING",
 ]:
     if expected_env not in os.environ:
         raise ValueError(f"Missing environment variable {expected_env}")
@@ -31,7 +33,26 @@ for expected_env in [
 SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
 REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
 ENVIRONMENT = os.environ.get("ENVIRONMENT")
+DB_STRING = os.environ.get("DB_STRING")
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
+
+engine = create_engine(DB_STRING)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+models.Base.metadata.create_all(bind=engine)
+
+
+def get_fastapi_sessionmaker() -> FastAPISessionMaker:
+    """This function could be replaced with a global variable if preferred"""
+    return FastAPISessionMaker(DB_STRING)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 app = FastAPI()
 
