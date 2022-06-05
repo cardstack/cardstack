@@ -21,7 +21,7 @@ class SafeOwnership(Rule):
     ):
         self.token = token
         self.duration = duration
-        self.reward_per_safe = reward_per_safe
+        self.reward_per_safe = int(reward_per_safe)
         self.start_analysis_block = start_analysis_block
         self.safe_type = safe_type
         self.max_rewards = max_rewards
