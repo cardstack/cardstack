@@ -15,7 +15,7 @@ class Rule(ABC):
         self.set_user_defined_parameters(**user_defined_parameters)
 
     def set_core_parameters(
-        self, payment_cycle_length, start_block, end_block, subgraph_config_locations
+        self, payment_cycle_length, start_block, end_block, subgraph_config_locations, docker_image=None
     ):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
