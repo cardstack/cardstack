@@ -132,7 +132,7 @@ export default class ExchangeRatesService {
     dateString: string,
     exchange = 'CCCAGG' // FIXME how deep should this optionality go?
   ): Promise<CryptoCompareSuccessResponse | undefined> {
-    let timestamp = Date.parse(dateString);
+    let timestamp = Date.parse(dateString) / 1000;
 
     return await (
       await fetch(

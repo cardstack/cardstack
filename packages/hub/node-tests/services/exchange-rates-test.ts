@@ -21,14 +21,14 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
   this.beforeEach(async function () {
     let mockResponses = {
       CCCAGG: {
-        1654041600000: {
+        1654041600: {
           BTC: {
             USD: 432.18,
           },
         },
       },
       kucoin: {
-        1654041600000: {
+        1654041600: {
           CARD: {
             USDT: 0.002059,
           },
@@ -43,7 +43,7 @@ describe('CryptoCompareFIXMEExchangeRatesService', function () {
         dateString: string,
         exchange = 'CCCAGG'
       ): Promise<CryptoCompareSuccessResponse> {
-        let date = Date.parse(dateString);
+        let date = Date.parse(dateString) / 1000;
         let exchangeRate = mockResponses[exchange][date][from][to];
 
         if (!exchangeRate) {
