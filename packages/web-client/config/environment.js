@@ -37,6 +37,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
+    exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
       universalLinkHostnamesByTarget[deployTargetClass] ??
