@@ -26,7 +26,7 @@
     "@walletconnect/types": "^1.6.0",
     "@walletconnect/utils": "^1.6.0",
     "@walletconnect/web3-provider": "^1.6.0",
-    "eth-block-tracker": "^5.0.1",
+    "eth-block-tracker": "MetaMask/eth-block-tracker#6520c9f2a76c7b78dce3d2d65ee4a55abc01fae8",
     "json-rpc-engine": "^5.1.3",
     "web3-core-helpers": "^1.5.1",
     "web3-provider-engine": "^16.0.3",
