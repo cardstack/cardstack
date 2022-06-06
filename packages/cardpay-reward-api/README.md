@@ -24,7 +24,7 @@ The cardpay reward api performs:
     
     
     # run 
-    pdm run main 
+    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres  pdm run main 
     
     # look at db
     psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
