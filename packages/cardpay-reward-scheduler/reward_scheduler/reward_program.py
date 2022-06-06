@@ -15,18 +15,12 @@ class RewardProgram:
     def __init__(
         self,
         reward_program_id,
-        w3,
-        reward_manager_address,
+        reward_manager,
         subgraph_url,
         result_file_root,
         subgraph_extract_location=None,
     ) -> None:
-        self.w3 = w3
-        with open(f"abis/RewardManager.json") as contract_file:
-            contract = json.load(contract_file)
-        self.reward_manager = self.w3.eth.contract(
-            address=reward_manager_address, abi=contract["abi"]
-        )
+        self.reward_manager = reward_manager
         self.reward_program_id = reward_program_id
         self.subgraph_url = subgraph_url
         self.reward_program_output_location = AnyPath(result_file_root).joinpath(
@@ -128,10 +122,9 @@ class RewardProgram:
     def get_rules(self):
         rule_blob = json.loads(self.reward_manager.caller.rule(self.reward_program_id))
         if type(rule_blob) == list:
-            yield from rule_blob
+            return rule_blob
         else:
-            yield rule_blob
-        return
+            return [rule_blob]
 
     def raise_on_payment_cycle_overlap(self, rules):
         """
@@ -160,7 +153,6 @@ class RewardProgram:
         logging.info(f"Running {payment_cycle} for {self.reward_program_id}")
         submission_data = deepcopy(rule)
         docker_image = submission_data["core"]["docker_image"]
-        del submission_data["core"]["docker_image"]
         submission_data["run"] = {
             "reward_program_id": self.reward_program_id,
             "payment_cycle": payment_cycle,
@@ -171,9 +163,14 @@ class RewardProgram:
         parameters_location = payment_cycle_output.joinpath("parameters.json")
         with parameters_location.open("w") as params_out:
             json.dump(submission_data, params_out)
-        job_definition = get_job_definition_for_image(docker_image)
         job = run_job(
-            job_definition, parameters_location.as_uri(), payment_cycle_output.as_uri()
+            docker_image,
+            parameters_location.as_uri(),
+            payment_cycle_output.as_uri(),
+            tags={
+                "reward_program_id": self.reward_program_id,
+                "payment_cycle": payment_cycle,
+            },
         )
         return job
 
@@ -185,7 +182,7 @@ class RewardProgram:
         if self.is_locked():
             logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
-        rules = list(self.get_rules())
+        rules = self.get_rules()
         self.raise_on_payment_cycle_overlap(rules)
         for rule in rules:
             processable_payment_cycles = (

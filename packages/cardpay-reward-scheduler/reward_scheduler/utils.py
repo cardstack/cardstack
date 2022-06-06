@@ -1,8 +1,7 @@
-import tempfile
 from pathlib import PosixPath
 import boto3
+import os
 
-import pyarrow.parquet as pq
 import yaml
 from cloudpathlib import AnyPath, CloudPath
 from cachetools import cached, TTLCache
@@ -92,13 +91,19 @@ def get_job_definition_for_image(image_name):
             return job_definition
 
 
-def run_job(job_definition, parameters_location, output_location):
+def run_job(image_name, parameters_location, output_location, tags={}):
     client = boto3.client("batch")
+    job_definition = get_job_definition_for_image(image_name)
+    container_overrides = {"command": [parameters_location, output_location]}
+    if os.environ.get("ENVIRONMENT") and os.environ.get("SENTRY_DSN"):
+        container_overrides["environment"] = [
+            {"name": "ENVIRONMENT", "value": os.environ.get("ENVIRONMENT")},
+            {"name": "SENTRY_DSN", "value": os.environ.get("SENTRY_DSN")},
+        ]
     return client.submit_job(
-        jobName="reward_programs_test",
+        jobName="reward_program_run",
         jobQueue="reward_programs_batch_job_queue",
         jobDefinition=job_definition["jobDefinitionArn"],
-        containerOverrides={
-            "command": [parameters_location, output_location],
-        },
+        containerOverrides=container_overrides,
+        tags={},
     )
