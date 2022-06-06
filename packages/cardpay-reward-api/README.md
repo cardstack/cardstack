@@ -13,7 +13,6 @@ The cardpay reward api performs:
 
     pdm run pytest tests
 
-
 ## Run
 
     # start postgres 
@@ -25,7 +24,7 @@ The cardpay reward api performs:
     
     
     # run 
-    pdm run main # if you want watch changes, use pdm run dev
+    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres  pdm run main 
     
     # look at db
     psql postgresql://postgres:mysecretpassword@localhost:5432/postgres

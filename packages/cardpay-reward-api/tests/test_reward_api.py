@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 
 import pytest
-from cardpay_reward_api.database import Base, get_db
+from cardpay_reward_api.database import Base
 from cardpay_reward_api.indexer import Indexer
-from cardpay_reward_api.main import app
+from cardpay_reward_api.main import app, get_db
 from cardpay_reward_api.models import Root
 from fastapi.testclient import TestClient
 
-from .fixtures import engine, override_get_db, roots_for_program
-from .mocks import reward_programs
+from .config import engine, override_get_db, settings
+from .mocks import reward_programs, roots_for_program
 from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
                     validate_proof_response_fields)
 
-REWARDS_BUCKET = "tests/resources"
-ENVIRONMENT = "local"
-
+# this overrides the get_db function yielding a different session with different engine
+# it is only needed when using dependencies in fastapi
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
@@ -53,7 +52,7 @@ def mock_db(monkeymodule, indexer):
     # setup
     Base.metadata.create_all(bind=engine)
     db = next(override_get_db())
-    indexer.run(db, REWARDS_BUCKET)
+    indexer.run(db, settings.REWARDS_BUCKET)
     yield db
     # teardown
     # https://stackoverflow.com/questions/67255653/how-to-set-up-and-tear-down-a-database-between-tests-in-fastapi
