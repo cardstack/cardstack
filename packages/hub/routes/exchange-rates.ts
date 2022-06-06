@@ -69,6 +69,61 @@ export default class ExchangeRatesRoute {
       ctx.type = 'application/vnd.api+json';
     }
   }
+
+  async getHistoric(ctx: Koa.Context) {
+    const hasValidAuthToken = ctx.state.userAddress;
+    const isAllowedDomain = ctx.headers.origin && allowedDomains.includes(ctx.headers.origin);
+    const isDevelopment = config.get('hubEnvironment') === 'development';
+
+    let from = ctx.query.from as string,
+      to = ctx.query.to as string,
+      date = ctx.query.date as string;
+
+    if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
+      let exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
+      if (!exchangeRates) {
+        let detail = exchangeRates?.error
+          ? `${exchangeRates.error.code}: ${exchangeRates.error.info}`
+          : 'Failed to fetch exchange rates for unknown reason';
+        ctx.status = 502;
+        ctx.body = {
+          errors: [
+            {
+              status: '502',
+              title: 'Bad Gateway',
+              detail,
+            },
+          ],
+        };
+        ctx.type = 'application/vnd.api+json';
+      } else {
+        ctx.status = 200;
+        ctx.body = {
+          data: {
+            type: 'exchange-rates',
+            attributes: {
+              base: from,
+              rates: {
+                [to]: exchangeRates[from][to],
+              },
+            },
+          },
+        };
+        ctx.type = 'application/vnd.api+json';
+      }
+    } else {
+      ctx.status = 403;
+      ctx.body = {
+        errors: [
+          {
+            status: '403',
+            title: 'Not allowed',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+    }
+  }
 }
 
 declare module '@cardstack/di' {
