@@ -83,7 +83,7 @@ def flat_drop(
         params["run"]["reward_program_id"], params["run"]["payment_cycle"]
     )
     if (
-        existing_root != tree.get_hex_root()
+        existing_root == tree.get_hex_root()
         or existing_root != NULL_HEX
         or existing_root == EMPTY_MARKER_HEX
     ):
@@ -101,7 +101,7 @@ def flat_drop(
         raise Exception(f"{output_location} already exists")
     else:
         write_parquet_file(output_path, table)
-        write_parameters_file(output_path, o)
+        write_parameters_file(output_path, params)
     print("Done")
 
 
