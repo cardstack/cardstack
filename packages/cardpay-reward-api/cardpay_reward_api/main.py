@@ -70,9 +70,9 @@ def param(skip: int = 0, limit: int = 100):
 @app.get("/about/")
 async def about():
     return {
-        "subgraph_url": SUBGRAPH_URL,
-        "rewards_bucket": REWARDS_BUCKET,
-        "environment": ENVIRONMENT,
+        "subgraph_url": settings.SUBGRAPH_URL,
+        "rewards_bucket": settings.REWARDS_BUCKET,
+        "environment": settings.ENVIRONMENT,
     }
 
 
