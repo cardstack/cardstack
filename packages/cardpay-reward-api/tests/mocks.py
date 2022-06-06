@@ -80,3 +80,51 @@ reward_programs = [
     {"id": "0x954A9C27bC398B4A8f6F543b13eea833d0e73308"},
     {"id": "0xd40c4b61D0B08548Dd1E2b79c1E8Ad98f15c65d8"},
 ]
+
+
+def roots_for_program(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return merkle_roots
+    if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
+        return other_merkle_roots
+    else:
+        return []
+
+
+def extra_one_merkle_roots_for_program(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return extra_one_merkle_roots
+    if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
+        return []
+    else:
+        return []
+
+
+def extra_one_merkle_roots_without_s3(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return extra_one_merkle_roots_old_file
+    if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
+        return []
+    else:
+        return []
+
+
+def extra_one_merkle_roots_old_file_written(reward_program_id, payment_cycle):
+    """
+    models get_merkle_roots
+    """
+    if reward_program_id == "0x5E4E148baae93424B969a0Ea67FF54c315248BbA":
+        return extra_one_merkle_roots_old_file
+    if reward_program_id == "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07":
+        return []
+    else:
+        return []

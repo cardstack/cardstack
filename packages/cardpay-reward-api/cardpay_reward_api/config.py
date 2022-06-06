@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+from functools import lru_cache
 
+from pydantic import BaseSettings, Field, SecretStr
 
 config = {
     "staging": {
@@ -13,3 +15,29 @@ config = {
     },
     "production": {"archived_reward_programs": []},
 }
+
+config["local"] = config["staging"]
+config["test"] = config["staging"]
+
+
+class Settings(BaseSettings):
+    ENVIRONMENT: str = "local"
+    SUBGRAPH_URL: str = (
+        "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
+    )
+    REWARDS_BUCKET: str = "s3://tally-staging-reward-programs"
+    DB_STRING: str = "postgresql://postgres@localhost:5432/postgres"
+    SENTRY_DSN: str = None
+
+    class Config:
+        fields = {
+            "DB_STRING": {
+                "env": "DB_STRING",
+            },
+            "SENTRY_DSN": {"env": "SENTRY_DSN"},
+        }
+
+
+# @lru_cache()
+def get_settings():
+    return Settings()
