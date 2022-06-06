@@ -276,7 +276,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(3, 0))
       .containsText(
-        `your token will be bridged to the ${c.layer2.shortName} blockchain`
+        `your tokens will be bridged to the ${c.layer2.shortName} blockchain`
       );
 
     post = postableSel(3, 1);

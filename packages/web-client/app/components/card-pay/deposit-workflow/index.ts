@@ -149,7 +149,7 @@ class DepositWorkflow extends Workflow {
       title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
-          message: `Congrats! Now that you have deposited funds into the CARD Protocol’s reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
+          message: `Congrats! Now that you have deposited funds into the CARD Protocol’s reserve pool, your tokens will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
         }),
         new WorkflowCard({
           cardName: 'TXN_STATUS',
