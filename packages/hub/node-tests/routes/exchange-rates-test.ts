@@ -504,14 +504,14 @@ describe.only('GET /api/historic-exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it.skip('Allows errors from the exchange rate service through', async function () {
+  it('Allows errors from the exchange rate service through', async function () {
     setFetchExchangeRates(async function () {
       let err = new Error('An error that might occur in caching or fetching');
       (err as any).intentionalTestError = true;
       throw err;
     });
     await request()
-      .get(`/api/historic-exchange-rates`)
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
