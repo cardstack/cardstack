@@ -145,6 +145,8 @@ function pruneTargetGroup(targetGroup) {
 }
 
 function main() {
+  console.log('\n» Pruning dangling resources...');
+
   const appName = core.getInput('app');
   const waypointConfigFilePath = core.getInput('waypoint_hcl_path');
   const retain = parseInt(core.getInput('retain'));
@@ -152,14 +154,12 @@ function main() {
   const services = getServices(config.cluster, appName);
 
   if (!config.disableAlb) {
-    console.log('\n» Pruning services and target groups...');
     const targetGroups = getTargetGroups(appName);
     const resourcesToPrune = getResourcesToPrune(services, targetGroups, retain);
     resourcesToPrune.services.forEach((service) => pruneService(service, cluster));
     resourcesToPrune.targetGroups.forEach((targetGroup) => pruneTargetGroup(targetGroup));
     console.log('-> Finish purging services and target groups');
   } else if (config.disableAlb && services.length > retain + 1) {
-    console.log('\n» Pruning services...');
     services.slice(retain + 1).forEach((service) => pruneService(service, cluster));
     console.log('-> Finish purging services');
   }
