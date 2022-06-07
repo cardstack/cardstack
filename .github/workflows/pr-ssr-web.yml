@@ -18,15 +18,10 @@ permissions:
   checks: write
   pull-requests: write
   id-token: write
+  statuses: write
 
 jobs:
   test:
-    permissions:
-      contents: read
-      issues: read
-      checks: write
-      pull-requests: write
-      id-token: write
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
@@ -89,8 +84,6 @@ jobs:
             ^packages/ssr-web
 
   deploy-ssr-preview-staging:
-    permissions:
-      checks: write
     name: Deploy a ssr-web staging preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
@@ -118,8 +111,6 @@ jobs:
           environment: staging
 
   deploy-ssr-preview-production:
-    permissions:
-      checks: write
     name: Deploy a ssr-web production preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
