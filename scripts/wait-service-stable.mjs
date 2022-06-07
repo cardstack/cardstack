@@ -97,6 +97,7 @@ function waitTargetInService(service) {
 }
 
 function main() {
+  console.log(process.env);
   console.log('\n» Waiting for service and target group to be ready...');
 
   const [appName, ...extraArgs] = process.argv.slice(2);
