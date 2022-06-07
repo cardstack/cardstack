@@ -21,6 +21,12 @@ permissions:
 
 jobs:
   test:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      id-token: write
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
