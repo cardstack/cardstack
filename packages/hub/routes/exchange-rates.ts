@@ -104,8 +104,17 @@ export default class ExchangeRatesRoute {
       date = new Date(this.clock.now()).toISOString().split('T')[0];
     }
 
+    let exchange = ctx.query.e as string;
+
     if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
-      let exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
+      let exchangeRates;
+
+      if (exchange) {
+        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date, exchange);
+      } else {
+        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
+      }
+
       if (!exchangeRates || exchangeRates.Response) {
         let detail = exchangeRates?.Message
           ? exchangeRates.Message

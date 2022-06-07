@@ -353,6 +353,25 @@ describe.only('GET /api/historic-exchange-rates', function () {
     expect(fetchArgs[2]).to.equal(new Date(fakeTime).toISOString().split('T')[0]);
   });
 
+  it('allows an alternate exchange source', async function () {
+    let fetchArgs: never[] = [];
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return mockCryptoCompareExchangeRatesResponse;
+    });
+
+    await request()
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD&e=something`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(200);
+
+    expect(fetchArgs[3]).to.equal('something');
+  });
+
   it('fetches exchange rates with a valid auth token but no origin', async function () {
     let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
     handleValidateAuthToken = (encryptedString: string) => {
