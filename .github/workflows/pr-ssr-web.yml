@@ -70,6 +70,7 @@ jobs:
             ^packages/ssr-web
 
   deploy-ssr-preview-staging:
+    permissions: write-all
     name: Deploy a ssr-web staging preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
@@ -97,6 +98,7 @@ jobs:
           environment: staging
 
   deploy-ssr-preview-production:
+    permissions: write-all
     name: Deploy a ssr-web production preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
