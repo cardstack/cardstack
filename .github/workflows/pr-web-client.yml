@@ -72,7 +72,8 @@ jobs:
             ^packages/web-client
 
   deploy-web-client-preview-staging:
-    permissions: write-all
+    permissions:
+      checks: write
     name: Deploy a staging preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
@@ -98,7 +99,8 @@ jobs:
           environment: staging
 
   deploy-web-client-preview-production:
-    permissions: write-all
+    permissions:
+      checks: write
     name: Deploy a production preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
