@@ -3,10 +3,8 @@ const hcl = require('js-hcl-parser');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-function execute(command, options) {
-  return execSync(command, options ?? {})
-    .toString()
-    .trim();
+function execute(command, options = {}) {
+  return execSync(command, options).toString().trim();
 }
 
 function getAppConfig(waypointConfigFilePath, appName) {
@@ -147,35 +145,29 @@ function pruneTargetGroup(targetGroup) {
 }
 
 function main() {
-  console.log('\n» Pruning services and target groups...');
-
   const appName = core.getInput('app');
   const waypointConfigFilePath = core.getInput('waypoint_hcl_path');
   const retain = parseInt(core.getInput('retain'));
-
   const config = getAppConfig(waypointConfigFilePath, appName);
   const services = getServices(config.cluster, appName);
 
   if (!config.disableAlb) {
-    try {
-      const targetGroups = getTargetGroups(appName);
-      const resourcesToPrune = getResourcesToPrune(services, targetGroups, retain);
-      resourcesToPrune.services.forEach((service) => pruneService(service, cluster));
-      resourcesToPrune.targetGroups.forEach((targetGroup) => pruneTargetGroup(targetGroup));
-      console.log('-> Finish purging services and target groups');
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
+    console.log('\n» Pruning services and target groups...');
+    const targetGroups = getTargetGroups(appName);
+    const resourcesToPrune = getResourcesToPrune(services, targetGroups, retain);
+    resourcesToPrune.services.forEach((service) => pruneService(service, cluster));
+    resourcesToPrune.targetGroups.forEach((targetGroup) => pruneTargetGroup(targetGroup));
+    console.log('-> Finish purging services and target groups');
   } else if (config.disableAlb && services.length > retain + 1) {
-    try {
-      services.slice(retain + 1).forEach((service) => pruneService(service, cluster));
-      console.log('-> Finish purging services');
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
+    console.log('\n» Pruning services...');
+    services.slice(retain + 1).forEach((service) => pruneService(service, cluster));
+    console.log('-> Finish purging services');
   }
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  core.setFailed(err.message);
+  throw err;
+}
