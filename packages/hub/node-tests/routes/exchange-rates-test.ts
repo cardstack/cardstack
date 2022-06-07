@@ -254,7 +254,7 @@ describe('GET /api/historic-exchange-rates', function () {
 
   it('does not fetch exchange rates for an incorrect origin', async function () {
     await request()
-      .get(`/api/historic-exchange-rates`)
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', 'https://google.com')
@@ -272,7 +272,7 @@ describe('GET /api/historic-exchange-rates', function () {
 
   it('does not fetch exchange rates if no origin and auth token', async function () {
     await request()
-      .get(`/api/historic-exchange-rates`)
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(403)
@@ -335,7 +335,56 @@ describe('GET /api/historic-exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it.skip('errors when query parameters are missing');
+  it('Returns 400 when mandatory query parameters are missing', async function () {
+    await request()
+      .get(`/api/historic-exchange-rates?to=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'Missing required parameter: from',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    await request()
+      .get(`/api/historic-exchange-rates?from=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'Missing required parameter: to',
+          },
+        ],
+      });
+
+    await request()
+      .get(`/api/historic-exchange-rates`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'Missing required parameters: from, to',
+          },
+        ],
+      });
+  });
 
   it('Returns 502 for falsey result being fetched', async function () {
     setFetchExchangeRates(async function () {
@@ -343,7 +392,7 @@ describe('GET /api/historic-exchange-rates', function () {
     });
 
     await request()
-      .get(`/api/historic-exchange-rates`)
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
@@ -374,7 +423,7 @@ describe('GET /api/historic-exchange-rates', function () {
     });
 
     await request()
-      .get(`/api/historic-exchange-rates`)
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)

@@ -80,6 +80,25 @@ export default class ExchangeRatesRoute {
       to = ctx.query.to as string,
       date = ctx.query.date as string;
 
+    if (!from || !to) {
+      let missing = [];
+      if (!from) missing.push('from');
+      if (!to) missing.push('to');
+
+      ctx.status = 400;
+      ctx.body = {
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: `Missing required parameter${missing.length > 1 ? 's' : ''}: ${missing.join(', ')}`,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
       let exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
       if (!exchangeRates || exchangeRates.Response) {
