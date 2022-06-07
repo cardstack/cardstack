@@ -3,11 +3,6 @@ const hcl = require('js-hcl-parser');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-import core from '@actions/core';
-import hcl from 'js-hcl-parser';
-import fs from 'fs';
-import { execSync } from 'child_process';
-
 function execute(command, options) {
   return execSync(command, options ?? {})
     .toString()
