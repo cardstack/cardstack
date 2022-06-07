@@ -5,7 +5,7 @@ inputs:
   waypoint_version:
     description: Waypoint version to use
     required: false
-    default: '0.4.0'
+    default: "0.4.0"
 
 runs:
   using: composite
@@ -31,26 +31,47 @@ runs:
       run: waypoint up --app=hub -plain
       shell: bash
       env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+        WAYPOINT_SERVER_TLS: "1"
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+
+    - name: Prune dangling resources [hub]
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "hub"
+        retain: "1"
 
     - name: Deploy worker
       run: waypoint up --app=hub-worker -prune-retain=0 -plain
       shell: bash
       env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+        WAYPOINT_SERVER_TLS: "1"
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+
+    - name: Prune dangling resources [hub-worker]
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "hub-worker"
 
     - name: Deploy bot
       run: waypoint up --app=hub-bot -prune-retain=0 -plain
       shell: bash
       env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+        WAYPOINT_SERVER_TLS: "1"
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+
+    - name: Prune dangling resources [hub-bot]
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "hub-bot"
 
     - name: Deploy event handler
       run: waypoint up --app=hub-event-listener -prune-retain=0 -plain
       shell: bash
       env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+        WAYPOINT_SERVER_TLS: "1"
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+
+    - name: Prune dangling resources [hub-event-listener]
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "hub-event-listener"

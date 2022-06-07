@@ -54,18 +54,8 @@ app "hub" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
 }
@@ -115,8 +105,8 @@ app "hub-worker" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-worker-staging", "waypoint-hub-worker", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
     }
   }
 }
@@ -165,8 +155,8 @@ app "hub-bot" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-bot-staging", "waypoint-hub-bot", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
   }
 }
@@ -215,8 +205,8 @@ app "hub-event-listener" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-event-listener-staging", "waypoint-hub-event-listener", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
 }
@@ -253,6 +243,11 @@ app "cardie" {
         DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
         GITHUB_TOKEN  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "cardie"]
     }
   }
 }
@@ -301,6 +296,11 @@ app "cardpay-subg-ext" {
       }
 
       disable_alb = true
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
     }
   }
 }
@@ -386,6 +386,11 @@ app "reward-submit" {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
+    }
   }
 }
 
@@ -437,7 +442,7 @@ app "reward-api" {
 
     hook {
       when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
 }

@@ -41,8 +41,8 @@ runs:
         WAYPOINT_SERVER_TLS: "1"
         WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
-    - name: Prune dangling deployments
-      uses: ./.github/actions/prune-waypoint-deployments
+    - name: Prune dangling resources
+      uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
         app: "ssr-web"
-        retain: "2"
+        retain: "1"
