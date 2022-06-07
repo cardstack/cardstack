@@ -23,9 +23,6 @@ runs:
     - name: Deploy reward api
       run: waypoint up -app=reward-api -plain
       shell: bash
-      env:
-        WAYPOINT_SERVER_TLS: "1"
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources

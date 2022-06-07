@@ -45,6 +45,8 @@ jobs:
         env:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+          WAYPOINT_SERVER_TLS: "1"
+          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
       - name: Send success notification to Discord
         if: ${{ success() }}

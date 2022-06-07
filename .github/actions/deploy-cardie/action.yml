@@ -25,9 +25,6 @@ runs:
     - name: Deploy cardie
       run: waypoint up --app=cardie -prune-retain=0 -plain
       shell: bash
-      env:
-        WAYPOINT_SERVER_TLS: "1"
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources
