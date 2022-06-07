@@ -149,7 +149,7 @@ function pruneTargetGroup(targetGroup) {
 function main() {
   console.log('\n» Pruning services and target groups...');
 
-  const appName = core.getInput('branch');
+  const appName = core.getInput('app');
   const waypointConfigFilePath = core.getInput('waypoint_hcl_path');
   const retain = parseInt(core.getInput('retain'));
 
