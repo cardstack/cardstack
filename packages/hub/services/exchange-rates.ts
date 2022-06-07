@@ -31,6 +31,16 @@ export interface CryptoCompareSuccessResponse {
   [currencyCode: string]: convertedCurrency;
 }
 
+export interface CryptoCompareFailureResponse {
+  Response: 'Error';
+  Message: string;
+  HasWarning: boolean;
+  Type: number;
+  RateLimit: any;
+  Data: any;
+  ParamWithError: string;
+}
+
 export interface convertedCurrency {
   [currencyCode: string]: number;
 }
@@ -150,7 +160,7 @@ export default class ExchangeRatesService {
     to: string,
     date: string,
     exchange = 'CCCAGG'
-  ): Promise<CryptoCompareSuccessResponse | undefined> {
+  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
     let cachedValue = await this.exchangeRates.select(from, to, date, exchange);
 
     if (cachedValue) {

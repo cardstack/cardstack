@@ -2,6 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import config from 'config';
+import { CryptoCompareSuccessResponse } from '../services/exchange-rates';
 
 const allowedDomains: string[] = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -81,9 +82,9 @@ export default class ExchangeRatesRoute {
 
     if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
       let exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
-      if (!exchangeRates) {
-        let detail = exchangeRates?.error
-          ? `${exchangeRates.error.code}: ${exchangeRates.error.info}`
+      if (!exchangeRates || exchangeRates.Response) {
+        let detail = exchangeRates?.Message
+          ? exchangeRates.Message
           : 'Failed to fetch exchange rates for unknown reason';
         ctx.status = 502;
         ctx.body = {
@@ -104,7 +105,7 @@ export default class ExchangeRatesRoute {
             attributes: {
               base: from,
               rates: {
-                [to]: exchangeRates[from][to],
+                [to]: (exchangeRates as CryptoCompareSuccessResponse)[from][to],
               },
             },
           },

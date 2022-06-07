@@ -1,4 +1,5 @@
 import {
+  CryptoCompareFailureResponse,
   CryptoCompareSuccessResponse,
   FixerFailureResponse,
   FixerSuccessResponse,
@@ -65,7 +66,9 @@ let mockCryptoCompareExchangeRatesResponse = {
 };
 
 function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
-  let fetchCryptoCompareExchangeRates: () => Promise<CryptoCompareSuccessResponse | undefined> = function () {
+  let fetchCryptoCompareExchangeRates: () => Promise<
+    CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined
+  > = function () {
     return Promise.resolve(mockCryptoCompareExchangeRatesResponse);
   };
 
@@ -79,7 +82,9 @@ function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
   });
 
   return {
-    setFetchExchangeRates(func: () => Promise<CryptoCompareSuccessResponse | undefined>) {
+    setFetchExchangeRates(
+      func: () => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined>
+    ) {
       fetchCryptoCompareExchangeRates = func;
     },
   };
@@ -332,7 +337,7 @@ describe('GET /api/historic-exchange-rates', function () {
 
   it.skip('errors when query parameters are missing');
 
-  it.skip('Returns 502 for falsey result being fetched', async function () {
+  it('Returns 502 for falsey result being fetched', async function () {
     setFetchExchangeRates(async function () {
       return undefined;
     });
@@ -355,14 +360,16 @@ describe('GET /api/historic-exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it.skip('Returns 502 for failure result from Fixer', async function () {
+  it('Returns 502 for failure result from Fixer', async function () {
     setFetchExchangeRates(async function () {
       return {
-        success: false,
-        error: {
-          code: -1,
-          info: 'readable info about the error',
-        },
+        Response: 'Error',
+        Message: 'readable info about the error',
+        HasWarning: false,
+        Type: 2,
+        RateLimit: {},
+        Data: {},
+        ParamWithError: 'tsyms',
       };
     });
 
@@ -377,7 +384,7 @@ describe('GET /api/historic-exchange-rates', function () {
           {
             status: '502',
             title: 'Bad Gateway',
-            detail: '-1: readable info about the error',
+            detail: 'readable info about the error',
           },
         ],
       })
