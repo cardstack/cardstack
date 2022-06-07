@@ -27,6 +27,25 @@ export default class ExchangeRatesService {
     autoBind(this);
   }
 
+  /**
+   * An example success response from CryptoCompare:
+   * {
+      "CARD": {
+        "USDT": 0.001964
+      }
+    }
+   *
+   * An example error response from CryptoCompare:
+   * {
+      "Response": "Error",
+      "Message": "tsyms param is invalid. (tsyms length is higher than maxlength: 30)",
+      "HasWarning": false,
+      "Type": 2,
+      "RateLimit": {},
+      "Data": {},
+      "ParamWithError": "tsyms"
+      }
+   */
   async requestExchangeRatesFromCryptoCompare(
     from: string,
     to: string,
