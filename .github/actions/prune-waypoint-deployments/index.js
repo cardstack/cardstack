@@ -13,7 +13,7 @@ function getAppConfig(waypointConfigFilePath, appName) {
   const waypointConfig = JSON.parse(waypointJson);
   const waypointApp = waypointConfig.app.find((app) => Object.keys(app)[0] === appName);
   const cluster = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].cluster;
-  const disableAlb = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].disable_alb ?? false;
+  const disableAlb = Boolean(waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].disable_alb);
 
   return { cluster, disableAlb };
 }
