@@ -1,5 +1,4 @@
 /* global fetch */
-import autoBind from 'auto-bind';
 import { query } from '../queries';
 
 export interface CryptoCompareSuccessResponse {
@@ -22,10 +21,6 @@ export interface convertedCurrency {
 
 export default class ExchangeRatesService {
   exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
-
-  constructor() {
-    autoBind(this);
-  }
 
   /**
    * An example success response from CryptoCompare:
