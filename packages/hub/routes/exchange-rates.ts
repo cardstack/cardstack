@@ -16,6 +16,7 @@ if (!isValidAllowedDomainConfig(allowedDomains)) {
  * Provides exchange rate information for converting from USD to other currencies
  */
 export default class ExchangeRatesRoute {
+  clock = inject('clock');
   exchangeRatesService = inject('exchange-rates', { as: 'exchangeRatesService' });
 
   constructor() {
@@ -97,6 +98,10 @@ export default class ExchangeRatesRoute {
       };
       ctx.type = 'application/vnd.api+json';
       return;
+    }
+
+    if (!date) {
+      date = new Date(this.clock.now()).toISOString().split('T')[0];
     }
 
     if (isDevelopment || isAllowedDomain || hasValidAuthToken) {

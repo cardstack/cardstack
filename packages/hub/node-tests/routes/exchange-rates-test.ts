@@ -7,6 +7,7 @@ import {
 import config from 'config';
 import { setupHub, registry } from '../helpers/server';
 import type Mocha from 'mocha';
+import { Clock } from '../../services/clock';
 
 const allowedDomains = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -66,15 +67,15 @@ let mockCryptoCompareExchangeRatesResponse = {
 };
 
 function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
-  let fetchCryptoCompareExchangeRates: () => Promise<
-    CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined
-  > = function () {
+  let fetchCryptoCompareExchangeRates: (
+    ...args: any
+  ) => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> = function () {
     return Promise.resolve(mockCryptoCompareExchangeRatesResponse);
   };
 
   class StubExchangeRatesService {
     fetchCryptoCompareExchangeRates() {
-      return fetchCryptoCompareExchangeRates();
+      return fetchCryptoCompareExchangeRates(...arguments);
     }
   }
   context.beforeEach(function () {
@@ -88,6 +89,18 @@ function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
       fetchCryptoCompareExchangeRates = func;
     },
   };
+}
+
+let fakeTime = 1650440847689;
+
+class FrozenClock implements Clock {
+  now() {
+    return fakeTime;
+  }
+
+  hrNow(): bigint {
+    throw new Error('Not implemented');
+  }
 }
 
 describe('GET /api/exchange-rates', function () {
@@ -244,13 +257,14 @@ describe('GET /api/exchange-rates', function () {
   });
 });
 
-describe('GET /api/historic-exchange-rates', function () {
-  let { setFetchExchangeRates } = stubCryptoCompareExchangeRates(this);
-  let { request } = setupHub(this);
-
+describe.only('GET /api/historic-exchange-rates', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('clock', FrozenClock);
   });
+
+  let { setFetchExchangeRates } = stubCryptoCompareExchangeRates(this);
+  let { request } = setupHub(this);
 
   it('does not fetch exchange rates for an incorrect origin', async function () {
     await request()
@@ -306,6 +320,37 @@ describe('GET /api/historic-exchange-rates', function () {
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('defaults to the current date if none is specified', async function () {
+    let fetchArgs: never[] = [];
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return mockCryptoCompareExchangeRatesResponse;
+    });
+
+    await request()
+      .get(`/api/historic-exchange-rates?from=BTC&to=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(200)
+      .expect({
+        data: {
+          type: 'exchange-rates',
+          attributes: {
+            base: 'BTC',
+            rates: {
+              USD: 191,
+            },
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(fetchArgs[2]).to.equal(new Date(fakeTime).toISOString().split('T')[0]);
   });
 
   it('fetches exchange rates with a valid auth token but no origin', async function () {
