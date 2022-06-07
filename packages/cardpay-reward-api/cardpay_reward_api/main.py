@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from typing import List, Optional
@@ -9,6 +10,7 @@ from fastapi_utils.session import FastAPISessionMaker
 from fastapi_utils.tasks import repeat_every
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from web3 import Web3
 
 from . import crud, models, schemas
 from .config import config, get_settings
@@ -36,6 +38,20 @@ def get_db():
 def get_fastapi_sessionmaker() -> FastAPISessionMaker:
     """This function could be replaced with a global variable if preferred"""
     return FastAPISessionMaker(settings.DB_STRING)
+
+
+def get_w3():
+    w3 = Web3(Web3.HTTPProvider(settings.EVM_FULL_NODE_URL))
+    yield w3
+
+
+def get_reward_pool(w3=Depends(get_w3)):
+    with open(f"abis/RewardPool.json") as contract_file:
+        contract = json.load(contract_file)
+    reward_contract = w3.eth.contract(
+        address=config[settings.ENVIRONMENT]["reward_pool"], abi=contract["abi"]
+    )
+    yield reward_contract
 
 
 if settings.SENTRY_DSN is not None:
@@ -88,6 +104,23 @@ def read_proofs(
     param: dict = Depends(param),
 ):
     return crud.get_proofs(db, proof_filter=proof_filter, param=param)
+
+
+@app.get(
+    "/reward-pool-balance/{rewardProgramId}/{token}",
+    response_model=schemas.RewardPoolBalance,
+)
+def read_reward_pool_balance(
+    rewardProgramId: str,
+    token: str,
+    reward_pool=Depends(get_reward_pool),
+):
+    balance_in_wei = reward_pool.caller.rewardBalance(rewardProgramId, token)
+    return {
+        "rewardProgramId": rewardProgramId,
+        "token": token,
+        "amountInEth": Web3.fromWei(balance_in_wei, "ether"),
+    }
 
 
 if __name__ == "__main__":
