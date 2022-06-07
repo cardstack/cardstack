@@ -69,7 +69,6 @@ export default class APIRouter {
     apiSubrouter.get('/boom', boomRoute.get);
     apiSubrouter.get('/config', configRoute.get);
     apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
-    apiSubrouter.get('/historic-exchange-rates', exchangeRatesRoute.getHistoric);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
     apiSubrouter.get('/status', statusRoute.get);
