@@ -39,4 +39,4 @@ class ProofFilter(BaseModel):
 class RewardPoolBalance(BaseModel):
     rewardProgramId: str
     token: str
-    amountInEth: int
+    balanceInEth: int

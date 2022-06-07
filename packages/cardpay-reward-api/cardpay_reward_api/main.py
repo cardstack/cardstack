@@ -119,7 +119,7 @@ def read_reward_pool_balance(
     return {
         "rewardProgramId": rewardProgramId,
         "token": token,
-        "amountInEth": Web3.fromWei(balance_in_wei, "ether"),
+        "balanceInEth": Web3.fromWei(balance_in_wei, "ether"),
     }
 
 
