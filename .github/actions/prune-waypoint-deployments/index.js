@@ -1,3 +1,8 @@
+const core = require('@actions/core');
+const hcl = require('js-hcl-parser');
+const fs = require('fs');
+const { execSync } = require('child_process');
+
 import core from '@actions/core';
 import hcl from 'js-hcl-parser';
 import fs from 'fs';
