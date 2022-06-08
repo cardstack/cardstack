@@ -8,6 +8,9 @@ from cachetools import cached, TTLCache
 
 
 def get_local_file(file_location):
+    """
+    Download files if not local & return their local path
+    """
     if isinstance(file_location, PosixPath):
         return file_location.as_posix()
     elif isinstance(file_location, CloudPath):
@@ -43,6 +46,10 @@ def get_partition_iterator(min_partition, max_partition, partition_sizes):
 
 
 def get_partition_files(config_location, table, min_partition=None, max_partition=None):
+    """
+    Given the location of extracted subgraph data & a block range,
+    get a set of non-overlapping files that cover the block range.
+    """
     # Get config
     with open(get_local_file(config_location / "config.yaml"), "r") as stream:
         config = yaml.safe_load(stream)

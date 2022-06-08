@@ -52,7 +52,7 @@ REWARD_SCHEDULER_UPDATE_FREQUENCY = int(
 
 def safe_run(reward_program):
     try:
-        reward_program.run_all()
+        reward_program.run_all_payment_cycles()
     except Exception as e:
         logging.error(
             f"Error running reward program {reward_program.reward_program_id}, {e}"
@@ -81,6 +81,7 @@ def main():
         schedule.every(REWARD_SCHEDULER_UPDATE_FREQUENCY).seconds.do(
             safe_run, reward_program=reward_program
         )
+        # When we start, run all scheduled tasks rather than waiting 10 minutes
         schedule.run_all()
     # Go into an infinite loop
     while True:

@@ -259,6 +259,16 @@ requires_python = ">=3.6, <4"
 summary = "hexbytes: Python `bytes` subclass that decodes hex, with a readable console output"
 
 [[package]]
+name = "hypothesis"
+version = "6.47.0"
+requires_python = ">=3.7"
+summary = "A library for property-based testing"
+dependencies = [
+    "attrs>=19.2.0",
+    "sortedcontainers<3.0.0,>=2.1.0",
+]
+
+[[package]]
 name = "idna"
 version = "3.3"
 requires_python = ">=3.5"
@@ -506,10 +516,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "setuptools"
+version = "62.3.3"
+requires_python = ">=3.7"
+summary = "Easily download, build, install, upgrade, and uninstall Python packages"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 summary = "Python 2 and 3 compatibility utilities"
+
+[[package]]
+name = "sortedcontainers"
+version = "2.4.0"
+summary = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
 
 [[package]]
 name = "tomli"
@@ -580,7 +601,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:7b906b78a0adb31a133be0de7f371679487d4648c36d937d6690ef8074e11a7a"
+content_hash = "sha256:67308a50dc12637cd4c26c51360a9f45ffc68d9440efb0d1310c4360d2b0d9cf"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -876,6 +897,10 @@ content_hash = "sha256:7b906b78a0adb31a133be0de7f371679487d4648c36d937d6690ef807
 "hexbytes 0.2.2" = [
     {file = "hexbytes-0.2.2-py3-none-any.whl", hash = "sha256:ef53c37ea9f316fff86fcb1df057b4c6ba454da348083e972031bbf7bc9c3acc"},
     {file = "hexbytes-0.2.2.tar.gz", hash = "sha256:a5881304d186e87578fb263a85317c808cf130e1d4b3d37d30142ab0f7898d03"},
+]
+"hypothesis 6.47.0" = [
+    {file = "hypothesis-6.47.0-py3-none-any.whl", hash = "sha256:76a7d16f78b5691db34ef87fa677d020dd86189f6b748adf801088743b66c889"},
+    {file = "hypothesis-6.47.0.tar.gz", hash = "sha256:dd88c57f45032fc3d84596e426d8e3d67f88eda2d8a2d96a5697def036a7e0c7"},
 ]
 "idna 3.3" = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1239,9 +1264,17 @@ content_hash = "sha256:7b906b78a0adb31a133be0de7f371679487d4648c36d937d6690ef807
     {file = "sentry_sdk-1.5.12-py2.py3-none-any.whl", hash = "sha256:778b53f0a6c83b1ee43d3b7886318ba86d975e686cb2c7906ccc35b334360be1"},
     {file = "sentry-sdk-1.5.12.tar.gz", hash = "sha256:259535ba66933eacf85ab46524188c84dcb4c39f40348455ce15e2c0aca68863"},
 ]
+"setuptools 62.3.3" = [
+    {file = "setuptools-62.3.3-py3-none-any.whl", hash = "sha256:d1746e7fd520e83bbe210d02fff1aa1a425ad671c7a9da7d246ec2401a087198"},
+    {file = "setuptools-62.3.3.tar.gz", hash = "sha256:e7d11f3db616cda0751372244c2ba798e8e56a28e096ec4529010b803485f3fe"},
+]
 "six 1.16.0" = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+"sortedcontainers 2.4.0" = [
+    {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
+    {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
 ]
 "tomli 2.0.1" = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},

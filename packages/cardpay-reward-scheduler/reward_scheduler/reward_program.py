@@ -1,6 +1,6 @@
 import json
 import duckdb
-from .utils import get_files, get_latest_details, get_job_definition_for_image, run_job
+from .utils import get_files, get_latest_details, run_job
 import requests
 import logging
 from copy import deepcopy
@@ -160,9 +160,13 @@ class RewardProgram:
         payment_cycle_output = self.reward_program_output_location.joinpath(
             f"paymentCycle={payment_cycle}"
         )
+
+        # We can't pass much data directly in AWS batch, so write the
+        # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
         with parameters_location.open("w") as params_out:
             json.dump(submission_data, params_out)
+
         job = run_job(
             docker_image,
             parameters_location.as_uri(),
@@ -174,7 +178,7 @@ class RewardProgram:
         )
         return job
 
-    def run_all(self) -> None:
+    def run_all_payment_cycles(self) -> None:
         """
         Run all rules for all payment cycles that can be processed at this time
         """
