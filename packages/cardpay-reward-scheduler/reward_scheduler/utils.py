@@ -89,6 +89,11 @@ def get_files(config_location, table, min_partition=None, max_partition=None):
 
 
 def get_job_definition_for_image(image_name):
+    """
+    Find a job definition on AWS which is configured to use this image.
+
+    Job definitions are required to launch a job on AWS Batch.
+    """
     client = boto3.client("batch")
     job_definitions = client.describe_job_definitions(maxResults=100, status="ACTIVE")
     for job_definition in job_definitions["jobDefinitions"]:
@@ -100,7 +105,13 @@ def get_job_definition_for_image(image_name):
 
 def run_job(image_name, parameters_location, output_location, tags={}):
     client = boto3.client("batch")
+    # The job definition is required to run a container 
+    # it defines CPU/RAM requirements etc.
     job_definition = get_job_definition_for_image(image_name)
+
+    # Change the command we run in the docker container at start in order
+    # to pass in the location of the parameters file and the location
+    # the output should be written to
     container_overrides = {"command": [parameters_location, output_location]}
     if os.environ.get("ENVIRONMENT") and os.environ.get("SENTRY_DSN"):
         container_overrides["environment"] = [
