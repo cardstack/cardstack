@@ -101,19 +101,20 @@ function main() {
 
   const [appName, ...extraArgs] = process.argv.slice(2);
   const waypointConfigFilePath = extraArgs.length > 0 ? extraArgs[0] : 'waypoint.hcl';
+
   const cluster = findCluster(waypointConfigFilePath, appName);
   const services = listServices(cluster, appName);
   const service = findService(services, appName, cluster);
 
-  try {
-    waitServiceStable(service, cluster);
-    if (serviceHasTargetGroup(service)) {
-      waitTargetInService(service);
-    }
-  } catch (err) {
-    console.error(err);
-    throw err;
+  waitServiceStable(service, cluster);
+  if (serviceHasTargetGroup(service)) {
+    waitTargetInService(service);
   }
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  console.error(err);
+  throw err;
+}
