@@ -35,7 +35,7 @@ export default class ApplicationRoute extends Route {
   }
 
   afterModel() {
-    if (!isTesting()) {
+    if (!isTesting() && !this.fastboot.isFastBoot) {
       console.warn(
         '%cBe careful!',
         'color: red; font-size: 20px;   font-weight: bold;'
