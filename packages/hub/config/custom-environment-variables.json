@@ -54,8 +54,7 @@
     "clientName": "WALLET_CONNECT_CLIENT_NAME"
   },
   "exchangeRates": {
-    "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS",
-    "apiKey": "FIXER_API_KEY"
+    "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS"
   },
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"

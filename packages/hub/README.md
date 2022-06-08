@@ -39,7 +39,6 @@ Below is a list of the most common environment variables that the Hub accepts:
 
 - `HUB_AUTH_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
 - `HUB_EMAIL_HASH_SALT` (required for /email-card-drop/verify) - generate similarly to auth secret
-- `FIXER_API_KEY` (required for `/api/exchange-rates`) - API key for currency exchange rates, we use https://fixer.io/
 - `EXCHANGE_RATES_ALLOWED_DOMAINS` - domains from which a request to `/api/exchange-rates` is allowed
 - `HUB_AWS_ACCESS_KEY_ID`
 - `HUB_AWS_SECRET_ACCESS_KEY`

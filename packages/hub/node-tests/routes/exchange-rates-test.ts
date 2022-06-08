@@ -282,7 +282,7 @@ describe('GET /api/exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('Returns 502 for failure result from Fixer', async function () {
+  it('Returns 502 for failure result from CryptoCompare', async function () {
     setFetchExchangeRates(async function () {
       return {
         Response: 'Error',
