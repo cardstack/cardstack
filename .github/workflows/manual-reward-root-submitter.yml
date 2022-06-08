@@ -45,6 +45,8 @@ jobs:
         uses: ./.github/actions/deploy-reward-root-submitter
         env:
           AWS_DEFAULT_REGION: us-east-1
+          WAYPOINT_SERVER_TLS: "1"
+          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
       - name: Send success notification to Discord
         if: ${{ success() }}

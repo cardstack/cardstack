@@ -54,18 +54,8 @@ app "hub" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-staging", "waypoint-hub", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "hub"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
 }
@@ -115,8 +105,8 @@ app "hub-worker" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-worker-staging", "waypoint-hub-worker", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
     }
   }
 }
@@ -165,8 +155,8 @@ app "hub-bot" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-bot-staging", "waypoint-hub-bot", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
   }
 }
@@ -215,8 +205,8 @@ app "hub-event-listener" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-event-listener-staging", "waypoint-hub-event-listener", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
 }
@@ -253,6 +243,11 @@ app "cardie" {
         DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
         GITHUB_TOKEN  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "cardie"]
     }
   }
 }
@@ -302,6 +297,11 @@ app "cardpay-subg-ext" {
 
       disable_alb = true
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
+    }
   }
 }
 
@@ -338,18 +338,8 @@ app "ssr-web" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "ssr-web-staging", "waypoint-ssr-web", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "ssr-web"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
   }
 }
@@ -393,8 +383,13 @@ app "reward-submit" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
         OWNER             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
-        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
+        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
     }
   }
 }
@@ -440,14 +435,14 @@ app "reward-api" {
       }
 
       secrets = {
-        DB_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+        DB_STRING  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
         SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
       }
     }
 
     hook {
       when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
 }
