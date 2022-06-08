@@ -25,6 +25,7 @@ interface WorkflowCardOptions<T extends string> {
   author?: Participant;
   componentName: T; // this should eventually become a card reference
   includeIf?(this: WorkflowCard<T>): boolean;
+  editableIf?(session: IWorkflowSession): boolean;
   check?(this: WorkflowCard<T>): Promise<CheckResult>;
 }
 
@@ -45,6 +46,7 @@ export class WorkflowCard<T extends string = string> extends WorkflowPostable {
   cardName: string;
   componentName: T;
   config?: any;
+  editableIf?: (session: IWorkflowSession) => boolean;
   check: (this: WorkflowCard<T>) => Promise<CheckResult> = () => {
     return Promise.resolve({ success: true });
   };
@@ -106,6 +108,7 @@ export class WorkflowCard<T extends string = string> extends WorkflowPostable {
     super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
+    this.editableIf = options.editableIf;
     if (this.hasConfig(options)) this.config = options.config;
 
     this.reset = () => {
@@ -117,8 +120,13 @@ export class WorkflowCard<T extends string = string> extends WorkflowPostable {
       this.check = options.check as this['check'];
     }
   }
+
   get session(): IWorkflowSession | undefined {
     return this.workflow?.session;
+  }
+
+  get isEditable() {
+    return this.editableIf ? this.editableIf(this.workflow!.session) : true;
   }
 
   get completedCardNames(): Array<string> {

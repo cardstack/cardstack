@@ -6,6 +6,7 @@ import NotifyMerchantClaim, {
 } from '../../tasks/notify-merchant-claim';
 import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
+import { EventData } from 'web3-eth-contract';
 
 type TransactionInformation = MerchantClaimsQueryResult['data']['merchantClaims'][number];
 
@@ -99,7 +100,7 @@ describe('NotifyMerchantClaimTask', function () {
     };
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
     // debugger;
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
@@ -155,7 +156,7 @@ describe('NotifyMerchantClaimTask', function () {
 
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
 
@@ -217,7 +218,7 @@ describe('NotifyMerchantClaimTask', function () {
 
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
 
@@ -258,7 +259,7 @@ describe('NotifyMerchantClaimTask', function () {
   it('throws when the transaction is not found on the subgraph', async function () {
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
-    return expect(task.perform('a'))
+    return expect(task.perform({ transactionHash: 'a' } as EventData))
       .to.be.rejectedWith(`Subgraph did not return information for merchant claim with transaction hash: "a"`)
       .then(() => {
         expect(addedJobIdentifiers).to.deep.equal([]);

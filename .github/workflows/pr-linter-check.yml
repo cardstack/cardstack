@@ -2,6 +2,10 @@ name: CI [linter-check]
 
 on:
   pull_request:
+    paths:
+      - "**.js"
+      - "**.ts"
+      - "**.json"
 
 jobs:
   test:

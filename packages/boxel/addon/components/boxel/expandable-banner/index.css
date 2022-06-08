@@ -71,13 +71,26 @@
   content: "";
 }
 
-.boxel-expandable-banner__summary:focus {
-  outline: var(--boxel-outline);
-  outline-offset: -4px;
+@supports not selector(:has(.boxel-expandable-banner:focus-visible)) {
+  .boxel-expandable-banner__summary:focus {
+    outline: var(--boxel-outline);
+    outline-offset: -4px;
+  }
+
+  .boxel-expandable-banner__summary:focus:not(:focus-visible) {
+    outline: transparent;
+  }
 }
 
-.boxel-expandable-banner__summary:focus:not(:focus-visible) {
-  outline: transparent;
+@supports selector(:has(.boxel-expandable-banner:focus-visible)) {
+  /* hide the focus outline here, but keep it visible for high contrast color schemes */
+  .boxel-expandable-banner__summary:focus {
+    outline: transparent;
+  }
+
+  .boxel-expandable-banner__details:has(.boxel-expandable-banner__summary:focus-visible) {
+    outline: var(--boxel-outline);
+  }
 }
 
 /* style our custom markers */

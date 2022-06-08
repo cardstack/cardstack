@@ -11,6 +11,12 @@ import crypto from 'crypto';
 import cryptoRandomString from 'crypto-random-string';
 import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
+import logger from '@cardstack/logger';
+
+const log = logger('hub/email-card-drop-requests');
+
+const cardDropSku = config.get('cardDrop.sku') as string;
+const notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
 
 export interface EmailCardDropRequest {
   id: string;
@@ -23,6 +29,7 @@ export interface EmailCardDropRequest {
 }
 
 export default class EmailCardDropRequestsRoute {
+  cardpay = inject('cardpay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -32,6 +39,7 @@ export default class EmailCardDropRequestsRoute {
   emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
+  web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -85,12 +93,41 @@ export default class EmailCardDropRequestsRoute {
 
     ctx.type = 'application/vnd.api+json';
 
+    let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
+
+    if (await prepaidCardMarketV2.isPaused()) {
+      return respondWith503(ctx, 'The prepaid card market contract is paused');
+    }
+
+    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
+    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
+
+    let supplyIsBelowNotificationThreshold = quantityAvailable - activeReservations < notifyWhenQuantityBelow;
+
+    log.info(
+      `${cardDropSku} has ${quantityAvailable} available and ${activeReservations} reserved, notification threshold is ${notifyWhenQuantityBelow}`
+    );
+
+    if (supplyIsBelowNotificationThreshold) {
+      Sentry.captureException(
+        new Error(
+          `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${quantityAvailable}) less reservations (${activeReservations}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+        ),
+        {
+          tags: {
+            action: 'drop-card',
+            alert: 'prepaid-card-supply',
+          },
+        }
+      );
+    }
+
+    if (quantityAvailable <= activeReservations) {
+      return respondWith503(ctx, 'There are no prepaid cards available');
+    }
+
     if (await this.emailCardDropStateQueries.read()) {
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
-      };
-      return;
+      return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
     let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
@@ -107,11 +144,7 @@ export default class EmailCardDropRequestsRoute {
 
       await this.emailCardDropStateQueries.update(true);
 
-      ctx.status = 503;
-      ctx.body = {
-        errors: [{ status: '503', title: 'Rate limit has been triggered' }],
-      };
-      return;
+      return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
     let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
@@ -222,6 +255,13 @@ export default class EmailCardDropRequestsRoute {
 
 function generateVerificationCode() {
   return cryptoRandomString({ length: 10, type: 'url-safe' });
+}
+
+function respondWith503(ctx: Koa.Context, message: string) {
+  ctx.status = 503;
+  ctx.body = {
+    errors: [{ status: '503', title: message }],
+  };
 }
 
 declare module '@cardstack/di' {

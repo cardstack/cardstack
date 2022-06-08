@@ -8,6 +8,7 @@ import * as Sentry from '@sentry/node';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
+import { EventData } from 'web3-eth-contract';
 
 export const MERCHANT_CLAIM_EXPIRY_TIME = 30 * 60 * 1000;
 
@@ -55,21 +56,24 @@ export default class NotifyMerchantClaim {
     as: 'notificationPreferenceService',
   });
 
-  async perform(payload: string) {
-    await this.cardpay.waitForSubgraphIndex(payload, web3Config.layer2Network);
+  async perform(event: EventData) {
+    let transactionHash = event.transactionHash;
+    await this.cardpay.waitForSubgraphIndex(transactionHash, web3Config.layer2Network);
 
     let queryResult: MerchantClaimsQueryResult = await this.cardpay.gqlQuery(
       web3Config.layer2Network,
       merchantClaimsQuery,
       {
-        txn: payload,
+        txn: transactionHash,
       }
     );
 
     let result = queryResult?.data?.merchantClaims?.[0];
 
     if (!result) {
-      throw new Error(`Subgraph did not return information for merchant claim with transaction hash: "${payload}"`);
+      throw new Error(
+        `Subgraph did not return information for merchant claim with transaction hash: "${transactionHash}"`
+      );
     }
 
     let ownerAddress = result.merchantSafe.merchant.id;
@@ -118,7 +122,7 @@ export default class NotifyMerchantClaim {
         notificationId: generateContractEventNotificationId({
           network: web3Config.layer2Network,
           ownerAddress,
-          transactionHash: payload,
+          transactionHash,
           pushClientId,
         }),
         pushClientId,

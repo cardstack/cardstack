@@ -8,6 +8,7 @@ import NotificationPreferenceService from '../services/push-notifications/prefer
 import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
 import omit from 'lodash/omit';
+import { EventData } from 'web3-eth-contract';
 
 export interface PrepaidCardPaymentsQueryResult {
   data: {
@@ -91,18 +92,19 @@ export default class NotifyCustomerPayment {
     as: 'notificationPreferenceService',
   });
 
-  async perform(payload: string) {
-    await this.cardpay.waitForSubgraphIndex(payload, network);
+  async perform(contractEvent: EventData) {
+    let transactionHash = contractEvent.transactionHash;
+    await this.cardpay.waitForSubgraphIndex(transactionHash, network);
 
     let queryResult: PrepaidCardPaymentsQueryResult = await this.cardpay.gqlQuery(network, prepaidCardPaymentsQuery, {
-      txn: payload,
+      txn: transactionHash,
     });
 
     let result = queryResult?.data?.prepaidCardPayments?.[0];
 
     if (!result) {
       throw new Error(
-        `Subgraph did not return information for prepaid card payment with transaction hash: "${payload}"`
+        `Subgraph did not return information for prepaid card payment with transaction hash: "${transactionHash}"`
       );
     }
 
@@ -147,7 +149,7 @@ export default class NotifyCustomerPayment {
         notificationId: generateContractEventNotificationId({
           network,
           ownerAddress,
-          transactionHash: payload,
+          transactionHash,
           pushClientId,
         }),
         pushClientId,

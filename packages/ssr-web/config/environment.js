@@ -45,6 +45,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
+    exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
     previewSubdomainInfix: 'ssr-web-preview',
     universalLinkDomain:

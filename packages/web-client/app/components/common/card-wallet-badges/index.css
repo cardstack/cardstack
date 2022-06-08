@@ -8,12 +8,6 @@
 }
 
 .card-wallet-badges img {
-  height: 2.8rem;
+  height: min(2.8rem, max(2.5rem, 5vw));
   object-fit: contain;
-}
-
-@media screen and (max-width: 480px) {
-  .card-wallet-badges img {
-    height: 2.5rem;
-  }
 }

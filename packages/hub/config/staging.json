@@ -5,6 +5,7 @@
     "allowedChannels": "898941895525425172"
   },
   "cardDrop": {
+    "sku": "0x905b1faa1a56a0fd8447a469f8aa558665d550e56d60d106cd1096c526df4bdd",
     "verificationUrl": "https://hub-staging.stack.cards/email-card-drop/verify"
   },
   "mailchimp": {

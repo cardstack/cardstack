@@ -1,0 +1,83 @@
+/*global fetch */
+import { Argv } from 'yargs';
+import { getConstant, getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
+import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
+import { Arguments, CommandModule } from 'yargs';
+
+import Web3 from 'web3';
+const { toChecksumAddress } = Web3.utils;
+
+export default {
+  command: 'provision <sku> <recipient> <environment> <provisionerSecret>',
+  describe: 'Provision a prepaid card to an EOA',
+  builder(yargs: Argv) {
+    return yargs
+      .positional('sku', {
+        type: 'string',
+        description: 'The sku of the prepaid card to provision',
+      })
+      .positional('recipient', {
+        type: 'string',
+        description: 'The address of the recipient of the prepaid card',
+      })
+      .positional('environment', {
+        type: 'string',
+        description: 'The environment in which to provision the prepaid card (staging or production)',
+      })
+      .positional('provisionerSecret', {
+        type: 'string',
+        description: 'The "provisioner secret" phrase to enable provisioning',
+      })
+      .option('network', NETWORK_OPTION_LAYER_2);
+  },
+  async handler(args: Arguments) {
+    let { network, sku, recipient, environment, provisionerSecret } = args as unknown as {
+      network: string;
+      sku: string;
+      recipient: string;
+      environment: string;
+      provisionerSecret: string;
+    };
+    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
+    let prepaidCardMarketV2 = await getSDK('PrepaidCardMarketV2', web3, signer);
+    let blockExplorer = await getConstant('blockExplorer', web3);
+
+    console.log(
+      `Provisioning a prepaid card from the SKU ${sku} to the EOA ${recipient} in the ${environment} environment...`
+    );
+
+    let quantity = await prepaidCardMarketV2.getQuantity(sku);
+
+    if (quantity === 0) {
+      console.log(`There is not enough balance in the issuer safe to provision a card of SKU ${sku}`);
+      return;
+    }
+
+    let relayUrl = getConstantByNetwork('relayServiceURL', network);
+    let response = await fetch(`${relayUrl}/v2/prepaid-card/provision/${sku}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: provisionerSecret,
+      },
+      body: JSON.stringify({
+        owner: toChecksumAddress(recipient),
+      }),
+    });
+
+    let body = await response.json();
+    if (!response.ok) {
+      console.log(
+        `Could not provision prepaid card for customer ${recipient}, sku ${sku}, received ${
+          response.status
+        } from relay server: ${JSON.stringify(body)}`
+      );
+      return;
+    }
+    let { txHash } = body;
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
+
+    let [prepaidCard] = await prepaidCardMarketV2.getPrepaidCardsFromTxn(txHash);
+    console.log(`Provisioned the EOA ${recipient} the prepaid card ${prepaidCard}`);
+  },
+} as CommandModule;
