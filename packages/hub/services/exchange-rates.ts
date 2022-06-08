@@ -1,5 +1,6 @@
 /* global fetch */
 import { query } from '../queries';
+import config from 'config';
 
 export interface CryptoCompareSuccessResponse {
   [currencyCode: string]: convertedCurrency;
@@ -21,6 +22,10 @@ export interface convertedCurrency {
 
 export default class ExchangeRatesService {
   exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
+
+  private get apiKey() {
+    return config.get('exchangeRates.apiKey') as string;
+  }
 
   /**
    * An example success response from CryptoCompare:
@@ -55,7 +60,12 @@ export default class ExchangeRatesService {
 
     return await (
       await fetch(
-        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}&e=${exchange}`
+        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}&e=${exchange}`,
+        {
+          headers: {
+            authorization: `Apikey ${this.apiKey}`,
+          },
+        }
       )
     ).json();
   }
