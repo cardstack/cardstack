@@ -28,6 +28,7 @@ export default class PayRoute extends Route {
   }
 
   async model(params: {
+    currency: string;
     network: string;
     merchant_safe_id: string;
   }): Promise<PayRouteModel> {
@@ -46,7 +47,7 @@ export default class PayRoute extends Route {
         merchantSafe,
         merchantInfo,
         exchangeRates: this.shouldFetchExchangeRates
-          ? await this.fetchExchangeRates()
+          ? await this.fetchExchangeRates('USD', params.currency)
           : undefined,
       };
     } catch (e) {
@@ -62,16 +63,19 @@ export default class PayRoute extends Route {
     );
   }
 
-  async fetchExchangeRates() {
+  async fetchExchangeRates(from: string, to: string) {
     try {
       return (
         await (
-          await fetch(`${config.hubURL}/api/exchange-rates`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/vnd.api+json',
-            },
-          })
+          await fetch(
+            `${config.hubURL}/api/exchange-rates?from=${from}&to=${to}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/vnd.api+json',
+              },
+            }
+          )
         ).json()
       ).data.attributes.rates;
     } catch (e) {
