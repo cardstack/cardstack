@@ -21,7 +21,7 @@ runs:
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
     - name: Deploy reward scheduler
-      run: waypoint up -app=cardpay-reward-scheduler -prune-retain=0 -plain
+      run: waypoint up -app=reward-scheduler -prune-retain=0 -plain
       shell: bash
       env:
         WAYPOINT_SERVER_TLS: '1'

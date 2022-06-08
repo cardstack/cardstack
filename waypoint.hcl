@@ -449,7 +449,7 @@ app "reward-api" {
 
 
 
-app "reward-sched" {
+app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
 
   config {
