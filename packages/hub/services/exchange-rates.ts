@@ -51,7 +51,7 @@ export default class ExchangeRatesService {
     to: string,
     dateString: string,
     exchange = 'CCCAGG' // FIXME how deep should this optionality go?
-  ): Promise<CryptoCompareSuccessResponse | undefined> {
+  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
     let timestamp = Date.parse(dateString) / 1000;
 
     console.debug(
@@ -89,7 +89,12 @@ export default class ExchangeRatesService {
 
     if (result) {
       console.debug('CryptoCompare result', JSON.stringify(result, null, 2));
-      await this.exchangeRates.insert(from, to, result[from][to], date, exchange);
+
+      if (result.Response === 'Error') {
+        return result;
+      } else {
+        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
+      }
     } else {
       console.debug('CryptoCompare returned a falsey value');
     }

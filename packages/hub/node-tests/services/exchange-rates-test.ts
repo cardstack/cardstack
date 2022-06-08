@@ -1,4 +1,7 @@
-import ExchangeRatesService, { CryptoCompareSuccessResponse } from '../../services/exchange-rates';
+import ExchangeRatesService, {
+  CryptoCompareFailureResponse,
+  CryptoCompareSuccessResponse,
+} from '../../services/exchange-rates';
 
 import { setupHub } from '../helpers/server';
 
@@ -13,6 +16,16 @@ interface CryptoCompareSuccessResponsesByDate {
 describe('ExchangeRatesService', function () {
   let { getContainer } = setupHub(this);
   let subject: ExchangeRatesService;
+
+  let mockErrorResponse = {
+    Response: 'Error',
+    Message: 'Kucoin market does not exist for this coin pair (EUR-GBP)',
+    HasWarning: false,
+    Type: 2,
+    RateLimit: {},
+    Data: {},
+    ParamWithError: 'e',
+  };
 
   this.beforeEach(async function () {
     let mockResponses = {
@@ -38,9 +51,14 @@ describe('ExchangeRatesService', function () {
         to: string,
         dateString: string,
         exchange = 'CCCAGG'
-      ): Promise<CryptoCompareSuccessResponse> {
+      ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
         let date = Date.parse(dateString) / 1000;
-        let exchangeRate = mockResponses[exchange][date][from][to];
+
+        if (from === 'EUR' && to === 'GBP' && exchange == 'kucoin') {
+          return mockErrorResponse;
+        }
+
+        let exchangeRate = mockResponses[exchange]?.[date]?.[from]?.[to];
 
         if (!exchangeRate) {
           throw new Error(`No exchange rate found for ${from} to ${to}`);
@@ -94,5 +112,11 @@ describe('ExchangeRatesService', function () {
 
     let cachedValue = await exchangeRates.select('CARD', 'USDT', '2022-06-01', 'kucoin');
     expect(cachedValue).equal(0.002059);
+  });
+
+  it('passes on error responses', async function () {
+    let result = await subject.fetchCryptoCompareExchangeRates('EUR', 'GBP', '2022-06-01', 'kucoin');
+
+    expect(result).deep.equal(mockErrorResponse);
   });
 });
