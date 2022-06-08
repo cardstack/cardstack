@@ -54,6 +54,7 @@ function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
   };
 }
 
+// ≈2022-04-20
 let fakeTime = 1650440847689;
 
 class FrozenClock implements Clock {
@@ -112,7 +113,7 @@ describe('GET /api/exchange-rates', function () {
 
   it('fetches exchange rates for an accepted origin', async function () {
     await request()
-      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-06-06`)
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-04-06`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
@@ -162,6 +163,28 @@ describe('GET /api/exchange-rates', function () {
     expect(fetchArgs[2]).to.equal(new Date(fakeTime).toISOString().split('T')[0]);
   });
 
+  it('rejects a date in the future', async function () {
+    await request()
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2222-04-06`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'date cannot be in the future',
+            pointer: {
+              parameter: 'date',
+            },
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('allows an alternate exchange source', async function () {
     let fetchArgs: never[] = [];
 
@@ -189,7 +212,7 @@ describe('GET /api/exchange-rates', function () {
     };
 
     await request()
-      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-06-06`)
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-04-06`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Authorization', 'Bearer abc123--def456--ghi789')

@@ -51,7 +51,25 @@ export default class ExchangeRatesRoute {
       return;
     }
 
-    if (!date) {
+    if (date) {
+      if (Date.parse(date) > this.clock.now()) {
+        ctx.status = 400;
+        ctx.body = {
+          errors: [
+            {
+              status: '400',
+              title: 'Bad Request',
+              detail: 'date cannot be in the future',
+              pointer: {
+                parameter: 'date',
+              },
+            },
+          ],
+        };
+        ctx.type = 'application/vnd.api+json';
+        return;
+      }
+    } else {
       date = new Date(this.clock.now()).toISOString().split('T')[0];
     }
 
