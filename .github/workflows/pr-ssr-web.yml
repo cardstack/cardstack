@@ -18,6 +18,7 @@ permissions:
   checks: write
   pull-requests: write
   id-token: write
+  statuses: write
 
 jobs:
   test:
