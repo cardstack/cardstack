@@ -10,8 +10,10 @@ The SDK/end users get their proofs via the `cardpay-reward-api` package.
 
 ## Process
 
-1. Iterate over all allowed reward programs on chain
+1. Iterate over all allowed reward programs on chain which are not 'locked' (the locked flag on chain means that no rewards should be computed right now)
 2. For each, get the "rules" which define what should be calculated
+    * The rules are in a json blob stored on chain
+    * Each rule defines the docker image to run & the parameters (start & end range, data dependencies, etc)
 3. For each rule in each reward program, find all payment cycles which:
     1. Have not yet been processed
     2. Are in the range start_block <= payment_cycle < end_block
