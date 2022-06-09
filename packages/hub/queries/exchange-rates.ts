@@ -23,7 +23,12 @@ export default class ExchangeRatesQueries {
     );
   }
 
-  async select(from: string, to: string[], date: string, exchange = 'CCCAGG'): Promise<CryptoCompareConversionBlock | null> {
+  async select(
+    from: string,
+    to: string[],
+    date: string,
+    exchange = 'CCCAGG'
+  ): Promise<CryptoCompareConversionBlock | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
