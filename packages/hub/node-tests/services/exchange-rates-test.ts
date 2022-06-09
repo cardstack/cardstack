@@ -37,6 +37,25 @@ describe('ExchangeRatesService', function () {
             USD: 432.18,
           },
         },
+        1654214400: {
+          XYZ: {
+            A00: 1,
+            B00: 2,
+            C00: 3,
+            D00: 4,
+            E00: 5,
+            F00: 6,
+            G00: 7,
+            H00: 8,
+            I00: 9,
+            J00: 10,
+            K00: 11,
+            L00: 12,
+            M00: 13,
+            N00: 14,
+            O00: 15,
+          },
+        },
       },
       kucoin: {
         1654041600: {
@@ -58,6 +77,18 @@ describe('ExchangeRatesService', function () {
 
         if (from === 'EUR' && tos[0] === 'GBP' && exchange == 'kucoin') {
           return mockErrorResponse;
+        }
+
+        if (tos.join(',').length > 30) {
+          return {
+            Response: 'Error',
+            Message: 'tsyms param is invalid. (tsyms length is higher than maxlength: 30)',
+            HasWarning: false,
+            Type: 2,
+            RateLimit: {},
+            Data: {},
+            ParamWithError: 'tsyms',
+          };
         }
 
         let toAndRates = tos.map((to) => {
@@ -92,7 +123,7 @@ describe('ExchangeRatesService', function () {
     expect(cachedValue).deep.equal({ USD: 432.18 });
   });
 
-  it.only('can fetch some rates and use some cached rates', async function () {
+  it('can fetch some rates and use some cached rates', async function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'AUD', 2.1, '2022-06-01', 'CCCAGG');
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', 'CCCAGG');
@@ -103,6 +134,34 @@ describe('ExchangeRatesService', function () {
 
     let cachedValue = await exchangeRates.select('BTC', ['CAD', 'GBP'], '2022-06-01');
     expect(cachedValue).deep.equal({ CAD: 2010, GBP: 2 });
+  });
+
+  it('can chunk fetches to handle the limit on tsyms', async function () {
+    let result = await subject.fetchCryptoCompareExchangeRates(
+      'XYZ',
+      ['A00', 'B00', 'C00', 'D00', 'E00', 'F00', 'G00', 'H00', 'I00', 'J00', 'K00', 'L00', 'M00', 'N00', 'O00'],
+      '2022-06-03'
+    );
+
+    expect(result).deep.equal({
+      XYZ: {
+        A00: 1,
+        B00: 2,
+        C00: 3,
+        D00: 4,
+        E00: 5,
+        F00: 6,
+        G00: 7,
+        H00: 8,
+        I00: 9,
+        J00: 10,
+        K00: 11,
+        L00: 12,
+        M00: 13,
+        N00: 14,
+        O00: 15,
+      },
+    });
   });
 
   it('returns the cached rates when they exist', async function () {

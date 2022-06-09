@@ -1,6 +1,7 @@
 /* global fetch */
 import { query } from '../queries';
 import config from 'config';
+import merge from 'lodash/merge';
 
 export interface CryptoCompareSuccessResponse {
   [currencyCode: string]: convertedCurrency;
@@ -51,7 +52,7 @@ export default class ExchangeRatesService {
     to: string[],
     dateString: string,
     exchange = 'CCCAGG' // FIXME how deep should this optionality go?
-  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
+  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
     let timestamp = Date.parse(dateString) / 1000;
 
     console.debug(
@@ -74,6 +75,40 @@ export default class ExchangeRatesService {
     ).json();
   }
 
+  private async requestCollectedExchangeRatesFromCryptoCompare(
+    from: string,
+    tos: string[],
+    dateString: string,
+    exchange = 'CCCAGG'
+  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
+    // CryptoCompare has a limit of 30 characters for the tsyms parameter so we need to split the request into chunks
+
+    let joinedTos = tos.join(',');
+    let tosChunks = [];
+
+    while (joinedTos.length > 30) {
+      let indexToCutAt = joinedTos.lastIndexOf(',', 30);
+      tosChunks.push(joinedTos.substring(0, indexToCutAt));
+      joinedTos = joinedTos.substring(indexToCutAt + 1);
+    }
+
+    tosChunks.push(joinedTos);
+
+    let results = await Promise.all(
+      tosChunks.map((tosChunk) =>
+        this.requestExchangeRatesFromCryptoCompare(from, tosChunk.split(','), dateString, exchange)
+      )
+    );
+
+    let errorResult = results.find((result) => result && result.Response);
+
+    if (errorResult) {
+      return errorResult;
+    }
+
+    return merge(results[0], ...results.slice(1));
+  }
+
   async fetchCryptoCompareExchangeRates(
     from: string,
     tos: string[],
@@ -91,7 +126,7 @@ export default class ExchangeRatesService {
       } as CryptoCompareSuccessResponse;
     }
 
-    let result = await this.requestExchangeRatesFromCryptoCompare(from, requestedButNotCached, date, exchange);
+    let result = await this.requestCollectedExchangeRatesFromCryptoCompare(from, requestedButNotCached, date, exchange);
 
     if (result) {
       console.debug('CryptoCompare result', JSON.stringify(result, null, 2));
