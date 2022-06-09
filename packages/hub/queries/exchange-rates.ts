@@ -34,7 +34,6 @@ export default class ExchangeRatesQueries {
           to_symbol = ANY ($2) AND
           date=$3 AND
           exchange=$4
-        LIMIT 1
       `,
       [from, to, date, exchange]
     );

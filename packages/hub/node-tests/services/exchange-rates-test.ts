@@ -32,6 +32,8 @@ describe('ExchangeRatesService', function () {
       CCCAGG: {
         1654041600: {
           BTC: {
+            CAD: 2010,
+            GBP: 2,
             USD: 432.18,
           },
         },
@@ -88,6 +90,19 @@ describe('ExchangeRatesService', function () {
 
     let cachedValue = await exchangeRates.select('BTC', ['USD'], '2022-06-01');
     expect(cachedValue).deep.equal({ USD: 432.18 });
+  });
+
+  it.only('can fetch some rates and use some cached rates', async function () {
+    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    await exchangeRates.insert('BTC', 'AUD', 2.1, '2022-06-01', 'CCCAGG');
+    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', 'CCCAGG');
+
+    let result = await subject.fetchCryptoCompareExchangeRates('BTC', ['AUD', 'GBP', 'USD', 'CAD'], '2022-06-01');
+
+    expect(result).deep.equal({ BTC: { AUD: 2.1, CAD: 2010, GBP: 2, USD: 1919 } });
+
+    let cachedValue = await exchangeRates.select('BTC', ['CAD', 'GBP'], '2022-06-01');
+    expect(cachedValue).deep.equal({ CAD: 2010, GBP: 2 });
   });
 
   it('returns the cached rates when they exist', async function () {

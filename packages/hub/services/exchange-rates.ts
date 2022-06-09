@@ -76,33 +76,36 @@ export default class ExchangeRatesService {
 
   async fetchCryptoCompareExchangeRates(
     from: string,
-    to: string[],
+    tos: string[],
     date: string,
     exchange = 'CCCAGG'
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
-    let cachedValues = await this.exchangeRates.select(from, to, date, exchange);
+    let cachedValues = await this.exchangeRates.select(from, tos, date, exchange);
 
-    if (cachedValues) {
+    let cachedValuesTos = Object.keys(cachedValues || {});
+    let requestedButNotCached = tos.filter((to) => !cachedValuesTos.includes(to));
+
+    if (requestedButNotCached.length === 0) {
       return {
         [from]: cachedValues,
-      };
+      } as CryptoCompareSuccessResponse;
     }
-    let result = await this.requestExchangeRatesFromCryptoCompare(from, to, date, exchange);
+
+    let result = await this.requestExchangeRatesFromCryptoCompare(from, requestedButNotCached, date, exchange);
 
     if (result) {
       console.debug('CryptoCompare result', JSON.stringify(result, null, 2));
 
       if (result.Response === 'Error') {
         return result;
-      } else {
-        await this.exchangeRates.insert(
-          from,
-          to[0],
-          (result as CryptoCompareSuccessResponse)[from][to],
-          date,
-          exchange
-        );
       }
+
+      requestedButNotCached.forEach(async (to) => {
+        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
+      });
+
+      let resultConversions = (result as CryptoCompareSuccessResponse)[from];
+      Object.assign(resultConversions, cachedValues);
     } else {
       console.debug('CryptoCompare returned a falsey value');
     }
