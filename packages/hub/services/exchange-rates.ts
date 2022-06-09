@@ -21,6 +21,8 @@ export interface CryptoCompareConversionBlock {
   [currencyCode: string]: number;
 }
 
+export const DEFAULT_CRYPTOCOMPARE_EXCHANGE = 'CCCAGG';
+
 export default class ExchangeRatesService {
   exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
 
@@ -105,7 +107,7 @@ export default class ExchangeRatesService {
     from: string,
     tos: string[],
     date: string,
-    exchange = 'CCCAGG'
+    exchange = DEFAULT_CRYPTOCOMPARE_EXCHANGE
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
     let cachedValues = await this.exchangeRates.select(from, tos, date, exchange);
 

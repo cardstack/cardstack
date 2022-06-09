@@ -27,7 +27,7 @@ export default class ExchangeRatesQueries {
     from: string,
     to: string[],
     date: string,
-    exchange = 'CCCAGG'
+    exchange: string
   ): Promise<CryptoCompareConversionBlock | null> {
     let db = await this.databaseManager.getClient();
 
