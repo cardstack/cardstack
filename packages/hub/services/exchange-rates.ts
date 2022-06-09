@@ -30,9 +30,12 @@ export default class ExchangeRatesService {
 
   /**
    * An example success response from CryptoCompare:
-   * {
-      "CARD": {
-        "USDT": 0.001964
+    {
+    "USD": {
+      "RUB": 58.24,
+      "INR": 86.49,
+      "NZD": 1.559,
+      "ZAR": 15.81
       }
     }
    *
