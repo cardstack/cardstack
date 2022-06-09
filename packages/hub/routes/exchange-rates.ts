@@ -80,14 +80,9 @@ export default class ExchangeRatesRoute {
       let exchangeRates;
 
       if (exchange) {
-        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(
-          from,
-          toSymbols,
-          date,
-          exchange
-        );
+        exchangeRates = await this.exchangeRatesService.fetchExchangeRates(from, toSymbols, date, exchange);
       } else {
-        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, toSymbols, date);
+        exchangeRates = await this.exchangeRatesService.fetchExchangeRates(from, toSymbols, date);
       }
 
       if (!exchangeRates || exchangeRates.Response) {

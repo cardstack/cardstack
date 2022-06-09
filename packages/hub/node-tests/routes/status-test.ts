@@ -48,7 +48,7 @@ class StubWeb3 {
 
 class StubExchangeRates {
   lastFetched = exchangeRatesLastFetched;
-  async fetchCryptoCompareExchangeRates() {
+  async fetchExchangeRates() {
     if (throwExchangeRatesError) {
       throw new Error('Mock exchange rates error');
     } else if (returnExchangeRatesError) {

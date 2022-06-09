@@ -56,7 +56,7 @@ export default class StatusRoute {
 
     let exchangeRatesValue = null;
     try {
-      exchangeRatesValue = await this.exchangeRates.fetchCryptoCompareExchangeRates(
+      exchangeRatesValue = await this.exchangeRates.fetchExchangeRates(
         'USD',
         ['BTC', 'ETH'],
         new Date().toISOString().split('T')[0]

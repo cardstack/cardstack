@@ -30,15 +30,15 @@ let mockCryptoCompareExchangeRatesResponse = {
 };
 
 function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
-  let fetchCryptoCompareExchangeRates: (
+  let fetchExchangeRates: (
     ...args: any
   ) => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> = function () {
     return Promise.resolve(mockCryptoCompareExchangeRatesResponse);
   };
 
   class StubExchangeRatesService {
-    fetchCryptoCompareExchangeRates() {
-      return fetchCryptoCompareExchangeRates(...arguments);
+    fetchExchangeRates() {
+      return fetchExchangeRates(...arguments);
     }
   }
   context.beforeEach(function () {
@@ -49,7 +49,7 @@ function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
     setFetchExchangeRates(
       func: () => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined>
     ) {
-      fetchCryptoCompareExchangeRates = func;
+      fetchExchangeRates = func;
     },
   };
 }

@@ -109,7 +109,7 @@ export default class ExchangeRatesService {
     return merge(results[0], ...results.slice(1));
   }
 
-  async fetchCryptoCompareExchangeRates(
+  async fetchExchangeRates(
     from: string,
     tos: string[],
     date: string,

@@ -114,7 +114,7 @@ describe('ExchangeRatesService', function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01', 'CCCAGG');
 
-    let result = await subject.fetchCryptoCompareExchangeRates('BTC', ['USD'], '2022-06-01');
+    let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
 
     // TODO should these be strings or numbers?
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
@@ -128,7 +128,7 @@ describe('ExchangeRatesService', function () {
     await exchangeRates.insert('BTC', 'AUD', 2.1, '2022-06-01', 'CCCAGG');
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', 'CCCAGG');
 
-    let result = await subject.fetchCryptoCompareExchangeRates('BTC', ['AUD', 'GBP', 'USD', 'CAD'], '2022-06-01');
+    let result = await subject.fetchExchangeRates('BTC', ['AUD', 'GBP', 'USD', 'CAD'], '2022-06-01');
 
     expect(result).deep.equal({ BTC: { AUD: 2.1, CAD: 2010, GBP: 2, USD: 1919 } });
 
@@ -137,7 +137,7 @@ describe('ExchangeRatesService', function () {
   });
 
   it('can chunk fetches to handle the limit on tsyms', async function () {
-    let result = await subject.fetchCryptoCompareExchangeRates(
+    let result = await subject.fetchExchangeRates(
       'XYZ',
       ['A00', 'B00', 'C00', 'D00', 'E00', 'F00', 'G00', 'H00', 'I00', 'J00', 'K00', 'L00', 'M00', 'N00', 'O00'],
       '2022-06-03'
@@ -168,7 +168,7 @@ describe('ExchangeRatesService', function () {
     let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', 'CCCAGG');
 
-    let result = await subject.fetchCryptoCompareExchangeRates('BTC', ['USD'], '2022-06-01');
+    let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
 
     expect(result).deep.equal({
       BTC: {
@@ -182,7 +182,7 @@ describe('ExchangeRatesService', function () {
     await exchangeRates.insert('CARD', 'USDT', 1919, '2022-05-01', 'kucoin');
     await exchangeRates.insert('CARD', 'USDT', 1870, '2022-06-01', 'CCCAGG');
 
-    let result = await subject.fetchCryptoCompareExchangeRates('CARD', ['USDT'], '2022-06-01', 'kucoin');
+    let result = await subject.fetchExchangeRates('CARD', ['USDT'], '2022-06-01', 'kucoin');
 
     expect(result).deep.equal({ CARD: { USDT: 0.002059 } });
 
@@ -191,7 +191,7 @@ describe('ExchangeRatesService', function () {
   });
 
   it('passes on error responses', async function () {
-    let result = await subject.fetchCryptoCompareExchangeRates('EUR', ['GBP'], '2022-06-01', 'kucoin');
+    let result = await subject.fetchExchangeRates('EUR', ['GBP'], '2022-06-01', 'kucoin');
 
     expect(result).deep.equal(mockErrorResponse);
   });
