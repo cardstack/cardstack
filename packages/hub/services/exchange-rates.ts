@@ -7,7 +7,7 @@ export interface CryptoCompareSuccessResponse {
 }
 
 export interface CryptoCompareFailureResponse {
-  Response: 'Error';
+  Response: string;
   Message: string;
   HasWarning: boolean;
   Type: number;
