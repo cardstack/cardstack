@@ -6,6 +6,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.analysis.extraPaths": [
-        "./streamlit"
+        "./streamlit",
+        "./__pypackages__/3.9/lib"
     ]
 }

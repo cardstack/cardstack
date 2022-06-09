@@ -20,12 +20,12 @@ cached_client = S3Client(
 )
 cached_client.set_as_default_client()
 
-for expected_env in ["ENVIRONMENT"]:
-    if expected_env not in os.environ:
-        raise ValueError(f"Missing environment variable {expected_env}")
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 if SENTRY_DSN is not None:
+    for expected_env in ["ENVIRONMENT"]:
+        if expected_env not in os.environ:
+            raise ValueError(f"Missing environment variable {expected_env}")
     sentry_sdk.init(
         SENTRY_DSN,
         # Set traces_sample_rate to 1.0 to capture 100%
@@ -64,3 +64,4 @@ def run_reward_program(
 
 if __name__ == "__main__":
     typer.run(run_reward_program)
+

@@ -18,6 +18,9 @@ class SafeOwnership(Rule):
         start_analysis_block,
         safe_type,
         max_rewards,
+        base_reward,
+        transaction_factor,
+        spend_factor
     ):
         self.token = token
         self.duration = duration
