@@ -76,12 +76,18 @@ export default class ExchangeRatesRoute {
     let exchange = ctx.query.e as string;
 
     if (isDevelopment || isAllowedDomain || hasValidAuthToken) {
+      let toSymbols = to.split(',');
       let exchangeRates;
 
       if (exchange) {
-        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date, exchange);
+        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(
+          from,
+          toSymbols,
+          date,
+          exchange
+        );
       } else {
-        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, to, date);
+        exchangeRates = await this.exchangeRatesService.fetchCryptoCompareExchangeRates(from, toSymbols, date);
       }
 
       if (!exchangeRates || exchangeRates.Response) {
@@ -106,9 +112,7 @@ export default class ExchangeRatesRoute {
             type: 'exchange-rates',
             attributes: {
               base: from,
-              rates: {
-                [to]: (exchangeRates as CryptoCompareSuccessResponse)[from][to],
-              },
+              rates: (exchangeRates as CryptoCompareSuccessResponse)[from],
             },
           },
         };
