@@ -1,5 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { convertedCurrency } from '../services/exchange-rates';
 
 export default class ExchangeRatesQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -22,21 +23,28 @@ export default class ExchangeRatesQueries {
     );
   }
 
-  async select(from: string, to: string, date: string, exchange = 'CCCAGG'): Promise<number | null> {
+  async select(from: string, to: string[], date: string, exchange = 'CCCAGG'): Promise<convertedCurrency | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(
       `
-        SELECT rate FROM exchange_rates
-        WHERE from_symbol=$1 AND to_symbol=$2 AND date=$3 AND exchange=$4
+        SELECT to_symbol, rate FROM exchange_rates
+        WHERE
+          from_symbol=$1 AND
+          to_symbol = ANY ($2) AND
+          date=$3 AND
+          exchange=$4
         LIMIT 1
       `,
       [from, to, date, exchange]
     );
 
     if (rows.length) {
-      // TODO why is this coming out as a string?
-      return parseFloat(rows[0].rate);
+      return rows.reduce((rates, row) => {
+        // TODO why is this coming out as a string?
+        rates[row.to_symbol] = parseFloat(row.rate);
+        return rates;
+      }, {});
     } else {
       return null;
     }

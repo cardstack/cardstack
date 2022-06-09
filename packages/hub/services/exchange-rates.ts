@@ -48,19 +48,23 @@ export default class ExchangeRatesService {
    */
   async requestExchangeRatesFromCryptoCompare(
     from: string,
-    to: string,
+    to: string[],
     dateString: string,
     exchange = 'CCCAGG' // FIXME how deep should this optionality go?
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
     let timestamp = Date.parse(dateString) / 1000;
 
     console.debug(
-      `fetching https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}&e=${exchange}`
+      `fetching https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to.join(
+        ','
+      )}&ts=${timestamp}&e=${exchange}`
     );
 
     return await (
       await fetch(
-        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to}&ts=${timestamp}&e=${exchange}`,
+        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to.join(
+          ','
+        )}&ts=${timestamp}&e=${exchange}`,
         {
           headers: {
             authorization: `Apikey ${this.apiKey}`,
@@ -72,17 +76,15 @@ export default class ExchangeRatesService {
 
   async fetchCryptoCompareExchangeRates(
     from: string,
-    to: string,
+    to: string[],
     date: string,
     exchange = 'CCCAGG'
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
-    let cachedValue = await this.exchangeRates.select(from, to, date, exchange);
+    let cachedValues = await this.exchangeRates.select(from, to, date, exchange);
 
-    if (cachedValue) {
+    if (cachedValues) {
       return {
-        [from]: {
-          [to]: cachedValue,
-        },
+        [from]: cachedValues,
       };
     }
     let result = await this.requestExchangeRatesFromCryptoCompare(from, to, date, exchange);
@@ -93,7 +95,13 @@ export default class ExchangeRatesService {
       if (result.Response === 'Error') {
         return result;
       } else {
-        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
+        await this.exchangeRates.insert(
+          from,
+          to[0],
+          (result as CryptoCompareSuccessResponse)[from][to],
+          date,
+          exchange
+        );
       }
     } else {
       console.debug('CryptoCompare returned a falsey value');
