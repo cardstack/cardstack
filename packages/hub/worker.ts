@@ -15,6 +15,7 @@ import DiscordPostTask from './tasks/discord-post';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
 import SendEmailCardDropVerification from './tasks/send-email-card-drop-verification';
+import NotifyPrepaidCardDropTask from './tasks/notify-prepaid-card-drop';
 import SendNotificationsTask from './tasks/send-notifications';
 import SubscribeEmail from './tasks/subscribe-email';
 import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
@@ -67,6 +68,7 @@ export class HubWorker {
         'subscribe-email': this.instantiateTask(SubscribeEmail),
         'notify-merchant-claim': this.instantiateTask(NotifyMerchantClaimTask),
         'notify-customer-payment': this.instantiateTask(NotifyCustomerPaymentTask),
+        'notify-prepaid-card-drop': this.instantiateTask(NotifyPrepaidCardDropTask),
         'persist-off-chain-prepaid-card-customization': this.instantiateTask(
           PersistOffChainPrepaidCardCustomizationTask
         ),

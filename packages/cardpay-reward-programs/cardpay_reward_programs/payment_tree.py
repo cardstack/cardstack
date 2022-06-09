@@ -34,6 +34,10 @@ class PaymentTree:
         self.payment_nodes = payment_list
         self.data = list(map(self.encode_payment, self.payment_nodes))
         self.tree = MerkleTree(self.data, hashfunc)
+        if len(self.data) != len(set(self.data)):
+            raise Exception(
+                "There are duplicate leafs. Check if you are rewarding the same address twice."
+            )
 
     @staticmethod
     def encode_payment(payment: Payment) -> bytes:
@@ -92,7 +96,13 @@ class PaymentTree:
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
-            extract_fields = ["rewardProgramID", "paymentCycle", "validFrom", "validTo", "payee"]
+            extract_fields = [
+                "rewardProgramID",
+                "paymentCycle",
+                "validFrom",
+                "validTo",
+                "payee",
+            ]
             for payment, leaf in zip(self.payment_nodes, self.data):
                 for field in extract_fields:
                     columns[field].append(payment[field])

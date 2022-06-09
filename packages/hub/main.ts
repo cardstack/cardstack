@@ -71,6 +71,7 @@ import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
 import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
+import NotifyPrepaidCardDropTask from './tasks/notify-prepaid-card-drop';
 import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
 import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
@@ -138,6 +139,7 @@ export function createRegistry(): Registry {
   registry.register('send-notifications', SendNotificationsTask);
   registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
   registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
+  registry.register('notify-prepaid-card-drop', NotifyPrepaidCardDropTask);
   registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
   registry.register('subscribe-email', SubscribeEmailTask);
   registry.register('discord-post', DiscordPostTask);

@@ -11,3 +11,4 @@ output/
 .pdm.toml
 __pypackages__
 input/results.parquet
+prepaid_card_less_gas.csv

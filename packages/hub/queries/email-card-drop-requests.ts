@@ -65,6 +65,24 @@ export default class EmailCardDropRequestsQueries {
     return queryResult.rows.map(mapRowToObject)[0];
   }
 
+  async activeReservations() {
+    let db = await this.databaseManager.getClient();
+
+    const query = `
+      SELECT COUNT(DISTINCT owner_address) FROM email_card_drop_requests
+      WHERE
+        owner_address NOT IN (
+          SELECT DISTINCT owner_address
+          FROM email_card_drop_requests
+          WHERE claimed_at IS NOT NULL
+        ) AND
+        requested_at > (now() - interval '${emailVerificationLinkExpiryMinutes} minutes')
+    `;
+
+    const queryResult = await db.query(query);
+    return queryResult.rows[0].count;
+  }
+
   async claimedInLastMinutes(minutes: number): Promise<(EmailCardDropRequest & { isExpired: boolean })[]> {
     let db = await this.databaseManager.getClient();
 

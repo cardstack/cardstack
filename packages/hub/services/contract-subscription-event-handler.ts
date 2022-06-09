@@ -4,6 +4,8 @@ import { inject } from '@cardstack/di';
 
 import logger from '@cardstack/logger';
 import { query } from '@cardstack/hub/queries';
+import { EventData } from 'web3-eth-contract';
+
 const log = logger('hub/contract-subscription-event-handler');
 
 export const HISTORIC_BLOCKS_AVAILABLE = 10000;
@@ -20,6 +22,13 @@ export const CONTRACT_EVENTS = [
     contractName: 'revenuePool' as AddressKeys,
     eventName: 'MerchantClaim',
     taskName: 'notify-merchant-claim',
+  },
+  {
+    abiName: 'prepaid-card-market-v-2',
+    contractName: 'prepaidCardMarketV2' as AddressKeys,
+    eventName: 'PrepaidCardProvisioned',
+    taskName: 'notify-prepaid-card-drop',
+    contractStartVersion: '0.9.0',
   },
 ];
 
@@ -45,7 +54,7 @@ export class ContractSubscriptionEventHandler {
     for (let contractEvent of CONTRACT_EVENTS) {
       let contract = await this.contracts.getContract(web3Instance, contractEvent.abiName, contractEvent.contractName);
 
-      contract.events[contractEvent.eventName](subscriptionOptions, async (error: Error, event: any) => {
+      contract.events[contractEvent.eventName](subscriptionOptions, async (error: Error, event: EventData) => {
         if (error) {
           Sentry.captureException(error, {
             tags: {
@@ -60,7 +69,7 @@ export class ContractSubscriptionEventHandler {
           );
 
           await this.latestEventBlockQueries.update(event.blockNumber);
-          this.workerClient.addJob(contractEvent.taskName, event.transactionHash);
+          this.workerClient.addJob(contractEvent.taskName, event);
         }
       });
     }

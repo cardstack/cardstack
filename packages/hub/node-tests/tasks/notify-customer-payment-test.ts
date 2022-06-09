@@ -3,6 +3,7 @@ import { registry, setupHub } from '../helpers/server';
 import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
+import { EventData } from 'web3-eth-contract';
 
 type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
 
@@ -150,7 +151,7 @@ describe('NotifyCustomerPaymentTask', function () {
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
@@ -244,7 +245,7 @@ describe('NotifyCustomerPaymentTask', function () {
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
@@ -341,7 +342,7 @@ describe('NotifyCustomerPaymentTask', function () {
 
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    await task.perform('a');
+    await task.perform({ transactionHash: 'a' } as EventData);
 
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
@@ -365,7 +366,7 @@ describe('NotifyCustomerPaymentTask', function () {
   it('throws when the transaction is not found on the subgraph', async function () {
     let task = (await getContainer().lookup('notify-customer-payment')) as NotifyCustomerPayment;
 
-    return expect(task.perform('a'))
+    return expect(task.perform({ transactionHash: 'a' } as EventData))
       .to.be.rejectedWith(`Subgraph did not return information for prepaid card payment with transaction hash: "a"`)
       .then(() => {
         expect(addedJobIdentifiers).to.deep.equal([]);

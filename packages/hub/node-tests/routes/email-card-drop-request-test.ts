@@ -153,13 +153,34 @@ class StubWorkerClient {
   }
 }
 
+let mockPrepaidCardMarketContractPaused = false;
+let mockPrepaidCardQuantity = 100;
+
+class StubCardpaySDK {
+  getSDK(sdk: string) {
+    switch (sdk) {
+      case 'PrepaidCardMarketV2':
+        return Promise.resolve({
+          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+          isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
+        });
+      default:
+        throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
+    }
+  }
+}
+
 describe('POST /api/email-card-drop-requests', function () {
   setupSentry(this);
 
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('cardpay', StubCardpaySDK);
     registry(this).register('worker-client', StubWorkerClient);
     registry(this).register('clock', FrozenClock);
+
+    mockPrepaidCardMarketContractPaused = false;
+    mockPrepaidCardQuantity = 50;
   });
 
   let { request, getContainer } = setupHub(this);
@@ -170,6 +191,21 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('persists an email card drop request and triggers jobs', async function () {
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeBeyondExpiry = Date.now() - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
+
+    // Create no-longer-active reservations
+
+    for (let i = 0; i < mockPrepaidCardQuantity + 1; i++) {
+      await emailCardDropRequestsQueries.insert({
+        ownerAddress: `0xother${i}`,
+        emailHash: `other-email-hash-${i}`,
+        verificationCode: 'x',
+        id: shortUUID.uuid(),
+        requestedAt: new Date(insertionTimeBeyondExpiry),
+      });
+    }
+
     let email = 'valid@example.com';
 
     const payload = {
@@ -194,7 +230,6 @@ describe('POST /api/email-card-drop-requests', function () {
         resourceId = res.body.data.id;
       });
 
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
@@ -210,6 +245,37 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(jobPayloads).to.deep.equal([{ id: resourceId, email }, { email }]);
   });
 
+  it('sends an alert to web-team if getQuantity drops below notifyWhenQuantityBelow', async function () {
+    let notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
+    mockPrepaidCardQuantity = notifyWhenQuantityBelow - 1;
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload);
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal(
+      `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${mockPrepaidCardQuantity}) less reservations (0) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+    );
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'drop-card',
+      alert: 'prepaid-card-supply',
+    });
+  });
+
   it('persists a new request for a given EOA and runs jobs if a request is present but has not been claimed', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
 
@@ -221,7 +287,7 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailHash = hash.digest('hex');
     let emailHash2 = crypto.createHmac('sha256', config.get('emailHashSalt')).update(email2).digest('hex');
 
-    let insertionTimeInMs = fakeTime - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
+    let insertionTimeInMs = fakeTime - 60 * 1000;
     await emailCardDropRequestsQueries.insert({
       ownerAddress: stubUserAddress,
       emailHash,
@@ -284,6 +350,91 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects with 503 when getQuantity is less than active reservations', async function () {
+    let notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
+
+    mockPrepaidCardQuantity = notifyWhenQuantityBelow + 1;
+
+    let reservationCount = mockPrepaidCardQuantity + 1;
+
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeBeforeExpiry = Date.now() - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
+
+    for (let i = 0; i < reservationCount; i++) {
+      await emailCardDropRequestsQueries.insert({
+        ownerAddress: `0xother${i}`,
+        emailHash: `other-email-hash-${i}`,
+        verificationCode: 'x',
+        id: shortUUID.uuid(),
+        requestedAt: new Date(insertionTimeBeforeExpiry),
+      });
+    }
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'There are no prepaid cards available',
+          },
+        ],
+      });
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal(
+      `https://app.gitbook.com/o/-MlRBKglR9VL1a7e4w85/s/05zPo3R26oH9uKrNVxni/hub/email-card-drop#quantity-threshold-warning Prepaid card quantity (${mockPrepaidCardQuantity}) less reservations (${reservationCount}) is below cardDrop.email.notifyWhenQuantityBelow threshold of ${notifyWhenQuantityBelow}`
+    );
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'drop-card',
+      alert: 'prepaid-card-supply',
+    });
+  });
+
+  it('rejects with 503 when the contract is paused', async function () {
+    mockPrepaidCardMarketContractPaused = true;
+
+    const payload = {
+      data: {
+        type: 'email-card-drop-requests',
+        attributes: {
+          email: 'valid@example.com',
+        },
+      },
+    };
+
+    await request()
+      .post('/api/email-card-drop-requests')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(payload)
+      .expect(503)
+      .expect({
+        errors: [
+          {
+            status: '503',
+            title: 'The prepaid card market contract is paused',
+          },
+        ],
+      });
   });
 
   it('rejects if the rate limit has been triggered', async function () {

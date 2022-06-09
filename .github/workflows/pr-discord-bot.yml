@@ -2,14 +2,13 @@ name: CI [discord-bot]
 
 on:
   pull_request:
-    branches: [main]
     paths:
-      - 'packages/discord-bot/**'
-      - 'packages/test-support/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/pr-discord-bot.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/discord-bot/**"
+      - "packages/test-support/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/pr-discord-bot.yml"
+      - "package.json"
+      - "yarn.lock"
 
 jobs:
   test:

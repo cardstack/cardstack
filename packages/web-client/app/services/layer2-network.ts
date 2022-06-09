@@ -240,8 +240,11 @@ export default class Layer2Network
     return this.simpleEmitter.on(event, cb);
   }
 
-  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
-    return this.strategy.getBlockConfirmation(blockNumber);
+  async getBlockConfirmation(
+    blockNumber: TxnBlockNumber,
+    duration?: number
+  ): Promise<void> {
+    return this.strategy.getBlockConfirmation(blockNumber, duration);
   }
 
   getBlockHeight() {

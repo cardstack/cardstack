@@ -49,7 +49,13 @@
         <a href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener noreferrer">here</a>.
       </p>
     {{/if}}
-    {{#if this.error}}
+    {{#if (eq this.error this.TIMEOUT_ERROR)}}
+      <CardPay::ErrorMessage data-test-withdrawal-transaction-status-error>
+        It took too long to confirm your transaction, this could be caused by network issues.
+        Please refresh this tab - you'll be brought back to this step in the workflow and we'll try to confirm it again.
+        If that doesn't work, please contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      </CardPay::ErrorMessage>
+    {{else if this.error}}
       <CardPay::ErrorMessage data-test-withdrawal-transaction-status-error>
         There was a problem completing the bridging of your tokens to {{network-display-info "layer1" "fullName"}}. Please contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
       </CardPay::ErrorMessage>

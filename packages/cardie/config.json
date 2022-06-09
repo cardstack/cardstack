@@ -3,7 +3,7 @@
   "allowedGuilds": ["584043165066199050"],
   "deploy": {
     "default": {
-      "environment": "production"
+      "environment": "staging"
     },
     "allowedChannels": ["866667164764471346"],
     "allowedRoles": ["Engineering Team", "Cardstack Core Team"]
