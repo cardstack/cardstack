@@ -1,6 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import { convertedCurrency } from '../services/exchange-rates';
+import { CryptoCompareConversionBlock } from '../services/exchange-rates';
 
 export default class ExchangeRatesQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -23,7 +23,7 @@ export default class ExchangeRatesQueries {
     );
   }
 
-  async select(from: string, to: string[], date: string, exchange = 'CCCAGG'): Promise<convertedCurrency | null> {
+  async select(from: string, to: string[], date: string, exchange = 'CCCAGG'): Promise<CryptoCompareConversionBlock | null> {
     let db = await this.databaseManager.getClient();
 
     let { rows } = await db.query(

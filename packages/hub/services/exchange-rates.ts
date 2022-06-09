@@ -4,7 +4,7 @@ import config from 'config';
 import merge from 'lodash/merge';
 
 export interface CryptoCompareSuccessResponse {
-  [currencyCode: string]: convertedCurrency;
+  [currencyCode: string]: CryptoCompareConversionBlock;
 }
 
 export interface CryptoCompareFailureResponse {
@@ -17,7 +17,7 @@ export interface CryptoCompareFailureResponse {
   ParamWithError: string;
 }
 
-export interface convertedCurrency {
+export interface CryptoCompareConversionBlock {
   [currencyCode: string]: number;
 }
 
