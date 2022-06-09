@@ -56,7 +56,11 @@ export default class StatusRoute {
 
     let exchangeRatesValue = null;
     try {
-      exchangeRatesValue = await this.exchangeRates.fetchExchangeRates();
+      exchangeRatesValue = await this.exchangeRates.fetchCryptoCompareExchangeRates(
+        'USD',
+        ['BTC', 'ETH'],
+        new Date().toDateString().split('T')[0]
+      );
     } catch (e) {
       Sentry.captureException(e, {
         tags: {
@@ -64,9 +68,18 @@ export default class StatusRoute {
         },
       });
     }
-    let exchangeRatesLastFetched = this.exchangeRates.lastFetched;
+
+    if (exchangeRatesValue && exchangeRatesValue.Response === 'Error') {
+      Sentry.captureException(exchangeRatesValue.Message, {
+        tags: {
+          action: 'status-route',
+        },
+      });
+      exchangeRatesValue = null;
+    }
+
     let exchangeRatesStatus = 'unknown';
-    if (exchangeRatesValue && exchangeRatesLastFetched) {
+    if (exchangeRatesValue) {
       exchangeRatesStatus = 'operational';
     } else if (!exchangeRatesValue) {
       exchangeRatesStatus = 'unknown';
@@ -83,7 +96,6 @@ export default class StatusRoute {
           },
           exchangeRates: {
             status: exchangeRatesStatus,
-            lastFetched: exchangeRatesLastFetched,
           },
         },
       },
