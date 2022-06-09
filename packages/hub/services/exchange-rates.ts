@@ -84,18 +84,7 @@ export default class ExchangeRatesService {
     dateString: string,
     exchange = 'CCCAGG'
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
-    // CryptoCompare has a limit of 30 characters for the tsyms parameter so we need to split the request into chunks
-
-    let joinedTos = tos.join(',');
-    let tosChunks = [];
-
-    while (joinedTos.length > 30) {
-      let indexToCutAt = joinedTos.lastIndexOf(',', 30);
-      tosChunks.push(joinedTos.substring(0, indexToCutAt));
-      joinedTos = joinedTos.substring(indexToCutAt + 1);
-    }
-
-    tosChunks.push(joinedTos);
+    let tosChunks = this.splitTosIntoChunks(tos);
 
     let results = await Promise.all(
       tosChunks.map((tosChunk) =>
@@ -149,6 +138,23 @@ export default class ExchangeRatesService {
     }
 
     return result;
+  }
+
+  private splitTosIntoChunks(tos: string[]) {
+    // CryptoCompare has a limit of 30 characters for the tsyms parameter so we need to split the request into chunks
+
+    let joinedTos = tos.join(',');
+    let tosChunks = [];
+
+    while (joinedTos.length > 30) {
+      let indexToCutAt = joinedTos.lastIndexOf(',', 30);
+      tosChunks.push(joinedTos.substring(0, indexToCutAt));
+      joinedTos = joinedTos.substring(indexToCutAt + 1);
+    }
+
+    tosChunks.push(joinedTos);
+
+    return tosChunks;
   }
 }
 
