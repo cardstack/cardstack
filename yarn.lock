@@ -16750,6 +16750,15 @@ ember-elsewhere@^1.2.1:
     ember-cli-htmlbars "^3.0.0"
     ember-let-polyfill "^0.1.0"
 
+ember-elsewhere@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-2.0.0.tgz#475ba533d7b41c8f3cd4e74e25b1c624a0fefd85"
+  integrity sha512-663e57ghtYCZsqIWpmfa9o2XfbI9vHt8qAiVWOFsdRuFF1FDVKZr3moAY2xNTQ2u2FH0ELh6ResCDUIiyh1d+A==
+  dependencies:
+    "@embroider/util" "^1.0.0"
+    ember-cli-babel "^7.26.11"
+    ember-cli-htmlbars "^6.0.1"
+
 ember-event-helpers@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ember-event-helpers/-/ember-event-helpers-0.1.1.tgz#8df141306c927b9d1a7bc63d63095e92c0ba90a1"

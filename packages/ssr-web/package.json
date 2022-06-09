@@ -164,7 +164,7 @@
     "@walletconnect/core": "^1.6.0",
     "@walletconnect/iso-crypto": "^1.6.0",
     "broadcastchannel-polyfill": "^1.0.1",
-    "ember-elsewhere": "^1.2.1",
+    "ember-elsewhere": "^2.0.0",
     "ember-test-selectors": "^6.0.0",
     "node-fetch": "^2.6.7",
     "short-uuid": "^4.2.0",
