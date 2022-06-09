@@ -59,7 +59,7 @@ export default class StatusRoute {
       exchangeRatesValue = await this.exchangeRates.fetchCryptoCompareExchangeRates(
         'USD',
         ['BTC', 'ETH'],
-        new Date().toDateString().split('T')[0]
+        new Date().toISOString().split('T')[0]
       );
     } catch (e) {
       Sentry.captureException(e, {
