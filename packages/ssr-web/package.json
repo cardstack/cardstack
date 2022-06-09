@@ -79,7 +79,7 @@
     "broccoli-postcss": "^6.0.1",
     "buffer": "^6.0.3",
     "did-resolver": "^3.1.0",
-    "ember-a11y-testing": "^4.0.3",
+    "ember-a11y-testing": "^5.0.0",
     "ember-auto-import": "^2.2.4",
     "ember-cached-decorator-polyfill": "^0.1.4",
     "ember-cli": "~3.28.5",
