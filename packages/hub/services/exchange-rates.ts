@@ -54,7 +54,7 @@ export default class ExchangeRatesService {
     from: string,
     to: string[],
     dateString: string,
-    exchange = 'CCCAGG' // FIXME how deep should this optionality go?
+    exchange: string
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
     let timestamp = Date.parse(dateString) / 1000;
 
@@ -82,7 +82,7 @@ export default class ExchangeRatesService {
     from: string,
     tos: string[],
     dateString: string,
-    exchange = 'CCCAGG'
+    exchange: string
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
     let tosChunks = this.splitTosIntoChunks(tos);
 
