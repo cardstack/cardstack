@@ -40,7 +40,6 @@ export default class ExchangeRatesQueries {
 
     if (rows.length) {
       return rows.reduce((rates, row) => {
-        // TODO why is this coming out as a string?
         rates[row.to_symbol] = parseFloat(row.rate);
         return rates;
       }, {});

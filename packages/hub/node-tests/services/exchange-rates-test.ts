@@ -116,7 +116,6 @@ describe('ExchangeRatesService', function () {
 
     let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
 
-    // TODO should these be strings or numbers?
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
 
     let cachedValue = await exchangeRates.select('BTC', ['USD'], '2022-06-01');
