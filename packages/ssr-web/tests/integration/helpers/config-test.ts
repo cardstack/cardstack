@@ -15,6 +15,8 @@ module('Integration | Helper | config', function (hooks) {
   });
 
   test('it errors when an unknown config value is requested', async function (assert) {
+    assert.expect(1);
+
     setupOnerror(function (err: Error) {
       assert.equal(err.message, 'Unknown config property: urls.unknown');
     });
