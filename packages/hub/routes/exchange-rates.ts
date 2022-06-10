@@ -70,7 +70,7 @@ export default class ExchangeRatesRoute {
         return;
       }
     } else {
-      date = new Date(this.clock.now()).toISOString().split('T')[0];
+      date = this.clock.dateStringNow();
     }
 
     let exchange = ctx.query.e as string;

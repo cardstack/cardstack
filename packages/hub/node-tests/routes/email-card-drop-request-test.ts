@@ -32,13 +32,9 @@ let unclaimedEoa: EmailCardDropRequest = {
 
 let fakeTime = 1650440847689;
 let fakeTimeString = new Date(fakeTime).toISOString();
-class FrozenClock implements Clock {
+class FrozenClock extends Clock {
   now() {
     return fakeTime;
-  }
-
-  hrNow(): bigint {
-    throw new Error('Not implemented');
   }
 }
 

@@ -57,13 +57,9 @@ function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
 // ≈2022-04-20
 let fakeTime = 1650440847689;
 
-class FrozenClock implements Clock {
+class FrozenClock extends Clock {
   now() {
     return fakeTime;
-  }
-
-  hrNow(): bigint {
-    throw new Error('Not implemented');
   }
 }
 
@@ -74,7 +70,7 @@ describe('GET /api/exchange-rates', function () {
   });
 
   let { setFetchExchangeRates } = stubCryptoCompareExchangeRates(this);
-  let { request } = setupHub(this);
+  let { getContainer, request } = setupHub(this);
 
   it('does not fetch exchange rates for an incorrect origin', async function () {
     await request()
@@ -160,7 +156,7 @@ describe('GET /api/exchange-rates', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(fetchArgs[2]).to.equal(new Date(fakeTime).toISOString().split('T')[0]);
+    expect(fetchArgs[2]).to.equal((await getContainer().lookup('clock')).dateStringNow());
   });
 
   it('rejects a date in the future', async function () {

@@ -7,9 +7,10 @@ import { JSONAPIDocument } from '../utils/jsonapi-document';
 export const DEGRADED_THRESHOLD = 10;
 
 export default class StatusRoute {
+  clock = inject('clock');
+  exchangeRates = inject('exchange-rates', { as: 'exchangeRates' });
   subgraph = inject('subgraph');
   web3 = inject('web3-http', { as: 'web3' });
-  exchangeRates = inject('exchange-rates', { as: 'exchangeRates' });
 
   constructor() {
     autoBind(this);
@@ -59,7 +60,7 @@ export default class StatusRoute {
       exchangeRatesValue = await this.exchangeRates.fetchExchangeRates(
         'USD',
         ['BTC', 'ETH'],
-        new Date().toISOString().split('T')[0]
+        this.clock.dateStringNow()
       );
     } catch (e) {
       Sentry.captureException(e, {
