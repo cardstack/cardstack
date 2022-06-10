@@ -937,6 +937,24 @@ CREATE TABLE public.exchange_rates (
 ALTER TABLE public.exchange_rates OWNER TO postgres;
 
 --
+-- Name: job_tickets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.job_tickets (
+    id uuid NOT NULL,
+    job_type text NOT NULL,
+    owner_address text NOT NULL,
+    payload jsonb,
+    result jsonb,
+    state text DEFAULT 'pending'::text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.job_tickets OWNER TO postgres;
+
+--
 -- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1307,6 +1325,14 @@ ALTER TABLE ONLY public.email_card_drop_state
 
 ALTER TABLE ONLY public.exchange_rates
     ADD CONSTRAINT exchange_rates_pkey PRIMARY KEY (date, from_symbol, to_symbol, exchange);
+
+
+--
+-- Name: job_tickets job_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.job_tickets
+    ADD CONSTRAINT job_tickets_pkey PRIMARY KEY (id);
 
 
 --
@@ -1708,6 +1734,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
 37	20220527204632100_create-exchange-rates	2022-05-27 15:47:21.944976
+38	20220610203119883_create-job-tickets	2022-06-10 15:39:24.04516
 \.
 
 
@@ -1715,7 +1742,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 37, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 38, true);
 
 
 --
