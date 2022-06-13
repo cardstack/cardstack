@@ -15,6 +15,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
     updated_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
   });
+
+  pgm.createIndex(JOB_TICKETS_TABLE, ['job_type', 'owner_address', 'state']);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {

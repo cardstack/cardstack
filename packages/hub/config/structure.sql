@@ -1469,6 +1469,13 @@ CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btr
 
 
 --
+-- Name: job_tickets_job_type_owner_address_state_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX job_tickets_job_type_owner_address_state_index ON public.job_tickets USING btree (job_type, owner_address, state);
+
+
+--
 -- Name: merchant_infos_slug_unique_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1733,8 +1740,9 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
+36	20220527195553987_add-prepaid-notification-type	2022-05-27 15:09:36.826839
 37	20220527204632100_create-exchange-rates	2022-05-27 15:47:21.944976
-38	20220610203119883_create-job-tickets	2022-06-10 15:39:24.04516
+39	20220610203119883_create-job-tickets	2022-06-13 09:56:55.438506
 \.
 
 
@@ -1742,7 +1750,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 38, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 39, true);
 
 
 --
