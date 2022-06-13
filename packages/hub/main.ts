@@ -62,6 +62,7 @@ import ReservedWords from './services/reserved-words';
 import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
+import CreateProfile from './tasks/create-profile';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
 import ExchangeRatesService from './services/exchange-rates';
@@ -120,6 +121,7 @@ export function createRegistry(): Registry {
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
   registry.register('contracts', Contracts);
+  registry.register('create-profile', CreateProfile);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
