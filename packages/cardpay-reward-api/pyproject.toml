@@ -21,6 +21,7 @@ dependencies = [
     "eth-utils>=1.10.0",
     "eth-hash[pycryptodome]>=0.3.2",
     "sentry-sdk>=1.5.12",
+    "web3>=5.29.2",
 ]
 requires-python = ">=3.9"
 

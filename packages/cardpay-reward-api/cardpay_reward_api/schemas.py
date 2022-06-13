@@ -34,3 +34,9 @@ class ProofFilter(BaseModel):
     rewardProgramId: Optional[str]
     token: Optional[str]
     payee: str
+
+
+class RewardPoolBalance(BaseModel):
+    rewardProgramId: str
+    token: str
+    balanceInEth: int
