@@ -922,6 +922,21 @@ CREATE TABLE public.email_card_drop_state (
 ALTER TABLE public.email_card_drop_state OWNER TO postgres;
 
 --
+-- Name: exchange_rates; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.exchange_rates (
+    date date NOT NULL,
+    from_symbol text NOT NULL,
+    to_symbol text NOT NULL,
+    exchange text NOT NULL,
+    rate numeric NOT NULL
+);
+
+
+ALTER TABLE public.exchange_rates OWNER TO postgres;
+
+--
 -- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1284,6 +1299,14 @@ ALTER TABLE ONLY public.email_card_drop_requests
 
 ALTER TABLE ONLY public.email_card_drop_state
     ADD CONSTRAINT email_card_drop_state_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rates exchange_rates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exchange_rates
+    ADD CONSTRAINT exchange_rates_pkey PRIMARY KEY (date, from_symbol, to_symbol, exchange);
 
 
 --
@@ -1684,6 +1707,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
+37	20220527204632100_create-exchange-rates	2022-05-27 15:47:21.944976
 \.
 
 
@@ -1691,7 +1715,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 33, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 37, true);
 
 
 --
