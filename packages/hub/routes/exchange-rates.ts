@@ -3,6 +3,9 @@ import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import { CryptoCompareSuccessResponse } from '../services/exchange-rates';
+import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
+
+const defaultCurrencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
 
 const allowedDomains: string[] = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -31,6 +34,12 @@ export default class ExchangeRatesRoute {
     let from = ctx.query.from as string,
       to = ctx.query.to as string,
       date = ctx.query.date as string;
+
+    // Support the existing interface that returned all the currencies from Fixer
+    if (!from && !to) {
+      from = 'USD';
+      to = defaultCurrencySymbols.join(',');
+    }
 
     if (!from || !to) {
       let missing = [];

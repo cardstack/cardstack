@@ -3,6 +3,9 @@ import config from 'config';
 import { setupHub, registry } from '../helpers/server';
 import type Mocha from 'mocha';
 import { Clock } from '../../services/clock';
+import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
+
+const defaultCurrencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
 
 const allowedDomains = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -260,22 +263,38 @@ describe('GET /api/exchange-rates', function () {
           },
         ],
       });
+  });
+
+  it('uses defaults for from and to to support the existing interface', async function () {
+    let fetchArgs: never[] = [];
+
+    let mockRates = Object.fromEntries(defaultCurrencySymbols.map((k) => [k, 2]));
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return { USD: mockRates };
+    });
 
     await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
-      .expect(400)
+      .expect(200)
       .expect({
-        errors: [
-          {
-            status: '400',
-            title: 'Bad Request',
-            detail: 'Missing required parameters: from, to',
+        data: {
+          type: 'exchange-rates',
+          attributes: {
+            base: 'USD',
+            rates: mockRates,
           },
-        ],
-      });
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(fetchArgs[0]).to.equal('USD');
+    expect(fetchArgs[1]).to.deep.equal(defaultCurrencySymbols);
   });
 
   it('Returns 502 for falsey result being fetched', async function () {
