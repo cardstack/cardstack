@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import (Boolean, Column, ForeignKey, Integer, PickleType,
-                        String, Time)
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
+                        PickleType, String, Time)
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
@@ -30,4 +30,4 @@ class Root(Base):
     rootHash = Column(String, unique=True)
     paymentCycle = Column(Integer)
     blockNumber = Column(Integer)
-    timestamp = Column(Time)
+    timestamp = Column(DateTime)

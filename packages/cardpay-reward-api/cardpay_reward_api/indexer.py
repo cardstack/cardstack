@@ -62,8 +62,8 @@ class Indexer:
         root = models.Root(
             rootHash=root["id"],
             rewardProgramId=root["rewardProgram"]["id"],
-            paymentCycle=root["paymentCycle"],
-            blockNumber=root["blockNumber"],
+            paymentCycle=int(root["paymentCycle"]),
+            blockNumber=int(root["blockNumber"]),
             timestamp=datetime.fromtimestamp(int(root["timestamp"])),
         )
         db.add(root)
@@ -77,7 +77,7 @@ class Indexer:
                 payee=payment["payee"],
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],
-                amount=amount,
+                amount=str(amount),
                 leaf=payment["leaf"],
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
