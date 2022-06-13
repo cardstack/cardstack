@@ -1,4 +1,3 @@
-import { nativeCurrencies } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/ssr-web/config/environment';
 
 export default function () {
@@ -8,15 +7,15 @@ export default function () {
     return schema.cardSpaces.where({ slug }).models[0];
   });
 
-  this.get('/exchange-rates', function () {
+  this.get('/exchange-rates', function (schema, { queryParams: { from, to } }) {
     return {
       data: {
         type: 'exchange-rates',
         attributes: {
-          base: 'USD',
-          rates: Object.fromEntries(
-            Object.keys(nativeCurrencies).map((k) => [k, 2])
-          ),
+          base: from,
+          rates: {
+            [to]: 2,
+          },
         },
       },
     };
