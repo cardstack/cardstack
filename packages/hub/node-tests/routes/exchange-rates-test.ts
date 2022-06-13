@@ -1,7 +1,11 @@
-import { FixerFailureResponse, FixerSuccessResponse } from '../../services/exchange-rates';
+import { CryptoCompareFailureResponse, CryptoCompareSuccessResponse } from '../../services/exchange-rates';
 import config from 'config';
 import { setupHub, registry } from '../helpers/server';
 import type Mocha from 'mocha';
+import { Clock } from '../../services/clock';
+import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
+
+const defaultCurrencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
 
 const allowedDomains = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -11,17 +15,6 @@ if (!isValidAllowedDomainConfig(allowedDomains)) {
   throw new Error('Exchange rate allowed domain config is invalid');
 }
 const allowedDomain = allowedDomains[0];
-
-const mockExchangeRatesResponse = {
-  success: true,
-  timestamp: Math.floor(Date.now() / 1000),
-  date: '2021-09-30',
-  base: 'USD',
-  rates: {
-    GBP: 1,
-    CAD: 3,
-  },
-} as FixerSuccessResponse;
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -33,14 +26,22 @@ let handleValidateAuthToken = function (_encryptedAuthToken: string) {
   return '';
 };
 
-function stubExchangeRates(context: Mocha.Suite) {
-  let fetchExchangeRates: () => Promise<FixerSuccessResponse | FixerFailureResponse | undefined> = function () {
-    return Promise.resolve(mockExchangeRatesResponse);
+let mockCryptoCompareExchangeRatesResponse = {
+  BTC: {
+    USD: 191,
+  },
+};
+
+function stubCryptoCompareExchangeRates(context: Mocha.Suite) {
+  let fetchExchangeRates: (
+    ...args: any
+  ) => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> = function () {
+    return Promise.resolve(mockCryptoCompareExchangeRatesResponse);
   };
 
   class StubExchangeRatesService {
     fetchExchangeRates() {
-      return fetchExchangeRates();
+      return fetchExchangeRates(...arguments);
     }
   }
   context.beforeEach(function () {
@@ -48,23 +49,35 @@ function stubExchangeRates(context: Mocha.Suite) {
   });
 
   return {
-    setFetchExchangeRates(func: () => Promise<FixerSuccessResponse | FixerFailureResponse | undefined>) {
+    setFetchExchangeRates(
+      func: () => Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined>
+    ) {
       fetchExchangeRates = func;
     },
   };
 }
 
-describe('GET /api/exchange-rates', function () {
-  let { setFetchExchangeRates } = stubExchangeRates(this);
-  let { request } = setupHub(this);
+// ≈2022-04-20
+let fakeTime = 1650440847689;
 
+class FrozenClock extends Clock {
+  now() {
+    return fakeTime;
+  }
+}
+
+describe('GET /api/exchange-rates', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('clock', FrozenClock);
   });
+
+  let { setFetchExchangeRates } = stubCryptoCompareExchangeRates(this);
+  let { getContainer, request } = setupHub(this);
 
   it('does not fetch exchange rates for an incorrect origin', async function () {
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', 'https://google.com')
@@ -82,7 +95,7 @@ describe('GET /api/exchange-rates', function () {
 
   it('does not fetch exchange rates if no origin and auth token', async function () {
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(403)
@@ -99,7 +112,7 @@ describe('GET /api/exchange-rates', function () {
 
   it('fetches exchange rates for an accepted origin', async function () {
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-04-06`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
@@ -108,12 +121,86 @@ describe('GET /api/exchange-rates', function () {
         data: {
           type: 'exchange-rates',
           attributes: {
-            base: mockExchangeRatesResponse.base,
-            rates: mockExchangeRatesResponse.rates,
+            base: 'BTC',
+            rates: {
+              USD: 191,
+            },
           },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('defaults to the current date if none is specified', async function () {
+    let fetchArgs: never[] = [];
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return mockCryptoCompareExchangeRatesResponse;
+    });
+
+    await request()
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(200)
+      .expect({
+        data: {
+          type: 'exchange-rates',
+          attributes: {
+            base: 'BTC',
+            rates: {
+              USD: 191,
+            },
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(fetchArgs[2]).to.equal((await getContainer().lookup('clock')).dateStringNow());
+  });
+
+  it('rejects a date in the future', async function () {
+    await request()
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2222-04-06`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'date cannot be in the future',
+            pointer: {
+              parameter: 'date',
+            },
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('allows an alternate exchange source', async function () {
+    let fetchArgs: never[] = [];
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return mockCryptoCompareExchangeRatesResponse;
+    });
+
+    await request()
+      .get(`/api/exchange-rates?from=BTC&to=USD&e=something`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(200);
+
+    expect(fetchArgs[3]).to.equal('something');
   });
 
   it('fetches exchange rates with a valid auth token but no origin', async function () {
@@ -124,7 +211,7 @@ describe('GET /api/exchange-rates', function () {
     };
 
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD&date=2022-04-06`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Authorization', 'Bearer abc123--def456--ghi789')
@@ -133,12 +220,81 @@ describe('GET /api/exchange-rates', function () {
         data: {
           type: 'exchange-rates',
           attributes: {
-            base: mockExchangeRatesResponse.base,
-            rates: mockExchangeRatesResponse.rates,
+            base: 'BTC',
+            rates: {
+              USD: 191,
+            },
           },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('Returns 400 when mandatory query parameters are missing', async function () {
+    await request()
+      .get(`/api/exchange-rates?to=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'Missing required parameter: from',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    await request()
+      .get(`/api/exchange-rates?from=USD`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(400)
+      .expect({
+        errors: [
+          {
+            status: '400',
+            title: 'Bad Request',
+            detail: 'Missing required parameter: to',
+          },
+        ],
+      });
+  });
+
+  it('uses defaults for from and to to support the existing interface', async function () {
+    let fetchArgs: never[] = [];
+
+    let mockRates = Object.fromEntries(defaultCurrencySymbols.map((k) => [k, 2]));
+
+    setFetchExchangeRates(async function (...args: any) {
+      fetchArgs = args;
+
+      return { USD: mockRates };
+    });
+
+    await request()
+      .get(`/api/exchange-rates`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Origin', allowedDomain)
+      .expect(200)
+      .expect({
+        data: {
+          type: 'exchange-rates',
+          attributes: {
+            base: 'USD',
+            rates: mockRates,
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(fetchArgs[0]).to.equal('USD');
+    expect(fetchArgs[1]).to.deep.equal(defaultCurrencySymbols);
   });
 
   it('Returns 502 for falsey result being fetched', async function () {
@@ -147,7 +303,7 @@ describe('GET /api/exchange-rates', function () {
     });
 
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
@@ -164,19 +320,23 @@ describe('GET /api/exchange-rates', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('Returns 502 for failure result from Fixer', async function () {
+  it('Returns 502 for failure result from CryptoCompare', async function () {
+    let errorResponse = {
+      Response: 'Error',
+      Message: 'readable info about the error',
+      HasWarning: false,
+      Type: 2,
+      RateLimit: {},
+      Data: {},
+      ParamWithError: 'tsyms',
+    };
+
     setFetchExchangeRates(async function () {
-      return {
-        success: false,
-        error: {
-          code: -1,
-          info: 'readable info about the error',
-        },
-      };
+      return errorResponse;
     });
 
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)
@@ -186,7 +346,7 @@ describe('GET /api/exchange-rates', function () {
           {
             status: '502',
             title: 'Bad Gateway',
-            detail: '-1: readable info about the error',
+            meta: errorResponse,
           },
         ],
       })
@@ -200,7 +360,7 @@ describe('GET /api/exchange-rates', function () {
       throw err;
     });
     await request()
-      .get(`/api/exchange-rates`)
+      .get(`/api/exchange-rates?from=BTC&to=USD`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Origin', allowedDomain)

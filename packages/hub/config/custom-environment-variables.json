@@ -55,7 +55,7 @@
   },
   "exchangeRates": {
     "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS",
-    "apiKey": "FIXER_API_KEY"
+    "apiKey": "CRYPTOCOMPARE_API_KEY"
   },
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"
