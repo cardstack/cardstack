@@ -937,6 +937,24 @@ CREATE TABLE public.exchange_rates (
 ALTER TABLE public.exchange_rates OWNER TO postgres;
 
 --
+-- Name: job_tickets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.job_tickets (
+    id uuid NOT NULL,
+    job_type text NOT NULL,
+    owner_address text NOT NULL,
+    payload jsonb,
+    result jsonb,
+    state text DEFAULT 'pending'::text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.job_tickets OWNER TO postgres;
+
+--
 -- Name: latest_event_block; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1310,6 +1328,14 @@ ALTER TABLE ONLY public.exchange_rates
 
 
 --
+-- Name: job_tickets job_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.job_tickets
+    ADD CONSTRAINT job_tickets_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: latest_event_block latest_event_block_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1440,6 +1466,13 @@ CREATE UNIQUE INDEX card_spaces_merchant_id_unique_index ON public.card_spaces U
 --
 
 CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btree (bot_type, status);
+
+
+--
+-- Name: job_tickets_job_type_owner_address_state_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX job_tickets_job_type_owner_address_state_index ON public.job_tickets USING btree (job_type, owner_address, state);
 
 
 --
@@ -1707,7 +1740,9 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 31	20220413090421591_card-space-unused-data-cleanup	2022-04-13 17:07:34.093762
 32	20220413215720902_create-email-card-drop-requests	2022-04-13 17:07:34.093762
 33	20220502174343477_create-email-card-drop-state	2022-05-02 12:57:33.181183
+36	20220527195553987_add-prepaid-notification-type	2022-05-27 15:09:36.826839
 37	20220527204632100_create-exchange-rates	2022-05-27 15:47:21.944976
+39	20220610203119883_create-job-tickets	2022-06-13 09:56:55.438506
 \.
 
 
@@ -1715,7 +1750,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 37, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 39, true);
 
 
 --
