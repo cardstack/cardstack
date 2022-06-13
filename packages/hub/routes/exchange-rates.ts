@@ -86,16 +86,16 @@ export default class ExchangeRatesRoute {
       }
 
       if (!exchangeRates || exchangeRates.Response) {
-        let detail = exchangeRates?.Message
-          ? exchangeRates.Message
-          : 'Failed to fetch exchange rates for unknown reason';
+        let errorProperty = exchangeRates
+          ? { meta: exchangeRates }
+          : { detail: 'Failed to fetch exchange rates for unknown reason' };
         ctx.status = 502;
         ctx.body = {
           errors: [
             {
               status: '502',
               title: 'Bad Gateway',
-              detail,
+              ...errorProperty,
             },
           ],
         };

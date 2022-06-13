@@ -302,16 +302,18 @@ describe('GET /api/exchange-rates', function () {
   });
 
   it('Returns 502 for failure result from CryptoCompare', async function () {
+    let errorResponse = {
+      Response: 'Error',
+      Message: 'readable info about the error',
+      HasWarning: false,
+      Type: 2,
+      RateLimit: {},
+      Data: {},
+      ParamWithError: 'tsyms',
+    };
+
     setFetchExchangeRates(async function () {
-      return {
-        Response: 'Error',
-        Message: 'readable info about the error',
-        HasWarning: false,
-        Type: 2,
-        RateLimit: {},
-        Data: {},
-        ParamWithError: 'tsyms',
-      };
+      return errorResponse;
     });
 
     await request()
@@ -325,7 +327,7 @@ describe('GET /api/exchange-rates', function () {
           {
             status: '502',
             title: 'Bad Gateway',
-            detail: 'readable info about the error',
+            meta: errorResponse,
           },
         ],
       })
