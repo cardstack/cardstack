@@ -1,12 +1,11 @@
 import { Container } from '@cardstack/di';
-import { Clock } from '../../services/clock';
 
 export interface TestEnv {
   container: Container;
   destroy(): Promise<void>;
 }
 
-export class AcceleratableClock extends Clock {
+export class AcceleratableClock {
   acceleratedByMs = 0;
   get acceleratedByNs(): bigint {
     return BigInt(this.acceleratedByMs) * BigInt(1000);

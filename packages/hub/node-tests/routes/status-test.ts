@@ -6,7 +6,6 @@ let stubWeb3Available = true;
 let subgraphBlockNumber = 19492428;
 let throwSubgraphError = false;
 let throwWeb3Error = false;
-let returnExchangeRatesError = false;
 let throwExchangeRatesError = false;
 let exchangeRatesLastFetched = Math.floor(Number(new Date()) / 1000);
 
@@ -51,21 +50,15 @@ class StubExchangeRates {
   async fetchExchangeRates() {
     if (throwExchangeRatesError) {
       throw new Error('Mock exchange rates error');
-    } else if (returnExchangeRatesError) {
-      return {
-        Response: 'Error',
-        Message: 'Kucoin market does not exist for this coin pair (EUR-GBP)',
-        HasWarning: false,
-        Type: 2,
-        RateLimit: {},
-        Data: {},
-        ParamWithError: 'e',
-      };
     }
 
     return {
-      USD: {
-        EUR: 0.9,
+      success: true,
+      timestamp: exchangeRatesLastFetched,
+      base: 'USD',
+      date: '2021-10-05',
+      rates: {
+        JPY: 4,
       },
     };
   }
@@ -81,7 +74,6 @@ describe('GET /api/status', function () {
 
     throwSubgraphError = false;
     throwWeb3Error = false;
-    returnExchangeRatesError = false;
     throwExchangeRatesError = false;
     subgraphBlockNumber = 19492428;
     stubWeb3Available = true;
@@ -106,6 +98,7 @@ describe('GET /api/status', function () {
             },
             exchangeRates: {
               status: 'operational',
+              lastFetched: exchangeRatesLastFetched,
             },
           },
         },
@@ -133,6 +126,7 @@ describe('GET /api/status', function () {
             },
             exchangeRates: {
               status: 'operational',
+              lastFetched: exchangeRatesLastFetched,
             },
           },
         },
@@ -160,6 +154,7 @@ describe('GET /api/status', function () {
             },
             exchangeRates: {
               status: 'operational',
+              lastFetched: exchangeRatesLastFetched,
             },
           },
         },
@@ -195,6 +190,7 @@ describe('GET /api/status', function () {
             },
             exchangeRates: {
               status: 'operational',
+              lastFetched: exchangeRatesLastFetched,
             },
           },
         },
@@ -229,6 +225,7 @@ describe('GET /api/status', function () {
             },
             exchangeRates: {
               status: 'unknown',
+              lastFetched: exchangeRatesLastFetched,
             },
           },
         },
@@ -242,39 +239,5 @@ describe('GET /api/status', function () {
     });
 
     expect(sentryReport.error?.message).to.equal('Mock exchange rates error');
-  });
-
-  it('reports unknown status when exchangeRates service returns an error', async function () {
-    returnExchangeRatesError = true;
-
-    await request()
-      .get('/api/status')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
-      .expect({
-        data: {
-          type: 'status',
-          attributes: {
-            subgraph: {
-              rpcBlockNumber: 19492430,
-              status: 'operational',
-              subgraphBlockNumber: 19492428,
-            },
-            exchangeRates: {
-              status: 'unknown',
-            },
-          },
-        },
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-
-    let sentryReport = await waitForSentryReport();
-
-    expect(sentryReport.tags).to.deep.equal({
-      action: 'status-route',
-    });
-
-    expect(sentryReport.error?.message).to.equal('Kucoin market does not exist for this coin pair (EUR-GBP)');
   });
 });

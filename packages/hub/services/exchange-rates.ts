@@ -1,162 +1,113 @@
 /* global fetch */
-import { query } from '../queries';
 import config from 'config';
-import merge from 'lodash/merge';
+import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
+import * as Sentry from '@sentry/node';
 
-export interface CryptoCompareSuccessResponse {
-  [currencyCode: string]: CryptoCompareConversionBlock;
+const currencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
+const INTERVAL = 1000 * 60 * 60;
+
+// these results are from fixer.
+export interface FixerSuccessResponse {
+  success: true;
+  timestamp: number;
+  base: string;
+  date: string;
+  rates: {
+    [currencyCode: string]: number;
+  };
 }
 
-export interface CryptoCompareFailureResponse {
-  Response: string;
-  Message: string;
-  HasWarning: boolean;
-  Type: number;
-  RateLimit: any;
-  Data: any;
-  ParamWithError: string;
+export interface FixerFailureResponse {
+  success: false;
+  error: {
+    code: number;
+    info: string;
+  };
 }
-
-export interface CryptoCompareConversionBlock {
-  [currencyCode: string]: number;
-}
-
-export const DEFAULT_CRYPTOCOMPARE_EXCHANGE = 'CCCAGG';
 
 export default class ExchangeRatesService {
-  exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
+  interval: number = INTERVAL;
+  lastFetched = 0;
+  cachedValue: FixerSuccessResponse | undefined = undefined;
 
   private get apiKey() {
     return config.get('exchangeRates.apiKey') as string;
   }
 
   /**
-   * An example success response from CryptoCompare:
-    {
-    "USD": {
-      "RUB": 58.24,
-      "INR": 86.49,
-      "NZD": 1.559,
-      "ZAR": 15.81
+   * Example of a successful request
+   * ```
+   * {
+   *   success: true,
+   *   timestamp: 1633018143,
+   *   base: 'USD',
+   *   date: '2021-09-30',
+   *   rates: {
+   *     USD: 1,
+   *     EUR: 0.859735,
+   *     GBP: 0.734635,
+   *     AUD: 1.370802,
+   *     CNY: 6.4467,
+   *     KRW: 1179.593505,
+   *     RUB: 72.672501,
+   *     INR: 74.264596,
+   *     JPY: 111.124504,
+   *     TRY: 8.855645,
+   *     CAD: 1.2588,
+   *     NZD: 1.433345,
+   *     ZAR: 14.94734
+   *   }
+   * }
+   * ```
+   *
+   * Example of a failed request:
+   * ```
+   * {
+   *   "success": false,
+   *   "error": {
+   *     "code": 104,
+   *     "info": "Your monthly API request volume has been reached. Please upgrade your plan."
+   *   }
+   * }
+   * ```
+   */
+  async fetchExchangeRates(): Promise<FixerSuccessResponse | FixerFailureResponse | undefined> {
+    if (this.cacheIsValid) {
+      return this.cachedValue;
+    } else {
+      try {
+        // this approach has a risk of sending multiple requests when the cache is invalidated
+        // since it does not handle simultaneous requests
+        let result = await this.requestExchangeRatesFromFixer();
+        if (result?.success) {
+          this.cachedValue = result;
+          this.lastFetched = result.timestamp * 1000;
+        } else {
+          Sentry.captureException(result ?? 'Fetching exchange rates returned a falsey value');
+          this.invalidateCache();
+        }
+        return result;
+      } catch (e) {
+        Sentry.captureException(e);
+        this.invalidateCache();
+        throw e;
       }
     }
-   *
-   * An example error response from CryptoCompare:
-   * {
-      "Response": "Error",
-      "Message": "tsyms param is invalid. (tsyms length is higher than maxlength: 30)",
-      "HasWarning": false,
-      "Type": 2,
-      "RateLimit": {},
-      "Data": {},
-      "ParamWithError": "tsyms"
-      }
-   */
-  async requestExchangeRatesFromCryptoCompare(
-    from: string,
-    to: string[],
-    dateString: string,
-    exchange: string
-  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
-    let timestamp = Date.parse(dateString) / 1000;
+  }
 
-    console.debug(
-      `fetching https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to.join(
-        ','
-      )}&ts=${timestamp}&e=${exchange}`
-    );
+  invalidateCache() {
+    this.cachedValue = undefined;
+    this.lastFetched = 0;
+  }
 
+  async requestExchangeRatesFromFixer(): Promise<FixerSuccessResponse | FixerFailureResponse | undefined> {
     return await (
-      await fetch(
-        `https://min-api.cryptocompare.com/data/pricehistorical?fsym=${from}&tsyms=${to.join(
-          ','
-        )}&ts=${timestamp}&e=${exchange}`,
-        {
-          headers: {
-            authorization: `Apikey ${this.apiKey}`,
-          },
-        }
-      )
+      await fetch(`http://data.fixer.io/api/latest?access_key=${this.apiKey}&base=USD&symbols=${currencySymbols}`)
     ).json();
   }
 
-  private async requestCollectedExchangeRatesFromCryptoCompare(
-    from: string,
-    tos: string[],
-    dateString: string,
-    exchange: string
-  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse> {
-    let tosChunks = this.splitTosIntoChunks(tos);
-
-    let results = await Promise.all(
-      tosChunks.map((tosChunk) =>
-        this.requestExchangeRatesFromCryptoCompare(from, tosChunk.split(','), dateString, exchange)
-      )
-    );
-
-    let errorResult = results.find((result) => result && result.Response);
-
-    if (errorResult) {
-      return errorResult;
-    }
-
-    return merge(results[0], ...results.slice(1));
-  }
-
-  async fetchExchangeRates(
-    from: string,
-    tos: string[],
-    date: string,
-    exchange = DEFAULT_CRYPTOCOMPARE_EXCHANGE
-  ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
-    let cachedValues = await this.exchangeRates.select(from, tos, date, exchange);
-
-    let cachedValuesTos = Object.keys(cachedValues || {});
-    let requestedButNotCached = tos.filter((to) => !cachedValuesTos.includes(to));
-
-    if (requestedButNotCached.length === 0) {
-      return {
-        [from]: cachedValues,
-      } as CryptoCompareSuccessResponse;
-    }
-
-    let result = await this.requestCollectedExchangeRatesFromCryptoCompare(from, requestedButNotCached, date, exchange);
-
-    if (result) {
-      console.debug('CryptoCompare result', JSON.stringify(result, null, 2));
-
-      if (result.Response === 'Error') {
-        return result;
-      }
-
-      requestedButNotCached.forEach(async (to) => {
-        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
-      });
-
-      let resultConversions = (result as CryptoCompareSuccessResponse)[from];
-      Object.assign(resultConversions, cachedValues);
-    } else {
-      console.debug('CryptoCompare returned a falsey value');
-    }
-
-    return result;
-  }
-
-  private splitTosIntoChunks(tos: string[]) {
-    // CryptoCompare has a limit of 30 characters for the tsyms parameter so we need to split the request into chunks
-
-    let joinedTos = tos.join(',');
-    let tosChunks = [];
-
-    while (joinedTos.length > 30) {
-      let indexToCutAt = joinedTos.lastIndexOf(',', 30);
-      tosChunks.push(joinedTos.substring(0, indexToCutAt));
-      joinedTos = joinedTos.substring(indexToCutAt + 1);
-    }
-
-    tosChunks.push(joinedTos);
-
-    return tosChunks;
+  get cacheIsValid() {
+    return Boolean(Number(new Date()) - this.lastFetched <= this.interval && this.cachedValue);
   }
 }
 
