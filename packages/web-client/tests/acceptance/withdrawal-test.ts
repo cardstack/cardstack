@@ -248,6 +248,12 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .isEnabled('Set amount button is enabled once amount has been entered');
     await waitFor(`${post} [data-test-withdrawal-transaction-amount]`);
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .doesNotExist();
+
     await click(
       `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
     );
@@ -277,6 +283,12 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(milestoneCompletedSel(4))
       .containsText(`Tokens bridged to ${c.layer1.fullName}`);
+
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .exists({ count: 3 });
 
     // // token claim step card
     assert

@@ -54,13 +54,8 @@ app "hub" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-prod", "waypoint-hub", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "hub"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
 }
@@ -110,8 +105,8 @@ app "hub-worker" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-worker-prod", "waypoint-hub-worker", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
     }
   }
 }
@@ -160,8 +155,8 @@ app "hub-bot" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-bot-prod", "waypoint-hub-bot", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
   }
 }
@@ -210,8 +205,8 @@ app "hub-event-listener" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "hub-event-listener-prod", "waypoint-hub-event-listener", "1"] # need this to purge old ecs services
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
 }
@@ -261,6 +256,11 @@ app "cardpay-subg-ext" {
 
       disable_alb = true
     }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
+    }
   }
 }
 
@@ -297,13 +297,8 @@ app "ssr-web" {
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "ssr-web-prod", "waypoint-ssr-web", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "ssr-web"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
   }
 }
@@ -347,8 +342,13 @@ app "reward-submit" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
         OWNER             = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
-        SENTRY_DSN = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
+        SENTRY_DSN        = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
     }
   }
 }
@@ -394,25 +394,15 @@ app "reward-api" {
       }
 
       secrets = {
-        DB_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
+        DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
         SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
     }
 
     hook {
-      when    = "before"
-      command = ["./scripts/purge-services.sh", "reward-api-production", "waypoint-reward-api", "2"] # need this to purge old ecs services
-    }
-
-    hook {
       when    = "after"
-      command = ["node", "./scripts/purge-target-groups.mjs", "reward-api"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-targetgroup-healthy.mjs", "reward-api"]
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
 }

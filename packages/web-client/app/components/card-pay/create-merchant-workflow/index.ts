@@ -55,6 +55,9 @@ class CreateMerchantWorkflow extends Workflow {
   milestones = [
     new Milestone({
       title: MILESTONE_TITLES[0],
+      editableIf(session) {
+        return !session.getValue('txnHash');
+      },
       postables: [
         new WorkflowMessage({
           message: `Hello, nice to see you!`,
@@ -139,6 +142,9 @@ class CreateMerchantWorkflow extends Workflow {
     }),
     new Milestone({
       title: MILESTONE_TITLES[1],
+      editableIf(session) {
+        return !session.getValue('txnHash');
+      },
       postables: [
         new NetworkAwareWorkflowMessage({
           message: `To store data in the Cardstack Hub, you need to authenticate using your Card Wallet.

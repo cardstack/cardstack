@@ -461,6 +461,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     let prepaidCardAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
 
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .doesNotExist();
+
     layer2Service.test__simulateIssuePrepaidCardForAmountFromSource(
       10000,
       merchantSafe.address,
@@ -470,6 +476,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     await waitFor(milestoneCompletedSel(3));
+
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .exists({ count: 4 });
+
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 
     assert

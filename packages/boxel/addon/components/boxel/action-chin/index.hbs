@@ -7,6 +7,7 @@
   }}
   ...attributes
   data-test-boxel-action-chin
+  data-test-boxel-action-chin-state={{@state}}
 >
   {{!-- Not accounting for 0 as a step number --}}
   {{#if @stepNumber}}
@@ -50,6 +51,7 @@
         ActionButton=(component
           "boxel/button"
           kind="secondary-light"
+          class="boxel-action-chin__memorialized-action-button"
           disabled=@disabled
         )
         ActionStatusArea=(component

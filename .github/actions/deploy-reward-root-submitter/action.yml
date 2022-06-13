@@ -5,7 +5,7 @@ inputs:
   waypoint_version:
     description: Waypoint version to use
     required: false
-    default: '0.4.0'
+    default: "0.4.0"
   environment:
     description: Deployment environment
     required: true
@@ -23,6 +23,8 @@ runs:
     - name: Deploy reward submitter
       run: waypoint up -app=reward-submit -prune-retain=0 -plain
       shell: bash
-      env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - name: Prune dangling resources
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "reward-submit"

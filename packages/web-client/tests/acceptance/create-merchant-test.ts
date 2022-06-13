@@ -208,6 +208,12 @@ module('Acceptance | create merchant', function (hooks) {
     // eslint-disable-next-line ember/no-settled-after-test-helper
     await settled();
 
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .doesNotExist();
+
     layer2Service.test__simulateRegisterMerchantForAddress(
       prepaidCardAddress,
       merchantAddress,
@@ -215,6 +221,13 @@ module('Acceptance | create merchant', function (hooks) {
     );
 
     await waitFor('[data-test-prepaid-card-choice-is-complete]');
+
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .exists({ count: 2 });
+
     assert.dom(`[data-test-boxel-card-picker-dropdown]`).doesNotExist();
     assert
       .dom('[data-test-prepaid-card-choice-merchant-address]')

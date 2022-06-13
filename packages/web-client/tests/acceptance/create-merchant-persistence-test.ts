@@ -276,8 +276,6 @@ module('Acceptance | create merchant persistence', function (hooks) {
         merchantBgColor,
         merchantRegistrationFee,
         prepaidCardAddress,
-        txnHash:
-          '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
         merchantSafe,
       });
 

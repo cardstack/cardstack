@@ -35,5 +35,15 @@ export async function query(
       variables,
     }),
   });
-  return await response.json();
+
+  let result = await response.json();
+
+  if (result.errors) {
+    let e = new Error('GraphQL query to subgraph failed');
+    // @ts-ignore
+    e.detail = result.errors;
+    throw e;
+  } else {
+    return result;
+  }
 }
