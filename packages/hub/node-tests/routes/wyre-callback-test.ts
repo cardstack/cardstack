@@ -10,6 +10,7 @@ import {
   stubWalletOrderTransferId,
   adminWalletId,
 } from '../helpers/wyre';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 class StubRelayService {
   async provisionPrepaidCard(userAddress: string, reservationId: string): Promise<string> {
@@ -23,12 +24,6 @@ class StubSubgraphService {
   }
 }
 
-class StubWorkerClient {
-  addJob(jobName: string, payload: any, options?: any) {
-    handleAddJob(jobName, payload, options);
-  }
-}
-
 const stubUserAddress2 = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 const stubSKU = 'sku1';
 const stubProvisionTxnHash = '0x1234567890123456789012345678901234567890';
@@ -37,7 +32,6 @@ const stubReservationId = uuidv4();
 
 let provisionPrepaidCardCallCount = 0;
 let waitForPrepaidCardTxnCallCount = 0;
-let addJobCallCount = 0;
 
 function handleWaitForPrepaidCardTxn(txnHash: string) {
   waitForPrepaidCardTxnCallCount++;
@@ -57,18 +51,6 @@ function handleProvisionPrepaidCard(userAddress: string, sku: string) {
   return stubProvisionTxnHash;
 }
 
-function handleAddJob(jobName: string, payload: any, options?: any) {
-  addJobCallCount++;
-  expect(jobName).to.equal('wyre-transfer');
-  expect(payload.request.transfer.destCurrency).to.equal('DAI', 'destCurrency is correct');
-  expect(payload.request.transfer.destAmount).to.equal(100, 'destAmount is correct');
-  expect(payload.request.order.id).to.equal(stubWalletOrderId, 'request order id is correct');
-  expect(payload.request.wallet.name).to.equal(stubUserAddress.toLowerCase(), 'request wallet name is correct');
-  expect(payload.request.wallet.id).to.equal(stubCustodialWalletId, 'request wallet id is correct');
-  expect(payload.dest).to.equal(adminWalletId, 'destination wallet id is correct');
-  expect(options.jobKey).to.equal(stubWalletOrderId, 'jobKey is correct');
-}
-
 describe('POST /api/wyre-callback', function () {
   let db: DBClient;
   let wyreService: StubWyreService;
@@ -77,11 +59,12 @@ describe('POST /api/wyre-callback', function () {
     return request().post(url);
   }
 
+  let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
+
   this.beforeEach(function () {
     registry(this).register('wyre', StubWyreService);
     registry(this).register('relay', StubRelayService, { type: 'service' });
     registry(this).register('subgraph', StubSubgraphService);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { getContainer, request } = setupHub(this);
@@ -89,7 +72,6 @@ describe('POST /api/wyre-callback', function () {
   this.beforeEach(async function () {
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
-    addJobCallCount = 0;
     wyreService = (await getContainer().lookup('wyre')) as unknown as StubWyreService;
     wyreService.wyreTransferCallCount = 0;
 
@@ -123,7 +105,18 @@ describe('POST /api/wyre-callback', function () {
         })
         .expect(204);
 
-      expect(addJobCallCount).to.equal(1, 'addJob called once');
+      expect(getJobIdentifiers()[0]).to.equal('wyre-transfer');
+
+      let payload = getJobPayloads()[0];
+      expect(payload.request.transfer.destCurrency).to.equal('DAI', 'destCurrency is correct');
+      expect(payload.request.transfer.destAmount).to.equal(100, 'destAmount is correct');
+      expect(payload.request.order.id).to.equal(stubWalletOrderId, 'request order id is correct');
+      expect(payload.request.wallet.name).to.equal(stubUserAddress.toLowerCase(), 'request wallet name is correct');
+      expect(payload.request.wallet.id).to.equal(stubCustodialWalletId, 'request wallet id is correct');
+      expect(payload.dest).to.equal(adminWalletId, 'destination wallet id is correct');
+
+      let options = getJobSpecs()[0];
+      expect(options?.jobKey).to.equal(stubWalletOrderId, 'jobKey is correct');
     });
 
     it(`ignores callback for pending wallet order we already received reservation for where the user address in the callback does not match the user address in the DB`, async function () {

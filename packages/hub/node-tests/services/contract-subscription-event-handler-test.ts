@@ -1,7 +1,7 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import Web3 from 'web3';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 import { setupHub, registry } from '../helpers/server';
 import { CONTRACT_EVENTS, HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
@@ -60,32 +60,18 @@ class StubWeb3 {
   }
 }
 
-class StubWorkerClient {
-  jobs: [string, any][] = [];
-
-  constructor() {
-    this.jobs = [];
-  }
-
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    this.jobs.push([identifier, payload]);
-    return Promise.resolve({} as Job);
-  }
-}
-
 describe('ContractSubscriptionEventHandler', function () {
   let { getContainer } = setupHub(this);
 
   setupSentry(this);
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(async function () {
     registry(this).register('contracts', StubContracts);
     registry(this).register('web3-socket', StubWeb3);
-    registry(this).register('worker-client', StubWorkerClient);
 
     this.subject = await getContainer().lookup('contract-subscription-event-handler');
     this.contracts = (await getContainer().lookup('contracts')) as unknown as StubContracts;
-    this.workerClient = (await getContainer().lookup('worker-client')) as unknown as StubWorkerClient;
     this.latestEventBlockQueries = await getContainer().lookup('latest-event-block', { type: 'query' });
 
     web3BlockNumber = 1234;
@@ -131,7 +117,8 @@ describe('ContractSubscriptionEventHandler', function () {
 
       await this.contracts.handlers[contractEventConfiguration.eventName](null, contractEvent);
 
-      expect(this.workerClient.jobs).to.deep.equal([[contractEventConfiguration.taskName, contractEvent]]);
+      expect(getJobIdentifiers()[0]).to.equal(contractEventConfiguration.taskName);
+      expect(getJobPayloads()[0]).to.deep.equal(contractEvent);
       expect(await this.latestEventBlockQueries.read()).to.equal(500);
     });
 
@@ -153,7 +140,8 @@ describe('ContractSubscriptionEventHandler', function () {
     let contractEvent = { blockNumber: 2324, transactionHash: '0x123' };
     await this.contracts.handlers.MerchantClaim(null, contractEvent);
 
-    expect(this.workerClient.jobs).to.deep.equal([['notify-merchant-claim', contractEvent]]);
+    expect(getJobIdentifiers()[0]).to.equal('notify-merchant-claim');
+    expect(getJobPayloads()[0]).to.deep.equal(contractEvent);
     expect(await this.latestEventBlockQueries.read()).to.equal(2324);
   });
 });

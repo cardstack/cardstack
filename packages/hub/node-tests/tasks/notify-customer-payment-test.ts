@@ -1,8 +1,8 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import NotifyCustomerPayment, { PrepaidCardPaymentsQueryResult } from '../../tasks/notify-customer-payment';
 import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { EventData } from 'web3-eth-contract';
 
 type TransactionInformation = PrepaidCardPaymentsQueryResult['data']['prepaidCardPayments'][number];
@@ -31,17 +31,6 @@ class StubCardPay {
   }
 }
 
-let addedJobIdentifiers: string[] = [];
-let addedJobPayloads: string[] = [];
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    addedJobIdentifiers.push(identifier);
-    addedJobPayloads.push(payload);
-    return Promise.resolve({} as Job);
-  }
-}
-
 let merchantInfoShouldError = false;
 class StubMerchantInfo {
   async getMerchantInfo(_did: string) {
@@ -63,21 +52,16 @@ class StubNotificationPreferenceService {
 
 describe('NotifyCustomerPaymentTask', function () {
   setupSentry(this);
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
     mockData.value = undefined;
     merchantInfoShouldError = false;
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('merchant-info', StubMerchantInfo);
-    registry(this).register('worker-client', StubWorkerClient);
     registry(this).register('notification-preference-service', StubNotificationPreferenceService);
   });
   let { getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    addedJobIdentifiers = [];
-    addedJobPayloads = [];
-  });
 
   it('adds a send-notifications job for the merchant’s owner', async function () {
     mockData.value = {
@@ -153,8 +137,8 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform({ transactionHash: 'a' } as EventData);
 
-    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
-    expect(addedJobPayloads).to.deep.equal([
+    expect(getJobIdentifiers()).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(getJobPayloads()).to.deep.equal([
       {
         notificationBody: 'Mandello has a new payment',
         notificationId: 'sokol::a::123::eoa-address',
@@ -247,8 +231,8 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform({ transactionHash: 'a' } as EventData);
 
-    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
-    expect(addedJobPayloads).to.deep.equal([
+    expect(getJobIdentifiers()).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(getJobPayloads()).to.deep.equal([
       {
         notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::123::eoa-address',
@@ -344,8 +328,8 @@ describe('NotifyCustomerPaymentTask', function () {
 
     await task.perform({ transactionHash: 'a' } as EventData);
 
-    expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
-    expect(addedJobPayloads).to.deep.equal([
+    expect(getJobIdentifiers()).to.deep.equal(['send-notifications', 'send-notifications']);
+    expect(getJobPayloads()).to.deep.equal([
       {
         notificationBody: 'You have a new payment',
         notificationId: 'sokol::a::123::eoa-address',
@@ -369,8 +353,8 @@ describe('NotifyCustomerPaymentTask', function () {
     return expect(task.perform({ transactionHash: 'a' } as EventData))
       .to.be.rejectedWith(`Subgraph did not return information for prepaid card payment with transaction hash: "a"`)
       .then(() => {
-        expect(addedJobIdentifiers).to.deep.equal([]);
-        expect(addedJobPayloads).to.deep.equal([]);
+        expect(getJobIdentifiers()).to.deep.equal([]);
+        expect(getJobPayloads()).to.deep.equal([]);
       });
   });
 });
