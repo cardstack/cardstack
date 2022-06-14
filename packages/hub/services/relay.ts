@@ -88,7 +88,7 @@ export default class RelayService {
     if (!provisionerSecret) {
       throw new Error(`Could not register profile because relay.provisionerSecret config is not set.`);
     }
-    let response = await fetch(`${relayUrl}/v2/profiles/register?eoa=${userAddress}&did=${did}`, {
+    let response = await fetch(`${relayUrl}/v1/profiles/register?eoa=${userAddress}&did=${did}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
