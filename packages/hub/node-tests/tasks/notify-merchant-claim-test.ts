@@ -101,7 +101,6 @@ describe('NotifyMerchantClaimTask', function () {
     let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
 
     await task.perform({ transactionHash: 'a' } as EventData);
-    // debugger;
     expect(addedJobIdentifiers).to.deep.equal(['send-notifications', 'send-notifications']);
     expect(addedJobPayloads).to.deep.equal([
       {
