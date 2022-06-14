@@ -2,6 +2,8 @@ import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
 import CreateProfile from '../../tasks/create-profile';
+import shortUUID from 'short-uuid';
+import JobTicketsQueries from '../../queries/job-tickets';
 
 let addedJobIdentifiers: string[] = [];
 let addedJobPayloads: string[] = [];
@@ -14,12 +16,14 @@ class StubWorkerClient {
   }
 }
 
+let jobTicketsQueries: JobTicketsQueries, jobTicketId: string;
+
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
 
   let registeredAddress = '0x123';
   let registeredDid = 'sku';
-  let mockTxnHash = '0x456';
+  let mockMerchantSafeAddress = '0x456';
   let registerProfileCalls = 0;
   let registeringShouldError = false;
 
@@ -33,7 +37,7 @@ describe('CreateProfileTask', function () {
 
       registeredAddress = userAddress;
       registeredDid = did;
-      return Promise.resolve(mockTxnHash);
+      return Promise.resolve(mockMerchantSafeAddress);
     }
   }
 
@@ -50,11 +54,17 @@ describe('CreateProfileTask', function () {
   });
 
   this.beforeEach(async function () {
+    jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
+    jobTicketId = shortUUID.uuid();
+
+    await jobTicketsQueries.insert(jobTicketId, 'create-profile', '0x000');
+
     subject = (await getContainer().lookup('create-profile')) as CreateProfile;
   });
 
   it('calls the relay server endpoint to register a profile and queues persist-off-chain-merchant-info', async function () {
     await subject.perform({
+      'job-ticket-id': jobTicketId,
       'merchant-infos': {
         'owner-address': '0x000',
       },
@@ -66,5 +76,9 @@ describe('CreateProfileTask', function () {
 
     expect(addedJobIdentifiers[0]).to.equal('persist-off-chain-merchant-info');
     expect(addedJobPayloads[0]).to.deep.equal({ 'merchant-safe-id': 'fixme' });
+
+    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    expect(jobTicket.state).to.equal('success');
+    expect(jobTicket.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
   });
 });
