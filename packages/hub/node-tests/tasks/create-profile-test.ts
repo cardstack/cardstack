@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import CreateProfile from '../../tasks/create-profile';
 import shortUUID from 'short-uuid';
 import JobTicketsQueries from '../../queries/job-tickets';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 
 let addedJobIdentifiers: string[] = [];
 let addedJobPayloads: string[] = [];
@@ -32,7 +33,7 @@ describe('CreateProfileTask', function () {
       registerProfileCalls++;
 
       if (registeringShouldError) {
-        throw new Error('provisioning should error');
+        throw new Error('registering should error');
       }
 
       registeredAddress = userAddress;
@@ -40,6 +41,8 @@ describe('CreateProfileTask', function () {
       return Promise.resolve(mockMerchantSafeAddress);
     }
   }
+
+  setupSentry(this);
 
   this.beforeEach(function () {
     registry(this).register('relay', StubRelayService, { type: 'service' });
@@ -80,5 +83,26 @@ describe('CreateProfileTask', function () {
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
     expect(jobTicket.state).to.equal('success');
     expect(jobTicket.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
+  });
+
+  it('fails the job ticket and logs to Sentry if the profile provisioning fails', async function () {
+    registeringShouldError = true;
+
+    await subject.perform({
+      'job-ticket-id': jobTicketId,
+      'merchant-infos': {
+        'owner-address': '0x000',
+      },
+    });
+
+    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    expect(jobTicket.state).to.equal('failed');
+    expect(jobTicket.result).to.deep.equal({ error: 'Error: registering should error' });
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal('registering should error');
+
+    expect(addedJobIdentifiers).to.be.empty;
   });
 });
