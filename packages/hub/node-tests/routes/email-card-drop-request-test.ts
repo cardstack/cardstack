@@ -2,7 +2,7 @@ import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
-import { getJobIdentifiers, getJobPayloads, setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import crypto from 'crypto';
 import config from 'config';
 import shortUUID from 'short-uuid';
@@ -158,7 +158,7 @@ class StubCardpaySDK {
 
 describe('POST /api/email-card-drop-requests', function () {
   setupSentry(this);
-  setupStubWorkerClient(this);
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);

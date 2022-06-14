@@ -4,30 +4,39 @@ import { Suite } from 'mocha';
 
 let jobIdentifiers: string[] = [];
 let jobPayloads: any[] = [];
+let jobSpecs: (TaskSpec | undefined)[] = [];
 
 export function setupStubWorkerClient(context: Suite) {
   context.beforeEach(function () {
     registry(this).register('worker-client', StubWorkerClient);
   });
-}
 
-export function getJobIdentifiers() {
-  return jobIdentifiers;
-}
+  context.afterEach(function () {
+    jobIdentifiers = [];
+    jobPayloads = [];
+    jobSpecs = [];
+  });
 
-export function getJobPayloads() {
-  return jobPayloads;
+  return {
+    getJobIdentifiers: function () {
+      return jobIdentifiers;
+    },
+
+    getJobPayloads: function () {
+      return jobPayloads;
+    },
+
+    getJobSpecs: function () {
+      return jobSpecs;
+    },
+  };
 }
 
 export class StubWorkerClient {
-  constructor() {
-    jobIdentifiers = [];
-    jobPayloads = [];
-  }
-
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
+  async addJob(identifier: string, payload?: any, spec?: TaskSpec): Promise<Job> {
     jobIdentifiers.push(identifier);
     jobPayloads.push(payload);
+    jobSpecs.push(spec);
     return Promise.resolve({} as Job);
   }
 }
