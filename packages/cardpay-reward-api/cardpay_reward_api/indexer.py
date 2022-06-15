@@ -58,7 +58,9 @@ class Indexer:
             logging.info("===Done===")
 
     def add_root_and_proofs(self, db: Session, root, payment_list):
-        logging.info(f"Indexing {len(payment_list)} proofs for root {root['id']}")
+        logging.info(
+            f"Indexing {len(payment_list)} proofs for payment cycle {root['paymentCycle']}"
+        )
         root = models.Root(
             rootHash=root["id"],
             rewardProgramId=root["rewardProgram"]["id"],
