@@ -71,7 +71,7 @@ describe.only('CreateProfileTask', function () {
     expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
-    expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': 'fixme' });
+    expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
 
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
     expect(jobTicket.state).to.equal('success');

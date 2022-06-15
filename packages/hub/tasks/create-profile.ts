@@ -27,7 +27,7 @@ export default class CreateProfile {
 
       await this.jobTickets.update(jobTicketId, { 'merchant-safe-id': merchantSafeAddress }, 'success');
 
-      this.workerClient.addJob('persist-off-chain-merchant-info', { 'merchant-safe-id': 'fixme' });
+      this.workerClient.addJob('persist-off-chain-merchant-info', { 'merchant-safe-id': merchantInfoId });
     } catch (error) {
       Sentry.captureException(error);
       await this.jobTickets.update(jobTicketId, { error: (error as Error).toString() }, 'failed');
