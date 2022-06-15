@@ -24,11 +24,26 @@ export default class JobTicketsRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let jobTicket = await this.jobTicketsQueries.find(ctx.params.id);
+    let id = ctx.params.id;
+    let jobTicket = await this.jobTicketsQueries.find(id);
 
-    ctx.body = this.jobTicketSerializer.serialize(jobTicket!);
-    ctx.type = 'application/vnd.api+json';
-    ctx.status = 200;
+    if (jobTicket) {
+      ctx.body = this.jobTicketSerializer.serialize(jobTicket!);
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 200;
+    } else {
+      ctx.body = {
+        errors: [
+          {
+            status: '404',
+            title: 'Job ticket not found',
+            detail: `Could not find the job ticket ${id}`,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 404;
+    }
   }
 }
 

@@ -26,4 +26,23 @@ describe('GET /api/job-tickets/:id', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+
+  it('returns 404 for an unknown job', async function () {
+    let randomId = shortUUID.uuid();
+
+    await request()
+      .get(`/api/job-tickets/${randomId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(404)
+      .expect({
+        errors: [
+          {
+            status: '404',
+            title: 'Job ticket not found',
+            detail: `Could not find the job ticket ${randomId}`,
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 });
