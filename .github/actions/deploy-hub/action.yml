@@ -10,17 +10,18 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install apt packages including waypoint
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Install dependencies
       shell: bash
       run: |
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
-
-    - uses: volta-cli/action@v1
-
-    - run: yarn --prefer-offline
-      shell: bash
+        yarn add hcl2-parser @actions/core -W --prefer-offline
 
     - name: Webpack build
       run: yarn build

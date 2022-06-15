@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const hcl = require('js-hcl-parser');
+const hcl = require('hcl2-parser');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
@@ -9,11 +9,10 @@ function execute(command, options = {}) {
 
 function getAppConfig(waypointConfigFilePath, appName) {
   const waypointHcl = fs.readFileSync(waypointConfigFilePath, 'utf8');
-  const waypointJson = hcl.parse(waypointHcl);
-  const waypointConfig = JSON.parse(waypointJson);
-  const waypointApp = waypointConfig.app.find((app) => Object.keys(app)[0] === appName);
-  const cluster = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].cluster;
-  const disableAlb = Boolean(waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].disable_alb);
+  const waypointConfig = hcl.parseToObject(waypointHcl)[0];
+  const waypointApp = waypointConfig.app[appName][0];
+  const cluster = waypointApp.deploy[0].use['aws-ecs'][0].cluster;
+  const disableAlb = Boolean(waypointApp.deploy[0].use['aws-ecs'][0].disable_alb);
 
   return { cluster, disableAlb };
 }
