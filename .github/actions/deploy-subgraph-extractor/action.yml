@@ -17,6 +17,11 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
+    - uses: volta-cli/action@v1
+
+    - run: yarn add js-hcl-parser -W --prefer-offline
+      shell: bash
+
     - name: Deploy subgraph extractor
       run: waypoint up -app=cardpay-subg-ext -prune-retain=0 -plain
       shell: bash
