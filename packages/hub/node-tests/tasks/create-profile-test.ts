@@ -9,7 +9,7 @@ import { encodeDID } from '@cardstack/did-resolver';
 
 let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 
-describe.only('CreateProfileTask', function () {
+describe('CreateProfileTask', function () {
   let subject: CreateProfile;
 
   let registeredAddress = '0x123';
