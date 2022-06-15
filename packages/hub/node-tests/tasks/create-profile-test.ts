@@ -5,10 +5,11 @@ import shortUUID from 'short-uuid';
 import JobTicketsQueries from '../../queries/job-tickets';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { encodeDID } from '@cardstack/did-resolver';
 
-let jobTicketsQueries: JobTicketsQueries, jobTicketId: string;
+let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 
-describe('CreateProfileTask', function () {
+describe.only('CreateProfileTask', function () {
   let subject: CreateProfile;
 
   let registeredAddress = '0x123';
@@ -43,8 +44,18 @@ describe('CreateProfileTask', function () {
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
     jobTicketId = shortUUID.uuid();
-
     await jobTicketsQueries.insert(jobTicketId, 'create-profile', '0x000');
+
+    merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
+    merchantInfosId = shortUUID.uuid();
+    await merchantInfoQueries.insert({
+      id: merchantInfosId,
+      ownerAddress: '0x000',
+      name: '',
+      slug: '',
+      color: '',
+      textColor: '',
+    });
 
     subject = (await getContainer().lookup('create-profile')) as CreateProfile;
   });
@@ -52,14 +63,12 @@ describe('CreateProfileTask', function () {
   it('calls the relay server endpoint to register a profile and queues persist-off-chain-merchant-info', async function () {
     await subject.perform({
       'job-ticket-id': jobTicketId,
-      'merchant-infos': {
-        'owner-address': '0x000',
-      },
+      'merchant-info-id': merchantInfosId,
     });
 
     expect(registerProfileCalls).to.equal(1);
     expect(registeredAddress).to.equal('0x000');
-    expect(registeredDid).to.equal('fixme');
+    expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': 'fixme' });
@@ -74,9 +83,7 @@ describe('CreateProfileTask', function () {
 
     await subject.perform({
       'job-ticket-id': jobTicketId,
-      'merchant-infos': {
-        'owner-address': '0x000',
-      },
+      'merchant-info-id': merchantInfosId,
     });
 
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
