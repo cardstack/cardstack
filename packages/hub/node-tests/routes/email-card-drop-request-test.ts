@@ -2,8 +2,8 @@ import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests
 import { Clock } from '../../services/clock';
 import { registry, setupHub } from '../helpers/server';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import crypto from 'crypto';
-import { Job, TaskSpec } from 'graphile-worker';
 import config from 'config';
 import shortUUID from 'short-uuid';
 
@@ -139,16 +139,6 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-let jobIdentifiers: string[] = [];
-let jobPayloads: any[] = [];
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    jobIdentifiers.push(identifier);
-    jobPayloads.push(payload);
-    return Promise.resolve({} as Job);
-  }
-}
-
 let mockPrepaidCardMarketContractPaused = false;
 let mockPrepaidCardQuantity = 100;
 
@@ -168,11 +158,11 @@ class StubCardpaySDK {
 
 describe('POST /api/email-card-drop-requests', function () {
   setupSentry(this);
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('cardpay', StubCardpaySDK);
-    registry(this).register('worker-client', StubWorkerClient);
     registry(this).register('clock', FrozenClock);
 
     mockPrepaidCardMarketContractPaused = false;
@@ -180,11 +170,6 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    jobIdentifiers = [];
-    jobPayloads = [];
-  });
 
   it('persists an email card drop request and triggers jobs', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
@@ -237,8 +222,8 @@ describe('POST /api/email-card-drop-requests', function () {
 
     expect(emailCardDropRequest.emailHash).to.equal(emailHash);
 
-    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
-    expect(jobPayloads).to.deep.equal([{ id: resourceId, email }, { email }]);
+    expect(getJobIdentifiers()).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
+    expect(getJobPayloads()).to.deep.equal([{ id: resourceId, email }, { email }]);
   });
 
   it('sends an alert to web-team if getQuantity drops below notifyWhenQuantityBelow', async function () {
@@ -326,8 +311,8 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(latestRequest.emailHash).to.equal(emailHash2);
     expect(Number(latestRequest.requestedAt)).to.equal(fakeTime);
 
-    expect(jobIdentifiers).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
-    expect(jobPayloads).to.deep.equal([{ id: resourceId, email: email2 }, { email: email2 }]);
+    expect(getJobIdentifiers()).to.deep.equal(['send-email-card-drop-verification', 'subscribe-email']);
+    expect(getJobPayloads()).to.deep.equal([{ id: resourceId, email: email2 }, { email: email2 }]);
   });
 
   it('returns 401 without bearer token', async function () {

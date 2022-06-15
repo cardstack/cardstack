@@ -407,3 +407,51 @@ app "reward-api" {
     }
   }
 }
+
+
+app "reward-scheduler" {
+  path = "./packages/cardpay-reward-scheduler"
+
+  config {
+    env = {
+      ENVIRONMENT    = "production"
+      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
+      REWARD_MANAGER_ADDRESS = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
+      REWARDS_SUBGRAPH_EXTRACTION = "s3://cardpay-production-partitioned-graph-data/data/rewards/0.0.2/"
+      REWARD_SCHEDULER_UPDATE_FREQUENCY = "600"
+    }
+  }
+
+  build {
+    use "docker" {
+      dockerfile = "Dockerfile"
+    }
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "cardpay-reward-scheduler-production"
+        tag        = "latest"
+      }
+    }
+  }
+
+  deploy {
+    use "aws-ecs" {
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "cardpay-reward-scheduler-staging"
+      count               = 1
+      task_role_name      = "reward-programs-scheduler-ecr-task"
+      execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
+      disable_alb         = true
+
+      secrets = {
+        SENTRY_DSN = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
+        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
+      }
+    }
+  }
+}
