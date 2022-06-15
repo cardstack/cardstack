@@ -36,6 +36,18 @@ export default class JobTicketsQueries {
       model.ownerAddress,
     ]);
   }
+
+  async update(id: string, result: any, state: string) {
+    let db = await this.databaseManager.getClient();
+
+    await db.query(
+      `UPDATE job_tickets SET
+        result = $2,
+        state = $3
+      WHERE ID = $1`,
+      [id, result, state]
+    );
+  }
 }
 
 declare module '@cardstack/hub/queries' {

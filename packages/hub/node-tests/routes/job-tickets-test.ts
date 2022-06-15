@@ -26,6 +26,7 @@ describe('GET /api/job-tickets/:id', function () {
 
     jobTicketId = shortUUID.uuid();
     await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'a-job', ownerAddress: stubUserAddress });
+    await jobTicketsQueries.update(jobTicketId, { 'a-result': 'yes' }, 'success');
 
     otherOwnerJobTicketId = shortUUID.uuid();
     await jobTicketsQueries.insert({ id: otherOwnerJobTicketId, jobType: 'a-job', ownerAddress: '0x111' });
@@ -41,7 +42,7 @@ describe('GET /api/job-tickets/:id', function () {
         data: {
           id: jobTicketId,
           type: 'job-tickets',
-          attributes: { state: 'pending' },
+          attributes: { state: 'success', result: { 'a-result': 'yes' } },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');

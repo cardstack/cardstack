@@ -8,6 +8,7 @@ export default class JobTicketSerializer {
         id: model.id,
         type: 'job-tickets',
         attributes: {
+          result: model.result,
           state: model.state,
         },
       },
