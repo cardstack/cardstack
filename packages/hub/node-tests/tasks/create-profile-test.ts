@@ -1,21 +1,10 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
 import CreateProfile from '../../tasks/create-profile';
 import shortUUID from 'short-uuid';
 import JobTicketsQueries from '../../queries/job-tickets';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
-
-let addedJobIdentifiers: string[] = [];
-let addedJobPayloads: string[] = [];
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    addedJobIdentifiers.push(identifier);
-    addedJobPayloads.push(payload);
-    return Promise.resolve({} as Job);
-  }
-}
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 let jobTicketsQueries: JobTicketsQueries, jobTicketId: string;
 
@@ -43,18 +32,13 @@ describe('CreateProfileTask', function () {
   }
 
   setupSentry(this);
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
     registry(this).register('relay', StubRelayService, { type: 'service' });
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    addedJobIdentifiers = [];
-    addedJobPayloads = [];
-  });
 
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
@@ -77,8 +61,8 @@ describe('CreateProfileTask', function () {
     expect(registeredAddress).to.equal('0x000');
     expect(registeredDid).to.equal('fixme');
 
-    expect(addedJobIdentifiers[0]).to.equal('persist-off-chain-merchant-info');
-    expect(addedJobPayloads[0]).to.deep.equal({ 'merchant-safe-id': 'fixme' });
+    expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+    expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': 'fixme' });
 
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
     expect(jobTicket.state).to.equal('success');
@@ -103,6 +87,6 @@ describe('CreateProfileTask', function () {
 
     expect(sentryReport.error?.message).to.equal('registering should error');
 
-    expect(addedJobIdentifiers).to.be.empty;
+    expect(getJobIdentifiers()).to.be.empty;
   });
 });
