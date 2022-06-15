@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { query } from '@cardstack/hub/queries';
+import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 
 export interface JobTicket {
@@ -24,6 +25,10 @@ export default class JobTicketsRoute {
   }
 
   async get(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
     let id = ctx.params.id;
     let jobTicket = await this.jobTicketsQueries.find(id);
 

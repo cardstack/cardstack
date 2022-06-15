@@ -1,7 +1,23 @@
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 import shortUUID from 'short-uuid';
 
+class StubAuthenticationUtils {
+  validateAuthToken(encryptedAuthToken: string) {
+    return handleValidateAuthToken(encryptedAuthToken);
+  }
+}
+
+let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+function handleValidateAuthToken(encryptedString: string) {
+  expect(encryptedString).to.equal('abc123--def456--ghi789');
+  return stubUserAddress;
+}
+
 describe('GET /api/job-tickets/:id', function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+  });
+
   let { request, getContainer } = setupHub(this);
   let jobTicketsQueries, jobTicketId: string;
 
@@ -15,6 +31,7 @@ describe('GET /api/job-tickets/:id', function () {
   it('returns the job ticket details', async function () {
     await request()
       .get(`/api/job-tickets/${jobTicketId}`)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -27,11 +44,28 @@ describe('GET /api/job-tickets/:id', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .get(`/api/job-tickets/${jobTicketId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('returns 404 for an unknown job', async function () {
     let randomId = shortUUID.uuid();
 
     await request()
       .get(`/api/job-tickets/${randomId}`)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(404)
       .expect({
