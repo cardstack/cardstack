@@ -32,11 +32,7 @@ export default class JobTicketsRoute {
     let id = ctx.params.id;
     let jobTicket = await this.jobTicketsQueries.find(id);
 
-    if (jobTicket) {
-      ctx.body = this.jobTicketSerializer.serialize(jobTicket!);
-      ctx.type = 'application/vnd.api+json';
-      ctx.status = 200;
-    } else {
+    if (!jobTicket) {
       ctx.body = {
         errors: [
           {
@@ -48,7 +44,30 @@ export default class JobTicketsRoute {
       };
       ctx.type = 'application/vnd.api+json';
       ctx.status = 404;
+
+      return;
     }
+
+    let requestingUserAddress = ctx.state.userAddress;
+
+    if (jobTicket.ownerAddress !== requestingUserAddress) {
+      ctx.body = {
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 401;
+
+      return;
+    }
+
+    ctx.body = this.jobTicketSerializer.serialize(jobTicket!);
+    ctx.type = 'application/vnd.api+json';
+    ctx.status = 200;
   }
 }
 

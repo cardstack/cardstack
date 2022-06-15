@@ -19,13 +19,16 @@ describe('GET /api/job-tickets/:id', function () {
   });
 
   let { request, getContainer } = setupHub(this);
-  let jobTicketsQueries, jobTicketId: string;
+  let jobTicketsQueries, jobTicketId: string, otherOwnerJobTicketId: string;
 
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
-    jobTicketId = shortUUID.uuid();
 
-    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'a-job', ownerAddress: '0x000' });
+    jobTicketId = shortUUID.uuid();
+    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'a-job', ownerAddress: stubUserAddress });
+
+    otherOwnerJobTicketId = shortUUID.uuid();
+    await jobTicketsQueries.insert({ id: otherOwnerJobTicketId, jobType: 'a-job', ownerAddress: '0x111' });
   });
 
   it('returns the job ticket details', async function () {
@@ -47,6 +50,23 @@ describe('GET /api/job-tickets/:id', function () {
   it('returns 401 without bearer token', async function () {
     await request()
       .get(`/api/job-tickets/${jobTicketId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 401 when the job ticket requested is for a different owner', async function () {
+    await request()
+      .get(`/api/job-tickets/${otherOwnerJobTicketId}`)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(401)
       .expect({
