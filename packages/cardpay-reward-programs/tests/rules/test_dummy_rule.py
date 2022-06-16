@@ -61,7 +61,7 @@ def create_rule(
 	            from {spend_accumulation_table}
 	            where _block_number > $1::integer
 	            and _block_number < $2::integer
-	            and historic_spend_balance_uint64 > 100000
+	            and historic_spend_balance_uint64 > $3::integer
             ),
             final_safes as (
                 select merchant_safe,
