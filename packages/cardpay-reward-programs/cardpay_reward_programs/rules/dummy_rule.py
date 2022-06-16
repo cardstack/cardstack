@@ -20,10 +20,9 @@ class DummyRule(Rule):
         self.base_reward = base_reward
         self.duration = duration
         
-    def sql(self, table_query): #THIS FUNCTION IS TO COMPLY WITH THE ABSTRACT METHODS OF rule.py BUT IT IS TEMPORAL
-        return f"""
-            select merchant_safe as payee from {table_query} limit 10;
-        """
+    def sql(self, table_query): 
+        #THIS FUNCTION IS TO COMPLY WITH THE ABSTRACT METHODS OF rule.py BUT IT IS TEMPORAL
+        pass
 
     def sql_2(self, tables_names): 
         
@@ -80,7 +79,7 @@ class DummyRule(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = self.base_reward
-        
+
         return df
 
     def run_query(self,tables_names, vars):
