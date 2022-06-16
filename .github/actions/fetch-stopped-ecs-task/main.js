@@ -116,9 +116,9 @@ function main(appName, waypointConfigFilePath) {
   const taskID = tasks[0].taskArn.replace(arnPattern, '');
 
   return {
-    has_stopped_task: true,
-    stopped_reason: tasks[0].stoppedReason,
-    logs_url: `https://console.aws.amazon.com/ecs/home#/clusters/${config.cluster}/tasks/${taskID}/logs`,
+    hasStoppedTask: true,
+    stoppedReason: tasks[0].stoppedReason,
+    logsUrl: `https://console.aws.amazon.com/ecs/home#/clusters/${config.cluster}/tasks/${taskID}/logs`,
   };
 }
 
