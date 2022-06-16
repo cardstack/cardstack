@@ -27,14 +27,14 @@ class DummyRule(Rule):
     def sql_2(self, tables_names): 
         
         spend_accumulation_table = self._get_table_query(
-            tables_names[0], 
+            "spend_accumulation", 
             tables_names[0], 
             self.start_block,
             self.end_block
         )
 
         safe_owner_table = self._get_table_query(
-            tables_names[1], 
+            "safe_owner", 
             tables_names[1],
             self.start_block,
             self.end_block
