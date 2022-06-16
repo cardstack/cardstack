@@ -71,23 +71,7 @@ class DummyRule(Rule):
             self.end_block
         ]
 
-        # spend_accumulation_table = self._get_table_query(
-        #     "spend_accumulation", 
-        #     "spend_accumulation", 
-        #     self.start_block,
-        #     self.end_block
-        # )
-        
-        # safe_owner_table = self._get_table_query(
-        #     "safe_owner", 
-        #     "safe_owner",
-        #     self.start_block,
-        #     self.end_block
-        # )
-
         tables_names = ["spend_accumulation", "safe_owner"]
-        
-        
         df = self.run_query(tables_names, vars)
            
         df["rewardProgramID"] = reward_program_id
@@ -96,8 +80,7 @@ class DummyRule(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = self.base_reward
-
-
+        
         return df
 
     def run_query(self,tables_names, vars):
