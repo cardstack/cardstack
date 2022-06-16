@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import pandas as pd
 import duckdb
 
@@ -21,8 +22,6 @@ def create_rule(
     user_config = {
         "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
         "base_reward": 5000000000000000000,
-        "transaction_factor": 2,
-        "spend_factor": 2,
         "duration": 43200
     }
 
@@ -38,14 +37,11 @@ def create_rule(
     ):
 
         if table_name == "safe_owner":
-            print("return safe")
             return "SAFE_TABLE"
         elif table_name == "spend_accumulation":
-            print("return spend")
             return "SPEND_TABLE"
         else:
-            print("Error creating tables")
-            return ""
+            raise Exception("Table name is incorrect!")
 
     def run_query(self, tables_names, vars):
         # con = duckdb.connect(database=":memory:", read_only=False) 
