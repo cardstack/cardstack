@@ -14,8 +14,6 @@ class DummyRule(Rule):
         self,
         token,
         base_reward,
-        transaction_factor, #not used, just for compatibility with parameters.json
-        spend_factor, #not used, just for compatibility with parameters.json
         duration  
     ):
         self.token = token 
