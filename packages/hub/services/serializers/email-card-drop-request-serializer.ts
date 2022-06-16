@@ -6,6 +6,7 @@ interface EmailCardDropRequestClaimStatus {
   available: boolean;
   claimed: boolean;
   rateLimited: boolean;
+  showBanner: boolean;
   timestamp: Date;
 }
 
@@ -32,6 +33,7 @@ export default class EmailCardDropRequestSerializer {
           available: model.available,
           claimed: model.claimed,
           'rate-limited': model.rateLimited,
+          'show-banner': model.showBanner,
           timestamp: model.timestamp.toISOString(),
         },
       },
