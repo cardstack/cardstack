@@ -30,7 +30,7 @@ def create_rule(
 
     con.execute("create table SPEND_TABLE as select * from fake_data_spend_acc")
     con.execute("create table SAFE_TABLE as select * from fake_data_safe_own")
-    print(con.fetchdf()) # It is not creating the table_
+    
 
     def table_query(
         self, config_name, table_name, min_partition: int, max_partition: int
@@ -137,8 +137,7 @@ def test_identifies_correct_block_number(monkeypatch):
         ]
     )
 
-    # print("fake: ", fake_data_safe_own)
-    # print("fake: ", fake_data_spend_acc)
+    
     rule = create_rule(
         monkeypatch, fake_data_spend_acc, fake_data_safe_own
     )
@@ -171,8 +170,7 @@ def test_identifies_repetitive_safes(monkeypatch):
         ]
     )
 
-    # print("fake: ", fake_data_safe_own)
-    # print("fake: ", fake_data_spend_acc)
+   
     rule = create_rule(
         monkeypatch, fake_data_spend_acc, fake_data_safe_own
     )
