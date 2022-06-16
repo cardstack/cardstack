@@ -22,7 +22,8 @@ def create_rule(
     user_config = {
         "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
         "base_reward": 5000000000000000000,
-        "duration": 43200
+        "duration": 43200,
+        "hist_balance_threshold": 100000
     }
 
     user_config.update(user_config_overrides)

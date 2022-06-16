@@ -14,11 +14,14 @@ class DummyRule(Rule):
         self,
         token,
         base_reward,
-        duration  
+        duration,
+        hist_balance_threshold
     ):
         self.token = token 
         self.base_reward = base_reward
         self.duration = duration
+        self.hist_balance_threshold = hist_balance_threshold
+
         
     def sql(self, table_query): 
         #THIS FUNCTION IS TO COMPLY WITH THE ABSTRACT METHODS OF rule.py BUT IT IS TEMPORAL
@@ -51,7 +54,7 @@ class DummyRule(Rule):
 	            from {spend_accumulation_table}
 	            where _block_number > $1::integer
 	            and _block_number < $2::integer
-	            and historic_spend_balance_uint64 > 100000
+	            and historic_spend_balance_uint64 > $3::integer
             ),
             final_safes as (
                 select merchant_safe,
@@ -67,7 +70,8 @@ class DummyRule(Rule):
     def run(self, payment_cycle: int, reward_program_id: str):
         vars = [
             self.start_block,
-            self.end_block
+            self.end_block,
+            self.hist_balance_threshold
         ]
 
         tables_names = ["spend_accumulation", "safe_owner"]
