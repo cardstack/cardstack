@@ -44,7 +44,7 @@ describe('CreateProfileTask', function () {
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
     jobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert(jobTicketId, 'create-profile', '0x000');
+    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'create-profile', ownerAddress: '0x000' });
 
     merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
     merchantInfosId = shortUUID.uuid();
@@ -74,8 +74,8 @@ describe('CreateProfileTask', function () {
     expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
 
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
-    expect(jobTicket.state).to.equal('success');
-    expect(jobTicket.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
+    expect(jobTicket?.state).to.equal('success');
+    expect(jobTicket?.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
   });
 
   it('fails the job ticket and logs to Sentry if the profile provisioning fails', async function () {
@@ -87,8 +87,8 @@ describe('CreateProfileTask', function () {
     });
 
     let jobTicket = await jobTicketsQueries.find(jobTicketId);
-    expect(jobTicket.state).to.equal('failed');
-    expect(jobTicket.result).to.deep.equal({ error: 'Error: registering should error' });
+    expect(jobTicket?.state).to.equal('failed');
+    expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
 
     let sentryReport = await waitForSentryReport();
 
