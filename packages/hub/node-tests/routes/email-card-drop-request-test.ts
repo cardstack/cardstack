@@ -49,7 +49,8 @@ class StubCardpaySDK {
     switch (sdk) {
       case 'PrepaidCardMarketV2':
         return Promise.resolve({
-          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+          // getQuantity is returned as a string
+          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity.toString()),
           isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
         });
       default:
@@ -105,9 +106,11 @@ describe('GET /api/email-card-drop-requests', function () {
   });
 
   it('reports no availability if there is insufficient funding for a card drop to be initiated', async function () {
-    let reservationCount = mockPrepaidCardQuantity + 1;
+    // Since these values are returned as strings, quantity '50' < reservations '100' is false, checking for true number comparison
+    let reservationCount = 100;
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeBeforeExpiry = new Date(fakeTime - emailVerificationLinkExpiryMinutes / 2);
 
     for (let i = 0; i < reservationCount; i++) {
       await emailCardDropRequestsQueries.insert({
@@ -115,7 +118,7 @@ describe('GET /api/email-card-drop-requests', function () {
         emailHash: `other-email-hash-${i}`,
         verificationCode: 'x',
         id: shortUUID.uuid(),
-        requestedAt: new Date(),
+        requestedAt: insertionTimeBeforeExpiry,
       });
     }
 
