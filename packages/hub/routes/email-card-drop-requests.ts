@@ -111,10 +111,11 @@ export default class EmailCardDropRequestsRoute {
       return respondWith503(ctx, 'The prepaid card market contract is paused');
     }
 
-    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
-    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
+    let quantityAvailable = await this.getPrepaidCardQuantityAvailable();
+    let activeReservations = await this.getActiveReservations();
+    let unreserved = quantityAvailable.sub(activeReservations);
 
-    let supplyIsBelowNotificationThreshold = quantityAvailable - activeReservations < notifyWhenQuantityBelow;
+    let supplyIsBelowNotificationThreshold = unreserved.lt(new BN(notifyWhenQuantityBelow));
 
     log.info(
       `${cardDropSku} has ${quantityAvailable} available and ${activeReservations} reserved, notification threshold is ${notifyWhenQuantityBelow}`

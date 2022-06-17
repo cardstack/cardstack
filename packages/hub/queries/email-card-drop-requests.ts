@@ -89,7 +89,7 @@ export default class EmailCardDropRequestsQueries {
     let { rows } = await db.query(
       `
         SELECT COUNT(*) FROM email_card_drop_requests
-        WHERE claimed_at > NOW() - interval '${minutes} minutes'
+        WHERE claimed_at > timestamp '${this.clock.postgresTimestampNow()}' - interval '${minutes} minutes'
       `
     );
 
