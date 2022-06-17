@@ -76,7 +76,7 @@ describe('GET /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('returns true if a known EOA has a claim timestamp for its card drop request', async function () {
+  it('returns claimed as true if a known EOA has a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
@@ -87,6 +87,7 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.attributes['owner-address']).to.equal(claimedEoa.ownerAddress);
     expect(response.body.data.attributes.available).to.be.true;
     expect(response.body.data.attributes['rate-limited']).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
     expect(response.body.data.attributes.claimed).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
@@ -102,6 +103,7 @@ describe('GET /api/email-card-drop-requests', function () {
 
     expect(response.status).to.equal(200);
     expect(response.body.data.attributes['rate-limited']).to.equal(true);
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
   });
 
   it('reports no availability if there is insufficient funding for a card drop to be initiated', async function () {
@@ -126,6 +128,7 @@ describe('GET /api/email-card-drop-requests', function () {
 
     expect(response.status).to.equal(200);
     expect(response.body.data.attributes.available).to.be.false;
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
   });
 
   it('reports no availability if the prepaid card market contract is paused', async function () {
@@ -138,9 +141,10 @@ describe('GET /api/email-card-drop-requests', function () {
 
     expect(response.status).to.equal(200);
     expect(response.body.data.attributes.available).to.be.false;
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
   });
 
-  it('returns false if a known EOA does not have a claim timestamp for its card drop request', async function () {
+  it('returns claimed as false if a known EOA does not have a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${unclaimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
@@ -150,10 +154,11 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(unclaimedEoa.ownerAddress);
     expect(response.body.data.attributes.claimed).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
-  it('returns false if the EOA is not in the db', async function () {
+  it('returns claimed as false if the EOA is not in the db', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=notrecorded`)
       .set('Accept', 'application/vnd.api+json')
@@ -163,6 +168,7 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal('notrecorded');
     expect(response.body.data.attributes.claimed).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 

@@ -85,11 +85,14 @@ export default class EmailCardDropRequestsRoute {
       available = false;
     }
 
+    let showBanner = available && !rateLimited && !claimed;
+
     let result = this.emailCardDropRequestSerializer.serializeEmailCardDropRequestStatus({
       timestamp,
       ownerAddress,
       available,
       rateLimited,
+      showBanner,
       claimed,
     });
 
