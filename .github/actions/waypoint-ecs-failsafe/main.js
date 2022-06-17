@@ -3,11 +3,7 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 
 function execute(command, options = {}) {
-  console.log(command);
-  const response = execSync(command, options).toString().trim();
-  console.log(response);
-  return response;
-  //return execSync(command, options).toString().trim();
+  return execSync(command, options).toString().trim();
 }
 
 function getAppConfig(waypointConfigFilePath, appName) {
@@ -93,10 +89,7 @@ function createListener(loadBalancerArn, certificateArn, targetGroupArn) {
   const certificatesArg = `--certificates CertificateArn=${certificateArn}`;
   const defaultActionsArg = `--default-actions Type=forward,TargetGroupArn=${targetGroupArn}`;
 
-  //execute(
-  //`aws elbv2 create-listener --protocol HTTPS --port 443 ${loadBalancerArnArg} ${certificatesArg} ${defaultActionsArg}`
-  //);
-  console.log(
+  execute(
     `aws elbv2 create-listener --protocol HTTPS --port 443 ${loadBalancerArnArg} ${certificatesArg} ${defaultActionsArg}`
   );
 }
