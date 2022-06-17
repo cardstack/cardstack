@@ -1,4 +1,4 @@
-const hcl = require('js-hcl-parser');
+const hcl = require('hcl2-parser');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
@@ -8,29 +8,18 @@ function execute(command, options = {}) {
 
 function getAppConfig(waypointConfigFilePath, appName) {
   const waypointHcl = fs.readFileSync(waypointConfigFilePath, 'utf8');
-  const waypointJson = hcl.parse(waypointHcl);
-  const waypointConfig = JSON.parse(waypointJson);
-  const waypointApp = waypointConfig.app.find((app) => Object.keys(app)[0] === appName);
-  const cluster = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].cluster;
-  const certificate = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].alb[0].certificate;
+  const waypointConfig = hcl.parseToObject(waypointHcl)[0];
+  const waypointApp = waypointConfig.app[appName][0];
+  const cluster = waypointApp.deploy[0].use['aws-ecs'][0].cluster;
+  const certificate = waypointApp.deploy[0].use['aws-ecs'][0].alb[0].certificate;
+  const disableAlb = Boolean(waypointApp.deploy[0].use['aws-ecs'][0].disable_alb);
 
-  return { cluster, certificate };
-}
-
-function getServiceNameFromArn(serviceArn) {
-  const arnPattern = /^.*\//g;
-  return serviceArn.replace(arnPattern, '');
+  return { cluster, certificate, disableAlb };
 }
 
 function getAppNameFromServiceArn(serviceArn) {
   const arnPattern = /^.*\/(.*)-[^-]*$/;
   const matches = serviceArn.match(arnPattern);
-  return matches && matches.length > 1 ? matches[1] : '';
-}
-
-function getAppNameFromTargetGroupName(targetGroupName) {
-  const namePattern = /^(.*)-[^-]+$/;
-  const matches = targetGroupName.match(namePattern);
   return matches && matches.length > 1 ? matches[1] : '';
 }
 
@@ -96,12 +85,24 @@ function createListener(loadBalancerArn, certificateArn, targetGroupArn) {
 
 function main(appName, waypointConfigFilePath) {
   const config = getAppConfig(waypointConfigFilePath, appName);
+
+  if (config.disableAlb) {
+    console.log(`App '${appName}' does not require a load balancer.`);
+    return;
+  }
+
   const services = getServices(config.cluster, appName);
   const loadBalancer = getLoadBalancer(appName);
   const listeners = getListeners(loadBalancer.LoadBalancerArn);
 
   if (!listeners.some((listener) => listener.Port === 443)) {
-    createListener(loadBalancer.LoadBalancerArn, config.certificate, services[0].loadBalancers[0].targetGroupArn);
+    const targetGroupArn = services[0].loadBalancers[0].targetGroupArn;
+    console.log(
+      `Unable to find listener (port 443) for app '${appName}'. Creating a listener with the target group of the latest service: ${targetGroupArn}`
+    );
+    createListener(loadBalancer.LoadBalancerArn, config.certificate, targetGroupArn);
+  } else {
+    console.log(`Listener (port 443) found for app '${appName}'`);
   }
 }
 
