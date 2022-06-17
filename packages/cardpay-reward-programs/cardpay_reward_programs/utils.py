@@ -96,3 +96,23 @@ def write_parquet_file(file_location, table):
             file_location.joinpath("results.parquet").upload_from(pq_file_location)
     else:
         pq.write_table(table, file_location / "results.parquet")
+
+
+def get_parameters_file_path(rule_name:str):
+    if rule_name=="DummyRule":
+        return "./input/dummy_rule/parameters.json"
+    elif rule_name=="FlatPayment":
+        return "./input/flat_payment/parameters.json"
+    elif rule_name=="MinOtherMerchantsPaid":
+        return "./input/min_other_merchants_paid/parameters.json"
+    elif rule_name=="MinSpend":
+        return "input/min_spend/parameters.json"
+    elif rule_name=="SafeOwnership":
+        return "./input/safe_ownership/parameters.json"
+    elif rule_name=="RetroAirdrop":
+        return "./input/retro_airdrop/parameters.json"
+    elif rule_name=="WeightedUsage":
+        return "./input/weighted_usage/parameters.json"
+    else:
+        raise Exception("Error rule not  found!")
+        

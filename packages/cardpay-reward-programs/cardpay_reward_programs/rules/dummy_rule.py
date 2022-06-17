@@ -43,6 +43,7 @@ class DummyRule(Rule):
             self.end_block
         )
 
+        print(safe_owner_table)
         #If any of the tables is empty return a none string
         if safe_owner_table == "parquet_scan([])" or spend_accumulation_table == "parquet_scan([])":
             return None

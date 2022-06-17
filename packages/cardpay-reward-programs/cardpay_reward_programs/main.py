@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
 from .utils import write_parquet_file
+from .utils import get_parameters_file_path
 
 load_dotenv()
 
@@ -37,9 +38,9 @@ if SENTRY_DSN is not None:
 
 
 def run_reward_program(
-    parameters_file: str = typer.Argument(
-        default="./input/safe_ownership/parameters.json", help="The parameters file to use"
-    ),
+    # parameters_file: str = typer.Argument(
+    #     default="./input/safe_ownership/parameters.json", help="The parameters file to use"
+    # ),
     output_location: str = typer.Argument(
         default="./output", help="The directory to write the results to"
     ),
@@ -48,15 +49,10 @@ def run_reward_program(
     """
     Run a reward program as defined in the parameters file
     """
-    if rule_name == "DummyRule":
-        parameters_file = "./input/dummy_rule/parameters.json"
-    elif rule_name == "SafeOwnership":
-        parameters_file = "./input/safe_ownership/parameters.json"
-    #Add elif for other rules?
+    parameters_file = get_parameters_file_path(rule_name)
 
     with open(AnyPath(parameters_file), "r") as stream:
         parameters = json.load(stream)
-
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
             rule = subclass(parameters["core"], parameters["user_defined"])
