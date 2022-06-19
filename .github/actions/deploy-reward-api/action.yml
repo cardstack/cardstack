@@ -34,7 +34,3 @@ runs:
       with:
         app: "reward-api"
         retain: "1"
-
-    - name: Deploy reward indexer
-      run: waypoint up -app=reward-indexer -prune-retain=0 -plain
-      shell: bash
