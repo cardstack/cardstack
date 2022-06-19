@@ -24,8 +24,11 @@ def run_task(indexer, storage_location):
     """
     Opens and close single db connection per indexing task
     """
-    with Session(engine) as db:
-        indexer.run(db, storage_location)
+    try:
+        with Session(engine) as db:
+            indexer.run(db, storage_location)
+    except Exception as e:
+        logging.error(e)
 
 
 def run_all():
