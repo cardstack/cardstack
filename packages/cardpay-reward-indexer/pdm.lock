@@ -21,6 +21,7 @@ dependencies = [
     "pathspec>=0.9.0",
     "platformdirs>=2",
     "tomli>=1.1.0; python_version < \"3.11\"",
+    "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -122,7 +123,7 @@ extras = ["pycryptodome"]
 requires_python = ">=3.5, <4"
 summary = "eth-hash: The Ethereum hashing function, keccak256, sometimes (erroneously) called sha3"
 dependencies = [
-    "eth-hash",
+    "eth-hash>=0.3.2",
     "pycryptodome<4,>=3.6.6",
 ]
 
@@ -360,7 +361,7 @@ summary = "HTTP library with thread-safe connection pooling, file post, and more
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:e00c6b161814ad013c0eafbc84150f018b5ba9a6bdacaea904c98bb2da4584cf"
+content_hash = "sha256:59b55f7a654c4ba3278bc552a3c832166dac95e2f40decd4c44333d14e6d277e"
 
 [metadata.files]
 "atomicwrites 1.4.0" = [
