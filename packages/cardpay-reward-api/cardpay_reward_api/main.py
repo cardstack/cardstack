@@ -32,11 +32,6 @@ def get_db():
         db.close()
 
 
-def get_fastapi_sessionmaker() -> FastAPISessionMaker:
-    """This function could be replaced with a global variable if preferred"""
-    return FastAPISessionMaker(settings.DB_STRING)
-
-
 def get_w3():
     w3 = Web3(Web3.HTTPProvider(settings.EVM_FULL_NODE_URL))
     yield w3
