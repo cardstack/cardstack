@@ -6,8 +6,6 @@ from typing import List, Optional
 import sentry_sdk
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi_utils.session import FastAPISessionMaker
-from fastapi_utils.tasks import repeat_every
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from web3 import Web3

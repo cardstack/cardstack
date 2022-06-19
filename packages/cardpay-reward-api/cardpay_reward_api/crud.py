@@ -3,7 +3,6 @@
 import json
 from typing import Optional
 
-import boto3
 from sqlalchemy.orm import Session
 
 from . import models, schemas
