@@ -97,6 +97,8 @@ import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
 import SubscribeEmailTask from './tasks/subscribe-email';
+import JobTicketsRoute from './routes/job-tickets';
+import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import DiscordPostTask from './tasks/discord-post';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
@@ -160,6 +162,8 @@ export function createRegistry(): Registry {
   registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
+  registry.register('job-tickets-route', JobTicketsRoute);
+  registry.register('job-ticket-serializer', JobTicketSerializer);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);

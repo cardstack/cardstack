@@ -73,10 +73,26 @@ export default class EmailCardDropRequestsRoute {
 
     let rateLimited = await this.emailCardDropStateQueries.read();
 
+    let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
+    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
+    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
+
+    let available = true;
+
+    if (await prepaidCardMarketV2.isPaused()) {
+      available = false;
+    } else if (quantityAvailable < activeReservations) {
+      available = false;
+    }
+
+    let showBanner = available && !rateLimited && !claimed;
+
     let result = this.emailCardDropRequestSerializer.serializeEmailCardDropRequestStatus({
       timestamp,
       ownerAddress,
+      available,
       rateLimited,
+      showBanner,
       claimed,
     });
 

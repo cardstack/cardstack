@@ -41,12 +41,33 @@ class FrozenClock extends Clock {
 const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
 const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
 
-describe('GET /api/email-card-drop-requests', function () {
-  let { request, getContainer } = setupHub(this);
+let mockPrepaidCardMarketContractPaused = false;
+let mockPrepaidCardQuantity = 100;
 
-  this.beforeAll(function () {
+class StubCardpaySDK {
+  getSDK(sdk: string) {
+    switch (sdk) {
+      case 'PrepaidCardMarketV2':
+        return Promise.resolve({
+          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+          isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
+        });
+      default:
+        throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
+    }
+  }
+}
+
+describe('GET /api/email-card-drop-requests', function () {
+  this.beforeEach(function () {
     registry(this).register('clock', FrozenClock);
+    registry(this).register('cardpay', StubCardpaySDK);
+
+    mockPrepaidCardMarketContractPaused = false;
+    mockPrepaidCardQuantity = 50;
   });
+
+  let { request, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
@@ -55,7 +76,7 @@ describe('GET /api/email-card-drop-requests', function () {
     await emailCardDropRequestsQueries.insert(unclaimedEoa);
   });
 
-  it('returns true if a known EOA has a claim timestamp for its card drop request', async function () {
+  it('returns claimed as true if a known EOA has a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
@@ -64,7 +85,9 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.status).to.equal(200);
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(claimedEoa.ownerAddress);
+    expect(response.body.data.attributes.available).to.be.true;
     expect(response.body.data.attributes['rate-limited']).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
     expect(response.body.data.attributes.claimed).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
@@ -80,9 +103,48 @@ describe('GET /api/email-card-drop-requests', function () {
 
     expect(response.status).to.equal(200);
     expect(response.body.data.attributes['rate-limited']).to.equal(true);
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
   });
 
-  it('returns false if a known EOA does not have a claim timestamp for its card drop request', async function () {
+  it('reports no availability if there is insufficient funding for a card drop to be initiated', async function () {
+    let reservationCount = mockPrepaidCardQuantity + 1;
+
+    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+
+    for (let i = 0; i < reservationCount; i++) {
+      await emailCardDropRequestsQueries.insert({
+        ownerAddress: `0xother${i}`,
+        emailHash: `other-email-hash-${i}`,
+        verificationCode: 'x',
+        id: shortUUID.uuid(),
+        requestedAt: new Date(),
+      });
+    }
+
+    let response = await request()
+      .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(200);
+    expect(response.body.data.attributes.available).to.be.false;
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
+  });
+
+  it('reports no availability if the prepaid card market contract is paused', async function () {
+    mockPrepaidCardMarketContractPaused = true;
+
+    let response = await request()
+      .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(200);
+    expect(response.body.data.attributes.available).to.be.false;
+    expect(response.body.data.attributes['show-banner']).to.equal(false);
+  });
+
+  it('returns claimed as false if a known EOA does not have a claim timestamp for its card drop request', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${unclaimedEoa.ownerAddress}`)
       .set('Accept', 'application/vnd.api+json')
@@ -92,10 +154,11 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal(unclaimedEoa.ownerAddress);
     expect(response.body.data.attributes.claimed).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
-  it('returns false if the EOA is not in the db', async function () {
+  it('returns claimed as false if the EOA is not in the db', async function () {
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=notrecorded`)
       .set('Accept', 'application/vnd.api+json')
@@ -105,6 +168,7 @@ describe('GET /api/email-card-drop-requests', function () {
     expect(response.body.data.type).to.equal('email-card-drop-request-claim-status');
     expect(response.body.data.attributes['owner-address']).to.equal('notrecorded');
     expect(response.body.data.attributes.claimed).to.equal(false);
+    expect(response.body.data.attributes['show-banner']).to.equal(true);
     expect(response.body.data.attributes.timestamp).to.equal(fakeTimeString);
   });
 
@@ -137,23 +201,6 @@ let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
   return stubUserAddress;
-}
-
-let mockPrepaidCardMarketContractPaused = false;
-let mockPrepaidCardQuantity = 100;
-
-class StubCardpaySDK {
-  getSDK(sdk: string) {
-    switch (sdk) {
-      case 'PrepaidCardMarketV2':
-        return Promise.resolve({
-          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
-          isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
-        });
-      default:
-        throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
-    }
-  }
 }
 
 describe('POST /api/email-card-drop-requests', function () {

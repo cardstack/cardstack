@@ -3,8 +3,10 @@ import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
 interface EmailCardDropRequestClaimStatus {
   ownerAddress: string;
+  available: boolean;
   claimed: boolean;
   rateLimited: boolean;
+  showBanner: boolean;
   timestamp: Date;
 }
 
@@ -28,8 +30,10 @@ export default class EmailCardDropRequestSerializer {
         id: `${model.ownerAddress}-${model.timestamp.toISOString()}`,
         attributes: {
           'owner-address': model.ownerAddress,
+          available: model.available,
           claimed: model.claimed,
           'rate-limited': model.rateLimited,
+          'show-banner': model.showBanner,
           timestamp: model.timestamp.toISOString(),
         },
       },
