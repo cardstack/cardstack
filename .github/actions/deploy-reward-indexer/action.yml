@@ -1,5 +1,5 @@
-name: Deploy Reward Api
-description: Deploy FastApi Server
+name: Deploy Reward Indexer
+description: Deploy worker which indexes proofs
 
 inputs:
   waypoint_version:
@@ -25,12 +25,6 @@ runs:
     - run: yarn add js-hcl-parser -W --prefer-offline
       shell: bash
 
-    - name: Deploy reward api
-      run: waypoint up -app=reward-api -plain
+    - name: Deploy reward indexer
+      run: waypoint up -app=reward-indexer -prune-retain=0 -plain
       shell: bash
-
-    - name: Prune dangling resources
-      uses: ./.github/actions/waypoint-prune-dangling-resources
-      with:
-        app: "reward-api"
-        retain: "1"
