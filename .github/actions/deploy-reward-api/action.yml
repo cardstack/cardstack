@@ -1,5 +1,5 @@
 name: Deploy Reward Api
-description: Deploy FastApi Server with Proof indexing
+description: Deploy FastApi Server and Proof Indexer
 
 inputs:
   waypoint_version:
@@ -34,3 +34,7 @@ runs:
       with:
         app: "reward-api"
         retain: "1"
+
+    - name: Deploy reward indexer
+      run: waypoint up -app=reward-indexer -prune-retain=0 -plain
+      shell: bash
