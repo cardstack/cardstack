@@ -28,5 +28,7 @@ jobs:
           python -m pip install --upgrade pdm
           pdm install -d
       - name: Test with pytest
+        env:
+          DB_STRING: "sqlite:///./test.db"
         run: |
           pdm run -s pytest tests
