@@ -14,7 +14,6 @@ from web3 import Web3
 
 from . import crud, models, schemas
 from .config import config, get_settings
-from .indexer import Indexer
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -63,20 +62,6 @@ if settings.SENTRY_DSN is not None:
         traces_sample_rate=1.0,
         environment=settings.ENVIRONMENT,
     )
-
-
-@app.on_event("startup")
-@repeat_every(seconds=5, raise_exceptions=True)
-def index_root_task() -> None:
-    sessionmaker = get_fastapi_sessionmaker()
-    with sessionmaker.context_session() as db:
-        try:
-            Indexer(
-                settings.SUBGRAPH_URL,
-                config[settings.ENVIRONMENT]["archived_reward_programs"],
-            ).run(db=db, storage_location=settings.REWARDS_BUCKET)
-        except Exception as e:
-            logging.error(e)
 
 
 def param(skip: int = 0, limit: int = 100):
