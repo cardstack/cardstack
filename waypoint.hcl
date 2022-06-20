@@ -425,7 +425,7 @@ app "reward-api" {
       service_port        = 8000
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "reward-api-staging"
+      cluster             = "reward-api"
       count               = 2
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-api-ecs-task"
@@ -478,7 +478,7 @@ app "reward-indexer" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "reward-indexer-staging"
+      cluster             = "reward-indexer"
       count               = 1
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-indexer-ecs-task"
