@@ -66,14 +66,24 @@ class Indexer:
         logging.info(
             f"Indexing {len(payment_list)} proofs for payment cycle {root['paymentCycle']}"
         )
-        root = models.Root(
-            rootHash=root["id"],
-            rewardProgramId=root["rewardProgram"]["id"],
-            paymentCycle=int(root["paymentCycle"]),
-            blockNumber=int(root["blockNumber"]),
-            timestamp=datetime.fromtimestamp(int(root["timestamp"])),
+        existing_root = (
+            db.query(models.Root)
+            .filter_by(
+                rewardProgramId=root["rewardProgram"]["id"],
+                paymentCycle=root["paymentCycle"],
+            )
+            .first()
         )
-        db.add(root)
+        if not existing_root:
+            new_root = models.Root(
+                rootHash=root["id"],
+                rewardProgramId=root["rewardProgram"]["id"],
+                paymentCycle=int(root["paymentCycle"]),
+                blockNumber=int(root["blockNumber"]),
+                timestamp=datetime.fromtimestamp(int(root["timestamp"])),
+            )
+            db.add(new_root)
+        leafs = []
         proofs = []
         for payment in payment_list:
             token, amount = self.decode_payment(payment)
@@ -90,7 +100,18 @@ class Indexer:
                 validTo=payment["validTo"],
             )
             proofs.append(i)
-        db.bulk_save_objects(proofs)
+            leafs.append(payment["leaf"])
+        for existing_proof in (
+            db.query(models.Proof).filter(models.Proof.leaf.in_(leafs)).all()
+        ):
+            try:
+                i = list(p.leaf == existing_proof.leaf for p in proofs).index(
+                    True
+                )  # find index of new proofs that already has leaf in db
+                del proofs[i]  # remove that proof from the array
+            except ValueError as e:
+                pass
+        db.add_all(proofs)
 
     def decode_payment(self, payment):
         _, _, _, _, token_type, _, transfer_data = eth_abi.decode_abi(
