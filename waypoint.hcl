@@ -436,8 +436,8 @@ app "reward-api" {
       }
 
       secrets = {
-        DB_STRING  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
-        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
+        DB_STRING         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
+        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
     }
@@ -449,6 +449,7 @@ app "reward-api" {
   }
 }
 
+<<<<<<< HEAD
 app "reward-indexer" {
   path = "./packages/cardpay-reward-indexer"
 
@@ -503,13 +504,13 @@ app "reward-scheduler" {
 
   config {
     env = {
-      ENVIRONMENT    = "staging"
-      REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
-      SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
+      ENVIRONMENT                        = "staging"
+      REWARDS_BUCKET                     = "s3://tally-staging-reward-programs"
+      SUBGRAPH_URL                       = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
       REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07,0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
-      REWARD_MANAGER_ADDRESS = "0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f"
-      REWARDS_SUBGRAPH_EXTRACTION = "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
-      REWARD_SCHEDULER_UPDATE_FREQUENCY = "600"
+      REWARD_MANAGER_ADDRESS             = "0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f"
+      REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
+      REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
     }
   }
 
@@ -539,7 +540,7 @@ app "reward-scheduler" {
       disable_alb         = true
 
       secrets = {
-        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_programs_sentry_dsn-zAMOFo"
+        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_programs_sentry_dsn-zAMOFo"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
     }
