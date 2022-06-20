@@ -2,7 +2,7 @@
 
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        PickleType, String, Time)
+                        PickleType, String, Time, UniqueConstraint)
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
