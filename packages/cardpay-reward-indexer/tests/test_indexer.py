@@ -103,16 +103,16 @@ def test_should_not_index_new_root_without_s3(indexer, mock_db, monkeypatch):
 
 
 @pytest.mark.parametrize("indexer", [[]], indirect=["indexer"])
-def test_should_not_index_root_with_old_file_written(indexer, mock_db, monkeypatch):
+def test_indexer_run_twice_should_not_add_new_rows(indexer, mock_db, monkeypatch):
     indexer.run(mock_db, settings.REWARDS_BUCKET)
-    monkeypatch.setattr(
-        Indexer,
-        "get_merkle_roots",
-        lambda _, reward_program_id, payment_cycle: extra_one_merkle_roots_old_file_written(
-            reward_program_id, payment_cycle
-        ),
-    )
-    with pytest.raises(
-        exc.IntegrityError, match=r".* UNIQUE constraint failed: proofs.leaf"
-    ):
-        indexer.run(mock_db, settings.REWARDS_BUCKET)
+    with mock_db.begin():
+        roots = mock_db.query(Root).all()
+        proofs = mock_db.query(Proof).all()
+    assert len(roots) == 4
+    assert len(proofs) == 41
+    indexer.run(mock_db, settings.REWARDS_BUCKET)
+    with mock_db.begin():
+        roots = mock_db.query(Root).all()
+        proofs = mock_db.query(Proof).all()
+    assert len(roots) == 4
+    assert len(proofs) == 41
