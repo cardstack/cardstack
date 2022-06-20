@@ -38,7 +38,6 @@ class Settings(BaseSettings):
     )
     REWARDS_BUCKET: str = "s3://tally-staging-reward-programs"
     DB_STRING: str = "postgresql://postgres@localhost:5432/postgres"
-    EVM_FULL_NODE_URL: str = "https://sokol-archive.blockscout.com"
     SENTRY_DSN: str = None
 
     class Config:
@@ -47,7 +46,6 @@ class Settings(BaseSettings):
                 "env": "DB_STRING",
             },
             "SENTRY_DSN": {"env": "SENTRY_DSN"},
-            "EVM_FULL_NODE_URL": {"env": "EVM_FULL_NODE_URL"},
         }
 
 
