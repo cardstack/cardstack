@@ -414,7 +414,7 @@ app "reward-api" {
     registry {
       use "aws-ecr" {
         region     = "us-east-1"
-        repository = "reward-api-staging"
+        repository = "reward-api"
         tag        = "latest"
       }
     }
@@ -428,8 +428,8 @@ app "reward-api" {
       cluster             = "reward-api-staging"
       count               = 2
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-api-staging-ecr-task"
-      execution_role_name = "reward-api-staging-ecr-task-executor-role"
+      task_role_name      = "reward-api-ecs-task"
+      execution_role_name = "reward-api-ecs-task-execution"
 
       alb {
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/b8ba590b-e901-4e52-8a79-dcf3c8d8e48a"
@@ -468,7 +468,7 @@ app "reward-indexer" {
     registry {
       use "aws-ecr" {
         region     = "us-east-1"
-        repository = "reward-indexer-staging"
+        repository = "reward-indexer"
         tag        = "latest"
       }
     }
@@ -481,8 +481,8 @@ app "reward-indexer" {
       cluster             = "reward-indexer-staging"
       count               = 1
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-indexer-staging-ecr-task"
-      execution_role_name = "reward-indexer-staging-ecr-task-executor-role"
+      task_role_name      = "reward-indexer-ecs-task"
+      execution_role_name = "reward-indexer-ecs-task-execution"
       disable_alb         = true
 
       secrets = {
