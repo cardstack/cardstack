@@ -4,6 +4,9 @@ import { service } from '@cardstack/hub/services';
 import { encodeDID } from '@cardstack/did-resolver';
 import * as Sentry from '@sentry/node';
 import config from 'config';
+import logger from '@cardstack/logger';
+
+const log = logger('hub/worker');
 
 const network = config.get('web3.layer2Network') as string;
 
@@ -65,8 +68,10 @@ export default class CreateProfile {
 
       this.workerClient.addJob('persist-off-chain-merchant-info', { 'merchant-safe-id': merchantInfoId });
     } catch (error) {
+      let errorString = (error as Error).toString();
       Sentry.captureException(error);
-      await this.jobTickets.update(jobTicketId, { error: (error as Error).toString() }, 'failed');
+      log.error(errorString);
+      await this.jobTickets.update(jobTicketId, { error: errorString }, 'failed');
     }
   }
 }
