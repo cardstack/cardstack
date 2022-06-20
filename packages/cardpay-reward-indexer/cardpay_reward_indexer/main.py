@@ -4,6 +4,7 @@ import os
 import time
 
 import schedule
+import sentry_sdk
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 

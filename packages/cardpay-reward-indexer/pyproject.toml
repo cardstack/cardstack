@@ -16,6 +16,7 @@ dependencies = [
     "sqlalchemy>=1.4.37",
     "psycopg2>=2.9.3",
     "eth-hash[pycryptodome]>=0.3.2",
+    "sentry-sdk>=1.5.12",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
