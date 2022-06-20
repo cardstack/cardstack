@@ -19,7 +19,6 @@ logging.basicConfig(level=LOGLEVEL)
 settings = get_settings()
 engine = create_engine(settings.DB_STRING)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
