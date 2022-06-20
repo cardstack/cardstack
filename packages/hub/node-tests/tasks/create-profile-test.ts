@@ -14,6 +14,7 @@ describe('CreateProfileTask', function () {
 
   let registeredAddress = '0x123';
   let registeredDid = 'sku';
+  let mockTransactionHash = '0xABC';
   let mockMerchantSafeAddress = '0x456';
   let registerProfileCalls = 0;
   let registeringShouldError = false;
@@ -28,7 +29,32 @@ describe('CreateProfileTask', function () {
 
       registeredAddress = userAddress;
       registeredDid = did;
-      return Promise.resolve(mockMerchantSafeAddress);
+      return Promise.resolve(mockTransactionHash);
+    }
+  }
+
+  class StubCardPay {
+    async gqlQuery(_network: string, _query: string, _variables: { txn: string }) {
+      return {
+        "data": {
+          "transaction": {
+            "merchantCreations": [
+              {
+                "merchant": {
+                  "id": "0x323B2318F35c6b31113342830204335Dac715AA8"
+                },
+                "merchantSafe": {
+                  "id": mockMerchantSafeAddress
+                }
+              }
+            ]
+          }
+        }
+      };
+    }
+
+    async waitForTransactionConsistency(_web3: any, txHash: string) {
+      return Promise.resolve(txHash);
     }
   }
 
@@ -36,6 +62,7 @@ describe('CreateProfileTask', function () {
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
+    registry(this).register('cardpay', StubCardPay);
     registry(this).register('relay', StubRelayService, { type: 'service' });
   });
 
