@@ -415,7 +415,7 @@ app "reward-scheduler" {
   config {
     env = {
       ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
       SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
       REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
       REWARD_MANAGER_ADDRESS = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
@@ -449,8 +449,8 @@ app "reward-scheduler" {
       disable_alb         = true
 
       secrets = {
-        SENTRY_DSN = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
+        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
     }
   }
