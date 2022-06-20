@@ -442,7 +442,7 @@ app "reward-scheduler" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "cardpay-reward-scheduler-staging"
+      cluster             = "cardpay-reward-scheduler-production"
       count               = 1
       task_role_name      = "reward-programs-scheduler-ecr-task"
       execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
