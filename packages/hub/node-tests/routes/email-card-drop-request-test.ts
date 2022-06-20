@@ -49,7 +49,8 @@ class StubCardpaySDK {
     switch (sdk) {
       case 'PrepaidCardMarketV2':
         return Promise.resolve({
-          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity),
+          // getQuantity is returned as a string
+          getQuantity: () => Promise.resolve(mockPrepaidCardQuantity.toString()),
           isPaused: () => Promise.resolve(mockPrepaidCardMarketContractPaused),
         });
       default:
@@ -107,9 +108,11 @@ describe('GET /api/email-card-drop-requests', function () {
   });
 
   it('reports no availability if there is insufficient funding for a card drop to be initiated', async function () {
-    let reservationCount = mockPrepaidCardQuantity + 1;
+    // Since these values are returned as strings, quantity '50' < reservations '100' is false, checking for true number comparison
+    let reservationCount = 100;
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
+    let insertionTimeBeforeExpiry = new Date(fakeTime - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000);
 
     for (let i = 0; i < reservationCount; i++) {
       await emailCardDropRequestsQueries.insert({
@@ -117,7 +120,7 @@ describe('GET /api/email-card-drop-requests', function () {
         emailHash: `other-email-hash-${i}`,
         verificationCode: 'x',
         id: shortUUID.uuid(),
-        requestedAt: new Date(),
+        requestedAt: insertionTimeBeforeExpiry,
       });
     }
 
@@ -220,7 +223,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
   it('persists an email card drop request and triggers jobs', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let insertionTimeBeyondExpiry = Date.now() - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
+    let insertionTimeBeyondExpiry = fakeTime - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
 
     // Create no-longer-active reservations
 
@@ -502,7 +505,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     for (let i = 0; i <= count; i++) {
       let claim = Object.assign({}, claimedEoa);
-      claim.claimedAt = new Date(Date.now() - periodMinutes * 60 * 1000);
+      claim.claimedAt = new Date(fakeTime - periodMinutes * 60 * 1000);
       claim.id = shortUUID.uuid();
       await emailCardDropRequestsQueries.insert(claim);
     }
@@ -554,7 +557,7 @@ describe('POST /api/email-card-drop-requests', function () {
 
     for (let i = 0; i <= count * 2; i++) {
       let claim = Object.assign({}, claimedEoa);
-      claim.claimedAt = new Date(Date.now() - 2 * periodMinutes * 60 * 1000);
+      claim.claimedAt = new Date(fakeTime - 2 * periodMinutes * 60 * 1000);
       claim.id = shortUUID.uuid();
       await emailCardDropRequestsQueries.insert(claim);
     }

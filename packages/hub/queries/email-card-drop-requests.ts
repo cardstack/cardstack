@@ -76,7 +76,7 @@ export default class EmailCardDropRequestsQueries {
           FROM email_card_drop_requests
           WHERE claimed_at IS NOT NULL
         ) AND
-        requested_at > (now() - interval '${emailVerificationLinkExpiryMinutes} minutes')
+        requested_at > (timestamp '${this.clock.postgresTimestampNow()}' - interval '${emailVerificationLinkExpiryMinutes} minutes')
     `;
 
     const queryResult = await db.query(query);
@@ -89,7 +89,7 @@ export default class EmailCardDropRequestsQueries {
     let { rows } = await db.query(
       `
         SELECT COUNT(*) FROM email_card_drop_requests
-        WHERE claimed_at > NOW() - interval '${minutes} minutes'
+        WHERE claimed_at > timestamp '${this.clock.postgresTimestampNow()}' - interval '${minutes} minutes'
       `
     );
 

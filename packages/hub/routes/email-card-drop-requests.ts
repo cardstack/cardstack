@@ -12,6 +12,7 @@ import cryptoRandomString from 'crypto-random-string';
 import * as Sentry from '@sentry/node';
 import { NOT_NULL } from '../utils/queries';
 import logger from '@cardstack/logger';
+import BN from 'bn.js';
 
 const log = logger('hub/email-card-drop-requests');
 
@@ -74,14 +75,12 @@ export default class EmailCardDropRequestsRoute {
     let rateLimited = await this.emailCardDropStateQueries.read();
 
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
-    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
-    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
 
     let available = true;
 
     if (await prepaidCardMarketV2.isPaused()) {
       available = false;
-    } else if (quantityAvailable < activeReservations) {
+    } else if (await this.getPrepaidCardReservationsAreUnavailable()) {
       available = false;
     }
 
@@ -115,10 +114,11 @@ export default class EmailCardDropRequestsRoute {
       return respondWith503(ctx, 'The prepaid card market contract is paused');
     }
 
-    let quantityAvailable = await prepaidCardMarketV2.getQuantity(cardDropSku);
-    let activeReservations = await this.emailCardDropRequestQueries.activeReservations();
+    let quantityAvailable = await this.getPrepaidCardQuantityAvailable();
+    let activeReservations = await this.getActiveReservations();
+    let unreserved = quantityAvailable.sub(activeReservations);
 
-    let supplyIsBelowNotificationThreshold = quantityAvailable - activeReservations < notifyWhenQuantityBelow;
+    let supplyIsBelowNotificationThreshold = unreserved.lt(new BN(notifyWhenQuantityBelow));
 
     log.info(
       `${cardDropSku} has ${quantityAvailable} available and ${activeReservations} reserved, notification threshold is ${notifyWhenQuantityBelow}`
@@ -138,7 +138,7 @@ export default class EmailCardDropRequestsRoute {
       );
     }
 
-    if (quantityAvailable <= activeReservations) {
+    if (await this.getPrepaidCardReservationsAreUnavailable()) {
       return respondWith503(ctx, 'There are no prepaid cards available');
     }
 
@@ -266,6 +266,22 @@ export default class EmailCardDropRequestsRoute {
 
     ctx.status = 201;
     ctx.body = serialized;
+  }
+
+  private async getMarketContract() {
+    return await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
+  }
+
+  private async getPrepaidCardQuantityAvailable() {
+    return new BN(await (await this.getMarketContract()).getQuantity(cardDropSku));
+  }
+
+  private async getActiveReservations() {
+    return new BN(await this.emailCardDropRequestQueries.activeReservations());
+  }
+
+  private async getPrepaidCardReservationsAreUnavailable() {
+    return (await this.getPrepaidCardQuantityAvailable()).lte(await this.getActiveReservations());
   }
 }
 
