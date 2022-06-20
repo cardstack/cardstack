@@ -11,13 +11,22 @@ from . import models
 from .config import config, get_settings
 from .indexer import Indexer
 
-settings = get_settings()
-engine = create_engine(settings.DB_STRING)
-
-models.Base.metadata.create_all(bind=engine)
-
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL)
+
+settings = get_settings()
+engine = create_engine(settings.DB_STRING)
+models.Base.metadata.create_all(bind=engine)
+
+if settings.SENTRY_DSN is not None:
+    sentry_sdk.init(
+        settings.SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        environment=settings.ENVIRONMENT,
+    )
 
 
 def run_task(indexer, storage_location):
