@@ -18,6 +18,7 @@ describe('CreateProfileTask', function () {
   let mockMerchantSafeAddress = '0x456';
   let registerProfileCalls = 0;
   let registeringShouldError = false;
+  let subgraphQueryShouldBeNull = false;
 
   class StubRelayService {
     async registerProfile(userAddress: string, did: string) {
@@ -36,20 +37,22 @@ describe('CreateProfileTask', function () {
   class StubCardPay {
     async gqlQuery(_network: string, _query: string, _variables: { txn: string }) {
       return {
-        "data": {
-          "transaction": {
-            "merchantCreations": [
-              {
-                "merchant": {
-                  "id": "0x323B2318F35c6b31113342830204335Dac715AA8"
-                },
-                "merchantSafe": {
-                  "id": mockMerchantSafeAddress
-                }
-              }
-            ]
-          }
-        }
+        data: {
+          transaction: subgraphQueryShouldBeNull
+            ? null
+            : {
+                merchantCreations: [
+                  {
+                    merchant: {
+                      id: '0x323B2318F35c6b31113342830204335Dac715AA8',
+                    },
+                    merchantSafe: {
+                      id: mockMerchantSafeAddress,
+                    },
+                  },
+                ],
+              },
+        },
       };
     }
 
@@ -64,6 +67,9 @@ describe('CreateProfileTask', function () {
   this.beforeEach(function () {
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('relay', StubRelayService, { type: 'service' });
+
+    registeringShouldError = false;
+    subgraphQueryShouldBeNull = false;
   });
 
   let { getContainer } = setupHub(this);
@@ -120,6 +126,29 @@ describe('CreateProfileTask', function () {
     let sentryReport = await waitForSentryReport();
 
     expect(sentryReport.error?.message).to.equal('registering should error');
+
+    expect(getJobIdentifiers()).to.be.empty;
+  });
+
+  it('fails the job ticket and logs to Sentry if the merchantCreations subgraph query does not return a merchant address', async function () {
+    subgraphQueryShouldBeNull = true;
+
+    await subject.perform({
+      'job-ticket-id': jobTicketId,
+      'merchant-info-id': merchantInfosId,
+    });
+
+    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    expect(jobTicket?.state).to.equal('failed');
+    expect(jobTicket?.result).to.deep.equal({
+      error: `Error: subgraph query for transaction ${mockTransactionHash} returned no results`,
+    });
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.error?.message).to.equal(
+      `subgraph query for transaction ${mockTransactionHash} returned no results`
+    );
 
     expect(getJobIdentifiers()).to.be.empty;
   });

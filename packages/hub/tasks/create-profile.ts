@@ -51,6 +51,12 @@ export default class CreateProfile {
         txnHash: profileRegistrationTxHash,
       });
 
+      let transaction = merchantCreationsSubgraphResult.data.transaction;
+
+      if (!transaction) {
+        throw new Error(`subgraph query for transaction ${profileRegistrationTxHash} returned no results`);
+      }
+
       await this.jobTickets.update(
         jobTicketId,
         { 'merchant-safe-id': merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id },
