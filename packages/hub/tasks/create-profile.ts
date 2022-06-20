@@ -51,7 +51,7 @@ export default class CreateProfile {
       await this.cardpay.waitForTransactionConsistency(this.web3.getInstance(), profileRegistrationTxHash);
 
       let merchantCreationsSubgraphResult = await this.cardpay.gqlQuery(network, merchantCreationsQuery, {
-        txnHash: profileRegistrationTxHash,
+        txn: profileRegistrationTxHash,
       });
 
       let transaction = merchantCreationsSubgraphResult.data.transaction;
