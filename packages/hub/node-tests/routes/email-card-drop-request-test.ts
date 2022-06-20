@@ -110,7 +110,7 @@ describe('GET /api/email-card-drop-requests', function () {
     let reservationCount = 100;
 
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let insertionTimeBeforeExpiry = new Date(fakeTime - emailVerificationLinkExpiryMinutes / 2);
+    let insertionTimeBeforeExpiry = new Date(fakeTime - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000);
 
     for (let i = 0; i < reservationCount; i++) {
       await emailCardDropRequestsQueries.insert({
