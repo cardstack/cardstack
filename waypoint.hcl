@@ -504,7 +504,7 @@ app "reward-scheduler" {
   config {
     env = {
       ENVIRONMENT                        = "staging"
-      REWARDS_BUCKET                     = "s3://tally-staging-reward-programs"
+      REWARDS_BUCKET                     = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL                       = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
       REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07,0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
       REWARD_MANAGER_ADDRESS             = "0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f"
