@@ -120,11 +120,15 @@ class RewardProgram:
         return set(range(start_block, end_block, payment_cycle_length))
 
     def get_rules(self):
-        rule_blob = json.loads(self.reward_manager.caller.rule(self.reward_program_id))
-        if type(rule_blob) == list:
-            return rule_blob
+        rule_blob = self.reward_manager.caller.rule(self.reward_program_id)
+        if rule_blob:
+            rules = json.loads(rule_blob)
+            if type(rules) == list:
+                return rules
+            else:
+                return [rules]
         else:
-            return [rule_blob]
+            return []
 
     def raise_on_payment_cycle_overlap(self, rules):
         """
