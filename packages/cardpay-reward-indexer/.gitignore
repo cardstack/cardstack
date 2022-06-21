@@ -1,0 +1,7 @@
+.env
+.pytest_cache
+*.pyc
+__pycache__
+.env
+__pypackages__
+.pdm.toml

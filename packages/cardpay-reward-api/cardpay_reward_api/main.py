@@ -6,15 +6,12 @@ from typing import List, Optional
 import sentry_sdk
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi_utils.session import FastAPISessionMaker
-from fastapi_utils.tasks import repeat_every
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from web3 import Web3
 
 from . import crud, models, schemas
 from .config import config, get_settings
-from .indexer import Indexer
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -22,7 +19,6 @@ logging.basicConfig(level=LOGLEVEL)
 settings = get_settings()
 engine = create_engine(settings.DB_STRING)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -33,11 +29,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-def get_fastapi_sessionmaker() -> FastAPISessionMaker:
-    """This function could be replaced with a global variable if preferred"""
-    return FastAPISessionMaker(settings.DB_STRING)
 
 
 def get_w3():
@@ -63,20 +54,6 @@ if settings.SENTRY_DSN is not None:
         traces_sample_rate=1.0,
         environment=settings.ENVIRONMENT,
     )
-
-
-@app.on_event("startup")
-@repeat_every(seconds=5, raise_exceptions=True)
-def index_root_task() -> None:
-    sessionmaker = get_fastapi_sessionmaker()
-    with sessionmaker.context_session() as db:
-        try:
-            Indexer(
-                settings.SUBGRAPH_URL,
-                config[settings.ENVIRONMENT]["archived_reward_programs"],
-            ).run(db=db, storage_location=settings.REWARDS_BUCKET)
-        except Exception as e:
-            logging.error(e)
 
 
 def param(skip: int = 0, limit: int = 100):
