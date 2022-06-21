@@ -38,7 +38,7 @@ jobs:
             echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
           elif [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "AWS_ROLE_ARN=arn:aws:iam::120317779495:role/reward-programs" >> $GITHUB_ENV
-            echo "AWS_REGION=ap-southeast-1" >> $GITHUB_ENV
+            echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
           else
             echo "unrecognized environment"
             exit 1;

@@ -36,7 +36,7 @@ Visit `localhost:8000/docs`. You can trigger the api calls from there.
 Set these values as the .env file at the root of the subpackage
     
     SUBGRAPH_URL=https://graph-staging.stack.cards.com/subgraphs/name/habdelra/cardpay-sokol
-    REWARDS_BUCKET=s3://tally-staging-reward-programs
+    REWARDS_BUCKET=s3://cardpay-staging-reward-programs
     DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres
 
 
