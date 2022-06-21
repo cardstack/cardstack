@@ -88,6 +88,8 @@ function main() {
       if (!app.disableAlb) {
         const loadbalancer = getLoadBalancer(app.name);
         const albSubnets = loadbalancer.AvailabilityZones.map((az) => az.SubnetId);
+        const servicePort = service.loadBalancers[0].containerPort;
+        _output = _output + `\nservice_port = "${servicePort}"`;
         _output = _output + `\nalb subnets = ${JSON.stringify(albSubnets)}`;
       }
       return _output;

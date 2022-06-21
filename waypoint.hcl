@@ -26,6 +26,7 @@ app "hub" {
 
   deploy {
     use "aws-ecs" {
+      service_port        = 3000
       region              = "us-east-1"
       memory              = "512"
       cluster             = "hub-staging"
