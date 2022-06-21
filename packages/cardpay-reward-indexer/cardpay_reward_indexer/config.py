@@ -15,7 +15,7 @@ config = {
             "0xd40c4b61D0B08548Dd1E2b79c1E8Ad98f15c65d8",
         ],
         "reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA",
-        "rewards_bucket": "s3://tally-staging-reward-programs",
+        "rewards_bucket": "s3://cardpay-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "tokens": {
             "card": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
@@ -25,7 +25,7 @@ config = {
     "production": {
         "reward_program": "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185",
         "archived_reward_programs": [],
-        "rewards_bucket": "s3://tally-production-reward-programs",
+        "rewards_bucket": "s3://cardpay-production-reward-programs",
         "subgraph_url": "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai",
         "reward_pool": "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a",
         "tokens": {
@@ -41,10 +41,8 @@ config["test"] = config["staging"]
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "local"
-    SUBGRAPH_URL: str = (
-        "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-    )
-    REWARDS_BUCKET: str = "s3://tally-staging-reward-programs"
+    SUBGRAPH_URL: str = config["staging"]["subgraph_url"]
+    REWARDS_BUCKET: str = config["staging"]["rewards_bucket"]
     DB_STRING: str = "postgresql://postgres@localhost:5432/postgres"
     SENTRY_DSN: str = None
 
