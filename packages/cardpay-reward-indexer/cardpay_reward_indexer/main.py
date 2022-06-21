@@ -30,13 +30,21 @@ if settings.SENTRY_DSN is not None:
     )
 
 
+def model_exists(db, model_class):
+    engine = db.get_bind()
+    return model_class.metadata.tables[model_class.__tablename__].exists(engine)
+
+
 def run_task(indexer, storage_location):
     """
     Opens and close single db connection per indexing task
     """
     try:
-        with Session(engine) as db:
-            indexer.run(db, storage_location)
+        if model_exists(db, models.Proof) and model_exists(db, models.Root):
+            with Session(engine) as db:
+                indexer.run(db, storage_location)
+        else:
+            logging.info("No tables exist")
     except Exception as e:
         logging.error(e)
 

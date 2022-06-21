@@ -2,7 +2,7 @@
 
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        PickleType, String, Time)
+                        PickleType, String, Time, UniqueConstraint)
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
@@ -28,7 +28,12 @@ class Root(Base):
     __tablename__ = "roots"
     id = Column(Integer, primary_key=True, index=True)
     rewardProgramId = Column(String)
-    rootHash = Column(String, unique=True)
+    rootHash = Column(String)
     paymentCycle = Column(Integer)
     blockNumber = Column(Integer)
     timestamp = Column(DateTime)
+    __table_args__ = (
+        UniqueConstraint(
+            "rewardProgramId", "paymentCycle", name="rewardProgramId_paymentCycle"
+        ),
+    )
