@@ -455,7 +455,7 @@ app "reward-indexer" {
   config {
     env = {
       ENVIRONMENT    = "staging"
-      REWARDS_BUCKET = "s3://tally-staging-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
     }
   }
