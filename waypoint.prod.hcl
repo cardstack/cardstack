@@ -373,7 +373,7 @@ app "reward-api" {
     registry {
       use "aws-ecr" {
         region     = "us-east-1"
-        repository = "reward-api-production"
+        repository = "reward-api"
         tag        = "latest"
       }
     }
@@ -384,11 +384,11 @@ app "reward-api" {
       service_port        = 8000
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "reward-api-production"
+      cluster             = "reward-api"
       count               = 2
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
-      task_role_name      = "reward-api-production-ecr-task"
-      execution_role_name = "reward-api-production-ecr-task-executor-role"
+      task_role_name      = "reward-api-ecs-task"
+      execution_role_name = "reward-api-ecs-task-execution"
 
       alb {
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/bf0eb25e-83be-48a9-a0b5-e267b088c959"
