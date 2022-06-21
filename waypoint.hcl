@@ -352,7 +352,7 @@ app "reward-submit" {
     env = {
       ENVIRONMENT           = "staging"
       REWARD_POOL_ADDRESS   = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
-      REWARD_PROGRAM_OUTPUT = "s3://tally-staging-reward-programs/"
+      REWARD_PROGRAM_OUTPUT = "s3://cardpay-staging-reward-programs/"
     }
   }
 
@@ -401,7 +401,7 @@ app "reward-api" {
   config {
     env = {
       ENVIRONMENT    = "staging"
-      REWARDS_BUCKET = "s3://tally-staging-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
     }
   }
