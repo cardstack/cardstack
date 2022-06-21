@@ -28,3 +28,8 @@ runs:
     - name: Deploy reward indexer
       run: waypoint up -app=reward-indexer -prune-retain=0 -plain
       shell: bash
+
+    - name: Prune dangling resources
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: "reward-indexer"
