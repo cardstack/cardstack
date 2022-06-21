@@ -56,8 +56,7 @@ def run_all():
         config[settings.ENVIRONMENT]["archived_reward_programs"],
     )
 
-    # Default to one minute
-    frequency = 5
+    frequency = 5  # 5 seconds
     schedule.every(frequency).seconds.do(run_task, indexer, settings.REWARDS_BUCKET)
     schedule.run_all()
     # Go into an infinite loop
