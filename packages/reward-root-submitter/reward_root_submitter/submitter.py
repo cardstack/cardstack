@@ -68,6 +68,11 @@ class RootSubmitter:
                     f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}"
                 )
                 return
+            else:
+                logging.error(
+                    f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}, differs from content on S3"
+                )
+                return
         # Now submit the root
         transaction_count = self.w3.eth.get_transaction_count(self.owner)
         tx = self.reward_contract.functions.submitPayeeMerkleRoot(
