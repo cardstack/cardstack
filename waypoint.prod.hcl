@@ -340,10 +340,10 @@ app "reward-submit" {
       disable_alb         = true
 
       secrets = {
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
-        OWNER             = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
-        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
-        SENTRY_DSN        = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
+        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+        OWNER             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
+        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
+        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
       }
     }
 
