@@ -40,11 +40,11 @@ def run_task(indexer, storage_location):
     Opens and close single db connection per indexing task
     """
     try:
-        if model_exists(db, models.Proof) and model_exists(db, models.Root):
-            with Session(engine) as db:
+        with Session(engine) as db:
+            if model_exists(db, models.Proof) and model_exists(db, models.Root):
                 indexer.run(db, storage_location)
-        else:
-            logging.info("No tables exist")
+            else:
+                logging.info("No tables exist")
     except Exception as e:
         logging.error(e)
 
