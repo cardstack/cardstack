@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import logging
 import re
 from datetime import datetime
@@ -7,13 +10,11 @@ import pyarrow.parquet as pq
 import requests
 from cloudpathlib import AnyPath
 from eth_utils import to_checksum_address
-from fastapi import Depends
 from hexbytes import HexBytes
-from pyarrow import fs
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from . import crud, database, models, schemas
+from . import models
 
 
 class Indexer:
@@ -31,6 +32,10 @@ class Indexer:
         with db.begin():
             last_submitted_root_block_number = self.get_last_indexed_root_block_number(
                 db, reward_program_id
+            )
+
+            print(
+                f"Indexing reward program {reward_program_id} since block {last_submitted_root_block_number}"
             )
             logging.info(
                 f"Indexing reward program {reward_program_id} since block {last_submitted_root_block_number}"
@@ -61,14 +66,24 @@ class Indexer:
         logging.info(
             f"Indexing {len(payment_list)} proofs for payment cycle {root['paymentCycle']}"
         )
-        root = models.Root(
-            rootHash=root["id"],
-            rewardProgramId=root["rewardProgram"]["id"],
-            paymentCycle=int(root["paymentCycle"]),
-            blockNumber=int(root["blockNumber"]),
-            timestamp=datetime.fromtimestamp(int(root["timestamp"])),
+        existing_root = (
+            db.query(models.Root)
+            .filter_by(
+                rewardProgramId=root["rewardProgram"]["id"],
+                paymentCycle=root["paymentCycle"],
+            )
+            .first()
         )
-        db.add(root)
+        if not existing_root:
+            new_root = models.Root(
+                rootHash=root["id"],
+                rewardProgramId=root["rewardProgram"]["id"],
+                paymentCycle=int(root["paymentCycle"]),
+                blockNumber=int(root["blockNumber"]),
+                timestamp=datetime.fromtimestamp(int(root["timestamp"])),
+            )
+            db.add(new_root)
+        leafs = []
         proofs = []
         for payment in payment_list:
             token, amount = self.decode_payment(payment)
@@ -85,7 +100,18 @@ class Indexer:
                 validTo=payment["validTo"],
             )
             proofs.append(i)
-        db.bulk_save_objects(proofs)
+            leafs.append(payment["leaf"])
+        for existing_proof in (
+            db.query(models.Proof).filter(models.Proof.leaf.in_(leafs)).all()
+        ):
+            try:
+                i = list(p.leaf == existing_proof.leaf for p in proofs).index(
+                    True
+                )  # find index of new proofs that already has leaf in db
+                del proofs[i]  # remove that proof from the array
+            except ValueError as e:
+                pass
+        db.add_all(proofs)
 
     def decode_payment(self, payment):
         _, _, _, _, token_type, _, transfer_data = eth_abi.decode_abi(

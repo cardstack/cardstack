@@ -1,10 +1,10 @@
-name: CI [cardpay-reward-api]
+name: CI [cardpay-reward-indexer]
 
 on:
   pull_request:
     paths:
-      - 'packages/cardpay-reward-api/**'
-      - '.github/workflows/pr-cardpay-reward-api.yml'
+      - 'packages/cardpay-reward-indexer/**'
+      - '.github/workflows/pr-cardpay-reward-indexer.yml'
 
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./packages/cardpay-reward-api
+        working-directory: ./packages/cardpay-reward-indexer
     strategy:
       matrix:
         python-version: [3.9]
