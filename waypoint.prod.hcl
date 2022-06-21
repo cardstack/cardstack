@@ -311,7 +311,7 @@ app "reward-submit" {
     env = {
       ENVIRONMENT           = "production"
       REWARD_POOL_ADDRESS   = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
-      REWARD_PROGRAM_OUTPUT = "s3://tally-production-reward-programs/"
+      REWARD_PROGRAM_OUTPUT = "s3://cardpay-production-reward-programs/"
     }
   }
 
@@ -360,7 +360,7 @@ app "reward-api" {
   config {
     env = {
       ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
       SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
     }
   }
@@ -415,7 +415,7 @@ app "reward-scheduler" {
   config {
     env = {
       ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
       SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
       REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
       REWARD_MANAGER_ADDRESS = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
