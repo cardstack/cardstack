@@ -20,35 +20,47 @@ for (const appSlug of appSlugs) {
   if (appConfig.secretArns.length === 0) {
     continue;
   }
-  let allowedSecretArns = [
-    ...queryAttachedPoliciesForAllowedSecretAccess(appConfig),
-    ...queryRolePoliciesForAllowedSecretAccess(appConfig),
-  ];
+
   let valid = true;
-  for (const neededSecretArn of appConfig.secretArns) {
-    if (!allowedSecretArns.includes(neededSecretArn)) {
+  let allowedSecretArns = [];
+
+  try {
+    allowedSecretArns = [
+      ...queryAttachedPoliciesForAllowedSecretAccess(appConfig),
+      ...queryRolePoliciesForAllowedSecretAccess(appConfig),
+    ];
+  } catch (err) {
+    errors.push({ app: appSlug, error: err.message });
+    valid = false;
+  }
+
+  if (valid) {
+    let missingSecretArns = [];
+    for (const neededSecretArn of appConfig.secretArns) {
+      if (!allowedSecretArns.includes(neededSecretArn)) {
+        missingSecretArns.push(neededSecretArn);
+      }
+    }
+
+    if (missingSecretArns.length > 0) {
       valid = false;
       errors.push({
         app: appSlug,
-        missingSecretArn: neededSecretArn,
+        error: `The role '${
+          appConfig.executionRoleName
+        }' is missing access to the following secrets:\n${missingSecretArns.join('\n')}\n`,
       });
     }
   }
+
   console.log(`${valid ? '✓' : '✗'} ${appSlug}`);
 }
 
 if (errors.length > 0) {
-  let errorMessage = 'Task execution roles do not have permission to read required secrets:\n\n';
-  errorMessage += errors.map(
-    (e) => `
-  app: ${e.app}
-  secretArn: ${e.missingSecretArn}
-
-`
-  );
-  console.log(errorMessage);
-  throw new Error(errorMessage);
+  errors.forEach((error) => console.error(`app: ${error.app}\nerror: ${error.error}`));
+  throw new Error(errors.join('\n'));
 }
+
 console.log(`Task policy access to secrets configured in ${waypointConfigFile} has been confirmed.`);
 
 function parseWaypointConfig(waypointConfigFile): RelevantWaypointConfigByApp {
