@@ -33,6 +33,7 @@ app "hub" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-staging-ecr-task"
       execution_role_name = "hub-staging-ecr-task-executor-role"
+      security_group_ids  = ["sg-09f7331a32e490c69"]
 
       alb {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
@@ -59,6 +60,10 @@ app "hub" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -92,6 +97,7 @@ app "hub-worker" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-staging-ecr-task"
       execution_role_name = "hub-staging-ecr-task-executor-role"
+      security_group_ids  = ["sg-0465ccc8bf0a0fe6f"]
       disable_alb         = true
 
       secrets = {
@@ -110,6 +116,10 @@ app "hub-worker" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -143,6 +153,7 @@ app "hub-bot" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-staging-ecr-task"
       execution_role_name = "hub-staging-ecr-task-executor-role"
+      security_group_ids  = ["sg-0439d31f77bea7b87"]
       disable_alb         = true
 
       secrets = {
@@ -160,6 +171,10 @@ app "hub-bot" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -193,6 +208,7 @@ app "hub-event-listener" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-staging-ecr-task"
       execution_role_name = "hub-staging-ecr-task-executor-role"
+      security_group_ids  = ["sg-0f67ba8550f29e23d"]
       disable_alb         = true
 
       secrets = {
@@ -210,6 +226,10 @@ app "hub-event-listener" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -239,6 +259,7 @@ app "cardie" {
       subnets             = ["subnet-89968ba2"]
       task_role_name      = "cardie-ecr-task"
       execution_role_name = "cardie-ecr-task-executor-role"
+      security_group_ids  = ["sg-081e62ecb53bd842a"]
       disable_alb         = true
 
       secrets = {
@@ -251,6 +272,10 @@ app "cardie" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "cardie"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -291,6 +316,7 @@ app "cardpay-subg-ext" {
       subnets             = ["subnet-081966e0d7a798bc1", "subnet-0544a2e18d66d0040"]
       task_role_name      = "cardpay-staging-subgraph-extraction-ecr-task"
       execution_role_name = "cardpay-staging-subgraph-extraction-ecr-task-executor-role"
+      security_group_ids  = ["sg-06a22e426f13d94ff"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4"
@@ -304,6 +330,10 @@ app "cardpay-subg-ext" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -326,13 +356,14 @@ app "ssr-web" {
 
   deploy {
     use "aws-ecs" {
-      service_port   = 4000
-      region         = "us-east-1"
-      memory         = "512"
-      cluster        = "ssr-web-staging"
-      count          = 2
-      subnets        = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      task_role_name = "ssr-web-staging-ecr-task"
+      service_port       = 4000
+      region             = "us-east-1"
+      memory             = "512"
+      cluster            = "ssr-web-staging"
+      count              = 2
+      subnets            = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+      security_group_ids = ["sg-0e4d7c35168bda780"]
+      task_role_name     = "ssr-web-staging-ecr-task"
 
       alb {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
@@ -344,6 +375,10 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -380,6 +415,7 @@ app "reward-submit" {
       count               = 1
       task_role_name      = "reward-root-submitter-ecr-task"
       execution_role_name = "reward-root-submitter-ecr-task-executor-role"
+      security_group_ids  = ["sg-01fb13ba9bdeb992c"]
       disable_alb         = true
 
       secrets = {
@@ -394,6 +430,10 @@ app "reward-submit" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -432,6 +472,7 @@ app "reward-api" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-api-ecs-task"
       execution_role_name = "reward-api-ecs-task-execution"
+      security_group_ids  = ["sg-0d93946d8742989a5"]
 
       alb {
         subnets     = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
@@ -449,6 +490,10 @@ app "reward-api" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -486,6 +531,7 @@ app "reward-indexer" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-indexer-ecs-task"
       execution_role_name = "reward-indexer-ecs-task-execution"
+      security_group_ids  = ["sg-02c932be6b9b5ba61"]
       disable_alb         = true
 
       secrets = {
@@ -498,6 +544,10 @@ app "reward-indexer" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -539,6 +589,7 @@ app "reward-scheduler" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-programs-scheduler-ecr-task"
       execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
+      security_group_ids  = ["sg-0294d0694d48bb9fb"]
       disable_alb         = true
 
       secrets = {
@@ -546,5 +597,9 @@ app "reward-scheduler" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
