@@ -449,7 +449,6 @@ app "reward-api" {
   }
 }
 
-<<<<<<< HEAD
 app "reward-indexer" {
   path = "./packages/cardpay-reward-indexer"
 
