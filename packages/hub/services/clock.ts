@@ -10,6 +10,9 @@ export class Clock {
   dateStringNow() {
     return format(this.now(), 'yyyy-MM-dd');
   }
+  postgresTimestampNow() {
+    return format(this.now(), 'yyyy-MM-dd HH:mm');
+  }
 }
 
 declare module '@cardstack/di' {
