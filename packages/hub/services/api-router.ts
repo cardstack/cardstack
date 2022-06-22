@@ -92,6 +92,7 @@ export default class APIRouter {
     apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
 
     apiSubrouter.get('/job-tickets/:id', jobTicketsRoute.get);
+    apiSubrouter.post('/job-tickets/:id/retry', jobTicketsRoute.retry);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.patch('/card-spaces/:id', parseBody, cardSpacesRoute.patch);

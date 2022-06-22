@@ -14,26 +14,29 @@ export default class JobTicketsQueries {
     if (queryResult.rows.length) {
       let row = queryResult.rows[0];
 
-      return {
-        id: row['id'],
-        jobType: row['job_type'],
-        ownerAddress: row['owner_address'],
-        state: row['state'],
-        payload: row['payload'],
-        result: row['result'],
-      };
+      return mapRowToModel(row);
     } else {
       return null;
     }
   }
 
+  async findAll(): Promise<JobTicket[]> {
+    let db = await this.databaseManager.getClient();
+
+    let query = `SELECT * FROM job_tickets`;
+    let queryResult = await db.query(query);
+
+    return queryResult.rows.map((row) => mapRowToModel(row));
+  }
+
   async insert(model: Partial<JobTicket>) {
     let db = await this.databaseManager.getClient();
 
-    await db.query('INSERT INTO job_tickets (id, job_type, owner_address) VALUES($1, $2, $3)', [
+    await db.query('INSERT INTO job_tickets (id, job_type, owner_address, payload) VALUES($1, $2, $3, $4)', [
       model.id,
       model.jobType,
       model.ownerAddress,
+      model.payload,
     ]);
   }
 
@@ -48,6 +51,17 @@ export default class JobTicketsQueries {
       [id, result, state]
     );
   }
+}
+
+function mapRowToModel(row: any): JobTicket {
+  return {
+    id: row['id'],
+    jobType: row['job_type'],
+    ownerAddress: row['owner_address'],
+    state: row['state'],
+    payload: row['payload'],
+    result: row['result'],
+  };
 }
 
 declare module '@cardstack/hub/queries' {
