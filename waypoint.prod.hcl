@@ -311,7 +311,7 @@ app "reward-submit" {
     env = {
       ENVIRONMENT           = "production"
       REWARD_POOL_ADDRESS   = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
-      REWARD_PROGRAM_OUTPUT = "s3://tally-production-reward-programs/"
+      REWARD_PROGRAM_OUTPUT = "s3://cardpay-production-reward-programs/"
     }
   }
 
@@ -340,10 +340,10 @@ app "reward-submit" {
       disable_alb         = true
 
       secrets = {
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
-        OWNER             = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
-        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
-        SENTRY_DSN        = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
+        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
+        OWNER             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
+        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
+        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
       }
     }
 
@@ -360,7 +360,7 @@ app "reward-api" {
   config {
     env = {
       ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
       SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
     }
   }
@@ -373,7 +373,7 @@ app "reward-api" {
     registry {
       use "aws-ecr" {
         region     = "us-east-1"
-        repository = "reward-api-production"
+        repository = "reward-api"
         tag        = "latest"
       }
     }
@@ -384,11 +384,11 @@ app "reward-api" {
       service_port        = 8000
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "reward-api-production"
+      cluster             = "reward-api"
       count               = 2
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
-      task_role_name      = "reward-api-production-ecr-task"
-      execution_role_name = "reward-api-production-ecr-task-executor-role"
+      task_role_name      = "reward-api-ecs-task"
+      execution_role_name = "reward-api-ecs-task-execution"
 
       alb {
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/bf0eb25e-83be-48a9-a0b5-e267b088c959"
@@ -408,6 +408,54 @@ app "reward-api" {
   }
 }
 
+app "reward-indexer" {
+  path = "./packages/cardpay-reward-indexer"
+
+  config {
+    env = {
+      ENVIRONMENT    = "production"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
+      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+    }
+  }
+
+  build {
+    use "docker" {
+      dockerfile = "Dockerfile"
+    }
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "reward-indexer"
+        tag        = "latest"
+      }
+    }
+  }
+
+  deploy {
+    use "aws-ecs" {
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "reward-indexer"
+      count               = 1
+      subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
+      task_role_name      = "reward-indexer-ecs-task"
+      execution_role_name = "reward-indexer-ecs-task-execution"
+      disable_alb         = true
+
+      secrets = {
+        DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
+      }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer"]
+    }
+  }
+}
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
@@ -415,7 +463,7 @@ app "reward-scheduler" {
   config {
     env = {
       ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://tally-production-reward-programs"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
       SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
       REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
       REWARD_MANAGER_ADDRESS = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
@@ -442,15 +490,15 @@ app "reward-scheduler" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
-      cluster             = "cardpay-reward-scheduler-staging"
+      cluster             = "cardpay-reward-scheduler-production"
       count               = 1
       task_role_name      = "reward-programs-scheduler-ecr-task"
       execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
       disable_alb         = true
 
       secrets = {
-        SENTRY_DSN = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:ap-southeast-1:120317779495:secret:production_evm_full_node_url-K67DON"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
+        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
     }
   }
