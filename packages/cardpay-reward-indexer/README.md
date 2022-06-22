@@ -32,7 +32,7 @@ Setup your local instance of postgres
 
 ## Env 
 
-By default, the envronment is setup to run with staging variables; there is no need to setup .env file except for your local postgres setup.
+By default, the envronment is setup to run with staging variables (and is completely SAFE to run since it is a read-only process). For running locally with staging, there is no need to setup except `DB_STRING` which points the app to your local postgres instance.
 
 You can easily overwrite env variables by either exporting them into your environment or prefixing them when running the main command(as below).
 
