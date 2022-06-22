@@ -46,7 +46,7 @@ query($txn: String!) {
 }
 `;
 
-const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
+const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'gnosis' };
 
 export default class NotifyMerchantClaim {
   cardpay: CardpaySDKService = inject('cardpay');

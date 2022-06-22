@@ -107,7 +107,7 @@ export default {
           statusOnCompletion: 'Transaction confirmed',
           sender: Cardbot,
           message: [
-            'We are ready to submit your transaction to the xDai network via a relayer. The transaction fee for the relay will be added to your payment, but you do not need to acquire the gas token (xDai) in order to complete the transaction.',
+            'We are ready to submit your transaction to the Gnosis Chain network via a relayer. The transaction fee for the relay will be added to your payment, but you do not need to acquire the gas token (xDai) in order to complete the transaction.',
             {
               component: 'boxel/action-container',
               title: 'Prepaid Card Issuance - Summary',

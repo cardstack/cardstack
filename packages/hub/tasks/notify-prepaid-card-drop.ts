@@ -6,7 +6,7 @@ import { PushNotificationData } from './send-notifications';
 import { generateContractEventNotificationId } from '../utils/notifications';
 import { EventData } from 'web3-eth-contract';
 
-const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
+const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'gnosis' };
 
 export default class NotifyPrepaidCardDrop {
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {

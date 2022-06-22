@@ -29,6 +29,6 @@ export type TransactionHash = string;
 export type TxnBlockNumber = number;
 export type ChainAddress = string;
 
-export type Layer2NetworkSymbol = 'xdai' | 'sokol';
+export type Layer2NetworkSymbol = 'gnosis' | 'sokol';
 export type TestLayer2NetworkSymbol = 'test-layer2';
 export type NetworkSymbol = Layer2NetworkSymbol;
