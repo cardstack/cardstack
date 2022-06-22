@@ -13,12 +13,15 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: volta-cli/action@v1
+
     - name: Install apt packages including waypoint
       shell: bash
       run: |
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
+        yarn add js-hcl-parser -W --prefer-offline
 
     - name: Deploy reward scheduler
       run: waypoint up -app=reward-scheduler -prune-retain=0 -plain
