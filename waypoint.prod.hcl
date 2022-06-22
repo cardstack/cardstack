@@ -391,7 +391,7 @@ app "reward-api" {
       execution_role_name = "reward-api-ecs-task-execution"
 
       alb {
-        certificate = "arn:aws:acm:us-east-1:120317779495:certificate/bf0eb25e-83be-48a9-a0b5-e267b088c959"
+        certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e8ea5aa9-f28e-40ea-88a6-05ff8f47fa5e"
       }
 
       secrets = {
