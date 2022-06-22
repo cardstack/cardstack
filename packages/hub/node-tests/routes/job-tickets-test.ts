@@ -1,6 +1,7 @@
 import { registry, setupHub } from '../helpers/server';
 import shortUUID from 'short-uuid';
 import JobTicketsQueries from '../../queries/job-tickets';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -104,6 +105,8 @@ describe('GET /api/job-tickets/:id', function () {
 });
 
 describe('POST /api/job-tickets/:id/retry', function () {
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
@@ -151,6 +154,9 @@ describe('POST /api/job-tickets/:id/retry', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
+    expect(getJobIdentifiers()).to.deep.equal(['a-job']);
+    expect(getJobPayloads()).to.deep.equal([{ 'a-payload': 'yes' }]);
+
     let allTickets = await jobTicketsQueries.findAll();
 
     let newTicket = allTickets.find((ticket) => !ticketIds.includes(ticket.id));
@@ -174,6 +180,8 @@ describe('POST /api/job-tickets/:id/retry', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(getJobIdentifiers()).to.be.empty;
   });
 
   it('returns 401 when the job ticket requested is for a different owner', async function () {
@@ -191,6 +199,8 @@ describe('POST /api/job-tickets/:id/retry', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(getJobIdentifiers()).to.be.empty;
   });
 
   it('returns 422 when the job ticket state is not failed', async function () {
@@ -208,6 +218,8 @@ describe('POST /api/job-tickets/:id/retry', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(getJobIdentifiers()).to.be.empty;
   });
 
   it('returns 404 for an unknown job', async function () {
@@ -228,5 +240,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(getJobIdentifiers()).to.be.empty;
   });
 });

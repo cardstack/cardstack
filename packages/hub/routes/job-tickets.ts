@@ -20,6 +20,7 @@ export default class JobTicketsRoute {
   });
 
   jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
+  workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -126,6 +127,8 @@ export default class JobTicketsRoute {
 
       return;
     }
+
+    this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload);
 
     let newJobTicket = {
       id: shortUUID.uuid(),
