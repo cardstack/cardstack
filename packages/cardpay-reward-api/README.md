@@ -1,7 +1,10 @@
 # Cardpay reward api
 
-The cardpay reward api performs:
-- exposes an api to access proofs for rewardees (people who get rewards). The rewardees use these proofs to claim their reward.
+The cardpay reward api exposes an api to access proofs for rewardees (people who get rewards). The rewardees use these proofs to claim their reward.
+
+This reward api works together with the [reward indexer](../cardpay-reward-indexer/README.md); you should set that up as a pre-requisite. 
+
+You can visit the live api on [production](https://reward-api.cardstack.com/docs) and on [staging](https://reward-api-staging.stack.cards).
 
 ## Setup
 
@@ -13,12 +16,9 @@ The cardpay reward api performs:
 
 ## Env 
 
-Export these into your local environment. We don't use .env files 
+By default, the envronment is setup to run with staging variables; there is no need to setup .env file except for your local postgres setup.
 
-    SUBGRAPH_URL=https://graph-staging.stack.cards.com/subgraphs/name/habdelra/cardpay-sokol
-    REWARDS_BUCKET=s3://tally-staging-reward-programs
-    DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres
-
+You can easily overwrite env variables by either exporting them into your environment or prefixing them when running the main command(as below).
 
 ## Run
 
