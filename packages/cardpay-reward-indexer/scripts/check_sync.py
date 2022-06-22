@@ -47,7 +47,7 @@ def check_sync(db_string: str, env: str):
     print(f"=======IN DB=========")
     print(f"Number of Roots:  {db_root_count}")
     print(f"Number of Proofs: {db_proof_count}")
-    print(f"======= DIFF =========")
+    print(f"=======DIFF=========")
     print(f"Number of Roots:  {root_count-db_root_count}")
     print(f"Number of Proofs: {proof_count-db_proof_count}")
 
