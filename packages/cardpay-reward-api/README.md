@@ -8,7 +8,19 @@ You can visit the live api on [production](https://reward-api.cardstack.com/docs
 
 ## Setup
 
+Install dependencies
+
     pdm install
+    
+Setup your local instance of postgres
+    
+    brew start postgresql
+
+    # or 
+
+    docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+        
+    psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
 
 ## Test
 
@@ -22,19 +34,8 @@ You can easily overwrite env variables by either exporting them into your enviro
 
 ## Run
 
-    # start postgres 
-    brew start postgresql
-    
-    or 
-    
-    docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
-    
-    
-    # run 
     env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgrespdm run main 
     
-    # look at db
-    psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
     
 Visit `localhost:8000/docs`. You can trigger the api calls from there. 
 
