@@ -112,6 +112,21 @@ export default class JobTicketsRoute {
       return;
     }
 
+    if (jobTicketToRetry.state !== 'failed') {
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Job ticket state is not failed',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 422;
+
+      return;
+    }
+
     let newJobTicket = {
       id: shortUUID.uuid(),
       jobType: jobTicketToRetry.jobType,
