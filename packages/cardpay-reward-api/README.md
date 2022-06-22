@@ -1,51 +1,46 @@
 # Cardpay reward api
 
-The cardpay reward api performs:
-- indexing of proofs (runs every 5s) into an rds db. The indexer is meant to be stateless; blowing away the tables in the db will recover all necessary state for the proofs. 
-- exposes an api to access proofs.
+The cardpay reward api exposes an api to access proofs for rewardees (people who get rewards). The rewardees use these proofs to claim their reward.
+
+This reward api works together with the [reward indexer](../cardpay-reward-indexer/README.md); you should set that up as a pre-requisite. 
+
+You can visit the live api on [production](https://reward-api.cardstack.com/docs) and on [staging](https://reward-api-staging.stack.cards).
 
 ## Setup
 
+Install dependencies
 
     pdm install
+    
+Setup your local instance of postgres
+    
+    brew start postgresql
+
+    # or 
+
+    docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+        
+    psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
 
 ## Test
 
     pdm run pytest tests
 
-## Run
-
-    # start postgres 
-    brew start postgresql
-    
-    or 
-    
-    docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
-    
-    
-    # run 
-    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres  pdm run main 
-    
-    # look at db
-    psql postgresql://postgres:mysecretpassword@localhost:5432/postgres
-
-Visit `localhost:8000/docs`. You can trigger the api calls from there. 
-    
 ## Env 
 
-Set these values as the .env file at the root of the subpackage
+By default, the envronment is setup to run with staging variables (and is completely SAFE to run since it is a read-only process). For running locally with staging, there is no need to setup except `DB_STRING` which points the app to your local postgres instance.
+
+You can easily overwrite env variables by either exporting them into your environment or prefixing them when running the main command(as below).
+
+## Run
+
+    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres pdm run main 
     
-    SUBGRAPH_URL=https://graph-staging.stack.cards.com/subgraphs/name/habdelra/cardpay-sokol
-    REWARDS_BUCKET=s3://cardpay-staging-reward-programs
-    DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres
+    
+Visit `localhost:8000/docs`. You can trigger the api calls from there. 
 
-
-## Docker
-
-    DOCKER_BUILDKIT=0 docker build  -t reward-api .
-    docker run --name some-postgres --rm -it -e POSTGRES_PASSWORD=mysecretpassword --net <some created network> --net-alias postgres -p 5432:5432 -d postgres
-    docker run -v ~/.aws:/root/.aws --env AWS_PROFILE=cardstack-prod --net <some created network> -p 8000:8000 reward-api:latest
-
+Note: it is important to prefix DB_STRING with `postgresql`
+    
 ## Deploy 
 
 This application is deployed via a manual dispatch of a github action 
