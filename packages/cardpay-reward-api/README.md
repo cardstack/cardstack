@@ -34,7 +34,7 @@ You can easily overwrite env variables by either exporting them into your enviro
 
 ## Run
 
-    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgrespdm run main 
+    env DB_STRING=postgresql://postgres:mysecretpassword@localhost:5432/postgres pdm run main 
     
     
 Visit `localhost:8000/docs`. You can trigger the api calls from there. 
