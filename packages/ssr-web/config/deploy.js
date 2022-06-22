@@ -56,9 +56,26 @@ module.exports = function (deployTarget) {
       prefix: process.env.PR_BRANCH_NAME,
       filePattern: s3AssetPattern.replace('}', ',css,html}'),
     };
-    ENV.plugins = ['build', 'compress', 's3'];
+    ENV.cloudfront = {
+      objectPaths: [
+        '/',
+        '/*',
+        '/*/*',
+        '/index.html',
+        '/assets/*',
+        '/assets/@cardstack/*',
+      ],
+    };
+    ENV.plugins = ['build', 'compress', 's3', 'cloudfront'];
   }
 
+  if (deployTarget === 's3-preview-staging') {
+    ENV.cloudfront.distribution = 'EFIB3VV9GQUOU';
+  }
+
+  if (deployTarget === 's3-preview-production') {
+    ENV.cloudfront.distribution = 'E2NL9H9YSQ24F8';
+  }
   // Note: if you need to build some configuration asynchronously, you can return
   // a promise that resolves with the ENV object instead of returning the
   // ENV object synchronously.
