@@ -43,7 +43,7 @@ jobs:
       - name: Deploy cardie
         uses: ./.github/actions/deploy-cardie
         with:
-          waypoint_version: "0.8.2"
+          waypoint_version: "0.8.1"
         env:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
