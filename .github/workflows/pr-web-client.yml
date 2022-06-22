@@ -73,7 +73,7 @@ jobs:
             ^packages/web-client
 
   deploy-web-client-preview-staging:
-    name: Deploy a staging preview to S3
+    name: Deploy a web-client staging preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
     # github.head_ref: the branch that the pull request is from. only appears on pull_request events
@@ -98,7 +98,7 @@ jobs:
           environment: staging
 
   deploy-web-client-preview-production:
-    name: Deploy a production preview to S3
+    name: Deploy a web-client production preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
     # github.head_ref: the branch that the pull request is from. only appears on pull_request events

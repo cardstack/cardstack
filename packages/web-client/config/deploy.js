@@ -126,7 +126,15 @@ module.exports = function (deployTarget) {
       prefix: process.env.PR_BRANCH_NAME,
       filePattern: s3AssetPattern.replace('}', ',css,html}'),
     };
-    ENV.plugins = ['build', 'compress', 's3'];
+    ENV.plugins = ['build', 'compress', 's3', 'cloudfront'];
+  }
+
+  if (deployTarget === 's3-preview-staging') {
+    ENV.cloudfront.distribution = 'E92FQLNVJGSBB';
+  }
+
+  if (deployTarget === 's3-preview-production') {
+    ENV.cloudfront.distribution = 'EEJQFF45KW0MY';
   }
 
   // Note: if you need to build some configuration asynchronously, you can return
