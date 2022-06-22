@@ -5,7 +5,7 @@ inputs:
   waypoint_version:
     description: Waypoint version to use
     required: false
-    default: "0.8.2"
+    default: "0.8.1"
   environment:
     description: Deployment environment
     required: true
