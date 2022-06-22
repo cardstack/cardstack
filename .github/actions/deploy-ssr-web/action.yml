@@ -38,6 +38,10 @@ runs:
       run: waypoint up --app=ssr-web -plain
       shell: bash
 
+    - uses: ./.github/actions/waypoint-ecs-failsafe
+      with:
+        app: "ssr-web"
+
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
