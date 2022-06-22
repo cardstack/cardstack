@@ -240,8 +240,6 @@ jobs:
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-        with:
-          waypoint_version: "0.8.1"
       - name: Send success notification to Discord
         if: ${{ success() }}
         uses: ./.github/actions/discord-message
@@ -336,7 +334,6 @@ jobs:
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
         with:
-          waypoint_version: "0.8.1"
           environment: staging
       - name: Send success notification to Discord
         if: ${{ success() }}
@@ -430,8 +427,6 @@ jobs:
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-        with:
-          waypoint_version: "0.8.1"
       - name: Send success notification to Discord
         if: ${{ success() }}
         uses: ./.github/actions/discord-message
