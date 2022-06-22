@@ -25,11 +25,13 @@ jobs:
             echo "AWS_ROLE_ARN=arn:aws:iam::120317779495:role/waypoint" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_TOKEN=${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_ADDR=${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+            echo "WAYPOINT_VERSION=0.4.0" >> $GITHUB_ENV
             cp waypoint.prod.hcl waypoint.hcl
           elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "AWS_ROLE_ARN=arn:aws:iam::680542703984:role/waypoint" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+            echo "WAYPOINT_VERSION=0.8.1" >> $GITHUB_ENV
           else
             echo "unrecognized environment"
             exit 1;
@@ -43,6 +45,8 @@ jobs:
 
       - name: Deploy reward root submitter
         uses: ./.github/actions/deploy-reward-root-submitter
+        with:
+          waypoint_version: ${{ env.WAYPOINT_VERSION }}
         env:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: "1"

@@ -29,6 +29,10 @@ runs:
       run: waypoint up -app=reward-api -plain
       shell: bash
 
+    - uses: ./.github/actions/waypoint-ecs-failsafe
+      with:
+        app: "reward-api"
+
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:

@@ -31,6 +31,10 @@ runs:
       run: waypoint up --app=hub -plain
       shell: bash
 
+    - uses: ./.github/actions/waypoint-ecs-failsafe
+      with:
+        app: "hub"
+
     - name: Prune dangling resources [hub]
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
