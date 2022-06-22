@@ -114,7 +114,7 @@ jobs:
       - name: Deploy web-client preview
         uses: ./.github/actions/deploy-web-client-preview
         env:
-          HUB_URL: https://hub-staging.stack.cards
+          HUB_URL: https://hub.cardstack.com
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           S3_PREVIEW_BUCKET_NAME: web-client-preview.cardstack.com
