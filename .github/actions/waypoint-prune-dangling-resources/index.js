@@ -156,12 +156,21 @@ function main() {
   if (!config.disableAlb) {
     const targetGroups = getTargetGroups(appName);
     const resourcesToPrune = getResourcesToPrune(services, targetGroups, retain);
-    resourcesToPrune.services.forEach((service) => pruneService(service, config.cluster));
-    resourcesToPrune.targetGroups.forEach((targetGroup) => pruneTargetGroup(targetGroup));
-    console.log('-> Finish purging services and target groups');
+    if (resourcesToPrune.services.length > 0 || resourcesToPrune.targetGroups.length > 0) {
+      resourcesToPrune.services.forEach((service) => pruneService(service, config.cluster));
+      resourcesToPrune.targetGroups.forEach((targetGroup) => pruneTargetGroup(targetGroup));
+      console.log('-> Finish purging services and target groups');
+    } else {
+      console.log('-> No resources need purging');
+    }
   } else if (config.disableAlb && services.length > retain + 1) {
-    services.slice(retain + 1).forEach((service) => pruneService(service, config.cluster));
-    console.log('-> Finish purging services');
+    const servicesToPrune = services.slice(retain + 1);
+    if (servicesToPrune.length > 0) {
+      servicesToPrune.forEach((service) => pruneService(service, config.cluster));
+      console.log('-> Finish purging services');
+    } else {
+      console.log('-> No resources need purging');
+    }
   }
 }
 
