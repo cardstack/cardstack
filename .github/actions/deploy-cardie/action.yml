@@ -21,7 +21,6 @@ runs:
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
-        yarn add hcl2-parser @actions/core -W --prefer-offline
 
     - name: Deploy cardie
       run: waypoint up --app=cardie -prune-retain=0 -plain
