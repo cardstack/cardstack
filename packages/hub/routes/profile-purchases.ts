@@ -9,6 +9,7 @@ import shortUuid from 'short-uuid';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
+  merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
@@ -28,10 +29,24 @@ export default class ProfilePurchasesRoute {
 
     let merchantAttributes = ctx.request.body.included[0].attributes;
 
+    let slug = merchantAttributes['slug'].toLowerCase();
+    let validationResult = await this.merchantInfosRoute.validateSlug(slug);
+
+    if (!validationResult.slugAvailable) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: validationResult.detail,
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     const merchantInfo: MerchantInfo = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
-      slug: merchantAttributes['slug'],
+      slug,
       color: merchantAttributes['color'],
       textColor: merchantAttributes['text-color'],
       ownerAddress: ctx.state.userAddress,

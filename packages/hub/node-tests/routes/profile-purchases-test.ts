@@ -1,6 +1,7 @@
 import { registry, setupHub } from '../helpers/server';
 import CardSpaceQueries from '../../queries/card-space';
 import MerchantInfoQueries from '../../queries/merchant-info';
+import shortUUID from 'short-uuid';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -89,5 +90,170 @@ describe('POST /api/profile-purchases', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects a slug with an invalid character', async function () {
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'sat-oshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
+      });
+  });
+
+  it('rejects a slug that is too long', async function () {
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'Unique ID cannot be more than 50 characters long. It is currently 51 characters long',
+      });
+  });
+
+  it('rejects a slug with a forbidden word', async function () {
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'cardstack',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This ID is not allowed',
+      });
+  });
+
+  it('rejects a duplicate slug', async function () {
+    await merchantInfosQueries.insert({
+      id: shortUUID.uuid(),
+      name: 'yes',
+      slug: 'satoshi',
+      color: 'pink',
+      textColor: 'black',
+      ownerAddress: 'me',
+    });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This ID is already taken. Please choose another one',
+      });
   });
 });
