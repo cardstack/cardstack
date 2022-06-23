@@ -357,7 +357,7 @@ app "ssr-web" {
 
   deploy {
     use "aws-ecs" {
-      service_port       = 4000
+      service_port       = 4001
       region             = "us-east-1"
       memory             = "512"
       cluster            = "ssr-web-staging"
