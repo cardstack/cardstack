@@ -214,7 +214,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
         errors: [
           {
             status: '422',
-            title: 'Job ticket state is not failed',
+            title: 'Can only retry a job with failed state (current state: pending)',
           },
         ],
       })
