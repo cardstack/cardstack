@@ -14,6 +14,10 @@ inputs:
   discord_channel:
     description: ID of the Discord channel to send the notification
     required: true
+  is_ecs:
+    description: If service is deployed with AWS ECS
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -36,12 +40,13 @@ runs:
 
     - name: Fetch stopped reason and logs
       id: debug
-      if: ${{ github.action_status == 'Failure' || job.status == 'failure' }}
+      if: ${{ inputs.is_ecs == 'true' && ( github.action_status == 'Failure' || job.status == 'failure' ) }}
       uses: ./.github/actions/fetch-stopped-ecs-task
       with:
         app: ${{ inputs.app }}
 
     - name: Send failure notification to Discord
+      id: notify_stopped_task
       if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'true' }}
       uses: ./.github/actions/discord-message
       with:
@@ -57,7 +62,7 @@ runs:
           View the latest logs at ${{ steps.debug.outputs.logs_url }}
 
     - name: Send failure notification to Discord
-      if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'false' }}
+      if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.notify_stopped_task.conclusion != 'success' }}
       uses: ./.github/actions/discord-message
       with:
         token: ${{ inputs.discord_channel }}
