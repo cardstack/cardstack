@@ -105,7 +105,7 @@ describe('GET /api/job-tickets/:id', function () {
 });
 
 describe('POST /api/job-tickets/:id/retry', function () {
-  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+  let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
@@ -127,6 +127,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
       jobType: 'a-job',
       ownerAddress: stubUserAddress,
       payload: { 'a-payload': 'yes' },
+      spec: { 'a-spec': 'yes' },
     });
     await jobTicketsQueries.update(jobTicketId, { 'a-result': 'yes' }, 'failed');
 
@@ -156,6 +157,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
 
     expect(getJobIdentifiers()).to.deep.equal(['a-job']);
     expect(getJobPayloads()).to.deep.equal([{ 'a-payload': 'yes' }]);
+    expect(getJobSpecs()).to.deep.equal([{ 'a-spec': 'yes' }]);
 
     let allTickets = await jobTicketsQueries.findAll();
 
@@ -164,6 +166,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
     expect(newTicket?.ownerAddress).to.equal(stubUserAddress);
     expect(newTicket?.jobType).to.equal('a-job');
     expect(newTicket?.payload).to.deep.equal({ 'a-payload': 'yes' });
+    expect(newTicket?.spec).to.deep.equal({ 'a-spec': 'yes' });
   });
 
   it('returns 401 without bearer token', async function () {

@@ -32,11 +32,12 @@ export default class JobTicketsQueries {
   async insert(model: Partial<JobTicket>) {
     let db = await this.databaseManager.getClient();
 
-    await db.query('INSERT INTO job_tickets (id, job_type, owner_address, payload) VALUES($1, $2, $3, $4)', [
+    await db.query('INSERT INTO job_tickets (id, job_type, owner_address, payload, spec) VALUES($1, $2, $3, $4, $5)', [
       model.id,
       model.jobType,
       model.ownerAddress,
       model.payload,
+      model.spec,
     ]);
   }
 
@@ -58,6 +59,7 @@ function mapRowToModel(row: any): JobTicket {
     id: row['id'],
     jobType: row['job_type'],
     ownerAddress: row['owner_address'],
+    spec: row['spec'],
     state: row['state'],
     payload: row['payload'],
     result: row['result'],

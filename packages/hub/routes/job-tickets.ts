@@ -11,6 +11,7 @@ export interface JobTicket {
   ownerAddress: string;
   payload: any;
   result: any;
+  spec: any;
   state: string;
 }
 
@@ -128,7 +129,7 @@ export default class JobTicketsRoute {
       return;
     }
 
-    this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload);
+    this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload, jobTicketToRetry.spec);
 
     let newJobTicket = {
       id: shortUUID.uuid(),
@@ -136,6 +137,7 @@ export default class JobTicketsRoute {
       ownerAddress: jobTicketToRetry.ownerAddress,
       payload: jobTicketToRetry.payload,
       result: null,
+      spec: jobTicketToRetry.spec,
       state: 'pending', // FIXME hmm
     };
 
