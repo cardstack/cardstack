@@ -256,4 +256,105 @@ describe('POST /api/profile-purchases', function () {
         detail: 'This ID is already taken. Please choose another one',
       });
   });
+
+  it('rejects missing merchant-infos', async function () {
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '2',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Missing merchant-infos',
+        detail: 'No included merchant-infos with lid 2 was found',
+      });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'what?',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Missing merchant-infos',
+        detail: 'No included merchant-infos with lid 1 was found',
+      });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          what: {
+            data: {
+              type: 'what',
+              lid: '1',
+            },
+          },
+        },
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Missing merchant-infos',
+        detail: 'merchant-info relationship must be included',
+      });
+  });
 });

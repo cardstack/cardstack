@@ -27,7 +27,38 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let merchantAttributes = ctx.request.body.included[0].attributes;
+    let relationships = ctx.request.body.relationships || {};
+    let merchantInfoRelationship = relationships['merchant-info'];
+
+    if (!merchantInfoRelationship) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Missing merchant-infos',
+        detail: 'merchant-info relationship must be included',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
+    let included = ctx.request.body.included || [];
+    let merchantObject = included.find(
+      (record: any) =>
+        record.type === merchantInfoRelationship.data.type && record.lid === merchantInfoRelationship.data.lid
+    );
+
+    if (!merchantObject) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Missing merchant-infos',
+        detail: `No included merchant-infos with lid ${merchantInfoRelationship.data.lid} was found`,
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
+    let merchantAttributes = merchantObject.attributes;
 
     let slug = merchantAttributes['slug'].toLowerCase();
     let validationResult = await this.merchantInfosRoute.validateSlug(slug);
