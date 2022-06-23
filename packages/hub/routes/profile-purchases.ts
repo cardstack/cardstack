@@ -9,6 +9,11 @@ import shortUuid from 'short-uuid';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
+
+  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
+
+  inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
+
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
@@ -16,7 +21,6 @@ export default class ProfilePurchasesRoute {
   merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
 
   constructor() {
     autoBind(this);
@@ -69,6 +73,24 @@ export default class ProfilePurchasesRoute {
         status: '422',
         title: 'Invalid merchant slug',
         detail: validationResult.detail,
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
+    let attributes = ctx.request.body.data.attributes;
+    let { valid: purchaseValidationResult, response: purchaseValidationResponse } = await this.inAppPurchases.validate(
+      attributes.provider,
+      attributes.receipt
+    );
+
+    if (!purchaseValidationResult) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid purchase receipt',
+        detail: 'Purchase receipt is not valid',
+        meta: purchaseValidationResponse,
       };
       ctx.type = 'application/vnd.api+json';
       return;

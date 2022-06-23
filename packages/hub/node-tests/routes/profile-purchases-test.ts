@@ -15,9 +15,27 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
+let shouldValidatePurchase = false;
+let purchaseValidationProvider: string, purchaseValidationReceipt: any, purchaseValidationResponse: any;
+
+class StubInAppPurchases {
+  validate(provider: string, receipt: any) {
+    purchaseValidationProvider = provider;
+    purchaseValidationReceipt = receipt;
+
+    return { valid: shouldValidatePurchase, response: purchaseValidationResponse };
+  }
+}
+
 describe('POST /api/profile-purchases', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('in-app-purchases', StubInAppPurchases);
+
+    shouldValidatePurchase = true;
+    purchaseValidationProvider = 'undefined';
+    purchaseValidationReceipt = undefined;
+    purchaseValidationResponse = {};
   });
 
   let { request, getContainer } = setupHub(this);
@@ -28,7 +46,7 @@ describe('POST /api/profile-purchases', function () {
     cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
   });
 
-  it('persists merchant information', async function () {
+  it('validates the purchase and persists merchant information', async function () {
     let merchantId;
 
     await request()
@@ -36,6 +54,12 @@ describe('POST /api/profile-purchases', function () {
       .send({
         data: {
           type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+          },
         },
         relationships: {
           'merchant-info': {
@@ -66,6 +90,11 @@ describe('POST /api/profile-purchases', function () {
         merchantId = res.body.data.id;
       });
 
+    expect(purchaseValidationProvider).to.equal('a-provider');
+    expect(purchaseValidationReceipt).to.deep.equal({
+      'a-receipt': 'yes',
+    });
+
     let merchantRecord = (await merchantInfosQueries.fetch({ id: merchantId }))[0];
     expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
     expect(merchantRecord.slug).to.equal('satoshi');
@@ -91,6 +120,57 @@ describe('POST /api/profile-purchases', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects when the purchase receipt is invalid', async function () {
+    shouldValidatePurchase = false;
+    purchaseValidationResponse = {
+      'a-validation-response': 'yes',
+    };
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+          },
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid purchase receipt',
+        detail: 'Purchase receipt is not valid',
+        meta: purchaseValidationResponse,
+      });
   });
 
   it('rejects a slug with an invalid character', async function () {
