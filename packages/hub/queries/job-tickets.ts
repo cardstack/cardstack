@@ -39,6 +39,8 @@ export default class JobTicketsQueries {
       model.payload,
       model.spec,
     ]);
+
+    return this.find(model.id!);
   }
 
   async update(id: string, result: any, state: string) {

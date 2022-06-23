@@ -4,7 +4,6 @@ import { query } from '@cardstack/hub/queries';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import shortUUID from 'short-uuid';
-import { JOB_TICKETS_STATE_DEFAULT } from '../db/migrations/20220610203119883_create-job-tickets';
 
 export interface JobTicket {
   id: string;
@@ -13,7 +12,7 @@ export interface JobTicket {
   payload: any;
   result: any;
   spec: any;
-  state: string;
+  state?: string;
 }
 
 export default class JobTicketsRoute {
@@ -132,17 +131,16 @@ export default class JobTicketsRoute {
 
     this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload, jobTicketToRetry.spec);
 
-    let newJobTicket = {
+    let newJobTicket: JobTicket | null = {
       id: shortUUID.uuid(),
       jobType: jobTicketToRetry.jobType,
       ownerAddress: jobTicketToRetry.ownerAddress,
       payload: jobTicketToRetry.payload,
       result: null,
       spec: jobTicketToRetry.spec,
-      state: JOB_TICKETS_STATE_DEFAULT,
     };
 
-    await this.jobTicketsQueries.insert(newJobTicket);
+    newJobTicket = await this.jobTicketsQueries.insert(newJobTicket);
 
     ctx.body = this.jobTicketSerializer.serialize(newJobTicket!);
     ctx.type = 'application/vnd.api+json';
