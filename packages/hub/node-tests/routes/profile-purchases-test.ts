@@ -2,6 +2,7 @@ import { registry, setupHub } from '../helpers/server';
 import CardSpaceQueries from '../../queries/card-space';
 import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -28,6 +29,8 @@ class StubInAppPurchases {
 }
 
 describe('POST /api/profile-purchases', function () {
+  let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
+
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
     registry(this).register('in-app-purchases', StubInAppPurchases);
@@ -46,7 +49,7 @@ describe('POST /api/profile-purchases', function () {
     cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
   });
 
-  it('validates the purchase and persists merchant information', async function () {
+  it('validates the purchase, persists merchant information, and queues a single-attempt CreateProfile task', async function () {
     let merchantId;
 
     await request()
@@ -104,6 +107,10 @@ describe('POST /api/profile-purchases', function () {
 
     let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
     expect(cardSpaceRecord).to.exist;
+
+    expect(getJobIdentifiers()).to.deep.equal(['create-profile']);
+    expect(getJobPayloads()).to.deep.equal([{ 'job-ticket-id': 'FIXME', 'merchant-info-id': merchantId }]);
+    expect(getJobSpecs()).to.deep.equal([{ maxAttempts: 1 }]);
   });
 
   it('returns 401 without bearer token', async function () {

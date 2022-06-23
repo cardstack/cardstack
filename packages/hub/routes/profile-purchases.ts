@@ -22,6 +22,8 @@ export default class ProfilePurchasesRoute {
     as: 'merchantInfoQueries',
   });
 
+  workerClient = inject('worker-client', { as: 'workerClient' });
+
   constructor() {
     autoBind(this);
   }
@@ -112,6 +114,12 @@ export default class ProfilePurchasesRoute {
       merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
       await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
     });
+
+    this.workerClient.addJob(
+      'create-profile',
+      { 'merchant-info-id': merchantInfoId, 'job-ticket-id': 'FIXME' },
+      { maxAttempts: 1 }
+    );
 
     let serialized = this.merchantInfoSerializer.serialize(merchantInfo);
 
