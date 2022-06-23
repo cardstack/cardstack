@@ -438,30 +438,30 @@ fast-levenshtein@~2.0.6:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
-fastboot-app-server@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/fastboot-app-server/-/fastboot-app-server-3.2.0.tgz#e43028c088f2439dd9217462d81c39421fce3e32"
-  integrity sha512-rbRiIvnVB2Sicn27leJ1PbcSi1iXDvI2csgYyJhSRmyGIVWo1M3DSgRGPpk92Qy36DHCKt6lUlkIz7WZGiz60g==
+fastboot-app-server@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/fastboot-app-server/-/fastboot-app-server-3.3.2.tgz#7aadc5bfdda7b51a20005c26404959c1d80d098b"
+  integrity sha512-jQ+nsmcLhR49Bx1J/74eN/9yez5abzutnck91FdctWgwHMghuuas82v5hoqrKYSVq8I1J5RwS0v7WcICNLH1oA==
   dependencies:
     basic-auth "^2.0.1"
     chalk "^4.1.2"
     compression "^1.7.4"
     express "^4.17.2"
-    fastboot "3.2.0"
-    fastboot-express-middleware "3.2.0"
+    fastboot "3.3.2"
+    fastboot-express-middleware "3.3.2"
 
-fastboot-express-middleware@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/fastboot-express-middleware/-/fastboot-express-middleware-3.2.0.tgz#86efd6452426efb4f73a0344d37f11b5736de09c"
-  integrity sha512-R6lXqmjJRZ+BWCIJL+amHecVoyi9+usZQkCj1VSM+qRf3wjPfhApv26atD6rJTvKrC3OPdI0E0O0ZtkcyXH+xQ==
+fastboot-express-middleware@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/fastboot-express-middleware/-/fastboot-express-middleware-3.3.2.tgz#6d78de06f1db51f47b4f66658c651a61fcf5ca96"
+  integrity sha512-/Fgr29Q1bMDiv65BeCYmFR88otTg9QJYvmVIWrgkwWSkfya5h1XzCQYEz+VqyhWT1v+BQWq98SuyKfpNrL2cRA==
   dependencies:
     chalk "^4.1.2"
-    fastboot "3.2.0"
+    fastboot "3.3.2"
 
-fastboot@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-3.2.0.tgz#1f7e93605c744a32457588d01471a0d2969b346a"
-  integrity sha512-NUy1No6KfGvkrzCRJ7Xy0ooFMEJeEqD2F/ccsjm2kQCEbHeGPWPBadYSSJTUm9xnLDZQzwcJrR+q0uCMarvW+g==
+fastboot@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-3.3.2.tgz#bf1ac7b01937846b63423a88138e13eb50406d2e"
+  integrity sha512-2NKTW32GvEsDyBrdw1trW1JsbS+9/7sAQuKwkht12mNitimRrSKVLP2AxsM/HSXQE+aiET4XCfKdyeIy0kQbKQ==
   dependencies:
     chalk "^4.1.2"
     cookie "^0.4.1"

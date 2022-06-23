@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "^6.17.9",
-    "fastboot-app-server": "^3.2.0",
+    "fastboot-app-server": "^3.3.2",
     "node-fetch": "^2.6.7"
   }
 }
