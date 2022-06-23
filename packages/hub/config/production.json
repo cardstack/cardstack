@@ -20,7 +20,7 @@
   },
   "web3": {
     "layer1Network": "mainnet",
-    "layer2Network": "xdai"
+    "layer2Network": "gnosis"
   },
   "checkly": {
     "handleWebhookRequests": true

@@ -46,7 +46,7 @@ export interface PrepaidCardPaymentsQueryResult {
   };
 }
 
-const web3 = config.get('web3') as { layer2Network: 'sokol' | 'xdai' };
+const web3 = config.get('web3') as { layer2Network: 'sokol' | 'gnosis' };
 const network = web3.layer2Network;
 const prepaidCardPaymentsQuery = `
 query($txn: String!) {

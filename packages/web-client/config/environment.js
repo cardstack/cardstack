@@ -80,7 +80,7 @@ module.exports = function (environment) {
     },
     chains: {
       layer1: deployTargetClassIsProduction ? 'eth' : 'keth',
-      layer2: deployTargetClassIsProduction ? 'xdai' : 'sokol',
+      layer2: deployTargetClassIsProduction ? 'gnosis' : 'sokol',
     },
     features: {},
     infuraId: infuraIdsByTarget[deployTargetClass] ?? process.env.INFURA_ID,
