@@ -20,15 +20,6 @@ export default class JobTicketsQueries {
     }
   }
 
-  async findAll(): Promise<JobTicket[]> {
-    let db = await this.databaseManager.getClient();
-
-    let query = `SELECT * FROM job_tickets`;
-    let queryResult = await db.query(query);
-
-    return queryResult.rows.map((row) => mapRowToModel(row));
-  }
-
   async insert(model: Partial<JobTicket>) {
     let db = await this.databaseManager.getClient();
 

@@ -116,7 +116,6 @@ describe('POST /api/job-tickets/:id/retry', function () {
     jobTicketId: string,
     otherOwnerJobTicketId: string,
     notFailedJobTicketId: string;
-  let ticketIds: string[];
 
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
@@ -136,17 +135,19 @@ describe('POST /api/job-tickets/:id/retry', function () {
 
     notFailedJobTicketId = shortUUID.uuid();
     await jobTicketsQueries.insert({ id: notFailedJobTicketId, jobType: 'a-job', ownerAddress: stubUserAddress });
-
-    ticketIds = [jobTicketId, otherOwnerJobTicketId, notFailedJobTicketId];
   });
 
   it('adds a new job, adds a job ticket for it, and returns its details', async function () {
+    let newJobId: string | undefined;
+
     await request()
       .post(`/api/job-tickets/${jobTicketId}/retry`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
       .expect(function (res) {
+        newJobId = res.body.data.id;
+
         expect(res.body.data.id).to.not.equal(jobTicketId);
         expect(res.body.data.attributes).to.deep.equal({
           state: 'pending',
@@ -158,9 +159,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
     expect(getJobPayloads()).to.deep.equal([{ 'a-payload': 'yes' }]);
     expect(getJobSpecs()).to.deep.equal([{ 'a-spec': 'yes' }]);
 
-    let allTickets = await jobTicketsQueries.findAll();
-
-    let newTicket = allTickets.find((ticket) => !ticketIds.includes(ticket.id));
+    let newTicket = await jobTicketsQueries.find(newJobId!);
 
     expect(newTicket?.ownerAddress).to.equal(stubUserAddress);
     expect(newTicket?.jobType).to.equal('a-job');
