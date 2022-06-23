@@ -1,4 +1,4 @@
-export class InAppPurchases {
+export default class InAppPurchases {
   async validate(provider: string, receipt: any) {
     console.error('In-app purchase validation is not implemented, arguments are', provider, receipt);
 

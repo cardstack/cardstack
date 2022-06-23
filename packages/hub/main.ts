@@ -98,6 +98,7 @@ import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
 import SubscribeEmailTask from './tasks/subscribe-email';
+import InAppPurchases from './services/in-app-purchases';
 import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
@@ -135,6 +136,7 @@ export function createRegistry(): Registry {
   registry.register('upload', Upload);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
+  registry.register('in-app-purchases', InAppPurchases);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
