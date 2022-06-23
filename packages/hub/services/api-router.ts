@@ -33,6 +33,7 @@ export default class APIRouter {
     as: 'emailCardDropRequestsRoute',
   });
   jobTicketsRoute = inject('job-tickets-route', { as: 'jobTicketsRoute' });
+  profilePurchasesRoute = inject('profile-purchases-route', { as: 'profilePurchasesRoute' });
   pushNotificationRegistrationsRoute = inject('push-notification-registrations-route', {
     as: 'pushNotificationRegistrationsRoute',
   });
@@ -92,6 +93,8 @@ export default class APIRouter {
     apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
 
     apiSubrouter.get('/job-tickets/:id', jobTicketsRoute.get);
+
+    apiSubrouter.post('/profile-purchases', this.profilePurchasesRoute.post);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.patch('/card-spaces/:id', parseBody, cardSpacesRoute.patch);
