@@ -54,22 +54,11 @@ jobs:
         with:
           environment: ${{ github.event.inputs.environment }}
 
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
+      - name: Send notification to Discord
+        if: ${{ always() }}
+        uses: ./.github/actions/discord-notification-deploy
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **web-client** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **web-client** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          app: web-client
+          environment: ${{ github.event.inputs.environment }}
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
