@@ -32,7 +32,7 @@ runs:
       if: ${{ github.action_status == 'Success' && job.status == 'success'}}
       uses: ./.github/actions/discord-message
       with:
-        token: ${{ inputs.discord_channel }}
+        token: ${{ inputs.discord_token }}
         channel: ${{ inputs.discord_channel }}
         message: |
           :checkered_flag: **${{ inputs.app }}** [${{ github.ref }}] has been successfully deployed to *${{ inputs.environment }}*
@@ -50,7 +50,7 @@ runs:
       if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'true' }}
       uses: ./.github/actions/discord-message
       with:
-        token: ${{ inputs.discord_channel }}
+        token: ${{ inputs.discord_token }}
         channel: ${{ inputs.discord_channel }}
         message: |
           :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
@@ -65,7 +65,7 @@ runs:
       if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.notify_stopped_task.conclusion != 'success' }}
       uses: ./.github/actions/discord-message
       with:
-        token: ${{ inputs.discord_channel }}
+        token: ${{ inputs.discord_token }}
         channel: ${{ inputs.discord_channel }}
         message: |
           :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
