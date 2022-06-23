@@ -71,6 +71,7 @@ describe('POST /api/profile-purchases', function () {
     expect(merchantRecord.slug).to.equal('satoshi');
     expect(merchantRecord.color).to.equal('ff0000');
     expect(merchantRecord.textColor).to.equal('ffffff');
+    expect(merchantRecord.ownerAddress).to.equal(stubUserAddress);
 
     let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
     expect(cardSpaceRecord).to.exist;
