@@ -49,8 +49,8 @@ describe('POST /api/profile-purchases', function () {
     cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
   });
 
-  it('validates the purchase, persists merchant information, and queues a single-attempt CreateProfile task', async function () {
-    let merchantId;
+  it('validates the purchase, persists merchant information, returns a job ticket, and queues a single-attempt CreateProfile task', async function () {
+    let merchantId, merchantDid, jobTicketId;
 
     await request()
       .post(`/api/profile-purchases`)
@@ -91,6 +91,33 @@ describe('POST /api/profile-purchases', function () {
       .expect('Content-Type', 'application/vnd.api+json')
       .expect(function (res) {
         merchantId = res.body.data.id;
+        merchantDid = res.body.data.attributes.did;
+        jobTicketId = res.body.included.find((included: any) => included.type === 'job-tickets').id;
+
+        expect(res.body).to.deep.equal({
+          data: {
+            id: merchantId,
+            type: 'merchant-infos',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              did: merchantDid,
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+              'owner-address': stubUserAddress,
+            },
+          },
+          meta: {
+            network: 'sokol',
+          },
+          included: [
+            {
+              id: jobTicketId,
+              type: 'job-tickets',
+              attributes: { state: 'fixme' },
+            },
+          ],
+        });
       });
 
     expect(purchaseValidationProvider).to.equal('a-provider');

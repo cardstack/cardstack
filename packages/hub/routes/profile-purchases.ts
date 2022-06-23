@@ -14,6 +14,8 @@ export default class ProfilePurchasesRoute {
 
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
+  jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
+
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
@@ -122,6 +124,17 @@ export default class ProfilePurchasesRoute {
     );
 
     let serialized = this.merchantInfoSerializer.serialize(merchantInfo);
+
+    serialized.included = [
+      this.jobTicketSerializer.serialize({
+        id: 'fixme',
+        jobType: '',
+        ownerAddress: '',
+        payload: undefined,
+        result: undefined,
+        state: 'fixme',
+      }).data,
+    ];
 
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
