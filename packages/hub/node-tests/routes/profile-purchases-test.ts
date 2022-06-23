@@ -1,4 +1,6 @@
 import { registry, setupHub } from '../helpers/server';
+import CardSpaceQueries from '../../queries/card-space';
+import MerchantInfoQueries from '../../queries/merchant-info';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -17,15 +19,60 @@ describe('POST /api/profile-purchases', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
 
-  let { request } = setupHub(this);
+  let { request, getContainer } = setupHub(this);
+  let merchantInfosQueries: MerchantInfoQueries, cardSpacesQueries: CardSpaceQueries;
 
-  it('succeeds', async function () {
+  this.beforeEach(async function () {
+    merchantInfosQueries = await getContainer().lookup('merchant-info', { type: 'query' });
+    cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
+  });
+
+  it('persists merchant information', async function () {
+    let merchantId;
+
     await request()
       .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
-      .expect('Content-Type', 'application/vnd.api+json');
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect(function (res) {
+        merchantId = res.body.data.id;
+      });
+
+    let merchantRecord = (await merchantInfosQueries.fetch({ id: merchantId }))[0];
+    expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
+    expect(merchantRecord.slug).to.equal('satoshi');
+    expect(merchantRecord.color).to.equal('ff0000');
+    expect(merchantRecord.textColor).to.equal('ffffff');
+
+    let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
+    expect(cardSpaceRecord).to.exist;
   });
 
   it('returns 401 without bearer token', async function () {

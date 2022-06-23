@@ -94,7 +94,7 @@ export default class APIRouter {
 
     apiSubrouter.get('/job-tickets/:id', jobTicketsRoute.get);
 
-    apiSubrouter.post('/profile-purchases', this.profilePurchasesRoute.post);
+    apiSubrouter.post('/profile-purchases', parseBody, this.profilePurchasesRoute.post);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
     apiSubrouter.patch('/card-spaces/:id', parseBody, cardSpacesRoute.patch);
