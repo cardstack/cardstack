@@ -83,10 +83,33 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let attributes = ctx.request.body.data.attributes;
+    let { provider, receipt } = ctx.request.body.data.attributes;
+
+    if (!provider) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Missing purchase information',
+        detail: 'Purchase provider is missing',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
+    if (!receipt) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Missing purchase information',
+        detail: 'Purchase receipt is missing',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let { valid: purchaseValidationResult, response: purchaseValidationResponse } = await this.inAppPurchases.validate(
-      attributes.provider,
-      attributes.receipt
+      provider,
+      receipt
     );
 
     if (!purchaseValidationResult) {
