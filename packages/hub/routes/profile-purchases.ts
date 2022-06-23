@@ -14,6 +14,7 @@ export default class ProfilePurchasesRoute {
 
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
+  jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
 
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
@@ -117,24 +118,26 @@ export default class ProfilePurchasesRoute {
       await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
     });
 
+    let jobTicketId = shortUuid.uuid();
+    let jobTicket = {
+      id: jobTicketId,
+      jobType: 'create-profile',
+      ownerAddress: ctx.state.userAddress,
+      payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
+      spec: { maxAttempts: 1 },
+    };
+
+    let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket);
+
     this.workerClient.addJob(
       'create-profile',
-      { 'merchant-info-id': merchantInfoId, 'job-ticket-id': 'FIXME' },
+      { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
       { maxAttempts: 1 }
     );
 
     let serialized = this.merchantInfoSerializer.serialize(merchantInfo);
 
-    serialized.included = [
-      this.jobTicketSerializer.serialize({
-        id: 'fixme',
-        jobType: '',
-        ownerAddress: '',
-        payload: undefined,
-        result: undefined,
-        state: 'fixme',
-      }).data,
-    ];
+    serialized.included = [this.jobTicketSerializer.serialize(insertedJobTicket!).data];
 
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
