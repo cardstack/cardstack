@@ -149,7 +149,6 @@ describe('POST /api/job-tickets/:id/retry', function () {
       .expect(function (res) {
         expect(res.body.data.id).to.not.equal(jobTicketId);
         expect(res.body.data.attributes).to.deep.equal({
-          'job-type': 'a-job',
           state: 'pending',
         });
       })

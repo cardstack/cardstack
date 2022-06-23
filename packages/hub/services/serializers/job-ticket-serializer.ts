@@ -4,7 +4,6 @@ import { JobTicket } from '../../routes/job-tickets';
 export default class JobTicketSerializer {
   serialize(model: JobTicket): JSONAPIDocument {
     let attributes: any = {
-      'job-type': model.jobType,
       state: model.state,
     };
 
