@@ -3,6 +3,7 @@ import { signTypedData } from './utils/signing-utils';
 import { networkName } from './utils/general-utils';
 import { networkIds } from './constants';
 import { ContractOptions } from 'web3-eth-contract';
+import { Signer } from 'ethers';
 
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
@@ -15,7 +16,7 @@ interface NonceResponse {
 }
 
 export default class HubAuth implements IHubAuth {
-  constructor(private layer2Web3: Web3, private hubRootUrl: string) {}
+  constructor(private layer2Web3: Web3, private hubRootUrl: string, private layer2Signer?: Signer) {}
 
   async checkValidAuth(authToken: string): Promise<boolean> {
     let response = await this.httpGetSession(authToken);
@@ -60,7 +61,7 @@ export default class HubAuth implements IHubAuth {
         nonce,
       },
     };
-    let signature = await signTypedData(this.layer2Web3, ownerAddress, typedData);
+    let signature = await signTypedData(this.layer2Signer ?? this.layer2Web3, ownerAddress, typedData);
     let postBody = JSON.stringify({
       data: {
         attributes: {
