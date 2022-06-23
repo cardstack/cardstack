@@ -1,8 +1,9 @@
 import Web3 from 'web3';
 import { signTypedData } from './utils/signing-utils';
 import { networkName } from './utils/general-utils';
-import { networkIds } from './constants';
+import { getConstantByNetwork, networkIds } from './constants';
 import { ContractOptions } from 'web3-eth-contract';
+import { Signer } from 'ethers';
 
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
@@ -15,7 +16,7 @@ interface NonceResponse {
 }
 
 export default class HubAuth implements IHubAuth {
-  constructor(private layer2Web3: Web3, private hubRootUrl: string) {}
+  constructor(private layer2Web3: Web3, private hubRootUrl?: string, private layer2Signer?: Signer) {}
 
   async checkValidAuth(authToken: string): Promise<boolean> {
     let response = await this.httpGetSession(authToken);
@@ -35,8 +36,12 @@ export default class HubAuth implements IHubAuth {
   async authenticate(contractOptions?: ContractOptions): Promise<string> {
     let ownerAddress = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let { nonce, version } = await this.getNonce();
-    let name = await networkName(this.layer2Web3);
-    let chainId = networkIds[name];
+
+    const netName = await networkName(this.layer2Web3);
+    const chainId = networkIds[netName];
+
+    const hubUrl = await this.getHubUrl(netName);
+
     const typedData = {
       types: {
         EIP712Domain: [
@@ -50,7 +55,7 @@ export default class HubAuth implements IHubAuth {
         ],
       },
       domain: {
-        name: this.hubRootUrl.replace(/https?:\/\//, ''),
+        name: hubUrl.replace(/https?:\/\//, ''),
         version,
         chainId,
       },
@@ -60,7 +65,7 @@ export default class HubAuth implements IHubAuth {
         nonce,
       },
     };
-    let signature = await signTypedData(this.layer2Web3, ownerAddress, typedData);
+    let signature = await signTypedData(this.layer2Signer ?? this.layer2Web3, ownerAddress, typedData);
     let postBody = JSON.stringify({
       data: {
         attributes: {
@@ -69,7 +74,7 @@ export default class HubAuth implements IHubAuth {
         },
       },
     });
-    let response = await global.fetch(`${this.hubRootUrl}/api/session`, {
+    let response = await global.fetch(`${hubUrl}/api/session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -88,7 +93,9 @@ export default class HubAuth implements IHubAuth {
   }
 
   private async httpGetSession(authToken?: string): Promise<Response> {
-    let url = `${this.hubRootUrl}/api/session`;
+    const hubUrl = await this.getHubUrl();
+
+    let url = `${hubUrl}/api/session`;
     let headers = {
       'Content-Type': 'application/vnd.api+json',
     } as Record<string, string>;
@@ -96,5 +103,11 @@ export default class HubAuth implements IHubAuth {
       headers['Authorization'] = `Bearer ${authToken}`;
     }
     return global.fetch(url, { headers });
+  }
+
+  private async getHubUrl(network?: string): Promise<string> {
+    const netName = network || (await networkName(this.layer2Web3));
+
+    return this.hubRootUrl || getConstantByNetwork('hubUrl', netName);
   }
 }

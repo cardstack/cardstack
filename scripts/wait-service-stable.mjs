@@ -1,4 +1,4 @@
-import hcl from 'js-hcl-parser';
+import hcl from 'hcl2-parser';
 import fs from 'fs';
 import { execSync } from 'child_process';
 
@@ -13,13 +13,13 @@ function stripArnPrefix(value) {
   return value.replace(arnPrefixPattern, '');
 }
 
-function findCluster(waypointConfigFilePath, appName) {
+function getAppConfig(waypointConfigFilePath, appName) {
   const waypointHcl = fs.readFileSync(waypointConfigFilePath, 'utf8');
-  const waypointJson = hcl.parse(waypointHcl);
-  const waypointConfig = JSON.parse(waypointJson);
-  const waypointApp = waypointConfig.app.find((app) => Object.keys(app)[0] == appName);
-  const cluster = waypointApp[appName][0].deploy[0].use[0]['aws-ecs'][0].cluster;
-  return cluster;
+  const waypointConfig = hcl.parseToObject(waypointHcl)[0];
+  const waypointApp = waypointConfig.app[appName][0];
+  const cluster = waypointApp.deploy[0].use['aws-ecs'][0].cluster;
+
+  return { cluster };
 }
 
 function listServices(cluster, appName) {
@@ -102,11 +102,11 @@ function main() {
   const [appName, ...extraArgs] = process.argv.slice(2);
   const waypointConfigFilePath = extraArgs.length > 0 ? extraArgs[0] : 'waypoint.hcl';
 
-  const cluster = findCluster(waypointConfigFilePath, appName);
-  const services = listServices(cluster, appName);
-  const service = findService(services, appName, cluster);
+  const config = getAppConfig(waypointConfigFilePath, appName);
+  const services = listServices(config.cluster, appName);
+  const service = findService(services, appName, config.cluster);
 
-  waitServiceStable(service, cluster);
+  waitServiceStable(service, config.cluster);
   if (serviceHasTargetGroup(service)) {
     waitTargetInService(service);
   }

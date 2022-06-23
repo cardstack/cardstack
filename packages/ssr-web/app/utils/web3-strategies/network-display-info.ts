@@ -15,7 +15,7 @@ let layer2NetworkDisplayInfo: Record<
   Layer2NetworkSymbol | TestLayer2NetworkSymbol,
   Layer2NetworkCopywriting
 > = {
-  xdai: {
+  gnosis: {
     fullName: 'Gnosis Chain',
     shortName: 'Gnosis',
     conversationalName: 'Gnosis Chain',
@@ -53,8 +53,8 @@ switch (config.chains.layer2) {
     currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo.sokol;
     break;
   }
-  case 'xdai': {
-    currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo.xdai;
+  case 'gnosis': {
+    currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo.gnosis;
     break;
   }
   default:

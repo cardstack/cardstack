@@ -6,7 +6,7 @@ import {
   Layer2Web3Strategy,
 } from '@cardstack/ssr-web/utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
-import XDaiWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/x-dai';
+import GnosisWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/gnosis';
 import SokolWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '@cardstack/ssr-web/utils/wallet-info';
@@ -41,8 +41,8 @@ export default class Layer2Network
     }
 
     switch (config.chains.layer2) {
-      case 'xdai':
-        this.strategy = new XDaiWeb3Strategy();
+      case 'gnosis':
+        this.strategy = new GnosisWeb3Strategy();
         break;
       case 'sokol':
         this.strategy = new SokolWeb3Strategy();

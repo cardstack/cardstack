@@ -166,6 +166,6 @@ export type ChainAddress = string;
 
 export type Layer1NetworkSymbol = 'kovan' | 'mainnet';
 export type TestLayer1NetworkSymbol = 'test-layer1';
-export type Layer2NetworkSymbol = 'xdai' | 'sokol';
+export type Layer2NetworkSymbol = 'gnosis' | 'sokol';
 export type TestLayer2NetworkSymbol = 'test-layer2';
 export type NetworkSymbol = Layer1NetworkSymbol | Layer2NetworkSymbol;

@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import { query } from '@cardstack/hub/queries';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
+import shortUUID from 'short-uuid';
 
 export interface JobTicket {
   id: string;
@@ -10,7 +11,8 @@ export interface JobTicket {
   ownerAddress: string;
   payload: any;
   result: any;
-  state: string;
+  spec: any;
+  state?: string;
 }
 
 export default class JobTicketsRoute {
@@ -19,6 +21,7 @@ export default class JobTicketsRoute {
   });
 
   jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
+  workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -68,6 +71,80 @@ export default class JobTicketsRoute {
     ctx.body = this.jobTicketSerializer.serialize(jobTicket!);
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
+  }
+
+  async retry(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let id = ctx.params.id;
+    let jobTicketToRetry = await this.jobTicketsQueries.find(id);
+
+    if (!jobTicketToRetry) {
+      ctx.body = {
+        errors: [
+          {
+            status: '404',
+            title: 'Job ticket not found',
+            detail: `Could not find the job ticket ${id}`,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 404;
+
+      return;
+    }
+
+    let requestingUserAddress = ctx.state.userAddress;
+
+    if (jobTicketToRetry.ownerAddress !== requestingUserAddress) {
+      ctx.body = {
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 401;
+
+      return;
+    }
+
+    if (jobTicketToRetry.state !== 'failed') {
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: `Can only retry a job with failed state (current state: ${jobTicketToRetry.state})`,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 422;
+
+      return;
+    }
+
+    this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload, jobTicketToRetry.spec);
+
+    let newJobTicket: JobTicket | null = {
+      id: shortUUID.uuid(),
+      jobType: jobTicketToRetry.jobType,
+      ownerAddress: jobTicketToRetry.ownerAddress,
+      payload: jobTicketToRetry.payload,
+      result: null,
+      spec: jobTicketToRetry.spec,
+    };
+
+    newJobTicket = await this.jobTicketsQueries.insert(newJobTicket);
+
+    ctx.body = this.jobTicketSerializer.serialize(newJobTicket!);
+    ctx.type = 'application/vnd.api+json';
+    ctx.status = 201;
   }
 }
 

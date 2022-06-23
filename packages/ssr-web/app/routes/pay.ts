@@ -32,9 +32,10 @@ export default class PayRoute extends Route {
     network: string;
     merchant_safe_id: string;
   }): Promise<PayRouteModel> {
+    let network = params.network === 'xdai' ? 'gnosis' : params.network;
     try {
       const merchantSafe = (await this.fetchMerchantSafe(
-        params.network,
+        network,
         params.merchant_safe_id
       )) as MerchantSafe;
 
@@ -43,7 +44,7 @@ export default class PayRoute extends Route {
       let merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID!);
 
       return {
-        network: params.network,
+        network,
         merchantSafe,
         merchantInfo,
         exchangeRates: this.shouldFetchExchangeRates
@@ -119,6 +120,6 @@ export default class PayRoute extends Route {
 
 function isLayer2Network(
   maybeNetwork: string
-): maybeNetwork is 'sokol' | 'xdai' {
-  return maybeNetwork === 'xdai' || maybeNetwork === 'sokol';
+): maybeNetwork is 'sokol' | 'gnosis' {
+  return maybeNetwork === 'gnosis' || maybeNetwork === 'sokol';
 }

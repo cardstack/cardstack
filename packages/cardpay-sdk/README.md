@@ -31,6 +31,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
 - [`PrepaidCard`](#prepaidcard)
   - [`PrepaidCard.create`](#prepaidcardcreate)
+  - [`PrepaidCard.faceValue`](#prepaidcardfacevalue)
   - [`PrepaidCard.canSplit`](#prepaidcardcansplit)
   - [`PrepaidCard.split`](#prepaidcardsplit)
   - [`PrepaidCard.canTransfer`](#prepaidcardcantransfer)
@@ -63,13 +64,13 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardManager`](#rewardmanager)
   - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
   - [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
-  - [`RewardManager.registerRewardeeGasEstimate`](#rewardmanagerregisterrewardeegasestimate)
   - [`RewardManager.lockRewardProgram`](#rewardmanagerlockrewardprogram)
   - [`RewardManager.updateRewardProgramAdmin`](#rewardmanagerupdaterewardprogramadmin)
   - [`RewardManager.withdraw`](#rewardmanagerwithdraw)
   - [`RewardManager.withdrawGasEstimate`](#rewardmanagerwithdrawgasestimate)
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
+  - [`RewardManager.registerRewardeeGasEstimate`](#rewardmanagerregisterrewardeegasestimate)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -126,7 +127,7 @@ let assetAPI = await getSDK('Assets', web3);
 ```
 
 ### `Assets.getNativeTokenBalance`
-This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In xDai this would be the DAI token balance. This call returns a promise for the native token amount as a string in units of `wei`. If no address is provided, then the balance of the first address in the wallet will be retrieved.
+This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In Gnosis Chain this would be the DAI token balance. This call returns a promise for the native token amount as a string in units of `wei`. If no address is provided, then the balance of the first address in the wallet will be retrieved.
 ```js
 let assetsAPI = await getSDK('Assets', web3);
 let etherBalance = await assetsAPI.getNativeTokenBalance(walletAddress);
@@ -214,7 +215,7 @@ This method returns a promise for a web3 transaction receipt.
 ### `TokenBridgeForeignSide.getSupportedTokens` (TBD)
 
 ## `TokenBridgeHomeSide`
-The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
@@ -297,7 +298,7 @@ let txnReceipt = await tokenBridge.waitForBridgingToLayer2Completed(
 ```
 
 ## `Safes`
-The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
@@ -419,7 +420,7 @@ await safes.setSupplierInfoDID(supplierDepotAddress, infoDID, daiCpxdAddress);
 ```
 This method returns a promise for a web3 transaction receipt.
 ## `PrepaidCard`
-The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
@@ -427,7 +428,7 @@ let prepaidCard = await getSDK('PrepaidCard', web3);
 ```
 
 ### `PrepaidCard.create`
-This call will create a new prepaid card from a gnosis safe, specifically a gnosis safe that holds tokens that were bridged to the layer 2 network from teh `TokenBridge` api. From this call you can create 1 or more prepaid cards from the `*.CPXD` layer 2 tokens (in the xDai network, for example). When a token is bridged to a layer 2 network like xDai, it will obtain a `*.CPXD` suffix, indicating that it can participate in the Card Protocol on xDai. The face value for the prepaid card does not include the amount of tokens consumed by the gas to create the card as well as fees to create a prepaid card.
+This call will create a new prepaid card from a gnosis safe, specifically a gnosis safe that holds tokens that were bridged to the layer 2 network from teh `TokenBridge` api. From this call you can create 1 or more prepaid cards from the `*.CPXD` layer 2 tokens (in the Gnosis Chain network, for example). When a token is bridged to a layer 2 network like Gnosis Chain, it will obtain a `*.CPXD` suffix, indicating that it can participate in the Card Protocol on Gnosis Chain. The face value for the prepaid card does not include the amount of tokens consumed by the gas to create the card as well as fees to create a prepaid card. (Note that the XD in CPXD originally comes from "XDai" the former name of Gnosis Chain.)
 ```
 total cost in *.CPXD = (Face value in § * token exchange rate) + fees + gas
 ```
@@ -572,7 +573,7 @@ let result = await prepaidCard.payMerchant(
 This method returns a promise for a web3 transaction receipt.
 
 ## `PrepaidCardMarket`
-The `PrepaidCardMarket` API is used to manage the inventory prepaid cards in the market contract, whose purpose is to provision prepaid cards to consumers who buy them. This API is used within the layer 2 network in which the Card Protocol runs. The `PrepaidCardMaket` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `PrepaidCardMarket` API is used to manage the inventory prepaid cards in the market contract, whose purpose is to provision prepaid cards to consumers who buy them. This API is used within the layer 2 network in which the Card Protocol runs. The `PrepaidCardMaket` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
@@ -660,7 +661,7 @@ let result = await prepaidCardMarket.setAsk(
 This method returns a promise for a web3 transaction receipt.
 
 ## `RevenuePool`
-The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance

@@ -62,7 +62,7 @@ const contractNames: Record<
     DAI: 'daiCpxd',
     CARD: 'cardCpxd',
   },
-  xdai: {
+  gnosis: {
     'DAI.CPXD': 'daiCpxd',
     'CARD.CPXD': 'cardCpxd',
   },

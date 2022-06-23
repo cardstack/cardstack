@@ -84,7 +84,7 @@ const MAINNET = {
   foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
 };
-const XDAI = {
+const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   homeBridge: '0xd1e46b8a371AF04Ce74c993B325b844ef0f48b16',
@@ -131,10 +131,11 @@ const addresses: {
   kovan: KOVAN,
   sokol: SOKOL,
   mainnet: MAINNET,
-  xdai: XDAI,
+  gnosis: GNOSIS,
+  xdai: GNOSIS,
 });
 
-export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
+export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof GNOSIS;
 
 export default addresses;
 

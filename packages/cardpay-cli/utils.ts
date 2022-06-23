@@ -69,6 +69,7 @@ export async function getEthereumClients(network: string, opts: Web3Opts): Promi
       rpcNodeWssUrl = hubConfigResponse.web3.layer1RpcNodeWssUrl as string;
       break;
     case 'sokol':
+    case 'gnosis':
     case 'xdai':
       rpcNodeHttpsUrl = hubConfigResponse.web3.layer2RpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.layer2RpcNodeWssUrl as string;
@@ -138,14 +139,14 @@ export const NETWORK_OPTION_LAYER_2 = {
   alias: 'n',
   type: 'string',
   description: 'The Layer 2 network to run this script on',
-  choices: ['sokol', 'xdai'],
+  choices: ['sokol', 'gnosis', 'xdai'],
 } as Options;
 
 export const NETWORK_OPTION_ANY = {
   alias: 'n',
   type: 'string',
   description: 'The network to run this script on',
-  choices: ['sokol', 'kovan', 'xdai', 'mainnet'],
+  choices: ['sokol', 'kovan', 'gnosis', 'xdai', 'mainnet'],
 } as Options;
 
 export const FROM_OPTION = {

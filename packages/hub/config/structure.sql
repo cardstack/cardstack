@@ -948,7 +948,8 @@ CREATE TABLE public.job_tickets (
     result jsonb,
     state text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    spec jsonb
 );
 
 
@@ -1743,6 +1744,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 36	20220527195553987_add-prepaid-notification-type	2022-05-27 15:09:36.826839
 37	20220527204632100_create-exchange-rates	2022-05-27 15:47:21.944976
 39	20220610203119883_create-job-tickets	2022-06-13 09:56:55.438506
+40	20220622235635327_add-job-ticket-spec	2022-06-22 19:02:28.256468
 \.
 
 
@@ -1750,7 +1752,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 39, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 40, true);
 
 
 --

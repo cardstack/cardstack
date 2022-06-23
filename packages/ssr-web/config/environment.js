@@ -113,7 +113,7 @@ module.exports = function (environment) {
       CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX,
     chains: {
       layer2:
-        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'xdai' : 'sokol',
+        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'gnosis' : 'sokol',
     },
   };
 
