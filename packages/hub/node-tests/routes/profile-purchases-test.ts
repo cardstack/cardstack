@@ -381,6 +381,45 @@ describe('POST /api/profile-purchases', function () {
       });
   });
 
+  it('rejects a name that is too long', async function () {
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'a'.repeat(51),
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
+      });
+  });
+
   it('rejects a slug with a forbidden word', async function () {
     await request()
       .post(`/api/profile-purchases`)

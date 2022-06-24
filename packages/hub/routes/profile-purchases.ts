@@ -69,6 +69,17 @@ export default class ProfilePurchasesRoute {
 
     let merchantAttributes = merchantObject.attributes;
 
+    if (merchantAttributes.name.length > 50) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant name',
+        detail: 'Merchant name cannot exceed 50 characters',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let slug = merchantAttributes['slug'].toLowerCase();
     let validationResult = await this.merchantInfosRoute.validateSlug(slug);
 
