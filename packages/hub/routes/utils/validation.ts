@@ -5,10 +5,11 @@ export function validateRequiredFields(
   {
     requiredAttributes = [],
     requiredRelationships = [],
-  }: { requiredAttributes?: string[]; requiredRelationships?: string[] }
+    attributesObject = null,
+  }: { requiredAttributes?: string[]; requiredRelationships?: string[]; attributesObject?: any }
 ) {
   let errors = [
-    ...requiredAttributes.map((attr) => errorForAttribute(ctx, attr)),
+    ...requiredAttributes.map((attr) => errorForAttribute(ctx, attr, attributesObject)),
     ...requiredRelationships.map((attr) => errorForRelationship(ctx, attr)),
   ].filter(Boolean);
 
@@ -23,8 +24,12 @@ export function validateRequiredFields(
   return false;
 }
 
-function errorForAttribute(ctx: Koa.Context, attributeName: string) {
-  let attributeValue = ctx.request.body?.data?.attributes?.[attributeName];
+function errorForAttribute(ctx: Koa.Context, attributeName: string, attributesObject: any) {
+  if (!attributesObject) {
+    attributesObject = ctx.request.body?.data?.attributes;
+  }
+
+  let attributeValue = attributesObject[attributeName];
   if (attributeValue && attributeValue.length > 0) {
     return;
   }

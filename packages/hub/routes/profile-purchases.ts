@@ -5,6 +5,7 @@ import { inject } from '@cardstack/di';
 import { query } from '@cardstack/hub/queries';
 import { CardSpace } from './card-spaces';
 import { MerchantInfo } from './merchant-infos';
+import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 
 export default class ProfilePurchasesRoute {
@@ -68,6 +69,15 @@ export default class ProfilePurchasesRoute {
     }
 
     let merchantAttributes = merchantObject.attributes;
+
+    if (
+      !validateRequiredFields(ctx, {
+        requiredAttributes: ['name', 'slug', 'color'],
+        attributesObject: merchantAttributes,
+      })
+    ) {
+      return;
+    }
 
     if (merchantAttributes.name.length > 50) {
       ctx.status = 422;
