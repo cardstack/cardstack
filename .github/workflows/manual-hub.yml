@@ -51,27 +51,11 @@ jobs:
 
       - name: Deploy hub
         uses: ./.github/actions/deploy-hub
+        with:
+          waypoint_version: ${{ env.WAYPOINT_VERSION }}
+          environment: ${{ github.event.inputs.environment }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **hub** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **hub** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

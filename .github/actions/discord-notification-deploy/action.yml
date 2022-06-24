@@ -8,11 +8,8 @@ inputs:
   environment:
     description: Deployment environment
     required: true
-  discord_token:
-    description: Authentication token for Discord bot
-    required: true
-  discord_channel:
-    description: ID of the Discord channel to send the notification
+  webhook:
+    description: Discord webhook URL
     required: true
   is_ecs:
     description: If service is deployed with AWS ECS
@@ -30,11 +27,11 @@ runs:
 
     - name: Send success notification to Discord
       if: ${{ github.action_status == 'Success' && job.status == 'success'}}
-      uses: ./.github/actions/discord-message
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
       with:
-        token: ${{ inputs.discord_token }}
-        channel: ${{ inputs.discord_channel }}
-        message: |
+        args: |
           :checkered_flag: **${{ inputs.app }}** [${{ github.ref }}] has been successfully deployed to *${{ inputs.environment }}*
           :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -48,11 +45,11 @@ runs:
     - name: Send failure notification to Discord
       id: notify_stopped_task
       if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'true' }}
-      uses: ./.github/actions/discord-message
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
       with:
-        token: ${{ inputs.discord_token }}
-        channel: ${{ inputs.discord_channel }}
-        message: |
+        args: |
           :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
           :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           Tasks stopped for reason:
@@ -63,10 +60,10 @@ runs:
 
     - name: Send failure notification to Discord
       if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.notify_stopped_task.conclusion != 'success' }}
-      uses: ./.github/actions/discord-message
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
       with:
-        token: ${{ inputs.discord_token }}
-        channel: ${{ inputs.discord_channel }}
-        message: |
+        args: |
           :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
           :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

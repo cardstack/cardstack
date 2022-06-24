@@ -60,5 +60,4 @@ jobs:
         with:
           app: web-client
           environment: ${{ github.event.inputs.environment }}
-          discord_token: ${{ secrets.DISCORD_TOKEN }}
-          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

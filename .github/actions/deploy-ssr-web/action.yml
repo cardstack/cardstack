@@ -9,6 +9,9 @@ inputs:
   environment:
     description: Deployment environment
     required: true
+  discord_webhook:
+    description: Discord webhook URL
+    required: true
 
 runs:
   using: composite
@@ -40,10 +43,19 @@ runs:
 
     - uses: ./.github/actions/waypoint-ecs-failsafe
       with:
-        app: "ssr-web"
+        app: ssr-web
 
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
-        app: "ssr-web"
+        app: ssr-web
         retain: "1"
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: ssr-web
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}
+        is_ecs: "true"
