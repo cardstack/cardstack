@@ -43,9 +43,13 @@ export default class ProfilePurchasesRoute {
     if (!merchantInfoRelationship) {
       ctx.status = 422;
       ctx.body = {
-        status: '422',
-        title: 'Missing merchant-infos',
-        detail: 'merchant-info relationship must be included',
+        errors: [
+          {
+            status: '422',
+            title: 'Missing merchant-infos',
+            detail: 'merchant-info relationship must be included',
+          },
+        ],
       };
       ctx.type = 'application/vnd.api+json';
       return;
@@ -60,9 +64,13 @@ export default class ProfilePurchasesRoute {
     if (!merchantObject) {
       ctx.status = 422;
       ctx.body = {
-        status: '422',
-        title: 'Missing merchant-infos',
-        detail: `No included merchant-infos with lid ${merchantInfoRelationship.data.lid} was found`,
+        errors: [
+          {
+            status: '422',
+            title: 'Missing merchant-infos',
+            detail: `No included merchant-infos with lid ${merchantInfoRelationship.data.lid} was found`,
+          },
+        ],
       };
       ctx.type = 'application/vnd.api+json';
       return;
@@ -82,9 +90,13 @@ export default class ProfilePurchasesRoute {
     if (merchantAttributes.name.length > 50) {
       ctx.status = 422;
       ctx.body = {
-        status: '422',
-        title: 'Invalid merchant name',
-        detail: 'Merchant name cannot exceed 50 characters',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant name',
+            detail: 'Merchant name cannot exceed 50 characters',
+          },
+        ],
       };
       ctx.type = 'application/vnd.api+json';
       return;
@@ -96,9 +108,13 @@ export default class ProfilePurchasesRoute {
     if (!validationResult.slugAvailable) {
       ctx.status = 422;
       ctx.body = {
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: validationResult.detail,
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant slug',
+            detail: validationResult.detail,
+          },
+        ],
       };
       ctx.type = 'application/vnd.api+json';
       return;
@@ -122,10 +138,14 @@ export default class ProfilePurchasesRoute {
     if (!purchaseValidationResult) {
       ctx.status = 422;
       ctx.body = {
-        status: '422',
-        title: 'Invalid purchase receipt',
-        detail: 'Purchase receipt is not valid',
-        meta: purchaseValidationResponse,
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+            meta: purchaseValidationResponse,
+          },
+        ],
       };
       ctx.type = 'application/vnd.api+json';
       return;

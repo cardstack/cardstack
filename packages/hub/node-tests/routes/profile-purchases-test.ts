@@ -212,10 +212,14 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid purchase receipt',
-        detail: 'Purchase receipt is not valid',
-        meta: purchaseValidationResponse,
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+            meta: purchaseValidationResponse,
+          },
+        ],
       });
   });
 
@@ -355,9 +359,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant slug',
+            detail: 'Unique ID can only contain lowercase letters or numbers, no special characters',
+          },
+        ],
       });
   });
 
@@ -394,9 +402,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'Unique ID cannot be more than 50 characters long. It is currently 51 characters long',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant slug',
+            detail: 'Unique ID cannot be more than 50 characters long. It is currently 51 characters long',
+          },
+        ],
       });
   });
 
@@ -433,9 +445,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid merchant name',
-        detail: 'Merchant name cannot exceed 50 characters',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant name',
+            detail: 'Merchant name cannot exceed 50 characters',
+          },
+        ],
       });
   });
 
@@ -472,9 +488,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'This ID is not allowed',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant slug',
+            detail: 'This ID is not allowed',
+          },
+        ],
       });
   });
 
@@ -520,9 +540,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'This ID is already taken. Please choose another one',
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid merchant slug',
+            detail: 'This ID is already taken. Please choose another one',
+          },
+        ],
       });
   });
 
@@ -559,9 +583,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Missing merchant-infos',
-        detail: 'No included merchant-infos with lid 2 was found',
+        errors: [
+          {
+            status: '422',
+            title: 'Missing merchant-infos',
+            detail: 'No included merchant-infos with lid 2 was found',
+          },
+        ],
       });
 
     await request()
@@ -596,9 +624,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Missing merchant-infos',
-        detail: 'No included merchant-infos with lid 1 was found',
+        errors: [
+          {
+            status: '422',
+            title: 'Missing merchant-infos',
+            detail: 'No included merchant-infos with lid 1 was found',
+          },
+        ],
       });
 
     await request()
@@ -621,9 +653,13 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Missing merchant-infos',
-        detail: 'merchant-info relationship must be included',
+        errors: [
+          {
+            status: '422',
+            title: 'Missing merchant-infos',
+            detail: 'merchant-info relationship must be included',
+          },
+        ],
       });
   });
 });
