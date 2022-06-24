@@ -5,6 +5,9 @@ inputs:
   app:
     description: Name of the app
     required: true
+  status:
+    description: Status of the deployment
+    required: true
   environment:
     description: Deployment environment
     required: true
@@ -19,14 +22,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Print job status
-      run: |
-        echo github.action_status=${{ github.action_status }}
-        echo job.status=${{ job.status }}
-      shell: bash
-
     - name: Send success notification to Discord
-      if: ${{ github.action_status == 'Success' && job.status == 'success'}}
+      if: ${{ inputs.status == 'success' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}
@@ -37,14 +34,14 @@ runs:
 
     - name: Fetch stopped reason and logs
       id: debug
-      if: ${{ inputs.is_ecs == 'true' && ( github.action_status == 'Failure' || job.status == 'failure' ) }}
+      if: ${{ inputs.status == 'failure' && inputs.is_ecs == 'true' }}
       uses: ./.github/actions/fetch-stopped-ecs-task
       with:
         app: ${{ inputs.app }}
 
     - name: Send failure notification to Discord
       id: notify_stopped_task
-      if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'true' }}
+      if: ${{ inputs.status == 'failure' && steps.debug.outputs.has_stopped_task == 'true' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}
@@ -59,7 +56,7 @@ runs:
           View the latest logs at ${{ steps.debug.outputs.logs_url }}
 
     - name: Send failure notification to Discord
-      if: ${{ ( github.action_status == 'Failure' || job.status == 'failure' ) && steps.notify_stopped_task.conclusion != 'success' }}
+      if: ${{ inputs.status == 'failure' && steps.notify_stopped_task.conclusion != 'success' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}

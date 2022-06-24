@@ -37,11 +37,18 @@ runs:
       with:
         app: cardie
 
+    - name: Print job status
+      run: |
+        echo github.action_status=${{ github.action_status }}
+        echo job.status=${{ job.status }}
+      shell: bash
+
     - name: Send notification to Discord
       if: ${{ always() }}
       uses: ./.github/actions/discord-notification-deploy
       with:
         app: cardie
+        status: ${{ github.action_status }}
         environment: ${{ inputs.environment }}
         webhook: ${{ inputs.discord_webhook }}
         is_ecs: "true"
