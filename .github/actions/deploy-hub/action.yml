@@ -79,6 +79,7 @@ runs:
       uses: ./.github/actions/discord-notification-deploy
       with:
         app: hub
+        status: ${{ github.action_status }}
         environment: ${{ inputs.environment }}
         webhook: ${{ inputs.discord_webhook }}
         is_ecs: "true"
