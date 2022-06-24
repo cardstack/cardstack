@@ -23,7 +23,7 @@ runs:
   using: composite
   steps:
     - name: Send success notification to Discord
-      if: ${{ inputs.status == 'success' }}
+      if: ${{ inputs.status == 'Success' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}
@@ -34,14 +34,14 @@ runs:
 
     - name: Fetch stopped reason and logs
       id: debug
-      if: ${{ inputs.status == 'failure' && inputs.is_ecs == 'true' }}
+      if: ${{ inputs.status == 'Failure' && inputs.is_ecs == 'true' }}
       uses: ./.github/actions/fetch-stopped-ecs-task
       with:
         app: ${{ inputs.app }}
 
     - name: Send failure notification to Discord
       id: notify_stopped_task
-      if: ${{ inputs.status == 'failure' && steps.debug.outputs.has_stopped_task == 'true' }}
+      if: ${{ inputs.status == 'Failure' && steps.debug.outputs.has_stopped_task == 'true' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}
@@ -56,7 +56,7 @@ runs:
           View the latest logs at ${{ steps.debug.outputs.logs_url }}
 
     - name: Send failure notification to Discord
-      if: ${{ inputs.status == 'failure' && steps.notify_stopped_task.conclusion != 'success' }}
+      if: ${{ inputs.status == 'Failure' && steps.notify_stopped_task.conclusion != 'success' }}
       uses: Ilshidur/action-discord@master
       env:
         DISCORD_WEBHOOK: ${{ inputs.webhook }}

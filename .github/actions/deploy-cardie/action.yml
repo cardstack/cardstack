@@ -38,6 +38,7 @@ runs:
         app: cardie
 
     - name: Print job status
+      if: ${{ always() }}
       run: |
         echo github.action_status=${{ github.action_status }}
         echo job.status=${{ job.status }}
