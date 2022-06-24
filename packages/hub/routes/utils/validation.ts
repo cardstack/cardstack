@@ -30,7 +30,7 @@ function errorForAttribute(ctx: Koa.Context, attributeName: string, attributesOb
   }
 
   let attributeValue = attributesObject[attributeName];
-  if (attributeValue && attributeValue.length > 0) {
+  if (attributeValue && (attributeValue.length > 0 || attributeValue instanceof Object)) {
     return;
   }
 

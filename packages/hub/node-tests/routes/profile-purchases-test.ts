@@ -279,11 +279,7 @@ describe('POST /api/profile-purchases', function () {
       .send({
         data: {
           type: 'profile-purchases',
-          attributes: {
-            receipt: {
-              'a-receipt': 'yes',
-            },
-          },
+          attributes: {},
         },
         relationships: {
           'merchant-info': {
@@ -311,49 +307,18 @@ describe('POST /api/profile-purchases', function () {
       .expect(422)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect({
-        status: '422',
-        title: 'Missing purchase information',
-        detail: 'Purchase provider is missing',
-      });
-
-    await request()
-      .post(`/api/profile-purchases`)
-      .send({
-        data: {
-          type: 'profile-purchases',
-          attributes: {
-            provider: 'a-provider',
-          },
-        },
-        relationships: {
-          'merchant-info': {
-            data: {
-              type: 'merchant-infos',
-              lid: '1',
-            },
-          },
-        },
-        included: [
+        errors: [
           {
-            type: 'merchant-infos',
-            lid: '1',
-            attributes: {
-              name: 'Satoshi Nakamoto',
-              slug: 'satoshi',
-              color: 'ff0000',
-              'text-color': 'ffffff',
-            },
+            status: '422',
+            title: 'Missing required attribute: provider',
+            detail: 'Required field provider was not provided',
+          },
+          {
+            status: '422',
+            title: 'Missing required attribute: receipt',
+            detail: 'Required field receipt was not provided',
           },
         ],
-      })
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
-      .expect('Content-Type', 'application/vnd.api+json')
-      .expect({
-        status: '422',
-        title: 'Missing purchase information',
-        detail: 'Purchase receipt is missing',
       });
   });
 
