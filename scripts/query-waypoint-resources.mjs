@@ -73,7 +73,8 @@ function getLoadBalancer(appName) {
 }
 
 function main() {
-  const apps = getWaypointConfig('waypoint.hcl');
+  const waypointConfigFilePath = process.argv[2];
+  const apps = getWaypointConfig(waypointConfigFilePath);
   const output = apps
     .map((app) => {
       const service = getLatestService(app.cluster, app.name);
