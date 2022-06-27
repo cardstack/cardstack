@@ -62,6 +62,10 @@ app "hub" {
       command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "hub-worker" {
@@ -114,6 +118,10 @@ app "hub-worker" {
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "hub-bot" {
@@ -165,6 +173,10 @@ app "hub-bot" {
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "hub-event-listener" {
@@ -215,6 +227,10 @@ app "hub-event-listener" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -270,6 +286,10 @@ app "cardpay-subg-ext" {
       command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "ssr-web" {
@@ -310,6 +330,10 @@ app "ssr-web" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -361,6 +385,10 @@ app "reward-submit" {
       when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
 
@@ -418,6 +446,10 @@ app "reward-api" {
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "reward-indexer" {
@@ -468,6 +500,10 @@ app "reward-indexer" {
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer"]
     }
   }
+
+  url {
+    auto_hostname = false
+  }
 }
 
 app "reward-scheduler" {
@@ -515,5 +551,9 @@ app "reward-scheduler" {
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
     }
+  }
+
+  url {
+    auto_hostname = false
   }
 }
