@@ -50,23 +50,3 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: |
-            :checkered_flag: **reward-api** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: |
-            :warning: **reward-api** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

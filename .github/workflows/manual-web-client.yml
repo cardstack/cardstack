@@ -53,11 +53,4 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
         with:
           environment: ${{ github.event.inputs.environment }}
-
-      - name: Send notification to Discord
-        if: ${{ always() }}
-        uses: ./.github/actions/discord-notification-deploy
-        with:
-          app: web-client
-          environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
