@@ -166,7 +166,9 @@ class RewardProgram:
         )
 
         if payment_cycle_output.joinpath("results.parquet").exists():
-            logging.info(f"Already processed: {payment_cycle} for {self.reward_program_id}")
+            logging.info(
+                f"Already processed: {payment_cycle} for {self.reward_program_id}"
+            )
             return None
 
         # We can't pass much data directly in AWS batch, so write the
