@@ -165,6 +165,10 @@ class RewardProgram:
             f"paymentCycle={payment_cycle}"
         )
 
+        if payment_cycle_output.joinpath("results.parquet").exists():
+            logging.info(f"Already processed: {payment_cycle} for {self.reward_program_id}")
+            return None
+
         # We can't pass much data directly in AWS batch, so write the
         # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
