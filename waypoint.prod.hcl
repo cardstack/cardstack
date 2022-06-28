@@ -32,9 +32,9 @@ app "hub" {
       cluster             = "hub-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      task_role_name      = "hub-ecr-task"
-      execution_role_name = "hub-ecr-task-executor-role"
-      security_group_ids  = ["sg-067ebe82aa5ba2d94"]
+      task_role_name      = "hub-ecs-task"
+      execution_role_name = "hub-ecs-task-execution"
+      security_group_ids  = ["sg-098518120fd2269f8"]
 
       alb {
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/20f287dd-ba3c-4175-8b06-5c3b1e75f6d9"
@@ -96,9 +96,9 @@ app "hub-worker" {
       cluster             = "hub-worker-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      task_role_name      = "hub-ecr-task"
-      execution_role_name = "hub-ecr-task-executor-role"
-      security_group_ids  = ["sg-032ddc1fc8ca0f103"]
+      task_role_name      = "hub-worker-ecs-task"
+      execution_role_name = "hub-worker-ecs-task-execution"
+      security_group_ids  = ["sg-0ebaff84eb2ce9911"]
       disable_alb         = true
 
       secrets = {
@@ -152,9 +152,9 @@ app "hub-bot" {
       cluster             = "hub-bot-prod"
       count               = 1
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      task_role_name      = "hub-ecr-task"
-      execution_role_name = "hub-ecr-task-executor-role"
-      security_group_ids  = ["sg-05c9bc300532597e4"]
+      task_role_name      = "hub-bot-ecs-task"
+      execution_role_name = "hub-bot-ecs-task-execution"
+      security_group_ids  = ["sg-07d3e7f1d03f6a550"]
       disable_alb         = true
 
       secrets = {
@@ -207,9 +207,9 @@ app "hub-event-listener" {
       cluster             = "hub-event-listener-prod"
       count               = 1
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      task_role_name      = "hub-ecr-task"
-      execution_role_name = "hub-ecr-task-executor-role"
-      security_group_ids  = ["sg-01280d0d83358dd19"]
+      task_role_name      = "hub-event-listener-ecs-task"
+      execution_role_name = "hub-event-listener-ecs-task-execution"
+      security_group_ids  = ["sg-0e670a65333b189e6"]
       disable_alb         = true
 
       secrets = {
@@ -269,9 +269,9 @@ app "cardpay-subg-ext" {
       cluster             = "cardpay-production-subgraph-extraction"
       count               = 1
       subnets             = ["subnet-0544d680b5f494842", "subnet-051e48e37cf15329c"]
-      task_role_name      = "cardpay-production-subgraph-extraction-ecr-task"
-      execution_role_name = "cardpay-production-subgraph-extraction-ecr-task-executor-role"
-      security_group_ids  = ["sg-043b971abe016344f"]
+      task_role_name      = "cardpay-subg-ext-ecs-task"
+      execution_role_name = "cardpay-subg-ext-ecs-task-execution"
+      security_group_ids  = ["sg-00f628311f41a4cfb"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7"
@@ -311,14 +311,15 @@ app "ssr-web" {
 
   deploy {
     use "aws-ecs" {
-      service_port       = 4000
-      region             = "us-east-1"
-      memory             = "512"
-      cluster            = "ssr-web-prod"
-      count              = 2
-      subnets            = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      security_group_ids = ["sg-076832134e8b64044"]
-      task_role_name     = "ssr-web-prod-ecr-task"
+      service_port        = 4000
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "ssr-web-prod"
+      count               = 2
+      subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
+      security_group_ids  = ["sg-0c8b6a2abf52d009a"]
+      task_role_name      = "ssr-web-ecs-task"
+      execution_role_name = "ssr-web-ecs-task-execution"
 
       alb {
         subnets     = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -368,9 +369,9 @@ app "reward-submit" {
       memory              = "512"
       cluster             = "reward-root-submitter"
       count               = 1
-      task_role_name      = "reward-root-submitter-ecr-task"
-      execution_role_name = "reward-root-submitter-ecr-task-executor-role"
-      security_group_ids  = ["sg-0e945981567c01d11"]
+      task_role_name      = "reward-submit-ecs-task"
+      execution_role_name = "reward-submit-ecs-task-execution"
+      security_group_ids  = ["sg-01c10b2d2afa89d70"]
       disable_alb         = true
 
       secrets = {
@@ -427,7 +428,7 @@ app "reward-api" {
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
       task_role_name      = "reward-api-ecs-task"
       execution_role_name = "reward-api-ecs-task-execution"
-      security_group_ids  = ["sg-09a7c64cd391290b9"]
+      security_group_ids  = ["sg-0539922b04d6141a3"]
 
       alb {
         subnets     = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
@@ -486,7 +487,7 @@ app "reward-indexer" {
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
       task_role_name      = "reward-indexer-ecs-task"
       execution_role_name = "reward-indexer-ecs-task-execution"
-      security_group_ids  = ["sg-0162c1445e92dd6eb"]
+      security_group_ids  = ["sg-0ddbdabbc933ec962"]
       disable_alb         = true
 
       secrets = {
@@ -541,9 +542,9 @@ app "reward-scheduler" {
       memory              = "512"
       cluster             = "cardpay-reward-scheduler-production"
       count               = 1
-      task_role_name      = "reward-programs-scheduler-ecr-task"
-      execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
-      security_group_ids  = ["sg-02a3e4b91f707a1a9"]
+      task_role_name      = "reward-scheduler-ecs-task"
+      execution_role_name = "reward-scheduler-ecs-task-execution"
+      security_group_ids  = ["sg-0df4cedbbbb97d9e3"]
       disable_alb         = true
 
       secrets = {
