@@ -6,6 +6,12 @@ inputs:
     description: Waypoint version to use
     required: false
     default: "0.8.1"
+  environment:
+    description: Deployment environment
+    required: true
+  discord_webhook:
+    description: Discord webhook URL
+    required: true
 
 runs:
   using: composite
@@ -67,3 +73,13 @@ runs:
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
         app: "hub-event-listener"
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: hub
+        status: ${{ github.action_status }}
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}
+        is_ecs: "true"

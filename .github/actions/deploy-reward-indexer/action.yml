@@ -9,6 +9,9 @@ inputs:
   environment:
     description: Deployment environment
     required: true
+  discord_webhook:
+    description: Discord webhook URL
+    required: true
 
 runs:
   using: composite
@@ -32,4 +35,14 @@ runs:
     - name: Prune dangling resources
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
-        app: "reward-indexer"
+        app: reward-indexer
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: reward-indexer
+        status: ${{ github.action_status }}
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}
+        is_ecs: "true"

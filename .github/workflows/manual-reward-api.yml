@@ -43,6 +43,9 @@ jobs:
 
       - name: Deploy reward api
         uses: ./.github/actions/deploy-reward-api
+        with:
+          environment: ${{ github.event.inputs.environment }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: "1"

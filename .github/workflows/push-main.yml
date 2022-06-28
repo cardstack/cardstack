@@ -240,24 +240,9 @@ jobs:
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **hub** [main] has been successfully deployed to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **hub** [main] has failed to deploy to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          environment: staging
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
@@ -286,24 +271,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
         with:
           environment: staging
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **web-client** [main] has been successfully deployed to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **web-client** [main] has failed to deploy to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy-ssr-web-staging:
     name: Deploy ssr-web
@@ -335,24 +303,7 @@ jobs:
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
         with:
           environment: staging
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **ssr-web** [main] has been successfully deployed to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **ssr-web** [main] has failed to deploy to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy-boxel:
     name: Deploy boxel to S3 bucket
@@ -382,24 +333,14 @@ jobs:
           S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
           S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
           S3_PREVIEW_REGION: us-east-1
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
+      - name: Send notification to Discord
+        if: ${{ always() }}
+        uses: ./.github/actions/discord-notification-deploy
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **boxel** [main] has been successfully deployed to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **boxel** [main] has failed to deploy to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          app: boxel
+          status: ${{ job.status }}
+          environment: staging
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy-cardie:
     name: Deploy cardie via waypoint
@@ -427,21 +368,6 @@ jobs:
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-      - name: Send success notification to Discord
-        if: ${{ success() }}
-        uses: ./.github/actions/discord-message
         with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :checkered_flag: **cardie** [main] has been successfully deployed to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      - name: Send failure notification to Discord
-        if: ${{ failure() }}
-        uses: ./.github/actions/discord-message
-        with:
-          token: ${{ secrets.DISCORD_TOKEN }}
-          channel: ${{ secrets.DISCORD_CHANNEL }}
-          message: |
-            :warning: **cardie** [main] has failed to deploy to *staging*
-            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          environment: staging
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
