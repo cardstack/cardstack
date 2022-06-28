@@ -241,7 +241,6 @@ jobs:
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
         with:
-          waypoint_version: "0.8.1"
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
@@ -370,6 +369,5 @@ jobs:
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
         with:
-          waypoint_version: "0.8.1"
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

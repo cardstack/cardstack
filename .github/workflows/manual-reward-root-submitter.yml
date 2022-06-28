@@ -44,7 +44,6 @@ jobs:
       - name: Deploy reward root submitter
         uses: ./.github/actions/deploy-reward-root-submitter
         with:
-          waypoint_version: ${{ env.WAYPOINT_VERSION }}
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
