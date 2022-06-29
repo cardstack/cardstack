@@ -152,6 +152,71 @@ describe('POST /api/profile-purchases', function () {
     expect(getJobSpecs()).to.deep.equal([{ maxAttempts: 1 }]);
   });
 
+  it('returns the existing job ticket if the request is a duplicate', async function () {
+    let existingJobTicketId = shortUUID.uuid();
+    await jobTicketsQueries.insert({
+      id: existingJobTicketId,
+      jobType: 'create-profile',
+      ownerAddress: stubUserAddress,
+      payload: {
+        'another-payload': 'okay',
+      },
+      sourceArguments: {
+        provider: 'a-provider',
+        receipt: {
+          'a-receipt': 'yes',
+        },
+      },
+    });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+          },
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        data: {
+          id: existingJobTicketId,
+          type: 'job-tickets',
+          attributes: { state: 'pending' },
+        },
+      });
+
+    expect(getJobIdentifiers()).to.be.empty;
+  });
+
   it('returns 401 without bearer token', async function () {
     await request()
       .post(`/api/profile-purchases`)

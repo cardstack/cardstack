@@ -37,6 +37,19 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
+    let alreadyCreatedJobTicket = await this.jobTicketsQueries.findAlreadyCreated(
+      'create-profile',
+      ctx.state.userAddress,
+      ctx.request.body.data.attributes
+    );
+
+    if (alreadyCreatedJobTicket) {
+      ctx.status = 200;
+      ctx.body = this.jobTicketSerializer.serialize(alreadyCreatedJobTicket);
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     let relationships = ctx.request.body.relationships || {};
     let merchantInfoRelationship = relationships['merchant-info'];
 
@@ -175,6 +188,7 @@ export default class ProfilePurchasesRoute {
       ownerAddress: ctx.state.userAddress,
       payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
       spec: { maxAttempts: 1 },
+      sourceArguments: ctx.request.body.data.attributes,
     };
 
     let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket);
