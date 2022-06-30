@@ -98,8 +98,10 @@ import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
 import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
 import SubscribeEmailTask from './tasks/subscribe-email';
+import InAppPurchases from './services/in-app-purchases';
 import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
+import ProfilePurchasesRoute from './routes/profile-purchases';
 import DiscordPostTask from './tasks/discord-post';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
@@ -134,6 +136,7 @@ export function createRegistry(): Registry {
   registry.register('upload', Upload);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
+  registry.register('in-app-purchases', InAppPurchases);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
@@ -166,6 +169,7 @@ export function createRegistry(): Registry {
   registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('job-tickets-route', JobTicketsRoute);
   registry.register('job-ticket-serializer', JobTicketSerializer);
+  registry.register('profile-purchases-route', ProfilePurchasesRoute);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);

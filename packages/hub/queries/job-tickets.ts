@@ -20,16 +20,28 @@ export default class JobTicketsQueries {
     }
   }
 
+  async findAlreadyCreated(jobType: string, ownerAddress: string, attributes: any): Promise<JobTicket | null> {
+    let db = await this.databaseManager.getClient();
+
+    let query = `SELECT * FROM job_tickets WHERE job_type = $1 AND owner_address = $2 AND source_arguments = $3`;
+    let queryResult = await db.query(query, [jobType, ownerAddress, attributes]);
+
+    if (queryResult.rows.length) {
+      let row = queryResult.rows[0];
+
+      return mapRowToModel(row);
+    } else {
+      return null;
+    }
+  }
+
   async insert(model: Partial<JobTicket>) {
     let db = await this.databaseManager.getClient();
 
-    await db.query('INSERT INTO job_tickets (id, job_type, owner_address, payload, spec) VALUES($1, $2, $3, $4, $5)', [
-      model.id,
-      model.jobType,
-      model.ownerAddress,
-      model.payload,
-      model.spec,
-    ]);
+    await db.query(
+      'INSERT INTO job_tickets (id, job_type, owner_address, payload, spec, source_arguments) VALUES($1, $2, $3, $4, $5, $6)',
+      [model.id, model.jobType, model.ownerAddress, model.payload, model.spec, model.sourceArguments]
+    );
 
     return this.find(model.id!);
   }

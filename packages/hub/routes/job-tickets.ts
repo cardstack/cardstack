@@ -13,6 +13,7 @@ export interface JobTicket {
   result: any;
   spec: any;
   state?: string;
+  sourceArguments?: any;
 }
 
 export default class JobTicketsRoute {
