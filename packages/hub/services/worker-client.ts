@@ -11,11 +11,11 @@ export default class WorkerClient {
 
   async addJob<T extends keyof KnownTasks>(
     identifier: T,
-    payload?: KnownTasks[T] extends { perform(payload: unknown, helpers?: any): any }
+    payload?: KnownTasks[T] extends { perform(payload: any, helpers?: any): any }
       ? Parameters<KnownTasks[T]['perform']>[0]
-      : KnownTasks[T] extends { (payload: unknown, helpers?: any): any }
+      : KnownTasks[T] extends (payload: any, helpers?: any) => any
       ? Parameters<KnownTasks[T]>[0]
-      : any,
+      : never,
     spec?: TaskSpec
   ): Promise<Job> {
     if (this.workerUtils) {
