@@ -4,6 +4,11 @@ import { Job, TaskSpec, WorkerUtils, makeWorkerUtils } from 'graphile-worker';
 
 export default class WorkerClient {
   private workerUtils: WorkerUtils | undefined;
+  defaultPriorities: Partial<Record<keyof KnownTasks, number>> = {
+    'notify-customer-payment': 1,
+    'notify-merchant-claim': 1,
+    'notify-prepaid-card-drop': 1,
+  };
 
   private get dbConfig() {
     return config.get('db') as Record<string, any>;
@@ -19,8 +24,16 @@ export default class WorkerClient {
     spec?: TaskSpec
   ): Promise<Job> {
     if (this.workerUtils) {
-      console.trace('Adding job', identifier, payload, spec);
-      return this.workerUtils.addJob(identifier, payload, spec);
+      // if there's a priority provided externally, respect it
+      // otherwise, we want to lower some tasks' priorities so they don't crowd out others
+      // scenario where this happens: restarting a hub-event-listener floods the job queue with notifications
+      let priority = spec?.priority ?? this.defaultPriorities[identifier];
+      let mergedSpec = {
+        ...spec,
+        priority,
+      };
+      console.trace('Adding job', identifier, payload, mergedSpec);
+      return this.workerUtils.addJob(identifier, payload, mergedSpec);
     } else {
       throw new Error('Cannot call addJob before workerUtils is ready');
     }
