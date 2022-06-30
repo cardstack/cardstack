@@ -9,7 +9,15 @@ export default class WorkerClient {
     return config.get('db') as Record<string, any>;
   }
 
-  async addJob(identifier: keyof KnownTasks, payload?: any, spec?: TaskSpec): Promise<Job> {
+  async addJob<T extends keyof KnownTasks>(
+    identifier: T,
+    payload?: KnownTasks[T] extends { perform(payload: unknown, helpers?: any): any }
+      ? Parameters<KnownTasks[T]['perform']>[0]
+      : KnownTasks[T] extends { (payload: unknown, helpers?: any): any }
+      ? Parameters<KnownTasks[T]>[0]
+      : any,
+    spec?: TaskSpec
+  ): Promise<Job> {
     if (this.workerUtils) {
       console.trace('Adding job', identifier, payload, spec);
       return this.workerUtils.addJob(identifier, payload, spec);

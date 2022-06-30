@@ -5,19 +5,22 @@ import { inject } from '@cardstack/di';
 import logger from '@cardstack/logger';
 import { query } from '@cardstack/hub/queries';
 import { EventData } from 'web3-eth-contract';
-import { KnownTasks } from '@cardstack/hub/tasks';
 
 const log = logger('hub/contract-subscription-event-handler');
 
 export const HISTORIC_BLOCKS_AVAILABLE = 10000;
 
-export const CONTRACT_EVENTS: {
+type TasksWhichAcceptEventData = 'notify-merchant-claim' | 'notify-customer-payment' | 'notify-prepaid-card-drop';
+
+interface ContractEventConfig {
   abiName: string;
   contractName: AddressKeys;
   eventName: string;
-  taskName: keyof KnownTasks;
+  taskName: TasksWhichAcceptEventData;
   contractStartVersion?: string;
-}[] = [
+}
+
+export const CONTRACT_EVENTS: readonly ContractEventConfig[] = [
   {
     abiName: 'pay-merchant-handler',
     contractName: 'payMerchantHandler' as AddressKeys,
@@ -37,7 +40,7 @@ export const CONTRACT_EVENTS: {
     taskName: 'notify-prepaid-card-drop',
     contractStartVersion: '0.9.0',
   },
-];
+] as const;
 
 export class ContractSubscriptionEventHandler {
   contracts = inject('contracts', { as: 'contracts' });
@@ -76,7 +79,7 @@ export class ContractSubscriptionEventHandler {
           );
 
           await this.latestEventBlockQueries.update(event.blockNumber);
-          this.workerClient.addJob(contractEvent.taskName, event);
+          this.workerClient.addJob<typeof CONTRACT_EVENTS[number]['taskName']>(contractEvent.taskName, event);
         }
       });
     }
