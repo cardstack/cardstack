@@ -25,3 +25,9 @@ export default class PersistOffChainPrepaidCardCustomization {
     });
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'persist-off-chain-prepaid-card-customization': PersistOffChainPrepaidCardCustomization;
+  }
+}

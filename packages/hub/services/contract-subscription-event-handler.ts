@@ -5,12 +5,19 @@ import { inject } from '@cardstack/di';
 import logger from '@cardstack/logger';
 import { query } from '@cardstack/hub/queries';
 import { EventData } from 'web3-eth-contract';
+import { KnownTasks } from '@cardstack/hub/tasks';
 
 const log = logger('hub/contract-subscription-event-handler');
 
 export const HISTORIC_BLOCKS_AVAILABLE = 10000;
 
-export const CONTRACT_EVENTS = [
+export const CONTRACT_EVENTS: {
+  abiName: string;
+  contractName: AddressKeys;
+  eventName: string;
+  taskName: keyof KnownTasks;
+  contractStartVersion?: string;
+}[] = [
   {
     abiName: 'pay-merchant-handler',
     contractName: 'payMerchantHandler' as AddressKeys,

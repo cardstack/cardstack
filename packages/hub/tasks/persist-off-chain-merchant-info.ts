@@ -27,3 +27,9 @@ export default class PersistOffChainMerchantInfo {
     });
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'persist-off-chain-merchant-info': PersistOffChainMerchantInfo;
+  }
+}

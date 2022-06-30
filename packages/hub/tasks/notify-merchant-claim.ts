@@ -139,3 +139,9 @@ export default class NotifyMerchantClaim {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'notify-merchant-claim': NotifyMerchantClaim;
+  }
+}

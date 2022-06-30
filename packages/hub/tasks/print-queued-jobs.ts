@@ -29,3 +29,9 @@ export default class PrintQueuedJobs {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'print-queued-jobs': PrintQueuedJobs;
+  }
+}

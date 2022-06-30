@@ -165,3 +165,9 @@ export default class NotifyCustomerPayment {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'notify-customer-payment': NotifyCustomerPayment;
+  }
+}

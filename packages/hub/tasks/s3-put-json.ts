@@ -2,7 +2,7 @@ import { Helpers } from 'graphile-worker';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import awsConfig from '../utils/aws-config';
 
-export default async (payload: any, helpers: Helpers) => {
+export default async function s3PutJson(payload: any, helpers: Helpers) {
   const { bucket, path, json, region, roleChain } = payload;
   let s3Config = await awsConfig({ roleChain });
   if (region) {
@@ -20,4 +20,10 @@ export default async (payload: any, helpers: Helpers) => {
 
   const response = await s3Client.send(command);
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);
-};
+}
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    's3-put-json': typeof s3PutJson;
+  }
+}

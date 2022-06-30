@@ -2,6 +2,7 @@ import { registry, setupHub } from '../helpers/server';
 import shortUUID from 'short-uuid';
 import JobTicketsQueries from '../../queries/job-tickets';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { KnownTasks } from '@cardstack/hub/tasks';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -27,11 +28,19 @@ describe('GET /api/job-tickets/:id', function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
 
     jobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'a-job', ownerAddress: stubUserAddress });
+    await jobTicketsQueries.insert({
+      id: jobTicketId,
+      jobType: 'a-job' as keyof KnownTasks,
+      ownerAddress: stubUserAddress,
+    });
     await jobTicketsQueries.update(jobTicketId, { 'a-result': 'yes' }, 'success');
 
     otherOwnerJobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: otherOwnerJobTicketId, jobType: 'a-job', ownerAddress: '0x111' });
+    await jobTicketsQueries.insert({
+      id: otherOwnerJobTicketId,
+      jobType: 'a-job' as keyof KnownTasks,
+      ownerAddress: '0x111',
+    });
   });
 
   it('returns the job ticket details', async function () {
@@ -123,7 +132,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
     jobTicketId = shortUUID.uuid();
     await jobTicketsQueries.insert({
       id: jobTicketId,
-      jobType: 'a-job',
+      jobType: 'a-job' as keyof KnownTasks,
       ownerAddress: stubUserAddress,
       payload: { 'a-payload': 'yes' },
       spec: { 'a-spec': 'yes' },
@@ -131,10 +140,18 @@ describe('POST /api/job-tickets/:id/retry', function () {
     await jobTicketsQueries.update(jobTicketId, { 'a-result': 'yes' }, 'failed');
 
     otherOwnerJobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: otherOwnerJobTicketId, jobType: 'a-job', ownerAddress: '0x111' });
+    await jobTicketsQueries.insert({
+      id: otherOwnerJobTicketId,
+      jobType: 'a-job' as keyof KnownTasks,
+      ownerAddress: '0x111',
+    });
 
     notFailedJobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: notFailedJobTicketId, jobType: 'a-job', ownerAddress: stubUserAddress });
+    await jobTicketsQueries.insert({
+      id: notFailedJobTicketId,
+      jobType: 'a-job' as keyof KnownTasks,
+      ownerAddress: stubUserAddress,
+    });
   });
 
   it('adds a new job, adds a job ticket for it, and returns its details', async function () {

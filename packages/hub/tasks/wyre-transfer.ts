@@ -59,3 +59,9 @@ export default class WyreTransferTask {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'wyre-transfer': WyreTransferTask;
+  }
+}
