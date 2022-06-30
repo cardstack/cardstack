@@ -76,7 +76,7 @@ class Indexer:
         )
         if not existing_root:
             new_root = models.Root(
-                rootHash=root["id"],
+                rootHash=root["rootHash"],
                 rewardProgramId=root["rewardProgram"]["id"],
                 paymentCycle=int(root["paymentCycle"]),
                 blockNumber=int(root["blockNumber"]),
