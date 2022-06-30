@@ -87,6 +87,7 @@ export function handleMerkleRootSubmission(event: MerkleRootSubmissionEvent): vo
   let txnHash = event.transaction.hash.toHex();
   let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
   let paymentCycle = event.params.paymentCycle;
+  let rootHash = event.params.payeeRoot;
 
   let rewardProgramEntity = RewardProgram.load(rewardProgramID);
   if (rewardProgramEntity == null) {
@@ -100,6 +101,7 @@ export function handleMerkleRootSubmission(event: MerkleRootSubmissionEvent): vo
   let entity = new MerkleRootSubmission(txnHash);
   entity.rewardProgram = rewardProgramID;
   entity.paymentCycle = paymentCycle;
+  entity.rootHash = rootHash;
   entity.timestamp = event.block.timestamp;
   entity.blockNumber = event.block.number;
   entity.save();
