@@ -141,7 +141,7 @@ describe('POST /api/profile-purchases', function () {
     let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
     expect(cardSpaceRecord).to.exist;
 
-    let jobTicketRecord = await jobTicketsQueries.find(jobTicketId!);
+    let jobTicketRecord = await jobTicketsQueries.find({ id: jobTicketId! });
     expect(jobTicketRecord?.state).to.equal('pending');
     expect(jobTicketRecord?.ownerAddress).to.equal(stubUserAddress);
     expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId });

@@ -38,11 +38,11 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let alreadyCreatedJobTicket = await this.jobTicketsQueries.findAlreadyCreated(
-      'create-profile',
-      ctx.state.userAddress,
-      ctx.request.body.data.attributes
-    );
+    let alreadyCreatedJobTicket = await this.jobTicketsQueries.find({
+      jobType: 'create-profile',
+      ownerAddress: ctx.state.userAddress,
+      sourceArguments: ctx.request.body.data.attributes,
+    });
 
     if (alreadyCreatedJobTicket) {
       ctx.status = 200;
