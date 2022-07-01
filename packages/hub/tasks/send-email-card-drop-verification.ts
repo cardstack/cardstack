@@ -79,3 +79,9 @@ export default class SendEmailCardDropVerification {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'send-email-card-drop-verification': SendEmailCardDropVerification;
+  }
+}

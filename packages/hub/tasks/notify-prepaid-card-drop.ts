@@ -50,3 +50,9 @@ export default class NotifyPrepaidCardDrop {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'notify-prepaid-card-drop': NotifyPrepaidCardDrop;
+  }
+}

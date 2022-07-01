@@ -41,3 +41,9 @@ export default class RemoveOldSentNotifications {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'remove-old-sent-notifications': RemoveOldSentNotifications;
+  }
+}

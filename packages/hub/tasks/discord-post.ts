@@ -21,3 +21,9 @@ export default class DiscordPost {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'discord-post': DiscordPost;
+  }
+}

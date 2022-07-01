@@ -4,10 +4,11 @@ import { query } from '@cardstack/hub/queries';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import shortUUID from 'short-uuid';
+import { KnownTasks } from '@cardstack/hub/tasks';
 
 export interface JobTicket {
   id: string;
-  jobType: string;
+  jobType: keyof KnownTasks; // TODO: how do we know that this is true?
   ownerAddress: string;
   payload: any;
   result: any;

@@ -75,3 +75,9 @@ export default class CreateProfile {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'create-profile': CreateProfile;
+  }
+}

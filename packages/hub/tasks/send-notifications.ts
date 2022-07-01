@@ -104,3 +104,9 @@ export default class SendNotificationsTask {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'send-notifications': SendNotificationsTask;
+  }
+}
