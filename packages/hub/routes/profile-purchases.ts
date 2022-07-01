@@ -7,6 +7,7 @@ import { CardSpace } from './card-spaces';
 import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
+import { JobTicket } from './job-tickets';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -174,7 +175,7 @@ export default class ProfilePurchasesRoute {
     };
 
     let db = await this.databaseManager.getClient();
-    let merchantInfoId;
+    let merchantInfoId!: string;
 
     await this.databaseManager.performTransaction(db, async () => {
       merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
@@ -191,7 +192,7 @@ export default class ProfilePurchasesRoute {
       sourceArguments: ctx.request.body.data.attributes,
     };
 
-    let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket);
+    let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket as unknown as JobTicket);
 
     this.workerClient.addJob(
       'create-profile',
