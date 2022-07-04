@@ -1,22 +1,35 @@
 import { setupHub } from '../helpers/server';
-import { ResponseComposition, rest, RestContext, RestRequest } from 'msw';
-import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+import { setupServer, SetupServerApi } from 'msw/node';
 
 describe('InAppPurchases', function () {
   let { getContainer } = setupHub(this);
 
   describe('for Apple provider', function () {
-    it('passes along a successful validation', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
-      let server = setupServer(
+    let mockServer: SetupServerApi;
+    let receiptSentToServer: keyof typeof mockResponses;
+
+    this.beforeEach(function () {
+      mockServer = setupServer(
         rest.post('https://sandbox.itunes.apple.com/verifyReceipt', (req, res, ctx) => {
-          respondWithMockResponse(req, res, ctx);
+          let body = JSON.parse(req.body as string);
+          receiptSentToServer = body['receipt-data'];
+          res(ctx.status(200), ctx.json(mockResponses[receiptSentToServer]));
         })
       );
 
-      server.listen();
+      mockServer.listen();
+    });
+
+    this.afterEach(function () {
+      mockServer.close();
+    });
+
+    it('passes along a successful validation', async function () {
+      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('apple', 'VALID_RECEIPT');
-      server.close();
+
+      expect(receiptSentToServer).to.equal('VALID_RECEIPT');
 
       expect(validationResponse).to.deep.equal({
         valid: true,
@@ -25,17 +38,10 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a failed validation', async function () {
-      let server = setupServer(
-        rest.post('https://sandbox.itunes.apple.com/verifyReceipt', (req, res, ctx) => {
-          respondWithMockResponse(req, res, ctx);
-        })
-      );
-
       let subject = await getContainer().lookup('in-app-purchases');
-
-      server.listen();
       let validationResponse = await subject.validate('apple', 'INVALID_RECEIPT');
-      server.close();
+
+      expect(receiptSentToServer).to.equal('INVALID_RECEIPT');
 
       expect(validationResponse).to.deep.equal({
         valid: false,
@@ -44,12 +50,6 @@ describe('InAppPurchases', function () {
     });
   });
 });
-
-function respondWithMockResponse(req: RestRequest, res: ResponseComposition, ctx: RestContext) {
-  let body = JSON.parse(req.body as string);
-  let receipt = body['receipt-data'] as keyof typeof mockResponses;
-  res(ctx.status(200), ctx.json(mockResponses[receipt]));
-}
 
 const mockResponses = {
   VALID_RECEIPT: {
