@@ -34,7 +34,7 @@ describe('InAppPurchases', function () {
 
       expect(validationResponse).to.deep.equal({
         valid: true,
-        response: validationResponse,
+        response: mockResponses['VALID_RECEIPT'],
       });
     });
 
@@ -46,7 +46,7 @@ describe('InAppPurchases', function () {
 
       expect(validationResponse).to.deep.equal({
         valid: false,
-        response: validationResponse,
+        response: mockResponses['INVALID_RECEIPT'],
       });
     });
   });
