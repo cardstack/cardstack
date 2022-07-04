@@ -1,4 +1,7 @@
 import https from 'https';
+import config from 'config';
+
+const appleVerificationURL = new URL(config.get('iap.apple.verificationUrl'));
 
 interface InAppPurchaseValidationResult {
   valid: boolean;
@@ -13,7 +16,7 @@ export default class InAppPurchases {
       return Promise.resolve({ valid: true, response: {} });
     }
 
-    var url = 'sandbox.itunes.apple.com';
+    var url = appleVerificationURL.hostname;
     var receiptEnvelope = {
       'receipt-data': receipt,
     };
@@ -21,7 +24,7 @@ export default class InAppPurchases {
     var options = {
       host: url,
       port: 443,
-      path: '/verifyReceipt',
+      path: appleVerificationURL.pathname,
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

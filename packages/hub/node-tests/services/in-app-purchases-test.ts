@@ -1,6 +1,7 @@
 import { setupHub } from '../helpers/server';
 import { rest } from 'msw';
 import { setupServer, SetupServerApi } from 'msw/node';
+import config from 'config';
 
 describe('InAppPurchases', function () {
   let { getContainer } = setupHub(this);
@@ -11,14 +12,14 @@ describe('InAppPurchases', function () {
 
     this.beforeEach(function () {
       mockServer = setupServer(
-        rest.post('https://sandbox.itunes.apple.com/verifyReceipt', (req, res, ctx) => {
+        rest.post(config.get('iap.apple.verificationUrl'), (req, res, ctx) => {
           let body = JSON.parse(req.body as string);
           receiptSentToServer = body['receipt-data'];
           return res(ctx.status(200), ctx.json(mockResponses[receiptSentToServer]));
         })
       );
 
-      mockServer.listen();
+      mockServer.listen({ onUnhandledRequest: 'error' });
     });
 
     this.afterEach(function () {

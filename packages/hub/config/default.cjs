@@ -38,6 +38,11 @@ module.exports = {
     messageVerificationDelayMs: 1000 * 15,
     onCallInternalWebhook: null,
   },
+  iap: {
+    apple: {
+      verificationUrl: 'https://sandbox.itunes.apple.com/verifyReceipt',
+    },
+  },
   mailchimp: {
     apiKey: null,
     serverPrefix: null,

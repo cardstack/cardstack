@@ -16,6 +16,11 @@ module.exports = {
     },
     verificationUrl: 'https://card-drop-email.test/email-card-drop/verify',
   },
+  iap: {
+    apple: {
+      verificationUrl: 'https://test.itunes.apple.com/verifyReceipt',
+    },
+  },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
     handleWebhookRequests: true,
