@@ -14,7 +14,7 @@ describe('InAppPurchases', function () {
         rest.post('https://sandbox.itunes.apple.com/verifyReceipt', (req, res, ctx) => {
           let body = JSON.parse(req.body as string);
           receiptSentToServer = body['receipt-data'];
-          res(ctx.status(200), ctx.json(mockResponses[receiptSentToServer]));
+          return res(ctx.status(200), ctx.json(mockResponses[receiptSentToServer]));
         })
       );
 
