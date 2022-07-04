@@ -71,6 +71,9 @@ module.exports = {
       // Test files:
       files: ['tests/**/*-test.{js,ts}'],
       extends: ['plugin:qunit/recommended'],
+      rules: {
+        'qunit/require-expect': 'off', // See https://github.com/cardstack/cardstack/pull/3010#issuecomment-1152708056
+      },
     },
   ],
 };
