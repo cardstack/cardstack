@@ -42,6 +42,10 @@ module.exports = {
     apple: {
       verificationUrl: 'https://sandbox.itunes.apple.com/verifyReceipt',
     },
+    google: {
+      verificationUrlBase:
+        'https://www.googleapis.com/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
+    },
   },
   mailchimp: {
     apiKey: null,
