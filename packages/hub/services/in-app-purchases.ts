@@ -1,8 +1,5 @@
-import https from 'https';
 import config from 'config';
 import fetch from 'node-fetch';
-
-const appleVerificationURL = new URL(config.get('iap.apple.verificationUrl'));
 
 interface InAppPurchaseValidationResult {
   valid: boolean;
@@ -23,53 +20,22 @@ export default class InAppPurchases {
   }
 
   private async validateFromApple(receipt: string): Promise<InAppPurchaseValidationResult> {
-    var url = appleVerificationURL.hostname;
-    var receiptEnvelope = {
+    let requestBody = {
       'receipt-data': receipt,
     };
-    var receiptEnvelopeStr = JSON.stringify(receiptEnvelope);
-    var options = {
-      host: url,
-      port: 443,
-      path: appleVerificationURL.pathname,
+
+    let response = await fetch(config.get('iap.apple.verificationUrl'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(receiptEnvelopeStr),
-      },
-    };
-
-    return new Promise(function (resolve) {
-      let chunks: Uint8Array[] = [];
-      var req = https.request(options, function (res) {
-        res.setEncoding('utf8');
-
-        res.on('data', function (chunk) {
-          chunks.push(Buffer.from(chunk));
-        });
-
-        res.on('end', function () {
-          try {
-            let response = JSON.parse(Buffer.concat(chunks).toString());
-
-            if (response.status === 0) {
-              resolve({ valid: true, response });
-            } else {
-              resolve({ valid: false, response });
-            }
-          } catch (e) {
-            resolve({ valid: false, response: e });
-          }
-        });
-
-        res.on('error', function (error) {
-          resolve({ valid: false, response: error });
-        });
-      });
-
-      req.write(receiptEnvelopeStr);
-      req.end();
+      body: JSON.stringify(requestBody),
     });
+
+    let json = await response.json();
+
+    if (json.status === 0) {
+      return { valid: true, response: json };
+    } else {
+      return { valid: false, response: json };
+    }
   }
 
   private async validateFromGoogle(token: string): Promise<InAppPurchaseValidationResult> {
