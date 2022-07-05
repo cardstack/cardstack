@@ -90,7 +90,7 @@ describe('CreateProfileTask', function () {
       textColor: '',
     });
 
-    subject = (await getContainer().lookup('create-profile')) as CreateProfile;
+    subject = (await getContainer().instantiate(CreateProfile)) as CreateProfile;
   });
 
   it('calls the relay server endpoint to register a profile and queues persist-off-chain-merchant-info', async function () {
