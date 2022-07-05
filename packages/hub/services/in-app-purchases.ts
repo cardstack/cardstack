@@ -46,7 +46,7 @@ export default class InAppPurchases {
 
     let json = await response.json();
 
-    if (response.ok && json.purchaseState === 0) {
+    if (response.ok && json.resource.purchaseState === 0) {
       return { valid: true, response: json };
     } else {
       return { valid: false, response: json };
