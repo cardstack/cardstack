@@ -67,7 +67,7 @@ describe('SubscribeEmailTask', function () {
       transport: sentryTransport,
     });
     testkit.reset();
-    subject = (await getContainer().lookup('subscribe-email')) as SubscribeEmail;
+    subject = await getContainer().instantiate(SubscribeEmail);
   });
 
   it('will try to subscribe the provided email to the Mailchimp newsletter', async function () {

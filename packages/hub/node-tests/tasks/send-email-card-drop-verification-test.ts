@@ -82,7 +82,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   });
 
   it('sends an email that contains the verification link', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
     let params = new URLSearchParams();
     params.append('eoa', cardDropRequest.ownerAddress);
     params.append('verification-code', cardDropRequest.verificationCode);
@@ -103,7 +103,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   });
 
   it('fails silently if the row does not exist', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
     let nonexistentId = '6a0d969f-84e1-41d3-8472-87fcf6353476';
 
     await task.perform({ email: 'anyone@test.test', id: nonexistentId }, helpers);
@@ -120,7 +120,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   });
 
   it('fails silently if the verification link is expired', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
 
     await task.perform({ email: 'anyone@test.test', id: expiredCardDropRequest.id }, helpers);
 
@@ -140,7 +140,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   it('reports emailing errors to Sentry with the correct tag, then rethrows', async function () {
     StubEmail.shouldThrow = true;
 
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
 
     await expect(task.perform({ email: 'anyone@test.test', id: cardDropRequest.id }, helpers)).to.be.rejectedWith(
       'Intentional error in stub email sending'
