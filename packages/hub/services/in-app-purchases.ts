@@ -39,7 +39,7 @@ export default class InAppPurchases {
   }
 
   private async validateFromGoogle(token: string): Promise<InAppPurchaseValidationResult> {
-    // FIXME this requires auth
+    // TODO this needs OAuth to truly work, see CS-4199
     let response = await fetch(`${config.get('iap.google.verificationUrlBase')}/${token}`, {
       method: 'GET',
     });
