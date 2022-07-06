@@ -5,8 +5,9 @@ base: &base
     token_holder:
       column_mappings:
         balance:
-          balance_uint64:
+          balance_downscale_e9_uint64:
             default: 0
+            downscale: 1000000000
             max_value: 18446744073709551615
             type: uint64
             validity_column: balance_uint64_valid
@@ -15,7 +16,7 @@ base: &base
       - 131072
       - 16384
       - 1024
-  version: 0.0.1
+  version: 1.0.0
   
 staging:
   <<: *base
