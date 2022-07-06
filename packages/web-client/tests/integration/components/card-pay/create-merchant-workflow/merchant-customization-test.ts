@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, render, waitFor } from '@ember/test-helpers';
+import { click, fillIn, blur, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
@@ -250,9 +250,11 @@ module(
 
       let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
       await fillIn(merchantNameInput, 'HELLO!');
+      await blur(merchantNameInput);
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
+      await blur(merchantIdInput);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
@@ -269,13 +271,19 @@ module(
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
       await fillIn(merchantIdInput, VALID_ID);
+      // await new Promise((resolve) => {
+      //   setTimeout(resolve, 5000);
+      // });
+      await blur(merchantIdInput);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
-
+      assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
       await click(SAVE_DETAILS_BUTTON);
+      // await this.pauseTest();
 
       let bgColor = workflowSession.getValue<string>('merchantBgColor')!;
       let textColor = workflowSession.getValue<string>('merchantTextColor')!;
 
+      await waitFor(COMPLETED_SELECTOR);
       assert.dom(COMPLETED_SELECTOR).exists();
       assert.dom(EDIT_BUTTON).exists();
       assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('HELLO!');

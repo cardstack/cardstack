@@ -79,11 +79,10 @@ module('Unit | Resource | Safes', function (hooks) {
       safes: [defaultDepotSafe],
       blockNumber: defaultBlockNumber,
     });
-    safes = new Safes(this.owner, {
-      named: {
-        strategy,
-        walletAddress: 'some-address',
-      },
+    safes = new Safes(this.owner);
+    safes.modify([], {
+      strategy,
+      walletAddress: 'some-address',
     });
     await settled();
   });
@@ -296,11 +295,10 @@ module('Unit | Resource | Safes', function (hooks) {
       blockNumber: defaultBlockNumber,
     });
 
-    safes = new Safes(this.owner, {
-      named: {
-        strategy,
-        walletAddress: 'some-address',
-      },
+    safes = new Safes(this.owner);
+    safes.modify([], {
+      strategy,
+      walletAddress: 'some-address',
     });
     await settled();
 

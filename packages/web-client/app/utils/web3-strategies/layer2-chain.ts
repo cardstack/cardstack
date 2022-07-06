@@ -48,7 +48,6 @@ import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { HubConfig } from '@cardstack/cardpay-sdk';
 import { IAssets } from '@cardstack/cardpay-sdk';
@@ -618,7 +617,7 @@ export default abstract class Layer2ChainWeb3Strategy
     )}/${txnHash}`;
   }
 
-  safes = useResource(this, Safes, () => ({
+  safes = Safes.from(this, () => ({
     strategy: this,
     walletAddress: this.walletInfo.firstAddress!,
   }));
