@@ -32,9 +32,9 @@ app "hub" {
       cluster             = "hub-staging"
       count               = 2
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      task_role_name      = "hub-staging-ecr-task"
-      execution_role_name = "hub-staging-ecr-task-executor-role"
-      security_group_ids  = ["sg-09f7331a32e490c69"]
+      task_role_name      = "hub-ecs-task"
+      execution_role_name = "hub-ecs-task-execution"
+      security_group_ids  = ["sg-036935079377197d1"]
 
       alb {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
@@ -96,9 +96,9 @@ app "hub-worker" {
       cluster             = "hub-worker-staging"
       count               = 2
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      task_role_name      = "hub-staging-ecr-task"
-      execution_role_name = "hub-staging-ecr-task-executor-role"
-      security_group_ids  = ["sg-0465ccc8bf0a0fe6f"]
+      task_role_name      = "hub-worker-ecs-task"
+      execution_role_name = "hub-worker-ecs-task-execution"
+      security_group_ids  = ["sg-0977e3c4d1af9f555"]
       disable_alb         = true
 
       secrets = {
@@ -152,9 +152,9 @@ app "hub-bot" {
       cluster             = "hub-bot-staging"
       count               = 1
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      task_role_name      = "hub-staging-ecr-task"
-      execution_role_name = "hub-staging-ecr-task-executor-role"
-      security_group_ids  = ["sg-0439d31f77bea7b87"]
+      task_role_name      = "hub-bot-ecs-task"
+      execution_role_name = "hub-bot-ecs-task-execution"
+      security_group_ids  = ["sg-0c2828b424cfb2484"]
       disable_alb         = true
 
       secrets = {
@@ -207,9 +207,9 @@ app "hub-event-listener" {
       cluster             = "hub-event-listener-staging"
       count               = 1
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      task_role_name      = "hub-staging-ecr-task"
-      execution_role_name = "hub-staging-ecr-task-executor-role"
-      security_group_ids  = ["sg-0f67ba8550f29e23d"]
+      task_role_name      = "hub-event-listener-ecs-task"
+      execution_role_name = "hub-event-listener-ecs-task-execution"
+      security_group_ids  = ["sg-0167a15ab65794aaf"]
       disable_alb         = true
 
       secrets = {
@@ -258,9 +258,9 @@ app "cardie" {
       count               = 1
       cluster             = "cardie"
       subnets             = ["subnet-89968ba2"]
-      task_role_name      = "cardie-ecr-task"
-      execution_role_name = "cardie-ecr-task-executor-role"
-      security_group_ids  = ["sg-081e62ecb53bd842a"]
+      task_role_name      = "cardie-ecs-task"
+      execution_role_name = "cardie-ecs-task-execution"
+      security_group_ids  = ["sg-02a6d8349ceb4c13c"]
       disable_alb         = true
 
       secrets = {
@@ -315,9 +315,9 @@ app "cardpay-subg-ext" {
       cluster             = "cardpay-staging-subgraph-extraction"
       count               = 1
       subnets             = ["subnet-081966e0d7a798bc1", "subnet-0544a2e18d66d0040"]
-      task_role_name      = "cardpay-staging-subgraph-extraction-ecr-task"
-      execution_role_name = "cardpay-staging-subgraph-extraction-ecr-task-executor-role"
-      security_group_ids  = ["sg-06a22e426f13d94ff"]
+      task_role_name      = "cardpay-subg-ext-ecs-task"
+      execution_role_name = "cardpay-subg-ext-ecs-task-execution"
+      security_group_ids  = ["sg-00160f813a48d47c9"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4"
@@ -357,14 +357,15 @@ app "ssr-web" {
 
   deploy {
     use "aws-ecs" {
-      service_port       = 4000
-      region             = "us-east-1"
-      memory             = "512"
-      cluster            = "ssr-web-staging"
-      count              = 2
-      subnets            = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      security_group_ids = ["sg-0e4d7c35168bda780"]
-      task_role_name     = "ssr-web-staging-ecr-task"
+      service_port        = 4000
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "ssr-web-staging"
+      count               = 2
+      subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+      security_group_ids  = ["sg-00c44baca348e403b"]
+      task_role_name      = "ssr-web-ecs-task"
+      execution_role_name = "ssr-web-ecs-task-execution"
 
       alb {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
@@ -414,9 +415,9 @@ app "reward-submit" {
       memory              = "512"
       cluster             = "reward-root-submitter"
       count               = 1
-      task_role_name      = "reward-root-submitter-ecr-task"
-      execution_role_name = "reward-root-submitter-ecr-task-executor-role"
-      security_group_ids  = ["sg-01fb13ba9bdeb992c"]
+      task_role_name      = "reward-submit-ecs-task"
+      execution_role_name = "reward-submit-ecs-task-execution"
+      security_group_ids  = ["sg-02c974bee0cb9a34e"]
       disable_alb         = true
 
       secrets = {
@@ -473,7 +474,7 @@ app "reward-api" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-api-ecs-task"
       execution_role_name = "reward-api-ecs-task-execution"
-      security_group_ids  = ["sg-0d93946d8742989a5"]
+      security_group_ids  = ["sg-00a14cee54051ae62"]
 
       alb {
         subnets     = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
@@ -532,7 +533,7 @@ app "reward-indexer" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-indexer-ecs-task"
       execution_role_name = "reward-indexer-ecs-task-execution"
-      security_group_ids  = ["sg-02c932be6b9b5ba61"]
+      security_group_ids  = ["sg-0df1b0a5714af6fd1"]
       disable_alb         = true
 
       secrets = {
@@ -588,9 +589,9 @@ app "reward-scheduler" {
       cluster             = "cardpay-reward-scheduler-staging"
       count               = 1
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-programs-scheduler-ecr-task"
-      execution_role_name = "reward-programs-scheduler-ecr-task-executor-role"
-      security_group_ids  = ["sg-0294d0694d48bb9fb"]
+      task_role_name      = "reward-scheduler-ecs-task"
+      execution_role_name = "reward-scheduler-ecs-task-execution"
+      security_group_ids  = ["sg-0ef2db7a5c985da2d"]
       disable_alb         = true
 
       secrets = {
