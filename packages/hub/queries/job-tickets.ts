@@ -7,7 +7,7 @@ export interface JobTicketsQueriesFilter {
   id?: string;
   jobType?: string;
   ownerAddress?: string;
-  sourceArguments?: string;
+  sourceArguments?: any;
 }
 
 export default class JobTicketsQueries {

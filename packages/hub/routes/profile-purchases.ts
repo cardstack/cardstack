@@ -38,10 +38,16 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
+    let { provider, receipt } = ctx.request.body.data.attributes || {};
+    let sourceArguments = {
+      provider,
+      receipt,
+    };
+
     let alreadyCreatedJobTicket = await this.jobTicketsQueries.find({
       jobType: 'create-profile',
       ownerAddress: ctx.state.userAddress,
-      sourceArguments: ctx.request.body.data.attributes,
+      sourceArguments,
     });
 
     if (alreadyCreatedJobTicket) {
@@ -142,7 +148,25 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let { provider, receipt } = ctx.request.body.data.attributes;
+    let alreadyUsedReceipt = await this.jobTicketsQueries.find({
+      jobType: 'create-profile',
+      sourceArguments,
+    });
+
+    if (alreadyUsedReceipt) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
 
     let { valid: purchaseValidationResult, response: purchaseValidationResponse } = await this.inAppPurchases.validate(
       provider,
@@ -189,7 +213,7 @@ export default class ProfilePurchasesRoute {
       ownerAddress: ctx.state.userAddress,
       payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
       spec: { maxAttempts: 1 },
-      sourceArguments: ctx.request.body.data.attributes,
+      sourceArguments,
     };
 
     let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket as unknown as JobTicket);

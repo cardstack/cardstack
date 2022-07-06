@@ -166,6 +166,7 @@ describe('POST /api/profile-purchases', function () {
         receipt: {
           'a-receipt': 'yes',
         },
+        somethingelse: 'hmm',
       },
     });
 
@@ -231,6 +232,71 @@ describe('POST /api/profile-purchases', function () {
         ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('rejects when the purchase receipt has already been used', async function () {
+    await jobTicketsQueries.insert({
+      id: shortUUID.uuid(),
+      jobType: 'create-profile',
+      ownerAddress: '0xsomeoneelse',
+      payload: {
+        'another-payload': 'okay',
+      },
+      sourceArguments: {
+        provider: 'a-provider',
+        receipt: {
+          'a-receipt': 'yes',
+        },
+      },
+    });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+            extraneous: 'hello',
+          },
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+          },
+        ],
+      });
   });
 
   it('rejects when the purchase receipt is invalid', async function () {
