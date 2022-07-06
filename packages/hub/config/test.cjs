@@ -20,6 +20,10 @@ module.exports = {
     apple: {
       verificationUrl: 'https://test.itunes.apple.com/verifyReceipt',
     },
+    google: {
+      verificationUrlBase:
+        'https://test.googleapis.com/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
+    },
   },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
