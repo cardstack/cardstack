@@ -2,6 +2,7 @@ import { registry, setupHub } from '../helpers/server';
 import CardSpaceQueries from '../../queries/card-space';
 import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import JobTicketsQueries from '../../queries/job-tickets';
 
@@ -30,6 +31,7 @@ class StubInAppPurchases {
 }
 
 describe('POST /api/profile-purchases', function () {
+  setupSentry(this);
   let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
@@ -352,6 +354,16 @@ describe('POST /api/profile-purchases', function () {
           },
         ],
       });
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'profile-purchases-route',
+    });
+
+    expect(sentryReport.error?.message).to.equal(
+      `Unable to validate purchase, response: ${JSON.stringify(purchaseValidationResponse)}`
+    );
   });
 
   it('rejects when the merchant information is incomplete', async function () {
