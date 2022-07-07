@@ -3,12 +3,7 @@ import { inject } from '@cardstack/di';
 import { JobTicket } from '../routes/job-tickets';
 import { buildConditions } from '../utils/queries';
 
-export interface JobTicketsQueriesFilter {
-  id?: string;
-  jobType?: string;
-  ownerAddress?: string;
-  sourceArguments?: any;
-}
+export type JobTicketsQueriesFilter = Partial<Pick<JobTicket, 'id' | 'jobType' | 'ownerAddress' | 'sourceArguments'>>;
 
 export default class JobTicketsQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
