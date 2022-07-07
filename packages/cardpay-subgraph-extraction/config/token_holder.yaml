@@ -1,0 +1,27 @@
+base: &base
+  name: token_holder
+  subgraph: habdelra/cardpay-xdai
+  tables:
+    token_holder:
+      column_mappings:
+        balance:
+          balance_downscale_e9_uint64:
+            default: 0
+            downscale: 1000000000
+            max_value: 18446744073709551615
+            type: uint64
+            validity_column: balance_uint64_valid
+      partition_sizes:
+      - 524288
+      - 131072
+      - 16384
+      - 1024
+  version: 1.0.0
+  
+staging:
+  <<: *base
+  subgraph: habdelra/cardpay-sokol
+
+production:
+  <<: *base
+  subgraph: habdelra/cardpay-xdai
