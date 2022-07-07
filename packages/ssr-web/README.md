@@ -114,9 +114,8 @@ Then, you can access your locally served app on your mobile device using `https:
 
 ### Linting
 
-* `yarn lint:hbs`
-* `yarn lint:js`
-* `yarn lint:js --fix`
+* `yarn lint`
+* `yarn lint:fix`
 
 ### Building
 

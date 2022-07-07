@@ -32,19 +32,19 @@ export class MerchantInfo
 
   @tracked loading = true;
   @tracked errored: Error | undefined;
+  @tracked infoDID: string | undefined;
+  @tracked waitForInfo = false;
 
   @service declare offChainJson: OffChainJsonService;
 
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
+  modify(_positional: any, { infoDID, waitForInfo }: Args['named']) {
+    this.infoDID = infoDID;
+    this.waitForInfo = waitForInfo;
   }
 
   async run() {
     try {
-      await this.fetchMerchantInfo(
-        this.args.named.infoDID,
-        this.args.named.waitForInfo
-      );
+      await this.fetchMerchantInfo();
       this.loading = false;
     } catch (err) {
       this.errored = err;
@@ -57,11 +57,11 @@ export class MerchantInfo
     }
   }
 
-  private async fetchMerchantInfo(
-    infoDID: string,
-    waitForInfo = false
-  ): Promise<void> {
-    let jsonApiDocument = await this.offChainJson.fetch(infoDID, waitForInfo);
+  private async fetchMerchantInfo(): Promise<void> {
+    let jsonApiDocument = await this.offChainJson.fetch(
+      this.infoDID,
+      this.waitForInfo
+    );
 
     if (jsonApiDocument) {
       this.id = jsonApiDocument.data.attributes['slug'];
