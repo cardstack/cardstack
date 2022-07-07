@@ -1,3 +1,4 @@
+import InAppPurchases from '../../services/in-app-purchases';
 import { setupHub } from '../helpers/server';
 import { rest } from 'msw';
 import { setupServer, SetupServerApi } from 'msw/node';
@@ -5,6 +6,11 @@ import config from 'config';
 
 describe('InAppPurchases', function () {
   let { getContainer } = setupHub(this);
+  let subject: InAppPurchases;
+
+  this.beforeEach(async function () {
+    subject = await getContainer().lookup('in-app-purchases');
+  });
 
   describe('for Apple provider', function () {
     let mockServer: SetupServerApi;
@@ -27,7 +33,6 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a successful validation', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('apple', 'VALID_RECEIPT');
 
       expect(receiptSentToServer).to.equal('VALID_RECEIPT');
@@ -39,7 +44,6 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a failed validation', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('apple', 'INVALID_RECEIPT');
 
       expect(receiptSentToServer).to.equal('INVALID_RECEIPT');
@@ -72,7 +76,6 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a successful validation', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('google', 'VALID_RECEIPT');
 
       expect(receiptSentToServer).to.equal('VALID_RECEIPT');
@@ -84,7 +87,6 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a failed validation', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('google', 'INVALID_RECEIPT');
 
       expect(receiptSentToServer).to.equal('INVALID_RECEIPT');
@@ -96,7 +98,6 @@ describe('InAppPurchases', function () {
     });
 
     it('passes along a failed validation for a canceled purchase', async function () {
-      let subject = await getContainer().lookup('in-app-purchases');
       let validationResponse = await subject.validate('google', 'CANCELED_RECEIPT');
 
       expect(validationResponse).to.deep.equal({
