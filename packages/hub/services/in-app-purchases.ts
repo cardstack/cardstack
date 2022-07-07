@@ -1,5 +1,5 @@
+/* global fetch */
 import config from 'config';
-import fetch from 'node-fetch';
 
 interface InAppPurchaseValidationResult {
   valid: boolean;
