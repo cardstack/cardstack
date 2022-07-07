@@ -8,6 +8,7 @@ import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 import { JobTicket } from './job-tickets';
+import * as Sentry from '@sentry/node';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -174,6 +175,11 @@ export default class ProfilePurchasesRoute {
     );
 
     if (!purchaseValidationResult) {
+      let error = new Error(`Unable to validate purchase, response: ${JSON.stringify(purchaseValidationResponse)}`);
+      Sentry.captureException(error, {
+        tags: { action: 'profile-purchases-route' },
+      });
+
       ctx.status = 422;
       ctx.body = {
         errors: [
