@@ -317,7 +317,7 @@ app "cardpay-subg-ext" {
       subnets             = ["subnet-081966e0d7a798bc1", "subnet-0544a2e18d66d0040"]
       task_role_name      = "cardpay-staging-subgraph-extraction-ecr-task"
       execution_role_name = "cardpay-staging-subgraph-extraction-ecr-task-executor-role"
-      security_group_ids  = ["sg-06a22e426f13d94ff"]
+      security_group_ids  = ["sg-05b9e06056e1b1a36"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4"
