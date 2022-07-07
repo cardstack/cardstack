@@ -35,7 +35,7 @@ export default class JobTicketsRoute {
     }
 
     let id = ctx.params.id;
-    let jobTicket = await this.jobTicketsQueries.find(id);
+    let jobTicket = await this.jobTicketsQueries.find({ id });
 
     if (!jobTicket) {
       ctx.body = {
@@ -81,7 +81,7 @@ export default class JobTicketsRoute {
     }
 
     let id = ctx.params.id;
-    let jobTicketToRetry = await this.jobTicketsQueries.find(id);
+    let jobTicketToRetry = await this.jobTicketsQueries.find({ id });
 
     if (!jobTicketToRetry) {
       ctx.body = {

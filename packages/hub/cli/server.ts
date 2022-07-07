@@ -34,7 +34,10 @@ export async function handler(argv: any) {
   } else {
     logger.configure({
       defaultLevel: 'warn',
-      logLevels: [['hub/*', 'info']],
+      logLevels: [
+        ['hub/*', 'info'],
+        ['route:wyre-callback', 'info'], // we would like as much detail as possible for future wyre failures
+      ],
     });
   }
   let container = createContainer();

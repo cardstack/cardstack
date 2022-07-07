@@ -90,7 +90,7 @@ describe('CreateProfileTask', function () {
       textColor: '',
     });
 
-    subject = (await getContainer().lookup('create-profile')) as CreateProfile;
+    subject = (await getContainer().instantiate(CreateProfile)) as CreateProfile;
   });
 
   it('calls the relay server endpoint to register a profile and queues persist-off-chain-merchant-info', async function () {
@@ -106,7 +106,7 @@ describe('CreateProfileTask', function () {
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
 
-    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('success');
     expect(jobTicket?.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
   });
@@ -119,7 +119,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
 
@@ -138,7 +138,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await jobTicketsQueries.find(jobTicketId);
+    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({
       error: `Error: subgraph query for transaction ${mockTransactionHash} returned no results`,

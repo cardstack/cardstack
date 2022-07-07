@@ -36,7 +36,7 @@ describe('wyre-transfer-task', function () {
   });
 
   it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
-    let task = (await getContainer().lookup('wyre-transfer')) as WyreTransferTask;
+    let task = await getContainer().instantiate(WyreTransferTask);
     await task.perform({
       request: {
         wallet: (await wyreService.getWalletById(stubCustodialWalletId))!,
@@ -70,7 +70,7 @@ describe('wyre-transfer-task', function () {
       `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
       [stubWalletOrderId, stubUserAddress.toLowerCase(), stubCustodialWalletId, stubReservationId, 'waiting-for-order']
     );
-    let task = (await getContainer().lookup('wyre-transfer')) as WyreTransferTask;
+    let task = await getContainer().instantiate(WyreTransferTask);
     await task.perform({
       request: {
         wallet: (await wyreService.getWalletById(stubCustodialWalletId))!,

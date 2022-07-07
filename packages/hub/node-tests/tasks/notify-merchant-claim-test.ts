@@ -82,7 +82,7 @@ describe('NotifyMerchantClaimTask', function () {
         symbol: 'DAI.CPXD',
       },
     };
-    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+    let task = await getContainer().instantiate(NotifyMerchantClaim);
 
     await task.perform({ transactionHash: 'a' } as EventData);
     expect(getJobIdentifiers()).to.deep.equal(['send-notifications', 'send-notifications']);
@@ -137,7 +137,7 @@ describe('NotifyMerchantClaimTask', function () {
       },
     };
 
-    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+    let task = await getContainer().instantiate(NotifyMerchantClaim);
 
     await task.perform({ transactionHash: 'a' } as EventData);
 
@@ -199,7 +199,7 @@ describe('NotifyMerchantClaimTask', function () {
       },
     };
 
-    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+    let task = await getContainer().instantiate(NotifyMerchantClaim);
 
     await task.perform({ transactionHash: 'a' } as EventData);
 
@@ -240,7 +240,7 @@ describe('NotifyMerchantClaimTask', function () {
   });
 
   it('throws when the transaction is not found on the subgraph', async function () {
-    let task = (await getContainer().lookup('notify-merchant-claim')) as NotifyMerchantClaim;
+    let task = await getContainer().instantiate(NotifyMerchantClaim);
 
     return expect(task.perform({ transactionHash: 'a' } as EventData))
       .to.be.rejectedWith(`Subgraph did not return information for merchant claim with transaction hash: "a"`)
