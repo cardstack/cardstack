@@ -7,7 +7,7 @@ interface InAppPurchaseValidationResult {
 }
 
 export default class InAppPurchases {
-  async validate(provider: string, receipt: any): Promise<InAppPurchaseValidationResult> {
+  async validate(provider: 'google' | 'apple', receipt: string): Promise<InAppPurchaseValidationResult> {
     if (provider === 'apple') {
       return this.validateFromApple(receipt);
     }
