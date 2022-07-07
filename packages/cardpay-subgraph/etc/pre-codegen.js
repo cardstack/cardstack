@@ -24,6 +24,11 @@ if (!network) {
 }
 let cleanNetwork = network.replace('poa-', '');
 
+// The graph-node configuration still references the gnosis chain as xdai
+let legacyNetwork = network;
+if (network == 'gnosis') {
+  legacyNetwork = 'xdai'
+}
 
 // If there is a graphql endpoing provided
 // take the latest deployed subgraph from it
@@ -153,7 +158,8 @@ for (let [name, abi] of Object.entries(abis)) {
 }
 
 let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
-  .replace(/{NETWORK}/g, network)
+  .replace(/{LEGACY_NETWORK}/g, legacyNetwork)
+  .replace(/{NETWORK}/g, cleanNetwork)
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_2}/g, getAddress('gnosisProxyFactory_v1_2', cleanNetwork))
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_3}/g, getAddress('gnosisProxyFactory_v1_3', cleanNetwork))
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
