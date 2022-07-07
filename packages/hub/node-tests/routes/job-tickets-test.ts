@@ -176,7 +176,7 @@ describe('POST /api/job-tickets/:id/retry', function () {
     expect(getJobPayloads()).to.deep.equal([{ 'a-payload': 'yes' }]);
     expect(getJobSpecs()).to.deep.equal([{ 'a-spec': 'yes' }]);
 
-    let newTicket = await jobTicketsQueries.find(newJobId!);
+    let newTicket = await jobTicketsQueries.find({ id: newJobId! });
 
     expect(newTicket?.ownerAddress).to.equal(stubUserAddress);
     expect(newTicket?.jobType).to.equal('a-job');

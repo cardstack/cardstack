@@ -1,30 +1,19 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import { JobTicket } from '../routes/job-tickets';
+import { buildConditions } from '../utils/queries';
+
+export type JobTicketsQueriesFilter = Partial<Pick<JobTicket, 'id' | 'jobType' | 'ownerAddress' | 'sourceArguments'>>;
 
 export default class JobTicketsQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async find(id: string): Promise<JobTicket | null> {
+  async find(filter: JobTicketsQueriesFilter): Promise<JobTicket | null> {
     let db = await this.databaseManager.getClient();
 
-    let query = `SELECT * FROM job_tickets WHERE ID = $1`;
-    let queryResult = await db.query(query, [id]);
-
-    if (queryResult.rows.length) {
-      let row = queryResult.rows[0];
-
-      return mapRowToModel(row);
-    } else {
-      return null;
-    }
-  }
-
-  async findAlreadyCreated(jobType: string, ownerAddress: string, attributes: any): Promise<JobTicket | null> {
-    let db = await this.databaseManager.getClient();
-
-    let query = `SELECT * FROM job_tickets WHERE job_type = $1 AND owner_address = $2 AND source_arguments = $3`;
-    let queryResult = await db.query(query, [jobType, ownerAddress, attributes]);
+    let conditions = buildConditions(filter);
+    let query = `SELECT * FROM job_tickets WHERE ${conditions.where}`;
+    let queryResult = await db.query(query, conditions.values);
 
     if (queryResult.rows.length) {
       let row = queryResult.rows[0];
@@ -43,7 +32,7 @@ export default class JobTicketsQueries {
       [model.id, model.jobType, model.ownerAddress, model.payload, model.spec, model.sourceArguments]
     );
 
-    return this.find(model.id!);
+    return this.find({ id: model.id! });
   }
 
   async update(id: string, result: any, state: string) {
