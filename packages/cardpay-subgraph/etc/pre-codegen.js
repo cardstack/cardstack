@@ -27,7 +27,7 @@ let cleanNetwork = network.replace('poa-', '');
 // The graph-node configuration still references the gnosis chain as xdai
 let legacyNetwork = network;
 if (network == 'gnosis') {
-  legacyNetwork = 'xdai'
+  legacyNetwork = 'xdai';
 }
 
 // If there is a graphql endpoing provided
