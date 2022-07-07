@@ -18,11 +18,11 @@ module.exports = {
   },
   iap: {
     apple: {
-      verificationUrl: 'https://test.itunes.apple.com/verifyReceipt',
+      verificationUrl: 'https://buy.itunes.apple.test/verifyReceipt',
     },
     google: {
       verificationUrlBase:
-        'https://test.googleapis.com/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
+        'https://www.googleapis.test/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
     },
   },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
