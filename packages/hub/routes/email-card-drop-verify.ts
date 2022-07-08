@@ -20,7 +20,7 @@ export default class EmailCardDropVerifyRoute {
   });
 
   relay = service('relay');
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

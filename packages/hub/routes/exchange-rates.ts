@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import config from 'config';
 import { CryptoCompareSuccessResponse } from '../services/exchange-rates';
 import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk';
@@ -19,8 +19,8 @@ if (!isValidAllowedDomainConfig(allowedDomains)) {
  * Provides exchange rate information for converting from USD to other currencies
  */
 export default class ExchangeRatesRoute {
-  clock = inject('clock');
-  exchangeRatesService = inject('exchange-rates', { as: 'exchangeRatesService' });
+  clock = service('clock');
+  exchangeRatesService = service('exchange-rates', { as: 'exchangeRatesService' });
 
   constructor() {
     autoBind(this);

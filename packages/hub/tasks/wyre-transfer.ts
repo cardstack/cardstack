@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import Logger from '@cardstack/logger';
 import { ValidatedWalletReceiveRequest } from '../routes/wyre-callback';
 import * as Sentry from '@sentry/node';
@@ -12,8 +13,8 @@ interface WyreTransferPayload {
 
 export default class WyreTransferTask {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
-  wyre = inject('wyre');
-  order = inject('order');
+  wyre = service('wyre');
+  order = service('order');
 
   async perform(payload: WyreTransferPayload) {
     let { dest, request } = payload;

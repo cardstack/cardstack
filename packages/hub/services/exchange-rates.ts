@@ -160,8 +160,8 @@ export default class ExchangeRatesService {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'exchange-rates': ExchangeRatesService;
   }
 }

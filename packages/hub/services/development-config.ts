@@ -10,8 +10,8 @@ export default class DevelopmentConfig {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'development-config': DevelopmentConfig;
   }
 }

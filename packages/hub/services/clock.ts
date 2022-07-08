@@ -15,8 +15,8 @@ export class Clock {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     clock: Clock;
   }
 }

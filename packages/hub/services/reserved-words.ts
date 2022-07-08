@@ -25,8 +25,8 @@ export default class ReservedWords {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'reserved-words': ReservedWords;
   }
 }

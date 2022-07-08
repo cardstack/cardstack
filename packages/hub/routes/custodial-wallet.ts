@@ -1,12 +1,12 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { ensureLoggedIn } from './utils/auth';
 import Web3 from 'web3';
 
 const { toChecksumAddress } = Web3.utils;
 export default class CustodialWalletRoute {
-  wyre = inject('wyre');
+  wyre = service('wyre');
 
   constructor() {
     autoBind(this);

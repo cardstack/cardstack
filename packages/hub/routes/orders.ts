@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { validateRequiredFields } from './utils/validation';
 import { validate as validateUUID } from 'uuid';
 import * as JSONAPI from 'jsonapi-typescript';
@@ -12,9 +13,9 @@ import { handleError } from './utils/error';
 let log = Logger('route:orders');
 
 export default class OrdersRoute {
-  order = inject('order');
+  order = service('order');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
-  wyre = inject('wyre');
+  wyre = service('wyre');
 
   constructor() {
     autoBind(this);

@@ -74,8 +74,8 @@ function handleError(msg: string, err: Error) {
   });
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'wallet-connect': WalletConnectService;
   }
 }

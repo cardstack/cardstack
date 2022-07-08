@@ -2,6 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { query } from '@cardstack/hub/queries';
 import { CardSpace } from './card-spaces';
 import { MerchantInfo } from './merchant-infos';
@@ -15,7 +16,7 @@ export default class ProfilePurchasesRoute {
 
   cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
 
-  inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
+  inAppPurchases = service('in-app-purchases', { as: 'inAppPurchases' });
 
   jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
@@ -28,7 +29,7 @@ export default class ProfilePurchasesRoute {
     as: 'merchantInfoQueries',
   });
 
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

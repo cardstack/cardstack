@@ -31,11 +31,11 @@ export default class HubBot extends DiscordBot {
     [CardDrop.name, CardDrop],
   ]);
 
-  inventory = inject('inventory');
+  inventory = service('inventory');
   relay = service('relay');
   walletConnect = inject('wallet-connect', { as: 'walletConnect' });
-  web3 = inject('web3-http', { as: 'web3' });
-  cardpay = inject('cardpay');
+  web3 = service('web3-http', { as: 'web3' });
+  cardpay = service('cardpay');
   discordBotsDbGateway = inject('hub-discord-bots-db-gateway', { as: 'discordBotsDbGateway' });
   dmChannelsDbGateway = inject('hub-dm-channels-db-gateway', { as: 'dmChannelsDbGateway' });
 

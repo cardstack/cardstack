@@ -15,8 +15,8 @@ interface SKUReservations {
 }
 
 export default class InventoryService {
-  subgraph = inject('subgraph');
-  web3 = inject('web3-http', { as: 'web3' });
+  subgraph = service('subgraph');
+  web3 = service('web3-http', { as: 'web3' });
   relay = service('relay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
@@ -99,8 +99,8 @@ function formatInventory(
   };
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     inventory: InventoryService;
   }
 }

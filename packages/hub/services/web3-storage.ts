@@ -17,8 +17,8 @@ export default class Web3Storage {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'web3-storage': Web3Storage;
   }
 }

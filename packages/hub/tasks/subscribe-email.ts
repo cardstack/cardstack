@@ -1,9 +1,9 @@
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
 
 export default class SubscribeEmail {
-  mailchimp = inject('mailchimp');
+  mailchimp = service('mailchimp');
 
   async perform(payload: { email: string }, helpers: Helpers) {
     try {

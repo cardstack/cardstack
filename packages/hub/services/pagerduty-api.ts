@@ -28,8 +28,8 @@ export default class PagerdutyApi {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'pagerduty-api': PagerdutyApi;
   }
 }

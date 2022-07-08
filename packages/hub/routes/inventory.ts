@@ -1,11 +1,11 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import qs from 'qs';
 
 export default class InventoryRoute {
-  inventory = inject('inventory');
+  inventory = service('inventory');
 
   constructor() {
     autoBind(this);

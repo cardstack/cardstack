@@ -1,10 +1,10 @@
 import Koa from 'koa';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import proxy from 'koa-proxies';
 import DevelopmentConfig from './development-config';
 
 export default class DevelopmentProxyMiddleware {
-  developmentConfig: DevelopmentConfig = inject('development-config', { as: 'developmentConfig' });
+  developmentConfig: DevelopmentConfig = service('development-config', { as: 'developmentConfig' });
 
   middleware() {
     return async (ctxt: Koa.Context, next: Koa.Next) => {
@@ -22,8 +22,8 @@ export default class DevelopmentProxyMiddleware {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'development-proxy-middleware': DevelopmentProxyMiddleware;
   }
 }

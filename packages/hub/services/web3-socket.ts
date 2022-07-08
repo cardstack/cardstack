@@ -80,8 +80,8 @@ export default class Web3SocketService {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'web3-socket': Web3SocketService;
   }
 }

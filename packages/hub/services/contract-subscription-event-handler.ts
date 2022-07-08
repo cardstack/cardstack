@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 import { AddressKeys } from '@cardstack/cardpay-sdk';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 
 import logger from '@cardstack/logger';
 import { query } from '@cardstack/hub/queries';
@@ -43,9 +43,9 @@ export const CONTRACT_EVENTS: readonly ContractEventConfig[] = [
 ] as const;
 
 export class ContractSubscriptionEventHandler {
-  contracts = inject('contracts', { as: 'contracts' });
-  web3 = inject('web3-socket', { as: 'web3' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  contracts = service('contracts', { as: 'contracts' });
+  web3 = service('web3-socket', { as: 'web3' });
+  workerClient = service('worker-client', { as: 'workerClient' });
   latestEventBlockQueries = query('latest-event-block', { as: 'latestEventBlockQueries' });
 
   async setupContractEventSubscriptions() {
@@ -88,8 +88,8 @@ export class ContractSubscriptionEventHandler {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'contract-subscription-event-handler': ContractSubscriptionEventHandler;
   }
 }

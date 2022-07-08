@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import StatuspageApi from '../services/statuspage-api';
 import crypto from 'crypto';
 import config from 'config';
@@ -30,7 +30,7 @@ type Checks = {
 };
 
 export default class ChecklyWebhookRoute {
-  statuspageApi: StatuspageApi = inject('statuspage-api', { as: 'statuspageApi' });
+  statuspageApi: StatuspageApi = service('statuspage-api', { as: 'statuspageApi' });
 
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {

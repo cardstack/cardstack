@@ -1,4 +1,3 @@
-import { inject } from '@cardstack/di';
 import { query } from '@cardstack/hub/queries';
 import { service } from '@cardstack/hub/services';
 import { encodeDID } from '@cardstack/did-resolver';
@@ -26,14 +25,14 @@ const merchantCreationsQuery = `
 `;
 
 export default class CreateProfile {
-  cardpay = inject('cardpay');
+  cardpay = service('cardpay');
   jobTickets = query('job-tickets', { as: 'jobTickets' });
   merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
   relay = service('relay');
-  web3 = inject('web3-http', { as: 'web3' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  web3 = service('web3-http', { as: 'web3' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   async perform({
     'job-ticket-id': jobTicketId,

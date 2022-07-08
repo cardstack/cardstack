@@ -169,11 +169,11 @@ export function createContainer(): Container {
 }
 
 export class HubServer {
-  private auth = inject('authentication-middleware', { as: 'auth' });
-  private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
-  private apiRouter = inject('api-router', { as: 'apiRouter' });
-  private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private emailCardDropRouter = inject('email-card-drop-router', { as: 'emailCardDropRouter' });
+  private auth = service('authentication-middleware', { as: 'auth' });
+  private devProxy = service('development-proxy-middleware', { as: 'devProxy' });
+  private apiRouter = service('api-router', { as: 'apiRouter' });
+  private callbacksRouter = service('callbacks-router', { as: 'callbacksRouter' });
+  private emailCardDropRouter = service('email-card-drop-router', { as: 'emailCardDropRouter' });
   private healthCheck = service('health-check', { as: 'healthCheck' });
   private uploadRouter = inject('upload-router', { as: 'uploadRouter' });
   private cardRoutes: KnownRoutes['card-routes'] | undefined;

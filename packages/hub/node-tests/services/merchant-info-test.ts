@@ -28,9 +28,9 @@ describe('MerchantInfoService', function () {
       }
     }
 
-    registry(this).register('merchant-info', PatchedMerchantInfoService);
+    registry(this).register('merchant-info', PatchedMerchantInfoService, { type: 'service' });
 
-    let subject = await getContainer().lookup('merchant-info');
+    let subject = await getContainer().lookup('merchant-info', { type: 'service' });
     let result = await subject.getMerchantInfo('did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62');
 
     expect(result).deep.equal({

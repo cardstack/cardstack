@@ -3,6 +3,7 @@ import config from 'config';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import Web3 from 'web3';
 import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
@@ -39,10 +40,10 @@ export const adminWalletName = `admin`;
 
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
-  wyre = inject('wyre');
-  order = inject('order');
+  wyre = service('wyre');
+  order = service('order');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

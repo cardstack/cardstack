@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import { query } from '@cardstack/hub/queries';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUUID from 'short-uuid';
 import { KnownTasks } from '@cardstack/hub/tasks';
 
@@ -23,7 +24,7 @@ export default class JobTicketsRoute {
   });
 
   jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

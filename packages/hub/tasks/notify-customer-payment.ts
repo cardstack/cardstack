@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import config from 'config';
 import CardpaySDKService from '../services/cardpay-sdk';
 import MerchantInfoService from '../services/merchant-info';
@@ -85,9 +86,9 @@ query($txn: String!) {
 `;
 
 export default class NotifyCustomerPayment {
-  cardpay: CardpaySDKService = inject('cardpay');
-  merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  cardpay: CardpaySDKService = service('cardpay');
+  merchantInfo: MerchantInfoService = service('merchant-info', { as: 'merchantInfo' });
+  workerClient: WorkerClient = service('worker-client', { as: 'workerClient' });
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
     as: 'notificationPreferenceService',
   });

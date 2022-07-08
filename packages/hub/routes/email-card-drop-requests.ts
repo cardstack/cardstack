@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import config from 'config';
 import { query } from '../queries';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import isEmail from 'validator/lib/isEmail';
@@ -30,7 +31,7 @@ export interface EmailCardDropRequest {
 }
 
 export default class EmailCardDropRequestsRoute {
-  cardpay = inject('cardpay');
+  cardpay = service('cardpay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
@@ -38,10 +39,10 @@ export default class EmailCardDropRequestsRoute {
     as: 'emailCardDropRequestSerializer',
   });
   emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
-  clock = inject('clock');
+  clock = service('clock');
 
-  web3 = inject('web3-http', { as: 'web3' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  web3 = service('web3-http', { as: 'web3' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

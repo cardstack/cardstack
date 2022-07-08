@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateRequiredFields } from './utils/validation';
@@ -10,7 +11,7 @@ export default class PrepaidCardCustomizationsRoute {
   prepaidCardCustomizationSerializer = inject('prepaid-card-customization-serializer', {
     as: 'prepaidCardCustomizationSerializer',
   });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

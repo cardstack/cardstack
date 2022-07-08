@@ -1,16 +1,16 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import * as Sentry from '@sentry/node';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 export const DEGRADED_THRESHOLD = 10;
 
 export default class StatusRoute {
-  clock = inject('clock');
-  exchangeRates = inject('exchange-rates', { as: 'exchangeRates' });
-  subgraph = inject('subgraph');
-  web3 = inject('web3-http', { as: 'web3' });
+  clock = service('clock');
+  exchangeRates = service('exchange-rates', { as: 'exchangeRates' });
+  subgraph = service('subgraph');
+  web3 = service('web3-http', { as: 'web3' });
 
   constructor() {
     autoBind(this);

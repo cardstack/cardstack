@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { MAX_NONCE_AGE_NS } from '../services/nonce-tracker';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
@@ -10,7 +11,7 @@ let log = Logger('route:session');
 
 export default class SessionRoute {
   authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  nonceTracker = inject('nonce-tracker', { as: 'nonceTracker' });
+  nonceTracker = service('nonce-tracker', { as: 'nonceTracker' });
   constructor() {
     autoBind(this);
   }

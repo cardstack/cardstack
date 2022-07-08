@@ -3,6 +3,7 @@ import type { MerchantInfoQueriesFilter } from '../queries/merchant-info';
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
@@ -29,11 +30,11 @@ export default class MerchantInfosRoute {
     as: 'merchantInfoQueries',
   });
   cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
-  reservedWords = inject('reserved-words', {
+  reservedWords = service('reserved-words', {
     as: 'reservedWords',
   });
 
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

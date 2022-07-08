@@ -118,8 +118,8 @@ export default class StatuspageApi {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'statuspage-api': StatuspageApi;
   }
 }

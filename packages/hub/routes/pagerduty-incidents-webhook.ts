@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import PagerdutyApi from '../services/pagerduty-api';
 import Logger from '@cardstack/logger';
 
@@ -13,8 +13,8 @@ const SUPPORTED_EVENT_TYPES = {
 let log = Logger('pagerduty-incidents-webhook');
 
 export default class PagerdutyIncidentsWebhookRoute {
-  pagerdutyApi: PagerdutyApi = inject('pagerduty-api', { as: 'pagerdutyApi' });
-  workerClient = inject('worker-client', { as: 'workerClient' });
+  pagerdutyApi: PagerdutyApi = service('pagerduty-api', { as: 'pagerdutyApi' });
+  workerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

@@ -16,8 +16,8 @@ export function registerServices(registry: Registry) {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface HubServices {}
 
-declare module '@cardstack/di' {
-  interface TypedKnownServices {
+declare module '@cardstack/hub/services' {
+  interface TypedHubServices {
     service: HubServices;
   }
 }

@@ -4,6 +4,7 @@ import { createContainer, runInitializers } from '../main';
 import * as Sentry from '@sentry/node';
 
 import logger from '@cardstack/logger';
+import { ContractSubscriptionEventHandler } from '../services/contract-subscription-event-handler';
 const log = logger('hub/event-listener');
 
 export const command = 'event-listener';
@@ -16,7 +17,7 @@ export async function handler() {
 
   try {
     let eventListener = await container.lookup('contract-subscription-event-handler');
-    eventListener.setupContractEventSubscriptions();
+    (eventListener as ContractSubscriptionEventHandler).setupContractEventSubscriptions();
   } catch (e: any) {
     log.error(`Unexpected error while running contracts event listener: ${e.message}`, e);
     Sentry.withScope(function () {

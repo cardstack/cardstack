@@ -2,6 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUuid from 'short-uuid';
 import CardSpaceSerializer from '../services/serializers/card-space-serializer';
 import { ensureLoggedIn } from './utils/auth';
@@ -36,7 +37,7 @@ export default class CardSpacesRoute {
   merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient: WorkerClient = service('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

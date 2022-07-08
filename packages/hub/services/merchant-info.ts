@@ -34,8 +34,8 @@ export default class MerchantInfoService {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'merchant-info': MerchantInfoService;
   }
 }

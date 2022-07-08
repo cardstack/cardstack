@@ -24,8 +24,8 @@ function notFound(ctx: Koa.Context) {
   ctx.status = 404;
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'email-card-drop-router': EmailCardDropRouter;
   }
 }

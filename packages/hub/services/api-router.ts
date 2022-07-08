@@ -135,8 +135,8 @@ function verifyJSONAPI(ctxt: RouterContext<any, any>, next: Koa.Next) {
 function notFound(ctx: Koa.Context) {
   ctx.status = 404;
 }
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'api-router': APIRouter;
   }
 }

@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import config from 'config';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
 import WorkerClient from '../services/worker-client';
@@ -12,7 +13,7 @@ export default class NotifyPrepaidCardDrop {
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
     as: 'notificationPreferenceService',
   });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient: WorkerClient = service('worker-client', { as: 'workerClient' });
 
   async perform(event: EventData) {
     let notificationBody = 'You were issued a new prepaid card!';

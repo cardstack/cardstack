@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import config from 'config';
 import Web3 from 'web3';
 import CardpaySDKService from '../services/cardpay-sdk';
@@ -49,9 +50,9 @@ query($txn: String!) {
 const web3Config = config.get('web3') as { layer2Network: 'sokol' | 'gnosis' };
 
 export default class NotifyMerchantClaim {
-  cardpay: CardpaySDKService = inject('cardpay');
-  merchantInfo: MerchantInfoService = inject('merchant-info', { as: 'merchantInfo' });
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  cardpay: CardpaySDKService = service('cardpay');
+  merchantInfo: MerchantInfoService = service('merchant-info', { as: 'merchantInfo' });
+  workerClient: WorkerClient = service('worker-client', { as: 'workerClient' });
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
     as: 'notificationPreferenceService',
   });

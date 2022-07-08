@@ -13,8 +13,8 @@ export default class Contracts {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     contracts: Contracts;
   }
 }

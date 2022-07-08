@@ -23,7 +23,7 @@ export interface OrderState {
 
 export default class OrderService {
   relay = service('relay');
-  subgraph = inject('subgraph');
+  subgraph = service('subgraph');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   /* State machine for order status:
@@ -174,8 +174,8 @@ function assertNever(_value: never): never {
   throw new Error(`not never`);
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     order: OrderService;
   }
 }

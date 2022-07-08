@@ -1,4 +1,4 @@
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
 import { Clock } from '../services/clock';
 import queryString from 'query-string';
@@ -41,7 +41,7 @@ function decrypt(cipherText: string) {
 }
 
 export class AuthenticationUtils {
-  clock: Clock = inject('clock');
+  clock: Clock = service('clock');
 
   generateNonce(): string {
     let timestampInNanoseconds = this.clock.hrNow().toString();

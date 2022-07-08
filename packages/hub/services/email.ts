@@ -41,8 +41,8 @@ export default class Email {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     email: Email;
   }
 }

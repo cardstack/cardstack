@@ -54,8 +54,8 @@ export default class InAppPurchases {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     'in-app-purchases': InAppPurchases;
   }
 }

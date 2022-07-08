@@ -1,11 +1,11 @@
 import { Helpers } from 'graphile-worker';
 import config from 'config';
 import { query } from '@cardstack/hub/queries';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import * as Sentry from '@sentry/node';
 
 export default class SendEmailCardDropVerification {
-  email = inject('email');
+  email = service('email');
   emailCardDropRequests = query('email-card-drop-requests', { as: 'emailCardDropRequests' });
 
   async perform(

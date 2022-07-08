@@ -137,8 +137,8 @@ export default class Subgraph {
   }
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
+declare module '@cardstack/hub/services' {
+  interface HubServices {
     subgraph: Subgraph;
   }
 }

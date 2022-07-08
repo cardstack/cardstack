@@ -14,9 +14,9 @@ import { service } from '@cardstack/hub/services';
 let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
-  web3 = inject('web3-http', { as: 'web3' });
+  web3 = service('web3-http', { as: 'web3' });
   relay = service('relay');
-  inventory = inject('inventory');
+  inventory = service('inventory');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {

@@ -1,5 +1,6 @@
 import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import { EmailCardDropRequest } from '../routes/email-card-drop-requests';
 import { buildConditions } from '../utils/queries';
 import config from 'config';
@@ -19,7 +20,7 @@ const IS_EXPIRED = `${IS_OLD} AND claimed_at IS NULL`;
 const RETURN_VALUE = `*, (${IS_EXPIRED}) as is_expired`;
 
 export default class EmailCardDropRequestsQueries {
-  clock = inject('clock');
+  clock = service('clock');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   async insert(model: EmailCardDropRequest): Promise<EmailCardDropRequest & { isExpired: boolean }> {

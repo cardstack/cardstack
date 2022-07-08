@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 import Koa from 'koa';
 import KoaBody from 'koa-body';
-import { inject } from '@cardstack/di';
+import { service } from '@cardstack/hub/services';
 import shortUuid from 'short-uuid';
 import { unlink } from 'fs';
 import * as Sentry from '@sentry/node';
@@ -23,7 +23,7 @@ export interface Upload {
 export default class UploadRouter {
   uploadQueries = query('upload', { as: 'uploadQueries' });
 
-  web3Storage = inject('web3-storage', {
+  web3Storage = service('web3-storage', {
     as: 'web3Storage',
   });
 
