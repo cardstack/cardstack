@@ -40,7 +40,7 @@ export default class Email {
     );
   }
 
-  async sendTemplate(email: { to: string; from: string; templateName: string; templateData: any }) {
+  async sendTemplate(email: { to: string; from: string; templateName: string; templateData: Record<string, any> }) {
     return this.client.send(
       new SendEmailCommand({
         Destination: {
