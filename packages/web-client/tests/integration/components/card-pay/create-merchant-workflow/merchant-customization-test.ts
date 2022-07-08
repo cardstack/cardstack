@@ -278,7 +278,6 @@ module(
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
       await click(SAVE_DETAILS_BUTTON);
-      // await this.pauseTest();
 
       let bgColor = workflowSession.getValue<string>('merchantBgColor')!;
       let textColor = workflowSession.getValue<string>('merchantTextColor')!;
