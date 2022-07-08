@@ -59,6 +59,11 @@ app "hub" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
@@ -111,6 +116,11 @@ app "hub-worker" {
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
         MAILCHIMP_API_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-worker"]
     }
 
     hook {
@@ -170,6 +180,11 @@ app "hub-bot" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-bot"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
   }
@@ -225,6 +240,11 @@ app "hub-event-listener" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-event-listener"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
@@ -267,6 +287,11 @@ app "cardie" {
         DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
         GITHUB_TOKEN  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardie"]
     }
 
     hook {
@@ -329,6 +354,11 @@ app "cardpay-subg-ext" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardpay-subg-ext"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
     }
   }
@@ -371,6 +401,11 @@ app "ssr-web" {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "ssr-web"]
     }
 
     hook {
@@ -426,6 +461,11 @@ app "reward-submit" {
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-submit"]
     }
 
     hook {
@@ -490,6 +530,11 @@ app "reward-api" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-api"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
@@ -544,7 +589,12 @@ app "reward-indexer" {
 
     hook {
       when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer"]
     }
   }
 
@@ -598,6 +648,16 @@ app "reward-scheduler" {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_programs_sentry_dsn-zAMOFo"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-scheduler"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-scheduler"]
     }
   }
 
