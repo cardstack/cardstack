@@ -50,19 +50,15 @@ export default class SendEmailCardDropVerification {
     const verificationLink = config.get('cardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
-    const expirationMinutes = config.get('cardDrop.email.expiryMinutes') as number;
-
-    const emailTitle = 'Claim your Card Drop';
-    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a> It will expire in ${expirationMinutes} minutes.`;
-    const emailBodyText = `This is your verification link: ${verificationLink} It will expire in ${expirationMinutes} minutes.`;
 
     try {
-      await this.email.send({
+      await this.email.sendTemplate({
         to: payload.email,
         from: senderEmailAddress,
-        text: emailBodyText,
-        html: emailBodyHtml,
-        title: emailTitle,
+        templateName: 'card-drop-email',
+        templateData: {
+          verificationUrl: verificationLink,
+        },
       });
     } catch (e) {
       helpers.logger.error('Failed to send verification email');
