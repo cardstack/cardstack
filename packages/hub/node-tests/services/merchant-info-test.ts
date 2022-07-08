@@ -52,7 +52,7 @@ describe('MerchantInfoService', function () {
 
     registry(this).register('merchant-info', PatchedMerchantInfoService);
 
-    let subject = await getContainer().lookup('merchant-info');
+    let subject = await getContainer().lookup('merchant-info', { type: 'service' });
     let result = await subject.getMerchantInfo('did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62');
 
     expect(result).to.be.null;
@@ -61,7 +61,7 @@ describe('MerchantInfoService', function () {
   it('returns null when there is no DID', async function () {
     registry(this).register('merchant-info', MerchantInfoService);
 
-    let subject = await getContainer().lookup('merchant-info');
+    let subject = await getContainer().lookup('merchant-info', { type: 'service' });
     let result = await subject.getMerchantInfo(undefined);
 
     expect(result).to.be.null;
@@ -70,7 +70,7 @@ describe('MerchantInfoService', function () {
   it('returns null the DID is invalid', async function () {
     registry(this).register('merchant-info', MerchantInfoService);
 
-    let subject = await getContainer().lookup('merchant-info');
+    let subject = await getContainer().lookup('merchant-info', { type: 'service' });
     let result = await subject.getMerchantInfo('did:cardstack:hey');
 
     expect(result).to.be.null;

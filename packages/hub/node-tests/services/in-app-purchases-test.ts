@@ -9,7 +9,7 @@ describe('InAppPurchases', function () {
   let subject: InAppPurchases;
 
   this.beforeEach(async function () {
-    subject = await getContainer().lookup('in-app-purchases');
+    subject = await getContainer().lookup('in-app-purchases', { type: 'service' });
   });
 
   describe('for Apple provider', function () {

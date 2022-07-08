@@ -159,7 +159,7 @@ describe('GET /api/exchange-rates', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(fetchArgs[2]).to.equal((await getContainer().lookup('clock')).dateStringNow());
+    expect(fetchArgs[2]).to.equal((await getContainer().lookup('clock', { type: 'service' })).dateStringNow());
   });
 
   it('rejects a date in the future', async function () {

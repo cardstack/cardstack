@@ -33,7 +33,7 @@ export default class HubBot extends DiscordBot {
 
   inventory = service('inventory');
   relay = service('relay');
-  walletConnect = inject('wallet-connect', { as: 'walletConnect' });
+  walletConnect = inject('wallet-connect', { as: 'walletConnect', type: 'service' });
   web3 = service('web3-http', { as: 'web3' });
   cardpay = service('cardpay');
   discordBotsDbGateway = inject('hub-discord-bots-db-gateway', { as: 'discordBotsDbGateway' });

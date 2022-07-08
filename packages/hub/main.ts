@@ -132,7 +132,7 @@ export function createRegistry(): Registry {
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   // registry.register('subgraph', SubgraphService);
-  registry.register('wallet-connect', WalletConnectService);
+  registry.register('wallet-connect', WalletConnectService, { type: 'service' });
   // registry.register('worker-client', WorkerClient);
   // registry.register('web3-http', Web3HttpService);
   // registry.register('web3-socket', Web3SocketService);
