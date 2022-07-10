@@ -53,6 +53,7 @@ extra_one_merkle_roots_without_s3 = [
         "paymentCycle": "27000000",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1663927740",
+        "rootHash": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
     },
 ]
 
@@ -63,6 +64,7 @@ extra_one_merkle_roots_old_file = [
         "paymentCycle": "27000000",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1663927740",
+        "rootHash": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
     },
 ]
 
