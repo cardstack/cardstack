@@ -14,7 +14,7 @@ export default class PrepaidCardPatternsRoute {
 
   async get(ctx: Koa.Context) {
     try {
-      let result = await this.prismaManager.getClient().prepaid_card_patterns.findMany();
+      let result = await (await this.prismaManager.getClient()).prepaid_card_patterns.findMany();
       let data = result.map((row) => {
         return {
           id: row.id,

@@ -106,6 +106,7 @@
   "devDependencies": {
     "@cardstack/eslint-config": "1.0.7",
     "@cardstack/test-support": "1.0.7",
+    "@chax-at/transactional-prisma-testing": "^0.5.0",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
