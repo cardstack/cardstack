@@ -93,6 +93,7 @@ import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
+import PrismaClient from './services/prisma-client';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -172,6 +173,7 @@ export function createRegistry(): Registry {
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
   registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
+  registry.register('prisma-client', PrismaClient);
 
   if (process.env.COMPILER) {
     registry.register(
