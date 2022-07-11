@@ -29,7 +29,7 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe.only('POST /api/push-notification-registrations', async function () {
+describe('POST /api/push-notification-registrations', async function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
