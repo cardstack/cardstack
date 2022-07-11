@@ -1,5 +1,7 @@
 import shortUuid from 'short-uuid';
 import { registry, setupHub } from '../helpers/server';
+import upsertPushNotificationRegistrationArgs from '../../utils/push-notification-registration';
+import { PrismaClient } from '@prisma/client';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -32,6 +34,11 @@ describe('POST /api/push-notification-registrations', async function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
   let { request, getContainer } = setupHub(this);
+  let prisma: PrismaClient;
+
+  this.beforeEach(async function () {
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+  });
 
   it('returns 401 without bearer token', async function () {
     await request()
@@ -84,30 +91,22 @@ describe('POST /api/push-notification-registrations', async function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
-      type: 'query',
-    });
-    let records = await pushNotificationRegistrationQueries.query({
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
+    let records = await prisma.push_notification_registrations.findMany({
+      where: {
+        owner_address: stubUserAddress,
+        push_client_id: 'FIREBASE_USER_ID',
+      },
     });
 
     expect(records.length).to.equal(1);
-    expect(records[0].ownerAddress).to.equal(stubUserAddress);
-    expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
+    expect(records[0].owner_address).to.equal(stubUserAddress);
+    expect(records[0].push_client_id).to.equal('FIREBASE_USER_ID');
   });
 
   it('does not fail when registration is already present + it reenables the existing one', async function () {
-    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
-      type: 'query',
-    });
-
-    await pushNotificationRegistrationQueries.upsert({
-      id: shortUuid.uuid(),
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
-      disabledAt: '2021-12-01 10:00:00',
-    });
+    await prisma.push_notification_registrations.upsert(
+      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), stubUserAddress, 'FIREBASE_USER_ID', new Date())
+    );
 
     let payload = {
       data: {
@@ -141,14 +140,16 @@ describe('POST /api/push-notification-registrations', async function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let records = await pushNotificationRegistrationQueries.query({
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
+    let records = await prisma.push_notification_registrations.findMany({
+      where: {
+        owner_address: stubUserAddress,
+        push_client_id: 'FIREBASE_USER_ID',
+      },
     });
 
     expect(records.length).to.equal(1);
-    expect(records[0].ownerAddress).to.equal(stubUserAddress);
-    expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
+    expect(records[0].owner_address).to.equal(stubUserAddress);
+    expect(records[0].push_client_id).to.equal('FIREBASE_USER_ID');
   });
 });
 
@@ -157,6 +158,11 @@ describe('DELETE /api/push-notification-registrations', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
   let { request, getContainer } = setupHub(this);
+  let prisma: PrismaClient;
+
+  this.beforeEach(async function () {
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+  });
 
   it('returns 401 without bearer token', async function () {
     await request()
@@ -177,17 +183,9 @@ describe('DELETE /api/push-notification-registrations', function () {
   });
 
   it('deletes push notification registration', async function () {
-    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
-      type: 'query',
-    });
-
-    await pushNotificationRegistrationQueries.upsert({
-      id: shortUuid.uuid(),
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
-      disabledAt: null,
-    });
-
+    await prisma.push_notification_registrations.upsert(
+      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), stubUserAddress, 'FIREBASE_USER_ID', null)
+    );
     await request()
       .delete(`/api/push-notification-registrations/FIREBASE_USER_ID`)
       .send({})
@@ -196,9 +194,11 @@ describe('DELETE /api/push-notification-registrations', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200);
 
-    let records = await pushNotificationRegistrationQueries.query({
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
+    let records = await prisma.push_notification_registrations.findMany({
+      where: {
+        owner_address: stubUserAddress,
+        push_client_id: 'FIREBASE_USER_ID',
+      },
     });
 
     expect(records.length).to.equal(0);
