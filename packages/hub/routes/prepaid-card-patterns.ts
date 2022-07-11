@@ -5,7 +5,7 @@ import { inject } from '@cardstack/di';
 let log = Logger('route:prepaid-card-patterns');
 
 export default class PrepaidCardPatternsRoute {
-  prismaManager = inject('prisma-client', { as: 'prismaManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {

@@ -1,7 +1,7 @@
 import { PrismaClient as PrismaClientToWrap } from '@prisma/client';
 import config from 'config';
 
-export default class PrismaClient {
+export default class PrismaManager {
   private client: PrismaClientToWrap | undefined;
 
   dbConfig: Record<string, any> = config.get('db');
@@ -37,6 +37,6 @@ export default class PrismaClient {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'prisma-client': PrismaClient;
+    'prisma-manager': PrismaManager;
   }
 }
