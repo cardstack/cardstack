@@ -5,7 +5,7 @@ import { inject } from '@cardstack/di';
 import { ensureLoggedIn } from './utils/auth';
 
 import PushNotificationRegistrationSerializer from '../services/serializers/push-notification-registration-serializer';
-import upsertPushNotificationRegistrationArgs from '../utils/push-notification-registration';
+import createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient from '../utils/create-or-update-push-notification-registration';
 import shortUuid from 'short-uuid';
 
 export interface PushNotificationRegistration {
@@ -43,8 +43,12 @@ export default class PushNotificationRegistrationsRoute {
     };
 
     let prisma = await this.prismaManager.getClient();
-    await prisma.push_notification_registrations.upsert(
-      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), ownerAddress, pushClientId, null)
+    await createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient(
+      prisma,
+      shortUuid.uuid(),
+      ownerAddress,
+      pushClientId,
+      null
     );
 
     let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);

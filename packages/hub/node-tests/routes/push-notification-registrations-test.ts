@@ -1,6 +1,6 @@
 import shortUuid from 'short-uuid';
 import { registry, setupHub } from '../helpers/server';
-import upsertPushNotificationRegistrationArgs from '../../utils/push-notification-registration';
+import createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient from '../../utils/create-or-update-push-notification-registration';
 import { PrismaClient } from '@prisma/client';
 
 const stubNonce = 'abc:123';
@@ -29,7 +29,7 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe('POST /api/push-notification-registrations', async function () {
+describe.only('POST /api/push-notification-registrations', async function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
@@ -104,8 +104,12 @@ describe('POST /api/push-notification-registrations', async function () {
   });
 
   it('does not fail when registration is already present + it reenables the existing one', async function () {
-    await prisma.push_notification_registrations.upsert(
-      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), stubUserAddress, 'FIREBASE_USER_ID', new Date())
+    await createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient(
+      prisma,
+      shortUuid.uuid(),
+      stubUserAddress,
+      'FIREBASE_USER_ID',
+      new Date()
     );
 
     let payload = {
@@ -183,8 +187,12 @@ describe('DELETE /api/push-notification-registrations', function () {
   });
 
   it('deletes push notification registration', async function () {
-    await prisma.push_notification_registrations.upsert(
-      upsertPushNotificationRegistrationArgs(shortUuid.uuid(), stubUserAddress, 'FIREBASE_USER_ID', null)
+    await createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient(
+      prisma,
+      shortUuid.uuid(),
+      stubUserAddress,
+      'FIREBASE_USER_ID',
+      null
     );
     await request()
       .delete(`/api/push-notification-registrations/FIREBASE_USER_ID`)
