@@ -4,11 +4,9 @@ describe('GET /api/prepaid-card-patterns', function () {
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let prismaClient = await getContainer().lookup('prisma-client');
+    let prismaClient = (await getContainer().lookup('prisma-client')).getClient();
 
-    await (
-      await prismaClient.getClient()
-    ).prepaid_card_patterns.createMany({
+    await prismaClient.prepaid_card_patterns.createMany({
       data: [
         {
           id: '543423cb-de7e-44c2-a9e1-902b4648b8fb',

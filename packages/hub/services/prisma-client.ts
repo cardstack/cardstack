@@ -6,9 +6,12 @@ export default class PrismaClient {
 
   dbConfig: Record<string, any> = config.get('db');
 
-  async getClient() {
+  getClient() {
     if (!this.client) {
-      this.client = new PrismaClientToWrap({ datasources: { db: { url: this.dbConfig.url } } });
+      this.client = new PrismaClientToWrap({
+        datasources: { db: { url: this.dbConfig.url } },
+        log: ['query', 'info', 'warn', 'error'], // FIXME make this configurable somehow
+      });
     }
     return this.client;
   }
