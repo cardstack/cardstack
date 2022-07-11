@@ -26,6 +26,7 @@ module.exports = {
     'migration-filename-format': 'utc',
     'ignore-pattern': 'README.md|.*\\.d\\.ts',
     'check-order': false,
+    prismaLog: ['warn', 'error'],
   },
   discord: {
     botId: '958127663577456714',

@@ -12,7 +12,7 @@ export default class PrismaManager {
     if (!this.client) {
       let client = new PrismaClient({
         datasources: { db: { url: this.dbConfig.url } },
-        log: ['query', 'info', 'warn', 'error'], // FIXME make this configurable somehow
+        log: this.dbConfig.prismaLog,
       });
 
       if (this.dbConfig.useTransactionalRollbacks) {
