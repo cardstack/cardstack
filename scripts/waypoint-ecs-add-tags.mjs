@@ -11,10 +11,8 @@ function getAppConfig(waypointConfigFilePath, appName) {
   const waypointConfig = hcl.parseToObject(waypointHcl)[0];
   const waypointApp = waypointConfig.app[appName][0];
   const cluster = waypointApp.deploy[0].use['aws-ecs'][0].cluster;
-  const certificate = waypointApp.deploy[0].use['aws-ecs'][0].alb[0].certificate;
-  const disableAlb = Boolean(waypointApp.deploy[0].use['aws-ecs'][0].disable_alb);
 
-  return { cluster, certificate, disableAlb };
+  return { cluster };
 }
 
 function getAppNameFromServiceArn(serviceArn) {
