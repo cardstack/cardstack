@@ -59,6 +59,11 @@ app "hub" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
@@ -111,6 +116,11 @@ app "hub-worker" {
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
         MAILCHIMP_API_KEY                = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_MAILCHIMP_API_KEY-XCGDUW"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-worker"]
     }
 
     hook {
@@ -170,6 +180,11 @@ app "hub-bot" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-bot"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
     }
   }
@@ -221,6 +236,11 @@ app "hub-event-listener" {
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-event-listener"]
     }
 
     hook {
@@ -283,6 +303,11 @@ app "cardpay-subg-ext" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardpay-subg-ext"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
     }
   }
@@ -324,6 +349,11 @@ app "ssr-web" {
         subnets     = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "ssr-web"]
     }
 
     hook {
@@ -379,6 +409,11 @@ app "reward-submit" {
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-submit"]
     }
 
     hook {
@@ -443,6 +478,11 @@ app "reward-api" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-api"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
@@ -493,6 +533,11 @@ app "reward-indexer" {
         DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
         SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer"]
     }
 
     hook {
@@ -550,6 +595,16 @@ app "reward-scheduler" {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-scheduler"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-scheduler"]
     }
   }
 
