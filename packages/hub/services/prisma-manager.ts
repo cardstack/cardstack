@@ -42,39 +42,7 @@ export default class PrismaManager {
         client = this.prismaTestingHelper.getProxyClient();
       }
 
-      Object.assign(client.push_notification_registrations, {
-        upsertByOwnerAndPushClient({
-          id,
-          owner_address,
-          push_client_id,
-          disabled_at = null,
-        }: {
-          id: string;
-          owner_address: string;
-          push_client_id: string;
-          disabled_at: Date | null;
-        }) {
-          return client.push_notification_registrations.upsert(
-            Prisma.validator<Prisma.push_notification_registrationsUpsertArgs>()({
-              where: {
-                owner_address_push_client_id: {
-                  owner_address,
-                  push_client_id,
-                },
-              },
-              create: {
-                id: id,
-                owner_address,
-                push_client_id,
-                disabled_at,
-              },
-              update: {
-                disabled_at,
-              },
-            })
-          );
-        },
-      });
+      this.addConvenienceFunctions(client);
 
       this.client = client as ExtendedPrismaClient;
     }
@@ -87,6 +55,42 @@ export default class PrismaManager {
     // FIXME I hoped the below would address this warning but no:
     // warn(prisma-client) There are already 10 instances of Prisma Client actively running.
     return this.client?.$disconnect();
+  }
+
+  private addConvenienceFunctions(client: PrismaClient) {
+    Object.assign(client.push_notification_registrations, {
+      upsertByOwnerAndPushClient({
+        id,
+        owner_address,
+        push_client_id,
+        disabled_at = null,
+      }: {
+        id: string;
+        owner_address: string;
+        push_client_id: string;
+        disabled_at: Date | null;
+      }) {
+        return client.push_notification_registrations.upsert(
+          Prisma.validator<Prisma.push_notification_registrationsUpsertArgs>()({
+            where: {
+              owner_address_push_client_id: {
+                owner_address,
+                push_client_id,
+              },
+            },
+            create: {
+              id: id,
+              owner_address,
+              push_client_id,
+              disabled_at,
+            },
+            update: {
+              disabled_at,
+            },
+          })
+        );
+      },
+    });
   }
 }
 
