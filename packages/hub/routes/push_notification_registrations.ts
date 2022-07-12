@@ -7,13 +7,6 @@ import { ensureLoggedIn } from './utils/auth';
 import PushNotificationRegistrationSerializer from '../services/serializers/push-notification-registration-serializer';
 import shortUuid from 'short-uuid';
 
-export interface PushNotificationRegistration {
-  id: string;
-  ownerAddress: string;
-  pushClientId: string;
-  disabledAt: string | null;
-}
-
 export default class PushNotificationRegistrationsRoute {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   pushNotificationRegistrationSerialier: PushNotificationRegistrationSerializer = inject(
@@ -31,20 +24,23 @@ export default class PushNotificationRegistrationsRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
-    let ownerAddress = ctx.state.userAddress;
-    let pushClientId = ctx.request.body.data.attributes['push-client-id'];
 
     let pushNotificationRegistration = {
       id: shortUuid.uuid(),
-      ownerAddress,
-      pushClientId,
-      disabledAt: null,
+      owner_address: ctx.state.userAddress,
+      push_client_id: ctx.request.body.data.attributes['push-client-id'],
+      disabled_at: null,
     };
 
     let prisma = await this.prismaManager.getClient();
-    await prisma.push_notification_registrations.upsertTest(shortUuid.uuid(), ownerAddress, pushClientId, null);
+    await prisma.push_notification_registrations.upsertTest(
+      pushNotificationRegistration.id,
+      pushNotificationRegistration.owner_address,
+      pushNotificationRegistration.push_client_id,
+      pushNotificationRegistration.disabled_at
+    );
 
-    let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
+    let serialized = this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
 
     ctx.status = 201;
     ctx.body = serialized;
