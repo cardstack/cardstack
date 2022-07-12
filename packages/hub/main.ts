@@ -68,7 +68,7 @@ import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gatew
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
+import PushNotificationRegistrationsRoute from './routes/push-notification-registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
 import Contracts from './services/contracts';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
