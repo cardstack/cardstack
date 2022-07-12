@@ -185,6 +185,7 @@ module.exports = {
     // __dirname
     'node-pg-migrate': 'commonjs node-pg-migrate',
 
+    // @prisma/client fails to build without this
     'util/types': 'util/types',
   },
 
