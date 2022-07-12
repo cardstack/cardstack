@@ -17,7 +17,7 @@
     "@babel/plugin-syntax-decorators": "^7.16.7",
     "@babel/traverse": "^7.12.13",
     "@babel/types": "^7.12.13",
-    "@glimmer/syntax": "0.75.0",
+    "@glimmer/syntax": "0.84.2",
     "@types/babel__core": "^7.1.12",
     "@types/inflection": "^1.5.28",
     "@types/lodash": "^4.14.168",
