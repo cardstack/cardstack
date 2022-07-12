@@ -42,12 +42,7 @@ export default class PushNotificationRegistrationsRoute {
     };
 
     let prisma = await this.prismaManager.getClient();
-    await (prisma.push_notification_registrations as any).upsertTest(
-      shortUuid.uuid(),
-      ownerAddress,
-      pushClientId,
-      null
-    );
+    await prisma.push_notification_registrations.upsertTest(shortUuid.uuid(), ownerAddress, pushClientId, null);
 
     let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
 

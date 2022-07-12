@@ -2,17 +2,24 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
 
-// type upsertReturnType = ReturnType<typeof PrismaClient['push_notification_registrations'].upsert>;
+type push_notification_registrations_getter = Prisma.push_notification_registrationsDelegate<any>;
+// FIXME this is <GlobalRejectSettings> but how to import?
 
-// interface ExtendedPushNotificationRegistrations extends push_notification_registrationsDelegate {
-//   upsertTest(id: string, owner_address: string, push_client_id: string, disabled_at: Date | null): upsertReturnType;
-// }
-// interface ExtendedPrismaClient extends PrismaClient {
-//   push_notification_registrationsDelegate: ExtendedPushNotificationRegistrations;
-// }
+interface ExtendedPushNotificationRegistrations extends push_notification_registrations_getter {
+  upsertTest(
+    id: string,
+    owner_address: string,
+    push_client_id: string,
+    disabled_at: Date | null
+  ): ReturnType<push_notification_registrations_getter['upsert']>;
+}
+
+interface ExtendedPrismaClient extends PrismaClient {
+  push_notification_registrations: ExtendedPushNotificationRegistrations;
+}
 
 export default class PrismaManager {
-  private client?: PrismaClient;
+  private client?: ExtendedPrismaClient;
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
 
   dbConfig: Record<string, any> = config.get('db');
@@ -55,7 +62,7 @@ export default class PrismaManager {
         },
       });
 
-      this.client = client;
+      this.client = client as ExtendedPrismaClient;
     }
 
     return this.client;
