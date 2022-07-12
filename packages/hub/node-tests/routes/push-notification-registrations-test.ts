@@ -1,6 +1,5 @@
 import shortUuid from 'short-uuid';
 import { registry, setupHub } from '../helpers/server';
-import createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient from '../../utils/create-or-update-push-notification-registration';
 import { PrismaClient } from '@prisma/client';
 
 const stubNonce = 'abc:123';
@@ -104,8 +103,7 @@ describe('POST /api/push-notification-registrations', async function () {
   });
 
   it('does not fail when registration is already present + it reenables the existing one', async function () {
-    await createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient(
-      prisma,
+    await (prisma.push_notification_registrations as any).upsertTest(
       shortUuid.uuid(),
       stubUserAddress,
       'FIREBASE_USER_ID',
@@ -187,8 +185,7 @@ describe('DELETE /api/push-notification-registrations', function () {
   });
 
   it('deletes push notification registration', async function () {
-    await createOrUpdatePushNotificationRegistrationsByOwnerAndPushClient(
-      prisma,
+    await (prisma.push_notification_registrations as any).upsertTest(
       shortUuid.uuid(),
       stubUserAddress,
       'FIREBASE_USER_ID',
