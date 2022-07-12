@@ -133,7 +133,12 @@ yarn db:migrate create <migration-name>`
 
 Documentation on how to create migration scripts is available at https://salsita.github.io/node-pg-migrate/#/migrations
 
-After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
+After you have completed running your new DB migration script, update Prisma’s schema and client:
+
+    yarn run prisma db pull
+    yarn run prisma generate
+
+And create a pg_dump of the DB in the `config/structure.sql` file using:
 
     node dist/hub.js db dump
 
