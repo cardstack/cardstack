@@ -43,7 +43,7 @@ class StubEmail {
   static shouldThrow = false;
   static lastSent: any = null;
 
-  async send(email: any) {
+  async sendTemplate(email: any) {
     if (StubEmail.shouldThrow) throw new Error('Intentional error in stub email sending');
     StubEmail.lastSent = email;
   }
@@ -93,13 +93,8 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent.to).to.equal('anyone@test.test');
     expect(StubEmail.lastSent.from).to.equal(config.get('aws.ses.supportEmail'));
-    expect(StubEmail.lastSent.text).to.contain(link);
-    expect(StubEmail.lastSent.html).to.contain(link);
-
-    let durationString = `${emailVerificationLinkExpiryMinutes} minutes`;
-
-    expect(StubEmail.lastSent.text).to.contain(durationString);
-    expect(StubEmail.lastSent.html).to.contain(durationString);
+    expect(StubEmail.lastSent.templateName).to.equal('card-drop-email');
+    expect(StubEmail.lastSent.templateData).to.deep.equal({ verificationUrl: link });
   });
 
   it('fails silently if the row does not exist', async function () {

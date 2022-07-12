@@ -59,6 +59,11 @@ app "hub" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
@@ -98,7 +103,7 @@ app "hub-worker" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-worker-ecs-task"
       execution_role_name = "hub-worker-ecs-task-execution"
-      security_group_ids  = ["sg-0977e3c4d1af9f555"]
+      security_group_ids  = ["sg-0cce1f41f369bf838"]
       disable_alb         = true
 
       secrets = {
@@ -111,6 +116,11 @@ app "hub-worker" {
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
         MAILCHIMP_API_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-worker"]
     }
 
     hook {
@@ -154,7 +164,7 @@ app "hub-bot" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-bot-ecs-task"
       execution_role_name = "hub-bot-ecs-task-execution"
-      security_group_ids  = ["sg-0c2828b424cfb2484"]
+      security_group_ids  = ["sg-06c858d75273b05d6"]
       disable_alb         = true
 
       secrets = {
@@ -166,6 +176,11 @@ app "hub-bot" {
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-bot"]
     }
 
     hook {
@@ -209,7 +224,7 @@ app "hub-event-listener" {
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
       task_role_name      = "hub-event-listener-ecs-task"
       execution_role_name = "hub-event-listener-ecs-task-execution"
-      security_group_ids  = ["sg-0167a15ab65794aaf"]
+      security_group_ids  = ["sg-02a1b0d7a025fabd0"]
       disable_alb         = true
 
       secrets = {
@@ -221,6 +236,11 @@ app "hub-event-listener" {
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-event-listener"]
     }
 
     hook {
@@ -271,6 +291,11 @@ app "cardie" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardie"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "cardie"]
     }
   }
@@ -317,7 +342,7 @@ app "cardpay-subg-ext" {
       subnets             = ["subnet-081966e0d7a798bc1", "subnet-0544a2e18d66d0040"]
       task_role_name      = "cardpay-subg-ext-ecs-task"
       execution_role_name = "cardpay-subg-ext-ecs-task-execution"
-      security_group_ids  = ["sg-00160f813a48d47c9"]
+      security_group_ids  = ["sg-02c9224910953df81"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_subg_extract_database_url-kLIcg4"
@@ -325,6 +350,11 @@ app "cardpay-subg-ext" {
       }
 
       disable_alb = true
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardpay-subg-ext"]
     }
 
     hook {
@@ -371,6 +401,11 @@ app "ssr-web" {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "ssr-web"]
     }
 
     hook {
@@ -426,6 +461,11 @@ app "reward-submit" {
         OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-submit"]
     }
 
     hook {
@@ -490,6 +530,11 @@ app "reward-api" {
 
     hook {
       when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-api"]
+    }
+
+    hook {
+      when    = "after"
       command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
     }
   }
@@ -533,7 +578,7 @@ app "reward-indexer" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-indexer-ecs-task"
       execution_role_name = "reward-indexer-ecs-task-execution"
-      security_group_ids  = ["sg-0df1b0a5714af6fd1"]
+      security_group_ids  = ["sg-0a896e4ebe2606421"]
       disable_alb         = true
 
       secrets = {
@@ -544,7 +589,12 @@ app "reward-indexer" {
 
     hook {
       when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer"]
     }
   }
 
@@ -591,13 +641,23 @@ app "reward-scheduler" {
       subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
       task_role_name      = "reward-scheduler-ecs-task"
       execution_role_name = "reward-scheduler-ecs-task-execution"
-      security_group_ids  = ["sg-0ef2db7a5c985da2d"]
+      security_group_ids  = ["sg-0aeaba4676411bb39"]
       disable_alb         = true
 
       secrets = {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_programs_sentry_dsn-zAMOFo"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-scheduler"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-scheduler"]
     }
   }
 
