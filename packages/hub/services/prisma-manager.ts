@@ -6,15 +6,20 @@ type push_notification_registrations_getter = Prisma.push_notification_registrat
 // FIXME this is <GlobalRejectSettings> but how to import?
 
 interface ExtendedPushNotificationRegistrations extends push_notification_registrations_getter {
-  upsertTest(
-    id: string,
-    owner_address: string,
-    push_client_id: string,
-    disabled_at: Date | null
-  ): ReturnType<push_notification_registrations_getter['upsert']>;
+  upsertByOwnerAndPushClient({
+    id,
+    owner_address,
+    push_client_id,
+    disabled_at,
+  }: {
+    id: string;
+    owner_address: string;
+    push_client_id: string;
+    disabled_at: Date | null;
+  }): ReturnType<push_notification_registrations_getter['upsert']>;
 }
 
-interface ExtendedPrismaClient extends PrismaClient {
+export interface ExtendedPrismaClient extends PrismaClient {
   push_notification_registrations: ExtendedPushNotificationRegistrations;
 }
 
@@ -38,8 +43,17 @@ export default class PrismaManager {
       }
 
       Object.assign(client.push_notification_registrations, {
-        upsertTest(id: string, owner_address: string, push_client_id: string, disabled_at?: Date) {
-          console.log('!!', id, owner_address, push_client_id, disabled_at);
+        upsertByOwnerAndPushClient({
+          id,
+          owner_address,
+          push_client_id,
+          disabled_at = null,
+        }: {
+          id: string;
+          owner_address: string;
+          push_client_id: string;
+          disabled_at: Date | null;
+        }) {
           return client.push_notification_registrations.upsert(
             Prisma.validator<Prisma.push_notification_registrationsUpsertArgs>()({
               where: {

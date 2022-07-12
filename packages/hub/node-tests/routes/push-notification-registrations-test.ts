@@ -1,6 +1,6 @@
 import shortUuid from 'short-uuid';
 import { registry, setupHub } from '../helpers/server';
-import { PrismaClient } from '@prisma/client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -33,7 +33,7 @@ describe('POST /api/push-notification-registrations', async function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
   let { request, getContainer } = setupHub(this);
-  let prisma: PrismaClient;
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
     prisma = await (await getContainer().lookup('prisma-manager')).getClient();
@@ -103,12 +103,12 @@ describe('POST /api/push-notification-registrations', async function () {
   });
 
   it('does not fail when registration is already present + it reenables the existing one', async function () {
-    await (prisma.push_notification_registrations as any).upsertTest(
-      shortUuid.uuid(),
-      stubUserAddress,
-      'FIREBASE_USER_ID',
-      new Date()
-    );
+    await prisma.push_notification_registrations.upsertByOwnerAndPushClient({
+      id: shortUuid.uuid(),
+      owner_address: stubUserAddress,
+      push_client_id: 'FIREBASE_USER_ID',
+      disabled_at: new Date(),
+    });
 
     let payload = {
       data: {
@@ -160,7 +160,7 @@ describe('DELETE /api/push-notification-registrations', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
   let { request, getContainer } = setupHub(this);
-  let prisma: PrismaClient;
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
     prisma = await (await getContainer().lookup('prisma-manager')).getClient();
@@ -185,12 +185,13 @@ describe('DELETE /api/push-notification-registrations', function () {
   });
 
   it('deletes push notification registration', async function () {
-    await (prisma.push_notification_registrations as any).upsertTest(
-      shortUuid.uuid(),
-      stubUserAddress,
-      'FIREBASE_USER_ID',
-      null
-    );
+    await prisma.push_notification_registrations.upsertByOwnerAndPushClient({
+      id: shortUuid.uuid(),
+      owner_address: stubUserAddress,
+      push_client_id: 'FIREBASE_USER_ID',
+      disabled_at: null,
+    });
+
     await request()
       .delete(`/api/push-notification-registrations/FIREBASE_USER_ID`)
       .send({})
