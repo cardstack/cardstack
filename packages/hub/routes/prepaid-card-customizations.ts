@@ -6,7 +6,7 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateRequiredFields } from './utils/validation';
 
 export default class PrepaidCardCustomizationsRoute {
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   prepaidCardCustomizationSerializer = inject('prepaid-card-customization-serializer', {
     as: 'prepaidCardCustomizationSerializer',
   });
@@ -21,7 +21,7 @@ export default class PrepaidCardCustomizationsRoute {
       return;
     }
 
-    let db = await this.databaseManager.getClient();
+    let prisma = await this.prismaManager.getClient();
 
     if (
       !validateRequiredFields(ctx, {
@@ -39,13 +39,18 @@ export default class PrepaidCardCustomizationsRoute {
     let newId = shortUuid.uuid();
 
     try {
-      await db.query(
-        'INSERT INTO prepaid_card_customizations (id, owner_address, issuer_name, color_scheme_id, pattern_id) VALUES($1, $2, $3, $4, $5)',
-        [newId, ownerAddress, issuerName, colorSchemeId, patternId]
-      );
+      await prisma.prepaid_card_customizations.create({
+        data: {
+          id: newId,
+          owner_address: ownerAddress,
+          issuer_name: issuerName,
+          color_scheme_id: colorSchemeId,
+          pattern_id: patternId,
+        },
+      });
     } catch (e: any) {
-      if (e.constraint.endsWith('fkey')) {
-        return foreignKeyConstraintError(ctx, e.constraint);
+      if (e.meta.field_name.endsWith('fkey (index)')) {
+        return foreignKeyConstraintError(ctx, e.meta.field_name);
       } else {
         throw e;
       }
@@ -73,10 +78,10 @@ export default class PrepaidCardCustomizationsRoute {
 function foreignKeyConstraintError(ctx: Koa.Context, constraintName: string) {
   let relationshipName;
   switch (constraintName) {
-    case 'prepaid_card_customizations_color_scheme_id_fkey':
+    case 'prepaid_card_customizations_color_scheme_id_fkey (index)':
       relationshipName = 'color-scheme';
       break;
-    case 'prepaid_card_customizations_pattern_id_fkey':
+    case 'prepaid_card_customizations_pattern_id_fkey (index)':
       relationshipName = 'pattern';
       break;
   }

@@ -1,8 +1,8 @@
-import { Client } from 'pg';
 import shortUuid from 'short-uuid';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { registry, setupHub } from '../helpers/server';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -31,7 +31,7 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/prepaid-card-customizations', function () {
-  let db: Client;
+  let prismaClient: ExtendedPrismaClient;
   let validPayload: any;
 
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
@@ -43,9 +43,7 @@ describe('POST /api/prepaid-card-customizations', function () {
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
-    let dbManager = await getContainer().lookup('database-manager');
-    db = await dbManager.getClient();
+    prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
 
     await prismaClient.prepaid_card_patterns.createMany({
       data: [
@@ -62,26 +60,25 @@ describe('POST /api/prepaid-card-customizations', function () {
       ],
     });
 
-    let rows = [
-      ['C169F7FE-D83C-426C-805E-DF1D695C30F1', '#efefef', 'black', 'black', 'Solid Gray'],
-      [
-        '5058B874-CE21-4FC4-958C-B6641E1DC175',
-        'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
-        'white',
-        'white',
-        'Awesome Gradient',
+    await prismaClient.prepaid_card_color_schemes.createMany({
+      data: [
+        {
+          id: 'C169F7FE-D83C-426C-805E-DF1D695C30F1',
+          background: '#efefef',
+          pattern_color: 'black',
+          text_color: 'black',
+          description: 'Solid Gray',
+        },
+        {
+          id: '5058B874-CE21-4FC4-958C-B6641E1DC175',
+          background: 'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
+          pattern_color: 'white',
+          text_color: 'white',
+          description: 'Awesome Gradient',
+        },
       ],
-    ];
-    for (const row of rows) {
-      try {
-        await db.query(
-          'INSERT INTO prepaid_card_color_schemes(id, background, pattern_color, text_color, description) VALUES($1, $2, $3, $4, $5)',
-          row
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    });
+
     validPayload = {
       data: {
         type: 'prepaid-card-customizations',
@@ -202,7 +199,7 @@ describe('POST /api/prepaid-card-customizations', function () {
       });
   });
 
-  it('responds with 200 and new resource', async function () {
+  it('responds with 201 and new resource', async function () {
     let resourceId: string;
     let actualDid: string;
     await request()
@@ -248,13 +245,13 @@ describe('POST /api/prepaid-card-customizations', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let result = await db.query('SELECT * FROM prepaid_card_customizations WHERE id = $1', [resourceId!]);
-    expect(result.rows.length).to.eq(1, 'Expected new row in `prepaid_card_customizations` table');
-    expect(result.rows[0]['issuer_name']).to.eq('Satoshi Nakamoto');
-    expect(result.rows[0]['owner_address']).to.eq(stubUserAddress);
-    expect(result.rows[0]['pattern_id']).to.eq('ab70b8d5-95f5-4c20-997c-4db9013b347c');
-    expect(result.rows[0]['color_scheme_id']).to.eq('5058b874-ce21-4fc4-958c-b6641e1dc175');
-    expect(result.rows[0]['created_at']).to.be.a('date');
+    let result = await prismaClient.prepaid_card_customizations.findMany({ where: { id: resourceId! } });
+    expect(result.length).to.eq(1, 'Expected new row in `prepaid_card_customizations` table');
+    expect(result[0]['issuer_name']).to.eq('Satoshi Nakamoto');
+    expect(result[0]['owner_address']).to.eq(stubUserAddress);
+    expect(result[0]['pattern_id']).to.eq('ab70b8d5-95f5-4c20-997c-4db9013b347c');
+    expect(result[0]['color_scheme_id']).to.eq('5058b874-ce21-4fc4-958c-b6641e1dc175');
+    expect(result[0]['created_at']).to.be.a('date');
 
     expect(actualDid!).to.be.a('string');
     let parts = actualDid!.split(':');
