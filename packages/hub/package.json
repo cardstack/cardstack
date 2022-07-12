@@ -45,6 +45,7 @@
     "@cardstack/discord-bot": "1.0.7",
     "@cardstack/logger": "^0.2.1",
     "@cardstack/wc-provider": "1.0.7",
+    "@chax-at/transactional-prisma-testing": "^0.5.0",
     "@graphile/logger": "^0.2.0",
     "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
@@ -106,7 +107,6 @@
   "devDependencies": {
     "@cardstack/eslint-config": "1.0.7",
     "@cardstack/test-support": "1.0.7",
-    "@chax-at/transactional-prisma-testing": "^0.5.0",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
