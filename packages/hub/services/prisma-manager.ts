@@ -84,6 +84,9 @@ export default class PrismaManager {
 
   async teardown() {
     this.prismaTestingHelper?.rollbackCurrentTransaction();
+    // FIXME I hoped the below would address this warning but no:
+    // warn(prisma-client) There are already 10 instances of Prisma Client actively running.
+    return this.client?.$disconnect();
   }
 }
 
