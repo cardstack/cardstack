@@ -43,21 +43,26 @@ describe('POST /api/prepaid-card-customizations', function () {
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
+    let prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
     let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
 
+    await prismaClient.prepaid_card_patterns.createMany({
+      data: [
+        {
+          id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+          pattern_url: 'https://example.com/a.svg',
+          description: 'Pattern A',
+        },
+        {
+          id: 'D2E94EA2-8124-44D8-B495-D3CF33D4C2A4',
+          pattern_url: 'https://example.com/b.svg',
+          description: 'Pattern B',
+        },
+      ],
+    });
+
     let rows = [
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'https://example.com/a.svg', 'Pattern A'],
-      ['D2E94EA2-8124-44D8-B495-D3CF33D4C2A4', 'https://example.com/b.svg', 'Pattern B'],
-    ];
-    for (const row of rows) {
-      try {
-        await db.query('INSERT INTO prepaid_card_patterns(id, pattern_url, description) VALUES($1, $2, $3)', row);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    rows = [
       ['C169F7FE-D83C-426C-805E-DF1D695C30F1', '#efefef', 'black', 'black', 'Solid Gray'],
       [
         '5058B874-CE21-4FC4-958C-B6641E1DC175',
