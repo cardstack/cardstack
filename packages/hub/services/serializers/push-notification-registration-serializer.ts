@@ -1,8 +1,8 @@
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-import { Prisma } from '@prisma/client';
+import { push_notification_registrations } from '@prisma/client';
 
 export default class PushNotificationRegistrationSerializer {
-  serialize(model: Prisma.push_notification_registrationsCreateInput): JSONAPIDocument {
+  serialize(model: push_notification_registrations): JSONAPIDocument {
     const result = {
       data: {
         id: model.id,
