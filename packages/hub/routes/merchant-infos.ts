@@ -60,7 +60,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color'] })) {
+    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color', 'text-color'] })) {
       return;
     }
 
