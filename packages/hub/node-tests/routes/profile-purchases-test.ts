@@ -416,6 +416,11 @@ describe('POST /api/profile-purchases', function () {
             title: 'Missing required attribute: color',
             detail: 'Required field color was not provided',
           },
+          {
+            status: '422',
+            title: 'Missing required attribute: text-color',
+            detail: 'Required field text-color was not provided',
+          },
         ],
       });
   });

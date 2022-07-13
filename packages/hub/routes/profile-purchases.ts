@@ -101,7 +101,7 @@ export default class ProfilePurchasesRoute {
 
     if (
       !validateRequiredFields(ctx, {
-        requiredAttributes: ['name', 'slug', 'color'],
+        requiredAttributes: ['name', 'slug', 'color', 'text-color'],
         attributesObject: merchantAttributes,
       })
     ) {
