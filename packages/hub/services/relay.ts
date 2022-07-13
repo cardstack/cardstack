@@ -88,13 +88,14 @@ export default class RelayService {
     if (!provisionerSecret) {
       throw new Error(`Could not register profile because relay.provisionerSecret config is not set.`);
     }
-    let response = await fetch(`${relayUrl}/v1/merchant/register?owner=${userAddress}&infoDid=${did}`, {
+    let response = await fetch(`${relayUrl}/v1/merchant/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: provisionerSecret,
       },
       body: JSON.stringify({
+        infoDid: did,
         owner: toChecksumAddress(userAddress),
       }),
     });

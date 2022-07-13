@@ -127,7 +127,7 @@ describe.only('CreateProfileTask', function () {
 
     expect(dataSentToServer).to.deep.equal({
       owner: exampleEthereumAddress,
-      // infoDid: did,
+      infoDid: did,
     });
   });
 
