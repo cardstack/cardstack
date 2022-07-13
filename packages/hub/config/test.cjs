@@ -51,4 +51,7 @@ module.exports = {
       },
     ],
   },
+  relay: {
+    provisionerSecret: 'fakesecret',
+  },
 };

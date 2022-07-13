@@ -6,33 +6,28 @@ import JobTicketsQueries from '../../queries/job-tickets';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { encodeDID } from '@cardstack/did-resolver';
+import { rest } from 'msw';
+import { setupServer, SetupServerApi } from 'msw/node';
+import config from 'config';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 
 let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
+let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
 
-describe('CreateProfileTask', function () {
+// TODO randomly selected from the web… is there an example.com equivalent?
+let exampleEthereumAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+
+describe.only('CreateProfileTask', function () {
   let subject: CreateProfile;
+  let mockServer: SetupServerApi;
+  let dataSentToServer: any;
+  let did: string;
 
-  let registeredAddress = '0x123';
-  let registeredDid = 'sku';
   let mockTransactionHash = '0xABC';
   let mockMerchantSafeAddress = '0x456';
   let registerProfileCalls = 0;
   let registeringShouldError = false;
   let subgraphQueryShouldBeNull = false;
-
-  class StubRelayService {
-    async registerProfile(userAddress: string, did: string) {
-      registerProfileCalls++;
-
-      if (registeringShouldError) {
-        throw new Error('registering should error');
-      }
-
-      registeredAddress = userAddress;
-      registeredDid = did;
-      return Promise.resolve(mockTransactionHash);
-    }
-  }
 
   class StubCardPay {
     async gqlQuery(_network: string, _query: string, _variables: { txn: string }) {
@@ -66,10 +61,26 @@ describe('CreateProfileTask', function () {
 
   this.beforeEach(function () {
     registry(this).register('cardpay', StubCardPay);
-    registry(this).register('relay', StubRelayService, { type: 'service' });
 
     registeringShouldError = false;
+    registerProfileCalls = 0;
     subgraphQueryShouldBeNull = false;
+
+    mockServer = setupServer(
+      rest.post(`${relayUrl}/v1/merchant/register`, (req, res, ctx) => {
+        dataSentToServer = req.body as string;
+        registerProfileCalls++;
+        let status = registeringShouldError ? 400 : 200;
+        let response = registeringShouldError ? {} : { tx_hash: mockTransactionHash };
+        return res(ctx.status(status), ctx.json(response));
+      })
+    );
+
+    mockServer.listen({ onUnhandledRequest: 'error' });
+  });
+
+  this.afterEach(function () {
+    mockServer.close();
   });
 
   let { getContainer } = setupHub(this);
@@ -77,18 +88,24 @@ describe('CreateProfileTask', function () {
   this.beforeEach(async function () {
     jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
     jobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'create-profile', ownerAddress: '0x000' });
+    await jobTicketsQueries.insert({
+      id: jobTicketId,
+      jobType: 'create-profile',
+      ownerAddress: exampleEthereumAddress,
+    });
 
     merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
     merchantInfosId = shortUUID.uuid();
     await merchantInfoQueries.insert({
       id: merchantInfosId,
-      ownerAddress: '0x000',
+      ownerAddress: exampleEthereumAddress,
       name: '',
       slug: '',
       color: '',
       textColor: '',
     });
+
+    did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId });
 
     subject = (await getContainer().instantiate(CreateProfile)) as CreateProfile;
   });
@@ -100,8 +117,6 @@ describe('CreateProfileTask', function () {
     });
 
     expect(registerProfileCalls).to.equal(1);
-    expect(registeredAddress).to.equal('0x000');
-    expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
@@ -109,6 +124,11 @@ describe('CreateProfileTask', function () {
     let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('success');
     expect(jobTicket?.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
+
+    expect(dataSentToServer).to.deep.equal({
+      owner: exampleEthereumAddress,
+      // infoDid: did,
+    });
   });
 
   it('fails the job ticket and logs to Sentry if the profile provisioning fails', async function () {
@@ -119,13 +139,17 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
+    let errorText = `Could not register profile card v2 for customer ${exampleEthereumAddress}, did ${did}, received 400 from relay server: {}`;
+
     let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('failed');
-    expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
+    expect(jobTicket?.result).to.deep.equal({
+      error: `Error: ${errorText}`,
+    });
 
     let sentryReport = await waitForSentryReport();
 
-    expect(sentryReport.error?.message).to.equal('registering should error');
+    expect(sentryReport.error?.message).to.equal(errorText);
 
     expect(getJobIdentifiers()).to.be.empty;
   });
