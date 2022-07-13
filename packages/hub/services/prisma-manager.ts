@@ -3,7 +3,6 @@ import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
 
 type push_notification_registrations_getter = Prisma.push_notification_registrationsDelegate<any>;
-// FIXME this is <GlobalRejectSettings> but how to import?
 
 interface ExtendedPushNotificationRegistrations extends push_notification_registrations_getter {
   upsertByOwnerAndPushClient({
