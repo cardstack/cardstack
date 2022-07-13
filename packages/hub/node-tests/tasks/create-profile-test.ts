@@ -71,7 +71,7 @@ describe('CreateProfileTask', function () {
         dataSentToServer = req.body as string;
         registerProfileCalls++;
         let status = registeringShouldError ? 400 : 200;
-        let response = registeringShouldError ? {} : { tx_hash: mockTransactionHash };
+        let response = registeringShouldError ? {} : { txHash: mockTransactionHash };
         return res(ctx.status(status), ctx.json(response));
       })
     );

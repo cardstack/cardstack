@@ -108,7 +108,7 @@ export default class RelayService {
     }
 
     let body = await response.json();
-    return body.tx_hash;
+    return body.txHash;
   }
 }
 
