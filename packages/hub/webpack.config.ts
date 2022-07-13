@@ -184,6 +184,9 @@ module.exports = {
     // the migration files which rely on a relative path calculation from
     // __dirname
     'node-pg-migrate': 'commonjs node-pg-migrate',
+
+    // @prisma/client fails to build without this
+    'util/types': 'util/types',
   },
 
   module: {

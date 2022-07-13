@@ -6,6 +6,7 @@ import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import shortUUID from 'short-uuid';
+import { PrismaClient } from '@prisma/client';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
@@ -38,7 +39,7 @@ let helpers = makeJobHelpers({}, makeMockJob('send-notifications'), {
 
 const messageID = 'firebase-message-id';
 let createPushNotification: (prefix: string) => PushNotificationData = (prefix = '') => ({
-  notificationId: `${prefix}mock-notification-id`,
+  notificationId: shortUUID.uuid(),
   notificationTitle: `${prefix}notification-title`,
   notificationBody: `${prefix}notification-body`,
   notificationData: {},
@@ -209,30 +210,35 @@ describe('SendNotificationsTask firebase errors', function () {
 
 describe('SendNotificationsTask requested entity not found', function () {
   let { getContainer } = setupHub(this);
+  let prisma: PrismaClient;
+
+  this.beforeEach(async function () {
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+  });
 
   it('should disable the push notification registration', async function () {
-    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
-      type: 'query',
-    });
-
-    await pushNotificationRegistrationQueries.upsert({
-      id: shortUUID.uuid(),
-      pushClientId: newlyAddedNotification.pushClientId,
-      ownerAddress: 'existing-owner-address',
-      disabledAt: null,
+    await prisma.push_notification_registrations.create({
+      data: {
+        id: shortUUID.uuid(),
+        push_client_id: newlyAddedNotification.pushClientId,
+        owner_address: 'existing-owner-address',
+        disabled_at: null,
+      },
     });
 
     registry(this).register('firebase-push-notifications', EntityNotFoundFirebasePushNotifications);
     let subject = await getContainer().instantiate(SendNotifications);
     await subject.perform(newlyAddedNotification, helpers);
 
-    let records = await pushNotificationRegistrationQueries.query({
-      ownerAddress: 'existing-owner-address',
-      pushClientId: newlyAddedNotification.pushClientId,
+    let records = await prisma.push_notification_registrations.findMany({
+      where: {
+        owner_address: 'existing-owner-address',
+        push_client_id: newlyAddedNotification.pushClientId,
+      },
     });
 
     expect(records.length).to.equal(1);
-    expect(records[0].disabledAt).to.exist;
+    expect(records[0].disabled_at).to.exist;
   });
 });
 

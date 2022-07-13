@@ -5,6 +5,7 @@ import { inject } from '@cardstack/di';
 let log = Logger('route:prepaid-card-patterns');
 
 export default class PrepaidCardPatternsRoute {
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -12,10 +13,9 @@ export default class PrepaidCardPatternsRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let db = await this.databaseManager.getClient();
     try {
-      let result = await db.query('SELECT id, pattern_url, description FROM prepaid_card_patterns');
-      let data = result.rows.map((row) => {
+      let result = await (await this.prismaManager.getClient()).prepaid_card_patterns.findMany();
+      let data = result.map((row) => {
         return {
           id: row.id,
           type: 'prepaid-card-patterns',

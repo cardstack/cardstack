@@ -5,19 +5,17 @@ import { inject } from '@cardstack/di';
 let log = Logger('route:prepaid-card-color-schemes');
 
 export default class PrepaidCardColorSchemesRoute {
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   constructor() {
     autoBind(this);
   }
 
   async get(ctx: Koa.Context) {
-    let db = await this.databaseManager.getClient();
+    let prisma = await this.prismaManager.getClient();
     try {
-      let result = await db.query(
-        'SELECT id, background, pattern_color, text_color, description FROM prepaid_card_color_schemes'
-      );
-      let data = result.rows.map((row) => {
+      let result = await prisma.prepaid_card_color_schemes.findMany();
+      let data = result.map((row) => {
         return {
           id: row.id,
           type: 'prepaid-card-color-schemes',

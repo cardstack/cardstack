@@ -1,32 +1,20 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 
 import { ensureLoggedIn } from './utils/auth';
 
 import PushNotificationRegistrationSerializer from '../services/serializers/push-notification-registration-serializer';
 import shortUuid from 'short-uuid';
-import { query } from '@cardstack/hub/queries';
-
-export interface PushNotificationRegistration {
-  id: string;
-  ownerAddress: string;
-  pushClientId: string;
-  disabledAt: string | null;
-}
 
 export default class PushNotificationRegistrationsRoute {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   pushNotificationRegistrationSerialier: PushNotificationRegistrationSerializer = inject(
     'push-notification-registration-serializer',
     {
       as: 'pushNotificationRegistrationSerialier',
     }
   );
-  pushNotificationRegistrationQueries = query('push-notification-registration', {
-    as: 'pushNotificationRegistrationQueries',
-  });
 
   constructor() {
     autoBind(this);
@@ -36,19 +24,18 @@ export default class PushNotificationRegistrationsRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
-    let ownerAddress = ctx.state.userAddress;
-    let pushClientId = ctx.request.body.data.attributes['push-client-id'];
 
     let pushNotificationRegistration = {
       id: shortUuid.uuid(),
-      ownerAddress,
-      pushClientId,
-      disabledAt: null,
+      owner_address: ctx.state.userAddress,
+      push_client_id: ctx.request.body.data.attributes['push-client-id'],
+      disabled_at: null,
     };
 
-    await this.pushNotificationRegistrationQueries.upsert(pushNotificationRegistration);
+    let prisma = await this.prismaManager.getClient();
+    let record = await prisma.push_notification_registrations.upsertByOwnerAndPushClient(pushNotificationRegistration);
 
-    let serialized = await this.pushNotificationRegistrationSerialier.serialize(pushNotificationRegistration);
+    let serialized = this.pushNotificationRegistrationSerialier.serialize(record);
 
     ctx.status = 201;
     ctx.body = serialized;
@@ -60,10 +47,16 @@ export default class PushNotificationRegistrationsRoute {
       return;
     }
 
-    await this.pushNotificationRegistrationQueries.delete({
-      ownerAddress: ctx.state.userAddress,
-      pushClientId: ctx.params.push_client_id,
-    } as PushNotificationRegistration);
+    let prisma = await this.prismaManager.getClient();
+
+    await prisma.push_notification_registrations.delete({
+      where: {
+        owner_address_push_client_id: {
+          owner_address: ctx.state.userAddress,
+          push_client_id: ctx.params.push_client_id,
+        },
+      },
+    });
 
     ctx.status = 200;
     ctx.type = 'application/vnd.api+json';
