@@ -62,11 +62,11 @@ export default class CreateProfile {
 
       await this.jobTickets.update(
         jobTicketId,
-        { 'merchant-safe-id': merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id },
+        { id: merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id },
         'success'
       );
 
-      this.workerClient.addJob('persist-off-chain-merchant-info', { 'merchant-safe-id': merchantInfoId });
+      this.workerClient.addJob('persist-off-chain-merchant-info', { id: merchantInfoId });
     } catch (error) {
       let errorString = (error as Error).toString();
       Sentry.captureException(error);
