@@ -33,7 +33,7 @@ export default class PrepaidCardPatternSerializer {
       return Promise.reject(new Error(`No prepaid_card_pattern record found with id ${id}`));
     }
 
-    // FIXME why? If it’s already known to not be null
+    // TODO why? If it’s already known to not be null. CS-4255
     return pattern as unknown as prepaid_card_patterns;
   }
 }
