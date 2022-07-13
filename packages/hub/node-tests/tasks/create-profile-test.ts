@@ -17,7 +17,7 @@ let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Ne
 // TODO randomly selected from the web… is there an example.com equivalent?
 let exampleEthereumAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
 
-describe.only('CreateProfileTask', function () {
+describe('CreateProfileTask', function () {
   let subject: CreateProfile;
   let mockServer: SetupServerApi;
   let dataSentToServer: any;
