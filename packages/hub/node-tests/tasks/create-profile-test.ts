@@ -14,8 +14,7 @@ import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
 
-// TODO randomly selected from the web… is there an example.com equivalent?
-let exampleEthereumAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+let exampleEthereumAddress = '0x323B2318F35c6b31113342830204335Dac715AA8';
 
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
