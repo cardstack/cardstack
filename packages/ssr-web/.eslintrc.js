@@ -16,6 +16,7 @@ module.exports = {
     'plugin:ember/recommended',
     'plugin:prettier/recommended',
   ],
+  ignorePatterns: ['dist/**/*.js'],
   env: {
     browser: true,
   },
@@ -40,17 +41,17 @@ module.exports = {
     // node files
     {
       files: [
-        '.eslintrc.js',
-        '.percy.js',
-        '.prettierrc.js',
-        '.template-lintrc.js',
+        './.eslintrc.js',
+        './.percy.js',
+        './.prettierrc.js',
+        './.template-lintrc.js',
+        './ember-cli-build.js',
+        './testem.js',
+        './blueprints/*/index.js',
+        './config/**/*.js',
+        './lib/*/index.js',
+        './server/**/*.js',
         'svgo-1-loader.js',
-        'ember-cli-build.js',
-        'testem.js',
-        'blueprints/*/index.js',
-        'config/**/*.js',
-        'lib/*/index.js',
-        'server/**/*.js',
       ],
       parserOptions: {
         sourceType: 'script',
@@ -66,6 +67,11 @@ module.exports = {
         // https://github.com/mysticatea/eslint-plugin-node/issues/77
         'node/no-unpublished-require': 'off',
       },
+    },
+    {
+      // Test files:
+      files: ['tests/**/*-test.{js,ts}'],
+      extends: ['plugin:qunit/recommended'],
     },
   ],
 };

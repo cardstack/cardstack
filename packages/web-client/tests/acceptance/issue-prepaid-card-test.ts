@@ -449,10 +449,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     // preview card
     post = postableSel(3, 1);
-    await click(
-      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
-    );
+    click(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`);
 
+    await waitFor(`${post} [data-test-boxel-action-chin-action-status-area]`);
     assert
       .dom(`${post} [data-test-boxel-action-chin-action-status-area]`)
       .containsText('Preparing to create your custom prepaid card…');

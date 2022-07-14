@@ -86,7 +86,7 @@ module('Unit | Milestone model', function (hooks) {
     });
   });
 
-  module('editable state', function () {
+  module('editable state', function (hooks) {
     let author: Participant;
     let postable1: WorkflowPostable;
 

@@ -95,6 +95,7 @@ module('Acceptance | pay', function (hooks) {
     });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It displays merchant info correctly in a non-iOS/non-Android environment', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
 
@@ -116,6 +117,7 @@ module('Acceptance | pay', function (hooks) {
     await percySnapshot(assert);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It displays merchant info correctly on iOS', async function (assert) {
     let UAService = this.owner.lookup('service:ua');
     sinon.stub(UAService, 'isIOS').returns(true);
@@ -138,6 +140,7 @@ module('Acceptance | pay', function (hooks) {
     await percySnapshot(assert);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It displays merchant info correctly on Android', async function (assert) {
     let UAService = this.owner.lookup('service:ua');
     sinon.stub(UAService, 'isAndroid').returns(true);

@@ -5,7 +5,6 @@ import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import BN from 'bn.js';
 import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
-import { useResource } from 'ember-resources';
 
 interface CardPaySafeComponentArgs {
   safe: Safe;
@@ -43,7 +42,7 @@ export default class CardPaySafeComponent extends Component<CardPaySafeComponent
       let merchant = this.args.safe as MerchantSafe;
 
       return {
-        info: useResource(this, MerchantInfo, () => ({
+        info: MerchantInfo.from(this, () => ({
           infoDID: merchant.infoDID,
         })),
       };

@@ -131,7 +131,7 @@ module(
 
       assert.ok(
         layer2Service.balancesRefreshed,
-        'Balances for layer 2 should be refreshsed after bridging'
+        'Balances for layer 2 should be refreshed after bridging'
       );
       assert
         .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
