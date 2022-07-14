@@ -12,7 +12,7 @@ export default class PersistOffChainMerchantInfo {
     as: 'merchantInfoQueries',
   });
 
-  async perform(payload: any, helpers: Helpers) {
+  async perform(payload: { id: string }, helpers: Helpers) {
     const { id } = payload;
 
     let merchantInfo = (await this.merchantInfoQueries.fetch({ id }))[0];

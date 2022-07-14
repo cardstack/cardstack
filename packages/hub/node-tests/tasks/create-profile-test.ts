@@ -104,11 +104,11 @@ describe('CreateProfileTask', function () {
     expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
-    expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
+    expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
 
     let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('success');
-    expect(jobTicket?.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
+    expect(jobTicket?.result).to.deep.equal({ id: mockMerchantSafeAddress });
   });
 
   it('fails the job ticket and logs to Sentry if the profile provisioning fails', async function () {
