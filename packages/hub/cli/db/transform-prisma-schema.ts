@@ -55,6 +55,7 @@ async function fixPrismaFile() {
   let currentModelName: string | null = null;
   let hasAddedModelMap = false;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (let [index, line] of textAsArray.entries()) {
     // Are we at the start of a model definition
     const modelMatch = line.match(/^model (\w+) {$/);
