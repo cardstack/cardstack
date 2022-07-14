@@ -39,6 +39,10 @@ function isPrimitiveType(typeName: string) {
   return PRISMA_PRIMITIVES.includes(typeName);
 }
 
+function isEnumType(typeName: string) {
+  return typeName.endsWith('_enum');
+}
+
 function fixFieldsArrayString(fields: string) {
   return fields
     .split(', ')
@@ -66,14 +70,6 @@ async function fixPrismaFile() {
       hasAddedModelMap = false;
       const singularPascalModelName = pluralize.singular(snakeToPascal(currentModelName));
       fixedText.push(`model ${singularPascalModelName} {`);
-      continue;
-    }
-
-    // Are we at the start of an enum definition
-    const enumMatch = line.match(/^enum (\w+) {$/);
-    if (enumMatch) {
-      const pascalEnumName = snakeToPascal(enumMatch[1]);
-      fixedText.push(`enum ${pascalEnumName} {`);
       continue;
     }
 
@@ -112,7 +108,8 @@ async function fixPrismaFile() {
 
       // Add map if we needed to convert the field name and the field is not a relational type
       // If it's relational, the field type will be a non-primitive, hence the isPrimitiveType check
-      if (currentFieldName.includes('_') && isPrimitiveType(currentFieldType)) {
+      // If it’s an enum, leave it alone because it will stay snake_case
+      if (currentFieldName.includes('_') && (isPrimitiveType(currentFieldType) || isEnumType(currentFieldType))) {
         fixedLine = `${fixedLine} @map("${currentFieldName}")`;
       }
     }
@@ -121,11 +118,15 @@ async function fixPrismaFile() {
     const fieldTypeMatch = fixedLine.match(/\s\s\w+\s+(\w+)/);
     if (fieldTypeMatch) {
       const currentFieldType = fieldTypeMatch[1];
-      const fieldTypeIndex = fieldTypeMatch[0].lastIndexOf(currentFieldType);
-      const fixedFieldType = pluralize.singular(snakeToPascal(currentFieldType));
-      const startOfLine = fixedLine.substr(0, fieldTypeIndex);
-      const restOfLine = fixedLine.substr(fieldTypeIndex + currentFieldType.length);
-      fixedLine = `${startOfLine}${fixedFieldType}${restOfLine}`;
+
+      // If it’s an enum, leave it alone because it will stay snake_case
+      if (!isEnumType(currentFieldType)) {
+        const fieldTypeIndex = fieldTypeMatch[0].lastIndexOf(currentFieldType);
+        const fixedFieldType = pluralize.singular(snakeToPascal(currentFieldType));
+        const startOfLine = fixedLine.substr(0, fieldTypeIndex);
+        const restOfLine = fixedLine.substr(fieldTypeIndex + currentFieldType.length);
+        fixedLine = `${startOfLine}${fixedFieldType}${restOfLine}`;
+      }
     }
 
     // Changes `fields: [relation_id]` in @relation to camel case
