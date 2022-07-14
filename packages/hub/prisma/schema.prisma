@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -9,24 +9,24 @@ datasource db {
 }
 
 model CardDropRecipient {
-  userId              String   @id @map("user_id")
-  userName            String @map("user_name")
-  address              String?
-  airdropTxnHash     String? @map("airdrop_txn_hash")
-  airdropPrepaidCard String? @map("airdrop_prepaid_card")
-  createdAt           DateTime @default(now()) @db.Timestamp(6) @map("created_at")
-  updatedAt           DateTime @default(now()) @db.Timestamp(6) @map("updated_at")
+  userId             String   @id @map("user_id")
+  userName           String   @map("user_name")
+  address            String?
+  airdropTxnHash     String?  @map("airdrop_txn_hash")
+  airdropPrepaidCard String?  @map("airdrop_prepaid_card")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
   @@map("card_drop_recipients")
 }
 
 model CardSpace {
-  id                  String         @id @db.Uuid
-  profileImageUrl   String? @map("profile_image_url")
-  profileDescription String? @map("profile_description")
-  createdAt          DateTime       @default(now()) @db.Timestamp(6) @map("created_at")
-  links               Json[]         @default([]) @db.Json
-  merchantId         String         @unique(map: "card_spaces_merchant_id_unique_index") @db.Uuid @map("merchant_id")
+  id                 String       @id @db.Uuid
+  profileImageUrl    String?      @map("profile_image_url")
+  profileDescription String?      @map("profile_description")
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  links              Json[]       @default([]) @db.Json
+  merchantId         String       @unique(map: "card_spaces_merchant_id_unique_index") @map("merchant_id") @db.Uuid
   merchantInfos      MerchantInfo @relation(fields: [merchantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("card_spaces")
@@ -50,159 +50,159 @@ model Card {
 }
 
 model DiscordBot {
-  botId          String                   @id @map("bot_id")
-  botType        String @map("bot_type")
-  status          DiscordBotsStatusEnum
-  createdAt      DateTime                 @default(now()) @db.Timestamp(6) @map("created_at")
-  lastMessageId String? @map("last_message_id")
+  botId         String                @id @map("bot_id")
+  botType       String                @map("bot_type")
+  status        DiscordBotsStatusEnum
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
+  lastMessageId String?               @map("last_message_id")
 
-  @@map("discord_bots")
   @@index([botType, status], map: "discord_bots_bot_type_status_index")
+  @@map("discord_bots")
 }
 
 model DmChannel {
   channelId String   @id @map("channel_id")
-  userId    String @map("user_id")
-  command    String?
-  createdAt DateTime @default(now()) @db.Timestamp(6) @map("created_at")
-  updatedAt DateTime @default(now()) @db.Timestamp(6) @map("updated_at")
+  userId    String   @map("user_id")
+  command   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
   @@map("dm_channels")
 }
 
 model EmailCardDropRequest {
-  id                String    @id @db.Uuid
-  ownerAddress     String @map("owner_address")
-  emailHash        String @map("email_hash")
-  verificationCode String @map("verification_code")
-  requestedAt      DateTime  @default(now()) @db.Timestamp(6) @map("requested_at")
-  claimedAt        DateTime? @db.Timestamp(6) @map("claimed_at")
-  transactionHash  String? @map("transaction_hash")
+  id               String    @id @db.Uuid
+  ownerAddress     String    @map("owner_address")
+  emailHash        String    @map("email_hash")
+  verificationCode String    @map("verification_code")
+  requestedAt      DateTime  @default(now()) @map("requested_at") @db.Timestamp(6)
+  claimedAt        DateTime? @map("claimed_at") @db.Timestamp(6)
+  transactionHash  String?   @map("transaction_hash")
 
   @@map("email_card_drop_requests")
 }
 
 model EmailCardDropState {
-  id           Int      @id @default(1)
-  rateLimited Boolean @map("rate_limited")
-  updatedAt   DateTime @default(now()) @db.Timestamp(6) @map("updated_at")
+  id          Int      @id @default(1)
+  rateLimited Boolean  @map("rate_limited")
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
   @@map("email_card_drop_state")
 }
 
 model ExchangeRate {
-  date        DateTime @db.Date
-  fromSymbol String @map("from_symbol")
-  toSymbol   String @map("to_symbol")
-  exchange    String
-  rate        Decimal  @db.Decimal
+  date       DateTime @db.Date
+  fromSymbol String   @map("from_symbol")
+  toSymbol   String   @map("to_symbol")
+  exchange   String
+  rate       Decimal  @db.Decimal
 
-  @@map("exchange_rates")
   @@id([date, fromSymbol, toSymbol, exchange])
+  @@map("exchange_rates")
 }
 
 model JobTicket {
-  id               String   @id @db.Uuid
-  jobType         String @map("job_type")
-  ownerAddress    String @map("owner_address")
-  payload          Json?
-  result           Json?
-  state            String   @default("pending")
-  createdAt       DateTime @default(now()) @db.Timestamp(6) @map("created_at")
-  updatedAt       DateTime @default(now()) @db.Timestamp(6) @map("updated_at")
-  spec             Json?
+  id              String   @id @db.Uuid
+  jobType         String   @map("job_type")
+  ownerAddress    String   @map("owner_address")
+  payload         Json?
+  result          Json?
+  state           String   @default("pending")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+  spec            Json?
   sourceArguments Json?
 
-  @@map("job_tickets")
   @@index([jobType, ownerAddress, state], map: "job_tickets_job_type_owner_address_state_index")
+  @@map("job_tickets")
 }
 
 model LatestEventBlock {
-  id           Int      @id @default(1)
-  blockNumber Int @map("block_number")
-  updatedAt   DateTime @default(now()) @db.Timestamp(6) @map("updated_at")
+  id          Int      @id @default(1)
+  blockNumber Int      @map("block_number")
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
   @@map("latest_event_block")
 }
 
 model MerchantInfo {
-  id            String       @id @db.Uuid
-  name          String
-  slug          String       @unique(map: "merchant_infos_slug_unique_index")
-  color         String
-  textColor    String @map("text_color")
-  ownerAddress String @map("owner_address")
-  createdAt    DateTime     @default(now()) @db.Timestamp(6) @map("created_at")
+  id           String     @id @db.Uuid
+  name         String
+  slug         String     @unique(map: "merchant_infos_slug_unique_index")
+  color        String
+  textColor    String     @map("text_color")
+  ownerAddress String     @map("owner_address")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
   cardSpaces   CardSpace?
 
   @@map("merchant_infos")
 }
 
 model NotificationPreference {
-  ownerAddress        String @map("owner_address")
-  notificationTypeId String                               @db.Uuid @map("notification_type_id")
-  pushClientId       String @map("push_client_id")
-  status               NotificationPreferencesStatusEnum @default(enabled)
-  createdAt           DateTime                             @default(now()) @db.Timestamp(6) @map("created_at")
-  notificationTypes   NotificationType                   @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ownerAddress       String                            @map("owner_address")
+  notificationTypeId String                            @map("notification_type_id") @db.Uuid
+  pushClientId       String                            @map("push_client_id")
+  status             NotificationPreferencesStatusEnum @default(enabled)
+  createdAt          DateTime                          @default(now()) @map("created_at") @db.Timestamp(6)
+  notificationTypes  NotificationType                  @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("notification_preferences")
   @@unique([ownerAddress, notificationTypeId, pushClientId], map: "notification_preferences_owner_address_notification_type_id_pus")
   @@index([ownerAddress], map: "notification_preferences_owner_address_index")
+  @@map("notification_preferences")
 }
 
 model NotificationType {
-  id                       String                         @id @db.Uuid
-  notificationType        String @map("notification_type")
+  id                      String                      @id @db.Uuid
+  notificationType        String                      @map("notification_type")
   defaultStatus           NotificationTypesStatusEnum @default(enabled)
-  createdAt               DateTime                       @default(now()) @db.Timestamp(6) @map("created_at")
+  createdAt               DateTime                    @default(now()) @map("created_at") @db.Timestamp(6)
   notificationPreferences NotificationPreference[]
 
   @@map("notification_types")
 }
 
 model PrepaidCardColorScheme {
-  id                          String                        @id @db.Uuid
-  background                  String
-  patternColor               String @map("pattern_color")
-  textColor                  String @map("text_color")
-  description                 String
+  id                        String                     @id @db.Uuid
+  background                String
+  patternColor              String                     @map("pattern_color")
+  textColor                 String                     @map("text_color")
+  description               String
   prepaidCardCustomizations PrepaidCardCustomization[]
 
   @@map("prepaid_card_color_schemes")
 }
 
 model PrepaidCardCustomization {
-  id                         String                     @id @db.Uuid
-  ownerAddress              String @map("owner_address")
-  issuerName                String @map("issuer_name")
-  colorSchemeId            String                     @db.Uuid @map("color_scheme_id")
-  patternId                 String                     @db.Uuid @map("pattern_id")
-  createdAt                 DateTime                   @default(now()) @db.Timestamp(6) @map("created_at")
+  id                      String                 @id @db.Uuid
+  ownerAddress            String                 @map("owner_address")
+  issuerName              String                 @map("issuer_name")
+  colorSchemeId           String                 @map("color_scheme_id") @db.Uuid
+  patternId               String                 @map("pattern_id") @db.Uuid
+  createdAt               DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
   prepaidCardColorSchemes PrepaidCardColorScheme @relation(fields: [colorSchemeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  prepaidCardPatterns      PrepaidCardPattern      @relation(fields: [patternId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  prepaidCardPatterns     PrepaidCardPattern     @relation(fields: [patternId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("prepaid_card_customizations")
 }
 
 model PrepaidCardPattern {
-  id                          String                        @id @db.Uuid
-  patternUrl                 String? @map("pattern_url")
-  description                 String
+  id                        String                     @id @db.Uuid
+  patternUrl                String?                    @map("pattern_url")
+  description               String
   prepaidCardCustomizations PrepaidCardCustomization[]
 
   @@map("prepaid_card_patterns")
 }
 
 model PushNotificationRegistration {
-  id             String    @id @db.Uuid
-  ownerAddress  String @map("owner_address")
-  pushClientId String @map("push_client_id")
-  disabledAt    DateTime? @db.Timestamp(6) @map("disabled_at")
-  createdAt     DateTime  @default(now()) @db.Timestamp(6) @map("created_at")
+  id           String    @id @db.Uuid
+  ownerAddress String    @map("owner_address")
+  pushClientId String    @map("push_client_id")
+  disabledAt   DateTime? @map("disabled_at") @db.Timestamp(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
 
-  @@map("push_notification_registrations")
   @@unique([ownerAddress, pushClientId], map: "push_notification_registrations_owner_address_push_client_id_un")
+  @@map("push_notification_registrations")
 }
 
 model RealmMeta {
@@ -213,77 +213,77 @@ model RealmMeta {
 }
 
 model Reservation {
-  id                   String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userAddress         String @map("user_address")
-  sku                  String
-  transactionHash     String? @map("transaction_hash")
-  prepaidCardAddress String? @map("prepaid_card_address")
-  createdAt           DateTime        @default(now()) @db.Timestamp(6) @map("created_at")
-  updatedAt           DateTime        @default(now()) @db.Timestamp(6) @map("updated_at")
-  walletOrders        WalletOrder[]
+  id                 String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userAddress        String        @map("user_address")
+  sku                String
+  transactionHash    String?       @map("transaction_hash")
+  prepaidCardAddress String?       @map("prepaid_card_address")
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime      @default(now()) @map("updated_at") @db.Timestamp(6)
+  walletOrders       WalletOrder[]
 
-  @@map("reservations")
   @@index([id, userAddress], map: "reservations_id_user_address_index")
   @@index([updatedAt, prepaidCardAddress], map: "reservations_updated_at_prepaid_card_address_index")
   @@index([updatedAt, prepaidCardAddress, sku], map: "reservations_updated_at_prepaid_card_address_sku_index")
   @@index([userAddress], map: "reservations_user_address_index")
+  @@map("reservations")
 }
 
 model SentPushNotification {
   notificationId    String   @id @map("notification_id")
-  pushClientId     String? @map("push_client_id")
-  notificationType  String? @map("notification_type")
-  notificationTitle String? @map("notification_title")
-  notificationBody  String? @map("notification_body")
+  pushClientId      String?  @map("push_client_id")
+  notificationType  String?  @map("notification_type")
+  notificationTitle String?  @map("notification_title")
+  notificationBody  String?  @map("notification_body")
   notificationData  Json?    @db.Json
-  messageId         String? @map("message_id")
-  createdAt         DateTime @default(now()) @db.Timestamp(6) @map("created_at")
+  messageId         String?  @map("message_id")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
-  @@map("sent_push_notifications")
   @@index([createdAt], map: "sent_push_notifications_created_at_index")
+  @@map("sent_push_notifications")
 }
 
 model Upload {
-  id            String   @id @db.Uuid
-  cid           String
-  service       String
-  url           String
-  filename      String
-  size          Int
-  type          String
-  ownerAddress String @map("owner_address")
-  createdAt    DateTime @default(now()) @db.Timestamp(6) @map("created_at")
+  id           String   @id @db.Uuid
+  cid          String
+  service      String
+  url          String
+  filename     String
+  size         Int
+  type         String
+  ownerAddress String   @map("owner_address")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
   @@map("uploads")
 }
 
 model WalletOrder {
-  orderId              String                    @id @map("order_id")
-  userAddress          String @map("user_address")
-  walletId             String @map("wallet_id")
-  status                WalletOrdersStatusEnum
-  custodialTransferId String? @map("custodial_transfer_id")
-  createdAt            DateTime                  @default(now()) @db.Timestamp(6) @map("created_at")
-  updatedAt            DateTime                  @default(now()) @db.Timestamp(6) @map("updated_at")
-  reservationId        String?                   @db.Uuid @map("reservation_id")
-  reservations          Reservation?             @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
+  orderId             String                 @id @map("order_id")
+  userAddress         String                 @map("user_address")
+  walletId            String                 @map("wallet_id")
+  status              WalletOrdersStatusEnum
+  custodialTransferId String?                @map("custodial_transfer_id")
+  createdAt           DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime               @default(now()) @map("updated_at") @db.Timestamp(6)
+  reservationId       String?                @map("reservation_id") @db.Uuid
+  reservations        Reservation?           @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
 
-  @@map("wallet_orders")
   @@index([custodialTransferId, status], map: "wallet_orders_custodial_transfer_id_status_index")
   @@index([reservationId], map: "wallet_orders_reservation_id_index")
+  @@map("wallet_orders")
 }
 
 model WyrePrice {
-  sku                   String   @id
-  sourceCurrency       String @map("source_currency")
-  destCurrency         String @map("dest_currency")
+  sku                 String   @id
+  sourceCurrency      String   @map("source_currency")
+  destCurrency        String   @map("dest_currency")
   sourceCurrencyPrice Decimal  @db.Decimal
-  includesFee          Boolean  @default(false) @map("includes_fee")
-  disabled              Boolean  @default(false)
-  createdAt            DateTime @default(now()) @db.Timestamp(6) @map("created_at")
+  includesFee         Boolean  @default(false) @map("includes_fee")
+  disabled            Boolean  @default(false)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
-  @@map("wyre_prices")
   @@index([disabled], map: "wyre_prices_disabled_index")
+  @@map("wyre_prices")
 }
 
 enum DiscordBotsStatusEnum {
