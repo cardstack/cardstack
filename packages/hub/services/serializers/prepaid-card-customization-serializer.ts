@@ -5,14 +5,8 @@ import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serial
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
+import { PrepaidCardCustomization } from '@prisma/client';
 
-interface PrepaidCardCustomization {
-  id: string;
-  issuerName: string;
-  ownerAddress: string;
-  colorSchemeId: string;
-  patternId: string;
-}
 interface PrepaidCardCustomizationSerializationOptions {
   include: PrepaidCardCustomizationRelationship[];
 }
