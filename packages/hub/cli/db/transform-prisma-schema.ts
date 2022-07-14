@@ -91,8 +91,15 @@ async function fixPrismaFile() {
     if (!hasAddedModelMap && (line.match(/\s+@@/) || line === '}')) {
       if (line === '}') {
         fixedText.push('');
+        fixedText.push(`  @@map("${currentModelName}")`);
+      } else {
+        // Don’t add if the transformed name has already been added
+        const mappingMatch = line.match(/@@map\((\w+)\)/);
+
+        if (mappingMatch && mappingMatch[1] != currentModelName) {
+          fixedText.push(`  @@map("${currentModelName}")`);
+        }
       }
-      fixedText.push(`  @@map("${currentModelName}")`);
       hasAddedModelMap = true;
     }
 
