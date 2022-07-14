@@ -49,8 +49,8 @@
   },
   "devDependencies": {
     "@cardstack/cardpay-sdk": "1.0.7",
-    "@graphprotocol/graph-cli": "0.20.0",
-    "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0",
     "@protofire/subgraph-toolkit": "0.1.2",
     "fs-extra": "^10.0.0",
     "node-fetch": "^2.6.1",
