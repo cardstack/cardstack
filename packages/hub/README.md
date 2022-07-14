@@ -136,7 +136,7 @@ Documentation on how to create migration scripts is available at https://salsita
 After you have completed running your new DB migration script, update Prisma’s schema and client:
 
     yarn run prisma db pull
-    node dist/hub.js transform-prisma-schema
+    node dist/hub.js db transform-prisma-schema
     yarn run prisma prisma format
     yarn run prisma generate
     yarn add @prisma/client
