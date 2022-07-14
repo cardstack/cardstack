@@ -69,6 +69,14 @@ async function fixPrismaFile() {
       continue;
     }
 
+    // Are we at the start of an enum definition
+    const enumMatch = line.match(/^enum (\w+) {$/);
+    if (enumMatch) {
+      const pascalEnumName = snakeToPascal(enumMatch[1]);
+      fixedText.push(`enum ${pascalEnumName} {`);
+      continue;
+    }
+
     if (currentModelName && isKnexInternalModel(currentModelName)) {
       continue;
     }
