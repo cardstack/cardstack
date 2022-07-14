@@ -64,8 +64,8 @@ async function fixPrismaFile() {
         continue;
       }
       hasAddedModelMap = false;
-      const pascalModelName = snakeToPascal(currentModelName);
-      fixedText.push(`model ${pascalModelName} {`);
+      const singularPascalModelName = pluralize.singular(snakeToPascal(currentModelName));
+      fixedText.push(`model ${singularPascalModelName} {`);
       continue;
     }
 
@@ -122,7 +122,7 @@ async function fixPrismaFile() {
     if (fieldTypeMatch) {
       const currentFieldType = fieldTypeMatch[1];
       const fieldTypeIndex = fieldTypeMatch[0].lastIndexOf(currentFieldType);
-      const fixedFieldType = snakeToPascal(currentFieldType);
+      const fixedFieldType = pluralize.singular(snakeToPascal(currentFieldType));
       const startOfLine = fixedLine.substr(0, fieldTypeIndex);
       const restOfLine = fixedLine.substr(fieldTypeIndex + currentFieldType.length);
       fixedLine = `${startOfLine}${fixedFieldType}${restOfLine}`;
