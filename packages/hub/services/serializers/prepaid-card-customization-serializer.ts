@@ -27,7 +27,7 @@ export default class PrepaidCardCustomizationSerializer {
     options: Partial<PrepaidCardCustomizationSerializationOptions>
   ): Promise<JSONAPIDocument>;
   async serialize(
-    content: string | PrepaidCardCustomization,
+    content: string | Omit<PrepaidCardCustomization, 'createdAt'>,
     options: Partial<PrepaidCardCustomizationSerializationOptions> = {}
   ): Promise<JSONAPIDocument> {
     if (typeof content === 'string') {
@@ -74,7 +74,7 @@ export default class PrepaidCardCustomizationSerializer {
     return result;
   }
 
-  async loadPrepaidCardCustomization(id: string): Promise<PrepaidCardCustomization> {
+  async loadPrepaidCardCustomization(id: string): Promise<Omit<PrepaidCardCustomization, 'createdAt'>> {
     let db = await this.databaseManager.getClient();
     let queryResult = await db.query(
       'SELECT id, issuer_name, owner_address, pattern_id, color_scheme_id from prepaid_card_customizations WHERE id = $1',
