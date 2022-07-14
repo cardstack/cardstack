@@ -139,6 +139,7 @@ After you have completed running your new DB migration script, update Prisma’s
     node dist/hub.js transform-prisma-schema
     yarn run prisma prisma format
     yarn run prisma generate
+    yarn add @prisma/client
 
 And create a pg_dump of the DB in the `config/structure.sql` file using:
 
