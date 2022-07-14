@@ -28,7 +28,7 @@ function snakeToPascal(str: string) {
   return upperFirst(camelCase(str));
 }
 
-const PRISMA_PRIMITIVES = ['String', 'Boolean', 'Int', 'Float', 'DateTime'];
+const PRISMA_PRIMITIVES = ['String', 'Boolean', 'Int', 'Float', 'DateTime', 'Json', 'Decimal'];
 const INTERNAL_MODELS = ['pgmigrations'];
 
 function isInternalModel(typeName: string) {
