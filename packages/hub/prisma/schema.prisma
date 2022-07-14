@@ -286,7 +286,7 @@ model WyrePrices {
   @@index([disabled], map: "wyre_prices_disabled_index")
 }
 
-enum discord_bots_status_enum {
+enum DiscordBotsStatusEnum {
   connecting
   connected
   listening
@@ -294,17 +294,17 @@ enum discord_bots_status_enum {
   unresponsive
 }
 
-enum notification_preferences_status_enum {
+enum NotificationPreferencesStatusEnum {
   enabled
   disabled
 }
 
-enum notification_types_status_enum {
+enum NotificationTypesStatusEnum {
   enabled
   disabled
 }
 
-enum wallet_orders_status_enum {
+enum WalletOrdersStatusEnum {
   waiting_for_order        @map("waiting-for-order")
   received_order           @map("received-order")
   waiting_for_reservation  @map("waiting-for-reservation")
