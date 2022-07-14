@@ -12,6 +12,7 @@ import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
+import * as Sentry from '@sentry/browser';
 
 export interface SafesResourceStrategy {
   bridgedDaiTokenSymbol: BridgedTokenSymbol;
@@ -195,8 +196,27 @@ export class Safes extends Resource<Args> {
           individualUpdate.blockNumber > this.graphData.blockNumber
             ? individualUpdate.safe
             : graphDataSafe;
+      } else if (graphDataSafe) {
+        selectedSafe = graphDataSafe;
+      } else if (individualUpdate) {
+        selectedSafe = individualUpdate.safe;
       } else {
-        selectedSafe = graphDataSafe ?? individualUpdate.safe;
+        let e = new Error(
+          `Safe with address "${address}" was not found in graph data or individual update data`
+        );
+
+        Sentry.withScope((scope) => {
+          // we want to know if there are actually any addresses available
+          scope.setExtras({
+            account: this.args.named.walletAddress,
+            graphData: this.graphData.safes.map((s) => s.address),
+            individual: Object.keys(this.individualSafeUpdateData),
+          });
+          Sentry.captureException(e);
+          scope.clear();
+        });
+
+        throw e;
       }
 
       if (isTrackedPrepaidCardSafe(this.safeReferences[address])) {

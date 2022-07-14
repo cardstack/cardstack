@@ -233,6 +233,14 @@ export default abstract class Layer2ChainWeb3Strategy
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
           session: this.connector?.session,
         });
+        Sentry.addBreadcrumb({
+          type: 'debug',
+          message: 'Layer 2 account changed',
+          data: {
+            account: accounts[0],
+          },
+          level: Sentry.Severity.Info,
+        });
       } catch (e) {
         console.error(
           'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
@@ -255,6 +263,11 @@ export default abstract class Layer2ChainWeb3Strategy
     });
 
     this.connector.on('disconnect', (error) => {
+      Sentry.addBreadcrumb({
+        type: 'debug',
+        message: 'Layer 2 disconnected',
+        level: Sentry.Severity.Info,
+      });
       if (error) {
         console.error('error disconnecting', error);
         throw error;
