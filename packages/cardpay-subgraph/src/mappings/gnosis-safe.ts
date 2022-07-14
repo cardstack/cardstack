@@ -122,7 +122,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
         safeTxEntity.safeTxGas.toString(),
         safeTxEntity.baseGas.toString(),
         safeTxEntity.gasPrice.toString(),
-        safeTxEntity.gasToken,
+        safeTxEntity.gasToken as string,
         safeTxEntity.refundReceiver,
         safeTxEntity.signatures.toHex(),
       ]

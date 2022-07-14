@@ -41,7 +41,14 @@ export function makeTransaction(event: ethereum.Event): void {
   let txEntity = new Transaction(event.transaction.hash.toHex());
   txEntity.timestamp = event.block.timestamp;
   txEntity.blockNumber = event.block.number;
-  txEntity.gasUsed = event.transaction.gasUsed;
+
+  if (event.receipt === null) {
+    txEntity.gasUsed = new BigInt(0);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    txEntity.gasUsed = event.receipt!.gasUsed;
+  }
+
   txEntity.save();
 }
 
@@ -157,7 +164,7 @@ export function makePrepaidCardPayment(
   paymentEntity.blockNumber = event.block.number;
   paymentEntity.prepaidCard = prepaidCard;
   paymentEntity.prepaidCardOwner = prepaidCardEntity.owner;
-  if (merchantSafe != null) {
+  if (merchantSafe !== null) {
     let merchantSafeEntity = MerchantSafe.load(merchantSafe);
     if (merchantSafeEntity != null) {
       paymentEntity.merchantSafe = merchantSafe;
@@ -171,7 +178,8 @@ export function makePrepaidCardPayment(
       return;
     }
   }
-  if (spendAmount == null) {
+
+  if (spendAmount === null) {
     spendAmount = convertToSpend(Address.fromString(issuingToken), issuingTokenAmount);
   }
   paymentEntity.issuingToken = issuingToken;
@@ -182,8 +190,8 @@ export function makePrepaidCardPayment(
   paymentEntity.historicPrepaidCardFaceValue = faceValue;
   paymentEntity.save();
 
-  if (merchantSafe != null) {
-    let revenueEntity = makeMerchantRevenue(merchantSafe, issuingToken);
+  if (merchantSafe !== null) {
+    let revenueEntity = makeMerchantRevenue(merchantSafe as string, issuingToken);
 
     let date = dayMonthYearFromEventTimestamp(event);
     let dateStr = date.year.toString() + '-' + date.month.toString() + '-' + date.day.toString();
