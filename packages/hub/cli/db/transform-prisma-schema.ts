@@ -91,7 +91,7 @@ async function fixPrismaFile() {
     }
 
     // Add the @@map to the table name for the model
-    if (!hasAddedModelMap && (line.match(/\s+@@/) || line === '}')) {
+    if (!hasAddedModelMap && (line.match(/\s+@@map/) || line === '}')) {
       if (line === '}') {
         fixedText.push('');
         fixedText.push(`  @@map("${currentModelName}")`);
