@@ -207,7 +207,7 @@ export class Safes extends Resource<Args> {
         Sentry.withScope((scope) => {
           // we want to know if there are actually any addresses available
           scope.setExtras({
-            account: this.args.named.walletAddress,
+            account: this.currentWalletAddress,
             graphData: this.graphData.safes.map((s) => s.address),
             individual: Object.keys(this.individualSafeUpdateData),
           });
