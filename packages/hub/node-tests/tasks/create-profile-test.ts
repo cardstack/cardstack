@@ -2,12 +2,12 @@ import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
 import CreateProfile from '../../tasks/create-profile';
 import shortUUID from 'short-uuid';
-import JobTicketsQueries from '../../queries/job-tickets';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { encodeDID } from '@cardstack/did-resolver';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
-let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
+let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
@@ -64,26 +64,33 @@ describe('CreateProfileTask', function () {
   setupSentry(this);
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
-  this.beforeEach(function () {
+  this.beforeEach(async function () {
     registry(this).register('cardpay', StubCardPay);
     registry(this).register('relay', StubRelayService, { type: 'service' });
-
-    registeringShouldError = false;
-    subgraphQueryShouldBeNull = false;
   });
 
   let { getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+
+    registeringShouldError = false;
+    subgraphQueryShouldBeNull = false;
+
     jobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({ id: jobTicketId, jobType: 'create-profile', ownerAddress: '0x000' });
+    await prisma.job_tickets.create({
+      data: {
+        id: jobTicketId,
+        job_type: 'create-profile',
+        owner_address: '0x0000000000000000000000000000000000000000',
+      },
+    });
 
     merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
     merchantInfosId = shortUUID.uuid();
     await merchantInfoQueries.insert({
       id: merchantInfosId,
-      ownerAddress: '0x000',
+      ownerAddress: '0x0000000000000000000000000000000000000000',
       name: '',
       slug: '',
       color: '',
@@ -98,15 +105,14 @@ describe('CreateProfileTask', function () {
       'job-ticket-id': jobTicketId,
       'merchant-info-id': merchantInfosId,
     });
-
     expect(registerProfileCalls).to.equal(1);
-    expect(registeredAddress).to.equal('0x000');
+    expect(registeredAddress).to.equal('0x0000000000000000000000000000000000000000');
     expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
+    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('success');
     expect(jobTicket?.result).to.deep.equal({ id: mockMerchantSafeAddress });
   });
@@ -119,7 +125,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
+    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
 
@@ -138,7 +144,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
+    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({
       error: `Error: subgraph query for transaction ${mockTransactionHash} returned no results`,

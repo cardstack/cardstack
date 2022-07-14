@@ -4,7 +4,7 @@ import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
-import JobTicketsQueries from '../../queries/job-tickets';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -30,6 +30,8 @@ class StubInAppPurchases {
   }
 }
 
+let prisma: ExtendedPrismaClient;
+
 describe('POST /api/profile-purchases', function () {
   setupSentry(this);
   let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
@@ -45,15 +47,15 @@ describe('POST /api/profile-purchases', function () {
   });
 
   let { request, getContainer } = setupHub(this);
-  let merchantInfosQueries: MerchantInfoQueries,
-    cardSpacesQueries: CardSpaceQueries,
-    jobTicketsQueries: JobTicketsQueries;
 
   this.beforeEach(async function () {
-    jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
-    merchantInfosQueries = await getContainer().lookup('merchant-info', { type: 'query' });
-    cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
+    let container = getContainer();
+    prisma = await (await container.lookup('prisma-manager')).getClient();
+    merchantInfosQueries = await container.lookup('merchant-info', { type: 'query' });
+    cardSpacesQueries = await container.lookup('card-space', { type: 'query' });
   });
+
+  let merchantInfosQueries: MerchantInfoQueries, cardSpacesQueries: CardSpaceQueries;
 
   it('validates the purchase, persists merchant information, returns a job ticket, and queues a single-attempt CreateProfile task', async function () {
     let merchantId,
@@ -143,9 +145,9 @@ describe('POST /api/profile-purchases', function () {
     let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
     expect(cardSpaceRecord).to.exist;
 
-    let jobTicketRecord = await jobTicketsQueries.find({ id: jobTicketId! });
+    let jobTicketRecord = await prisma.job_tickets.findUnique({ where: { id: jobTicketId! } });
     expect(jobTicketRecord?.state).to.equal('pending');
-    expect(jobTicketRecord?.ownerAddress).to.equal(stubUserAddress);
+    expect(jobTicketRecord?.owner_address).to.equal(stubUserAddress);
     expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId });
     expect(jobTicketRecord?.spec).to.deep.equal({ maxAttempts: 1 });
 
@@ -156,19 +158,21 @@ describe('POST /api/profile-purchases', function () {
 
   it('returns the existing job ticket if the request is a duplicate', async function () {
     let existingJobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({
-      id: existingJobTicketId,
-      jobType: 'create-profile',
-      ownerAddress: stubUserAddress,
-      payload: {
-        'another-payload': 'okay',
-      },
-      sourceArguments: {
-        provider: 'a-provider',
-        receipt: {
-          'a-receipt': 'yes',
+    await prisma.job_tickets.create({
+      data: {
+        id: existingJobTicketId,
+        job_type: 'create-profile',
+        owner_address: stubUserAddress,
+        payload: {
+          'another-payload': 'okay',
         },
-        somethingelse: 'hmm',
+        source_arguments: {
+          provider: 'a-provider',
+          receipt: {
+            'a-receipt': 'yes',
+          },
+          somethingelse: 'hmm',
+        },
       },
     });
 
@@ -237,17 +241,19 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects when the purchase receipt has already been used', async function () {
-    await jobTicketsQueries.insert({
-      id: shortUUID.uuid(),
-      jobType: 'create-profile',
-      ownerAddress: '0xsomeoneelse',
-      payload: {
-        'another-payload': 'okay',
-      },
-      sourceArguments: {
-        provider: 'a-provider',
-        receipt: {
-          'a-receipt': 'yes',
+    await prisma.job_tickets.create({
+      data: {
+        id: shortUUID.uuid(),
+        job_type: 'create-profile',
+        owner_address: '0xsomeoneelse',
+        payload: {
+          'another-payload': 'okay',
+        },
+        source_arguments: {
+          provider: 'a-provider',
+          receipt: {
+            'a-receipt': 'yes',
+          },
         },
       },
     });

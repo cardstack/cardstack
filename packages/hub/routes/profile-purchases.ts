@@ -7,17 +7,17 @@ import { CardSpace } from './card-spaces';
 import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
-import { JobTicket } from './job-tickets';
 import * as Sentry from '@sentry/node';
+import { job_tickets } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
 
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
-  jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
 
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
@@ -45,12 +45,23 @@ export default class ProfilePurchasesRoute {
       receipt,
     };
 
-    let alreadyCreatedJobTicket = await this.jobTicketsQueries.find({
-      jobType: 'create-profile',
-      ownerAddress: ctx.state.userAddress,
-      sourceArguments,
-    });
+    let prisma = await this.prismaManager.getClient();
+    let alreadyCreatedJobTicket;
 
+    try {
+      // prisma does not support postgres' @> object containment operator, so we're using a raw query here
+      let rows = await prisma.$queryRaw<job_tickets[]>`
+        SELECT * from job_tickets
+        WHERE
+          job_type = 'create-profile'
+          AND owner_address = ${ctx.state.userAddress}
+          AND source_arguments @> ${sourceArguments}
+        LIMIT 1
+      `;
+      alreadyCreatedJobTicket = rows[0];
+    } catch (e) {
+      console.log({ e });
+    }
     if (alreadyCreatedJobTicket) {
       ctx.status = 200;
       ctx.body = this.jobTicketSerializer.serialize(alreadyCreatedJobTicket);
@@ -149,9 +160,11 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let alreadyUsedReceipt = await this.jobTicketsQueries.find({
-      jobType: 'create-profile',
-      sourceArguments,
+    let alreadyUsedReceipt = await prisma.job_tickets.findFirst({
+      where: {
+        job_type: 'create-profile',
+        source_arguments: { equals: sourceArguments },
+      },
     });
 
     if (alreadyUsedReceipt) {
@@ -213,16 +226,17 @@ export default class ProfilePurchasesRoute {
     });
 
     let jobTicketId = shortUuid.uuid();
-    let jobTicket = {
-      id: jobTicketId,
-      jobType: 'create-profile',
-      ownerAddress: ctx.state.userAddress,
-      payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
-      spec: { maxAttempts: 1 },
-      sourceArguments,
-    };
 
-    let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket as unknown as JobTicket);
+    let insertedJobTicket = await prisma.job_tickets.create({
+      data: {
+        id: jobTicketId,
+        job_type: 'create-profile',
+        owner_address: ctx.state.userAddress,
+        payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
+        spec: { maxAttempts: 1 },
+        source_arguments: sourceArguments,
+      },
+    });
 
     this.workerClient.addJob(
       'create-profile',

@@ -27,7 +27,8 @@ const merchantCreationsQuery = `
 
 export default class CreateProfile {
   cardpay = inject('cardpay');
-  jobTickets = query('job-tickets', { as: 'jobTickets' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
+
   merchantInfoQueries = query('merchant-info', {
     as: 'merchantInfoQueries',
   });
@@ -42,6 +43,8 @@ export default class CreateProfile {
     'job-ticket-id': string;
     'merchant-info-id': string;
   }) {
+    let prisma = await this.prismaManager.getClient();
+
     try {
       let merchantInfo = (await this.merchantInfoQueries.fetch({ id: merchantInfoId }))[0];
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfoId });
@@ -60,18 +63,30 @@ export default class CreateProfile {
         throw new Error(`subgraph query for transaction ${profileRegistrationTxHash} returned no results`);
       }
 
-      await this.jobTickets.update(
-        jobTicketId,
-        { id: merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id },
-        'success'
-      );
+      await prisma.job_tickets.update({
+        where: { id: jobTicketId },
+        data: {
+          result: {
+            id: merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id,
+          },
+          state: 'success',
+        },
+      });
 
       this.workerClient.addJob('persist-off-chain-merchant-info', { id: merchantInfoId });
     } catch (error) {
       let errorString = (error as Error).toString();
       Sentry.captureException(error);
       log.error(errorString);
-      await this.jobTickets.update(jobTicketId, { error: errorString }, 'failed');
+      await prisma.job_tickets.update({
+        where: { id: jobTicketId },
+        data: {
+          result: {
+            error: errorString,
+          },
+          state: 'failed',
+        },
+      });
     }
   }
 }

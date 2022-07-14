@@ -1,8 +1,8 @@
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-import { JobTicket } from '../../routes/job-tickets';
+import { job_tickets } from '@prisma/client';
 
 export default class JobTicketSerializer {
-  serialize(model: JobTicket): JSONAPIDocument {
+  serialize(model: job_tickets): JSONAPIDocument {
     let attributes: any = {
       state: model.state,
     };

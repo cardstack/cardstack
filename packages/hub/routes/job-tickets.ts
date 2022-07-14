@@ -1,28 +1,16 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { query } from '@cardstack/hub/queries';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import shortUUID from 'short-uuid';
 import { KnownTasks } from '@cardstack/hub/tasks';
-
-export interface JobTicket {
-  id: string;
-  jobType: keyof KnownTasks; // TODO: how do we know that this is true?
-  ownerAddress: string;
-  payload: any;
-  result: any;
-  spec: any;
-  state?: string;
-  sourceArguments?: any;
-}
 
 export default class JobTicketsRoute {
   jobTicketSerializer = inject('job-ticket-serializer', {
     as: 'jobTicketSerializer',
   });
 
-  jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
@@ -33,10 +21,9 @@ export default class JobTicketsRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
-
     let id = ctx.params.id;
-    let jobTicket = await this.jobTicketsQueries.find({ id });
-
+    let prisma = await this.prismaManager.getClient();
+    let jobTicket = await prisma.job_tickets.findUnique({ where: { id } });
     if (!jobTicket) {
       ctx.body = {
         errors: [
@@ -55,7 +42,7 @@ export default class JobTicketsRoute {
 
     let requestingUserAddress = ctx.state.userAddress;
 
-    if (jobTicket.ownerAddress !== requestingUserAddress) {
+    if (jobTicket.owner_address !== requestingUserAddress) {
       ctx.body = {
         errors: [
           {
@@ -80,8 +67,9 @@ export default class JobTicketsRoute {
       return;
     }
 
+    let prisma = await this.prismaManager.getClient();
     let id = ctx.params.id;
-    let jobTicketToRetry = await this.jobTicketsQueries.find({ id });
+    let jobTicketToRetry = await prisma.job_tickets.findUnique({ where: { id } });
 
     if (!jobTicketToRetry) {
       ctx.body = {
@@ -101,7 +89,7 @@ export default class JobTicketsRoute {
 
     let requestingUserAddress = ctx.state.userAddress;
 
-    if (jobTicketToRetry.ownerAddress !== requestingUserAddress) {
+    if (jobTicketToRetry.owner_address !== requestingUserAddress) {
       ctx.body = {
         errors: [
           {
@@ -131,18 +119,20 @@ export default class JobTicketsRoute {
       return;
     }
 
-    this.workerClient.addJob(jobTicketToRetry.jobType, jobTicketToRetry.payload, jobTicketToRetry.spec);
+    let taskName = jobTicketToRetry.job_type as unknown as keyof KnownTasks;
+    let payload = jobTicketToRetry.payload as any;
+    let taskSpec = jobTicketToRetry.spec as any;
+    this.workerClient.addJob(taskName, payload, taskSpec);
 
-    let newJobTicket: JobTicket | null = {
-      id: shortUUID.uuid(),
-      jobType: jobTicketToRetry.jobType,
-      ownerAddress: jobTicketToRetry.ownerAddress,
-      payload: jobTicketToRetry.payload,
-      result: null,
-      spec: jobTicketToRetry.spec,
-    };
-
-    newJobTicket = await this.jobTicketsQueries.insert(newJobTicket);
+    let newJobTicket = await prisma.job_tickets.create({
+      data: {
+        id: shortUUID.uuid(),
+        job_type: jobTicketToRetry.job_type,
+        owner_address: jobTicketToRetry.owner_address,
+        payload: jobTicketToRetry.payload ?? undefined,
+        spec: jobTicketToRetry.spec ?? undefined,
+      },
+    });
 
     ctx.body = this.jobTicketSerializer.serialize(newJobTicket!);
     ctx.type = 'application/vnd.api+json';
