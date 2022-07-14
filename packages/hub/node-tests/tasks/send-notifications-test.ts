@@ -217,12 +217,12 @@ describe('SendNotificationsTask requested entity not found', function () {
   });
 
   it('should disable the push notification registration', async function () {
-    await prisma.push_notification_registrations.create({
+    await prisma.pushNotificationRegistration.create({
       data: {
         id: shortUUID.uuid(),
-        push_client_id: newlyAddedNotification.pushClientId,
-        owner_address: 'existing-owner-address',
-        disabled_at: null,
+        pushClientId: newlyAddedNotification.pushClientId,
+        ownerAddress: 'existing-owner-address',
+        disabledAt: null,
       },
     });
 
@@ -230,15 +230,15 @@ describe('SendNotificationsTask requested entity not found', function () {
     let subject = await getContainer().instantiate(SendNotifications);
     await subject.perform(newlyAddedNotification, helpers);
 
-    let records = await prisma.push_notification_registrations.findMany({
+    let records = await prisma.pushNotificationRegistration.findMany({
       where: {
-        owner_address: 'existing-owner-address',
-        push_client_id: newlyAddedNotification.pushClientId,
+        ownerAddress: 'existing-owner-address',
+        pushClientId: newlyAddedNotification.pushClientId,
       },
     });
 
     expect(records.length).to.equal(1);
-    expect(records[0].disabled_at).to.exist;
+    expect(records[0].disabledAt).to.exist;
   });
 });
 

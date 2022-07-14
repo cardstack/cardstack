@@ -14,13 +14,13 @@ export default class PrepaidCardPatternsRoute {
 
   async get(ctx: Koa.Context) {
     try {
-      let result = await (await this.prismaManager.getClient()).prepaid_card_patterns.findMany();
+      let result = await (await this.prismaManager.getClient()).prepaidCardPattern.findMany();
       let data = result.map((row) => {
         return {
           id: row.id,
           type: 'prepaid-card-patterns',
           attributes: {
-            'pattern-url': row.pattern_url,
+            'pattern-url': row.patternUrl,
             description: row.description,
           },
         };

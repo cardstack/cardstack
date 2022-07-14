@@ -6,16 +6,16 @@ describe('GET /api/prepaid-card-patterns', function () {
   this.beforeEach(async function () {
     let prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
 
-    await prismaClient.prepaid_card_patterns.createMany({
+    await prismaClient.prepaidCardPattern.createMany({
       data: [
         {
           id: '543423cb-de7e-44c2-a9e1-902b4648b8fb',
-          pattern_url: 'https://example.com/a.svg',
+          patternUrl: 'https://example.com/a.svg',
           description: 'Pattern A',
         },
         {
           id: '72b654e4-dd4a-4a89-a78c-43a9baa7f354',
-          pattern_url: 'https://example.com/b.svg',
+          patternUrl: 'https://example.com/b.svg',
           description: 'Pattern B',
         },
       ],

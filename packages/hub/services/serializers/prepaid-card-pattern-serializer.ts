@@ -1,13 +1,13 @@
 import { inject } from '@cardstack/di';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-import { prepaid_card_patterns } from '@prisma/client';
+import { PrepaidCardPattern } from '@prisma/client';
 
 export default class PrepaidCardPatternSerializer {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async serialize(id: string): Promise<JSONAPIDocument>;
-  async serialize(model: prepaid_card_patterns): Promise<JSONAPIDocument>;
-  async serialize(content: string | prepaid_card_patterns): Promise<JSONAPIDocument> {
+  async serialize(model: PrepaidCardPattern): Promise<JSONAPIDocument>;
+  async serialize(content: string | PrepaidCardPattern): Promise<JSONAPIDocument> {
     if (typeof content === 'string') {
       content = await this.loadPrepaidCardPattern(content);
     }
@@ -15,7 +15,7 @@ export default class PrepaidCardPatternSerializer {
       id: content.id,
       type: 'prepaid-card-patterns',
       attributes: {
-        'pattern-url': content.pattern_url,
+        'pattern-url': content.patternUrl,
         description: content.description,
       },
     };
@@ -25,16 +25,16 @@ export default class PrepaidCardPatternSerializer {
     return result;
   }
 
-  async loadPrepaidCardPattern(id: string): Promise<prepaid_card_patterns> {
+  async loadPrepaidCardPattern(id: string): Promise<PrepaidCardPattern> {
     let prisma = await this.prismaManager.getClient();
-    let pattern = prisma.prepaid_card_patterns.findUnique({ where: { id } });
+    let pattern = prisma.prepaidCardPattern.findUnique({ where: { id } });
 
     if (!pattern) {
       return Promise.reject(new Error(`No prepaid_card_pattern record found with id ${id}`));
     }
 
     // TODO why? If it’s already known to not be null. CS-4255
-    return pattern as unknown as prepaid_card_patterns;
+    return pattern as unknown as PrepaidCardPattern;
   }
 }
 

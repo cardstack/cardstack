@@ -39,13 +39,13 @@ export default class PrepaidCardCustomizationsRoute {
     let newId = shortUuid.uuid();
 
     try {
-      await prisma.prepaid_card_customizations.create({
+      await prisma.prepaidCardCustomization.create({
         data: {
           id: newId,
-          owner_address: ownerAddress,
-          issuer_name: issuerName,
-          color_scheme_id: colorSchemeId,
-          pattern_id: patternId,
+          ownerAddress,
+          issuerName,
+          colorSchemeId,
+          patternId,
         },
       });
     } catch (e: any) {
