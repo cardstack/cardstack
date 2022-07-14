@@ -292,16 +292,22 @@ enum DiscordBotsStatusEnum {
   listening
   disconnected
   unresponsive
+
+  @@map("discord_bots_status_enum")
 }
 
 enum NotificationPreferencesStatusEnum {
   enabled
   disabled
+
+  @@map("notification_preferences_status_enum")
 }
 
 enum NotificationTypesStatusEnum {
   enabled
   disabled
+
+  @@map("notification_types_status_enum")
 }
 
 enum WalletOrdersStatusEnum {
@@ -311,4 +317,6 @@ enum WalletOrdersStatusEnum {
   provisioning
   error_provisioning       @map("error-provisioning")
   complete
+
+  @@map("wallet_orders_status_enum")
 }

@@ -55,7 +55,7 @@ async function fixPrismaFile() {
   let currentModelName: string | null = null;
   let hasAddedModelMap = false;
 
-  for (let line of textAsArray) {
+  for (let [index, line] of textAsArray.entries()) {
     // Are we at the start of a model definition
     const modelMatch = line.match(/^model (\w+) {$/);
     if (modelMatch) {
@@ -72,6 +72,7 @@ async function fixPrismaFile() {
     // Are we at the start of an enum definition
     const enumMatch = line.match(/^enum (\w+) {$/);
     if (enumMatch) {
+      hasAddedModelMap = false;
       currentModelName = enumMatch[1];
       const pascalEnumName = snakeToPascal(currentModelName);
       fixedText.push(`enum ${pascalEnumName} {`);
