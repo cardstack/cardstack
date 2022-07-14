@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
 
 export let command = 'transform-prisma-schema';
-export let describe = 'yes';
+export let describe = 'Transform schema.prisma to camelCase model and property names';
 export let builder = {};
 
 // Adapted from here: https://github.com/prisma/prisma/discussions/2530#discussioncomment-17535
