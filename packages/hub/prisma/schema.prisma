@@ -50,11 +50,11 @@ model Card {
 }
 
 model DiscordBot {
-  botId         String                   @id @map("bot_id")
-  botType       String                   @map("bot_type")
-  status        discord_bots_status_enum
-  createdAt     DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
-  lastMessageId String?                  @map("last_message_id")
+  botId         String                @id @map("bot_id")
+  botType       String                @map("bot_type")
+  status        DiscordBotsStatusEnum
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
+  lastMessageId String?               @map("last_message_id")
 
   @@index([botType, status], map: "discord_bots_bot_type_status_index")
   @@map("discord_bots")
@@ -102,17 +102,16 @@ model ExchangeRate {
 }
 
 model JobTicket {
-  id               String   @id @db.Uuid
-  jobType          String   @map("job_type")
-  ownerAddress     String   @map("owner_address")
-  payload          Json?
-  result           Json?
-  state            String   @default("pending")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
-  spec             Json?
-  sourceArguments Json? @map("source_arguments")
-  squeee           String?
+  id              String   @id @db.Uuid
+  jobType         String   @map("job_type")
+  ownerAddress    String   @map("owner_address")
+  payload         Json?
+  result          Json?
+  state           String   @default("pending")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+  spec            Json?
+  sourceArguments Json?    @map("source_arguments")
 
   @@index([jobType, ownerAddress, state], map: "job_tickets_job_type_owner_address_state_index")
   @@map("job_tickets")
@@ -140,12 +139,12 @@ model MerchantInfo {
 }
 
 model NotificationPreference {
-  ownerAddress       String                               @map("owner_address")
-  notificationTypeId String                               @map("notification_type_id") @db.Uuid
-  pushClientId       String                               @map("push_client_id")
-  status             notification_preferences_status_enum @default(enabled)
-  createdAt          DateTime                             @default(now()) @map("created_at") @db.Timestamp(6)
-  notificationTypes  NotificationType                     @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ownerAddress       String                            @map("owner_address")
+  notificationTypeId String                            @map("notification_type_id") @db.Uuid
+  pushClientId       String                            @map("push_client_id")
+  status             NotificationPreferencesStatusEnum @default(enabled)
+  createdAt          DateTime                          @default(now()) @map("created_at") @db.Timestamp(6)
+  notificationTypes  NotificationType                  @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([ownerAddress, notificationTypeId, pushClientId], map: "notification_preferences_owner_address_notification_type_id_pus")
   @@index([ownerAddress], map: "notification_preferences_owner_address_index")
@@ -153,10 +152,10 @@ model NotificationPreference {
 }
 
 model NotificationType {
-  id                      String                         @id @db.Uuid
-  notificationType        String                         @map("notification_type")
-  defaultStatus          notification_types_status_enum @default(enabled) @map("default_status")
-  createdAt               DateTime                       @default(now()) @map("created_at") @db.Timestamp(6)
+  id                      String                      @id @db.Uuid
+  notificationType        String                      @map("notification_type")
+  defaultStatus           NotificationTypesStatusEnum @default(enabled)
+  createdAt               DateTime                    @default(now()) @map("created_at") @db.Timestamp(6)
   notificationPreferences NotificationPreference[]
 
   @@map("notification_types")
@@ -236,7 +235,7 @@ model SentPushNotification {
   notificationType  String?  @map("notification_type")
   notificationTitle String?  @map("notification_title")
   notificationBody  String?  @map("notification_body")
-  notificationData Json?    @db.Json @map("notification_data")
+  notificationData  Json?    @map("notification_data") @db.Json
   messageId         String?  @map("message_id")
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
@@ -259,15 +258,15 @@ model Upload {
 }
 
 model WalletOrder {
-  orderId             String                    @id @map("order_id")
-  userAddress         String                    @map("user_address")
-  walletId            String                    @map("wallet_id")
-  status              wallet_orders_status_enum
-  custodialTransferId String?                   @map("custodial_transfer_id")
-  createdAt           DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt           DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
-  reservationId       String?                   @map("reservation_id") @db.Uuid
-  reservations        Reservation?              @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
+  orderId             String                 @id @map("order_id")
+  userAddress         String                 @map("user_address")
+  walletId            String                 @map("wallet_id")
+  status              WalletOrdersStatusEnum
+  custodialTransferId String?                @map("custodial_transfer_id")
+  createdAt           DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime               @default(now()) @map("updated_at") @db.Timestamp(6)
+  reservationId       String?                @map("reservation_id") @db.Uuid
+  reservations        Reservation?           @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
 
   @@index([custodialTransferId, status], map: "wallet_orders_custodial_transfer_id_status_index")
   @@index([reservationId], map: "wallet_orders_reservation_id_index")
@@ -275,19 +274,19 @@ model WalletOrder {
 }
 
 model WyrePrice {
-  sku                   String   @id
-  sourceCurrency        String   @map("source_currency")
-  destCurrency          String   @map("dest_currency")
-  sourceCurrencyPrice Decimal  @db.Decimal @map("source_currency_price")
-  includesFee           Boolean  @default(false) @map("includes_fee")
-  disabled              Boolean  @default(false)
-  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  sku                 String   @id
+  sourceCurrency      String   @map("source_currency")
+  destCurrency        String   @map("dest_currency")
+  sourceCurrencyPrice Decimal  @map("source_currency_price") @db.Decimal
+  includesFee         Boolean  @default(false) @map("includes_fee")
+  disabled            Boolean  @default(false)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
   @@index([disabled], map: "wyre_prices_disabled_index")
   @@map("wyre_prices")
 }
 
-enum discord_bots_status_enum {
+enum DiscordBotsStatusEnum {
   connecting
   connected
   listening
@@ -295,21 +294,21 @@ enum discord_bots_status_enum {
   unresponsive
 }
 
-enum notification_preferences_status_enum {
+enum NotificationPreferencesStatusEnum {
   enabled
   disabled
 }
 
-enum notification_types_status_enum {
+enum NotificationTypesStatusEnum {
   enabled
   disabled
 }
 
-enum wallet_orders_status_enum {
-  waiting_for_order
-  received_order
-  waiting_for_reservation
+enum WalletOrdersStatusEnum {
+  waiting_for_order        @map("waiting-for-order")
+  received_order           @map("received-order")
+  waiting_for_reservation  @map("waiting-for-reservation")
   provisioning
-  error_provisioning
+  error_provisioning       @map("error-provisioning")
   complete
 }
