@@ -45,7 +45,8 @@
     "xdai-blue-status": "ts-node ./lib/sync-status.ts xdai-blue",
     "remove-localchain": "graph remove --node http://localhost:8020 localchain",
     "create-localchain": "graph create --node http://localhost:8020 localchain",
-    "deploy-localchain": "graph deploy localchain --ipfs http://localhost:5001 --node http://localhost:8020"
+    "deploy-localchain": "graph deploy localchain --ipfs http://localhost:5001 --node http://localhost:8020",
+    "deploy-local-xdai-fork": "ts-node ./lib/get-subgraph-deployment-id.ts https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai | xargs -o sh -c 'yarn run graph deploy local-subgraph --ipfs http://localhost:5001 --node http://localhost:8020 --debug-fork=\"$0\"'"
   },
   "devDependencies": {
     "@cardstack/cardpay-sdk": "1.0.7",
