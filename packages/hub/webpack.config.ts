@@ -106,6 +106,7 @@ module.exports = {
       'graceful-fs',
       'jsonfile',
       'universalify',
+      '@prisma/client', // FIXME Prisma-related, move elsewhere?
     ].map(
       (pkg) =>
         new CopyPlugin({
