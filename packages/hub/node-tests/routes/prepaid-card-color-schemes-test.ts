@@ -8,20 +8,20 @@ describe('GET /api/prepaid-card-color-schemes', function () {
   this.beforeEach(async function () {
     prisma = await (await getContainer().lookup('prisma-manager')).getClient();
 
-    await prisma.prepaid_card_color_schemes.createMany({
+    await prisma.prepaidCardColorScheme.createMany({
       data: [
         {
           id: 'C169F7FE-D83C-426C-805E-DF1D695C30F1',
           background: '#efefef',
-          pattern_color: 'black',
-          text_color: 'black',
+          patternColor: 'black',
+          textColor: 'black',
           description: 'Solid Gray',
         },
         {
           id: '5058B874-CE21-4FC4-958C-B6641E1DC175',
           background: 'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
-          pattern_color: 'white',
-          text_color: 'white',
+          patternColor: 'white',
+          textColor: 'white',
           description: 'Awesome Gradient',
         },
       ],

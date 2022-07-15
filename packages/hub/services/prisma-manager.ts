@@ -2,24 +2,24 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
 
-type push_notification_registrations_getter = Prisma.push_notification_registrationsDelegate<any>;
+type PushNotificationRegistrationGetter = Prisma.PushNotificationRegistrationDelegate<any>;
 
-interface ExtendedPushNotificationRegistrations extends push_notification_registrations_getter {
+interface ExtendedPushNotificationRegistrations extends PushNotificationRegistrationGetter {
   upsertByOwnerAndPushClient({
     id,
-    owner_address,
-    push_client_id,
-    disabled_at,
+    ownerAddress,
+    pushClientId,
+    disabledAt,
   }: {
     id: string;
-    owner_address: string;
-    push_client_id: string;
-    disabled_at: Date | null;
-  }): ReturnType<push_notification_registrations_getter['upsert']>;
+    ownerAddress: string;
+    pushClientId: string;
+    disabledAt: Date | null;
+  }): ReturnType<PushNotificationRegistrationGetter['upsert']>;
 }
 
 export interface ExtendedPrismaClient extends PrismaClient {
-  push_notification_registrations: ExtendedPushNotificationRegistrations;
+  pushNotificationRegistration: ExtendedPushNotificationRegistrations;
 }
 
 export default class PrismaManager {
@@ -57,34 +57,34 @@ export default class PrismaManager {
   }
 
   private addConvenienceFunctions(client: PrismaClient) {
-    Object.assign(client.push_notification_registrations, {
+    Object.assign(client.pushNotificationRegistration, {
       upsertByOwnerAndPushClient({
         id,
-        owner_address,
-        push_client_id,
-        disabled_at = null,
+        ownerAddress,
+        pushClientId,
+        disabledAt = null,
       }: {
         id: string;
-        owner_address: string;
-        push_client_id: string;
-        disabled_at: Date | null;
+        ownerAddress: string;
+        pushClientId: string;
+        disabledAt: Date | null;
       }) {
-        return client.push_notification_registrations.upsert(
-          Prisma.validator<Prisma.push_notification_registrationsUpsertArgs>()({
+        return client.pushNotificationRegistration.upsert(
+          Prisma.validator<Prisma.PushNotificationRegistrationUpsertArgs>()({
             where: {
-              owner_address_push_client_id: {
-                owner_address,
-                push_client_id,
+              ownerAddress_pushClientId: {
+                ownerAddress,
+                pushClientId,
               },
             },
             create: {
               id: id,
-              owner_address,
-              push_client_id,
-              disabled_at,
+              ownerAddress,
+              pushClientId,
+              disabledAt,
             },
             update: {
-              disabled_at,
+              disabledAt,
             },
           })
         );

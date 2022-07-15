@@ -22,10 +22,10 @@ export default class NotificationPreferenceService {
     let pushClientIds;
 
     if (!pushClientId) {
-      let registrations = await prismaClient.push_notification_registrations.findMany({
-        where: { owner_address: ownerAddress, disabled_at: null },
+      let registrations = await prismaClient.pushNotificationRegistration.findMany({
+        where: { ownerAddress, disabledAt: null },
       });
-      pushClientIds = registrations.map((registration) => registration.push_client_id);
+      pushClientIds = registrations.map((registration) => registration.pushClientId);
     } else {
       pushClientIds = [pushClientId];
     }

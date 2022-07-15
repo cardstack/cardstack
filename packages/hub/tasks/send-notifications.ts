@@ -65,9 +65,9 @@ export default class SendNotificationsTask {
     } catch (e: any) {
       if (e.errorInfo?.code === 'messaging/registration-token-not-registered') {
         let prismaClient = await this.prismaManager.getClient();
-        await prismaClient.push_notification_registrations.updateMany({
-          where: { push_client_id: payload.pushClientId },
-          data: { disabled_at: new Date() },
+        await prismaClient.pushNotificationRegistration.updateMany({
+          where: { pushClientId: payload.pushClientId },
+          data: { disabledAt: new Date() },
         });
 
         helpers.logger.info(

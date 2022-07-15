@@ -27,13 +27,13 @@ export default class PushNotificationRegistrationsRoute {
 
     let pushNotificationRegistration = {
       id: shortUuid.uuid(),
-      owner_address: ctx.state.userAddress,
-      push_client_id: ctx.request.body.data.attributes['push-client-id'],
-      disabled_at: null,
+      ownerAddress: ctx.state.userAddress,
+      pushClientId: ctx.request.body.data.attributes['push-client-id'],
+      disabledAt: null,
     };
 
     let prisma = await this.prismaManager.getClient();
-    let record = await prisma.push_notification_registrations.upsertByOwnerAndPushClient(pushNotificationRegistration);
+    let record = await prisma.pushNotificationRegistration.upsertByOwnerAndPushClient(pushNotificationRegistration);
 
     let serialized = this.pushNotificationRegistrationSerialier.serialize(record);
 
@@ -49,11 +49,11 @@ export default class PushNotificationRegistrationsRoute {
 
     let prisma = await this.prismaManager.getClient();
 
-    await prisma.push_notification_registrations.delete({
+    await prisma.pushNotificationRegistration.delete({
       where: {
-        owner_address_push_client_id: {
-          owner_address: ctx.state.userAddress,
-          push_client_id: ctx.params.push_client_id,
+        ownerAddress_pushClientId: {
+          ownerAddress: ctx.state.userAddress,
+          pushClientId: ctx.params.push_client_id,
         },
       },
     });

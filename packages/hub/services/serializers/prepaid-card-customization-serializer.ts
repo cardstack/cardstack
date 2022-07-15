@@ -5,14 +5,10 @@ import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serial
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
+import { PrepaidCardCustomization } from '@prisma/client';
 
-interface PrepaidCardCustomization {
-  id: string;
-  issuerName: string;
-  ownerAddress: string;
-  colorSchemeId: string;
-  patternId: string;
-}
+type PrepaidCardCustomizationWithoutCreatedAt = Omit<PrepaidCardCustomization, 'createdAt'>;
+
 interface PrepaidCardCustomizationSerializationOptions {
   include: PrepaidCardCustomizationRelationship[];
 }
@@ -29,11 +25,11 @@ export default class PrepaidCardCustomizationSerializer {
 
   async serialize(id: string, options: Partial<PrepaidCardCustomizationSerializationOptions>): Promise<JSONAPIDocument>;
   async serialize(
-    model: PrepaidCardCustomization,
+    model: PrepaidCardCustomizationWithoutCreatedAt,
     options: Partial<PrepaidCardCustomizationSerializationOptions>
   ): Promise<JSONAPIDocument>;
   async serialize(
-    content: string | PrepaidCardCustomization,
+    content: string | PrepaidCardCustomizationWithoutCreatedAt,
     options: Partial<PrepaidCardCustomizationSerializationOptions> = {}
   ): Promise<JSONAPIDocument> {
     if (typeof content === 'string') {
@@ -80,7 +76,7 @@ export default class PrepaidCardCustomizationSerializer {
     return result;
   }
 
-  async loadPrepaidCardCustomization(id: string): Promise<PrepaidCardCustomization> {
+  async loadPrepaidCardCustomization(id: string): Promise<PrepaidCardCustomizationWithoutCreatedAt> {
     let db = await this.databaseManager.getClient();
     let queryResult = await db.query(
       'SELECT id, issuer_name, owner_address, pattern_id, color_scheme_id from prepaid_card_customizations WHERE id = $1',

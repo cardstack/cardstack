@@ -1,14 +1,7 @@
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-
-interface PrepaidCardColorScheme {
-  id: string;
-  background: string;
-  patternColor: string;
-  textColor: string;
-  description: string;
-}
+import { PrepaidCardColorScheme } from '@prisma/client';
 
 export default class PrepaidCardColorSchemeSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });

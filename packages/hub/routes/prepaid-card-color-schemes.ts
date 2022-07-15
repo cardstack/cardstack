@@ -14,15 +14,15 @@ export default class PrepaidCardColorSchemesRoute {
   async get(ctx: Koa.Context) {
     let prisma = await this.prismaManager.getClient();
     try {
-      let result = await prisma.prepaid_card_color_schemes.findMany();
+      let result = await prisma.prepaidCardColorScheme.findMany();
       let data = result.map((row) => {
         return {
           id: row.id,
           type: 'prepaid-card-color-schemes',
           attributes: {
             background: row.background,
-            'pattern-color': row.pattern_color,
-            'text-color': row.text_color,
+            'pattern-color': row.patternColor,
+            'text-color': row.textColor,
             description: row.description,
           },
         };
