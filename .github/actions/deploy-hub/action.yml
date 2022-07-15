@@ -28,13 +28,13 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
-    - name: Webpack build
-      run: yarn build
+    - name: Build Prisma client
+      run: yarn run prisma generate
       shell: bash
       working-directory: packages/hub
 
-    - name: Build Prisma client
-      run: yarn run prisma generate
+    - name: Webpack build
+      run: yarn build
       shell: bash
       working-directory: packages/hub
 
