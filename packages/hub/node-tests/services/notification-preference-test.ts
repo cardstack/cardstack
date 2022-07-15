@@ -2,13 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import { setupHub } from '../helpers/server';
 
 describe('NotificationPreferenceService', function () {
-  let { getContainer } = setupHub(this);
+  let { getPrisma, lookup } = setupHub(this);
   let prisma: PrismaClient;
 
   this.beforeEach(async function () {
-    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+    prisma = await getPrisma();
 
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
@@ -20,7 +20,7 @@ describe('NotificationPreferenceService', function () {
       'customer_payment',
       'enabled',
     ]);
-    let preferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
+    let preferenceQueries = await lookup('notification-preference', { type: 'query' });
 
     await prisma.pushNotificationRegistration.createMany({
       data: [
@@ -68,7 +68,7 @@ describe('NotificationPreferenceService', function () {
   });
 
   it('returns preferences for an EOA', async function () {
-    let service = await getContainer().lookup('notification-preference-service');
+    let service = await lookup('notification-preference-service');
 
     let preferences = await service.getPreferences('0x01');
 
@@ -103,7 +103,7 @@ describe('NotificationPreferenceService', function () {
   });
 
   it('returns which devices should receive a notification for an EOA and notification type', async function () {
-    let service = await getContainer().lookup('notification-preference-service');
+    let service = await lookup('notification-preference-service');
 
     expect(await service.getEligiblePushClientIds('0x01', 'customer_payment')).to.deep.equal(['124']);
     expect(await service.getEligiblePushClientIds('0x01', 'merchant_claim')).to.deep.equal(['123', '124']);

@@ -3,7 +3,7 @@ import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import Web3 from 'web3';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
-import { setupHub, registry } from '../helpers/server';
+import { setupHub, setupRegistry } from '../helpers/server';
 import { CONTRACT_EVENTS, HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
 
 class StubContracts {
@@ -61,18 +61,15 @@ class StubWeb3 {
 }
 
 describe('ContractSubscriptionEventHandler', function () {
-  let { getContainer } = setupHub(this);
-
-  setupSentry(this);
+  setupRegistry(this, ['contracts', StubContracts], ['web3-socket', StubWeb3]);
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+  let { lookup } = setupHub(this);
+  setupSentry(this);
 
   this.beforeEach(async function () {
-    registry(this).register('contracts', StubContracts);
-    registry(this).register('web3-socket', StubWeb3);
-
-    this.subject = await getContainer().lookup('contract-subscription-event-handler');
-    this.contracts = (await getContainer().lookup('contracts')) as unknown as StubContracts;
-    this.latestEventBlockQueries = await getContainer().lookup('latest-event-block', { type: 'query' });
+    this.subject = await lookup('contract-subscription-event-handler');
+    this.contracts = (await lookup('contracts')) as unknown as StubContracts;
+    this.latestEventBlockQueries = await lookup('latest-event-block', { type: 'query' });
 
     web3BlockNumber = 1234;
 

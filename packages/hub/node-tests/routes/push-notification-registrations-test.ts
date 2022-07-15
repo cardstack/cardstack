@@ -1,5 +1,5 @@
 import shortUuid from 'short-uuid';
-import { registry, setupHub } from '../helpers/server';
+import { setupHub, setupRegistry } from '../helpers/server';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 const stubNonce = 'abc:123';
@@ -28,185 +28,174 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe('POST /api/push-notification-registrations', async function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-  });
-  let { request, getContainer } = setupHub(this);
+describe('push-notification-registrations endpoints', function () {
+  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
+  let { request, getPrisma } = setupHub(this);
   let prisma: ExtendedPrismaClient;
-
   this.beforeEach(async function () {
-    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+    prisma = await getPrisma();
   });
 
-  it('returns 401 without bearer token', async function () {
-    await request()
-      .post('/api/push-notification-registrations')
-      .send({})
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(401)
-      .expect({
-        errors: [
-          {
-            status: '401',
-            title: 'No valid auth token',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
+  describe('POST /api/push-notification-registrations', function () {
+    it('returns 401 without bearer token', async function () {
+      await request()
+        .post('/api/push-notification-registrations')
+        .send({})
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(401)
+        .expect({
+          errors: [
+            {
+              status: '401',
+              title: 'No valid auth token',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
 
-  it('persists push notification registration', async function () {
-    let payload = {
-      data: {
-        type: 'push-notification-registration',
-        attributes: {
-          'push-client-id': 'FIREBASE_USER_ID',
-        },
-      },
-    };
-
-    await request()
-      .post('/api/push-notification-registrations')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
-      .expect(function (res) {
-        res.body.data.id = 'id';
-      })
-      .expect({
+    it('persists push notification registration', async function () {
+      let payload = {
         data: {
-          id: 'id',
           type: 'push-notification-registration',
           attributes: {
-            'owner-address': stubUserAddress,
             'push-client-id': 'FIREBASE_USER_ID',
-            'disabled-at': null,
           },
         },
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
+      };
 
-    let records = await prisma.pushNotificationRegistration.findMany({
-      where: {
+      await request()
+        .post('/api/push-notification-registrations')
+        .send(payload)
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(201)
+        .expect(function (res) {
+          res.body.data.id = 'id';
+        })
+        .expect({
+          data: {
+            id: 'id',
+            type: 'push-notification-registration',
+            attributes: {
+              'owner-address': stubUserAddress,
+              'push-client-id': 'FIREBASE_USER_ID',
+              'disabled-at': null,
+            },
+          },
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+
+      let records = await prisma.pushNotificationRegistration.findMany({
+        where: {
+          ownerAddress: stubUserAddress,
+          pushClientId: 'FIREBASE_USER_ID',
+        },
+      });
+
+      expect(records.length).to.equal(1);
+      expect(records[0].ownerAddress).to.equal(stubUserAddress);
+      expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
+    });
+
+    it('does not fail when registration is already present + it reenables the existing one', async function () {
+      await prisma.pushNotificationRegistration.upsertByOwnerAndPushClient({
+        id: shortUuid.uuid(),
         ownerAddress: stubUserAddress,
         pushClientId: 'FIREBASE_USER_ID',
-      },
-    });
+        disabledAt: new Date(),
+      });
 
-    expect(records.length).to.equal(1);
-    expect(records[0].ownerAddress).to.equal(stubUserAddress);
-    expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
-  });
-
-  it('does not fail when registration is already present + it reenables the existing one', async function () {
-    await prisma.pushNotificationRegistration.upsertByOwnerAndPushClient({
-      id: shortUuid.uuid(),
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
-      disabledAt: new Date(),
-    });
-
-    let payload = {
-      data: {
-        type: 'push-notification-registration',
-        attributes: {
-          'push-client-id': 'FIREBASE_USER_ID',
-        },
-      },
-    };
-
-    await request()
-      .post('/api/push-notification-registrations')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
-      .expect(function (res) {
-        res.body.data.id = 'id';
-      })
-      .expect({
+      let payload = {
         data: {
-          id: 'id',
           type: 'push-notification-registration',
           attributes: {
-            'owner-address': stubUserAddress,
             'push-client-id': 'FIREBASE_USER_ID',
-            'disabled-at': null,
           },
         },
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
+      };
 
-    let records = await prisma.pushNotificationRegistration.findMany({
-      where: {
-        ownerAddress: stubUserAddress,
-        pushClientId: 'FIREBASE_USER_ID',
-      },
-    });
-
-    expect(records.length).to.equal(1);
-    expect(records[0].ownerAddress).to.equal(stubUserAddress);
-    expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
-  });
-});
-
-describe('DELETE /api/push-notification-registrations', function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-  });
-  let { request, getContainer } = setupHub(this);
-  let prisma: ExtendedPrismaClient;
-
-  this.beforeEach(async function () {
-    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
-  });
-
-  it('returns 401 without bearer token', async function () {
-    await request()
-      .post('/api/push-notification-registrations')
-      .send({})
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(401)
-      .expect({
-        errors: [
-          {
-            status: '401',
-            title: 'No valid auth token',
+      await request()
+        .post('/api/push-notification-registrations')
+        .send(payload)
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(201)
+        .expect(function (res) {
+          res.body.data.id = 'id';
+        })
+        .expect({
+          data: {
+            id: 'id',
+            type: 'push-notification-registration',
+            attributes: {
+              'owner-address': stubUserAddress,
+              'push-client-id': 'FIREBASE_USER_ID',
+              'disabled-at': null,
+            },
           },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+
+      let records = await prisma.pushNotificationRegistration.findMany({
+        where: {
+          ownerAddress: stubUserAddress,
+          pushClientId: 'FIREBASE_USER_ID',
+        },
+      });
+
+      expect(records.length).to.equal(1);
+      expect(records[0].ownerAddress).to.equal(stubUserAddress);
+      expect(records[0].pushClientId).to.equal('FIREBASE_USER_ID');
+    });
   });
 
-  it('deletes push notification registration', async function () {
-    await prisma.pushNotificationRegistration.upsertByOwnerAndPushClient({
-      id: shortUuid.uuid(),
-      ownerAddress: stubUserAddress,
-      pushClientId: 'FIREBASE_USER_ID',
-      disabledAt: null,
+  describe('DELETE /api/push-notification-registrations', function () {
+    it('returns 401 without bearer token', async function () {
+      await request()
+        .post('/api/push-notification-registrations')
+        .send({})
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(401)
+        .expect({
+          errors: [
+            {
+              status: '401',
+              title: 'No valid auth token',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
     });
 
-    await request()
-      .delete(`/api/push-notification-registrations/FIREBASE_USER_ID`)
-      .send({})
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(200);
-
-    let records = await prisma.pushNotificationRegistration.findMany({
-      where: {
+    it('deletes push notification registration', async function () {
+      await prisma.pushNotificationRegistration.upsertByOwnerAndPushClient({
+        id: shortUuid.uuid(),
         ownerAddress: stubUserAddress,
         pushClientId: 'FIREBASE_USER_ID',
-      },
-    });
+        disabledAt: null,
+      });
 
-    expect(records.length).to.equal(0);
+      await request()
+        .delete(`/api/push-notification-registrations/FIREBASE_USER_ID`)
+        .send({})
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(200);
+
+      let records = await prisma.pushNotificationRegistration.findMany({
+        where: {
+          ownerAddress: stubUserAddress,
+          pushClientId: 'FIREBASE_USER_ID',
+        },
+      });
+
+      expect(records.length).to.equal(0);
+    });
   });
 });
