@@ -33,6 +33,11 @@ runs:
       shell: bash
       working-directory: packages/hub
 
+    - name: Build Prisma client
+      run: yarn run prisma generate
+      shell: bash
+      working-directory: packages/hub
+
     - name: Deploy server
       run: waypoint up --app=hub -plain
       shell: bash
