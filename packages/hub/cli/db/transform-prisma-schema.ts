@@ -155,7 +155,9 @@ async function fixPrismaFile() {
     fixedText.push(fixedLine);
   }
 
-  await fs.promises.writeFile(PRISMA_FILE_PATH, fixedText.join('\n'));
+  // Hack to replace doubled whitespace
+  const textToWrite = fixedText.join('\n').replace(/\n\n\n/g, '\n\n');
+  await fs.promises.writeFile(PRISMA_FILE_PATH, textToWrite);
 }
 
 fixPrismaFile();
