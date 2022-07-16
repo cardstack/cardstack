@@ -45,9 +45,13 @@ runs:
         limit-access-to-users: backspace
 
     - run: tree ./node_modules/.prisma
+      shell: bash
     - run: tree ./node_modules/@prisma
+      shell: bash
     - run: tree ../../node_modules/.prisma
+      shell: bash
     - run: tree ../../node_modules/@prisma
+      shell: bash
 
     - name: Deploy server
       run: waypoint up --app=hub -plain
