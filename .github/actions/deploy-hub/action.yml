@@ -38,6 +38,11 @@ runs:
       shell: bash
       working-directory: packages/hub
 
+    - run: tree ./node_modules/.prisma
+    - run: tree ./node_modules/@prisma
+    - run: tree ../../node_modules/.prisma
+    - run: tree ../../node_modules/@prisma
+
     - name: Deploy server
       run: waypoint up --app=hub -plain
       shell: bash
