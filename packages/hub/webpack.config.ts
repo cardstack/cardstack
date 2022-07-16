@@ -58,6 +58,16 @@ module.exports = {
       ],
     }),
 
+    // Prisma?????
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join('..', '..', 'node_modules', '.prisma', 'client'),
+          to: path.join('.prisma', 'client'),
+        },
+      ],
+    }),
+
     // copy image assets that the hub hosts into dist
     new CopyPlugin({
       patterns: [
