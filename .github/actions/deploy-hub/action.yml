@@ -38,6 +38,12 @@ runs:
       shell: bash
       working-directory: packages/hub
 
+    - uses: actions/checkout@v2
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
+      with:
+        limit-access-to-users: backspace
+
     - run: tree ./node_modules/.prisma
     - run: tree ./node_modules/@prisma
     - run: tree ../../node_modules/.prisma
