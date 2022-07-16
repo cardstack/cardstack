@@ -51,10 +51,10 @@ runs:
       shell: bash
       working-directory: packages/hub
 
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-      with:
-        limit-access-to-users: backspace
+    # - name: Setup upterm session
+    #   uses: lhotari/action-upterm@v1
+    #   with:
+    #     limit-access-to-users: backspace
 
     - name: Deploy server
       run: waypoint up --app=hub -plain
