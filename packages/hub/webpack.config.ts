@@ -87,7 +87,7 @@ module.exports = {
       ],
     }),
 
-    // copy over pkgs necessary for node-pg-migrate to work. these will be added
+    // copy over pkgs necessary for node-pg-migrate and Prisma to work. these will be added
     // to the docker image's file system
     ...[
       'node-pg-migrate',
@@ -116,7 +116,7 @@ module.exports = {
       'graceful-fs',
       'jsonfile',
       'universalify',
-      '@prisma/client', // FIXME Prisma-related, move elsewhere?
+      '@prisma/client',
     ].map(
       (pkg) =>
         new CopyPlugin({
