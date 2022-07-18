@@ -5,6 +5,7 @@ import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 import { setupHub, setupRegistry } from '../helpers/server';
 import { CONTRACT_EVENTS, HISTORIC_BLOCKS_AVAILABLE } from '../../services/contract-subscription-event-handler';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 class StubContracts {
   handlers: Record<any, any> = {};
@@ -60,16 +61,18 @@ class StubWeb3 {
   }
 }
 
+let prisma: ExtendedPrismaClient;
+
 describe('ContractSubscriptionEventHandler', function () {
   setupRegistry(this, ['contracts', StubContracts], ['web3-socket', StubWeb3]);
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
-  let { lookup } = setupHub(this);
+  let { lookup, getPrisma } = setupHub(this);
   setupSentry(this);
 
   this.beforeEach(async function () {
     this.subject = await lookup('contract-subscription-event-handler');
     this.contracts = (await lookup('contracts')) as unknown as StubContracts;
-    this.latestEventBlockQueries = await lookup('latest-event-block', { type: 'query' });
+    prisma = await getPrisma();
 
     web3BlockNumber = 1234;
 
@@ -83,7 +86,7 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('starts the event listeners with a fromBlock when the latest block has been persisted', async function () {
-    await this.latestEventBlockQueries.update(1234);
+    await prisma.latestEventBlock.updateBlockNumber(1234);
 
     await this.subject.setupContractEventSubscriptions();
 
@@ -93,7 +96,7 @@ describe('ContractSubscriptionEventHandler', function () {
   });
 
   it('starts the event listener with the most-recently-available block when the latest block is more than 10000 ahead of the persisted block', async function () {
-    await this.latestEventBlockQueries.update(web3BlockNumber);
+    await prisma.latestEventBlock.updateBlockNumber(web3BlockNumber);
     web3BlockNumber = web3BlockNumber + HISTORIC_BLOCKS_AVAILABLE * 2;
 
     await this.subject.setupContractEventSubscriptions();
@@ -116,7 +119,7 @@ describe('ContractSubscriptionEventHandler', function () {
 
       expect(getJobIdentifiers()[0]).to.equal(contractEventConfiguration.taskName);
       expect(getJobPayloads()[0]).to.deep.equal(contractEvent);
-      expect(await this.latestEventBlockQueries.read()).to.equal(500);
+      expect(await prisma.latestEventBlock.read()).to.equal(500);
     });
 
     it(`logs an error from ${contractEventConfiguration.eventName}`, async function () {
@@ -139,6 +142,6 @@ describe('ContractSubscriptionEventHandler', function () {
 
     expect(getJobIdentifiers()[0]).to.equal('notify-merchant-claim');
     expect(getJobPayloads()[0]).to.deep.equal(contractEvent);
-    expect(await this.latestEventBlockQueries.read()).to.equal(2324);
+    expect(await prisma.latestEventBlock.read()).to.equal(2324);
   });
 });
