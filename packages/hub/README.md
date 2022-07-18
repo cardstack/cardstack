@@ -135,11 +135,7 @@ Documentation on how to create migration scripts is available at https://salsita
 
 After you have completed running your new DB migration script, update Prisma’s schema and client:
 
-    yarn run prisma db pull
-    node dist/hub.js db transform-prisma-schema
-    yarn run prisma format
-    yarn run prisma generate
-    yarn add @prisma/client
+    HUB_DATABASE_URL=postgres://postgres:postgres@localhost:5432/hub_development yarn db:update-prisma
 
 And create a pg_dump of the DB in the `config/structure.sql` file using:
 
