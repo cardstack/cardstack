@@ -11,7 +11,6 @@ COPY dist/services packages/hub/services
 # Copy Prisma necessities
 COPY dist/@prisma/client node_modules/@prisma/client
 COPY prisma/schema.prisma node_modules/.prisma/client/schema.prisma
-COPY prisma/schema.prisma node_modules/@prisma/client/schema.prisma
 COPY dist/.prisma/client/ node_modules/.prisma/client/
 
 # Replicate enough of the node_modules structure to support node-pg-migrate
