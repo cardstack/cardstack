@@ -58,7 +58,7 @@ module.exports = {
       ],
     }),
 
-    // Prisma?????
+    // copy Prisma client code and libraries
     new CopyPlugin({
       patterns: [
         {
