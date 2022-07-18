@@ -145,9 +145,9 @@ describe('POST /api/profile-purchases', function () {
     let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
     expect(cardSpaceRecord).to.exist;
 
-    let jobTicketRecord = await prisma.job_tickets.findUnique({ where: { id: jobTicketId! } });
+    let jobTicketRecord = await prisma.jobTicket.findUnique({ where: { id: jobTicketId! } });
     expect(jobTicketRecord?.state).to.equal('pending');
-    expect(jobTicketRecord?.owner_address).to.equal(stubUserAddress);
+    expect(jobTicketRecord?.ownerAddress).to.equal(stubUserAddress);
     expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId });
     expect(jobTicketRecord?.spec).to.deep.equal({ maxAttempts: 1 });
 
@@ -158,15 +158,15 @@ describe('POST /api/profile-purchases', function () {
 
   it('returns the existing job ticket if the request is a duplicate', async function () {
     let existingJobTicketId = shortUUID.uuid();
-    await prisma.job_tickets.create({
+    await prisma.jobTicket.create({
       data: {
         id: existingJobTicketId,
-        job_type: 'create-profile',
-        owner_address: stubUserAddress,
+        jobType: 'create-profile',
+        ownerAddress: stubUserAddress,
         payload: {
           'another-payload': 'okay',
         },
-        source_arguments: {
+        sourceArguments: {
           provider: 'a-provider',
           receipt: {
             'a-receipt': 'yes',
@@ -241,15 +241,15 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects when the purchase receipt has already been used', async function () {
-    await prisma.job_tickets.create({
+    await prisma.jobTicket.create({
       data: {
         id: shortUUID.uuid(),
-        job_type: 'create-profile',
-        owner_address: '0xsomeoneelse',
+        jobType: 'create-profile',
+        ownerAddress: '0xsomeoneelse',
         payload: {
           'another-payload': 'okay',
         },
-        source_arguments: {
+        sourceArguments: {
           provider: 'a-provider',
           receipt: {
             'a-receipt': 'yes',

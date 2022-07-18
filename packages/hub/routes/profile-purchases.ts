@@ -8,7 +8,7 @@ import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 import * as Sentry from '@sentry/node';
-import { job_tickets } from '@prisma/client';
+import { JobTicket } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -50,7 +50,7 @@ export default class ProfilePurchasesRoute {
 
     try {
       // prisma does not support postgres' @> object containment operator, so we're using a raw query here
-      let rows = await prisma.$queryRaw<job_tickets[]>`
+      let rows = await prisma.$queryRaw<JobTicket[]>`
         SELECT * from job_tickets
         WHERE
           job_type = 'create-profile'
@@ -160,10 +160,10 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let alreadyUsedReceipt = await prisma.job_tickets.findFirst({
+    let alreadyUsedReceipt = await prisma.jobTicket.findFirst({
       where: {
-        job_type: 'create-profile',
-        source_arguments: { equals: sourceArguments },
+        jobType: 'create-profile',
+        sourceArguments: { equals: sourceArguments },
       },
     });
 
@@ -227,14 +227,14 @@ export default class ProfilePurchasesRoute {
 
     let jobTicketId = shortUuid.uuid();
 
-    let insertedJobTicket = await prisma.job_tickets.create({
+    let insertedJobTicket = await prisma.jobTicket.create({
       data: {
         id: jobTicketId,
-        job_type: 'create-profile',
-        owner_address: ctx.state.userAddress,
+        jobType: 'create-profile',
+        ownerAddress: ctx.state.userAddress,
         payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
         spec: { maxAttempts: 1 },
-        source_arguments: sourceArguments,
+        sourceArguments,
       },
     });
 

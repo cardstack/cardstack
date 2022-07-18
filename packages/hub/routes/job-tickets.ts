@@ -3,7 +3,7 @@ import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import shortUUID from 'short-uuid';
-import { KnownTasks } from '@cardstack/hub/tasks';
+import { isKnownTask } from '@cardstack/hub/tasks';
 
 export default class JobTicketsRoute {
   jobTicketSerializer = inject('job-ticket-serializer', {
@@ -23,7 +23,7 @@ export default class JobTicketsRoute {
     }
     let id = ctx.params.id;
     let prisma = await this.prismaManager.getClient();
-    let jobTicket = await prisma.job_tickets.findUnique({ where: { id } });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id } });
     if (!jobTicket) {
       ctx.body = {
         errors: [
@@ -42,7 +42,7 @@ export default class JobTicketsRoute {
 
     let requestingUserAddress = ctx.state.userAddress;
 
-    if (jobTicket.owner_address !== requestingUserAddress) {
+    if (jobTicket.ownerAddress !== requestingUserAddress) {
       ctx.body = {
         errors: [
           {
@@ -69,7 +69,7 @@ export default class JobTicketsRoute {
 
     let prisma = await this.prismaManager.getClient();
     let id = ctx.params.id;
-    let jobTicketToRetry = await prisma.job_tickets.findUnique({ where: { id } });
+    let jobTicketToRetry = await prisma.jobTicket.findUnique({ where: { id } });
 
     if (!jobTicketToRetry) {
       ctx.body = {
@@ -89,7 +89,7 @@ export default class JobTicketsRoute {
 
     let requestingUserAddress = ctx.state.userAddress;
 
-    if (jobTicketToRetry.owner_address !== requestingUserAddress) {
+    if (jobTicketToRetry.ownerAddress !== requestingUserAddress) {
       ctx.body = {
         errors: [
           {
@@ -118,17 +118,19 @@ export default class JobTicketsRoute {
 
       return;
     }
-
-    let taskName = jobTicketToRetry.job_type as unknown as keyof KnownTasks;
+    if (!isKnownTask(jobTicketToRetry.jobType)) {
+      throw new Error('not a known task');
+    }
+    let taskName = jobTicketToRetry.jobType;
     let payload = jobTicketToRetry.payload as any;
     let taskSpec = jobTicketToRetry.spec as any;
     this.workerClient.addJob(taskName, payload, taskSpec);
 
-    let newJobTicket = await prisma.job_tickets.create({
+    let newJobTicket = await prisma.jobTicket.create({
       data: {
         id: shortUUID.uuid(),
-        job_type: jobTicketToRetry.job_type,
-        owner_address: jobTicketToRetry.owner_address,
+        jobType: jobTicketToRetry.jobType,
+        ownerAddress: jobTicketToRetry.ownerAddress,
         payload: jobTicketToRetry.payload ?? undefined,
         spec: jobTicketToRetry.spec ?? undefined,
       },

@@ -137,7 +137,7 @@ After you have completed running your new DB migration script, update Prisma’s
 
     yarn run prisma db pull
     node dist/hub.js db transform-prisma-schema
-    yarn run prisma prisma format
+    yarn run prisma format
     yarn run prisma generate
     yarn add @prisma/client
 

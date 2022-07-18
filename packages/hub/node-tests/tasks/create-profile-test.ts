@@ -78,11 +78,11 @@ describe('CreateProfileTask', function () {
     subgraphQueryShouldBeNull = false;
 
     jobTicketId = shortUUID.uuid();
-    await prisma.job_tickets.create({
+    await prisma.jobTicket.create({
       data: {
         id: jobTicketId,
-        job_type: 'create-profile',
-        owner_address: '0x0000000000000000000000000000000000000000',
+        jobType: 'create-profile',
+        ownerAddress: '0x0000000000000000000000000000000000000000',
       },
     });
 
@@ -112,7 +112,7 @@ describe('CreateProfileTask', function () {
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
 
-    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('success');
     expect(jobTicket?.result).to.deep.equal({ id: mockMerchantSafeAddress });
   });
@@ -125,7 +125,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
 
@@ -144,7 +144,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await prisma.job_tickets.findUnique({ where: { id: jobTicketId } });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({
       error: `Error: subgraph query for transaction ${mockTransactionHash} returned no results`,

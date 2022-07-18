@@ -32,22 +32,22 @@ describe('JobTicket endpoints', function () {
 
     this.beforeEach(async function () {
       jobTicketId = shortUUID.uuid();
-      await prisma.job_tickets.create({
+      await prisma.jobTicket.create({
         data: {
           id: jobTicketId,
-          job_type: 'a-job',
-          owner_address: stubUserAddress,
+          jobType: 'boom',
+          ownerAddress: stubUserAddress,
           result: { 'a-result': 'yes' },
           state: 'success',
         },
       });
 
       otherOwnerJobTicketId = shortUUID.uuid();
-      await prisma.job_tickets.create({
+      await prisma.jobTicket.create({
         data: {
           id: otherOwnerJobTicketId,
-          job_type: 'a-job',
-          owner_address: '0x111',
+          jobType: 'boom',
+          ownerAddress: '0x111',
         },
       });
     });
@@ -130,12 +130,12 @@ describe('JobTicket endpoints', function () {
       otherOwnerJobTicketId = shortUUID.uuid();
       notFailedJobTicketId = shortUUID.uuid();
 
-      await prisma.job_tickets.createMany({
+      await prisma.jobTicket.createMany({
         data: [
           {
             id: jobTicketId,
-            job_type: 'a-job',
-            owner_address: stubUserAddress,
+            jobType: 'boom',
+            ownerAddress: stubUserAddress,
             payload: { 'a-payload': 'yes' },
             spec: { 'a-spec': 'yes' },
             result: { 'a-result': 'yes' },
@@ -143,13 +143,13 @@ describe('JobTicket endpoints', function () {
           },
           {
             id: otherOwnerJobTicketId,
-            job_type: 'a-job',
-            owner_address: '0x111',
+            jobType: 'boom',
+            ownerAddress: '0x111',
           },
           {
             id: notFailedJobTicketId,
-            job_type: 'a-job',
-            owner_address: stubUserAddress,
+            jobType: 'boom',
+            ownerAddress: stubUserAddress,
           },
         ],
       });
@@ -173,14 +173,14 @@ describe('JobTicket endpoints', function () {
         })
         .expect('Content-Type', 'application/vnd.api+json');
 
-      expect(getJobIdentifiers()).to.deep.equal(['a-job']);
+      expect(getJobIdentifiers()).to.deep.equal(['boom']);
       expect(getJobPayloads()).to.deep.equal([{ 'a-payload': 'yes' }]);
       expect(getJobSpecs()).to.deep.equal([{ 'a-spec': 'yes' }]);
 
-      let newTicket = await prisma.job_tickets.findUnique({ where: { id: newJobId! } });
+      let newTicket = await prisma.jobTicket.findUnique({ where: { id: newJobId! } });
 
-      expect(newTicket?.owner_address).to.equal(stubUserAddress);
-      expect(newTicket?.job_type).to.equal('a-job');
+      expect(newTicket?.ownerAddress).to.equal(stubUserAddress);
+      expect(newTicket?.jobType).to.equal('boom');
       expect(newTicket?.payload).to.deep.equal({ 'a-payload': 'yes' });
       expect(newTicket?.spec).to.deep.equal({ 'a-spec': 'yes' });
     });

@@ -63,7 +63,7 @@ export default class CreateProfile {
         throw new Error(`subgraph query for transaction ${profileRegistrationTxHash} returned no results`);
       }
 
-      await prisma.job_tickets.update({
+      await prisma.jobTicket.update({
         where: { id: jobTicketId },
         data: {
           result: {
@@ -78,7 +78,7 @@ export default class CreateProfile {
       let errorString = (error as Error).toString();
       Sentry.captureException(error);
       log.error(errorString);
-      await prisma.job_tickets.update({
+      await prisma.jobTicket.update({
         where: { id: jobTicketId },
         data: {
           result: {
