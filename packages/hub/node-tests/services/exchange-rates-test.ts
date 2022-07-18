@@ -15,7 +15,7 @@ interface CryptoCompareSuccessResponsesByDate {
 }
 
 describe('ExchangeRatesService', function () {
-  let { getContainer } = setupHub(this);
+  let { instantiate, lookup } = setupHub(this);
   let subject: ExchangeRatesService;
 
   let mockErrorResponse = {
@@ -108,11 +108,11 @@ describe('ExchangeRatesService', function () {
       }
     }
 
-    subject = await getContainer().instantiate(PatchedExchangeRatesService);
+    subject = await instantiate(PatchedExchangeRatesService);
   });
 
   it('fetches the rates when they are not cached and caches them', async function () {
-    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
 
     let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
@@ -124,7 +124,7 @@ describe('ExchangeRatesService', function () {
   });
 
   it('can fetch some rates and use some cached rates', async function () {
-    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'AUD', 2.1, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
 
@@ -165,7 +165,7 @@ describe('ExchangeRatesService', function () {
   });
 
   it('returns the cached rates when they exist', async function () {
-    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
 
     let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
@@ -178,7 +178,7 @@ describe('ExchangeRatesService', function () {
   });
 
   it('fetches the rates from another exchange when they are not cached and caches them', async function () {
-    let exchangeRates = await getContainer().lookup('exchange-rates', { type: 'query' });
+    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
     await exchangeRates.insert('CARD', 'USDT', 1919, '2022-05-01', 'kucoin');
     await exchangeRates.insert('CARD', 'USDT', 1870, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
 

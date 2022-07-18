@@ -1,7 +1,7 @@
 import { Client as DBClient } from 'pg';
 import WyreTransferTask from '../../tasks/wyre-transfer';
 import { v4 as uuidv4 } from 'uuid';
-import { registry, setupHub } from '../helpers/server';
+import { setupHub, setupRegistry } from '../helpers/server';
 import {
   StubWyreService,
   stubCustodialTransferId,
@@ -19,24 +19,22 @@ describe('wyre-transfer-task', function () {
   let db: DBClient;
   let wyreService: StubWyreService;
 
-  this.beforeEach(function () {
-    registry(this).register('wyre', StubWyreService);
-  });
+  setupRegistry(this, ['wyre', StubWyreService]);
 
-  let { getContainer } = setupHub(this);
+  let { instantiate, lookup } = setupHub(this);
 
   this.beforeEach(async function () {
-    wyreService = (await getContainer().lookup('wyre')) as unknown as StubWyreService;
+    wyreService = (await lookup('wyre')) as unknown as StubWyreService;
     wyreService.wyreTransferCallCount = 0;
 
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
     await db.query(`DELETE FROM reservations`);
   });
 
   it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
-    let task = await getContainer().instantiate(WyreTransferTask);
+    let task = await instantiate(WyreTransferTask);
     await task.perform({
       request: {
         wallet: (await wyreService.getWalletById(stubCustodialWalletId))!,
@@ -70,7 +68,7 @@ describe('wyre-transfer-task', function () {
       `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
       [stubWalletOrderId, stubUserAddress.toLowerCase(), stubCustodialWalletId, stubReservationId, 'waiting-for-order']
     );
-    let task = await getContainer().instantiate(WyreTransferTask);
+    let task = await instantiate(WyreTransferTask);
     await task.perform({
       request: {
         wallet: (await wyreService.getWalletById(stubCustodialWalletId))!,

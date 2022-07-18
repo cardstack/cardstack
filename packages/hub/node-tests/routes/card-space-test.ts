@@ -1,5 +1,5 @@
 import { CardSpace } from '../../routes/card-spaces';
-import { registry, setupHub } from '../helpers/server';
+import { setupRegistry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
 import { encodeDID } from '@cardstack/did-resolver';
 
@@ -30,12 +30,12 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('GET /api/card-spaces/:slug', function () {
-  let { request, getContainer } = setupHub(this);
+  let { request, lookup } = setupHub(this);
 
   it('fetches a card space', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -53,7 +53,7 @@ describe('GET /api/card-spaces/:slug', function () {
       merchantId,
     };
 
-    await (await getContainer().lookup('card-space', { type: 'query' })).insert(cardSpace);
+    await (await lookup('card-space', { type: 'query' })).insert(cardSpace);
 
     await request()
       .get('/api/card-spaces/satoshi')
@@ -110,15 +110,13 @@ describe('GET /api/card-spaces/:slug', function () {
 });
 
 describe('POST /api/card-spaces', function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-  });
-  let { request, getContainer } = setupHub(this);
+  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
+  let { request, lookup } = setupHub(this);
 
   it('persists card space', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -203,7 +201,7 @@ describe('POST /api/card-spaces', function () {
   it('returns 403 when the related merchant has a different owner', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: '0xmystery',
@@ -283,7 +281,7 @@ describe('POST /api/card-spaces', function () {
   it('returns 422 when the merchant doesn’t exist', async function () {
     let merchantId = uuidv4();
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -334,11 +332,8 @@ describe('POST /api/card-spaces', function () {
 });
 
 describe('PATCH /api/card-spaces', function () {
-  this.beforeEach(function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-  });
-
-  let { request, getContainer } = setupHub(this);
+  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
+  let { request, lookup } = setupHub(this);
 
   it('returns 404 when resource does not exist', async function () {
     await request()
@@ -354,7 +349,7 @@ describe('PATCH /api/card-spaces', function () {
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: '0x1234',
@@ -364,7 +359,7 @@ describe('PATCH /api/card-spaces', function () {
       textColor: 'red',
     });
 
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query('INSERT INTO card_spaces(id, profile_description, merchant_id) VALUES($1, $2, $3)', [
       'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
@@ -400,12 +395,12 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('updates the specified fields of the resource', async function () {
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
@@ -463,13 +458,13 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('returns errors when updating a resource with invalid attributes', async function () {
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
 
     let merchantId = uuidv4();
 
     await (
-      await getContainer().lookup('merchant-info', { type: 'query' })
+      await lookup('merchant-info', { type: 'query' })
     ).insert({
       id: merchantId,
       ownerAddress: stubUserAddress,
