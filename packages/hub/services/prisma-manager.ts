@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
+import { CryptoCompareConversionBlock } from './exchange-rates';
 
 type PushNotificationRegistrationGetter = Prisma.PushNotificationRegistrationDelegate<any>;
 
@@ -18,7 +19,14 @@ interface ExtendedPushNotificationRegistrations extends PushNotificationRegistra
   }): ReturnType<PushNotificationRegistrationGetter['upsert']>;
 }
 
+type ExchangeRateGetter = Prisma.ExchangeRateDelegate<any>;
+
+interface ExtendedExchangeRate extends ExchangeRateGetter {
+  select(from: string, to: string[], date: string, exchange: string): Promise<CryptoCompareConversionBlock | null>;
+}
+
 export interface ExtendedPrismaClient extends PrismaClient {
+  exchangeRate: ExtendedExchangeRate;
   pushNotificationRegistration: ExtendedPushNotificationRegistrations;
 }
 
@@ -57,6 +65,29 @@ export default class PrismaManager {
   }
 
   private addConvenienceFunctions(client: PrismaClient) {
+    Object.assign(client.exchangeRate, {
+      async select(
+        from: string,
+        to: string[],
+        date: string,
+        exchange: string
+      ): Promise<CryptoCompareConversionBlock | null> {
+        let rows = await client.exchangeRate.findMany({
+          select: { toSymbol: true, rate: true },
+          where: { fromSymbol: from, toSymbol: { in: to }, date: new Date(Date.parse(date)), exchange },
+        });
+
+        if (rows.length) {
+          return rows.reduce((rates, row) => {
+            rates[row.toSymbol] = row.rate;
+            return rates;
+          }, {} as any);
+        } else {
+          return null;
+        }
+      },
+    });
+
     Object.assign(client.pushNotificationRegistration, {
       upsertByOwnerAndPushClient({
         id,

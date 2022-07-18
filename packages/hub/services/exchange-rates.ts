@@ -1,5 +1,5 @@
 /* global fetch */
-import { query } from '../queries';
+import { inject } from '@cardstack/di';
 import config from 'config';
 import merge from 'lodash/merge';
 
@@ -24,7 +24,7 @@ export interface CryptoCompareConversionBlock {
 export const DEFAULT_CRYPTOCOMPARE_EXCHANGE = 'CCCAGG';
 
 export default class ExchangeRatesService {
-  exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   private get apiKey() {
     return config.get('exchangeRates.apiKey') as string;
@@ -109,7 +109,8 @@ export default class ExchangeRatesService {
     date: string,
     exchange = DEFAULT_CRYPTOCOMPARE_EXCHANGE
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
-    let cachedValues = await this.exchangeRates.select(from, tos, date, exchange);
+    let prisma = await this.prismaManager.getClient();
+    let cachedValues = await prisma.exchangeRate.select(from, tos, date, exchange);
 
     let cachedValuesTos = Object.keys(cachedValues || {});
     let requestedButNotCached = tos.filter((to) => !cachedValuesTos.includes(to));
@@ -130,7 +131,15 @@ export default class ExchangeRatesService {
       }
 
       requestedButNotCached.forEach(async (to) => {
-        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
+        await prisma.exchangeRate.create({
+          data: {
+            fromSymbol: from,
+            toSymbol: to,
+            rate: (result as CryptoCompareSuccessResponse)[from][to],
+            date,
+            exchange,
+          },
+        });
       });
 
       let resultConversions = (result as CryptoCompareSuccessResponse)[from];
