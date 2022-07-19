@@ -1,33 +1,16 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
-import { CryptoCompareConversionBlock } from './exchange-rates';
-
-type PushNotificationRegistrationGetter = Prisma.PushNotificationRegistrationDelegate<any>;
-
-interface ExtendedPushNotificationRegistrations extends PushNotificationRegistrationGetter {
-  upsertByOwnerAndPushClient({
-    id,
-    ownerAddress,
-    pushClientId,
-    disabledAt,
-  }: {
-    id: string;
-    ownerAddress: string;
-    pushClientId: string;
-    disabledAt: Date | null;
-  }): ReturnType<PushNotificationRegistrationGetter['upsert']>;
-}
-
-type ExchangeRateGetter = Prisma.ExchangeRateDelegate<any>;
-
-interface ExtendedExchangeRate extends ExchangeRateGetter {
-  select(from: string, to: string[], date: string, exchange: string): Promise<CryptoCompareConversionBlock | null>;
-}
-
+import {
+  ExtendedPushNotificationRegistration,
+  getPushNotificationRegistrationExtension,
+} from './prisma-extensions/push-notification-registration';
+import { ExtendedLatestEventBlock, getLatestEventBlockExtension } from './prisma-extensions/latest-event-block';
+import { ExtendedExchangeRate, getExchangeRateExtension } from './prisma-extensions/exchange-rate';
 export interface ExtendedPrismaClient extends PrismaClient {
   exchangeRate: ExtendedExchangeRate;
-  pushNotificationRegistration: ExtendedPushNotificationRegistrations;
+  pushNotificationRegistration: ExtendedPushNotificationRegistration;
+  latestEventBlock: ExtendedLatestEventBlock;
 }
 
 export default class PrismaManager {
@@ -49,7 +32,7 @@ export default class PrismaManager {
         client = this.prismaTestingHelper.getProxyClient();
       }
 
-      this.addConvenienceFunctions(client);
+      this.addCardstackPrismaExtensions(client);
 
       this.client = client as ExtendedPrismaClient;
     }
@@ -64,63 +47,10 @@ export default class PrismaManager {
     return this.client?.$disconnect();
   }
 
-  private addConvenienceFunctions(client: PrismaClient) {
-    Object.assign(client.exchangeRate, {
-      async select(
-        from: string,
-        to: string[],
-        date: string,
-        exchange: string
-      ): Promise<CryptoCompareConversionBlock | null> {
-        let rows = await client.exchangeRate.findMany({
-          select: { toSymbol: true, rate: true },
-          where: { fromSymbol: from, toSymbol: { in: to }, date: new Date(Date.parse(date)), exchange },
-        });
-
-        if (rows.length) {
-          return rows.reduce((rates, row) => {
-            rates[row.toSymbol] = row.rate.toNumber();
-            return rates;
-          }, {} as any);
-        } else {
-          return null;
-        }
-      },
-    });
-
-    Object.assign(client.pushNotificationRegistration, {
-      upsertByOwnerAndPushClient({
-        id,
-        ownerAddress,
-        pushClientId,
-        disabledAt = null,
-      }: {
-        id: string;
-        ownerAddress: string;
-        pushClientId: string;
-        disabledAt: Date | null;
-      }) {
-        return client.pushNotificationRegistration.upsert(
-          Prisma.validator<Prisma.PushNotificationRegistrationUpsertArgs>()({
-            where: {
-              ownerAddress_pushClientId: {
-                ownerAddress,
-                pushClientId,
-              },
-            },
-            create: {
-              id: id,
-              ownerAddress,
-              pushClientId,
-              disabledAt,
-            },
-            update: {
-              disabledAt,
-            },
-          })
-        );
-      },
-    });
+  private addCardstackPrismaExtensions(client: PrismaClient) {
+    Object.assign(client.exchangeRate, getExchangeRateExtension(client));
+    Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
+    Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
   }
 }
 
