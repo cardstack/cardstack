@@ -13,59 +13,72 @@ class Staking(Rule):
         self,
         token,
         duration,
-        num_of_blocks_per_month,
         interest_rate_monthly
     ):
         self.token = token
         self.duration = duration
-        self.num_of_blocks_per_month = num_of_blocks_per_month #518400
-        self.interest_rate_monthly = interest_rate_monthly #0.48
+        self.interest_rate_monthly = interest_rate_monthly 
 
-    def sql(self, table_query): 
-        #THIS FUNCTION IS TO COMPLY WITH THE ABSTRACT METHODS OF rule.py BUT IT IS TEMPORAL
-        pass
+    def sql(self, table_query, aux_table_query): 
+        token_holder_table = table_query
+        safe_owner_table = aux_table_query
+        
+        return  f"""
+            with compound_parameters as (select th._block_number, so.owner, th.safe, th.balance_uint64,
+                lag(th.balance_uint64) over (partition by th.safe order by th._block_number asc NULLS LAST) as old_balance,
+                th.balance_uint64 - lag(th.balance_uint64) over (partition by th.safe order by th._block_number asc NULLS LAST) as change,
+                $1::integer as start_block, $2::integer as end_block,  $2::integer - th._block_number::integer as blocks_to_finish
+                from {token_holder_table} as th, {safe_owner_table} as so
+                where th._block_number::integer >= $1::integer
+                and th._block_number::integer < $2::integer
+                and th.token = 'card'
+                and th.safe = so.safe
+                and th.safe is not null
+                ),
 
-    def sql_2(self):
+            partial_rewards as (select * ,(blocks_to_finish::float/$4::float) as percentage_of_month, 
+                (blocks_to_finish::float/$4::float) * $5::float as interest_rate,
+                (blocks_to_finish::float/$4::float) * $5::float * change as partial_reward
+                from compound_parameters),
+        
+            base_rewards as (select distinct on (safe) safe, owner, balance_uint64, blocks_to_finish, percentage_of_month, interest_rate,
+                ((blocks_to_finish::float/$4::float) * $5::float) * balance_uint64 as base_reward
+                from partial_rewards),
 
-        token_holder_table = self._get_table_query(
-            "token_holder",
-            "token_holder",
+            agg_partial_rewards as (select safe, Sum(partial_reward) as intermediate_rewards 
+                from partial_rewards group by safe order by safe)
+
+            select br.owner as payee, br.base_reward + coalesce(agr.intermediate_rewards, 0) as rewards
+                from base_rewards as br, agg_partial_rewards as agr 
+                where br.safe = agr.safe;
+        """        
+
+    def run(self, payment_cycle: int, reward_program_id:str): 
+        start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
+        vars = [
+            start_block, # $1 -> int
+            end_block, # $2 -> int
+            self.token, # $3 -> str
+            self.payment_cycle_length, # $4 -> int
+            self.interest_rate_monthly # $5 -> float
+        ]
+
+        table_query = self._get_table_query(
+            "token_holder", 
+            "token_holder", 
             self.start_block,
             self.end_block
         )
 
-        safe_owner_table = self._get_table_query(
+        aux_table_query = self._get_table_query(
             "safe_owner", 
             "safe_owner",
             self.start_block,
             self.end_block
         )
 
-        return  f"""
-            select lower(block_range), upper(block_range), safe, balance,
-                lag(balance) over (partition by safe order by upper(block_range) asc NULLS LAST) as old_balance,
-                balance - lag(balance) over (partition by safe order by upper(block_range) asc NULLS LAST) as change,
-                first_value(lower(block_range)) over (partition by safe order by lower(block_range) asc) as star_block,
-                518400 + first_value(lower(block_range)) over (partition by safe order by lower(block_range) asc) as end_block,
-                (518400 + first_value(lower(block_range)) over (partition by safe order by lower(block_range) asc)) - lower(block_range) as blocks_to_finish,
-                balance * 2 as compound
-                from sgd1.token_holder 
-                where token = '0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3'
-                and safe is not null
-                ;
-        """
-
-    def run(self, payment_cycle: int, reward_program_id:str): 
-        vars = [
-            self.start_block,
-            self.end_block,
-            self.token
-        ]
-
-        tables_names = ["token_holder", "safe_owner"]
-
-        df = self.run_query(tables_names, vars)
-
+        df = self.run_query(table_query, vars, aux_table_query)
+    
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
         df["validFrom"] = payment_cycle
@@ -75,6 +88,8 @@ class Staking(Rule):
         df.drop(["rewards"], axis=1)
         return df
 
+
+    
 
 
 
