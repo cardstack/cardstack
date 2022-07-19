@@ -79,7 +79,7 @@ export default class PrismaManager {
 
         if (rows.length) {
           return rows.reduce((rates, row) => {
-            rates[row.toSymbol] = row.rate;
+            rates[row.toSymbol] = row.rate.toNumber();
             return rates;
           }, {} as any);
         } else {
