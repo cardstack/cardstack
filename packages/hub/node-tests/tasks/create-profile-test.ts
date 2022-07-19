@@ -5,34 +5,28 @@ import shortUUID from 'short-uuid';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { encodeDID } from '@cardstack/did-resolver';
+import { rest } from 'msw';
+import { setupServer, SetupServerApi } from 'msw/node';
+import config from 'config';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
+let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
+
+let exampleEthereumAddress = '0x323B2318F35c6b31113342830204335Dac715AA8';
 let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
+  let mockServer: SetupServerApi;
+  let dataSentToServer: any;
+  let did: string;
 
-  let registeredAddress = '0x123';
-  let registeredDid = 'sku';
   let mockTransactionHash = '0xABC';
   let mockMerchantSafeAddress = '0x456';
   let registerProfileCalls = 0;
   let registeringShouldError = false;
   let subgraphQueryShouldBeNull = false;
-
-  class StubRelayService {
-    async registerProfile(userAddress: string, did: string) {
-      registerProfileCalls++;
-
-      if (registeringShouldError) {
-        throw new Error('registering should error');
-      }
-
-      registeredAddress = userAddress;
-      registeredDid = did;
-      return Promise.resolve(mockTransactionHash);
-    }
-  }
 
   class StubCardPay {
     async gqlQuery(_network: string, _query: string, _variables: { txn: string }) {
@@ -66,7 +60,26 @@ describe('CreateProfileTask', function () {
 
   this.beforeEach(async function () {
     registry(this).register('cardpay', StubCardPay);
-    registry(this).register('relay', StubRelayService, { type: 'service' });
+
+    registeringShouldError = false;
+    registerProfileCalls = 0;
+    subgraphQueryShouldBeNull = false;
+
+    mockServer = setupServer(
+      rest.post(`${relayUrl}/v1/merchant/register`, (req, res, ctx) => {
+        dataSentToServer = req.body as string;
+        registerProfileCalls++;
+        let status = registeringShouldError ? 400 : 200;
+        let response = registeringShouldError ? {} : { txHash: mockTransactionHash };
+        return res(ctx.status(status), ctx.json(response));
+      })
+    );
+
+    mockServer.listen({ onUnhandledRequest: 'error' });
+  });
+
+  this.afterEach(function () {
+    mockServer.close();
   });
 
   let { getContainer } = setupHub(this);
@@ -82,7 +95,7 @@ describe('CreateProfileTask', function () {
       data: {
         id: jobTicketId,
         jobType: 'create-profile',
-        ownerAddress: '0x0000000000000000000000000000000000000000',
+        ownerAddress: exampleEthereumAddress,
       },
     });
 
@@ -90,12 +103,14 @@ describe('CreateProfileTask', function () {
     merchantInfosId = shortUUID.uuid();
     await merchantInfoQueries.insert({
       id: merchantInfosId,
-      ownerAddress: '0x0000000000000000000000000000000000000000',
+      ownerAddress: exampleEthereumAddress,
       name: '',
       slug: '',
       color: '',
       textColor: '',
     });
+
+    did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId });
 
     subject = (await getContainer().instantiate(CreateProfile)) as CreateProfile;
   });
@@ -106,8 +121,6 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
     expect(registerProfileCalls).to.equal(1);
-    expect(registeredAddress).to.equal('0x0000000000000000000000000000000000000000');
-    expect(registeredDid).to.equal(encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId }));
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
     expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
@@ -115,6 +128,11 @@ describe('CreateProfileTask', function () {
     let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('success');
     expect(jobTicket?.result).to.deep.equal({ id: mockMerchantSafeAddress });
+
+    expect(dataSentToServer).to.deep.equal({
+      owner: exampleEthereumAddress,
+      infoDid: did,
+    });
   });
 
   it('fails the job ticket and logs to Sentry if the profile provisioning fails', async function () {
@@ -125,13 +143,17 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
+    let errorText = `Could not register profile card v2 for customer ${exampleEthereumAddress}, did ${did}, received 400 from relay server: {}`;
     let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
+
     expect(jobTicket?.state).to.equal('failed');
-    expect(jobTicket?.result).to.deep.equal({ error: 'Error: registering should error' });
+    expect(jobTicket?.result).to.deep.equal({
+      error: `Error: ${errorText}`,
+    });
 
     let sentryReport = await waitForSentryReport();
 
-    expect(sentryReport.error?.message).to.equal('registering should error');
+    expect(sentryReport.error?.message).to.equal(errorText);
 
     expect(getJobIdentifiers()).to.be.empty;
   });
