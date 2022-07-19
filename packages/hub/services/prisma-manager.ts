@@ -1,25 +1,15 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import config from 'config';
 import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
-
-type PushNotificationRegistrationGetter = Prisma.PushNotificationRegistrationDelegate<any>;
-
-interface ExtendedPushNotificationRegistrations extends PushNotificationRegistrationGetter {
-  upsertByOwnerAndPushClient({
-    id,
-    ownerAddress,
-    pushClientId,
-    disabledAt,
-  }: {
-    id: string;
-    ownerAddress: string;
-    pushClientId: string;
-    disabledAt: Date | null;
-  }): ReturnType<PushNotificationRegistrationGetter['upsert']>;
-}
+import {
+  ExtendedPushNotificationRegistration,
+  getPushNotificationRegistrationExtension,
+} from './prisma-extensions/push-notification-registration';
+import { ExtendedLatestEventBlock, getLatestEventBlockExtension } from './prisma-extensions/latest-event-block';
 
 export interface ExtendedPrismaClient extends PrismaClient {
-  pushNotificationRegistration: ExtendedPushNotificationRegistrations;
+  pushNotificationRegistration: ExtendedPushNotificationRegistration;
+  latestEventBlock: ExtendedLatestEventBlock;
 }
 
 export default class PrismaManager {
@@ -41,7 +31,7 @@ export default class PrismaManager {
         client = this.prismaTestingHelper.getProxyClient();
       }
 
-      this.addConvenienceFunctions(client);
+      this.addCardstackPrismaExtensions(client);
 
       this.client = client as ExtendedPrismaClient;
     }
@@ -56,40 +46,9 @@ export default class PrismaManager {
     return this.client?.$disconnect();
   }
 
-  private addConvenienceFunctions(client: PrismaClient) {
-    Object.assign(client.pushNotificationRegistration, {
-      upsertByOwnerAndPushClient({
-        id,
-        ownerAddress,
-        pushClientId,
-        disabledAt = null,
-      }: {
-        id: string;
-        ownerAddress: string;
-        pushClientId: string;
-        disabledAt: Date | null;
-      }) {
-        return client.pushNotificationRegistration.upsert(
-          Prisma.validator<Prisma.PushNotificationRegistrationUpsertArgs>()({
-            where: {
-              ownerAddress_pushClientId: {
-                ownerAddress,
-                pushClientId,
-              },
-            },
-            create: {
-              id: id,
-              ownerAddress,
-              pushClientId,
-              disabledAt,
-            },
-            update: {
-              disabledAt,
-            },
-          })
-        );
-      },
-    });
+  private addCardstackPrismaExtensions(client: PrismaClient) {
+    Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
+    Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
   }
 }
 

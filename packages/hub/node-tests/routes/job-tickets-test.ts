@@ -22,9 +22,9 @@ describe('JobTicket endpoints', function () {
   this.beforeEach(async function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
-  let { request, getContainer } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
   this.beforeEach(async function () {
-    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+    prisma = await getPrisma();
   });
 
   describe('GET /api/job-tickets/:id', function () {
