@@ -61,15 +61,6 @@ runs:
       with:
         app: "hub-worker"
 
-    - name: Deploy bot
-      run: waypoint up --app=hub-bot -prune-retain=0 -plain
-      shell: bash
-
-    - name: Prune dangling resources [hub-bot]
-      uses: ./.github/actions/waypoint-prune-dangling-resources
-      with:
-        app: "hub-bot"
-
     - name: Deploy event handler
       run: waypoint up --app=hub-event-listener -prune-retain=0 -plain
       shell: bash
