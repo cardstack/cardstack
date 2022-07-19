@@ -77,7 +77,11 @@ class Staking(Rule):
             self.end_block
         )
 
-        df = self.run_query(table_query, vars, aux_table_query)
+
+        if table_query == "parquet_scan([])" or aux_table_query == "parquet_scan([])":
+            df = pd.DataFrame(columns=["payee", "rewards"])
+        else:
+           df = self.run_query(table_query, vars, aux_table_query)
     
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
