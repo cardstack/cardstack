@@ -12,6 +12,18 @@ export interface ExtendedPrismaClient extends PrismaClient {
   latestEventBlock: ExtendedLatestEventBlock;
 }
 
+let dbConfig: Record<string, any> = config.get('db');
+let clientForTests: ExtendedPrismaClient;
+
+if (dbConfig.useTransactionalRollbacks) {
+  let client = new PrismaClient({
+    datasources: { db: { url: dbConfig.url } },
+    log: dbConfig.prismaLog,
+  });
+  addCardstackPrismaExtensions(client);
+  clientForTests = client as ExtendedPrismaClient;
+}
+
 export default class PrismaManager {
   private client?: ExtendedPrismaClient;
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
@@ -19,6 +31,16 @@ export default class PrismaManager {
   dbConfig: Record<string, any> = config.get('db');
 
   async getClient() {
+    if (clientForTests) {
+      if (!this.prismaTestingHelper) {
+        this.prismaTestingHelper = new PrismaTestingHelper(clientForTests);
+        await this.prismaTestingHelper.startNewTransaction();
+        return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+      } else {
+        return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+      }
+    }
+
     if (!this.client) {
       let client = new PrismaClient({
         datasources: { db: { url: this.dbConfig.url } },
@@ -31,9 +53,13 @@ export default class PrismaManager {
         client = this.prismaTestingHelper.getProxyClient();
       }
 
-      this.addCardstackPrismaExtensions(client);
+      addCardstackPrismaExtensions(client);
 
       this.client = client as ExtendedPrismaClient;
+
+      if (this.dbConfig.useTransactionalRollbacks) {
+        clientForTests = this.client;
+      }
     }
 
     return this.client;
@@ -43,13 +69,13 @@ export default class PrismaManager {
     this.prismaTestingHelper?.rollbackCurrentTransaction();
     // TODO CS-4254
     // warn(prisma-client) There are already 10 instances of Prisma Client actively running.
-    return this.client?.$disconnect();
+    // return this.client?.$disconnect();
   }
+}
 
-  private addCardstackPrismaExtensions(client: PrismaClient) {
-    Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
-    Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
-  }
+function addCardstackPrismaExtensions(client: PrismaClient) {
+  Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
+  Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
 }
 
 declare module '@cardstack/di' {
