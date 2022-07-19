@@ -54,7 +54,7 @@ class MinSpend(Rule):
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "total_spent"])
         else:
-            base_df = self.run_query(table_query, vars)
+            base_df = self.run_query(table_query, vars, None)
         return self.df_to_payment_list(base_df, payment_cycle, reward_program_id)
 
     def aggregate(self, cached_df=[]):

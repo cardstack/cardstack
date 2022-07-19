@@ -5,3 +5,6 @@ from .retro_airdrop import RetroAirdrop
 from .flat_payment import FlatPayment
 from .safe_ownership import SafeOwnership
 from .dummy_rule import DummyRule
+from .staking import Staking
+
+
