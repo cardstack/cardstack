@@ -130,16 +130,14 @@ export default class ExchangeRatesService {
         return result;
       }
 
-      requestedButNotCached.forEach(async (to) => {
-        await prisma.exchangeRate.create({
-          data: {
-            fromSymbol: from,
-            toSymbol: to,
-            rate: (result as CryptoCompareSuccessResponse)[from][to],
-            date,
-            exchange,
-          },
-        });
+      await prisma.exchangeRate.createMany({
+        data: requestedButNotCached.map((to) => ({
+          fromSymbol: from,
+          toSymbol: to,
+          rate: (result as CryptoCompareSuccessResponse)[from][to],
+          date: new Date(Date.parse(date)),
+          exchange,
+        })),
       });
 
       let resultConversions = (result as CryptoCompareSuccessResponse)[from];
