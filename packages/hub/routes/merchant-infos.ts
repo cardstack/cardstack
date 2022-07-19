@@ -60,7 +60,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color'] })) {
+    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color', 'text-color'] })) {
       return;
     }
 
@@ -99,7 +99,7 @@ export default class MerchantInfosRoute {
     };
 
     let db = await this.databaseManager.getClient();
-    let merchantInfoId;
+    let merchantInfoId!: string;
 
     await this.databaseManager.performTransaction(db, async () => {
       merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;

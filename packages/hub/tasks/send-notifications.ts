@@ -21,9 +21,7 @@ export interface PushNotificationsIdentifiers {
 }
 
 export default class SendNotificationsTask {
-  pushNotificationRegistrationQueries = query('push-notification-registration', {
-    as: 'pushNotificationRegistrationQueries',
-  });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   sentPushNotificationsQueries = query('sent-push-notifications', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
@@ -66,7 +64,11 @@ export default class SendNotificationsTask {
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
     } catch (e: any) {
       if (e.errorInfo?.code === 'messaging/registration-token-not-registered') {
-        await this.pushNotificationRegistrationQueries.disable(payload.pushClientId);
+        let prismaClient = await this.prismaManager.getClient();
+        await prismaClient.pushNotificationRegistration.updateMany({
+          where: { pushClientId: payload.pushClientId },
+          data: { disabledAt: new Date() },
+        });
 
         helpers.logger.info(
           `Disabled push notification registration for ${payload.pushClientId} because Firebase rejected notification ${payload.notificationId}`

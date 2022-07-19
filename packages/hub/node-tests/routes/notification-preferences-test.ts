@@ -1,4 +1,4 @@
-import { registry, setupHub } from '../helpers/server';
+import { setupHub, setupRegistry } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -27,12 +27,11 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('GET /api/notification-preferences/:push_client_id', async function () {
-  let { request, getContainer } = setupHub(this);
+  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
+  let { request, lookup } = setupHub(this);
 
   this.beforeEach(async function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
@@ -99,7 +98,7 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
   it('returns overriden preference when EOA/device pair has a preference saved', async function () {
     let pushClientId = '1234567';
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
+    let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
     await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId,
@@ -140,12 +139,11 @@ describe('GET /api/notification-preferences/:push_client_id', async function () 
 });
 
 describe('PUT /api/notification-preferences/:push_client_id', async function () {
-  let { request, getContainer } = setupHub(this);
+  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
+  let { request, lookup } = setupHub(this);
 
   this.beforeEach(async function () {
-    registry(this).register('authentication-utils', StubAuthenticationUtils);
-
-    let dbManager = await getContainer().lookup('database-manager');
+    let dbManager = await lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
       '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
@@ -205,7 +203,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
         },
       });
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
+    let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
@@ -250,7 +248,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
   });
 
   it('updates a preference', async function () {
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
+    let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
     await notificationPreferenceQueries.upsert({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',
@@ -481,7 +479,7 @@ describe('PUT /api/notification-preferences/:push_client_id', async function () 
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200);
 
-    let notificationPreferenceQueries = await getContainer().lookup('notification-preference', { type: 'query' });
+    let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
     let records = await notificationPreferenceQueries.query({
       ownerAddress: stubUserAddress,
       pushClientId: '1234567',

@@ -3,7 +3,6 @@ import { AddressKeys } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 
 import logger from '@cardstack/logger';
-import { query } from '@cardstack/hub/queries';
 import { EventData } from 'web3-eth-contract';
 
 const log = logger('hub/contract-subscription-event-handler');
@@ -46,13 +45,14 @@ export class ContractSubscriptionEventHandler {
   contracts = inject('contracts', { as: 'contracts' });
   web3 = inject('web3-socket', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
-  latestEventBlockQueries = query('latest-event-block', { as: 'latestEventBlockQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async setupContractEventSubscriptions() {
     let web3Instance = this.web3.getInstance();
+    let prisma = await this.prismaManager.getClient();
 
     let subscriptionOptions = {};
-    let subscriptionEventLatestBlock = await this.latestEventBlockQueries.read();
+    let subscriptionEventLatestBlock = await prisma.latestEventBlock.read();
 
     if (subscriptionEventLatestBlock) {
       let latestBlock = await web3Instance.eth.getBlockNumber();
@@ -77,8 +77,7 @@ export class ContractSubscriptionEventHandler {
             `Received ${contractEvent.contractName} event (block number ${event.blockNumber})`,
             event.transactionHash
           );
-
-          await this.latestEventBlockQueries.update(event.blockNumber);
+          await prisma.latestEventBlock.updateBlockNumber(event.blockNumber);
           this.workerClient.addJob<typeof CONTRACT_EVENTS[number]['taskName']>(contractEvent.taskName, event);
         }
       });

@@ -1,5 +1,6 @@
 import { module, test } from 'qunit';
 import {
+  blur,
   click,
   currentURL,
   fillIn,
@@ -362,10 +363,14 @@ module('Acceptance | persistence view and restore', function () {
         `[data-test-merchant-customization-merchant-name-field] input`,
         'Mandello'
       );
+      await blur(
+        '[data-test-merchant-customization-merchant-name-field] input'
+      );
       await fillIn(
         `[data-test-merchant-customization-merchant-id-field] input`,
         'mandello1'
       );
+      await blur('[data-test-merchant-customization-merchant-id-field] input');
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       await click(`[data-test-merchant-customization-save-details]`);
 

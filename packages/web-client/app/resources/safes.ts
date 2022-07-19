@@ -12,6 +12,7 @@ import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
+import * as Sentry from '@sentry/browser';
 
 export interface SafesResourceStrategy {
   bridgedDaiTokenSymbol: BridgedTokenSymbol;
@@ -132,7 +133,7 @@ export class TrackedDepotSafe
 }
 
 export class Safes extends Resource<Args> {
-  @reads('args.named.strategy.viewSafesTask')
+  @reads('strategy.viewSafesTask')
   declare viewSafesTask: TaskFunction;
   @reads('viewSafesTask.isRunning') declare isLoading: boolean;
   graphData: ViewSafesResult = {
@@ -140,13 +141,12 @@ export class Safes extends Resource<Args> {
     blockNumber: 0,
   };
   individualSafeUpdateData: Record<string, IndividualSafeState> = {};
+  @tracked walletAddress: string | undefined;
   @tracked safeReferences: Record<string, Safe> = {};
   @tracked value: Safe[] = [];
-
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
-    this.fetch();
-  }
+  @tracked strategy: SafesResourceStrategy | undefined;
+  didSetup = false;
+  currentWalletAddress: string | undefined;
 
   updateReferences(safes: Safe[]) {
     // FIXME maybe this should never happen? but it is in tests… need mock graph responses?
@@ -195,8 +195,27 @@ export class Safes extends Resource<Args> {
           individualUpdate.blockNumber > this.graphData.blockNumber
             ? individualUpdate.safe
             : graphDataSafe;
+      } else if (graphDataSafe) {
+        selectedSafe = graphDataSafe;
+      } else if (individualUpdate) {
+        selectedSafe = individualUpdate.safe;
       } else {
-        selectedSafe = graphDataSafe ?? individualUpdate.safe;
+        let e = new Error(
+          `Safe with address "${address}" was not found in graph data or individual update data`
+        );
+
+        Sentry.withScope((scope) => {
+          // we want to know if there are actually any addresses available
+          scope.setExtras({
+            account: this.currentWalletAddress,
+            graphData: this.graphData.safes.map((s) => s.address),
+            individual: Object.keys(this.individualSafeUpdateData),
+          });
+          Sentry.captureException(e);
+          scope.clear();
+        });
+
+        throw e;
       }
 
       if (isTrackedPrepaidCardSafe(this.safeReferences[address])) {
@@ -225,16 +244,32 @@ export class Safes extends Resource<Args> {
     this.value = safesWithLatestValues;
   }
 
+  modify(_positional: any, named: any) {
+    this.strategy = named.strategy;
+    if (this.currentWalletAddress !== named.walletAddress) {
+      this.currentWalletAddress = named.walletAddress;
+      this.walletAddress = named.walletAddress;
+      this.clear();
+    }
+    if (!this.didSetup) {
+      this.didSetup = true;
+      this.fetch();
+    }
+  }
+
   async fetch() {
     this.graphData = await taskFor(this.viewSafesTask).perform(
-      this.args.named.walletAddress
+      this.walletAddress
     );
 
     this.updateReferences(this.graphData.safes);
   }
 
   get issuePrepaidCardSourceSafes() {
-    let strategy = this.args.named.strategy;
+    let strategy = this.strategy;
+    if (!strategy) {
+      return [];
+    }
     let tokenOptions = [strategy.bridgedDaiTokenSymbol];
     let minimumFaceValue = new BN(strategy.issuePrepaidCardDaiMinValue);
     let compatibleSafeTypes = ['depot', 'merchant'];
@@ -253,10 +288,11 @@ export class Safes extends Resource<Args> {
   }
 
   async updateOne(address: string) {
-    let blockNumber = (
-      await this.args.named.strategy.getBlockHeight()
-    ).toNumber();
-    let safe = await this.args.named.strategy.getLatestSafe(address);
+    if (!this.strategy) {
+      return;
+    }
+    let blockNumber = (await this.strategy.getBlockHeight()).toNumber();
+    let safe = await this.strategy.getLatestSafe(address);
 
     if (!safe) {
       throw new Error(`There is no safe for address: ${address}`);

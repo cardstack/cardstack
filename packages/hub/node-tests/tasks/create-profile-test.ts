@@ -2,7 +2,6 @@ import { registry, setupHub } from '../helpers/server';
 import { expect } from 'chai';
 import CreateProfile from '../../tasks/create-profile';
 import shortUUID from 'short-uuid';
-import JobTicketsQueries from '../../queries/job-tickets';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { encodeDID } from '@cardstack/did-resolver';
@@ -10,11 +9,12 @@ import { rest } from 'msw';
 import { setupServer, SetupServerApi } from 'msw/node';
 import config from 'config';
 import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
-let jobTicketsQueries: JobTicketsQueries, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
 
 let exampleEthereumAddress = '0x323B2318F35c6b31113342830204335Dac715AA8';
+let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
 
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
@@ -58,7 +58,7 @@ describe('CreateProfileTask', function () {
   setupSentry(this);
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
-  this.beforeEach(function () {
+  this.beforeEach(async function () {
     registry(this).register('cardpay', StubCardPay);
 
     registeringShouldError = false;
@@ -85,12 +85,18 @@ describe('CreateProfileTask', function () {
   let { getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
+
+    registeringShouldError = false;
+    subgraphQueryShouldBeNull = false;
+
     jobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({
-      id: jobTicketId,
-      jobType: 'create-profile',
-      ownerAddress: exampleEthereumAddress,
+    await prisma.jobTicket.create({
+      data: {
+        id: jobTicketId,
+        jobType: 'create-profile',
+        ownerAddress: exampleEthereumAddress,
+      },
     });
 
     merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
@@ -114,15 +120,14 @@ describe('CreateProfileTask', function () {
       'job-ticket-id': jobTicketId,
       'merchant-info-id': merchantInfosId,
     });
-
     expect(registerProfileCalls).to.equal(1);
 
     expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
-    expect(getJobPayloads()[0]).to.deep.equal({ 'merchant-safe-id': merchantInfosId });
+    expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('success');
-    expect(jobTicket?.result).to.deep.equal({ 'merchant-safe-id': mockMerchantSafeAddress });
+    expect(jobTicket?.result).to.deep.equal({ id: mockMerchantSafeAddress });
 
     expect(dataSentToServer).to.deep.equal({
       owner: exampleEthereumAddress,
@@ -139,8 +144,8 @@ describe('CreateProfileTask', function () {
     });
 
     let errorText = `Could not register profile card v2 for customer ${exampleEthereumAddress}, did ${did}, received 400 from relay server: {}`;
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({
       error: `Error: ${errorText}`,
@@ -161,7 +166,7 @@ describe('CreateProfileTask', function () {
       'merchant-info-id': merchantInfosId,
     });
 
-    let jobTicket = await jobTicketsQueries.find({ id: jobTicketId });
+    let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });
     expect(jobTicket?.state).to.equal('failed');
     expect(jobTicket?.result).to.deep.equal({
       error: `Error: subgraph query for transaction ${mockTransactionHash} returned no results`,
