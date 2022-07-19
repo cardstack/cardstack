@@ -33,12 +33,13 @@ def create_rule(
     ):
         return "TEST_TABLE"
 
-    def run_query(self, table_query, vars):
+    def run_query(self, table_query, vars, aux_table_query):
         con.execute(self.sql("TEST_TABLE"), vars)
         return con.fetchdf()
 
     monkeypatch.setattr(safe_ownership.SafeOwnership, "_get_table_query", table_query)
     monkeypatch.setattr(safe_ownership.SafeOwnership, "run_query", run_query)
+
 
     rule = safe_ownership.SafeOwnership(core_config, user_config)
     return rule

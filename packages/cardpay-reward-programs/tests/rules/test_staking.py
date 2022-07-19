@@ -1,14 +1,16 @@
-from logging import raiseExceptions
+
+from cmath import nan
+from msilib.schema import Error
 import pandas as pd
 import duckdb
+from cardpay_reward_programs.rules import safe_ownership, staking
 
-from cardpay_reward_programs.rules import staking
-
+token_holder_table = "_TOKEN_HOLDER"
+safe_ownership_table = "_SAFE_OWNERSHIP"
 
 def create_rule(
-    monkeypatch, test, table_names, fake_data_table1, fake_data_table2 = None,  core_config_overrides={}, user_config_overrides={}
+    monkeypatch, fake_data_token_holder, fake_data_safe_owner, core_config_overrides={}, user_config_overrides={}
 ):
-   
     core_config = {
         "payment_cycle_length": 30,
         "start_block": 0,
@@ -22,293 +24,245 @@ def create_rule(
 
     core_config.update(core_config_overrides)
     user_config = {
-        "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
-        "duration": 43200,
-        "num_of_blocks_per_month": 30,
-        "interest_rate_monthly": 0.5
+        "token": "card",
+        "duration": 30,
+        "interest_rate_monthly": 0.06
     }
 
     user_config.update(user_config_overrides)
     con = duckdb.connect(database=":memory:", read_only=False)
-    con.execute(f"""create table {table_names[0]} as select * from fake_data_table1""")
+    con.execute(f"""create table {token_holder_table} as select * from fake_data_token_holder""")
+    con.execute(f"""create table {safe_ownership_table} as select * from fake_data_safe_owner""")
 
-    if fake_data_table2 is not None:
-        con.execute(f"""create table {table_names[1]} as select * from fake_data_table2""")
+    def table_query(self, config_name, table_name, min_partition: int, max_partition: int):
+        
+        if table_name == "token_holder":
+            return token_holder_table
+        elif table_name == "safe_owner":
+            return safe_ownership_table
+        else:
+            raise NameError 
 
+
+    def run_query(self, table_query, vars, aux_table_query):
+        con.execute(self.sql(token_holder_table, safe_ownership_table), vars)
+        return con.fetchdf()
     
-
-    def run_query(self, tables_names, vars):
-        
-        if test == "compound_parameters":
-            vars = ["0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3"] #[token, num_of_blocks_per_month, interest_rate_monthly]
-        elif test == "partial_rewards":
-            vars = ["0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3", 30, 0.5 ]
-        elif test == "base_rewards":
-            vars = []
-        elif test == "intermediate_rewards":
-            vars = []
-        con.execute(self.sql_2(["TOKEN_TABLE", "SAFE_TABLE"]), vars)
-        df = con.fetchdf()
-        return df
-
-    def sql_2(self, tables_names):
-        
-        if test == "compound_parameters":
-            token_holder_table = "TOKEN_TABLE"
-            safe_owner_table = "SAFE_TABLE"
-            return f""" 
-                select th.vid, th.lower_block_range, th.upper_block_range,so.owner, th.safe, th.balance,
-                lag(th.balance) over (partition by th.safe order by th.upper_block_range asc NULLS LAST) as old_balance,
-                th.balance - lag(th.balance) over (partition by th.safe order by th.upper_block_range asc NULLS LAST) as change,
-                first_value(th.lower_block_range) over (partition by th.safe order by th.lower_block_range asc) as star_block,
-                30 + first_value(th.lower_block_range) over (partition by th.safe order by th.lower_block_range asc) as end_block,
-                (30 + first_value(th.lower_block_range) over (partition by th.safe order by th.lower_block_range asc)) - th.lower_block_range as blocks_to_finish,
-                balance * 2 as rewards 
-                from {token_holder_table} as th, {safe_owner_table} as so
-                where th.token = $1::text
-                and th.safe = so.safe
-                and th.safe is not null;
-            """
-        ###-----BALANACE * AS REWARDS DELETE
-        elif test == "partial_rewards":
-            compound_parameters_table = "COMPOUND_PARAMETERS_TABLE"
-            return f"""
-                select *,(blocks_to_finish::float/30::float) as percentage_of_month, 
-                (blocks_to_finish::float/$2::float)* $3 as interest_rate,
-                ((blocks_to_finish::float/$2::float) * $3) * change as reward_in_tokens,
-                change * 2 as rewards
-                from {compound_parameters_table};
-            """
-        elif test == "base_rewards":
-            partial_rewards_table = "PARTIAL_REWARDS_TABLE"
-            return f"""select  distinct on (safe) safe, vid, owner, balance, blocks_to_finish, percentage_of_month, interest_rate,
-            ((blocks_to_finish::float/30::float) * 0.5) * balance as reward_in_tokens,
-            balance * 2 as rewards
-            from {partial_rewards_table};"""
-        elif test == "intermediate_rewards":
-            partial_rewards_table = "AGG_PARTIAL_REWARDS_TABLE"
-            return f""" 
-            select safe, owner, Sum(partial_reward) as intermediate_rewards,
-            1000 as rewards
-            from {partial_rewards_table} group by safe, owner order by safe;
-            """
-
-    ###-----BALANACE * AS REWARDS DELETE
+    monkeypatch.setattr(staking.Staking, "_get_table_query", table_query)
     monkeypatch.setattr(staking.Staking, "run_query", run_query)
-    monkeypatch.setattr(staking.Staking, "sql_2", sql_2)
+
     rule = staking.Staking(core_config, user_config)
     return rule
 
-def get_amount(result, payee):
-    return result.where(result["payee"] == payee)["amount"][0]
-
-def test_compound_parameters(monkeypatch):
+def get_amount(result, payee, idx):
+    idx = result.index[result["payee"] == payee].tolist()[0]
+    return result.loc[idx, "amount"]
+   
+   
+def test_correctly_compound_interest(monkeypatch):
     fake_data_token_holder = pd.DataFrame(
         [
             {
-                "vid":0,
-                "lower_block_range": 0,
-                "upper_block_range":10,
-                "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
+                "_block_number": 0,
+                "id": 1,
+                "token": "card",
                 "safe": "safe1",
-                "balance": 10000
+                "balance_uint64": 1000
             },
             {
-                "vid":1,
-                "lower_block_range": 10,
-                "upper_block_range":15,
-                "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
+                "_block_number": 10,
+                "id": 1,
+                "token": "card",
                 "safe": "safe1",
-                "balance": 15000
+                "balance_uint64": 1500
             },
             {
-                "vid":2,
-                "lower_block_range": 15,
-                "upper_block_range":20,
-                "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
+                "_block_number": 15,
+                "id": 1,
+                "token": "card",
                 "safe": "safe1",
-                "balance": 12000
-            }
-        ]
+                "balance_uint64": 1200
+            },
+            {
+                "_block_number": 20,
+                "id": 1,
+                "token": "card",
+                "safe": "safe1",
+                "balance_uint64": 1700
+            },
+            {
+                "_block_number": 25,
+                "id": 1,
+                "token": "card",
+                "safe": "safe1",
+                "balance_uint64": 1900
+            },
+            {
+                "_block_number": 0,
+                "id": 2,
+                "token": "card",
+                "safe": "safe2",
+                "balance_uint64": 1500
+            },
+            {
+                "_block_number": 0,
+                "id": 2,
+                "token": "card",
+                "safe": "safe2",
+                "balance_uint64": 1500
+            },   
+            {
+                "_block_number": 15,
+                "id": 2,
+                "token": "card",
+                "safe": "safe2",
+                "balance_uint64": 1200
+            },
+            {
+                "_block_number": 25,
+                "id": 2,
+                "token": "card",
+                "safe": "safe2",
+                "balance_uint64": 1000
+            }, 
+            {
+                "_block_number": 0,
+                "id": 3,
+                "token": "card",
+                "safe": "safe3",
+                "balance_uint64": 1500
+            }, 
+        ]    
     )
 
     fake_data_safe_owner = pd.DataFrame(
         [
             {
-                "owner": "owner1",
-                "safe": "safe1"
+                "safe":"safe1",
+                "owner":"owner1"
+            },
+            {
+                "safe": "safe2",
+                "owner": "owner2"
+            },
+            {
+                "safe": "safe3",
+                "owner": "owner3"
             }
-        ]
+        ]   
     )
-    table_names = ["TOKEN_TABLE","SAFE_TABLE"]
+
     rule = create_rule(
-        monkeypatch, "compound_parameters", table_names, fake_data_token_holder, fake_data_safe_owner, 
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
     )
-
-    result = rule.run(200, "0x0")
-    for i in range(len(result)):
-        if i == 0: 
-            prev_balance = result.where(result["vid"] == i)["balance"][i]
-            continue
-
-        old_balance = result.where(result["vid"] == i)["old_balance"][i]
-        assert prev_balance == old_balance
-
-        cur_balance =  result.where(result["vid"] == i)["balance"][i]
-        change = result.where(result["vid"] == i)["change"][i]
-        assert change == cur_balance - old_balance
-        prev_balance = cur_balance
-
-        blocks_to_finish = result.where(result["vid"] == i)["blocks_to_finish"][i]
-        lower_block = result.where(result["vid"] == i)["lower_block_range"][i]
-        end_block = result.where(result["vid"] == i)["end_block"][i]
-        assert blocks_to_finish == end_block - lower_block
-    
-    
-def test_partial_rewards(monkeypatch):
-    fake_data_compound_parameter = pd.DataFrame(
-        [
-            {
-                "vid":0,
-                "lower_block_range":10,
-                "upper_block_range":15,
-                "owner":"owner1",
-                "safe":"safe1",
-                "balance":1500,
-                "old_balance": 1000,
-                "change": 500,
-                "blocks_to_finish":15,
-                "end_block": 30
-            },
-            {
-                "vid":1,
-                "lower_block_range":15,
-                "upper_block_range":20,
-                "owner":"owner1",
-                "safe":"safe1",
-                "balance":1200,
-                "old_balance": 1500,
-                "change": -300,
-                "blocks_to_finish":10,
-                "end_block": 30
-            },
-            {
-                "vid":2,
-                "lower_block_range":10,
-                "upper_block_range":15,
-                "owner":"owner2",
-                "safe":"safe2",
-                "balance":1500,
-                "old_balance": 1000,
-                "change": 500,
-                "blocks_to_finish":15,
-                "end_block": 30
-            }
-        ]
-    )
-    
-    table_names = ["COMPOUND_PARAMETERS_TABLE"]
-    rule = create_rule( monkeypatch, "partial_rewards", table_names, fake_data_compound_parameter)
-
-    result = rule.run(200, "0x0")
-    for i in range(len(result)):
-        month_percentage = result.where(result["vid"] == i)["percentage_of_month"][i]
-        blocks_to_finish = result.where(result["vid"] == i)["blocks_to_finish"][i]
-        end_block = result.where(result["vid"] == i)["end_block"][i]
-        interest_rate = result.where(result["vid"] == i)["interest_rate"][i]
-        reward_in_tokens = result.where(result["vid"] == i)["reward_in_tokens"][i]
-        change = result.where(result["vid"] == i)["change"][i]
-        assert abs(month_percentage - float(blocks_to_finish/end_block)) < 0.01
-        assert abs(interest_rate - (month_percentage * 0.5)) < 0.01
-        assert abs(reward_in_tokens - (change * interest_rate)) < 0.01
-
-
-def test_base_rewards(monkeypatch):
-    
-
-    fake_partial_rewards_data = pd.DataFrame([
-        {
-            "vid":0,
-            "safe": "safe1",
-            "owner": "owner1",
-            "balance": 1000,
-            "blocks_to_finish": 30,
-            "percentage_of_month": 1,
-            "interest_rate": 0.5
-        },
-        {
-            "vid":0,
-            "safe": "safe1",
-            "owner": "owner1",
-            "balance": 1500,
-            "blocks_to_finish": 20,
-            "percentage_of_month": 0.66,
-            "interest_rate": 0.33
-        },
-        {
-            "vid":1,
-            "safe": "safe2",
-            "owner": "owner2",
-            "balance": 2000,
-            "blocks_to_finish": 30,
-            "percentage_of_month": 1,
-            "interest_rate": 0.5
-        }
-        
-    ])
-    table_names = ["PARTIAL_REWARDS_TABLE"]
-    rule = create_rule( monkeypatch, "base_rewards", table_names, fake_partial_rewards_data)
-    result = rule.run(200, "0x0")
-    assert len(result) == 2
-    for i in range(len(result)):
-         balance = result.where(result["vid"] == i)["balance"][i]
-         interest_rate = result.where(result["vid"] == i)["interest_rate"][i]
-         reward_in_tokens = result.where(result["vid"] == i)["reward_in_tokens"][i]
-         assert reward_in_tokens - (balance * interest_rate) < 0.001
-         
-     
-def test_intermediate_rewards(monkeypatch):
-    
-
-    fake_partial_rewards_data = pd.DataFrame(
-    [
-        {
-            "vid": 0,
-            "safe":"safe1",
-            "owner":"owner1",
-            "partial_reward": 1000
-        },
-        {
-            "vid":0,
-            "safe":"safe1",
-            "owner":"owner1",
-            "partial_reward": 500
-        },
-        {
-            "vid":1,
-            "safe":"safe2",
-            "owner":"owner2",
-            "partial_reward": 200
-        },
-        {
-            "vid":1,
-            "safe":"safe2",
-            "owner":"owner2",
-            "partial_reward": -300
-        },
-        {
-            "vid":2,
-            "safe":"safe3",
-            "owner":"owner3",
-            "partial_reward": 500
-        }
-        
-    ])
-
-    table_names = ["AGG_PARTIAL_REWARDS_TABLE"]
-    rule = create_rule(monkeypatch, "intermediate_rewards", table_names, fake_partial_rewards_data)
-    result = rule.run(200, "0x0")
+    result = rule.run(30, "0x0")
     assert len(result) == 3
 
+def test_correct_calc_rewards(monkeypatch):
+    fake_data_token_holder = pd.DataFrame([
+        {
+            "_block_number": 0,
+            "token": "card",
+            "safe": "safe1",
+            "balance_uint64": 1000
+        },
+        {
+            "_block_number": 10,
+            "token": "card",
+            "safe": "safe1",
+            "balance_uint64": 2000
+        },
+        {
+            "_block_number": 20,
+            "token": "card",
+            "safe": "safe1",
+            "balance_uint64": 1500
+        },
+        {
+            "_block_number": 0,
+            "token": "card",
+            "safe": "safe2",
+            "balance_uint64": 1000
+        },
+        {
+            "_block_number": 10,
+            "token": "card",
+            "safe": "safe2",
+            "balance_uint64": 1500
+        },
+        {
+            "_block_number": 15,
+            "token": "card",
+            "safe": "safe2",
+            "balance_uint64": 1200
+        },
+        {
+            "_block_number": 20,
+            "token": "card",
+            "safe": "safe2",
+            "balance_uint64": 1700
+        },
+        {
+            "_block_number": 25,
+            "token": "card",
+            "safe": "safe2",
+            "balance_uint64": 1900
+        },
+        {
+            "_block_number": 0,
+            "token": "card",
+            "safe": "safe3",
+            "balance_uint64": 15000
+        }
+
+    ])
+
+    fake_data_safe_owner = pd.DataFrame([
+        {
+            "safe":"safe1",
+            "owner":"owner1"
+        },
+        {
+            "safe":"safe2",
+            "owner":"owner2"
+        },
+        {
+            "safe":"safe3",
+            "owner":"owner3"
+        }
+    ])
+
+    rule = create_rule(
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
+    )
+    result = rule.run(30, "0x0")
+    
+    assert get_amount(result, "owner1", 0) == 90
+    assert get_amount(result, "owner2", 1) == 83
+    assert get_amount(result, "owner3", 2) == 900
 
 
+def test_max_balance(monkeypatch):
+    fake_data_token_holder = pd.DataFrame([
+        {
+            "_block_number": 0,
+            "token": "card",
+            "safe": "safe1",
+            "balance_uint64": 18446744073709551615
+        }
+    ])
+
+    fake_data_safe_owner = pd.DataFrame([
+        {
+            "safe":"safe1",
+            "owner":"owner1"
+        }
+    ])
+    
+    rule = create_rule(
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
+    )
+
+    result = rule.run(30, "0x0")
+    expected_value = 1.1068 * (10**18)
+    assert get_amount(result, "owner1", 0) - expected_value < 4619683561473

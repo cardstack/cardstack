@@ -14,7 +14,7 @@ def create_rule(
         "end_block": 10000,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
-            "spend_accumulation": "s3://tall-data-dev/paulin/spend_accumulation/0.0.1/",
+            # "spend_accumulation": "s3://tall-data-dev/paulin/spend_accumulation/0.0.1/",
             "safe_owner": "s3://tall-data-dev/paulin/safe_owner/0.0.1/"  
         }
     }
