@@ -8,6 +8,7 @@ RUN pip install pdm
 
 # copy files
 COPY pyproject.toml pdm.lock /project/
+RUN pdm config python.use_venv false
 
 # install dependencies
 WORKDIR /project
