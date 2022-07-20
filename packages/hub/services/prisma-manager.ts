@@ -22,7 +22,7 @@ let dbConfig: Record<string, any> = config.get('db');
 let singletonClient = new PrismaClient({
   datasources: { db: { url: dbConfig.url } },
   log: dbConfig.prismaLog,
-}) as ExtendedPrismaClient;
+});
 
 // In tests, do not add extensions until the in-transaction proxy client exists
 
@@ -47,7 +47,7 @@ export default class PrismaManager {
       return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
     }
 
-    return singletonClient;
+    return singletonClient as ExtendedPrismaClient;
   }
 
   async teardown() {
