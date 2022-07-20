@@ -22,7 +22,7 @@ if (dbConfig.useTransactionalRollbacks) {
     datasources: { db: { url: dbConfig.url } },
     log: dbConfig.prismaLog,
   });
-  addCardstackPrismaExtensions(client);
+
   clientForTests = client as ExtendedPrismaClient;
 }
 
@@ -37,7 +37,10 @@ export default class PrismaManager {
       if (!this.prismaTestingHelper) {
         this.prismaTestingHelper = new PrismaTestingHelper(clientForTests);
         await this.prismaTestingHelper.startNewTransaction();
-        return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+
+        let clientToReturn = this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+        addCardstackPrismaExtensions(clientToReturn);
+        return clientToReturn;
       } else {
         return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
       }
