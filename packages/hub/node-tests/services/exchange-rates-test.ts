@@ -3,6 +3,7 @@ import ExchangeRatesService, {
   CryptoCompareSuccessResponse,
   DEFAULT_CRYPTOCOMPARE_EXCHANGE,
 } from '../../services/exchange-rates';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 import { setupHub } from '../helpers/server';
 
@@ -15,8 +16,9 @@ interface CryptoCompareSuccessResponsesByDate {
 }
 
 describe('ExchangeRatesService', function () {
-  let { instantiate, lookup } = setupHub(this);
+  let { getPrisma, instantiate } = setupHub(this);
   let subject: ExchangeRatesService;
+  let prisma: ExtendedPrismaClient;
 
   let mockErrorResponse = {
     Response: 'Error',
@@ -109,30 +111,64 @@ describe('ExchangeRatesService', function () {
     }
 
     subject = await instantiate(PatchedExchangeRatesService);
+
+    prisma = await getPrisma();
   });
 
   it('fetches the rates when they are not cached and caches them', async function () {
-    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'USD', 1919, '2022-05-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'BTC',
+        toSymbol: 'USD',
+        rate: 1919,
+        date: new Date(Date.parse('2022-05-01')),
+        exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+      },
+    });
 
     let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
 
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
 
-    let cachedValue = await exchangeRates.select('BTC', ['USD'], '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'BTC',
+      to: ['USD'],
+      date: '2022-06-01',
+      exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+    });
     expect(cachedValue).deep.equal({ USD: 432.18 });
   });
 
   it('can fetch some rates and use some cached rates', async function () {
-    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'AUD', 2.1, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
-    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    await prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'BTC',
+        toSymbol: 'AUD',
+        rate: 2.1,
+        date: new Date(Date.parse('2022-06-01')),
+        exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+      },
+    });
+    await prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'BTC',
+        toSymbol: 'USD',
+        rate: 1919,
+        date: new Date(Date.parse('2022-06-01')),
+        exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+      },
+    });
 
     let result = await subject.fetchExchangeRates('BTC', ['AUD', 'GBP', 'USD', 'CAD'], '2022-06-01');
 
     expect(result).deep.equal({ BTC: { AUD: 2.1, CAD: 2010, GBP: 2, USD: 1919 } });
 
-    let cachedValue = await exchangeRates.select('BTC', ['CAD', 'GBP'], '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'BTC',
+      to: ['CAD', 'GBP'],
+      date: '2022-06-01',
+      exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+    });
     expect(cachedValue).deep.equal({ CAD: 2010, GBP: 2 });
   });
 
@@ -165,8 +201,15 @@ describe('ExchangeRatesService', function () {
   });
 
   it('returns the cached rates when they exist', async function () {
-    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('BTC', 'USD', 1919, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    await prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'BTC',
+        toSymbol: 'USD',
+        rate: 1919,
+        date: new Date(Date.parse('2022-06-01')),
+        exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+      },
+    });
 
     let result = await subject.fetchExchangeRates('BTC', ['USD'], '2022-06-01');
 
@@ -178,15 +221,35 @@ describe('ExchangeRatesService', function () {
   });
 
   it('fetches the rates from another exchange when they are not cached and caches them', async function () {
-    let exchangeRates = await lookup('exchange-rates', { type: 'query' });
-    await exchangeRates.insert('CARD', 'USDT', 1919, '2022-05-01', 'kucoin');
-    await exchangeRates.insert('CARD', 'USDT', 1870, '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    await prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'CARD',
+        toSymbol: 'USDT',
+        rate: 1919,
+        date: new Date(Date.parse('2022-05-01')),
+        exchange: 'kucoin',
+      },
+    });
+    await prisma.exchangeRate.create({
+      data: {
+        fromSymbol: 'CARD',
+        toSymbol: 'USDT',
+        rate: 1870,
+        date: new Date(Date.parse('2022-06-01')),
+        exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+      },
+    });
 
     let result = await subject.fetchExchangeRates('CARD', ['USDT'], '2022-06-01', 'kucoin');
 
     expect(result).deep.equal({ CARD: { USDT: 0.002059 } });
 
-    let cachedValue = await exchangeRates.select('CARD', ['USDT'], '2022-06-01', 'kucoin');
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'CARD',
+      to: ['USDT'],
+      date: '2022-06-01',
+      exchange: 'kucoin',
+    });
     expect(cachedValue).deep.equal({ USDT: 0.002059 });
   });
 
