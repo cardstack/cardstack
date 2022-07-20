@@ -3,9 +3,6 @@ import { inject } from '@cardstack/di';
 import { NotificationPreference } from '../../routes/notification-preferences';
 
 export default class NotificationPreferenceService {
-  notificationTypeQueries = query('notification-type', {
-    as: 'notificationTypeQueries',
-  });
   notificationPreferenceQueries = query('notification-preference', {
     as: 'notificationPreferenceQueries',
   });
@@ -14,7 +11,7 @@ export default class NotificationPreferenceService {
   async getPreferences(ownerAddress: string, pushClientId?: string): Promise<NotificationPreference[]> {
     let prismaClient = await this.prismaManager.getClient();
 
-    let notificationTypes = await this.notificationTypeQueries.query();
+    let notificationTypes = await prismaClient.notificationType.findMany();
     let preferences = await this.notificationPreferenceQueries.query({
       ownerAddress,
     });
