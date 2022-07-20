@@ -15,66 +15,43 @@ export interface ExtendedPrismaClient extends PrismaClient {
 }
 
 let dbConfig: Record<string, any> = config.get('db');
-let clientForTests: ExtendedPrismaClient;
 
-if (dbConfig.useTransactionalRollbacks) {
-  let client = new PrismaClient({
-    datasources: { db: { url: dbConfig.url } },
-    log: dbConfig.prismaLog,
-  });
+// Prisma client should be a singleton to avoid this problem:
+// https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client#the-number-of-prismaclient-instances-matters
 
-  clientForTests = client as ExtendedPrismaClient;
+let singletonClient = new PrismaClient({
+  datasources: { db: { url: dbConfig.url } },
+  log: dbConfig.prismaLog,
+}) as ExtendedPrismaClient;
+
+// Extensions must be added to the Prisma testing helper proxy client in tests
+// so they are available on the client passed to the extension functions
+if (!dbConfig.useTransactionalRollbacks) {
+  addCardstackPrismaExtensions(singletonClient);
 }
 
 export default class PrismaManager {
-  private client?: ExtendedPrismaClient;
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
 
-  dbConfig: Record<string, any> = config.get('db');
-
   async getClient() {
-    if (clientForTests) {
+    if (dbConfig.useTransactionalRollbacks) {
+      // Set up transactional test helper if it doesn’t yet exist, or return its proxy client
       if (!this.prismaTestingHelper) {
-        this.prismaTestingHelper = new PrismaTestingHelper(clientForTests);
+        this.prismaTestingHelper = new PrismaTestingHelper(singletonClient);
         await this.prismaTestingHelper.startNewTransaction();
 
-        let clientToReturn = this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
-        addCardstackPrismaExtensions(clientToReturn);
-        return clientToReturn;
-      } else {
-        return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+        let proxyClientToExtend = this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+        addCardstackPrismaExtensions(proxyClientToExtend);
       }
+
+      return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
     }
 
-    if (!this.client) {
-      let client = new PrismaClient({
-        datasources: { db: { url: this.dbConfig.url } },
-        log: this.dbConfig.prismaLog,
-      });
-
-      if (this.dbConfig.useTransactionalRollbacks) {
-        this.prismaTestingHelper = new PrismaTestingHelper(client);
-        await this.prismaTestingHelper.startNewTransaction();
-        client = this.prismaTestingHelper.getProxyClient();
-      }
-
-      addCardstackPrismaExtensions(client);
-
-      this.client = client as ExtendedPrismaClient;
-
-      if (this.dbConfig.useTransactionalRollbacks) {
-        clientForTests = this.client;
-      }
-    }
-
-    return this.client;
+    return singletonClient;
   }
 
   async teardown() {
     this.prismaTestingHelper?.rollbackCurrentTransaction();
-    // TODO CS-4254
-    // warn(prisma-client) There are already 10 instances of Prisma Client actively running.
-    // return this.client?.$disconnect();
   }
 }
 
