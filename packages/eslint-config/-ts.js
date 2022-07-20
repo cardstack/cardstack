@@ -22,6 +22,12 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/naming-convention.md
     // '@typescript-eslint/naming-convention': 'error',
     indent: 'off',
+    '@typescript-eslint/no-misused-promises': [
+      'error',
+      {
+        checksVoidReturn: false,
+      },
+    ],
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/member-delimiter-style': 'error',
     '@typescript-eslint/consistent-type-assertions': 'error',
