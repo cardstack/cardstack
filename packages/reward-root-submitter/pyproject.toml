@@ -1,5 +1,5 @@
 [project]
-name = ""
+name = "reward_root_submitter"
 version = ""
 description = ""
 authors = [
@@ -12,6 +12,7 @@ dependencies = [
     "pyarrow>=7.0.0",
     "schedule>=1.1.0",
     "sentry-sdk>=1.5.12",
+    "pydantic[dotenv]>=1.9.1",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}

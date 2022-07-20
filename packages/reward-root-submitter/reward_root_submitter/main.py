@@ -21,18 +21,6 @@ def setup_logging(config):
     logging.basicConfig(level=config.log_level.upper())
 
 
-def setup_sentry(config):
-    if config.reward_root_submitter_sentry_dsn is not None:
-        sentry_sdk.init(
-            SENTRY_DSN,
-            # Set traces_sample_rate to 1.0 to capture 100%
-            # of transactions for performance monitoring.
-            # We recommend adjusting this value in production.
-            traces_sample_rate=1.0,
-            environment=config.environment,
-        )
-
-
 def safe_regex_group_search(regex, string, group):
     """
     Returns None in the case of a missing group
