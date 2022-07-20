@@ -6,8 +6,10 @@ import {
   getPushNotificationRegistrationExtension,
 } from './prisma-extensions/push-notification-registration';
 import { ExtendedLatestEventBlock, getLatestEventBlockExtension } from './prisma-extensions/latest-event-block';
+import { ExtendedExchangeRate, getExchangeRateExtension } from './prisma-extensions/exchange-rate';
 
 export interface ExtendedPrismaClient extends PrismaClient {
+  exchangeRate: ExtendedExchangeRate;
   pushNotificationRegistration: ExtendedPushNotificationRegistration;
   latestEventBlock: ExtendedLatestEventBlock;
 }
@@ -74,6 +76,7 @@ export default class PrismaManager {
 }
 
 function addCardstackPrismaExtensions(client: PrismaClient) {
+  Object.assign(client.exchangeRate, getExchangeRateExtension(client));
   Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
   Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
 }
