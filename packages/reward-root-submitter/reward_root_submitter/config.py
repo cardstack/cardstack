@@ -24,7 +24,6 @@ class Config(BaseSettings):
 
     @root_validator(pre=True)
     def load_secrets(cls, values):
-        client = boto3.client("secretsmanager")
         env = values["environment"]
         for field_name, field in cls.__fields__.items():
             # Check it isn't already set *and* there is no default
