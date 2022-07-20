@@ -105,15 +105,15 @@ export default class ExchangeRatesService {
 
   async fetchExchangeRates(
     from: string,
-    tos: string[],
+    to: string[],
     date: string,
     exchange = DEFAULT_CRYPTOCOMPARE_EXCHANGE
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
     let prisma = await this.prismaManager.getClient();
-    let cachedValues = await prisma.exchangeRate.select(from, tos, date, exchange);
+    let cachedValues = await prisma.exchangeRate.select({ from, to, date, exchange });
 
     let cachedValuesTos = Object.keys(cachedValues || {});
-    let requestedButNotCached = tos.filter((to) => !cachedValuesTos.includes(to));
+    let requestedButNotCached = to.filter((to) => !cachedValuesTos.includes(to));
 
     if (requestedButNotCached.length === 0) {
       return {

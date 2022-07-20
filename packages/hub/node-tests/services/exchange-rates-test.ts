@@ -130,7 +130,12 @@ describe('ExchangeRatesService', function () {
 
     expect(result).deep.equal({ BTC: { USD: 432.18 } });
 
-    let cachedValue = await prisma.exchangeRate.select('BTC', ['USD'], '2022-06-01', DEFAULT_CRYPTOCOMPARE_EXCHANGE);
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'BTC',
+      to: ['USD'],
+      date: '2022-06-01',
+      exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+    });
     expect(cachedValue).deep.equal({ USD: 432.18 });
   });
 
@@ -158,12 +163,12 @@ describe('ExchangeRatesService', function () {
 
     expect(result).deep.equal({ BTC: { AUD: 2.1, CAD: 2010, GBP: 2, USD: 1919 } });
 
-    let cachedValue = await prisma.exchangeRate.select(
-      'BTC',
-      ['CAD', 'GBP'],
-      '2022-06-01',
-      DEFAULT_CRYPTOCOMPARE_EXCHANGE
-    );
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'BTC',
+      to: ['CAD', 'GBP'],
+      date: '2022-06-01',
+      exchange: DEFAULT_CRYPTOCOMPARE_EXCHANGE,
+    });
     expect(cachedValue).deep.equal({ CAD: 2010, GBP: 2 });
   });
 
@@ -239,7 +244,12 @@ describe('ExchangeRatesService', function () {
 
     expect(result).deep.equal({ CARD: { USDT: 0.002059 } });
 
-    let cachedValue = await prisma.exchangeRate.select('CARD', ['USDT'], '2022-06-01', 'kucoin');
+    let cachedValue = await prisma.exchangeRate.select({
+      from: 'CARD',
+      to: ['USDT'],
+      date: '2022-06-01',
+      exchange: 'kucoin',
+    });
     expect(cachedValue).deep.equal({ USDT: 0.002059 });
   });
 
