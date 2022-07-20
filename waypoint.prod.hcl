@@ -103,7 +103,7 @@ app "hub-worker" {
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
       task_role_name      = "hub-worker-ecs-task"
       execution_role_name = "hub-worker-ecs-task-execution"
-      security_group_ids  = ["sg-0ebaff84eb2ce9911"]
+      security_group_ids  = ["sg-03ae615bbcfa87393"]
       disable_alb         = true
 
       secrets = {
@@ -164,7 +164,7 @@ app "hub-bot" {
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
       task_role_name      = "hub-bot-ecs-task"
       execution_role_name = "hub-bot-ecs-task-execution"
-      security_group_ids  = ["sg-07d3e7f1d03f6a550"]
+      security_group_ids  = ["sg-003ba9cd5594cbcc2"]
       disable_alb         = true
 
       secrets = {
@@ -224,7 +224,7 @@ app "hub-event-listener" {
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
       task_role_name      = "hub-event-listener-ecs-task"
       execution_role_name = "hub-event-listener-ecs-task-execution"
-      security_group_ids  = ["sg-0e670a65333b189e6"]
+      security_group_ids  = ["sg-09b022c7166e01262"]
       disable_alb         = true
 
       secrets = {
@@ -291,7 +291,7 @@ app "cardpay-subg-ext" {
       subnets             = ["subnet-0544d680b5f494842", "subnet-051e48e37cf15329c"]
       task_role_name      = "cardpay-subg-ext-ecs-task"
       execution_role_name = "cardpay-subg-ext-ecs-task-execution"
-      security_group_ids  = ["sg-00f628311f41a4cfb"]
+      security_group_ids  = ["sg-08a9f0f453e7e7a43"]
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7"
@@ -527,7 +527,7 @@ app "reward-indexer" {
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
       task_role_name      = "reward-indexer-ecs-task"
       execution_role_name = "reward-indexer-ecs-task-execution"
-      security_group_ids  = ["sg-0ddbdabbc933ec962"]
+      security_group_ids  = ["sg-05c9c059e019205ca"]
       disable_alb         = true
 
       secrets = {
@@ -589,7 +589,7 @@ app "reward-scheduler" {
       count               = 1
       task_role_name      = "reward-scheduler-ecs-task"
       execution_role_name = "reward-scheduler-ecs-task-execution"
-      security_group_ids  = ["sg-0df4cedbbbb97d9e3"]
+      security_group_ids  = ["sg-0e26577768ce001a2"]
       disable_alb         = true
 
       secrets = {
