@@ -5,7 +5,6 @@ import { ensureLoggedIn } from './utils/auth';
 import NotificationPreferenceSerializer from '../services/serializers/notification-preference-serializer';
 import { serializeErrors } from './utils/error';
 import NotificationPreferenceService from '../services/push-notifications/preferences';
-import { query } from '@cardstack/hub/queries';
 
 export interface NotificationType {
   id: string;
@@ -21,13 +20,13 @@ export interface NotificationPreference {
 }
 
 export default class NotificationPreferencesRoute {
-  notificationPreferenceQueries = query('notification-preference', { as: 'notificationPreferenceQueries' });
   notificationPreferenceSerializer: NotificationPreferenceSerializer = inject('notification-preference-serializer', {
     as: 'notificationPreferenceSerializer',
   });
   notificationPreferenceService: NotificationPreferenceService = inject('notification-preference-service', {
     as: 'notificationPreferenceService',
   });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   constructor() {
     autoBind(this);
@@ -72,7 +71,9 @@ export default class NotificationPreferencesRoute {
       return;
     }
 
-    await this.notificationPreferenceQueries.upsert({
+    let prisma = await this.prismaManager.getClient();
+
+    await prisma.notificationPreference.updateStatus({
       ownerAddress: ctx.state.userAddress,
       pushClientId,
       notificationType,

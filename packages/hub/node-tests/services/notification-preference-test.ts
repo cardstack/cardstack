@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { setupHub } from '../helpers/server';
 
 describe('NotificationPreferenceService', function () {
   let { getPrisma, lookup } = setupHub(this);
-  let prisma: PrismaClient;
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
     prisma = await getPrisma();
@@ -22,8 +22,6 @@ describe('NotificationPreferenceService', function () {
         },
       ],
     });
-
-    let preferenceQueries = await lookup('notification-preference', { type: 'query' });
 
     await prisma.pushNotificationRegistration.createMany({
       data: [
@@ -62,7 +60,7 @@ describe('NotificationPreferenceService', function () {
     });
 
     // Preference override for 1st device
-    await preferenceQueries.upsert({
+    await prisma.notificationPreference.updateStatus({
       ownerAddress: '0x01',
       pushClientId: '123',
       notificationType: 'customer_payment',

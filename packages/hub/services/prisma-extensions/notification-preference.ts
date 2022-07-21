@@ -1,9 +1,9 @@
-import { NotificationPreference, Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 type NotificationPreferenceGetter = Prisma.NotificationPreferenceDelegate<any>;
 
 export interface ExtendedNotificationPreference extends NotificationPreferenceGetter {
-  findManyWithKnownTypes({
+  findManyWithTypes({
     ownerAddress,
     pushClientId,
     notificationType,
@@ -11,8 +11,8 @@ export interface ExtendedNotificationPreference extends NotificationPreferenceGe
     ownerAddress: string;
     pushClientId?: string;
     notificationType?: string;
-  }): ReturnType<NotificationPreferenceGetter['findMany']>;
-  updateStatus(model: NotificationPreference): ReturnType<NotificationPreferenceGetter['upsert']>;
+  }): NotificationPreferenceWithInlineType[];
+  updateStatus(model: NotificationPreferenceWithInlineType): ReturnType<NotificationPreferenceGetter['upsert']>;
 }
 
 export interface NotificationPreferenceWithInlineType {
@@ -24,7 +24,7 @@ export interface NotificationPreferenceWithInlineType {
 
 export function getNotificationPreferenceExtension(client: PrismaClient) {
   return {
-    async findManyWithKnownTypes({
+    async findManyWithTypes({
       ownerAddress,
       pushClientId,
       notificationType,
@@ -47,9 +47,26 @@ export function getNotificationPreferenceExtension(client: PrismaClient) {
         };
       }
 
-      return client.notificationPreference.findMany({
+      let rows = await client.notificationPreference.findMany({
+        select: {
+          ownerAddress: true,
+          pushClientId: true,
+          status: true,
+          notificationTypes: {
+            select: {
+              notificationType: true,
+            },
+          },
+        },
         where: whereClause,
       });
+
+      return rows.map((row) => ({
+        ownerAddress: row.ownerAddress,
+        pushClientId: row.pushClientId,
+        status: row.status,
+        notificationType: row.notificationTypes.notificationType,
+      }));
     },
 
     async updateStatus(model: NotificationPreferenceWithInlineType) {

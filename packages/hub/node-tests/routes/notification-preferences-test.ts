@@ -1,3 +1,4 @@
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { setupHub, setupRegistry } from '../helpers/server';
 
 const stubNonce = 'abc:123';
@@ -28,10 +29,11 @@ function handleValidateAuthToken(encryptedString: string) {
 
 describe('NotificationPreference endpoints', function () {
   setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
-  let { getPrisma, request, lookup } = setupHub(this);
+  let { getPrisma, request } = setupHub(this);
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
-    let prisma = await getPrisma();
+    prisma = await getPrisma();
     await prisma.notificationType.createMany({
       data: [
         {
@@ -102,8 +104,7 @@ describe('NotificationPreference endpoints', function () {
     it('returns overriden preference when EOA/device pair has a preference saved', async function () {
       let pushClientId = '1234567';
 
-      let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
-      await notificationPreferenceQueries.upsert({
+      await prisma.notificationPreference.updateStatus({
         ownerAddress: stubUserAddress,
         pushClientId,
         notificationType: 'customer_payment',
@@ -189,8 +190,7 @@ describe('NotificationPreference endpoints', function () {
           },
         });
 
-      let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
-      let records = await notificationPreferenceQueries.query({
+      let records = await prisma.notificationPreference.findManyWithTypes({
         ownerAddress: stubUserAddress,
         pushClientId: '1234567',
         notificationType: 'merchant_claim',
@@ -234,8 +234,7 @@ describe('NotificationPreference endpoints', function () {
     });
 
     it('updates a preference', async function () {
-      let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
-      await notificationPreferenceQueries.upsert({
+      await prisma.notificationPreference.updateStatus({
         ownerAddress: stubUserAddress,
         pushClientId: '1234567',
         notificationType: 'customer_payment',
@@ -269,7 +268,7 @@ describe('NotificationPreference endpoints', function () {
           },
         });
 
-      let records = await notificationPreferenceQueries.query({
+      let records = await prisma.notificationPreference.findManyWithTypes({
         ownerAddress: stubUserAddress,
         pushClientId: '1234567',
       });
@@ -465,8 +464,7 @@ describe('NotificationPreference endpoints', function () {
         .set('Content-Type', 'application/vnd.api+json')
         .expect(200);
 
-      let notificationPreferenceQueries = await lookup('notification-preference', { type: 'query' });
-      let records = await notificationPreferenceQueries.query({
+      let records = await prisma.notificationPreference.findManyWithTypes({
         ownerAddress: stubUserAddress,
         pushClientId: '1234567',
       });
