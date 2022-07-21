@@ -121,7 +121,8 @@ async function fixPrismaFile() {
 
       // Add map if we needed to convert the field name and the field is not a relational type
       // If it's relational, the field type will be a non-primitive, hence the isPrimitiveType check
-      if (currentFieldName.includes('_') && isPrimitiveType(currentFieldType)) {
+      // If it’s an enum, it’s not a true relation and needs mapping
+      if (currentFieldName.includes('_') && (isPrimitiveType(currentFieldType) || currentFieldType.endsWith('enum'))) {
         fixedLine = `${fixedLine} @map("${currentFieldName}")`;
       }
     }

@@ -155,7 +155,7 @@ model NotificationPreference {
 model NotificationType {
   id                      String                      @id @db.Uuid
   notificationType        String                      @map("notification_type")
-  defaultStatus           NotificationTypesStatusEnum @default(enabled)
+  defaultStatus           NotificationTypesStatusEnum @default(enabled) @map("default_status")
   createdAt               DateTime                    @default(now()) @map("created_at") @db.Timestamp(6)
   notificationPreferences NotificationPreference[]
 
