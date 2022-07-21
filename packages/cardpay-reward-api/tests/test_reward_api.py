@@ -1,15 +1,11 @@
-#!/usr/bin/env python3
-
 import pytest
 from cardpay_reward_api.database import Base
 from cardpay_reward_api.main import app, get_db
 from cardpay_reward_api.models import Proof
 from fastapi.testclient import TestClient
 
-from .config import engine, override_get_db, settings
-from .mocks import reward_programs, roots_for_program
-from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
-                    validate_proof_response_fields)
+from .config import engine, override_get_db
+from .utils import check_duplicates_for_proofs, validate_proof_response_fields
 
 # this overrides the get_db function yielding a different session with different engine
 # it is only needed when using dependencies in fastapi

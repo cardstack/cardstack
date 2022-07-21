@@ -1,9 +1,8 @@
 import streamlit as st
 from boto3.session import Session
-from cardpay_reward_programs.rules import *
 from cloudpathlib import S3Client
 from views import min_other_merchants_paid, min_spend, weighted_usage
-from views.utils import *
+from views.utils import download_csv, view_multiple, view_single
 
 cached_client = S3Client(local_cache_dir="mycache", boto3_session=Session())
 cached_client.set_as_default_client()
