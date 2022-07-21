@@ -91,7 +91,7 @@
     "ember-cli-deploy-build": "^2.0.0",
     "ember-cli-deploy-compress": "^0.3.2",
     "ember-cli-deploy-s3": "^3.0.0",
-    "ember-cli-deprecation-workflow": "^1.0.1",
+    "ember-cli-deprecation-workflow": "^2.1.0",
     "ember-cli-dotenv": "^3.1.0",
     "ember-cli-fastboot": "^3.3.0",
     "ember-cli-htmlbars": "^5.7.2",
