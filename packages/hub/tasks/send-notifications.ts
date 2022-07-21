@@ -1,7 +1,6 @@
 import { inject } from '@cardstack/di';
 import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
-import { query } from '@cardstack/hub/queries';
 
 export interface PushNotificationData {
   /**
@@ -22,14 +21,16 @@ export interface PushNotificationsIdentifiers {
 
 export default class SendNotificationsTask {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
-  sentPushNotificationsQueries = query('sent-push-notifications', { as: 'sentPushNotificationsQueries' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
   async perform(payload: PushNotificationData, helpers: Helpers) {
     let messageId: string;
+    let prisma = await this.prismaManager.getClient();
     try {
-      let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists({
-        notificationId: payload.notificationId,
+      let notificationHasBeenSent = await prisma.sentPushNotification.findFirst({
+        where: {
+          notificationId: payload.notificationId,
+        },
       });
       if (notificationHasBeenSent) {
         helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
@@ -64,8 +65,7 @@ export default class SendNotificationsTask {
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
     } catch (e: any) {
       if (e.errorInfo?.code === 'messaging/registration-token-not-registered') {
-        let prismaClient = await this.prismaManager.getClient();
-        await prismaClient.pushNotificationRegistration.updateMany({
+        await prisma.pushNotificationRegistration.updateMany({
           where: { pushClientId: payload.pushClientId },
           data: { disabledAt: new Date() },
         });
@@ -91,7 +91,7 @@ export default class SendNotificationsTask {
     try {
       // We don't want to have this in the same try catch block because
       // We don't want failure to write to the database to result in infinite notifications being sent
-      await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
+      await prisma.sentPushNotification.create({ data: { ...payload, messageId } });
     } catch (e) {
       // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
       Sentry.captureException(e, {
