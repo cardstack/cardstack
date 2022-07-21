@@ -27,14 +27,13 @@ export default class PrepaidCardPatternSerializer {
 
   async loadPrepaidCardPattern(id: string): Promise<PrepaidCardPattern> {
     let prisma = await this.prismaManager.getClient();
-    let pattern = prisma.prepaidCardPattern.findUnique({ where: { id } });
+    let pattern = await prisma.prepaidCardPattern.findUnique({ where: { id } });
 
     if (!pattern) {
       return Promise.reject(new Error(`No prepaid_card_pattern record found with id ${id}`));
     }
 
-    // TODO why? If it’s already known to not be null. CS-4255
-    return pattern as unknown as PrepaidCardPattern;
+    return pattern;
   }
 }
 
