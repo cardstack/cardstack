@@ -24,14 +24,16 @@ let singletonClient = new PrismaClient({
   log: dbConfig.prismaLog,
 });
 
-// In tests, do not add extensions until the in-transaction proxy client exists
-
-if (!dbConfig.useTransactionalRollbacks) {
-  addCardstackPrismaExtensions(singletonClient);
-}
-
 export default class PrismaManager {
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
+
+  async ready() {
+    // In tests, do not add extensions until the in-transaction proxy client exists
+
+    if (!dbConfig.useTransactionalRollbacks) {
+      addCardstackPrismaExtensions(singletonClient);
+    }
+  }
 
   async getClient() {
     if (dbConfig.useTransactionalRollbacks) {
