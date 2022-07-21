@@ -117,6 +117,11 @@ async function fixPrismaFile() {
         fixedFieldName = pluralize.plural(fixedFieldName);
       }
 
+      // In a belongs-to relation, the property should be singular
+      if (!isArrayType && pluralize.isPlural(fixedFieldName) && !isPrimitiveType(currentFieldType)) {
+        fixedFieldName = pluralize.singular(fixedFieldName);
+      }
+
       fixedLine = fixedLine.replace(currentFieldName, fixedFieldName);
 
       // Add map if we needed to convert the field name and the field is not a relational type

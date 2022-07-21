@@ -42,7 +42,7 @@ export function getNotificationPreferenceExtension(client: PrismaClient) {
       }
 
       if (notificationType) {
-        whereClause.notificationTypes = {
+        whereClause.notificationType = {
           notificationType,
         };
       }
@@ -52,7 +52,7 @@ export function getNotificationPreferenceExtension(client: PrismaClient) {
           ownerAddress: true,
           pushClientId: true,
           status: true,
-          notificationTypes: {
+          notificationType: {
             select: {
               notificationType: true,
             },
@@ -65,7 +65,7 @@ export function getNotificationPreferenceExtension(client: PrismaClient) {
         ownerAddress: row.ownerAddress,
         pushClientId: row.pushClientId,
         status: row.status,
-        notificationType: row.notificationTypes.notificationType,
+        notificationType: row.notificationType.notificationType,
       }));
     },
 
