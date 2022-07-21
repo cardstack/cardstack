@@ -2,9 +2,6 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
-import { query } from '@cardstack/hub/queries';
-import { CardSpace } from './card-spaces';
-import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 import * as Sentry from '@sentry/node';
@@ -13,9 +10,6 @@ import { JobTicket } from '@prisma/client';
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
-
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
-
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
@@ -23,9 +17,6 @@ export default class ProfilePurchasesRoute {
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
-  });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
   });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -208,7 +199,7 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    const merchantInfo: MerchantInfo = {
+    const merchantInfo = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
       slug,
@@ -218,11 +209,10 @@ export default class ProfilePurchasesRoute {
     };
 
     let db = await this.databaseManager.getClient();
-    let merchantInfoId!: string;
 
     await this.databaseManager.performTransaction(db, async () => {
-      merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
-      await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
+      await prisma.merchantInfo.create({ data: merchantInfo });
+      await prisma.cardSpace.create({ data: { id: shortUuid.uuid(), merchantId: merchantInfo.id } });
     });
 
     let jobTicketId = shortUuid.uuid();
@@ -232,7 +222,7 @@ export default class ProfilePurchasesRoute {
         id: jobTicketId,
         jobType: 'create-profile',
         ownerAddress: ctx.state.userAddress,
-        payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
+        payload: { 'merchant-info-id': merchantInfo.id, 'job-ticket-id': jobTicketId },
         spec: { maxAttempts: 1 },
         sourceArguments,
       },
@@ -240,7 +230,7 @@ export default class ProfilePurchasesRoute {
 
     this.workerClient.addJob(
       'create-profile',
-      { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
+      { 'merchant-info-id': merchantInfo.id, 'job-ticket-id': jobTicketId },
       { maxAttempts: 1 }
     );
 

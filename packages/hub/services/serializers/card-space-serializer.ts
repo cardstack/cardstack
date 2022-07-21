@@ -1,14 +1,14 @@
 import { encodeDID } from '@cardstack/did-resolver';
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
-import { CardSpace } from '../../routes/card-spaces';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
+import { CardSpace } from '@prisma/client';
 
 export default class CardSpaceSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async serialize(model: CardSpace): Promise<JSONAPIDocument> {
+  async serialize(model: Partial<CardSpace> & Omit<CardSpace, 'createdAt' | 'links'>): Promise<JSONAPIDocument> {
     let did = encodeDID({ type: 'CardSpace', uniqueId: model.id });
 
     const result = {

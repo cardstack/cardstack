@@ -1,10 +1,9 @@
 import { registry, setupHub } from '../helpers/server';
-import CardSpaceQueries from '../../queries/card-space';
-import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
+import assert from 'assert';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -51,11 +50,7 @@ describe('POST /api/profile-purchases', function () {
   this.beforeEach(async function () {
     let container = getContainer();
     prisma = await (await container.lookup('prisma-manager')).getClient();
-    merchantInfosQueries = await container.lookup('merchant-info', { type: 'query' });
-    cardSpacesQueries = await container.lookup('card-space', { type: 'query' });
   });
-
-  let merchantInfosQueries: MerchantInfoQueries, cardSpacesQueries: CardSpaceQueries;
 
   it('validates the purchase, persists merchant information, returns a job ticket, and queues a single-attempt CreateProfile task', async function () {
     let merchantId,
@@ -135,14 +130,15 @@ describe('POST /api/profile-purchases', function () {
       'a-receipt': 'yes',
     });
 
-    let merchantRecord = (await merchantInfosQueries.fetch({ id: merchantId }))[0];
+    let merchantRecord = await prisma.merchantInfo.findUnique({ where: { id: merchantId } });
+    assert(!!merchantRecord);
     expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
     expect(merchantRecord.slug).to.equal('satoshi');
     expect(merchantRecord.color).to.equal('ff0000');
     expect(merchantRecord.textColor).to.equal('ffffff');
     expect(merchantRecord.ownerAddress).to.equal(stubUserAddress);
 
-    let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
+    let cardSpaceRecord = await prisma.cardSpace.findFirst({ where: { merchantId } });
     expect(cardSpaceRecord).to.exist;
 
     let jobTicketRecord = await prisma.jobTicket.findUnique({ where: { id: jobTicketId! } });
@@ -653,13 +649,15 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects a duplicate slug', async function () {
-    await merchantInfosQueries.insert({
-      id: shortUUID.uuid(),
-      name: 'yes',
-      slug: 'satoshi',
-      color: 'pink',
-      textColor: 'black',
-      ownerAddress: 'me',
+    await prisma.merchantInfo.create({
+      data: {
+        id: shortUUID.uuid(),
+        name: 'yes',
+        slug: 'satoshi',
+        color: 'pink',
+        textColor: 'black',
+        ownerAddress: 'me',
+      },
     });
 
     await request()

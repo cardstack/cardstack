@@ -1,6 +1,5 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import CardSpaceSerializer from '../services/serializers/card-space-serializer';
@@ -9,32 +8,17 @@ import WorkerClient from '../services/worker-client';
 import CardSpaceValidator from '../services/validators/card-space';
 import { serializeErrors } from './utils/error';
 import { validateRequiredFields } from './utils/validation';
-import { query } from '../queries';
-
-export interface CardSpace {
-  id: string;
-  profileDescription?: string;
-  profileImageUrl?: string;
-  links?: any[];
-  merchantId?: string;
-  merchantName?: string;
-  merchantOwnerAddress?: string;
-}
 
 export default class CardSpacesRoute {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   cardSpaceSerializer: CardSpaceSerializer = inject('card-space-serializer', {
     as: 'cardSpaceSerializer',
   });
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
   cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
     as: 'cardSpaceValidator',
   });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
-  });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
   });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
@@ -44,18 +28,19 @@ export default class CardSpacesRoute {
 
   async get(ctx: Koa.Context) {
     let slug = ctx.params.slug;
-    let cardSpace = (await this.cardSpaceQueries.query({ merchantSlug: slug }))[0] as CardSpace;
+    let prisma = await this.prismaManager.getClient();
+    let cardSpace = await prisma.cardSpace.findFirst({ where: { merchantInfo: { slug } } });
 
     if (!cardSpace) {
       ctx.status = 404;
       return;
     }
 
-    let merchant = (await this.merchantInfoQueries.fetch({ id: cardSpace.merchantId }))[0];
+    let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id: cardSpace.merchantId } });
 
     let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
 
-    let serializedMerchant = await this.merchantInfoSerializer.serialize(merchant);
+    let serializedMerchant = await this.merchantInfoSerializer.serialize(merchantInfo!);
     serialized.included = [serializedMerchant.data];
 
     ctx.status = 200;
@@ -72,17 +57,19 @@ export default class CardSpacesRoute {
       return;
     }
 
-    const cardSpace: CardSpace = {
+    const cardSpace = {
       id: shortUuid.uuid(),
       merchantId: this.sanitizeText(ctx.request.body.data.relationships['merchant-info'].data.id),
       profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
       profileImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']),
     };
 
+    let prisma = await this.prismaManager.getClient();
+
     let merchantInfoError;
 
     let merchantId = cardSpace.merchantId;
-    let merchant = (await this.merchantInfoQueries.fetch({ id: merchantId }))[0];
+    let merchant = await prisma.merchantInfo.findUnique({ where: { id: merchantId } });
 
     if (merchant) {
       if (merchant.ownerAddress !== ctx.state.userAddress) {
@@ -118,7 +105,7 @@ export default class CardSpacesRoute {
           errors: serializeErrors(errors),
         };
       } else {
-        await this.cardSpaceQueries.insert(cardSpace);
+        await prisma.cardSpace.create({ data: cardSpace });
 
         let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
         ctx.status = 201;
@@ -132,12 +119,13 @@ export default class CardSpacesRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
+    let prisma = await this.prismaManager.getClient();
 
     let cardSpaceId = ctx.params.id;
-    let cardSpace = (await this.cardSpaceQueries.query({ id: cardSpaceId }))[0] as CardSpace;
+    let cardSpace = await prisma.cardSpace.findUnique({ where: { id: cardSpaceId }, include: { merchantInfo: true } });
 
     if (cardSpace) {
-      if (ctx.state.userAddress !== cardSpace.merchantOwnerAddress) {
+      if (ctx.state.userAddress !== cardSpace.merchantInfo.ownerAddress) {
         ctx.status = 403;
         return;
       }
@@ -171,7 +159,15 @@ export default class CardSpacesRoute {
         errors: serializeErrors(errors),
       };
     } else {
-      await this.cardSpaceQueries.update(cardSpace);
+      await prisma.cardSpace.update({
+        data: {
+          profileDescription: cardSpace.profileDescription,
+          profileImageUrl: cardSpace.profileImageUrl,
+          merchantId: cardSpace.merchantId,
+          links: cardSpace.links,
+        },
+        where: { id: cardSpace.id },
+      });
 
       let serialized = await this.cardSpaceSerializer.serialize(cardSpace);
 
