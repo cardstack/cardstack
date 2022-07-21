@@ -7,51 +7,60 @@ import {
 } from './prisma-extensions/push-notification-registration';
 import { ExtendedLatestEventBlock, getLatestEventBlockExtension } from './prisma-extensions/latest-event-block';
 import { ExtendedExchangeRate, getExchangeRateExtension } from './prisma-extensions/exchange-rate';
+
 export interface ExtendedPrismaClient extends PrismaClient {
   exchangeRate: ExtendedExchangeRate;
   pushNotificationRegistration: ExtendedPushNotificationRegistration;
   latestEventBlock: ExtendedLatestEventBlock;
 }
 
+let dbConfig: Record<string, any> = config.get('db');
+
+// Prisma client should be a singleton to avoid this problem:
+// https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client#the-number-of-prismaclient-instances-matters
+
+let singletonClient = new PrismaClient({
+  datasources: { db: { url: dbConfig.url } },
+  log: dbConfig.prismaLog,
+});
+
 export default class PrismaManager {
-  private client?: ExtendedPrismaClient;
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
 
-  dbConfig: Record<string, any> = config.get('db');
+  async ready() {
+    // In tests, do not add extensions until the in-transaction proxy client exists
+
+    if (!dbConfig.useTransactionalRollbacks) {
+      addCardstackPrismaExtensions(singletonClient);
+    }
+  }
 
   async getClient() {
-    if (!this.client) {
-      let client = new PrismaClient({
-        datasources: { db: { url: this.dbConfig.url } },
-        log: this.dbConfig.prismaLog,
-      });
-
-      if (this.dbConfig.useTransactionalRollbacks) {
-        this.prismaTestingHelper = new PrismaTestingHelper(client);
+    if (dbConfig.useTransactionalRollbacks) {
+      // Set up transactional test helper with extensions if it doesn’t yet exist
+      if (!this.prismaTestingHelper) {
+        this.prismaTestingHelper = new PrismaTestingHelper(singletonClient);
         await this.prismaTestingHelper.startNewTransaction();
-        client = this.prismaTestingHelper.getProxyClient();
+
+        let proxyClientToExtend = this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
+        addCardstackPrismaExtensions(proxyClientToExtend);
       }
 
-      this.addCardstackPrismaExtensions(client);
-
-      this.client = client as ExtendedPrismaClient;
+      return this.prismaTestingHelper.getProxyClient() as ExtendedPrismaClient;
     }
 
-    return this.client;
+    return singletonClient as ExtendedPrismaClient;
   }
 
   async teardown() {
     this.prismaTestingHelper?.rollbackCurrentTransaction();
-    // TODO CS-4254
-    // warn(prisma-client) There are already 10 instances of Prisma Client actively running.
-    return this.client?.$disconnect();
   }
+}
 
-  private addCardstackPrismaExtensions(client: PrismaClient) {
-    Object.assign(client.exchangeRate, getExchangeRateExtension(client));
-    Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
-    Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
-  }
+function addCardstackPrismaExtensions(client: PrismaClient) {
+  Object.assign(client.exchangeRate, getExchangeRateExtension(client));
+  Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
+  Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
 }
 
 declare module '@cardstack/di' {
