@@ -133,3 +133,6 @@ package-lock.json
 service-account.json
 **/ui-debug.log
 **/firebase-debug.log
+
+#python
+.pdm.toml

@@ -5,3 +5,6 @@
 __pycache__
 __pypackages__
 .pdm.toml
+.hypothesis
+.mypy_cache
+.venv

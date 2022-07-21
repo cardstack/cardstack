@@ -3,7 +3,7 @@
 *.log
 tmp/
 dist/*
-mycache/*
+mycache
 __pycache__
 .env
 output/
@@ -12,3 +12,5 @@ output/
 __pypackages__
 input/results.parquet
 prepaid_card_less_gas.csv
+build/
+.pytest_cache
