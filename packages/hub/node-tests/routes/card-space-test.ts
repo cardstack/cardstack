@@ -1,4 +1,3 @@
-import { CardSpace } from '../../routes/card-spaces';
 import { setupRegistry, setupHub } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
 import { encodeDID } from '@cardstack/did-resolver';
@@ -30,30 +29,31 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('GET /api/card-spaces/:slug', function () {
-  let { request, lookup } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
 
   it('fetches a card space', async function () {
     let merchantId = uuidv4();
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: stubUserAddress,
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: stubUserAddress,
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
     const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
-    const cardSpace: CardSpace = {
+    const cardSpace = {
       id,
       profileDescription: "Satoshi's place",
       profileImageUrl: 'https://test.com/test1.png',
       merchantId,
     };
 
-    await (await lookup('card-space', { type: 'query' })).insert(cardSpace);
+    await prisma.cardSpace.create({ data: cardSpace });
 
     await request()
       .get('/api/card-spaces/satoshi')
@@ -111,19 +111,20 @@ describe('GET /api/card-spaces/:slug', function () {
 
 describe('POST /api/card-spaces', function () {
   setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
-  let { request, lookup } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
 
   it('persists card space', async function () {
     let merchantId = uuidv4();
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: stubUserAddress,
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: stubUserAddress,
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
     let payload = {
@@ -200,15 +201,16 @@ describe('POST /api/card-spaces', function () {
 
   it('returns 403 when the related merchant has a different owner', async function () {
     let merchantId = uuidv4();
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: '0xmystery',
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: '0xmystery',
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
     let payload = {
@@ -280,15 +282,16 @@ describe('POST /api/card-spaces', function () {
 
   it('returns 422 when the merchant doesn’t exist', async function () {
     let merchantId = uuidv4();
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: stubUserAddress,
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: stubUserAddress,
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
     let payloadMerchantId = uuidv4();
@@ -333,7 +336,7 @@ describe('POST /api/card-spaces', function () {
 
 describe('PATCH /api/card-spaces', function () {
   setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
-  let { request, lookup } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
 
   it('returns 404 when resource does not exist', async function () {
     await request()
@@ -347,25 +350,25 @@ describe('PATCH /api/card-spaces', function () {
 
   it('returns 403 when resource does not belong to wallet', async function () {
     let merchantId = uuidv4();
-
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: '0x1234',
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: '0x1234',
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
-    let dbManager = await lookup('database-manager');
-    let db = await dbManager.getClient();
-    await db.query('INSERT INTO card_spaces(id, profile_description, merchant_id) VALUES($1, $2, $3)', [
-      'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
-      'Test',
-      merchantId,
-    ]);
+    await prisma.cardSpace.create({
+      data: {
+        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+        profileDescription: 'Test',
+        merchantId,
+      },
+    });
 
     await request()
       .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
@@ -395,25 +398,28 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('updates the specified fields of the resource', async function () {
-    let dbManager = await lookup('database-manager');
-    let db = await dbManager.getClient();
     let merchantId = uuidv4();
 
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: stubUserAddress,
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: stubUserAddress,
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
-    await db.query(
-      'INSERT INTO card_spaces(id, profile_description, profile_image_url, merchant_id) VALUES($1, $2, $3, $4)',
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', "Satoshi's place", 'https://test.com/profile.jpg', merchantId]
-    );
+    await prisma.cardSpace.create({
+      data: {
+        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+        profileDescription: "Satoshi's place",
+        profileImageUrl: 'https://test.com/profile.jpg',
+        merchantId,
+      },
+    });
 
     let payload = {
       data: {
@@ -458,27 +464,27 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('returns errors when updating a resource with invalid attributes', async function () {
-    let dbManager = await lookup('database-manager');
-    let db = await dbManager.getClient();
-
     let merchantId = uuidv4();
 
-    await (
-      await lookup('merchant-info', { type: 'query' })
-    ).insert({
-      id: merchantId,
-      ownerAddress: stubUserAddress,
-      name: 'Satoshi?',
-      slug: 'satoshi',
-      color: 'black',
-      textColor: 'red',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: merchantId,
+        ownerAddress: stubUserAddress,
+        name: 'Satoshi?',
+        slug: 'satoshi',
+        color: 'black',
+        textColor: 'red',
+      },
     });
 
-    await db.query('INSERT INTO card_spaces(id, profile_description, merchant_id) VALUES($1, $2, $3)', [
-      'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
-      'Test',
-      merchantId,
-    ]);
+    await prisma.cardSpace.create({
+      data: {
+        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+        profileDescription: 'Test',
+        merchantId,
+      },
+    });
 
     let payload = {
       data: {

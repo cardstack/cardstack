@@ -2,8 +2,8 @@
 import { inject } from '@cardstack/di';
 
 import { getResolver } from '@cardstack/did-resolver';
+import { MerchantInfo } from '@prisma/client';
 import { Resolver } from 'did-resolver';
-import { MerchantInfo } from '../routes/merchant-infos';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 export default class MerchantInfoService {
@@ -13,7 +13,7 @@ export default class MerchantInfoService {
     as: 'merchantInfoSerializer',
   });
 
-  async getMerchantInfo(did?: string): Promise<MerchantInfo | null> {
+  async getMerchantInfo(did?: string): Promise<MerchantInfo | Omit<MerchantInfo, 'createdAt'> | null> {
     if (!did) {
       return null;
     }
