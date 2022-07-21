@@ -11,10 +11,10 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
-    "build": "webpack --progress",
+    "build": "prisma generate && webpack --progress",
     "build_if_missing": "[ -d dist ] || yarn build",
     "clean": "rm -rf dist",
-    "rebuild": "webpack --watch --progress",
+    "rebuild": "prisma generate && webpack --watch --progress",
     "start": "yarn build_if_missing && run-p -c start:*",
     "start:server": "node --no-deprecation -r source-map-support/register dist/hub.js server",
     "start:worker": "node --no-deprecation -r source-map-support/register dist/hub.js worker",
