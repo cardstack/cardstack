@@ -3,10 +3,10 @@ import { registry, setupHub, setupRegistry } from '../helpers/server';
 import SendNotifications, { PushNotificationData } from '../../tasks/send-notifications';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import shortUUID from 'short-uuid';
 import { PrismaClient } from '@prisma/client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
@@ -86,21 +86,18 @@ class EntityNotFoundFirebasePushNotifications {
 
 describe('SendNotificationsTask', function () {
   let subject: SendNotifications;
-  let sentPushNotificationsQueries: SentPushNotificationsQueries;
   setupRegistry(this, ['firebase-push-notifications', StubFirebasePushNotifications]);
-  let { instantiate, lookup } = setupHub(this);
+  let { instantiate, getPrisma } = setupHub(this);
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
-    let dbManager = await lookup('database-manager');
-    let db = await dbManager.getClient();
-    await db.query(`DELETE FROM sent_push_notifications`);
-
-    sentPushNotificationsQueries = (await lookup('sent-push-notifications', {
-      type: 'query',
-    })) as SentPushNotificationsQueries;
-    sentPushNotificationsQueries.insert({
-      ...existingNotification,
-      messageId: 'existing-message-id',
+    prisma = await getPrisma();
+    await prisma.sentPushNotification.deleteMany();
+    await prisma.sentPushNotification.create({
+      data: {
+        ...existingNotification,
+        messageId: 'existing-message-id',
+      },
     });
 
     lastSentData = undefined;
@@ -127,30 +124,41 @@ describe('SendNotificationsTask', function () {
     });
     expect(notificationSent).equal(true);
 
-    let newNotificationInDatabase = await sentPushNotificationsQueries.exists({
-      notificationId: newlyAddedNotification.notificationId,
+    let newNotificationInDatabase = await prisma.sentPushNotification.findFirst({
+      where: {
+        notificationId: newlyAddedNotification.notificationId,
+      },
     });
 
-    expect(newNotificationInDatabase).equal(true);
+    expect(!!newNotificationInDatabase).equal(true);
   });
 });
+
+class ErroringPrismaClientSentPushNotification {
+  async create() {
+    throw new Error('insert fails');
+  }
+
+  async findFirst() {
+    return null;
+  }
+}
+
+class ErroringPrismaClient {
+  sentPushNotification = new ErroringPrismaClientSentPushNotification();
+}
 
 describe('SendNotificationsTask deduplication errors', async function () {
   setupRegistry(
     this,
     ['firebase-push-notifications', StubFirebasePushNotifications],
     [
-      'sent-push-notifications',
-      class ErroredSentPushNotificationsQueries {
-        async insert() {
-          throw new Error('insert fails');
-        }
-
-        async exists() {
-          return false;
+      'prisma-manager',
+      class ErroringPrismaManager {
+        async getClient() {
+          return Promise.resolve(new ErroringPrismaClient());
         }
       },
-      { type: 'query' },
     ]
   );
   let { instantiate } = setupHub(this);
