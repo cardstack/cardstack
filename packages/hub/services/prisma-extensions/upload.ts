@@ -2,9 +2,11 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 type UploadGetter = Prisma.UploadDelegate<any>;
 
-export interface ExtendedUpload extends UploadGetter {
+interface UploadExtensions {
   isAbusing(ownerAddress: string): Promise<boolean>;
 }
+
+export interface ExtendedUpload extends UploadGetter, UploadExtensions {}
 
 export function getUploadExtension(client: PrismaClient) {
   return {

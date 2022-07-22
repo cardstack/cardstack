@@ -3,7 +3,7 @@ import { CryptoCompareConversionBlock } from '../exchange-rates';
 
 type ExchangeRateGetter = Prisma.ExchangeRateDelegate<any>;
 
-export interface ExtendedExchangeRate extends ExchangeRateGetter {
+interface ExchangeRateExtensions {
   select({
     from,
     to,
@@ -16,6 +16,8 @@ export interface ExtendedExchangeRate extends ExchangeRateGetter {
     exchange: string;
   }): Promise<CryptoCompareConversionBlock | null>;
 }
+
+export interface ExtendedExchangeRate extends ExchangeRateGetter, ExchangeRateExtensions {}
 
 export function getExchangeRateExtension(client: PrismaClient) {
   return {
