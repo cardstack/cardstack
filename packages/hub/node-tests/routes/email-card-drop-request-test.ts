@@ -6,6 +6,7 @@ import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import crypto from 'crypto';
 import config from 'config';
 import shortUUID from 'short-uuid';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',
@@ -68,9 +69,12 @@ describe('GET /api/email-card-drop-requests', function () {
     mockPrepaidCardQuantity = 50;
   });
 
-  let { request, getContainer } = setupHub(this);
+  let { getContainer, getPrisma, request } = setupHub(this);
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
+    prisma = await getPrisma();
+
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     await emailCardDropRequestsQueries.insert(unclaimedEmailForClaimedEoa);
     await emailCardDropRequestsQueries.insert(claimedEoa);
@@ -94,8 +98,7 @@ describe('GET /api/email-card-drop-requests', function () {
   });
 
   it('reports if the rate limit has been reached', async function () {
-    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
-    await emailCardDropStateQueries.update(true);
+    await prisma.emailCardDropState.updateState(true);
 
     let response = await request()
       .get(`/api/email-card-drop-requests?eoa=${claimedEoa.ownerAddress}`)
@@ -219,7 +222,12 @@ describe('POST /api/email-card-drop-requests', function () {
     mockPrepaidCardQuantity = 50;
   });
 
-  let { request, getContainer } = setupHub(this);
+  let { getPrisma, getContainer, request } = setupHub(this);
+  let prisma: ExtendedPrismaClient;
+
+  this.beforeEach(async function () {
+    prisma = await getPrisma();
+  });
 
   it('persists an email card drop request and triggers jobs', async function () {
     let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
@@ -469,8 +477,7 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('rejects if the rate limit has been triggered', async function () {
-    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
-    await emailCardDropStateQueries.update(true);
+    await prisma.emailCardDropState.updateState(true);
 
     const payload = {
       data: {
@@ -535,8 +542,8 @@ describe('POST /api/email-card-drop-requests', function () {
         ],
       });
 
-    let emailCardDropStateQueries = await getContainer().lookup('email-card-drop-state', { type: 'query' });
-    let limited = await emailCardDropStateQueries.read();
+    prisma = await getPrisma();
+    let limited = await prisma.emailCardDropState.read();
 
     expect(limited).to.equal(true);
 

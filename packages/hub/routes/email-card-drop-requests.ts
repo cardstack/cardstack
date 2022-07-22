@@ -32,12 +32,12 @@ export interface EmailCardDropRequest {
 export default class EmailCardDropRequestsRoute {
   cardpay = inject('cardpay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
-  emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
   web3 = inject('web3-http', { as: 'web3' });
@@ -72,7 +72,8 @@ export default class EmailCardDropRequestsRoute {
 
     let claimed = previousRequests.some((request) => Boolean(request?.claimedAt));
 
-    let rateLimited = await this.emailCardDropStateQueries.read();
+    let prisma = await this.prismaManager.getClient();
+    let rateLimited = await prisma.emailCardDropState.read();
 
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
@@ -108,6 +109,7 @@ export default class EmailCardDropRequestsRoute {
 
     ctx.type = 'application/vnd.api+json';
 
+    let prisma = await this.prismaManager.getClient();
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
     if (await prepaidCardMarketV2.isPaused()) {
@@ -142,7 +144,7 @@ export default class EmailCardDropRequestsRoute {
       return respondWith503(ctx, 'There are no prepaid cards available');
     }
 
-    if (await this.emailCardDropStateQueries.read()) {
+    if (await prisma.emailCardDropState.read()) {
       return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
@@ -158,7 +160,7 @@ export default class EmailCardDropRequestsRoute {
         },
       });
 
-      await this.emailCardDropStateQueries.update(true);
+      await prisma.emailCardDropState.updateState(true);
 
       return respondWith503(ctx, 'Rate limit has been triggered');
     }

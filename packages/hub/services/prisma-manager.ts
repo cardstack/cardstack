@@ -12,8 +12,10 @@ import {
   ExtendedNotificationPreference,
   getNotificationPreferenceExtension,
 } from './prisma-extensions/notification-preference';
+import { ExtendedEmailCardDropState, getEmailCardDropStateExtension } from './prisma-extensions/email-card-drop-state';
 
 export interface ExtendedPrismaClient extends PrismaClient {
+  emailCardDropState: ExtendedEmailCardDropState;
   exchangeRate: ExtendedExchangeRate;
   notificationPreference: ExtendedNotificationPreference;
   pushNotificationRegistration: ExtendedPushNotificationRegistration;
@@ -65,6 +67,7 @@ export default class PrismaManager {
 }
 
 function addCardstackPrismaExtensions(client: PrismaClient) {
+  Object.assign(client.emailCardDropState, getEmailCardDropStateExtension(client));
   Object.assign(client.exchangeRate, getExchangeRateExtension(client));
   Object.assign(client.notificationPreference, getNotificationPreferenceExtension(client));
   Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
