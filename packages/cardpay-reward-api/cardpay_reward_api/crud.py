@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-
-import json
-from typing import Optional
-
 from sqlalchemy.orm import Session
 
 from . import models, schemas

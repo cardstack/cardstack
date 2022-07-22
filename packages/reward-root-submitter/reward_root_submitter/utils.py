@@ -5,7 +5,6 @@ from cloudpathlib import AnyPath
 from hexbytes import HexBytes
 from web3 import Web3
 
-
 NULL_HEX = HexBytes(
     "0x0000000000000000000000000000000000000000000000000000000000000000"
 )

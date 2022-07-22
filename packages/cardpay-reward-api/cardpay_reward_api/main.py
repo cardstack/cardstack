@@ -1,16 +1,16 @@
 import json
 import logging
 import os
-from typing import List, Optional
+from typing import List
 
 import sentry_sdk
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from web3 import Web3
 
-from . import crud, models, schemas
+from . import crud, schemas
 from .config import config, get_settings
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
@@ -37,7 +37,7 @@ def get_w3():
 
 
 def get_reward_pool(w3=Depends(get_w3)):
-    with open(f"abis/RewardPool.json") as contract_file:
+    with open("abis/RewardPool.json") as contract_file:
         contract = json.load(contract_file)
     reward_contract = w3.eth.contract(
         address=config[settings.ENVIRONMENT]["reward_pool"], abi=contract["abi"]

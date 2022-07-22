@@ -1,13 +1,11 @@
-from os import environ
-from tempfile import TemporaryDirectory
-from typing import Any
-from cloudpathlib import AnyPath, CloudPath
-import shutil
 import json
-import boto3
-import typer
+import shutil
+from tempfile import TemporaryDirectory
 
+import boto3
 import docker
+import typer
+from cloudpathlib import AnyPath, CloudPath
 
 client = docker.from_env()
 
@@ -73,7 +71,7 @@ def run_all(output_location: str, max_block: int = 24589499):
                     print(
                         client.containers.run(
                             rule["core"]["docker_image"],
-                            f"run_reward_program --parameters-file /input/parameters.json --output-location /output",
+                            "run_reward_program --parameters-file /input/parameters.json --output-location /output",
                             mounts=[
                                 docker.types.Mount("/input/", tmpdir, type="bind"),
                                 docker.types.Mount("/output/", tmpdir, type="bind"),

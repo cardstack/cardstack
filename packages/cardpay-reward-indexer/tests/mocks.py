@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 merkle_roots = [
     {
         "id": "0x2ffd93ec2ddc15dcb170e3fb29a1f06df274e65746a715562f6a6579bd8e9cd7",
@@ -7,7 +5,7 @@ merkle_roots = [
         "paymentCycle": "26777325",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1653901895",
-         "rootHash": "0x9f880d8e63c4dca5f33fce867a36e988afbf41ed9f1ab0e08387b1bc76921173",
+        "rootHash": "0x9f880d8e63c4dca5f33fce867a36e988afbf41ed9f1ab0e08387b1bc76921173",
     },
     {
         "id": "0x68c1355a6f7b96aaa03ae6085d37f23d04e753b07b8cf4d18e546c0d1565bb63",
@@ -15,7 +13,7 @@ merkle_roots = [
         "paymentCycle": "26777601",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1653905565",
-        "rootHash": "0x3b4096bd5a350c9469089b781e7ee0c7e57a08749b267c770604a14e80f835b2"
+        "rootHash": "0x3b4096bd5a350c9469089b781e7ee0c7e57a08749b267c770604a14e80f835b2",
     },
     {
         "id": "0x7acb8082f540d8e7a3dc283534f09bd50e9ad37eea940441a87b43db3266e026",
@@ -23,7 +21,7 @@ merkle_roots = [
         "paymentCycle": "26778053",
         "rewardProgram": {"id": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA"},
         "timestamp": "1653912015",
-        "rootHash": "0xee9c501af460fa65d059d64f415969cfa954413158af14c9e6a6e2f4e97d7d45"
+        "rootHash": "0xee9c501af460fa65d059d64f415969cfa954413158af14c9e6a6e2f4e97d7d45",
     },
 ]
 
