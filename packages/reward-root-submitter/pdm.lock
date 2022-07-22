@@ -61,7 +61,7 @@ dependencies = [
     "mypy-extensions>=0.4.3",
     "pathspec>=0.9.0",
     "platformdirs>=2",
-    "tomli>=1.1.0",
+    "tomli>=1.1.0; python_version < \"3.11\"",
     "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
@@ -71,18 +71,18 @@ version = "1.21.2"
 requires_python = ">= 3.6"
 summary = "The AWS SDK for Python"
 dependencies = [
-    "botocore<1.25.0,>=1.24.2",
-    "jmespath<1.0.0,>=0.7.1",
+    "botocore<1.27.0,>=1.26.6",
+    "jmespath<2.0.0,>=0.7.1",
     "s3transfer<0.6.0,>=0.5.0",
 ]
 
 [[package]]
 name = "botocore"
-version = "1.24.2"
+version = "1.26.10"
 requires_python = ">= 3.6"
 summary = "Low-level, data-driven core of boto 3."
 dependencies = [
-    "jmespath<1.0.0,>=0.7.1",
+    "jmespath<2.0.0,>=0.7.1",
     "python-dateutil<3.0.0,>=2.1",
     "urllib3<1.27,>=1.25.4",
 ]
@@ -95,6 +95,7 @@ summary = "A decorator for caching properties in classes."
 [[package]]
 name = "certifi"
 version = "2021.10.8"
+requires_python = ">=3.6"
 summary = "Python package for providing Mozilla's CA Bundle."
 
 [[package]]
@@ -106,7 +107,7 @@ summary = "The Real First Universal Charset Detector. Open, modern and actively 
 [[package]]
 name = "click"
 version = "8.0.3"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "Composable command line interface toolkit"
 dependencies = [
     "colorama; platform_system == \"Windows\"",
@@ -115,14 +116,14 @@ dependencies = [
 [[package]]
 name = "cloudpathlib"
 version = "0.7.0"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "pathlib-style classes for cloud storage services"
 
 [[package]]
 name = "cloudpathlib"
 version = "0.7.0"
 extras = ["s3"]
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "pathlib-style classes for cloud storage services"
 dependencies = [
     "boto3",
@@ -285,6 +286,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "flake8"
+version = "4.0.1"
+requires_python = ">=3.6"
+summary = "the modular source code checker: pep8 pyflakes and co"
+dependencies = [
+    "mccabe<0.7.0,>=0.6.0",
+    "pycodestyle<2.9.0,>=2.8.0",
+    "pyflakes<2.5.0,>=2.4.0",
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.3.0"
 requires_python = ">=3.7"
@@ -326,24 +338,28 @@ summary = "A Python utility / library to sort Python imports."
 [[package]]
 name = "jmespath"
 version = "0.10.0"
-requires_python = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+requires_python = ">=3.7"
 summary = "JSON Matching Expressions"
 
 [[package]]
 name = "jsonschema"
 version = "3.2.0"
+requires_python = ">=3.7"
 summary = "An implementation of JSON Schema validation for Python"
 dependencies = [
     "attrs>=17.4.0",
-    "pyrsistent>=0.14.0",
-    "setuptools",
-    "six>=1.11.0",
+    "pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0",
 ]
 
 [[package]]
 name = "lru-dict"
 version = "1.1.7"
 summary = "An Dict like LRU container."
+
+[[package]]
+name = "mccabe"
+version = "0.6.1"
+summary = "McCabe checker, plugin for flake8"
 
 [[package]]
 name = "multiaddr"
@@ -417,7 +433,7 @@ summary = "plugin and hook calling mechanisms for python"
 [[package]]
 name = "protobuf"
 version = "3.19.4"
-requires_python = ">=3.5"
+requires_python = ">=3.7"
 summary = "Protocol Buffers"
 
 [[package]]
@@ -458,7 +474,7 @@ dependencies = [
 
 [[package]]
 name = "py-geth"
-version = "3.7.0"
+version = "3.8.0"
 requires_python = ">=3"
 summary = "Run Go-Ethereum as a subprocess"
 dependencies = [
@@ -475,6 +491,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "pycodestyle"
+version = "2.8.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+summary = "Python style guide checker"
+
+[[package]]
 name = "pycryptodome"
 version = "3.14.1"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -486,10 +508,16 @@ version = "0.1.27"
 summary = "Python wrappers for ethash, the ethereum proof of workhashing function"
 
 [[package]]
+name = "pyflakes"
+version = "2.4.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "passive checker of Python programs"
+
+[[package]]
 name = "pyparsing"
 version = "3.0.7"
-requires_python = ">=3.6"
-summary = "Python parsing module"
+requires_python = ">=3.6.8"
+summary = "pyparsing module - Classes and methods to define and execute parsing grammars"
 
 [[package]]
 name = "pyrsistent"
@@ -505,7 +533,7 @@ summary = "SHA-3 (Keccak) for Python 2.7 - 3.5"
 [[package]]
 name = "pytest"
 version = "7.0.1"
-requires_python = ">=3.6"
+requires_python = ">=3.7"
 summary = "pytest: simple powerful testing with Python"
 dependencies = [
     "atomicwrites>=1.0; sys_platform == \"win32\"",
@@ -589,12 +617,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "setuptools"
-version = "60.9.3"
-requires_python = ">=3.7"
-summary = "Easily download, build, install, upgrade, and uninstall Python packages"
-
-[[package]]
 name = "six"
 version = "1.16.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
@@ -661,7 +683,7 @@ dependencies = [
     "eth-utils<2.0.0,>=1.9.5",
     "hexbytes<1.0.0,>=0.1.0",
     "ipfshttpclient==0.8.0a2",
-    "jsonschema<4.0.0,>=3.2.0",
+    "jsonschema<5,>=3.2.0",
     "lru-dict<2.0.0,>=1.1.6",
     "protobuf<4,>=3.10.0",
     "pywin32>=223; platform_system == \"Windows\"",
@@ -677,7 +699,7 @@ requires_python = ">=3.6,<4"
 summary = "Web3.py"
 dependencies = [
     "eth-tester[py-evm]==v0.6.0-beta.6",
-    "py-geth<4,>=3.7.0",
+    "py-geth<4,>=3.8.0",
     "web3>=5.28.0",
 ]
 
@@ -699,7 +721,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73eef5e40"
+content_hash = "sha256:f3baa855adf6b5c6cff53a4b3654c0ae38d5b1210f7c56c4f32066b6b9622dbf"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -828,9 +850,9 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
     {file = "boto3-1.21.2-py3-none-any.whl", hash = "sha256:50de4ae3dc9cbc3065b184247580160540273b25e7eaf72cdc18b979294a1b54"},
     {file = "boto3-1.21.2.tar.gz", hash = "sha256:e46133e44d5600e3de6739c60af2cc47d23742234df149aab3ccff4f1edec64d"},
 ]
-"botocore 1.24.2" = [
-    {file = "botocore-1.24.2-py3-none-any.whl", hash = "sha256:d1547d0bd8428df2dc1ad95b227e271914bb01f8edbd16a45766465c2090bc9b"},
-    {file = "botocore-1.24.2.tar.gz", hash = "sha256:c017dd174285a07db4e1b844750c43550c1f51e8256e722f1e69030c4f6c78f1"},
+"botocore 1.26.10" = [
+    {file = "botocore-1.26.10-py3-none-any.whl", hash = "sha256:8a4a984bf901ccefe40037da11ba2abd1ddbcb3b490a492b7f218509c99fc12f"},
+    {file = "botocore-1.26.10.tar.gz", hash = "sha256:5df2cf7ebe34377470172bd0bbc582cf98c5cbd02da0909a14e9e2885ab3ae9c"},
 ]
 "cached-property 1.5.2" = [
     {file = "cached_property-1.5.2-py2.py3-none-any.whl", hash = "sha256:df4f613cf7ad9a588cc381aaf4a512d26265ecebd5eb9e1ba12f1319eb85a6a0"},
@@ -898,6 +920,10 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
 "eth-utils 1.10.0" = [
     {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
     {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
+]
+"flake8 4.0.1" = [
+    {file = "flake8-4.0.1-py2.py3-none-any.whl", hash = "sha256:479b1304f72536a55948cb40a32dce8bb0ffe3501e26eaf292c7e60eb5e0428d"},
+    {file = "flake8-4.0.1.tar.gz", hash = "sha256:806e034dda44114815e23c16ef92f95c91e4c71100ff52813adf7132a6ad870d"},
 ]
 "frozenlist 1.3.0" = [
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d2257aaba9660f78c7b1d8fea963b68f3feffb1a9d5d05a18401ca9eb3e8d0a3"},
@@ -990,6 +1016,10 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
 ]
 "lru-dict 1.1.7" = [
     {file = "lru-dict-1.1.7.tar.gz", hash = "sha256:45b81f67d75341d4433abade799a47e9c42a9e22a118531dcb5e549864032d7c"},
+]
+"mccabe 0.6.1" = [
+    {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
+    {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 "multiaddr 0.0.9" = [
     {file = "multiaddr-0.0.9-py2.py3-none-any.whl", hash = "sha256:5c0f862cbcf19aada2a899f80ef896ddb2e85614e0c8f04dd287c06c69dac95b"},
@@ -1144,9 +1174,9 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
     {file = "py_evm-0.5.0a3-py3-none-any.whl", hash = "sha256:dfea98874dcb35a4288a42ebdf52b37dc462f61fcaa3a274be276a1dd53a5e3f"},
     {file = "py-evm-0.5.0a3.tar.gz", hash = "sha256:7253dc14f5780d90eba7b236043ccacbfddee7c2a3b771584260f6f82e61486b"},
 ]
-"py-geth 3.7.0" = [
-    {file = "py_geth-3.7.0-py3-none-any.whl", hash = "sha256:5a1070cb47220b54f8685f70787cc1aed25445d4784af25f627dd47e170835e4"},
-    {file = "py-geth-3.7.0.tar.gz", hash = "sha256:d0e51f2a46bbafdc186e87800ced0da0148cd0689d43354422609052b561a7a8"},
+"py-geth 3.8.0" = [
+    {file = "py_geth-3.8.0-py3-none-any.whl", hash = "sha256:f1cd12b7b1f0aedc4870d47c84805803b35570053581336081336de79140680d"},
+    {file = "py-geth-3.8.0.tar.gz", hash = "sha256:3aa310510c53dcdd477e97ec19b1f63d7ce9772a45f700419c1f09a50a3b71fc"},
 ]
 "pyarrow 7.0.0" = [
     {file = "pyarrow-7.0.0-cp310-cp310-macosx_10_13_universal2.whl", hash = "sha256:0f15213f380539c9640cb2413dc677b55e70f04c9e98cfc2e1d8b36c770e1036"},
@@ -1179,6 +1209,10 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
     {file = "pyarrow-7.0.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:306120af554e7e137895254a3b4741fad682875a5f6403509cd276de3fe5b844"},
     {file = "pyarrow-7.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:087769dac6e567d58d59b94c4f866b3356c00d3db5b261387ece47e7324c2150"},
     {file = "pyarrow-7.0.0.tar.gz", hash = "sha256:da656cad3c23a2ebb6a307ab01d35fce22f7850059cffafcb90d12590f8f4f38"},
+]
+"pycodestyle 2.8.0" = [
+    {file = "pycodestyle-2.8.0-py2.py3-none-any.whl", hash = "sha256:720f8b39dde8b293825e7ff02c475f3077124006db4f440dcbc9a20b76548a20"},
+    {file = "pycodestyle-2.8.0.tar.gz", hash = "sha256:eddd5847ef438ea1c7870ca7eb78a9d47ce0cdb4851a5523949f2601d0cbbe7f"},
 ]
 "pycryptodome 3.14.1" = [
     {file = "pycryptodome-3.14.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:75a3a364fee153e77ed889c957f6f94ec6d234b82e7195b117180dcc9fc16f96"},
@@ -1214,6 +1248,10 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
 ]
 "pyethash 0.1.27" = [
     {file = "pyethash-0.1.27.tar.gz", hash = "sha256:ff66319ce26b9d77df1f610942634dac9742e216f2c27b051c0a2c2dec9c2818"},
+]
+"pyflakes 2.4.0" = [
+    {file = "pyflakes-2.4.0-py2.py3-none-any.whl", hash = "sha256:3bb3a3f256f4b7968c9c788781e4ff07dce46bdf12339dcda61053375426ee2e"},
+    {file = "pyflakes-2.4.0.tar.gz", hash = "sha256:05a85c2872edf37a4ed30b0cce2f6093e1d0581f8c19d7393122da7e25b2b24c"},
 ]
 "pyparsing 3.0.7" = [
     {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
@@ -1314,10 +1352,6 @@ content_hash = "sha256:e31c3cdcd007b3ab51a38c17e06b7bff1ec1dbb042803de00f5aefb73
 "sentry-sdk 1.5.12" = [
     {file = "sentry_sdk-1.5.12-py2.py3-none-any.whl", hash = "sha256:778b53f0a6c83b1ee43d3b7886318ba86d975e686cb2c7906ccc35b334360be1"},
     {file = "sentry-sdk-1.5.12.tar.gz", hash = "sha256:259535ba66933eacf85ab46524188c84dcb4c39f40348455ce15e2c0aca68863"},
-]
-"setuptools 60.9.3" = [
-    {file = "setuptools-60.9.3-py3-none-any.whl", hash = "sha256:e4f30b9f84e5ab3decf945113119649fec09c1fc3507c6ebffec75646c56e62b"},
-    {file = "setuptools-60.9.3.tar.gz", hash = "sha256:2347b2b432c891a863acadca2da9ac101eae6169b1d3dfee2ec605ecd50dbfe5"},
 ]
 "six 1.16.0" = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},

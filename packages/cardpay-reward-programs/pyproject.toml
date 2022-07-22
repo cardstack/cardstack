@@ -35,7 +35,8 @@ Homepage = ""
 dev = [
     "pytest>=7.0.1",
     "black>=22.1.0",
-    "isort>=5.10.1"
+    "isort>=5.10.1",
+    "flake8>=4.0.1",
 ]
 explore = [
     "streamlit>=1.9.0",

@@ -26,6 +26,7 @@ dev = [
     "pytest>=7.1.2",
     "mock>=4.0.3",
     "black>=22.1.0",
+    "flake8>=4.0.1",
 ]
 
 [build-system]
