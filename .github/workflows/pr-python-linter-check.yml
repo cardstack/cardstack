@@ -1,7 +1,7 @@
 name: CI [python-linter-check]
 
 on:
-  push:
+  pull_request:
     paths:
       - "**.py"
       - '.github/workflows/pr-python-linter-check.yml'
