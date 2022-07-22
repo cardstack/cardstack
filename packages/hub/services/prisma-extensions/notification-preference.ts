@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 type NotificationPreferenceGetter = Prisma.NotificationPreferenceDelegate<any>;
 
-export interface ExtendedNotificationPreference extends NotificationPreferenceGetter {
+interface NotificationPreferencesExtensions {
   findManyWithTypes({
     ownerAddress,
     pushClientId,
@@ -12,8 +12,13 @@ export interface ExtendedNotificationPreference extends NotificationPreferenceGe
     pushClientId?: string;
     notificationType?: string;
   }): NotificationPreferenceWithInlineType[];
+
   updateStatus(model: NotificationPreferenceWithInlineType): ReturnType<NotificationPreferenceGetter['upsert']>;
 }
+
+export interface ExtendedNotificationPreference
+  extends NotificationPreferenceGetter,
+    NotificationPreferencesExtensions {}
 
 export interface NotificationPreferenceWithInlineType {
   ownerAddress: string;

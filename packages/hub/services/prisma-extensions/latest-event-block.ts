@@ -2,10 +2,12 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 type LatestEventBlockGetter = Prisma.LatestEventBlockDelegate<any>;
 
-export interface ExtendedLatestEventBlock extends LatestEventBlockGetter {
+interface LatestEventBlockExtensions {
   read(): Promise<number | undefined>;
   updateBlockNumber(blockNumber: number): ReturnType<LatestEventBlockGetter['upsert']>;
 }
+
+export interface ExtendedLatestEventBlock extends LatestEventBlockGetter, LatestEventBlockExtensions {}
 
 export function getLatestEventBlockExtension(client: PrismaClient) {
   return {
@@ -22,7 +24,7 @@ export function getLatestEventBlockExtension(client: PrismaClient) {
       return client.$executeRaw`
         INSERT INTO latest_event_block (id, block_number)
         VALUES (1, ${blockNumber})
-  
+
         ON CONFLICT (id)
         DO UPDATE SET
           block_number = GREATEST(
