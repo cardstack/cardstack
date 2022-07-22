@@ -7,6 +7,7 @@ import {
 } from './prisma-extensions/push-notification-registration';
 import { ExtendedLatestEventBlock, getLatestEventBlockExtension } from './prisma-extensions/latest-event-block';
 import { ExtendedExchangeRate, getExchangeRateExtension } from './prisma-extensions/exchange-rate';
+import { ExtendedUpload, getUploadExtension } from './prisma-extensions/upload';
 import {
   ExtendedNotificationPreference,
   getNotificationPreferenceExtension,
@@ -17,6 +18,7 @@ export interface ExtendedPrismaClient extends PrismaClient {
   notificationPreference: ExtendedNotificationPreference;
   pushNotificationRegistration: ExtendedPushNotificationRegistration;
   latestEventBlock: ExtendedLatestEventBlock;
+  upload: ExtendedUpload;
 }
 
 let dbConfig: Record<string, any> = config.get('db');
@@ -67,6 +69,7 @@ function addCardstackPrismaExtensions(client: PrismaClient) {
   Object.assign(client.notificationPreference, getNotificationPreferenceExtension(client));
   Object.assign(client.pushNotificationRegistration, getPushNotificationRegistrationExtension(client));
   Object.assign(client.latestEventBlock, getLatestEventBlockExtension(client));
+  Object.assign(client.upload, getUploadExtension(client));
 }
 
 declare module '@cardstack/di' {

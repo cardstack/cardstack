@@ -7,7 +7,6 @@ import { unlink } from 'fs';
 import * as Sentry from '@sentry/node';
 import { ensureLoggedIn } from './utils/auth';
 import { handleError } from './utils/error';
-import { query } from '@cardstack/hub/queries';
 
 export interface Upload {
   id: string;
@@ -21,7 +20,7 @@ export interface Upload {
 }
 
 export default class UploadRouter {
-  uploadQueries = query('upload', { as: 'uploadQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   web3Storage = inject('web3-storage', {
     as: 'web3Storage',
@@ -42,7 +41,8 @@ export default class UploadRouter {
         return;
       }
 
-      if (await this.uploadQueries.isAbusing(ctx.state.userAddress)) {
+      let prisma = await this.prismaManager.getClient();
+      if (await prisma.upload.isAbusing(ctx.state.userAddress)) {
         handleError(ctx, 429, 'Too many uploads', `Too many uploads. Try again later.`);
         return;
       }
@@ -72,15 +72,17 @@ export default class UploadRouter {
         // Use CloudFlare's IPFS CDN: https://developers.cloudflare.com/distributed-web/ipfs-gateway
         let url = `https://cloudflare-ipfs.com/ipfs/${cid}/${filename}`;
 
-        await this.uploadQueries.insert({
-          id: shortUuid.uuid(),
-          cid,
-          service: 'web3.storage',
-          url,
-          filename,
-          size,
-          type,
-          ownerAddress: '0x0',
+        await prisma.upload.create({
+          data: {
+            id: shortUuid.uuid(),
+            cid,
+            service: 'web3.storage',
+            url,
+            filename,
+            size,
+            type,
+            ownerAddress: '0x0',
+          },
         });
 
         ctx.body = {
