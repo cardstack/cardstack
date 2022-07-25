@@ -16,7 +16,7 @@ export default class CardPayTabBaseRoute extends Route {
 
   @service declare router: RouterService;
 
-  model(params: any, transition: any) {
+  model(params: any, _transition: any) {
     if (params.flow && !params.workflowPersistenceId) {
       // TODO: remove me once all flows have persistence support
       if (
@@ -27,7 +27,6 @@ export default class CardPayTabBaseRoute extends Route {
       )
         return;
 
-      transition.abort();
       this.router.transitionTo(this.routeName, {
         queryParams: {
           flow: params.flow,
