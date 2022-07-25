@@ -7,6 +7,5 @@ self.deprecationWorkflow.config = {
       handler: 'silence',
       matchId: 'deprecated-run-loop-and-computed-dot-access',
     },
-    { handler: 'silence', matchId: 'routing.transition-methods' },
   ],
 };

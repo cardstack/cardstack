@@ -1,4 +1,6 @@
 import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
+import RouterService from '@ember/routing/router-service';
 import '../../css/card-pay/index.css';
 import * as short from 'short-uuid';
 
@@ -11,6 +13,9 @@ export default class CardPayTabBaseRoute extends Route {
       refreshModel: true,
     },
   };
+
+  @service declare router: RouterService;
+
   model(params: any, transition: any) {
     if (params.flow && !params.workflowPersistenceId) {
       // TODO: remove me once all flows have persistence support
@@ -23,7 +28,7 @@ export default class CardPayTabBaseRoute extends Route {
         return;
 
       transition.abort();
-      this.transitionTo(this.routeName, {
+      this.router.transitionTo(this.routeName, {
         queryParams: {
           flow: params.flow,
           workflowPersistenceId: short.generate(),

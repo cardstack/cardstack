@@ -1,10 +1,13 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 import METADATASTEPS from '../data/amend-metadata-steps';
 import MILESTONES from '../data/catalog-transfer-workflow';
 
 export default class MediaRegistryController extends Controller {
+  @service router;
+
   @tracked actionSteps = METADATASTEPS;
   @tracked milestones = MILESTONES;
 
@@ -22,7 +25,7 @@ export default class MediaRegistryController extends Controller {
 
     if (this.model.currentOrg.id !== id) {
       if (currentRouteName === 'media-registry.agreements') {
-        return this.transitionToRoute(
+        return this.router.transitionTo(
           'media-registry.agreements',
           id,
           'TA-38185847898'
@@ -30,15 +33,15 @@ export default class MediaRegistryController extends Controller {
       }
 
       if (currentRouteName === 'media-registry.cardflow') {
-        return this.transitionToRoute('media-registry.cardflow', id);
+        return this.router.transitionTo('media-registry.cardflow', id);
       }
     }
 
-    this.transitionToRoute('media-registry', id);
+    this.router.transitionTo('media-registry', id);
   }
 
   @action
   goHome() {
-    this.transitionToRoute('media-registry.index', this.model.orgs[0].id);
+    this.router.transitionTo('media-registry.index', this.model.orgs[0].id);
   }
 }
