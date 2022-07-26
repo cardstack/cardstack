@@ -5,7 +5,7 @@ from uuid import UUID
 import requests
 from did_resolver import Resolver
 from python_did_resolver.main import (
-    NAMESPACE,
+    UUIDV5_NAMESPACE,
     EncodeOptions,
     encode_did,
     s3_resolution_method,
@@ -31,7 +31,7 @@ def validate(did: str):
     """
     content = resolve_doc(reward_rule_did)
     json_content = json.dumps(content)
-    _uu.NAMESPACE_DNS = UUID(NAMESPACE)
+    _uu.NAMESPACE_DNS = UUID(UUIDV5_NAMESPACE)
     uid = su.uuid(name=json_content)
     encode_options: EncodeOptions = {
         "version": 1,
@@ -42,6 +42,6 @@ def validate(did: str):
     return did == computed_did
 
 
-reward_rule_did = "did:cardstack:1r9G5U5ndRuS6sF71mZ99huhfea3dc0deddf87da"
+reward_rule_did = "did:cardstack:1rqspLvwQ2qsuXRJcVzCj49j3540d207ca4116ec"
 print(resolve_doc(reward_rule_did))
 print(validate(reward_rule_did))

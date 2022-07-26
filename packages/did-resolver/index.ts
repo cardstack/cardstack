@@ -6,6 +6,7 @@ import shortUuid from 'short-uuid';
 import * as uuidv4 from 'uuid';
 
 export const CURRENT_VERSION = 1;
+export const UUIDV5_NAMESPACE = '1b671a64-40d5-491e-99b0-da01ff1f3341';
 
 type CardstackIdentifierType =
   | 'PrepaidCardCustomization'

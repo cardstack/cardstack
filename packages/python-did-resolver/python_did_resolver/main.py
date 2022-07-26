@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re
-from typing import Literal, TypedDict, get_args
+from typing import Literal, TypedDict
 from uuid import UUID
 
 from did_resolver import DIDDocument, DIDResolutionResult, ParsedDID, Resolvable
@@ -18,7 +18,7 @@ FLICKR_BASE58_ALPHABET = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUV
 su = ShortUUID(alphabet=FLICKR_BASE58_ALPHABET)
 su._alphabet = list(FLICKR_BASE58_ALPHABET)
 
-NAMESPACE = (
+UUIDV5_NAMESPACE = (
     "1b671a64-40d5-491e-99b0-da01ff1f3341"  # this NAMESPACE is reserved for uuid5
 )
 CURRENT_VERSION = 1

@@ -4,7 +4,7 @@ from typing import get_args
 
 import pytest
 from did_resolver.resolver import Resolver
-from hypothesis import example, given, settings
+from hypothesis import given, settings
 from hypothesis import strategies as st
 from python_did_resolver.main import (
     FLICKR_BASE58_ALPHABET,
