@@ -59,7 +59,7 @@ module.exports = function (environment) {
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
         enabled:
           environment === 'production' && process.env.SENTRY_DSN !== undefined,
-        environment: process.env.SENTRY_ENVIRONMENT || 'staging',
+        environment: process.env.SSR_WEB_ENVIRONMENT || 'development',
         release:
           `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
