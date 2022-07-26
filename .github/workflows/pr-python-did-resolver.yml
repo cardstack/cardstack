@@ -5,9 +5,9 @@ on:
     paths:
       - 'packages/python-did-resolver/**'
       - 'packages/did-resolver/**'
-      - '.github/workflows/pr-python-did-resolver.yml'
       - "packages/test-support/**"
       - "packages/eslint-config/**"
+      - '.github/workflows/pr-python-did-resolver.yml'
       - "package.json"
       - "yarn.lock"
 
