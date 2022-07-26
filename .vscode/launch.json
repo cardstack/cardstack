@@ -1157,5 +1157,26 @@
         "${config:cardCli.mnemonic}"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode DID",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "did",
+        "encode",
+        "CardSpace",
+        "--uniqueId",
+        "4661e0e4-851d-511f-ab57-34687608ac08",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    }
   ]
 }
