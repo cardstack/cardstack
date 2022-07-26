@@ -10,10 +10,17 @@ from typing_extensions import NotRequired
 
 from .utils import HASH_LENGTH, hash_func, number_to_version_char, to_kebab_case
 
+# https://github.com/skorokithakis/shortuuid/issues/68
+# shortuuid decode() sorts alphabets before using it for translation
+# this is incompatible with shortuuid implementation in javascript
+# we therefore overwrite the _alphabet attribute so the answers are the same in javascript
 FLICKR_BASE58_ALPHABET = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
 su = ShortUUID(alphabet=FLICKR_BASE58_ALPHABET)
 su._alphabet = list(FLICKR_BASE58_ALPHABET)
 
+NAMESPACE = (
+    "1b671a64-40d5-491e-99b0-da01ff1f3341"  # this NAMESPACE is reserved for uuid5
+)
 CURRENT_VERSION = 1
 CardstackIdentifierType = Literal[
     "PrepaidCardCustomization",
