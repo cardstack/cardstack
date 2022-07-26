@@ -82,7 +82,7 @@ def process_file(reward_output_filename, config):
     reward_pool_contract.submit_merkle_root(
         merkle_root_details.reward_program_id,
         merkle_root_details.payment_cycle,
-        merkle_root_details.root,
+        merkle_root_details.merkle_root_hash,
         config.reward_root_submitter_address,
         config.reward_root_submitter_private_key,
     )
