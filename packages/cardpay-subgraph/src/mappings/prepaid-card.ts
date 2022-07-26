@@ -28,7 +28,13 @@ import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let prepaidCard = toChecksumAddress(event.params.card);
-  let issuer = toChecksumAddress(event.params.issuer);
+
+  let prepaidCardMgr = PrepaidCardManager.bind(event.address);
+  let cardInfo = prepaidCardMgr.cardDetails(event.params.card);
+
+  let issuer = toChecksumAddress(cardInfo.value0);
+  let owner = toChecksumAddress(prepaidCardMgr.getPrepaidCardOwner(event.params.card));
+
   let maybeDepot = toChecksumAddress(event.params.createdFromDepot);
   log.info('indexing new prepaid card {}', [prepaidCard]);
   let isDepot = Depot.load(maybeDepot) != null;
@@ -40,8 +46,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   makeAccount(issuer);
 
   let txnHash = event.transaction.hash.toHex();
-  let prepaidCardMgr = PrepaidCardManager.bind(event.address);
-  let cardInfo = prepaidCardMgr.cardDetails(event.params.card);
+
   let reloadable = cardInfo.value4;
   let issuingToken = makeToken(event.params.token);
 
@@ -50,7 +55,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.customizationDID = event.params.customizationDID;
   prepaidCardEntity.issuingToken = issuingToken;
   prepaidCardEntity.issuer = issuer;
-  prepaidCardEntity.owner = issuer;
+  prepaidCardEntity.owner = owner;
   prepaidCardEntity.reloadable = reloadable;
   prepaidCardEntity.faceValue = getPrepaidCardFaceValue(prepaidCard);
   prepaidCardEntity.issuingTokenBalance = event.params.issuingTokenAmount;
