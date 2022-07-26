@@ -17,6 +17,9 @@
     },
     {
       "path": "./packages/cardpay-reward-scheduler"
+    },
+    {
+      "path": "./packages/python-did-resolver"
     }
   ],
   "settings": {
