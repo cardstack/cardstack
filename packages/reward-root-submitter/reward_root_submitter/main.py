@@ -1,6 +1,5 @@
+from dataclasses import dataclass
 import logging
-import os
-import sentry_sdk
 import re
 
 from .contracts import RewardPool
@@ -16,6 +15,11 @@ EMPTY_MARKER_HEX = HexBytes(
     "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 )
 
+@dataclass
+class MerkleRoot:
+    reward_program_id: str
+    payment_cycle: int
+    merkle_root_hash: HexBytes
 
 def setup_logging(config):
     logging.basicConfig(level=config.log_level.upper())
@@ -32,14 +36,12 @@ def safe_regex_group_search(regex, string, group):
         return None
 
 
-def process_file(reward_output_filename, config):
-    evm_node = config.evm_full_node_url
-    w3 = Web3(Web3.HTTPProvider(evm_node))
+def get_merkle_root_details(reward_output_filename):
 
     reward_program_id = safe_regex_group_search(
         r"rewardProgramID=([^/]*)", str(reward_output_filename), 1
     )
-    if not w3.isChecksumAddress(reward_program_id):
+    if not Web3().isChecksumAddress(reward_program_id):
         raise Exception(
             f"{reward_output_filename} does not have a valid checksummed address for the reward program ID"
         )
@@ -68,12 +70,19 @@ def process_file(reward_output_filename, config):
             payment_cycle = int(payment_cycle)
         except StopIteration:
             root = EMPTY_MARKER_HEX
+    return MerkleRoot(reward_program_id=reward_program_id, payment_cycle=payment_cycle, merkle_root_hash=root)
+
+def process_file(reward_output_filename, config):
+    evm_node = config.evm_full_node_url
+    w3 = Web3(Web3.HTTPProvider(evm_node))
+
+    merkle_root_details = get_merkle_root_details(reward_output_filename)
 
     reward_pool_contract = RewardPool(w3, config.environment)
     reward_pool_contract.submit_merkle_root(
-        reward_program_id,
-        payment_cycle,
-        root,
+        merkle_root_details.reward_program_id,
+        merkle_root_details.payment_cycle,
+        merkle_root_details.root,
         config.reward_root_submitter_address,
         config.reward_root_submitter_private_key,
     )

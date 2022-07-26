@@ -3,15 +3,15 @@ import requests
 import logging
 from eth_utils import to_wei
 
+class Contract:
+    def get_gas_price(speed="average"):
+        gas_price_oracle = "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle"
+        current_values = requests.get(gas_price_oracle).json()
+        gwei = current_values[speed]
+        return to_wei(gwei, "gwei")
 
-def get_gas_price(speed="average"):
-    gas_price_oracle = "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle"
-    current_values = requests.get(gas_price_oracle).json()
-    gwei = current_values[speed]
-    return to_wei(gwei, "gwei")
 
-
-class RewardPool:
+class RewardPool(Contract):
     def __init__(self, w3, environment):
         # TODO: extract these into common SDK python code
         if environment == "staging":
@@ -35,7 +35,7 @@ class RewardPool:
             {
                 "from": caller,
                 "nonce": transaction_count,
-                "gasPrice": get_gas_price(),
+                "gasPrice": self.get_gas_price(),
             }
         )
         signed_tx = self.w3.eth.account.sign_transaction(tx, caller_key)
