@@ -11933,14 +11933,6 @@ broccoli-debug@^0.6.1, broccoli-debug@^0.6.4, broccoli-debug@^0.6.5:
     symlink-or-copy "^1.1.8"
     tree-sync "^1.2.2"
 
-broccoli-file-creator@^1.1.1:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/broccoli-file-creator/-/broccoli-file-creator-1.2.0.tgz#27f1b25b1b00e7bb7bf3d5d7abed5f4d5388df4d"
-  integrity sha512-l9zthHg6bAtnOfRr/ieZ1srRQEsufMZID7xGYRW3aBDv3u/3Eux+Iawl10tAGYE5pL9YB4n5X4vxkp6iNOoZ9g==
-  dependencies:
-    broccoli-plugin "^1.1.0"
-    mkdirp "^0.5.1"
-
 broccoli-file-creator@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/broccoli-file-creator/-/broccoli-file-creator-2.1.1.tgz#7351dd2496c762cfce7736ce9b49e3fce0c7b7db"
@@ -16668,16 +16660,6 @@ ember-fetch@^8.1.1:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.6.2"
 
-ember-focus-trap@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/ember-focus-trap/-/ember-focus-trap-0.6.0.tgz#49312309926835cec7bfc2e516dfa47f7821211d"
-  integrity sha512-LuEv0BNMLspTkW4c2KsAkWLwr3s5ZLlpGS6JN8YazFmYaILWvoyp82AFqgMKLjQJrONx9TpqpCqpW308KE7s4w==
-  dependencies:
-    ember-auto-import "^1.11.2"
-    ember-cli-babel "^7.26.3"
-    ember-modifier-manager-polyfill "^1.2.0"
-    focus-trap "^6.4.0"
-
 ember-focus-trap@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ember-focus-trap/-/ember-focus-trap-1.0.1.tgz#a99565f6ce55d500b92a0965e79e3ad04219f157"
@@ -16704,18 +16686,10 @@ ember-freestyle@^0.14.0:
     macro-decorators "^0.1.2"
     strip-indent "^3.0.0"
 
-"ember-get-config@^0.2.4 || ^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/ember-get-config/-/ember-get-config-0.3.0.tgz#a73a1a87b48d9dde4c66a0e52ed5260b8a48cfbd"
-  integrity sha512-0e2pKzwW5lBZ4oJnvu9qHOht4sP1MWz/m3hyz8kpSoMdrlZVf62LDKZ6qfKgy8drcv5YhCMYE6QV7MhnqlrzEQ==
-  dependencies:
-    broccoli-file-creator "^1.1.1"
-    ember-cli-babel "^7.0.0"
-
-ember-get-config@^1.0.2:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/ember-get-config/-/ember-get-config-1.0.4.tgz#e8c36b0937767ead32e16d157fabd8178c542587"
-  integrity sha512-WOnf1E0ceRHWy7apnmUFbKcJm2c3KOg4rNNUKNtBFCFp770tOTwv5LAYcqV4+HootPCsQYL7oFUd/0JLiZpMeg==
+ember-get-config@2.1.0, "ember-get-config@^0.2.4 || ^0.3.0", ember-get-config@^1.0.2:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/ember-get-config/-/ember-get-config-2.1.0.tgz#57c052b742718e8f3eb795cffc635c16d55625f9"
+  integrity sha512-0OJ2Y4zI5+kgVqh7mD/8t1N+LoYrAO847j9sa970swW14IeU0EiiMZ1zwJ7zEhAB7scf7wJyWEHO1ESXgY508Q==
   dependencies:
     "@embroider/macros" "^0.50.0 || ^1.0.0"
     ember-cli-babel "^7.26.6"
@@ -19493,13 +19467,6 @@ fn.name@1.x.x:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fn.name/-/fn.name-1.1.0.tgz#26cad8017967aea8731bc42961d04a3d5988accc"
   integrity sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==
-
-focus-trap@^6.4.0:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.4.0.tgz#e9951484fddf933d9b9b0e95b499f9420f6a54d6"
-  integrity sha512-RpH291GjfNhy1ek+Iwe00oCaqJN0sBaB+S/v7BpCIldf39IslPI7657nOZ6HwgoEHpjCmUJoAY+Mfgrm0rohvQ==
-  dependencies:
-    tabbable "^5.2.0"
 
 focus-trap@^6.7.1:
   version "6.9.4"
@@ -30954,11 +30921,6 @@ sync-fetch@^0.3.1:
   dependencies:
     buffer "^5.7.0"
     node-fetch "^2.6.1"
-
-tabbable@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-5.2.0.tgz#4fba60991d8bb89d06e5d9455c92b453acf88fb2"
-  integrity sha512-0uyt8wbP0P3T4rrsfYg/5Rg3cIJ8Shl1RJ54QMqYxm1TLdWqJD1u6+RQjr2Lor3wmfT7JRHkirIwy99ydBsyPg==
 
 tabbable@^5.3.3:
   version "5.3.3"
