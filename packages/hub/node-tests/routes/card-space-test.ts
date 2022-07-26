@@ -68,7 +68,7 @@ describe('GET /api/card-spaces/:slug', function () {
           type: 'card-spaces',
           id,
           attributes: {
-            did: 'did:cardstack:1cqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
+            did: 'did:cardstack:1cqNUmMUPV16eUWwjxGZNZ2rfe6528a6d56f52bb',
             'profile-description': "Satoshi's place",
             'profile-image-url': 'https://test.com/test1.png',
             links: [],
@@ -445,7 +445,7 @@ describe('PATCH /api/card-spaces', function () {
           type: 'card-spaces',
           id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
           attributes: {
-            did: 'did:cardstack:1cnaSutV4uMuyyJZcJ7ktsTwdec10adda76d48c7',
+            did: 'did:cardstack:1cnaSutV4uMuyyJZcJ7ktsTw51955a8a4770c7e3',
             'profile-description': "Satoshi's place",
             'profile-image-url': 'https://test.com/profile.jpg',
             links: [{ title: 'Link1', url: 'https://test.com/something' }],
