@@ -76,7 +76,10 @@ encode_options_bad_version = st.fixed_dictionaries(
 
 @given(st.uuids())
 def test_shortuuid(o):
-    assert su._alphabet == FLICKR_BASE58_ALPHABET
+    """
+    This test ensures that the shortuuid class is patched correctly
+    """
+    assert su._alphabet == list(FLICKR_BASE58_ALPHABET)
     o == su.decode(su.encode(o))
 
 
