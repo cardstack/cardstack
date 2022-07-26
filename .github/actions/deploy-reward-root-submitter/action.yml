@@ -27,7 +27,7 @@ runs:
         yarn add hcl2-parser @actions/core -W --prefer-offline
 
     - name: Build reward submitter
-      run: docker pull $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri') && waypoint build -app=reward-submit-lambda
+      run: waypoint build -app=reward-submit-lambda
       shell: bash
       
     - name: Update reward submitter
