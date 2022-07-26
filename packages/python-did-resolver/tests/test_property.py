@@ -153,7 +153,7 @@ def test_resolve(o):
 
 @given(encode_options)
 def test_resolve_invalid_checksum(o):
-    did = encode_did(o) + 'a'
+    did = encode_did(o) + "a"
     registry = {"cardstack": s3_resolution_method}
     r = Resolver(registry)
     with pytest.raises(
@@ -164,7 +164,7 @@ def test_resolve_invalid_checksum(o):
 
 
 SHORT_TYPES_DELIMITED = "".join([str(ele) + "|" for ele in get_args(SHORT_TYPE)])
-REGEX_NON_EXISTENT_SHORT_CODE = fr"^(?!(?:{SHORT_TYPES_DELIMITED})$)[a-z]\Z"
+REGEX_NON_EXISTENT_SHORT_CODE = rf"^(?!(?:{SHORT_TYPES_DELIMITED})$)[a-z]\Z"
 
 
 @given(st.from_regex(REGEX_NON_EXISTENT_SHORT_CODE))
