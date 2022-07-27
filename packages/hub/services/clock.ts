@@ -11,7 +11,7 @@ export class Clock {
     return format(this.now(), 'yyyy-MM-dd');
   }
   postgresTimestampNow() {
-    return format(this.now(), 'yyyy-MM-dd HH:mm');
+    return format(this.now(), 'yyyy-MM-dd HH:mm:ssx');
   }
 }
 

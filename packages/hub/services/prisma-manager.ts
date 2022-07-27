@@ -13,8 +13,13 @@ import {
   getNotificationPreferenceExtension,
 } from './prisma-extensions/notification-preference';
 import { ExtendedEmailCardDropState, getEmailCardDropStateExtension } from './prisma-extensions/email-card-drop-state';
+import {
+  ExtendedEmailCardDropRequest,
+  getEmailCardDropRequestExtension,
+} from './prisma-extensions/email-card-drop-requests';
 
 export interface ExtendedPrismaClient extends PrismaClient {
+  emailCardDropRequest: ExtendedEmailCardDropRequest;
   emailCardDropState: ExtendedEmailCardDropState;
   exchangeRate: ExtendedExchangeRate;
   notificationPreference: ExtendedNotificationPreference;
@@ -31,6 +36,12 @@ let dbConfig: Record<string, any> = config.get('db');
 let singletonClient = new PrismaClient({
   datasources: { db: { url: dbConfig.url } },
   log: dbConfig.prismaLog,
+});
+
+singletonClient.$on('query', (e: any) => {
+  console.log('Query: ' + e.query);
+  console.log('Params: ' + e.params);
+  console.log('Duration: ' + e.duration + 'ms');
 });
 
 export default class PrismaManager {
@@ -67,6 +78,7 @@ export default class PrismaManager {
 }
 
 function addCardstackPrismaExtensions(client: PrismaClient) {
+  Object.assign(client.emailCardDropRequest, getEmailCardDropRequestExtension(client));
   Object.assign(client.emailCardDropState, getEmailCardDropStateExtension(client));
   Object.assign(client.exchangeRate, getExchangeRateExtension(client));
   Object.assign(client.notificationPreference, getNotificationPreferenceExtension(client));
