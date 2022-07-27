@@ -38,12 +38,6 @@ let singletonClient = new PrismaClient({
   log: dbConfig.prismaLog,
 });
 
-singletonClient.$on('query', (e: any) => {
-  console.log('Query: ' + e.query);
-  console.log('Params: ' + e.params);
-  console.log('Duration: ' + e.duration + 'ms');
-});
-
 export default class PrismaManager {
   private prismaTestingHelper?: PrismaTestingHelper<PrismaClient>;
 
