@@ -22,6 +22,13 @@ if (!network) {
   console.error(`need to specify network`);
   process.exit(1);
 }
+
+let localChainAddresses;
+if (network === 'localchain') {
+  let localchainAddressesFile = resolve(join(__dirname, '..', 'localchain-addresses.json'));
+  localChainAddresses = JSON.parse(readFileSync(localchainAddressesFile), { encoding: 'utf8' });
+}
+
 let cleanNetwork = network.replace('poa-', '');
 
 // The graph-node configuration still references the gnosis chain as xdai
@@ -198,6 +205,12 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{REGISTER_REWARDEE_HANDLER_ADDRESS}/g, getAddress('registerRewardeeHandler', cleanNetwork))
   .replace(/{GRAFTING}/g, graftingSection);
 
+if (network === 'localchain') {
+  subgraph = subgraph
+    .replace(/startBlock: undefined/g, 'startBlock: 0')
+    .replace('uniswap-factory-localchain', 'uniswap-factory-sokol'); // Not sure we need this for local chain, so we'll use the sokol one so we don't have to add local uniswap config
+}
+
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
 ensureDirSync(generatedDir);
@@ -235,6 +248,11 @@ function getAbi(path) {
 
 function getAddress(contractName, network) {
   let file = readFileSync(addressFile, { encoding: 'utf8' });
+
+  if (network === 'localchain') {
+    return localChainAddresses[contractName];
+  }
+
   let [, networkContents] = file.match(new RegExp(`${network.toUpperCase()} = {([^}]*)}`));
   let [, address] = networkContents.match(new RegExp(`${contractName}: ['"](\\w*)['"]`));
   return address;
