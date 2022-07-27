@@ -67,4 +67,4 @@ function autoscroll(
   };
 }
 
-export default modifier(autoscroll);
+export default modifier(autoscroll, { eager: false });
