@@ -2,6 +2,7 @@ import pytest
 import pandas as pd
 import duckdb
 from cardpay_reward_programs.rules import safe_ownership, staking
+import math
 
 token_holder_table = "_TOKEN_HOLDER"
 safe_ownership_table = "_SAFE_OWNERSHIP"
@@ -168,10 +169,16 @@ def test_correct_calc_rewards(monkeypatch):
             "_block_number": 10,
             "token": "card",
             "safe": "safe1",
-            "balance_uint64": 2000
+            "balance_uint64": 1500
         },
         {
             "_block_number": 20,
+            "token": "card",
+            "safe": "safe1",
+            "balance_uint64": 1750
+        },
+        {
+            "_block_number": 25,
             "token": "card",
             "safe": "safe1",
             "balance_uint64": 1500
@@ -201,16 +208,10 @@ def test_correct_calc_rewards(monkeypatch):
             "balance_uint64": 1700
         },
         {
-            "_block_number": 25,
-            "token": "card",
-            "safe": "safe2",
-            "balance_uint64": 1900
-        },
-        {
             "_block_number": 0,
             "token": "card",
             "safe": "safe3",
-            "balance_uint64": 15000
+            "balance_uint64": 1000
         }
 
     ])
@@ -234,10 +235,10 @@ def test_correct_calc_rewards(monkeypatch):
         monkeypatch, fake_data_token_holder, fake_data_safe_owner
     )
     result = rule.run(30, "0x0")
-    
-    #assert get_amount(result, "owner1", 0) == 90
-    #assert get_amount(result, "owner2", 1) == 83
-    #assert get_amount(result, "owner3", 2) == 900
+    print(get_amount(result, "owner1", 0))
+    assert math.ceil(get_amount(result, "owner1", 0)) == math.ceil(82.26866088)
+    assert math.ceil(get_amount(result, "owner2", 1)) == math.ceil(80.74)
+    assert math.ceil(get_amount(result, "owner3", 2)) == math.ceil(60)
 
 
 def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
