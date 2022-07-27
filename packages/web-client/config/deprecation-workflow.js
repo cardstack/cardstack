@@ -16,7 +16,6 @@ self.deprecationWorkflow.config = {
     { handler: 'silence', matchId: 'ember-modifier.no-args-property' },
     { handler: 'silence', matchId: 'ember-modifier.no-element-property' },
     { handler: 'silence', matchId: 'ember-modifier.function-based-options' },
-    { handler: 'silence', matchId: 'setting-on-hash' },
     { handler: 'silence', matchId: 'ensure-safe-component.string' },
     { handler: 'silence', matchId: 'autotracking.mutation-after-consumption' },
   ],

@@ -106,7 +106,7 @@
     "ember-concurrency-ts": "^0.2.2",
     "ember-css-url": "v1.0.0-alpha.0",
     "ember-export-application-global": "^2.0.1",
-    "ember-focus-trap": "^0.6.0",
+    "ember-focus-trap": "^1.0.1",
     "ember-head": "^1.0.0",
     "ember-load-initializers": "^2.1.2",
     "ember-named-blocks-polyfill": "^0.2.4",
