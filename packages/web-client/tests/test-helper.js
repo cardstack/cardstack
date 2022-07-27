@@ -14,6 +14,8 @@ setupSinon();
 
 start();
 
+// This bypasses a long-standing bug in tests where a first call to visit() with
+// query parameters fails: https://github.com/emberjs/ember.js/issues/17118
 export async function visitWithQueryFix(url) {
   await visit('/');
   await visit(url);
