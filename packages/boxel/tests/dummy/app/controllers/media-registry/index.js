@@ -2,10 +2,13 @@ import Controller from '@ember/controller';
 import { action, get } from '@ember/object';
 import { compare, isBlank } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class MediaRegistryIndexController extends Controller {
   queryParams = ['version'];
   removed = [];
+
+  @service router;
 
   @tracked version = null;
 
@@ -23,17 +26,17 @@ export default class MediaRegistryIndexController extends Controller {
   @action
   transitionToIsolate(item) {
     if (this.model.type === 'master-collection') {
-      return this.transitionToRoute('media-registry.collection', item.id);
+      return this.router.transitionTo('media-registry.collection', item.id);
     }
 
     if (this.version) {
-      return this.transitionToRoute(
+      return this.router.transitionTo(
         'media-registry.version',
         item.id,
         this.version
       );
     }
-    this.transitionToRoute('media-registry.item', item.id);
+    this.router.transitionTo('media-registry.item', item.id);
   }
 
   @action

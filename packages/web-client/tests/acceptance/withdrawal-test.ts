@@ -24,6 +24,7 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import { visitWithQueryFix } from '../test-helper';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -443,7 +444,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(postableSel(0, 2))
@@ -484,7 +485,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Disconnecting Layer 1 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(postableSel(0, 2))
@@ -556,7 +557,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -573,7 +574,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -609,7 +610,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Changing layer 1 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -645,7 +646,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Changing layer 2 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
+      await visitWithQueryFix('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))

@@ -1,7 +1,10 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 
 export default class MediaRegistryProductsAlbumController extends Controller {
+  @service router;
+
   get headerDetailFields() {
     if (!this.model) {
       return null;
@@ -95,7 +98,7 @@ export default class MediaRegistryProductsAlbumController extends Controller {
 
   @action
   transitionToCatalog(id) {
-    this.transitionToRoute('media-registry.collection', id);
+    this.router.transitionTo('media-registry.collection', id);
   }
 
   @action
@@ -103,6 +106,6 @@ export default class MediaRegistryProductsAlbumController extends Controller {
     if (!item || !item.id) {
       return;
     }
-    this.transitionToRoute('media-registry.item', item.id);
+    this.router.transitionTo('media-registry.item', item.id);
   }
 }

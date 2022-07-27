@@ -1,9 +1,12 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { titleize } from 'dummy/utils/titleize';
 import { formatId } from 'dummy/utils/format-id';
 
 export default class MediaRegistryItemController extends Controller {
+  @service router;
+
   get album() {
     if (!this.model.album) {
       return null;
@@ -27,17 +30,17 @@ export default class MediaRegistryItemController extends Controller {
 
   @action
   transitionToEdit() {
-    this.transitionToRoute('media-registry.item.edit', this.model.id);
+    this.router.transitionTo('media-registry.item.edit', this.model.id);
   }
 
   @action
   transitionToView() {
-    this.transitionToRoute('media-registry.item', this.model.id);
+    this.router.transitionTo('media-registry.item', this.model.id);
   }
 
   @action
   transitionToProduct() {
-    this.transitionToRoute(
+    this.router.transitionTo(
       'media-registry.products.album',
       formatId(this.model.album)
     );
@@ -45,6 +48,6 @@ export default class MediaRegistryItemController extends Controller {
 
   @action
   transitionToCatalog(id) {
-    this.transitionToRoute('media-registry.collection', id);
+    this.router.transitionTo('media-registry.collection', id);
   }
 }
