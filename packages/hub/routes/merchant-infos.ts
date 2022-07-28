@@ -28,7 +28,7 @@ export default class MerchantInfosRoute {
       return;
     }
     let prisma = await this.prismaManager.getClient();
-    let merchantInfos = await prisma.profile.findMany({
+    let profiles = await prisma.profile.findMany({
       where: {
         ownerAddress: ctx.state.userAddress,
       },
@@ -36,7 +36,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serializeCollection(merchantInfos);
+    ctx.body = this.merchantInfoSerializer.serializeCollection(profiles);
   }
 
   async post(ctx: Koa.Context) {
@@ -129,10 +129,10 @@ export default class MerchantInfosRoute {
         };
       } else {
         let prisma = await this.prismaManager.getClient();
-        let merchantInfo = await prisma.profile.findFirst({ where: { slug } });
+        let profile = await prisma.profile.findFirst({ where: { slug } });
         return {
-          slugAvailable: merchantInfo ? false : true,
-          detail: merchantInfo ? 'This ID is already taken. Please choose another one' : 'ID is available',
+          slugAvailable: profile ? false : true,
+          detail: profile ? 'This ID is already taken. Please choose another one' : 'ID is available',
         };
       }
     }
@@ -140,19 +140,19 @@ export default class MerchantInfosRoute {
 
   async getFromShortId(ctx: Koa.Context) {
     let prisma = await this.prismaManager.getClient();
-    let merchantInfo = await prisma.profile.findUnique({
+    let profile = await prisma.profile.findUnique({
       where: {
         id: shortUUID().toUUID(ctx.params.id),
       },
     });
 
-    if (!merchantInfo) {
+    if (!profile) {
       ctx.status = 404;
       return;
     }
 
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serialize(merchantInfo);
+    ctx.body = this.merchantInfoSerializer.serialize(profile);
     ctx.type = 'application/vnd.api+json';
   }
 }

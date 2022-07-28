@@ -32,11 +32,11 @@ describe('GET /api/card-spaces/:slug', function () {
   let { request, getPrisma } = setupHub(this);
 
   it('fetches a card space', async function () {
-    let merchantId = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
+    let profileId = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
     let prisma = await getPrisma();
     await prisma.profile.create({
       data: {
-        id: merchantId,
+        id: profileId,
         ownerAddress: stubUserAddress,
         name: 'Satoshi?',
         slug: 'satoshi',
@@ -59,7 +59,7 @@ describe('GET /api/card-spaces/:slug', function () {
         },
         data: {
           type: 'card-spaces',
-          id: merchantId,
+          id: profileId,
           attributes: {
             did: 'did:cardstack:1csqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
             'profile-description': "Satoshi's place",
@@ -70,7 +70,7 @@ describe('GET /api/card-spaces/:slug', function () {
             'merchant-info': {
               data: {
                 type: 'merchant-infos',
-                id: merchantId,
+                id: profileId,
               },
             },
           },
@@ -78,10 +78,10 @@ describe('GET /api/card-spaces/:slug', function () {
         included: [
           {
             type: 'merchant-infos',
-            id: merchantId,
+            id: profileId,
             attributes: {
               color: 'black',
-              did: encodeDID({ type: 'MerchantInfo', uniqueId: merchantId }),
+              did: encodeDID({ type: 'MerchantInfo', uniqueId: profileId }),
               name: 'Satoshi?',
               'owner-address': stubUserAddress,
               slug: 'satoshi',
@@ -117,11 +117,11 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('returns 403 when resource does not belong to wallet', async function () {
-    let merchantId = uuidv4();
+    let profileId = uuidv4();
     let prisma = await getPrisma();
     await prisma.profile.create({
       data: {
-        id: merchantId,
+        id: profileId,
         ownerAddress: '0x1234',
         name: 'Satoshi?',
         slug: 'satoshi',
@@ -133,7 +133,7 @@ describe('PATCH /api/card-spaces', function () {
     });
 
     await request()
-      .patch(`/api/card-spaces/${merchantId}`)
+      .patch(`/api/card-spaces/${profileId}`)
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -160,12 +160,12 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('updates the specified fields of the resource', async function () {
-    let merchantId = 'ab70b8d5-95f5-4c20-997c-4db9013b347c';
+    let profileId = 'ab70b8d5-95f5-4c20-997c-4db9013b347c';
 
     let prisma = await getPrisma();
     await prisma.profile.create({
       data: {
-        id: merchantId,
+        id: profileId,
         ownerAddress: stubUserAddress,
         name: 'Satoshi?',
         slug: 'satoshi',
@@ -187,7 +187,7 @@ describe('PATCH /api/card-spaces', function () {
     };
 
     await request()
-      .patch(`/api/card-spaces/${merchantId}`)
+      .patch(`/api/card-spaces/${profileId}`)
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -209,7 +209,7 @@ describe('PATCH /api/card-spaces', function () {
           relationships: {
             'merchant-info': {
               data: {
-                id: merchantId,
+                id: profileId,
                 type: 'merchant-infos',
               },
             },
@@ -220,12 +220,12 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('returns errors when updating a resource with invalid attributes', async function () {
-    let merchantId = uuidv4();
+    let profileId = uuidv4();
 
     let prisma = await getPrisma();
     await prisma.profile.create({
       data: {
-        id: merchantId,
+        id: profileId,
         ownerAddress: stubUserAddress,
         name: 'Satoshi?',
         slug: 'satoshi',
@@ -254,7 +254,7 @@ describe('PATCH /api/card-spaces', function () {
     };
 
     await request()
-      .patch(`/api/card-spaces/${merchantId}`)
+      .patch(`/api/card-spaces/${profileId}`)
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
