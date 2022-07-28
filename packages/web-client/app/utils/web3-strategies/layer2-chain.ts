@@ -48,7 +48,6 @@ import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { HubConfig } from '@cardstack/cardpay-sdk';
 import { IAssets } from '@cardstack/cardpay-sdk';
@@ -233,6 +232,14 @@ export default abstract class Layer2ChainWeb3Strategy
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
           session: this.connector?.session,
         });
+        Sentry.addBreadcrumb({
+          type: 'debug',
+          message: 'Layer 2 account changed',
+          data: {
+            account: accounts[0],
+          },
+          level: Sentry.Severity.Info,
+        });
       } catch (e) {
         console.error(
           'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
@@ -255,6 +262,11 @@ export default abstract class Layer2ChainWeb3Strategy
     });
 
     this.connector.on('disconnect', (error) => {
+      Sentry.addBreadcrumb({
+        type: 'debug',
+        message: 'Layer 2 disconnected',
+        level: Sentry.Severity.Info,
+      });
       if (error) {
         console.error('error disconnecting', error);
         throw error;
@@ -491,10 +503,13 @@ export default abstract class Layer2ChainWeb3Strategy
     )}/tx/${txnHash}`;
   }
 
-  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+  async getBlockConfirmation(
+    blockNumber: TxnBlockNumber,
+    duration?: number
+  ): Promise<void> {
     if (!this.web3)
       throw new Error('Cannot get block confirmations without web3');
-    return await waitUntilBlock(this.web3, blockNumber);
+    return await waitUntilBlock(this.web3, blockNumber, duration);
   }
 
   async getBlockHeight(): Promise<BN> {
@@ -615,7 +630,7 @@ export default abstract class Layer2ChainWeb3Strategy
     )}/${txnHash}`;
   }
 
-  safes = useResource(this, Safes, () => ({
+  safes = Safes.from(this, () => ({
     strategy: this,
     walletAddress: this.walletInfo.firstAddress!,
   }));

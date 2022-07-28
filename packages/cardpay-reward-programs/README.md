@@ -37,3 +37,11 @@ Each individual program can be built by specifying the rule class name as a buil
     docker run -v ~/.aws:/root/.aws  -v `pwd`/input:/host -v `pwd`/.cache:/app/.cache --env AWS_PROFILE=cardstack --rm -it flat_payment:latest /host/parameters.json /host/
     
 If you are using an m1 laptop, you should add `--platform=linux/amd64` flag.
+
+## Perform Flat Drop
+
+``` sh
+pdm run flat_drop --env staging
+```
+
+

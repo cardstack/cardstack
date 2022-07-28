@@ -59,7 +59,7 @@ const MAINNET = {
   // check https://docs.tokenbridge.net/eth-xdai-amb-bridge/about-the-eth-xdai-amb for the finalization rate
   ambFinalizationRate: '20',
 };
-const XDAI = {
+const GNOSIS = {
   apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x6B78C121bBd10D8ef0dd3623CC1abB077b186F65',
@@ -76,10 +76,10 @@ const XDAI = {
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
   merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-  tallyServiceURL: 'https://reward-api-production.cardstack.com',
+  tallyServiceURL: 'https://reward-api.cardstack.com',
 };
 
-type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
+type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof GNOSIS;
 
 const constants: {
   [network: string]: {
@@ -89,7 +89,8 @@ const constants: {
   sokol: SOKOL,
   kovan: KOVAN,
   mainnet: MAINNET,
-  xdai: XDAI,
+  gnosis: GNOSIS,
+  xdai: GNOSIS,
 });
 
 export const networks: { [networkId: number]: string } = Object.freeze({
@@ -101,11 +102,11 @@ export const networks: { [networkId: number]: string } = Object.freeze({
 
 // invert the networks object, so { '1': 'mainnet', ... } becomes { mainnet: '1', ... }
 // then map over the values, so that { mainnet: '1', ... } has its values casted as numbers: { mainnet: 1, ... }
-export const networkIds = Object.freeze(
-  mapValues(invert({ ...networks }), (networkIdString: string) => Number(networkIdString))
-) as unknown as {
+export const networkIds = mapValues(invert({ ...networks }), Number) as unknown as {
   [networkName: string]: number;
 };
+networkIds['gnosis'] = networkIds['xdai'];
+Object.freeze(networkIds);
 
 export function getConstantByNetwork(name: ConstantKeys, network: string): string {
   let value = constants[network][name];

@@ -1,0 +1,66 @@
+name: Notify deploy status with Discord
+description: Send a Discord message when to inform about deployment status
+
+inputs:
+  app:
+    description: Name of the app
+    required: true
+  status:
+    description: Status of the deployment
+    required: true
+  environment:
+    description: Deployment environment
+    required: true
+  webhook:
+    description: Discord webhook URL
+    required: true
+  is_ecs:
+    description: If service is deployed with AWS ECS
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Send success notification to Discord
+      if: ${{ inputs.status == 'Success' || inputs.status == 'success' }}
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
+      with:
+        args: |
+          :checkered_flag: **${{ inputs.app }}** [${{ github.ref }}] has been successfully deployed to *${{ inputs.environment }}*
+          :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    - name: Fetch stopped reason and logs
+      id: debug
+      if: ${{ ( inputs.status == 'Failure' || inputs.status == 'failure' ) && inputs.is_ecs == 'true' }}
+      uses: ./.github/actions/fetch-stopped-ecs-task
+      with:
+        app: ${{ inputs.app }}
+
+    - name: Send failure notification to Discord
+      id: notify_stopped_task
+      if: ${{ ( inputs.status == 'Failure' || inputs.status == 'failure' ) && steps.debug.outputs.has_stopped_task == 'true' }}
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
+      with:
+        args: |
+          :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
+          :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Tasks stopped for reason:
+          ```
+          ${{ steps.debug.outputs.stopped_reason }}
+          ```
+          View the latest logs at ${{ steps.debug.outputs.logs_url }}
+
+    - name: Send failure notification to Discord
+      if: ${{ ( inputs.status == 'Failure' || inputs.status == 'failure' ) && steps.notify_stopped_task.conclusion != 'success' }}
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ inputs.webhook }}
+      with:
+        args: |
+          :warning: **${{ inputs.app }}** [${{ github.ref }}] has failed to deploy to *${{ inputs.environment }}*
+          :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

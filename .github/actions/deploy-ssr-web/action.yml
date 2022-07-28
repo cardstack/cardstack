@@ -5,25 +5,28 @@ inputs:
   waypoint_version:
     description: Waypoint version to use
     required: false
-    default: '0.4.0'
+    default: "0.8.1"
   environment:
     description: Deployment environment
+    required: true
+  discord_webhook:
+    description: Discord webhook URL
     required: true
 
 runs:
   using: composite
   steps:
-    - name: Install apt packages including waypoint
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Install dependencies
       shell: bash
       run: |
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
-
-    - uses: volta-cli/action@v1
-
-    - run: yarn --prefer-offline
-      shell: bash
 
     - name: Build
       run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}
@@ -37,6 +40,23 @@ runs:
     - name: Deploy FastBoot server
       run: waypoint up --app=ssr-web -plain
       shell: bash
-      env:
-        WAYPOINT_SERVER_TLS: '1'
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - uses: ./.github/actions/waypoint-ecs-failsafe
+      with:
+        app: ssr-web
+
+    - name: Prune dangling resources
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: ssr-web
+        retain: "1"
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: ssr-web
+        status: ${{ github.action_status }}
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}
+        is_ecs: "true"

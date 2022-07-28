@@ -35,14 +35,12 @@ class WeightedUsage(Rule):
         sum(spend_amount_uint64) as total_spent
 
         from {table_query}
-        where block_number_uint64 > $4::integer and block_number_uint64 <= $5::integer 
+        where block_number_uint64 > $4::integer and block_number_uint64 <= $5::integer
         group by prepaid_card_owner
         order by transactions desc
         """
 
-    def df_to_payment_list(
-        self, df, payment_cycle, reward_program_id
-    ):
+    def df_to_payment_list(self, df, payment_cycle, reward_program_id):
         if df.empty:
             return default_payment_list
         new_df = df.copy()
@@ -55,7 +53,10 @@ class WeightedUsage(Rule):
         return new_df[new_df["amount"] > 0]
 
     def run(self, payment_cycle: int, reward_program_id: str):
-        start_block, end_block = payment_cycle - self.payment_cycle_length, payment_cycle
+        start_block, end_block = (
+            payment_cycle - self.payment_cycle_length,
+            payment_cycle,
+        )
         vars = [
             self.base_reward,
             self.spend_factor,
@@ -63,9 +64,13 @@ class WeightedUsage(Rule):
             start_block,
             end_block,
         ]
-        table_query = self._get_table_query("prepaid_card_payment", "prepaid_card_payment", start_block, end_block)
+        table_query = self._get_table_query(
+            "prepaid_card_payment", "prepaid_card_payment", start_block, end_block
+        )
         if table_query == "parquet_scan([])":
-            base_df = pd.DataFrame(columns=["payee", "amount", "transactions", "total_spent"])
+            base_df = pd.DataFrame(
+                columns=["payee", "amount", "transactions", "total_spent"]
+            )
         else:
             base_df = self.run_query(table_query, vars)
         return self.df_to_payment_list(base_df, payment_cycle, reward_program_id)

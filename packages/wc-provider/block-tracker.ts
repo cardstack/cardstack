@@ -12,6 +12,23 @@ export default class PatchedSubscribeBlockTracker extends SubscribeBlockTracker 
     //@ts-ignore need to expose the provider for updating
     return this._provider;
   }
+
+  // Some RPC nodes don’t support subscribing to newHeads with {} parameters, so this removes that
+  protected async _start(): Promise<void> {
+    //@ts-ignore access private this._subscriptionId
+    if (this._subscriptionId === undefined || this._subscriptionId === null) {
+      try {
+        //@ts-ignore access private this._call
+        const blockNumber = (await this._call('eth_blockNumber')) as string;
+        //@ts-ignore access private this._subscriptionId and this._call
+        this._subscriptionId = (await this._call('eth_subscribe', 'newHeads')) as string;
+        this.provider.on('data', this._handleSubData.bind(this));
+        this._newPotentialLatest(blockNumber);
+      } catch (e) {
+        this.emit('error', e);
+      }
+    }
+  }
 }
 
 type Constructor = new (...args: any[]) => {};

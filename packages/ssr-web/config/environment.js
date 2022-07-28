@@ -45,6 +45,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
+    exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
     previewSubdomainInfix: 'ssr-web-preview',
     universalLinkDomain:
@@ -58,7 +59,7 @@ module.exports = function (environment) {
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
         enabled:
           environment === 'production' && process.env.SENTRY_DSN !== undefined,
-        environment: process.env.SENTRY_ENVIRONMENT || 'staging',
+        environment: process.env.SSR_WEB_ENVIRONMENT || 'development',
         release:
           `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
@@ -112,7 +113,7 @@ module.exports = function (environment) {
       CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX,
     chains: {
       layer2:
-        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'xdai' : 'sokol',
+        process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'gnosis' : 'sokol',
     },
   };
 

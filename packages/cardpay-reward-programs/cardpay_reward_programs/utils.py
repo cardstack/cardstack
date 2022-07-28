@@ -1,11 +1,11 @@
+import json
 import tempfile
 from pathlib import PosixPath
 
 import pyarrow.parquet as pq
 import yaml
+from cachetools import TTLCache, cached
 from cloudpathlib import AnyPath, CloudPath
-from cachetools import cached, TTLCache
-
 
 
 def get_local_file(file_location):
@@ -22,10 +22,12 @@ def get_local_file(file_location):
     else:
         raise Exception("Unsupported path type")
 
+
 @cached(TTLCache(maxsize=1000, ttl=60))
 def get_latest_details(config_location):
     with open(config_location / "latest.yaml", "r") as stream:
         return yaml.safe_load(stream)
+
 
 def get_partition_iterator(min_partition, max_partition, partition_sizes):
     for partition_size in sorted(partition_sizes, reverse=True):
@@ -39,6 +41,7 @@ def get_partition_iterator(min_partition, max_partition, partition_sizes):
             yield partition_size, start_partition, start_partition + partition_size
         if last_max_partition is not None:
             min_partition = last_max_partition
+
 
 def get_partition_files(config_location, table, min_partition, max_partition):
     # Get config
@@ -54,19 +57,24 @@ def get_partition_files(config_location, table, min_partition, max_partition):
     )
     files = []
     for partition_size, start_partition, end_partition in get_partition_iterator(
-        min_partition, latest_block, partition_sizes):
+        min_partition, latest_block, partition_sizes
+    ):
         if start_partition < max_partition:
-            files.append(table_dir.joinpath(
-                f"partition_size={partition_size}",
-                f"start_partition={start_partition}",
-                f"end_partition={end_partition}",
-                "data.parquet",
-            ))
+            files.append(
+                table_dir.joinpath(
+                    f"partition_size={partition_size}",
+                    f"start_partition={start_partition}",
+                    f"end_partition={end_partition}",
+                    "data.parquet",
+                )
+            )
     return files
 
 
 def get_files(config_location, table, min_partition, max_partition):
-    file_list = get_partition_files(AnyPath(config_location), table, min_partition, max_partition)
+    file_list = get_partition_files(
+        AnyPath(config_location), table, min_partition, max_partition
+    )
     return list(map(get_local_file, file_list))
 
 
@@ -98,21 +106,14 @@ def write_parquet_file(file_location, table):
         pq.write_table(table, file_location / "results.parquet")
 
 
-def get_parameters_file_path(rule_name:str):
-    if rule_name=="DummyRule":
-        return "./input/dummy_rule/parameters.json"
-    elif rule_name=="FlatPayment":
-        return "./input/flat_payment/parameters.json"
-    elif rule_name=="MinOtherMerchantsPaid":
-        return "./input/min_other_merchants_paid/parameters.json"
-    elif rule_name=="MinSpend":
-        return "input/min_spend/parameters.json"
-    elif rule_name=="SafeOwnership":
-        return "./input/safe_ownership/parameters.json"
-    elif rule_name=="RetroAirdrop":
-        return "./input/retro_airdrop/parameters.json"
-    elif rule_name=="WeightedUsage":
-        return "./input/weighted_usage/parameters.json"
+def write_parameters_file(file_location, o):
+    if isinstance(file_location, CloudPath):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            parameters_file_location = AnyPath(temp_dir) / "parameters.json"
+            with open(parameters_file_location, "w") as f:
+                f.write(json.dumps(o))
+            file_location.joinpath("parameters.json").upload_from(
+                parameters_file_location
+            )
     else:
-        raise Exception("Error rule not  found!")
-        
+        raise Exception("Should only write to s3 bucket")

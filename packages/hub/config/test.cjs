@@ -10,11 +10,20 @@ module.exports = {
   cardDrop: {
     email: {
       rateLimit: {
-        count: 10,
+        count: 100,
         periodMinutes: 10,
       },
     },
     verificationUrl: 'https://card-drop-email.test/email-card-drop/verify',
+  },
+  iap: {
+    apple: {
+      verificationUrl: 'https://buy.itunes.apple.test/verifyReceipt',
+    },
+    google: {
+      verificationUrlBase:
+        'https://www.googleapis.test/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
+    },
   },
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
@@ -41,5 +50,8 @@ module.exports = {
         watch: false,
       },
     ],
+  },
+  relay: {
+    provisionerSecret: 'fakesecret',
   },
 };

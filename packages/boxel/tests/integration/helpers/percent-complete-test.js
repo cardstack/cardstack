@@ -10,7 +10,9 @@ module('Integration | Helper | percent-complete', function (hooks) {
     this.set('total', 4);
     this.set('completed', 2);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
     assert.equal(this.element.textContent.trim(), '50');
   });
@@ -19,7 +21,9 @@ module('Integration | Helper | percent-complete', function (hooks) {
     this.set('total', undefined);
     this.set('completed', 2);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
     assert.equal(this.element.textContent.trim(), '0');
   });
@@ -28,7 +32,9 @@ module('Integration | Helper | percent-complete', function (hooks) {
     this.set('total', 4);
     this.set('completed', null);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
     assert.equal(this.element.textContent.trim(), '0');
   });

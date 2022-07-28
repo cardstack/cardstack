@@ -2,7 +2,6 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import { CardSpace } from '../resources/card-space';
-import { useResource } from 'ember-resources';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import Layer2Network from './layer2-network';
 
@@ -11,7 +10,7 @@ export default class CardSpaceService extends Service {
   @service declare fastboot: Fastboot;
   @service declare layer2Network: Layer2Network;
 
-  model = useResource(this, CardSpace, () => ({
+  model = CardSpace.from(this, () => ({
     named: {
       slug: this.slug,
     },

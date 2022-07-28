@@ -2,9 +2,11 @@ import Controller from '@ember/controller';
 import { action, get } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { compare, isBlank } from '@ember/utils';
+import { inject as service } from '@ember/service';
 
 export default class MediaRegistryDiscrepanciesIndexComponent extends Controller {
   queryParams = ['version'];
+  @service router;
   @tracked version = null;
 
   removed = [];
@@ -45,6 +47,9 @@ export default class MediaRegistryDiscrepanciesIndexComponent extends Controller
 
   @action
   expandAction(item) {
-    this.transitionToRoute('media-registry.discrepancies.discrepancy', item.id);
+    this.router.transitionTo(
+      'media-registry.discrepancies.discrepancy',
+      item.id
+    );
   }
 }

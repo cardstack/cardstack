@@ -36,7 +36,12 @@ export {
   MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
   MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 } from './sdk/constants';
-export { waitUntilBlock, waitUntilTransactionMined, waitForSubgraphIndex } from './sdk/utils/general-utils';
+export {
+  waitForTransactionConsistency,
+  waitUntilBlock,
+  waitUntilTransactionMined,
+  waitForSubgraphIndex,
+} from './sdk/utils/general-utils';
 export { signTypedData } from './sdk/utils/signing-utils';
 export * from './sdk/currency-utils';
 export * from './sdk/currencies';

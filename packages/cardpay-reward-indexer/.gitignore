@@ -1,0 +1,9 @@
+.env
+.pytest_cache
+*.pyc
+__pycache__
+__pypackages__
+.pdm.toml
+.cache
+test.db
+.mypy_cache

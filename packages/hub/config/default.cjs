@@ -26,6 +26,7 @@ module.exports = {
     'migration-filename-format': 'utc',
     'ignore-pattern': 'README.md|.*\\.d\\.ts',
     'check-order': false,
+    prismaLog: ['warn', 'error'],
   },
   discord: {
     botId: '958127663577456714',
@@ -37,6 +38,15 @@ module.exports = {
     allowedChannels: '958136277096620084,958137087641661450',
     messageVerificationDelayMs: 1000 * 15,
     onCallInternalWebhook: null,
+  },
+  iap: {
+    apple: {
+      verificationUrl: 'https://sandbox.itunes.apple.com/verifyReceipt',
+    },
+    google: {
+      verificationUrlBase:
+        'https://www.googleapis.com/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
+    },
   },
   mailchimp: {
     apiKey: null,
@@ -85,6 +95,7 @@ module.exports = {
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
     email: {
       expiryMinutes: 60,
+      notifyWhenQuantityBelow: 25,
       rateLimit: {
         count: null,
         periodMinutes: null,

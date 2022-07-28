@@ -7,7 +7,12 @@ from cloudpathlib import AnyPath
 from eth_utils import to_wei
 from hexbytes import HexBytes
 
-from .utils import get_all_reward_outputs, get_root_from_file, NULL_HEX, EMPTY_MARKER_HEX
+from .utils import (
+    EMPTY_MARKER_HEX,
+    NULL_HEX,
+    get_all_reward_outputs,
+    get_root_from_file,
+)
 
 
 class RootSubmitter:
@@ -35,7 +40,7 @@ class RootSubmitter:
         self.reward_program_output_root = AnyPath(reward_program_output_root)
         self.gas_price_oracle = gas_price_oracle
 
-        with open(f"abis/RewardPool.json") as contract_file:
+        with open("abis/RewardPool.json") as contract_file:
             contract = json.load(contract_file)
         self.reward_contract = self.w3.eth.contract(
             address=reward_contract_address, abi=contract["abi"]
@@ -66,6 +71,11 @@ class RootSubmitter:
             if existing_root == root:
                 logging.info(
                     f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}"
+                )
+                return
+            else:
+                logging.error(
+                    f"Root already submitted for reward program {reward_program_id} payment cycle {payment_cycle}, differs from content on S3"
                 )
                 return
         # Now submit the root

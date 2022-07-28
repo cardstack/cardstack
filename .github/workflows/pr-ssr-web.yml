@@ -3,14 +3,22 @@ name: CI [ssr-web]
 on:
   pull_request:
     paths:
-      - 'packages/ssr-web/**'
-      - 'packages/boxel/**'
-      - 'packages/cardpay-sdk/**'
-      - 'packages/did-resolver/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/pr-ssr-web.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/ssr-web/**"
+      - "packages/boxel/**"
+      - "packages/cardpay-sdk/**"
+      - "packages/did-resolver/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/pr-ssr-web.yml"
+      - "package.json"
+      - "yarn.lock"
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
+  statuses: write
 
 jobs:
   test:
@@ -43,7 +51,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1.28
         if: always()
         with:
-          check_name: 'ssr-web test results'
+          check_name: "ssr-web test results"
           files: ci-xml-test-results/ssr-web.xml
 
   check-if-requires-preview:
@@ -71,11 +79,14 @@ jobs:
     needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/ssr-web
+          aws-region: us-east-1
       - name: Deploy ssr-web preview
         uses: ./.github/actions/deploy-ember-preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.SSR_WEB_STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.SSR_WEB_STAGING_EMBER_DEPLOY_AWS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
           SENTRY_AUTH_TOKEN: ${{ secrets.SSR_WEB_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}
@@ -95,11 +106,14 @@ jobs:
     needs: check-if-requires-preview
     steps:
       - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/ssr-web
+          aws-region: us-east-1
       - name: Deploy ssr-web preview
         uses: ./.github/actions/deploy-ember-preview
         env:
-          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.SSR_WEB_PROD_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.SSR_WEB_PROD_EMBER_DEPLOY_AWS_SECRET }}
           HUB_URL: https://hub.cardstack.com
           SENTRY_AUTH_TOKEN: ${{ secrets.SSR_WEB_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SSR_WEB_SENTRY_DSN }}

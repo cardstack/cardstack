@@ -3,9 +3,11 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class MediaRegistryVersionController extends Controller {
   queryParams = ['version'];
+  @service router;
   @tracked version = this.model ? this.model.version : null;
 
   get item() {
@@ -18,12 +20,12 @@ export default class MediaRegistryVersionController extends Controller {
 
   @action
   transitionToView() {
-    this.transitionToRoute('media-registry.version', this.model.id);
+    this.router.transitionTo('media-registry.version', this.model.id);
   }
 
   @action
   transitionToCatalog(id) {
-    this.transitionToRoute('media-registry.collection', id, {
+    this.router.transitionTo('media-registry.collection', id, {
       queryParams: { version: this.model.version },
     });
   }

@@ -35,17 +35,13 @@ export class MerchantInfo
 
   @service declare offChainJson: OffChainJsonService;
 
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
-    this.run();
+  modify(_positional: any, named: any) {
+    this.run(named.infoDID, named.waitForInfo);
   }
 
-  private async run() {
+  private async run(infoDID: string, waitForInfo: boolean) {
     try {
-      await this.fetchMerchantInfo(
-        this.args.named.infoDID,
-        this.args.named.waitForInfo
-      );
+      await this.fetchMerchantInfo(infoDID, waitForInfo);
       this.loading = false;
     } catch (err) {
       this.errored = err;

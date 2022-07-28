@@ -5,7 +5,6 @@ import sentry_sdk
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
-from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 
@@ -20,7 +19,6 @@ cached_client = S3Client(
     boto3_session=Session(),
 )
 cached_client.set_as_default_client()
-
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 if SENTRY_DSN is not None:

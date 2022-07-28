@@ -12,7 +12,7 @@ import {
 } from '../utils/web3-strategies/types';
 import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
-import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
+import GnosisWeb3Strategy from '../utils/web3-strategies/gnosis';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
@@ -73,8 +73,8 @@ export default class Layer2Network
   constructor(props: object | undefined) {
     super(props);
     switch (config.chains.layer2) {
-      case 'xdai':
-        this.strategy = new XDaiWeb3Strategy();
+      case 'gnosis':
+        this.strategy = new GnosisWeb3Strategy();
         break;
       case 'sokol':
         this.strategy = new SokolWeb3Strategy();
@@ -240,8 +240,11 @@ export default class Layer2Network
     return this.simpleEmitter.on(event, cb);
   }
 
-  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
-    return this.strategy.getBlockConfirmation(blockNumber);
+  async getBlockConfirmation(
+    blockNumber: TxnBlockNumber,
+    duration?: number
+  ): Promise<void> {
+    return this.strategy.getBlockConfirmation(blockNumber, duration);
   }
 
   getBlockHeight() {

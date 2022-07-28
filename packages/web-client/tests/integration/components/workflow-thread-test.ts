@@ -8,6 +8,7 @@ import {
   WorkflowMessage,
   WorkflowPostable,
   WorkflowCard,
+  IWorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 import { MirageTestContext, setupMirage } from 'ember-cli-mirage/test-support';
@@ -330,5 +331,110 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert.dom('[data-test-sidebar-preview-body]').doesNotExist();
     assert.dom('[data-test-sidebar-preview-description]').doesNotExist();
     assert.dom('[data-test-sidebar-preview-separator]').doesNotExist();
+  });
+
+  module('conditional disabling of parts or whole workflow', function (hooks) {
+    let workflow: WorkflowStub;
+    let completableFrozenIndicator: WorkflowCard;
+    let session: IWorkflowSession;
+
+    hooks.beforeEach(async function () {
+      this.owner.register(
+        'template:components/frozen-indicator',
+        hbs`
+          {{#if @frozen}}
+            <div data-test-frozen-indicator>frozen</div>
+          {{else}}
+            <div>active</div>
+          {{/if}}
+          `
+      );
+
+      workflow = new WorkflowStub(this.owner);
+      session = workflow.session;
+      completableFrozenIndicator = new WorkflowCard({
+        cardName: 'FROZEN_INDICATOR',
+        componentName: 'frozen-indicator',
+        editableIf(session) {
+          return !session.getValue('completableFrozenIndicatorDisabled');
+        },
+      });
+
+      let completedFrozenIndicator = new WorkflowCard({
+        cardName: 'FROZEN_INDICATOR',
+        componentName: 'frozen-indicator',
+      });
+      completedFrozenIndicator.isComplete = true;
+
+      let completedFrozenIndicator2 = new WorkflowCard({
+        cardName: 'FROZEN_INDICATOR',
+        componentName: 'frozen-indicator',
+      });
+      completedFrozenIndicator2.isComplete = true;
+
+      workflow.milestones = [
+        new Milestone({
+          title: 'First milestone',
+          postables: [completedFrozenIndicator],
+          completedDetail: 'You are number one!',
+        }),
+        new Milestone({
+          title: 'Second milestone',
+          postables: [completedFrozenIndicator2, completableFrozenIndicator],
+          completedDetail: 'Number two!',
+          editableIf(session) {
+            return !session.getValue('secondMilestoneDisabled');
+          },
+        }),
+      ];
+
+      this.set('workflow', workflow);
+
+      workflow.attachWorkflow();
+
+      await render(hbs`
+        <WorkflowThread @workflow={{this.workflow}} />
+      `);
+    });
+
+    test('@frozen is true for all cards when workflow is canceled', async function (assert) {
+      assert.dom('[data-test-frozen-indicator]').doesNotExist();
+
+      workflow.isCanceled = true;
+
+      await waitFor('[data-test-frozen-indicator]');
+
+      assert.dom('[data-test-frozen-indicator]').exists({ count: 3 });
+    });
+
+    test('@frozen is true for all cards when workflow is completed', async function (assert) {
+      assert.dom('[data-test-frozen-indicator]').doesNotExist();
+
+      completableFrozenIndicator.isComplete = true;
+
+      await waitFor('[data-test-frozen-indicator]');
+
+      assert.dom('[data-test-frozen-indicator]').exists({ count: 3 });
+    });
+
+    test('@frozen is true for children in milestone when milestone is not editable', async function (assert) {
+      assert.dom('[data-test-frozen-indicator]').doesNotExist();
+
+      session.setValue('secondMilestoneDisabled', true);
+
+      await waitFor('[data-test-frozen-indicator]');
+
+      assert.dom('[data-test-frozen-indicator]').exists({ count: 2 });
+    });
+
+    test('@frozen is true for only one card when card is not editable', async function (assert) {
+      assert.dom('[data-test-frozen-indicator]').doesNotExist();
+
+      session.setValue('completableFrozenIndicatorDisabled', true);
+
+      await waitFor('[data-test-frozen-indicator]');
+
+      assert.dom('[data-test-frozen-indicator]').exists({ count: 1 });
+    });
   });
 });

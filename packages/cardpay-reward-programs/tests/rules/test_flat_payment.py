@@ -1,13 +1,6 @@
-import hashlib
-import itertools
-from audioop import mul
-
-import pandas as pd
 import pytest
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import FlatPayment
-
-from .fixture import indexed_data
 
 summaries = [
     {"total_reward": 100 * 1_000_000_000_000_000_000, "unique_payee": 12},
@@ -67,7 +60,7 @@ class TestFlatPayment:
         ],
         indirect=["rule"],
     )
-    def test_pays_all(self, rule, expected_payees, indexed_data):
+    def test_pays_all(self, rule, expected_payees):
         payment_cycle = 24859648
         payment_list = rule.run(
             payment_cycle, "0x41149498EAc53F8C15Fe848bC5f010039A130963"

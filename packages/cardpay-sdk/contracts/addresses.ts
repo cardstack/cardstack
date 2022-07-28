@@ -47,6 +47,7 @@ const SOKOL = {
   cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
   prepaidCardManager: '0xEba6d63dDf30174B87272D5cF566D63547e60119',
   prepaidCardMarket: '0x959CF9c3f8bDdba69210159c25f77BCE58EADC75',
+  prepaidCardMarketV2: '0xb52726CbDA92b5340F32A0e837e8678E68Ff9da8',
   revenuePool: '0xfD59940a9789E161217A853F3D78ec619247ADb7',
   bridgeUtils: '0x34e286a943E017b105C48fd78f4A61424b0cc8f7',
   exchange: '0x95C13a7CFf0c12bAD1AAD2e7C962103988bD4444',
@@ -83,7 +84,7 @@ const MAINNET = {
   foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
 };
-const XDAI = {
+const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   homeBridge: '0xd1e46b8a371AF04Ce74c993B325b844ef0f48b16',
@@ -92,6 +93,7 @@ const XDAI = {
   cardCpxd: '0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3',
   prepaidCardManager: '0x15a4Cc5b3CfeBe900e5F514348bC077Eb883224D',
   prepaidCardMarket: '0x20f4251776e776D138967Ad36a3F5d0c6de3EB09',
+  prepaidCardMarketV2: '0x8897600115FE944FA8aC78254E1A799698265ddc',
   revenuePool: '0xE097ec255eA9fE4e199E920E105b0f61d6e09C34',
   bridgeUtils: '0xa79206F956461e053DbCF33ADDFa77553Df58D7F',
   exchange: '0x1c5B87A6905327D2370fA57C80667D432926ABA1',
@@ -129,10 +131,11 @@ const addresses: {
   kovan: KOVAN,
   sokol: SOKOL,
   mainnet: MAINNET,
-  xdai: XDAI,
+  gnosis: GNOSIS,
+  xdai: GNOSIS,
 });
 
-export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
+export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof GNOSIS;
 
 export default addresses;
 

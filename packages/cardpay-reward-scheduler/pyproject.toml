@@ -1,0 +1,46 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Ian Calvert", email = "ian.calvert@cardstack.com"},
+]
+dependencies = [
+    "boto3",
+    "cloudpathlib[s3]>=0.7.1",
+    "pyyaml>=6.0",
+    "cachetools>=5.0.0",
+    "pyarrow>=8.0.0",
+    "web3>=5.29.1",
+    "sentry-sdk>=1.5.12",
+    "python-dotenv>=0.20.0",
+    "schedule>=1.1.0",
+    "duckdb>=0.3.4",
+    "rusty-rlp>=0.2.1",
+    "typer>=0.6.1",
+    "docker>=5.0.3",
+]
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+
+[tool.pdm]
+[[tool.pdm.source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.0.1",
+    "black>=22.1.0",
+    "isort>=5.10.1",
+    "hypothesis>=6.47.0",
+    "setuptools>=62.3.3",
+    "flake8>=4.0.1",
+]
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"

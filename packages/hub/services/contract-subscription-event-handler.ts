@@ -3,12 +3,23 @@ import { AddressKeys } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 
 import logger from '@cardstack/logger';
-import { query } from '@cardstack/hub/queries';
+import { EventData } from 'web3-eth-contract';
+
 const log = logger('hub/contract-subscription-event-handler');
 
 export const HISTORIC_BLOCKS_AVAILABLE = 10000;
 
-export const CONTRACT_EVENTS = [
+type TasksWhichAcceptEventData = 'notify-merchant-claim' | 'notify-customer-payment' | 'notify-prepaid-card-drop';
+
+interface ContractEventConfig {
+  abiName: string;
+  contractName: AddressKeys;
+  eventName: string;
+  taskName: TasksWhichAcceptEventData;
+  contractStartVersion?: string;
+}
+
+export const CONTRACT_EVENTS: readonly ContractEventConfig[] = [
   {
     abiName: 'pay-merchant-handler',
     contractName: 'payMerchantHandler' as AddressKeys,
@@ -21,19 +32,27 @@ export const CONTRACT_EVENTS = [
     eventName: 'MerchantClaim',
     taskName: 'notify-merchant-claim',
   },
-];
+  {
+    abiName: 'prepaid-card-market-v-2',
+    contractName: 'prepaidCardMarketV2' as AddressKeys,
+    eventName: 'PrepaidCardProvisioned',
+    taskName: 'notify-prepaid-card-drop',
+    contractStartVersion: '0.9.0',
+  },
+] as const;
 
 export class ContractSubscriptionEventHandler {
   contracts = inject('contracts', { as: 'contracts' });
   web3 = inject('web3-socket', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
-  latestEventBlockQueries = query('latest-event-block', { as: 'latestEventBlockQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async setupContractEventSubscriptions() {
     let web3Instance = this.web3.getInstance();
+    let prisma = await this.prismaManager.getClient();
 
     let subscriptionOptions = {};
-    let subscriptionEventLatestBlock = await this.latestEventBlockQueries.read();
+    let subscriptionEventLatestBlock = await prisma.latestEventBlock.read();
 
     if (subscriptionEventLatestBlock) {
       let latestBlock = await web3Instance.eth.getBlockNumber();
@@ -45,7 +64,7 @@ export class ContractSubscriptionEventHandler {
     for (let contractEvent of CONTRACT_EVENTS) {
       let contract = await this.contracts.getContract(web3Instance, contractEvent.abiName, contractEvent.contractName);
 
-      contract.events[contractEvent.eventName](subscriptionOptions, async (error: Error, event: any) => {
+      contract.events[contractEvent.eventName](subscriptionOptions, async (error: Error, event: EventData) => {
         if (error) {
           Sentry.captureException(error, {
             tags: {
@@ -58,9 +77,8 @@ export class ContractSubscriptionEventHandler {
             `Received ${contractEvent.contractName} event (block number ${event.blockNumber})`,
             event.transactionHash
           );
-
-          await this.latestEventBlockQueries.update(event.blockNumber);
-          this.workerClient.addJob(contractEvent.taskName, event.transactionHash);
+          await prisma.latestEventBlock.updateBlockNumber(event.blockNumber);
+          this.workerClient.addJob<typeof CONTRACT_EVENTS[number]['taskName']>(contractEvent.taskName, event);
         }
       });
     }

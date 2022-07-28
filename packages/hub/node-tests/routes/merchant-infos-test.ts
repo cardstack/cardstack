@@ -1,4 +1,3 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
@@ -21,17 +20,6 @@ class StubAuthenticationUtils {
   }
 }
 
-let jobIdentifiers: string[] = [];
-let jobPayloads: any[] = [];
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    jobIdentifiers.push(identifier);
-    jobPayloads.push(payload);
-    return Promise.resolve({} as Job);
-  }
-}
-
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
@@ -41,15 +29,9 @@ function handleValidateAuthToken(encryptedString: string) {
 describe('POST /api/merchant-infos', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
-  let { request, getContainer } = setupHub(this);
-
-  this.afterEach(async function () {
-    jobIdentifiers = [];
-    jobPayloads = [];
-  });
+  let { request, getPrisma } = setupHub(this);
 
   it('persists merchant info', async function () {
     const payload = {
@@ -98,10 +80,10 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let cardSpaceQueries = await getContainer().lookup('card-space', { type: 'query' });
-    let cardSpace = (await cardSpaceQueries.query({ merchantId: String(resourceId) }))[0];
+    let prisma = await getPrisma();
+    let cardSpace = await prisma.cardSpace.findFirst({ where: { merchantId: String(resourceId) } });
 
-    expect(cardSpace.merchantId).to.exist;
+    expect(cardSpace?.merchantId).to.exist;
   });
 
   it('returns 401 without bearer token', async function () {
@@ -323,15 +305,9 @@ describe('POST /api/merchant-infos', function () {
 describe('GET /api/merchant-infos/validate-slug/:slug', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { request } = setupHub(this);
-
-  this.afterEach(async function () {
-    jobIdentifiers = [];
-    jobPayloads = [];
-  });
 
   it('returns 401 without bearer token', async function () {
     const slug = 'slug';
@@ -455,18 +431,19 @@ describe('GET /api/merchant-infos/short-id/:id', function () {
   // shortened using short-uuid, originally 'a7eeb098-f8d6-4926-a47b-c320b7375d6b'
   // this endpoint should convert it back
   const shortenedUuid = 'mJKhNVKyAUgScu1dysmR8R';
-  let { request, getContainer } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
 
   this.beforeEach(async function () {
-    let merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
-
-    await merchantInfoQueries.insert({
-      id: fullUuid,
-      name: 'Merchie!',
-      slug: 'slug',
-      color: 'red',
-      textColor: 'purple',
-      ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+    let prisma = await getPrisma();
+    await prisma.merchantInfo.create({
+      data: {
+        id: fullUuid,
+        name: 'Merchie!',
+        slug: 'slug',
+        color: 'red',
+        textColor: 'purple',
+        ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+      },
     });
   });
 

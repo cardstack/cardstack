@@ -21,3 +21,9 @@ export default class SubscribeEmail {
     }
   }
 }
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'subscribe-email': SubscribeEmail;
+  }
+}

@@ -24,17 +24,17 @@ export class CardCustomization extends Resource<Args> {
 
   @service declare offChainJson: OffChainJsonService;
 
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
-    this.run();
-  }
+  didSetup = false;
 
-  private async run() {
+  modify(_positional: any, named: any) {
+    if (!this.didSetup) {
+      this.didSetup = true;
+      this.run(named.customizationDID, named.waitForCustomization);
+    }
+  }
+  private async run(customizationDID: string, waitForCustomization: boolean) {
     try {
-      await this.fetchCardCustomization(
-        this.args.named.customizationDID,
-        this.args.named.waitForCustomization
-      );
+      await this.fetchCardCustomization(customizationDID, waitForCustomization);
       this.loading = false;
     } catch (err) {
       this.errored = err;

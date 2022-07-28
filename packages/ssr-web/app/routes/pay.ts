@@ -4,10 +4,10 @@ import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
-import { getOwner } from '@ember/application';
 import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import RouterService from '@ember/routing/router-service';
 
 interface PayRouteModel {
   network: string;
@@ -17,23 +17,26 @@ interface PayRouteModel {
 }
 
 export default class PayRoute extends Route {
+  @service declare router: RouterService;
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
   @service('card-space') declare cardSpace: CardSpaceService;
 
   beforeModel() {
     if (this.cardSpace.isActive) {
-      this.transitionTo('index');
+      this.router.transitionTo('index');
     }
   }
 
   async model(params: {
+    currency: string;
     network: string;
     merchant_safe_id: string;
   }): Promise<PayRouteModel> {
+    let network = params.network === 'xdai' ? 'gnosis' : params.network;
     try {
       const merchantSafe = (await this.fetchMerchantSafe(
-        params.network,
+        network,
         params.merchant_safe_id
       )) as MerchantSafe;
 
@@ -42,11 +45,11 @@ export default class PayRoute extends Route {
       let merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID!);
 
       return {
-        network: params.network,
+        network,
         merchantSafe,
         merchantInfo,
         exchangeRates: this.shouldFetchExchangeRates
-          ? await this.fetchExchangeRates()
+          ? await this.fetchExchangeRates('USD', params.currency)
           : undefined,
       };
     } catch (e) {
@@ -62,16 +65,19 @@ export default class PayRoute extends Route {
     );
   }
 
-  async fetchExchangeRates() {
+  async fetchExchangeRates(from: string, to: string) {
     try {
       return (
         await (
-          await fetch(`${config.hubURL}/api/exchange-rates`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/vnd.api+json',
-            },
-          })
+          await fetch(
+            `${config.hubURL}/api/exchange-rates?from=${from}&to=${to}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/vnd.api+json',
+              },
+            }
+          )
         ).json()
       ).data.attributes.rates;
     } catch (e) {
@@ -101,12 +107,10 @@ export default class PayRoute extends Route {
   async fetchMerchantInfo(infoDID: string) {
     // use a resource in a blocking manner
     // see https://github.com/NullVoxPopuli/ember-resources/issues/316
-    let merchantInfo = new MerchantInfo(getOwner(this), {
-      named: {
-        infoDID,
-        waitForInfo: false,
-      },
-    });
+    let merchantInfo = MerchantInfo.from(this, () => ({
+      infoDID,
+      waitForInfo: false,
+    }));
     await merchantInfo.run();
 
     return merchantInfo;
@@ -115,6 +119,6 @@ export default class PayRoute extends Route {
 
 function isLayer2Network(
   maybeNetwork: string
-): maybeNetwork is 'sokol' | 'xdai' {
-  return maybeNetwork === 'xdai' || maybeNetwork === 'sokol';
+): maybeNetwork is 'sokol' | 'gnosis' {
+  return maybeNetwork === 'gnosis' || maybeNetwork === 'sokol';
 }

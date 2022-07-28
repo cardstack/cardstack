@@ -15,7 +15,7 @@ jobs:
         working-directory: ./packages/cardpay-reward-programs
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: ["3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v2

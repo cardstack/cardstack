@@ -274,12 +274,13 @@ export async function signTypedData(web3OrSigner: Web3 | Signer, account: string
     }
     if (Signer.isSigner(web3OrSigner)) {
       let signer = web3OrSigner;
-      let {
-        types: { SafeTx },
-        domain,
-        message,
-      } = data;
-      let types = { SafeTx };
+      let { domain, message } = data;
+
+      // Ethers signer errors when types fields are mismatched with message fields,
+      // Which is the case for EIP712Domain, so it needs to be removed before signing
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { EIP712Domain: removed, ...types } = data.types;
+
       //@ts-ignore the _signTypedData method is unfortunately not typed
       signature = await signer._signTypedData(domain, types, message);
     } else {

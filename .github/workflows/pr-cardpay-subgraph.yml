@@ -1,14 +1,14 @@
 name: CI [cardpay-subgraph]
+
 on:
   pull_request:
-    branches: [main]
     paths:
-      - 'packages/cardpay-sdk/**'
-      - 'packages/cardpay-subgraph/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/pr-cardpay-subgraph.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/cardpay-sdk/**"
+      - "packages/cardpay-subgraph/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/pr-cardpay-subgraph.yml"
+      - "package.json"
+      - "yarn.lock"
 
 jobs:
   test:
@@ -28,3 +28,4 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
       - run: yarn codegen:subgraph-sokol && yarn build:subgraph
+      - run: yarn codegen:subgraph-xdai && yarn build:subgraph

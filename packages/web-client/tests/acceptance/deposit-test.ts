@@ -152,6 +152,9 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0x1826...6E44');
 
     await settled();
+    assert
+      .dom(`${postableSel(1, 2)} [data-test-layer-2-wallet-disconnect-button]`)
+      .exists();
 
     assert
       .dom(milestoneCompletedSel(1))
@@ -207,8 +210,20 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).doesNotExist();
 
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .doesNotExist();
+
     layer1Service.test__simulateUnlockTxnHash();
     await settled();
+
+    assert
+      .dom(
+        `[data-test-boxel-action-chin-state="memorialized"] [data-test-boxel-button].boxel-action-chin__memorialized-action-button[disabled]`
+      )
+      .exists({ count: 3 });
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).exists();
 
@@ -263,7 +278,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(3, 0))
       .containsText(
-        `your token will be bridged to the ${c.layer2.shortName} blockchain`
+        `your tokens will be bridged to the ${c.layer2.shortName} blockchain`
       );
 
     post = postableSel(3, 1);

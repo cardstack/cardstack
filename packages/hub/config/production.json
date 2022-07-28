@@ -14,13 +14,18 @@
     "allowedGuilds": "584043165066199050",
     "allowedChannels": "898954606242054185"
   },
+  "iap": {
+    "apple": {
+      "verificationUrl": "https://buy.itunes.apple.com/verifyReceipt"
+    }
+  },
   "mailchimp": {
     "serverPrefix": "us8",
     "newsletterListId": "f2fe559998"
   },
   "web3": {
     "layer1Network": "mainnet",
-    "layer2Network": "xdai"
+    "layer2Network": "gnosis"
   },
   "checkly": {
     "handleWebhookRequests": true
@@ -30,7 +35,7 @@
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
   },
   "cardDrop": {
-    "sku": "0xa749b13a8b8a0ee736e3dde0a1a02658bc1cad6641d50849009a707ace79ce17",
+    "sku": "0x81225830f5bfadbe142da2e9175e9fd52b01806e636c84299bcd8d1aae7dea8b",
     "verificationUrl": "https://hub.cardstack.com/email-card-drop/verify"
   }
 }

@@ -1,6 +1,6 @@
-import { Job, TaskSpec } from 'graphile-worker';
 import { PagerdutyIncident } from '../../services/pagerduty-api';
 import { registry, setupHub } from '../helpers/server';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 class StubPagerdutyApi {
   async fetchIncident(id: string): Promise<PagerdutyIncident> {
@@ -10,17 +10,6 @@ class StubPagerdutyApi {
       title: 'A little bump in the road',
       status: 'triggered',
     };
-  }
-}
-
-let jobIdentifiers: string[] = [];
-let jobPayloads: any[] = [];
-
-class StubWorkerClient {
-  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
-    jobIdentifiers.push(identifier);
-    jobPayloads.push(payload);
-    return Promise.resolve({} as Job);
   }
 }
 
@@ -100,11 +89,10 @@ const EXAMPLE_INCIDENT_TRIGGERED_REQUEST_BODY = {
 };
 
 describe('POST /callbacks/pagerduty-incidents', async function () {
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+
   this.beforeEach(function () {
-    jobIdentifiers = [];
-    jobPayloads = [];
     registry(this).register('pagerduty-api', StubPagerdutyApi);
-    registry(this).register('worker-client', StubWorkerClient);
   });
 
   let { request } = setupHub(this);
@@ -117,8 +105,8 @@ describe('POST /callbacks/pagerduty-incidents', async function () {
       .send(EXAMPLE_INCIDENT_TRIGGERED_REQUEST_BODY)
       .expect(200);
 
-    expect(jobIdentifiers).to.deep.equal(['discord-post']);
-    expect(jobPayloads).to.deep.equal([
+    expect(getJobIdentifiers()).to.deep.equal(['discord-post']);
+    expect(getJobPayloads()).to.deep.equal([
       {
         channel: 'on-call-internal',
         message: '🚨 Incident triggered: A little bump in the road (https://acme.pagerduty.com/incidents/PGR0VU2)',
@@ -133,8 +121,8 @@ describe('POST /callbacks/pagerduty-incidents', async function () {
       .set('Content-Type', 'application/json')
       .send({ event: { event_type: 'incident.acknowledged', resource_type: 'not-incident' } })
       .expect(422);
-    expect(jobIdentifiers).to.deep.equal([]);
-    expect(jobPayloads).to.deep.equal([]);
+    expect(getJobIdentifiers()).to.deep.equal([]);
+    expect(getJobPayloads()).to.deep.equal([]);
   });
 
   it('skips events where the type is not supported', async function () {
@@ -144,7 +132,7 @@ describe('POST /callbacks/pagerduty-incidents', async function () {
       .set('Content-Type', 'application/json')
       .send({ event: { event_type: 'incident.unsupported', resource_type: 'incident' } })
       .expect(422);
-    expect(jobIdentifiers).to.deep.equal([]);
-    expect(jobPayloads).to.deep.equal([]);
+    expect(getJobIdentifiers()).to.deep.equal([]);
+    expect(getJobPayloads()).to.deep.equal([]);
   });
 });

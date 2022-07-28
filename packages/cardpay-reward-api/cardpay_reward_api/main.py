@@ -1,62 +1,59 @@
+import json
 import logging
 import os
-from typing import List, Optional
+from typing import List
 
 import sentry_sdk
 import uvicorn
-from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi_utils.tasks import repeat_every
-from sqlalchemy.orm import Session
+from fastapi import Depends, FastAPI
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from web3 import Web3
 
-from . import crud, models, schemas
-from .config import config
-from .database import SessionLocal, engine, get_db, get_fastapi_sessionmaker
-from .indexer import Indexer
-
-load_dotenv()
+from . import crud, schemas
+from .config import config, get_settings
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL)
 
-models.Base.metadata.create_all(bind=engine)
-for expected_env in [
-    "SUBGRAPH_URL",
-    "REWARDS_BUCKET",
-    "ENVIRONMENT",
-]:
-    if expected_env not in os.environ:
-        raise ValueError(f"Missing environment variable {expected_env}")
-
-SUBGRAPH_URL = os.environ.get("SUBGRAPH_URL")
-REWARDS_BUCKET = os.environ.get("REWARDS_BUCKET")
-ENVIRONMENT = os.environ.get("ENVIRONMENT")
-SENTRY_DSN = os.environ.get("SENTRY_DSN")
+settings = get_settings()
+engine = create_engine(settings.DB_STRING)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 app = FastAPI()
 
-if SENTRY_DSN is not None:
+
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
+def get_w3():
+    w3 = Web3(Web3.HTTPProvider(settings.EVM_FULL_NODE_URL))
+    yield w3
+
+
+def get_reward_pool(w3=Depends(get_w3)):
+    with open("abis/RewardPool.json") as contract_file:
+        contract = json.load(contract_file)
+    reward_contract = w3.eth.contract(
+        address=config[settings.ENVIRONMENT]["reward_pool"], abi=contract["abi"]
+    )
+    yield reward_contract
+
+
+if settings.SENTRY_DSN is not None:
     sentry_sdk.init(
-        SENTRY_DSN,
+        settings.SENTRY_DSN,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-        environment=ENVIRONMENT,
+        environment=settings.ENVIRONMENT,
     )
-
-
-@app.on_event("startup")
-@repeat_every(seconds=5, raise_exceptions=True)
-def index_root_task() -> None:
-    sessionmaker = get_fastapi_sessionmaker()
-    with sessionmaker.context_session() as db:
-        try:
-            Indexer(SUBGRAPH_URL, config[ENVIRONMENT]["archived_reward_programs"]).run(
-                db=db, storage_location=REWARDS_BUCKET
-            )
-        except Exception as e:
-            logging.error(e)
 
 
 def param(skip: int = 0, limit: int = 100):
@@ -66,9 +63,9 @@ def param(skip: int = 0, limit: int = 100):
 @app.get("/about/")
 async def about():
     return {
-        "subgraph_url": SUBGRAPH_URL,
-        "rewards_bucket": REWARDS_BUCKET,
-        "environment": ENVIRONMENT,
+        "subgraph_url": settings.SUBGRAPH_URL,
+        "rewards_bucket": settings.REWARDS_BUCKET,
+        "environment": settings.ENVIRONMENT,
     }
 
 
@@ -84,6 +81,23 @@ def read_proofs(
     param: dict = Depends(param),
 ):
     return crud.get_proofs(db, proof_filter=proof_filter, param=param)
+
+
+@app.get(
+    "/reward-pool-balance/{rewardProgramId}/{token}",
+    response_model=schemas.RewardPoolBalance,
+)
+def read_reward_pool_balance(
+    rewardProgramId: str,
+    token: str,
+    reward_pool=Depends(get_reward_pool),
+):
+    balance_in_wei = reward_pool.caller.rewardBalance(rewardProgramId, token)
+    return {
+        "rewardProgramId": rewardProgramId,
+        "token": token,
+        "balanceInEth": Web3.fromWei(balance_in_wei, "ether"),
+    }
 
 
 if __name__ == "__main__":

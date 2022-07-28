@@ -1,0 +1,13 @@
+name: Waypoint ECS Failsafe
+description: "Detect and counteract anticipated bugs from waypoint"
+inputs:
+  app:
+    description: "Name of the app"
+    required: true
+  waypoint_hcl_path:
+    description: "Path to waypoint.hcl"
+    required: false
+    default: ./waypoint.hcl
+runs:
+  using: "node12"
+  main: "dist/index.js"

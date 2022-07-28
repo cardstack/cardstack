@@ -116,7 +116,7 @@ export interface Layer2Web3Strategy
     symbolsToUpdate: UsdConvertibleSymbol[]
   ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  getBlockConfirmation(blockNumber: number): Promise<void>;
+  getBlockConfirmation(blockNumber: number, duration?: number): Promise<void>;
   getBlockHeight(): Promise<BN>;
   awaitBridgedToLayer2(
     fromBlock: BN,
@@ -166,6 +166,6 @@ export type ChainAddress = string;
 
 export type Layer1NetworkSymbol = 'kovan' | 'mainnet';
 export type TestLayer1NetworkSymbol = 'test-layer1';
-export type Layer2NetworkSymbol = 'xdai' | 'sokol';
+export type Layer2NetworkSymbol = 'gnosis' | 'sokol';
 export type TestLayer2NetworkSymbol = 'test-layer2';
 export type NetworkSymbol = Layer1NetworkSymbol | Layer2NetworkSymbol;

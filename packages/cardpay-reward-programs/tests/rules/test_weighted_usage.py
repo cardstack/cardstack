@@ -1,16 +1,13 @@
 import itertools
 
-import pandas as pd
 import pytest
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import WeightedUsage
 
-from .fixture import indexed_data
-
 summaries = [
-    {"total_reward": 106, "unique_payee": 9},
-    {"total_reward": 106, "unique_payee": 9},
-    {"total_reward": 106, "unique_payee": 9},
+    {"total_reward": 109, "unique_payee": 9},
+    {"total_reward": 109, "unique_payee": 9},
+    {"total_reward": 109, "unique_payee": 9},
 ]
 
 
@@ -23,7 +20,6 @@ transaction_factor_ls = [2.0]
 def rule(request):
     payment_cycle_length, spend_factor, transaction_factor = request.param
     core_config = {
-        "payment_cycle_length": 32768,
         "start_block": 20000000,
         "end_block": 26000000,
         "payment_cycle_length": payment_cycle_length,
@@ -41,6 +37,7 @@ def rule(request):
     return WeightedUsage(core_config, user_config)
 
 
+@pytest.mark.usefixtures("indexed_data")
 class TestWeightedUsageSingle:
     @pytest.mark.parametrize(
         "rule,summary",
@@ -52,7 +49,7 @@ class TestWeightedUsageSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, summary, indexed_data):
+    def test_run(self, rule, summary):
         start_block = 24000000
         end_block = 26000000
         rule.payment_cycle_length = end_block - start_block
@@ -65,11 +62,12 @@ class TestWeightedUsageSingle:
 range_summaries = [
     [{"block": 24001024, "amount": 0}],
     [{"block": 24032768, "amount": 49}],
-    [{"block": 24524288, "amount": 60}],
+    [{"block": 24524288, "amount": 61}],
 ]
 range_ans_ls = zip(range_summaries)
 
 
+@pytest.mark.usefixtures("indexed_data")
 class TestWeightedUsageMultiple:
     @pytest.mark.parametrize(
         "rule,ans",
@@ -81,7 +79,7 @@ class TestWeightedUsageMultiple:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, ans, indexed_data):
+    def test_run(self, rule, ans):
         (range_summary,) = ans
         start_block = 24000000
         end_block = start_block + rule.payment_cycle_length * 10

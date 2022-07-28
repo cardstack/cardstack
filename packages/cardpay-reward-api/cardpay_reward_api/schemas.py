@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from typing import List, Optional
 
 from hexbytes import HexBytes
@@ -34,3 +32,9 @@ class ProofFilter(BaseModel):
     rewardProgramId: Optional[str]
     token: Optional[str]
     payee: str
+
+
+class RewardPoolBalance(BaseModel):
+    rewardProgramId: str
+    token: str
+    balanceInEth: int

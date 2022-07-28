@@ -30,7 +30,6 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 import {
@@ -121,6 +120,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   async refreshSafesAndBalances() {
     this.balancesRefreshed = true;
+    if (!this.isConnected) return;
     await this.safes.fetch();
   }
 
@@ -133,7 +133,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     };
   }
 
-  async getBlockConfirmation(_blockNumber: TxnBlockNumber): Promise<void> {
+  async getBlockConfirmation(
+    _blockNumber: TxnBlockNumber,
+    _duration?: number
+  ): Promise<void> {
     if (this.test__autoResolveBlockConfirmations) {
       return Promise.resolve();
     } else {
@@ -345,7 +348,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(true);
   }
 
-  safes = useResource(this, Safes, () => ({
+  safes = Safes.from(this, () => ({
     strategy: this,
     walletAddress: this.walletInfo.firstAddress!,
   }));

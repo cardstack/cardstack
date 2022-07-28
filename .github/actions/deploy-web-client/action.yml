@@ -5,6 +5,9 @@ inputs:
   environment:
     description: Deployment environment
     required: true
+  discord_webhook:
+    description: Discord webhook URL
+    required: true
 
 runs:
   using: composite
@@ -43,4 +46,13 @@ runs:
         ignore_missing: true
         sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
         version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
-        url_prefix: '~'
+        url_prefix: "~"
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: web-client
+        status: ${{ github.action_status }}
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}

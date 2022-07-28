@@ -22,8 +22,20 @@ if (!network) {
   console.error(`need to specify network`);
   process.exit(1);
 }
+
+let localChainAddresses;
+if (network === 'localchain') {
+  let localchainAddressesFile = resolve(join(__dirname, '..', 'localchain-addresses.json'));
+  localChainAddresses = JSON.parse(readFileSync(localchainAddressesFile), { encoding: 'utf8' });
+}
+
 let cleanNetwork = network.replace('poa-', '');
 
+// The graph-node configuration still references the gnosis chain as xdai
+let legacyNetwork = network;
+if (network == 'gnosis') {
+  legacyNetwork = 'xdai';
+}
 
 // If there is a graphql endpoing provided
 // take the latest deployed subgraph from it
@@ -74,54 +86,54 @@ graft:
 
 let cardpayGenesisBlock = {
   sokol: 21403252,
-  xdai: 17265698,
+  gnosis: 17265698,
 };
 let tokenStartBlock = {
   sokol: 20644808, // the block that the token bridge was created (and hence our CPXD tokens)
-  xdai: cardpayGenesisBlock.xdai,
+  gnosis: cardpayGenesisBlock.gnosis,
 };
 let gnosisSafeGenesisBlock = {
   sokol: cardpayGenesisBlock.sokol,
-  xdai: cardpayGenesisBlock.xdai,
+  gnosis: cardpayGenesisBlock.gnosis,
 };
 let uniswapV2GenesisBlock = {
   sokol: 21474163,
-  xdai: cardpayGenesisBlock.xdai,
+  gnosis: cardpayGenesisBlock.gnosis,
 };
 
 let v0_7_0_startBlock = {
   sokol: 22189483,
-  xdai: 18457665,
+  gnosis: 18457665,
 };
 
 let v0_8_0_startBlock = {
   sokol: 22728770,
-  xdai: 18457665,
+  gnosis: 18457665,
 };
 
 let v0_8_3_startBlock = {
   sokol: 23046211,
-  xdai: 18457665,
+  gnosis: 18457665,
 };
 
 let v0_8_4_startBlock = {
   sokol: 23427748,
-  xdai: 18855934,
+  gnosis: 18855934,
 };
 
 let v0_8_5_startBlock = {
   sokol: 23567204,
-  xdai: 19003918,
+  gnosis: 19003918,
 };
 
 let v0_8_6_startBlock = {
   sokol: 23843871,
-  xdai: 19375796,
+  gnosis: 19375796,
 };
 
 let v0_8_7_startBlock = {
   sokol: 23912918,
-  xdai: 19375796,
+  gnosis: 19375796,
 };
 
 let abis = {
@@ -153,7 +165,8 @@ for (let [name, abi] of Object.entries(abis)) {
 }
 
 let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
-  .replace(/{NETWORK}/g, network)
+  .replace(/{LEGACY_NETWORK}/g, legacyNetwork)
+  .replace(/{NETWORK}/g, cleanNetwork)
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_2}/g, getAddress('gnosisProxyFactory_v1_2', cleanNetwork))
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY_v1_3}/g, getAddress('gnosisProxyFactory_v1_3', cleanNetwork))
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
@@ -192,6 +205,12 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{REGISTER_REWARDEE_HANDLER_ADDRESS}/g, getAddress('registerRewardeeHandler', cleanNetwork))
   .replace(/{GRAFTING}/g, graftingSection);
 
+if (network === 'localchain') {
+  subgraph = subgraph
+    .replace(/startBlock: undefined/g, 'startBlock: 0')
+    .replace('uniswap-factory-localchain', 'uniswap-factory-sokol'); // Not sure we need this for local chain, so we'll use the sokol one so we don't have to add local uniswap config
+}
+
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
 ensureDirSync(generatedDir);
@@ -229,6 +248,11 @@ function getAbi(path) {
 
 function getAddress(contractName, network) {
   let file = readFileSync(addressFile, { encoding: 'utf8' });
+
+  if (network === 'localchain') {
+    return localChainAddresses[contractName];
+  }
+
   let [, networkContents] = file.match(new RegExp(`${network.toUpperCase()} = {([^}]*)}`));
   let [, address] = networkContents.match(new RegExp(`${contractName}: ['"](\\w*)['"]`));
   return address;

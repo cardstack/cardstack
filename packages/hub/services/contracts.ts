@@ -2,7 +2,7 @@ import { getAddressByNetwork, getABI, AddressKeys } from '@cardstack/cardpay-sdk
 import config from 'config';
 import Web3 from 'web3';
 
-const web3Config = config.get('web3') as { layer2Network: 'xdai' | 'sokol' };
+const web3Config = config.get('web3') as { layer2Network: 'gnosis' | 'sokol' };
 
 export default class Contracts {
   async getContract(web3Instance: Web3, abiName: string, contractName: AddressKeys) {

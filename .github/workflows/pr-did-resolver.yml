@@ -2,14 +2,13 @@ name: CI [did-resolver]
 
 on:
   pull_request:
-    branches: [main]
     paths:
-      - 'packages/did-resolver/**'
-      - 'packages/test-support/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/pr-did-resolver.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/did-resolver/**"
+      - "packages/test-support/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/pr-did-resolver.yml"
+      - "package.json"
+      - "yarn.lock"
 
 jobs:
   test:

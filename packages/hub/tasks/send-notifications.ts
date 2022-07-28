@@ -1,7 +1,6 @@
 import { inject } from '@cardstack/di';
 import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
-import { query } from '@cardstack/hub/queries';
 
 export interface PushNotificationData {
   /**
@@ -21,17 +20,17 @@ export interface PushNotificationsIdentifiers {
 }
 
 export default class SendNotificationsTask {
-  pushNotificationRegistrationQueries = query('push-notification-registration', {
-    as: 'pushNotificationRegistrationQueries',
-  });
-  sentPushNotificationsQueries = query('sent-push-notifications', { as: 'sentPushNotificationsQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   firebasePushNotifications = inject('firebase-push-notifications', { as: 'firebasePushNotifications' });
 
   async perform(payload: PushNotificationData, helpers: Helpers) {
     let messageId: string;
+    let prisma = await this.prismaManager.getClient();
     try {
-      let notificationHasBeenSent = await this.sentPushNotificationsQueries.exists({
-        notificationId: payload.notificationId,
+      let notificationHasBeenSent = await prisma.sentPushNotification.findFirst({
+        where: {
+          notificationId: payload.notificationId,
+        },
       });
       if (notificationHasBeenSent) {
         helpers.logger.info(`Not sending notification for ${payload.notificationId} because it has already been sent`);
@@ -66,7 +65,10 @@ export default class SendNotificationsTask {
       helpers.logger.info(`Sent notification for ${payload.notificationId}`);
     } catch (e: any) {
       if (e.errorInfo?.code === 'messaging/registration-token-not-registered') {
-        await this.pushNotificationRegistrationQueries.disable(payload.pushClientId);
+        await prisma.pushNotificationRegistration.updateMany({
+          where: { pushClientId: payload.pushClientId },
+          data: { disabledAt: new Date() },
+        });
 
         helpers.logger.info(
           `Disabled push notification registration for ${payload.pushClientId} because Firebase rejected notification ${payload.notificationId}`
@@ -89,7 +91,7 @@ export default class SendNotificationsTask {
     try {
       // We don't want to have this in the same try catch block because
       // We don't want failure to write to the database to result in infinite notifications being sent
-      await this.sentPushNotificationsQueries.insert({ ...payload, messageId });
+      await prisma.sentPushNotification.create({ data: { ...payload, messageId } });
     } catch (e) {
       // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
       Sentry.captureException(e, {
@@ -102,5 +104,11 @@ export default class SendNotificationsTask {
       });
       helpers.logger.error(`failed to record that notification with id ${payload.notificationId} is sent`);
     }
+  }
+}
+
+declare module '@cardstack/hub/tasks' {
+  interface KnownTasks {
+    'send-notifications': SendNotificationsTask;
   }
 }

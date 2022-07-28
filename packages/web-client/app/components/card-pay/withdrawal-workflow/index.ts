@@ -147,6 +147,9 @@ export class WithdrawalWorkflow extends Workflow {
   milestones = [
     new Milestone({
       title: MILESTONE_TITLES[0],
+      editableIf(session) {
+        return !session.getValue('relayTokensTxnHash');
+      },
       postables: [
         new WorkflowMessage({
           message: 'Hi there, it’s good to see you!',
@@ -180,6 +183,9 @@ export class WithdrawalWorkflow extends Workflow {
     }),
     new Milestone({
       title: MILESTONE_TITLES[1],
+      editableIf(session) {
+        return !session.getValue('relayTokensTxnHash');
+      },
       postables: [
         new CheckBalanceWorkflowMessage(),
         new WorkflowCard({
@@ -191,6 +197,9 @@ export class WithdrawalWorkflow extends Workflow {
     }),
     new Milestone({
       title: MILESTONE_TITLES[2],
+      editableIf(session) {
+        return !session.getValue('relayTokensTxnHash');
+      },
       postables: [
         new NetworkAwareWorkflowMessage({
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
@@ -230,6 +239,9 @@ with Card Pay.`,
         new WorkflowCard({
           cardName: 'CHOOSE_BALANCE',
           componentName: 'card-pay/withdrawal-workflow/choose-balance',
+          editableIf(session) {
+            return !session.getValue('relayTokensTxnHash');
+          },
         }),
         new WorkflowMessage({
           message: 'How much would you like to withdraw from your balance?',

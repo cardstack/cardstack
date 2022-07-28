@@ -1,5 +1,5 @@
-from cardpay_reward_programs.rule import Rule
 import pandas as pd
+from cardpay_reward_programs.rule import Rule
 
 
 class SafeOwnership(Rule):
@@ -21,14 +21,14 @@ class SafeOwnership(Rule):
     ):
         self.token = token
         self.duration = duration
-        self.reward_per_safe = reward_per_safe
+        self.reward_per_safe = int(reward_per_safe)
         self.start_analysis_block = start_analysis_block
         self.safe_type = safe_type
         self.max_rewards = max_rewards
 
     def sql(self, table_query):
         return f"""
-        with total_safes as (select 
+        with total_safes as (select
                 owner as payee,
                 count(distinct safe) as total_safe_count
                 from {table_query}
@@ -36,7 +36,7 @@ class SafeOwnership(Rule):
                 and type = $4::text
                 group by owner
                 ),
-            new_safes as (select 
+            new_safes as (select
                 owner as payee,
                 count(distinct safe) as new_safe_count
                 from {table_query}
