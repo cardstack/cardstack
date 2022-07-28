@@ -84,7 +84,7 @@ export default class MerchantInfosRoute {
     };
 
     await prisma.$transaction(async () => {
-      await prisma.profile.create({ data: { ...merchantInfo, createdAt: new Date() } });
+      await prisma.profile.create({ data: { ...merchantInfo } });
     });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {

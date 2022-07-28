@@ -44,7 +44,6 @@ describe('GET /api/card-spaces/:slug', function () {
         textColor: 'red',
         profileDescription: "Satoshi's place",
         profileImageUrl: 'https://test.com/test1.png',
-        createdAt: new Date(),
       },
     });
 
@@ -128,7 +127,6 @@ describe('PATCH /api/card-spaces', function () {
         color: 'black',
         textColor: 'red',
         profileDescription: 'Test',
-        createdAt: new Date(),
       },
     });
 
@@ -173,7 +171,6 @@ describe('PATCH /api/card-spaces', function () {
         textColor: 'red',
         profileDescription: "Satoshi's place",
         profileImageUrl: 'https://test.com/profile.jpg',
-        createdAt: new Date(),
       },
     });
 
@@ -232,7 +229,6 @@ describe('PATCH /api/card-spaces', function () {
         color: 'black',
         textColor: 'red',
         profileDescription: 'Test',
-        createdAt: new Date(),
       },
     });
 

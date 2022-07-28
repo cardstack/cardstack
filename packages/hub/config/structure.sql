@@ -1076,7 +1076,7 @@ CREATE TABLE public.profiles (
     links json[] DEFAULT '{}'::json[] NOT NULL,
     profile_image_url text,
     profile_description text,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 

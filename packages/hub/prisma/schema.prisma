@@ -272,7 +272,7 @@ model Profile {
   links              Json[]   @default([]) @db.Json
   profileImageUrl    String?  @map("profile_image_url")
   profileDescription String?  @map("profile_description")
-  createdAt          DateTime @map("created_at") @db.Timestamp(6)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
   @@map("profiles")
 }

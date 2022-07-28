@@ -3,7 +3,6 @@ import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 const idField = { id: { type: 'uuid', primaryKey: true } };
-const createdAtField = { created_at: { type: 'timestamp', notNull: true } };
 
 const merchantInfosFields = {
   name: { type: 'string', notNull: true },
@@ -20,6 +19,8 @@ const cardSpaceFields = {
 };
 
 export async function up(pgm: MigrationBuilder, run: () => Promise<void>): Promise<void> {
+  const createdAtField = { created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') } };
+
   pgm.createTable('profiles', {
     ...idField,
     ...merchantInfosFields,
@@ -44,6 +45,8 @@ export async function up(pgm: MigrationBuilder, run: () => Promise<void>): Promi
 }
 
 export async function down(pgm: MigrationBuilder, run: () => any): Promise<void> {
+  const createdAtField = { created_at: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') } };
+
   pgm.createTable('merchant_infos', { ...idField, ...merchantInfosFields, ...createdAtField });
   pgm.createTable('card_spaces', {
     ...idField,

@@ -654,7 +654,6 @@ describe('POST /api/profile-purchases', function () {
         color: 'pink',
         textColor: 'black',
         ownerAddress: 'me',
-        createdAt: new Date(),
       },
     });
 

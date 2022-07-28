@@ -108,7 +108,6 @@ describe('CreateProfileTask', function () {
         slug: '',
         color: '',
         textColor: '',
-        createdAt: new Date(),
       },
     });
 
