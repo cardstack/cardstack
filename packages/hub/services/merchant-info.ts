@@ -7,6 +7,7 @@ import { Resolver } from 'did-resolver';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 export type ProfileMerchantSubset = Omit<Profile, 'links' | 'profileImageUrl' | 'profileDescription' | 'createdAt'>;
+
 export default class MerchantInfoService {
   #didResolver = new Resolver(getResolver());
 
