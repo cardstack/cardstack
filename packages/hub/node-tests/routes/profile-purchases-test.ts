@@ -130,16 +130,13 @@ describe('POST /api/profile-purchases', function () {
       'a-receipt': 'yes',
     });
 
-    let merchantRecord = await prisma.merchantInfo.findUnique({ where: { id: merchantId } });
+    let merchantRecord = await prisma.profile.findUnique({ where: { id: merchantId } });
     assert(!!merchantRecord);
     expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
     expect(merchantRecord.slug).to.equal('satoshi');
     expect(merchantRecord.color).to.equal('ff0000');
     expect(merchantRecord.textColor).to.equal('ffffff');
     expect(merchantRecord.ownerAddress).to.equal(stubUserAddress);
-
-    let cardSpaceRecord = await prisma.cardSpace.findFirst({ where: { merchantId } });
-    expect(cardSpaceRecord).to.exist;
 
     let jobTicketRecord = await prisma.jobTicket.findUnique({ where: { id: jobTicketId! } });
     expect(jobTicketRecord?.state).to.equal('pending');
@@ -649,7 +646,7 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects a duplicate slug', async function () {
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: shortUUID.uuid(),
         name: 'yes',
@@ -657,6 +654,7 @@ describe('POST /api/profile-purchases', function () {
         color: 'pink',
         textColor: 'black',
         ownerAddress: 'me',
+        createdAt: new Date(),
       },
     });
 

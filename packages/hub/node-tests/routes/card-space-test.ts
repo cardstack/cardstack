@@ -32,9 +32,9 @@ describe('GET /api/card-spaces/:slug', function () {
   let { request, getPrisma } = setupHub(this);
 
   it('fetches a card space', async function () {
-    let merchantId = uuidv4();
+    let merchantId = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
     let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: merchantId,
         ownerAddress: stubUserAddress,
@@ -42,18 +42,11 @@ describe('GET /api/card-spaces/:slug', function () {
         slug: 'satoshi',
         color: 'black',
         textColor: 'red',
+        profileDescription: "Satoshi's place",
+        profileImageUrl: 'https://test.com/test1.png',
+        createdAt: new Date(),
       },
     });
-
-    const id = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
-    const cardSpace = {
-      id,
-      profileDescription: "Satoshi's place",
-      profileImageUrl: 'https://test.com/test1.png',
-      merchantId,
-    };
-
-    await prisma.cardSpace.create({ data: cardSpace });
 
     await request()
       .get('/api/card-spaces/satoshi')
@@ -66,7 +59,7 @@ describe('GET /api/card-spaces/:slug', function () {
         },
         data: {
           type: 'card-spaces',
-          id,
+          id: merchantId,
           attributes: {
             did: 'did:cardstack:1csqNUmMUPV16eUWwjxGZNZ2r68a319e3ae1d2606',
             'profile-description': "Satoshi's place",
@@ -109,231 +102,6 @@ describe('GET /api/card-spaces/:slug', function () {
   });
 });
 
-describe('POST /api/card-spaces', function () {
-  setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
-  let { request, getPrisma } = setupHub(this);
-
-  it('persists card space', async function () {
-    let merchantId = uuidv4();
-    let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
-      data: {
-        id: merchantId,
-        ownerAddress: stubUserAddress,
-        name: 'Satoshi?',
-        slug: 'satoshi',
-        color: 'black',
-        textColor: 'red',
-      },
-    });
-
-    let payload = {
-      data: {
-        type: 'card-spaces',
-        attributes: {
-          'profile-description': "Satoshi's place",
-          'profile-image-url': 'https://test.com/test1.png',
-        },
-        relationships: {
-          'merchant-info': {
-            data: {
-              type: 'merchant-infos',
-              id: merchantId,
-            },
-          },
-        },
-      },
-    };
-
-    await request()
-      .post('/api/card-spaces')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(201)
-      .expect(function (res) {
-        res.body.data.id = 'the-id';
-        res.body.data.attributes.did = 'the-did';
-      })
-      .expect({
-        meta: {
-          network: 'sokol',
-        },
-        data: {
-          type: 'card-spaces',
-          id: 'the-id',
-          attributes: {
-            did: 'the-did',
-            'profile-description': "Satoshi's place",
-            'profile-image-url': 'https://test.com/test1.png',
-          },
-          relationships: {
-            'merchant-info': {
-              data: {
-                type: 'merchant-infos',
-                id: merchantId,
-              },
-            },
-          },
-        },
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns 401 without bearer token', async function () {
-    await request()
-      .post('/api/card-spaces')
-      .send({})
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(401)
-      .expect({
-        errors: [
-          {
-            status: '401',
-            title: 'No valid auth token',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns 403 when the related merchant has a different owner', async function () {
-    let merchantId = uuidv4();
-    let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
-      data: {
-        id: merchantId,
-        ownerAddress: '0xmystery',
-        name: 'Satoshi?',
-        slug: 'satoshi',
-        color: 'black',
-        textColor: 'red',
-      },
-    });
-
-    let payload = {
-      data: {
-        type: 'card-spaces',
-        attributes: {
-          'profile-description': "Satoshi's place",
-          'profile-image-url': 'https://test.com/test1.png',
-        },
-        relationships: {
-          'merchant-info': {
-            data: {
-              type: 'merchant-infos',
-              id: merchantId,
-            },
-          },
-        },
-      },
-    };
-
-    await request()
-      .post('/api/card-spaces')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(403)
-      .expect({
-        errors: [
-          {
-            detail: `Given merchant-id ${merchantId} is not owned by the user`,
-            source: { pointer: '/data/relationships/merchant-info' },
-            status: '403',
-            title: 'Invalid relationship',
-          },
-        ],
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('returns 422 when the merchant id is not specified', async function () {
-    let payload = {
-      data: {
-        type: 'card-spaces',
-        attributes: {
-          'profile-description': "Satoshi's place",
-          'profile-image-url': 'https://test.com/test1.png',
-        },
-      },
-    };
-
-    await request()
-      .post('/api/card-spaces')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
-      .expect({
-        errors: [
-          {
-            detail: 'Required relationship merchant-info was not provided',
-            status: '422',
-            title: 'Missing required relationship: merchant-info',
-          },
-        ],
-      });
-  });
-
-  it('returns 422 when the merchant doesn’t exist', async function () {
-    let merchantId = uuidv4();
-    let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
-      data: {
-        id: merchantId,
-        ownerAddress: stubUserAddress,
-        name: 'Satoshi?',
-        slug: 'satoshi',
-        color: 'black',
-        textColor: 'red',
-      },
-    });
-
-    let payloadMerchantId = uuidv4();
-
-    let payload = {
-      data: {
-        type: 'card-spaces',
-        attributes: {
-          'profile-description': "Satoshi's place",
-          'profile-image-url': 'https://test.com/test1.png',
-        },
-        relationships: {
-          'merchant-info': {
-            data: {
-              type: 'merchant-infos',
-              id: payloadMerchantId,
-            },
-          },
-        },
-      },
-    };
-
-    await request()
-      .post('/api/card-spaces')
-      .send(payload)
-      .set('Authorization', 'Bearer abc123--def456--ghi789')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
-      .expect({
-        errors: [
-          {
-            detail: `Given merchant-id ${payloadMerchantId} was not found`,
-            source: { pointer: '/data/relationships/merchant-info' },
-            status: '422',
-            title: 'Invalid relationship',
-          },
-        ],
-      });
-  });
-});
-
 describe('PATCH /api/card-spaces', function () {
   setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
   let { request, getPrisma } = setupHub(this);
@@ -351,7 +119,7 @@ describe('PATCH /api/card-spaces', function () {
   it('returns 403 when resource does not belong to wallet', async function () {
     let merchantId = uuidv4();
     let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: merchantId,
         ownerAddress: '0x1234',
@@ -359,19 +127,13 @@ describe('PATCH /api/card-spaces', function () {
         slug: 'satoshi',
         color: 'black',
         textColor: 'red',
-      },
-    });
-
-    await prisma.cardSpace.create({
-      data: {
-        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
         profileDescription: 'Test',
-        merchantId,
+        createdAt: new Date(),
       },
     });
 
     await request()
-      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch(`/api/card-spaces/${merchantId}`)
       .send({})
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -398,10 +160,10 @@ describe('PATCH /api/card-spaces', function () {
   });
 
   it('updates the specified fields of the resource', async function () {
-    let merchantId = uuidv4();
+    let merchantId = 'ab70b8d5-95f5-4c20-997c-4db9013b347c';
 
     let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: merchantId,
         ownerAddress: stubUserAddress,
@@ -409,15 +171,9 @@ describe('PATCH /api/card-spaces', function () {
         slug: 'satoshi',
         color: 'black',
         textColor: 'red',
-      },
-    });
-
-    await prisma.cardSpace.create({
-      data: {
-        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
         profileDescription: "Satoshi's place",
         profileImageUrl: 'https://test.com/profile.jpg',
-        merchantId,
+        createdAt: new Date(),
       },
     });
 
@@ -431,7 +187,7 @@ describe('PATCH /api/card-spaces', function () {
     };
 
     await request()
-      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch(`/api/card-spaces/${merchantId}`)
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -467,7 +223,7 @@ describe('PATCH /api/card-spaces', function () {
     let merchantId = uuidv4();
 
     let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: merchantId,
         ownerAddress: stubUserAddress,
@@ -475,14 +231,8 @@ describe('PATCH /api/card-spaces', function () {
         slug: 'satoshi',
         color: 'black',
         textColor: 'red',
-      },
-    });
-
-    await prisma.cardSpace.create({
-      data: {
-        id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
         profileDescription: 'Test',
-        merchantId,
+        createdAt: new Date(),
       },
     });
 
@@ -504,7 +254,7 @@ describe('PATCH /api/card-spaces', function () {
     };
 
     await request()
-      .patch('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+      .patch(`/api/card-spaces/${merchantId}`)
       .send(payload)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')

@@ -42,7 +42,7 @@ export default class CreateProfile {
     let prisma = await this.prismaManager.getClient();
 
     try {
-      let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id: merchantInfoId } });
+      let merchantInfo = await prisma.profile.findUnique({ where: { id: merchantInfoId } });
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfoId });
 
       let profileRegistrationTxHash = await this.relay.registerProfile(merchantInfo!.ownerAddress, did);
