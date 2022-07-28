@@ -17,7 +17,7 @@ To run the Cardpay CLI type:
 cardpay <command> <arguments> [options]
 ```
 
-The commands are listed below (which you can view using --help option). Each command has arguments specific to it. The options indicate how you wish to connect to your wallet. You can either provide your mnemonic seed (as either an environment variable `MNEMONIC_PHRASE` or using the `--mnemonic` param. Or you can specify `--walletConnect` to use the cardpay wallet app. A QR code will be displayed that you can scan in your cardwallet app, which will connect the CLI to your cardwallet. Or you can specify `--trezor` which allows you to sign and execute transactions with your trezor device (Pre-requisite: You need to setup [trezor-cli-wallet-provider](https://github.com/cardstack/trezor-cli-wallet-provider/).
+The commands are listed below (which you can view using --help option). Each command has arguments specific to it. The options indicate how you wish to connect to your wallet. You can either provide your mnemonic seed (as either an environment variable `MNEMONIC_PHRASE` or using the `--mnemonic` param. Or you can specify `--walletConnect` to use the cardpay wallet app. A QR code will be displayed that you can scan in your cardwallet app, which will connect the CLI to your cardwallet. Or you can specify `--trezor` which allows you to sign and execute transactions with your trezor device (Pre-requisite: You need to setup [trezor-cli-wallet-provider](https://github.com/cardstack/trezor-cli-wallet-provider/)).
 
 ## Running within the development environment
 If you wish to run the CLI within the development environment, then you can use the `yarn cardpay` yarn script.
