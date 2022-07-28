@@ -31,7 +31,7 @@ class Staking(Rule):
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
                 from {token_holder_table}
                 where _block_number::integer < $2::integer
-                and token = 'card'
+                and token = $3::text
                 and safe is not null
                 qualify 
                 _block_number::integer >= $1::integer
