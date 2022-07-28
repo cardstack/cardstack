@@ -247,7 +247,7 @@ def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
         )
         safes_set = set()
         for _, instance in token_holder_df.iterrows():
-            if START_BLOCK <= instance["_block_number"] < END_BLOCK:
+            if instance["_block_number"] < END_BLOCK:
                 safes_set.add(instance["safe"])
         
         result = rule.run(END_BLOCK, "0x0")

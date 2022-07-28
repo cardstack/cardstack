@@ -42,7 +42,7 @@ class Staking(Rule):
                 1 as compounding_rate,
                 from {token_holder_table} 
                 where _block_number::integer < $1::integer
-                and token = 'card'
+                and token = $3::text
                 and safe is not null
                 ),
             safe_owners as (
@@ -51,7 +51,7 @@ class Staking(Rule):
 
             all_data as (select * from original_balances union all select * from balance_changes)
             
-            select owner as payee, sum(change * (interest_rate**compounding_rate - 1)) as rewards
+            select owner as payee, sum(change * ((interest_rate**compounding_rate) - 1)) as rewards
             from all_data
             left join {safe_owner_table} using (safe)
             group by payee
