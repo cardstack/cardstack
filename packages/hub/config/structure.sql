@@ -823,22 +823,6 @@ CREATE TABLE public.card_drop_recipients (
 ALTER TABLE public.card_drop_recipients OWNER TO postgres;
 
 --
--- Name: card_spaces; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.card_spaces (
-    id uuid NOT NULL,
-    profile_image_url text,
-    profile_description text,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    links json[] DEFAULT '{}'::json[] NOT NULL,
-    merchant_id uuid NOT NULL
-);
-
-
-ALTER TABLE public.card_spaces OWNER TO postgres;
-
---
 -- Name: cards; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -971,23 +955,6 @@ CREATE TABLE public.latest_event_block (
 ALTER TABLE public.latest_event_block OWNER TO postgres;
 
 --
--- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.merchant_infos (
-    id uuid NOT NULL,
-    name text NOT NULL,
-    slug text NOT NULL,
-    color text NOT NULL,
-    text_color text NOT NULL,
-    owner_address text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
-ALTER TABLE public.merchant_infos OWNER TO postgres;
-
---
 -- Name: notification_preferences; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1094,6 +1061,26 @@ CREATE TABLE public.prepaid_card_patterns (
 
 
 ALTER TABLE public.prepaid_card_patterns OWNER TO postgres;
+
+--
+-- Name: profiles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.profiles (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    slug text NOT NULL,
+    color text NOT NULL,
+    text_color text NOT NULL,
+    owner_address text NOT NULL,
+    links json[] DEFAULT '{}'::json[] NOT NULL,
+    profile_image_url text,
+    profile_description text,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.profiles OWNER TO postgres;
 
 --
 -- Name: push_notification_registrations; Type: TABLE; Schema: public; Owner: postgres
@@ -1274,14 +1261,6 @@ ALTER TABLE ONLY public.card_drop_recipients
 
 
 --
--- Name: card_spaces card_spaces_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.card_spaces
-    ADD CONSTRAINT card_spaces_pkey PRIMARY KEY (id);
-
-
---
 -- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1346,14 +1325,6 @@ ALTER TABLE ONLY public.latest_event_block
 
 
 --
--- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.merchant_infos
-    ADD CONSTRAINT merchant_infos_pkey PRIMARY KEY (id);
-
-
---
 -- Name: notification_types notification_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1391,6 +1362,14 @@ ALTER TABLE ONLY public.prepaid_card_customizations
 
 ALTER TABLE ONLY public.prepaid_card_patterns
     ADD CONSTRAINT prepaid_card_patterns_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: profiles profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_pkey PRIMARY KEY (id);
 
 
 --
@@ -1457,13 +1436,6 @@ CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_
 
 
 --
--- Name: card_spaces_merchant_id_unique_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX card_spaces_merchant_id_unique_index ON public.card_spaces USING btree (merchant_id);
-
-
---
 -- Name: discord_bots_bot_type_status_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1475,13 +1447,6 @@ CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btr
 --
 
 CREATE INDEX job_tickets_job_type_owner_address_state_index ON public.job_tickets USING btree (job_type, owner_address, state);
-
-
---
--- Name: merchant_infos_slug_unique_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos USING btree (slug);
 
 
 --
@@ -1608,14 +1573,6 @@ CREATE TRIGGER _900_notify_worker AFTER INSERT ON graphile_worker.jobs FOR EACH 
 --
 
 CREATE TRIGGER discord_bots_updated_trigger AFTER INSERT OR UPDATE ON public.discord_bots FOR EACH ROW EXECUTE FUNCTION public.discord_bots_updated_trigger();
-
-
---
--- Name: card_spaces card_spaces_merchant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.card_spaces
-    ADD CONSTRAINT card_spaces_merchant_id_fkey FOREIGN KEY (merchant_id) REFERENCES public.merchant_infos(id);
 
 
 --
@@ -1747,6 +1704,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 39	20220610203119883_create-job-tickets	2022-06-13 09:56:55.438506
 40	20220622235635327_add-job-ticket-spec	2022-06-22 19:02:28.256468
 41	20220629173134216_add-job-ticket-source-arguments	2022-06-29 16:48:05.380858
+52	20220728144935996_add-profiles	2022-07-28 11:07:31.429076
 \.
 
 
@@ -1754,7 +1712,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 41, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 52, true);
 
 
 --
