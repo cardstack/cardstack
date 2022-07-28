@@ -34,4 +34,4 @@ function onClickOutside(
   };
 }
 
-export default modifier(onClickOutside);
+export default modifier(onClickOutside, { eager: false });
