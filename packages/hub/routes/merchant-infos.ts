@@ -6,7 +6,7 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import shortUUID from 'short-uuid';
-import { Profile } from '@prisma/client';
+import { ProfileMerchantSubset } from '../services/merchant-info';
 
 export default class MerchantInfosRoute {
   merchantInfoSerializer = inject('merchant-info-serializer', {
@@ -74,7 +74,7 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const merchantInfo: Omit<Profile, 'links' | 'profileImageUrl' | 'profileDescription' | 'createdAt'> = {
+    const merchantInfo: ProfileMerchantSubset = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,

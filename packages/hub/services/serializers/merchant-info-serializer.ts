@@ -4,11 +4,12 @@ import DatabaseManager from '@cardstack/db';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
 import { Profile } from '@prisma/client';
+import { ProfileMerchantSubset } from '../merchant-info';
 
 export default class ProfileSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  serialize(model: Omit<Profile, 'links' | 'profileImageUrl' | 'profileDescription' | 'createdAt'>): JSONAPIDocument {
+  serialize(model: ProfileMerchantSubset): JSONAPIDocument {
     let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
     const result = {
@@ -42,9 +43,7 @@ export default class ProfileSerializer {
     return result as JSONAPIDocument;
   }
 
-  deserialize(
-    json: JSONAPIDocument
-  ): Profile | Omit<Profile, 'links' | 'profileImageUrl' | 'profileDescription' | 'createdAt'> {
+  deserialize(json: JSONAPIDocument): Profile | ProfileMerchantSubset {
     return {
       id: json.data.id,
       name: json.data.attributes['name'],
