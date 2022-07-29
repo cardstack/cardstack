@@ -5,6 +5,8 @@ from copy import deepcopy
 import duckdb
 import requests
 from cloudpathlib import AnyPath
+from did_resolver import Resolver
+from python_did_resolver import get_resolver
 
 from .utils import get_files, get_latest_details, run_job
 
@@ -122,8 +124,10 @@ class RewardProgram:
         return set(range(start_block, end_block, payment_cycle_length))
 
     def get_rules(self):
-        rule_blob = self.reward_manager.caller.rule(self.reward_program_id)
-        if rule_blob:
+        resolver = Resolver(get_resolver())
+        rule_did = self.reward_manager.caller.rule(self.reward_program_id)
+        if rule_did:
+            rule_blob = resolver.resolve(rule_did)
             rules = json.loads(rule_blob)
             if type(rules) == list:
                 return rules
