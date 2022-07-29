@@ -19,6 +19,7 @@ dependencies = [
     "rusty-rlp>=0.2.1",
     "typer>=0.6.1",
     "docker>=5.0.3",
+    "python-did-resolver>=0.0.3",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
