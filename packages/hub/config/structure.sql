@@ -1464,6 +1464,13 @@ CREATE UNIQUE INDEX notification_preferences_owner_address_notification_type_id_
 
 
 --
+-- Name: profiles_slug_unique_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX profiles_slug_unique_index ON public.profiles USING btree (slug);
+
+
+--
 -- Name: push_notification_registrations_owner_address_push_client_id_un; Type: INDEX; Schema: public; Owner: postgres
 --
 

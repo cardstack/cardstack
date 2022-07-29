@@ -28,6 +28,8 @@ export async function up(pgm: MigrationBuilder, run: () => Promise<void>): Promi
     ...createdAtField,
   });
 
+  pgm.createIndex('profiles', 'slug', { unique: true });
+
   await forceRun(pgm, run);
 
   await pgm.db.query(`
@@ -54,6 +56,8 @@ export async function down(pgm: MigrationBuilder, run: () => any): Promise<void>
     merchant_id: { type: 'uuid', references: 'merchant_infos' },
     ...createdAtField,
   });
+
+  pgm.createIndex('merchant_infos', 'slug', { unique: true });
 
   await forceRun(pgm, run);
 
