@@ -8,13 +8,9 @@ from python_did_resolver.main import (
     UUIDV5_NAMESPACE,
     EncodeOptions,
     encode_did,
-    s3_resolution_method,
+    get_resolver,
     su,
 )
-
-
-def get_resolver():
-    return {"cardstack": s3_resolution_method}
 
 
 def resolve_doc(did: str):
