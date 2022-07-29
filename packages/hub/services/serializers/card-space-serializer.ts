@@ -3,12 +3,12 @@ import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-import { Profile } from '@prisma/client';
+import { CardSpace } from '@prisma/client';
 
 export default class CardSpaceSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async serialize(model: Partial<Profile> & Omit<Profile, 'createdAt' | 'links'>): Promise<JSONAPIDocument> {
+  async serialize(model: Partial<CardSpace> & Omit<CardSpace, 'createdAt' | 'links'>): Promise<JSONAPIDocument> {
     let did = encodeDID({ type: 'CardSpace', uniqueId: model.id });
 
     const result = {
@@ -28,7 +28,7 @@ export default class CardSpaceSerializer {
           'merchant-info': {
             data: {
               type: 'merchant-infos',
-              id: model.id,
+              id: model.merchantId,
             },
           },
         },

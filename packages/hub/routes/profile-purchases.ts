@@ -211,7 +211,8 @@ export default class ProfilePurchasesRoute {
     let db = await this.databaseManager.getClient();
 
     await this.databaseManager.performTransaction(db, async () => {
-      await prisma.profile.create({ data: { ...merchantInfo } });
+      await prisma.merchantInfo.create({ data: merchantInfo });
+      await prisma.cardSpace.create({ data: { id: shortUuid.uuid(), merchantId: merchantInfo.id } });
     });
 
     let jobTicketId = shortUuid.uuid();
