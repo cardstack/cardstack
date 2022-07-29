@@ -3,13 +3,12 @@ import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-import { Profile } from '@prisma/client';
-import { ProfileMerchantSubset } from '../merchant-info';
+import { MerchantInfo } from '@prisma/client';
 
-export default class ProfileSerializer {
+export default class MerchantInfoSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  serialize(model: ProfileMerchantSubset): JSONAPIDocument {
+  serialize(model: Omit<MerchantInfo, 'createdAt'>): JSONAPIDocument {
     let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
     const result = {
@@ -33,7 +32,7 @@ export default class ProfileSerializer {
     return result as JSONAPIDocument;
   }
 
-  serializeCollection(models: Profile[]): JSONAPIDocument {
+  serializeCollection(models: MerchantInfo[]): JSONAPIDocument {
     let result = {
       data: models.map((model) => {
         return this.serialize(model).data;
@@ -43,7 +42,7 @@ export default class ProfileSerializer {
     return result as JSONAPIDocument;
   }
 
-  deserialize(json: JSONAPIDocument): Profile | ProfileMerchantSubset {
+  deserialize(json: JSONAPIDocument): MerchantInfo | Omit<MerchantInfo, 'createdAt'> {
     return {
       id: json.data.id,
       name: json.data.attributes['name'],
@@ -57,6 +56,6 @@ export default class ProfileSerializer {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'merchant-info-serializer': ProfileSerializer;
+    'merchant-info-serializer': MerchantInfoSerializer;
   }
 }

@@ -13,8 +13,8 @@ export default class PersistOffChainMerchantInfo {
     const { id } = payload;
     let prisma = await this.prismaManager.getClient();
 
-    let profile = await prisma.profile.findUnique({ where: { id } });
-    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(profile!);
+    let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id } });
+    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(merchantInfo!);
 
     helpers.addJob('s3-put-json', {
       bucket: config.get('aws.offchainStorage.bucketName'),

@@ -2,11 +2,9 @@
 import { inject } from '@cardstack/di';
 
 import { getResolver } from '@cardstack/did-resolver';
-import { Profile } from '@prisma/client';
+import { MerchantInfo } from '@prisma/client';
 import { Resolver } from 'did-resolver';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
-
-export type ProfileMerchantSubset = Omit<Profile, 'links' | 'profileImageUrl' | 'profileDescription' | 'createdAt'>;
 
 export default class MerchantInfoService {
   #didResolver = new Resolver(getResolver());
@@ -15,7 +13,7 @@ export default class MerchantInfoService {
     as: 'merchantInfoSerializer',
   });
 
-  async getMerchantInfo(did?: string): Promise<Profile | ProfileMerchantSubset | null> {
+  async getMerchantInfo(did?: string): Promise<MerchantInfo | Omit<MerchantInfo, 'createdAt'> | null> {
     if (!did) {
       return null;
     }

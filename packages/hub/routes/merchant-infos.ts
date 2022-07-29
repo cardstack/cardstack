@@ -6,7 +6,7 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import shortUUID from 'short-uuid';
-import { ProfileMerchantSubset } from '../services/merchant-info';
+import { MerchantInfo } from '@prisma/client';
 
 export default class MerchantInfosRoute {
   merchantInfoSerializer = inject('merchant-info-serializer', {
@@ -28,7 +28,7 @@ export default class MerchantInfosRoute {
       return;
     }
     let prisma = await this.prismaManager.getClient();
-    let profiles = await prisma.profile.findMany({
+    let merchantInfos = await prisma.merchantInfo.findMany({
       where: {
         ownerAddress: ctx.state.userAddress,
       },
@@ -36,7 +36,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serializeCollection(profiles);
+    ctx.body = this.merchantInfoSerializer.serializeCollection(merchantInfos);
   }
 
   async post(ctx: Koa.Context) {
@@ -74,7 +74,7 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const merchantInfo: ProfileMerchantSubset = {
+    const merchantInfo: Omit<MerchantInfo, 'createdAt'> = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
@@ -84,7 +84,13 @@ export default class MerchantInfosRoute {
     };
 
     await prisma.$transaction(async () => {
-      await prisma.profile.create({ data: { ...merchantInfo } });
+      await prisma.merchantInfo.create({ data: merchantInfo });
+      await prisma.cardSpace.create({
+        data: {
+          id: shortUuid.uuid(),
+          merchantId: merchantInfo.id,
+        },
+      });
     });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
@@ -129,10 +135,10 @@ export default class MerchantInfosRoute {
         };
       } else {
         let prisma = await this.prismaManager.getClient();
-        let profile = await prisma.profile.findFirst({ where: { slug } });
+        let merchantInfo = await prisma.merchantInfo.findFirst({ where: { slug } });
         return {
-          slugAvailable: profile ? false : true,
-          detail: profile ? 'This ID is already taken. Please choose another one' : 'ID is available',
+          slugAvailable: merchantInfo ? false : true,
+          detail: merchantInfo ? 'This ID is already taken. Please choose another one' : 'ID is available',
         };
       }
     }
@@ -140,19 +146,19 @@ export default class MerchantInfosRoute {
 
   async getFromShortId(ctx: Koa.Context) {
     let prisma = await this.prismaManager.getClient();
-    let profile = await prisma.profile.findUnique({
+    let merchantInfo = await prisma.merchantInfo.findUnique({
       where: {
         id: shortUUID().toUUID(ctx.params.id),
       },
     });
 
-    if (!profile) {
+    if (!merchantInfo) {
       ctx.status = 404;
       return;
     }
 
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serialize(profile);
+    ctx.body = this.merchantInfoSerializer.serialize(merchantInfo);
     ctx.type = 'application/vnd.api+json';
   }
 }

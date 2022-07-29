@@ -100,7 +100,7 @@ describe('CreateProfileTask', function () {
     });
 
     merchantInfosId = shortUUID.uuid();
-    await prisma.profile.create({
+    await prisma.merchantInfo.create({
       data: {
         id: merchantInfosId,
         ownerAddress: exampleEthereumAddress,
