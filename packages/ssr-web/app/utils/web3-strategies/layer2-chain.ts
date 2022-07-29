@@ -26,6 +26,7 @@ import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { getSentry } from '@cardstack/ssr-web/utils/sentry';
+import { SeverityLevel } from '@sentry/browser';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -114,7 +115,7 @@ export default abstract class Layer2ChainWeb3Strategy
         data: {
           url: rpcNodeWssUrl,
         },
-        level: this.sentry.Severity.Info,
+        level: 'info' as SeverityLevel,
       });
     });
 
@@ -136,8 +137,8 @@ export default abstract class Layer2ChainWeb3Strategy
         // unlike other codes which will only get here after the websocket provider
         // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
         level: [1000, 1001].includes(event.code)
-          ? this.sentry.Severity.Info
-          : this.sentry.Severity.Error,
+          ? ('info' as SeverityLevel)
+          : ('error' as SeverityLevel),
       });
     });
 
