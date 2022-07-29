@@ -66,14 +66,16 @@ module(
 
       this.setProperties({
         session,
+        onComplete: () => {},
+        onIncomplete: () => {},
       });
 
       renderSubject = async () => {
         await render(hbs`
           <CardPay::WithdrawalWorkflow::TransactionAmount
             @workflowSession={{this.session}}
-            @onComplete={{(noop)}}
-            @onIncomplete={{(noop)}}
+            @onComplete={{this.onComplete}}
+            @onIncomplete={{this.onIncomplete}}
           />
         `);
       };
@@ -278,7 +280,7 @@ module(
         @workflowSession={{this.session}}
         @isComplete={{this.isComplete}}
         @onComplete={{this.onComplete}}
-        @onIncomplete={{noop}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
       await fillIn('input', '5');
@@ -348,7 +350,7 @@ module(
           @workflowSession={{this.session}}
           @isComplete={{this.isComplete}}
           @onComplete={{this.onComplete}}
-          @onIncomplete={{noop}}
+          @onIncomplete={{this.onIncomplete}}
         />
       `);
       await fillIn('input', '5');

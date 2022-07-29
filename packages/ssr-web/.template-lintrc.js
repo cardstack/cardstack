@@ -58,7 +58,7 @@ module.exports = {
   ],
   rules: {
     'no-implicit-this': {
-      allow: ['config', 'noop', 'placeholder-address'],
+      allow: ['config', 'noop'],
     },
     'no-curly-component-invocation': {
       allow: ['sentry-breadcrumb'],

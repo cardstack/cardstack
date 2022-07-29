@@ -4,10 +4,6 @@ self.deprecationWorkflow.config = {
   throwOnUnhandled: true,
   workflow: [
     { handler: 'silence', matchId: 'autotracking.mutation-after-consumption' },
-    {
-      handler: 'silence',
-      matchId: 'argument-less-helper-paren-less-invocation',
-    },
 
     // We're unable eliminate ember-modifier deprecations completely due to the current state
     // of ember-power-select. However, the ember-modifier deprecations are for upgrading to
