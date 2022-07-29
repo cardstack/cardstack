@@ -1,6 +1,6 @@
 [project]
 name = "python-did-resolver"
-version = "0.0.2"
+version = "0.0.3"
 description = ""
 authors = [
     {name = "tintinthong", email = "justinthong93@gmail.com"},
