@@ -1,13 +1,15 @@
 import { HeadObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { CURRENT_VERSION, encodeDID, EncodeOptions, UUIDV5_NAMESPACE } from '@cardstack/did-resolver';
+import * as fs from 'fs';
+import { join } from 'path';
 import shortUuid from 'short-uuid';
 import { v5 as uuidv5 } from 'uuid';
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { getConnectionType, getEthereumClients, NETWORK_OPTION_LAYER_2 } from '../../utils';
 
 export default {
-  command: 'add-rule <fundingCard> <rewardProgramId> <blob>',
+  command: 'add-rule <fundingCard> <rewardProgramId> <pathToJsonRule>',
   describe: 'Add a rule to a reward program',
   builder(yargs: Argv) {
     return yargs
@@ -19,21 +21,23 @@ export default {
         type: 'string',
         description: 'The reward program id.',
       })
-      .positional('blob', {
+      .positional('pathToJsonRule', {
         type: 'string',
-        description: 'Hex encoding of rule blob',
+        default: 'rule.json',
+        description:
+          'Relative path to json rule. The file should exist in cardpay-cli/rewards/admin. The default is rule.json',
       })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, fundingCard, rewardProgramId, blob } = args as unknown as {
+    let { network, fundingCard, rewardProgramId, pathToJsonRule } = args as unknown as {
       network: string;
       fundingCard: string;
       rewardProgramId: string;
-      blob: string;
+      pathToJsonRule: string;
     };
     const s3Client = new S3Client({ region: 'ap-southeast-1' });
-    let ruleJsonStr = hexDecode(blob);
+    let ruleJsonStr = JSON.stringify(readJsonFile(pathToJsonRule));
     let uid = uuidv5(ruleJsonStr, UUIDV5_NAMESPACE);
     let did = encodeDID({ version: CURRENT_VERSION, type: 'RewardRule', uniqueId: uid } as EncodeOptions);
     console.log(`The did of the reward rule  = ${did}`);
@@ -52,9 +56,6 @@ export default {
   },
 } as CommandModule;
 
-const hexDecode = (dataHex: string) => {
-  return Buffer.from(dataHex.slice(2), 'hex').toString('utf-8');
-};
 const hexEncode = (data: string) => {
   return '0x' + Buffer.from(data, 'utf-8').toString('hex');
 };
@@ -103,4 +104,8 @@ const putJSONObj = async (s3Client: S3Client, bucketName: string, key: string, s
   } else {
     throw new Error(`JSON file was not written to ${bucketName}\\${key}`);
   }
+};
+
+const readJsonFile = (filePath: string) => {
+  return JSON.parse(fs.readFileSync(join(__dirname, filePath), 'utf-8'));
 };
