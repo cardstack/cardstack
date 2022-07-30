@@ -1133,7 +1133,6 @@
         "add-rule",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027",
         "0x73F92405b438D85ee46539a8FaDbBCa04C155F81",
-        "rule.json",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",

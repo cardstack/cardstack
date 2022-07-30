@@ -9,7 +9,7 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import { getConnectionType, getEthereumClients, NETWORK_OPTION_LAYER_2 } from '../../utils';
 
 export default {
-  command: 'add-rule <fundingCard> <rewardProgramId> <pathToJsonRule>',
+  command: 'add-rule <fundingCard> <rewardProgramId> [didBlob] [pathToJsonRule]',
   describe: 'Add a rule to a reward program',
   builder(yargs: Argv) {
     return yargs
@@ -21,7 +21,12 @@ export default {
         type: 'string',
         description: 'The reward program id.',
       })
-      .positional('pathToJsonRule', {
+      .option('didBlob', {
+        type: 'string',
+        description:
+          'A hex encoded string of the didBlob. Will ignore pathToJsonRule if specified. To unset rule didBlob= "0x"',
+      })
+      .option('pathToJsonRule', {
         type: 'string',
         default: 'rule.json',
         description:
@@ -30,22 +35,29 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, fundingCard, rewardProgramId, pathToJsonRule } = args as unknown as {
+    let { network, fundingCard, rewardProgramId, pathToJsonRule, didBlob } = args as unknown as {
       network: string;
       fundingCard: string;
       rewardProgramId: string;
+      didBlob: string;
       pathToJsonRule: string;
     };
-    const s3Client = new S3Client({ region: 'ap-southeast-1' });
-    let ruleJsonStr = JSON.stringify(readJsonFile(pathToJsonRule));
-    let uid = uuidv5(ruleJsonStr, UUIDV5_NAMESPACE);
-    let did = encodeDID({ version: CURRENT_VERSION, type: 'RewardRule', uniqueId: uid } as EncodeOptions);
-    console.log(`The did of the reward rule  = ${did}`);
-    let didBlob = hexEncode(did);
-    let bucketName = 'storage.cardstack.com';
-    let shortUid = shortUuid().fromUUID(uid);
-    let key = `reward-rule/${shortUid}.json`;
-    await writeJsonToOffchainStorage(s3Client, ruleJsonStr, bucketName, key);
+    if (didBlob) {
+      let did = hexDecode(didBlob);
+      console.log(`The did of the reward rule  = ${did}`);
+    } else {
+      console.log(`Getting rule from ${pathToJsonRule}`);
+      let ruleJsonStr = JSON.stringify(readJsonFile(pathToJsonRule));
+      let uid = uuidv5(ruleJsonStr, UUIDV5_NAMESPACE);
+      let did = encodeDID({ version: CURRENT_VERSION, type: 'RewardRule', uniqueId: uid } as EncodeOptions);
+      console.log(`The did of the reward rule  = ${did}`);
+      didBlob = hexEncode(did);
+      const s3Client = new S3Client({ region: 'ap-southeast-1' });
+      let bucketName = 'storage.cardstack.com';
+      let shortUid = shortUuid().fromUUID(uid);
+      let key = `reward-rule/${shortUid}.json`;
+      await writeJsonToOffchainStorage(s3Client, ruleJsonStr, bucketName, key);
+    }
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let rewardManagerAPI = await getSDK('RewardManager', web3, signer);
     let blockExplorer = await getConstant('blockExplorer', web3);
@@ -56,6 +68,9 @@ export default {
   },
 } as CommandModule;
 
+const hexDecode = (dataHex: string) => {
+  return Buffer.from(dataHex.slice(2), 'hex').toString('utf-8');
+};
 const hexEncode = (data: string) => {
   return '0x' + Buffer.from(data, 'utf-8').toString('hex');
 };
@@ -66,7 +81,8 @@ const writeJsonToOffchainStorage = async (s3Client: S3Client, jsonStr: string, b
     await putJSONObj(s3Client, bucketName, key, jsonStr);
     console.log(`Wrote json to ${bucketName}/${key} `);
   } else {
-    throw new Error(`${bucketName}/${key} already exists`);
+    console.log(`${bucketName}/${key} already exists`);
+    return;
   }
 };
 const checkObjExists = async (s3Client: S3Client, bucketName: string, key: string) => {
