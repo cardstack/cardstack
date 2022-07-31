@@ -124,11 +124,10 @@ class RewardProgram:
         return set(range(start_block, end_block, payment_cycle_length))
 
     def get_rules(self):
-        resolver = Resolver(get_resolver())
-        rule_did = self.reward_manager.caller.rule(self.reward_program_id)
-        if rule_did:
-            rule_blob = resolver.resolve(rule_did)
-            rules = json.loads(rule_blob)
+        did_blob = self.reward_manager.caller.rule(self.reward_program_id)
+        if did_blob:
+            did = did_blob.decode("utf-8")
+            rules = resolve_rule(did)
             if type(rules) == list:
                 return rules
             else:
@@ -210,3 +209,11 @@ class RewardProgram:
             )
             for payment_cycle in sorted(processable_payment_cycles):
                 self.run(payment_cycle, rule)
+
+
+def resolve_rule(did: str):
+    try:
+        url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
+        return requests.get(url).json()
+    except Exception as e:
+        raise e
