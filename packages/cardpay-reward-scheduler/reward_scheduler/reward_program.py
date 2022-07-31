@@ -125,7 +125,7 @@ class RewardProgram:
 
     def get_rules(self):
         did_blob = self.reward_manager.caller.rule(self.reward_program_id)
-        if did_blob:
+        if did_blob and did_blob != b"":
             did = did_blob.decode("utf-8")
             rules = resolve_rule(did)
             if type(rules) == list:
