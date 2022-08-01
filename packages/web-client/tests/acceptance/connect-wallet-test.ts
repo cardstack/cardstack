@@ -50,7 +50,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
   });
 
-  test('Connecting a layer 2 wallet via Card Wallet mobile app', async function (assert) {
+  test('Connecting a layer 2 wallet via Cardstack Wallet mobile app', async function (assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');

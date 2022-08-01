@@ -13,7 +13,7 @@
       @action={{this.onDisconnect}}
     />
     <ActionCardContainer::Section
-      @title="Card Wallet"
+      @title="Cardstack Wallet"
       @imgUrl={{this.cardstackLogo}}
       class="layer-two-connect-card__body"
       data-test-layer-2-wallet-summary
@@ -68,13 +68,13 @@
   {{else}}
     <ActionCardContainer::Section>
       <ActionCardContainer::Section
-        @title="Install the Card Wallet app on your mobile phone"
+        @title="Install the Cardstack Wallet app on your mobile phone"
         class="layer-two-connect-card__section layer-two-connect-card__section--one"
         data-test-layer-2-connect-prompt
       >
         {{#if @includeExplanations}}
           <p class="layer-two-connect-card__explanation">
-            Please install the Card Wallet app on your mobile phone and create/add an account.
+            Please install the Cardstack Wallet app on your mobile phone and create/add an account.
           </p>
         {{/if}}
         <div class="layer-two-connect-card__link-container">
@@ -82,7 +82,7 @@
             srcset="{{this.cardstackMobileAppPhone}},
                     {{this.cardstackMobileAppPhone2x}} 2x"
             src={{this.cardstackMobileAppPhone}}
-            alt="Card Wallet mobile app on a smartphone"
+            alt="Cardstack Wallet mobile app on a smartphone"
             width="138px"
             height="149px"
           >
@@ -90,7 +90,7 @@
         </div>
       </ActionCardContainer::Section>
       <ActionCardContainer::Section
-        @title="Scan this QR code with your Card Wallet app"
+        @title="Scan this QR code with your Cardstack Wallet app"
         class="layer-two-connect-card__section layer-two-connect-card__section--two"
       >
         {{#if @includeExplanations}}
@@ -116,7 +116,7 @@
         {{else}}
           <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
             <span>
-              Loading QR Code for Card Wallet connection...
+              Loading QR Code for Cardstack Wallet connection...
             </span>
           </div>
         {{/if}}

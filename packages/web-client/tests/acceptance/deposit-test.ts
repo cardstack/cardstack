@@ -102,7 +102,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app`
       );
 
     assert
@@ -425,7 +425,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app`
       );
 
     assert
@@ -436,7 +436,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Loading QR Code for Card Wallet connection');
+      .containsText('Loading QR Code for Cardstack Wallet connection');
 
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;

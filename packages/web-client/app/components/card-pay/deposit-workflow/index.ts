@@ -101,7 +101,7 @@ class DepositWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
-          wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
+          wallet via your Cardstack Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -199,12 +199,12 @@ class DepositWorkflow extends Workflow {
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.',
     }),
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
-        'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but your Cardstack Wallet got disconnected. Please restart the workflow.',
     }),
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
