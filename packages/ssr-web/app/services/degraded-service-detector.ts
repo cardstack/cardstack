@@ -3,13 +3,14 @@ import config from '../config/environment';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator, timeout } from 'ember-concurrency';
 import { tracked } from '@glimmer/tracking';
-import * as Sentry from '@sentry/browser';
-
+import SentryService from './sentry';
+import { inject as service } from '@ember/service';
 export default class DegradedServiceDetector extends Service {
   @tracked notificationShown: boolean = false;
   @tracked title: string | null = null;
   @tracked body: string | null = null;
   @tracked impact: 'none' | 'minor' | 'major' | 'critical' | null = null;
+  @service declare sentry: SentryService;
 
   statusPageUrl = config.urls.statusPageUrl;
 
@@ -54,7 +55,7 @@ export default class DegradedServiceDetector extends Service {
       data = await response.json();
     } catch (e) {
       console.error('Failed to fetch Statuspage summary', e);
-      Sentry.captureException(e);
+      this.sentry.captureException(e);
 
       return null;
     }

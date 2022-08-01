@@ -1,10 +1,10 @@
 import { tracked } from '@glimmer/tracking';
 import { Resource } from 'ember-resources';
-import * as Sentry from '@sentry/browser';
 import OffChainJsonService from '../services/off-chain-json';
 import { inject as service } from '@ember/service';
 import { isStorage404 } from '@cardstack/ssr-web/utils/fetch-off-chain-json';
 import config from '@cardstack/ssr-web/config/environment';
+import SentryService from '../services/sentry';
 
 interface Args {
   named: {
@@ -37,6 +37,7 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
   @tracked errored: Error | undefined;
   @tracked is404 = false;
   @service declare offChainJson: OffChainJsonService;
+  @service declare sentry: SentryService;
 
   modify(_positional: any, { slug }: { slug: any }) {
     this.slug = slug;
@@ -49,7 +50,7 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
 
       if (!isStorage404(err)) {
         console.log('Exception fetching merchant info', err);
-        Sentry.captureException(err);
+        this.sentry.captureException(err);
       }
     } finally {
       this.loading = false;
@@ -90,7 +91,7 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
       this.ownerAddress = merchant.attributes['owner-address'];
       this.textColor = merchant.attributes['text-color'];
     } catch (e) {
-      Sentry.captureException(e);
+      this.sentry.captureException(e);
       this.errored = e;
       throw e;
     }
