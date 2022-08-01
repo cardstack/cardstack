@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const Sentry = require('@sentry/node');
 
 module.exports = function (/* environment */) {
   return {
@@ -12,6 +13,7 @@ module.exports = function (/* environment */) {
         // because the server runs the ember app within a sandbox
         fetch,
         URLSearchParams,
+        NodeSentry: Sentry,
       });
     },
   };
