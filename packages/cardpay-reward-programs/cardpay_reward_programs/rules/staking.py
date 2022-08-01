@@ -1,3 +1,4 @@
+from tracemalloc import start
 import pandas as pd
 from cardpay_reward_programs.rule import Rule
 
@@ -10,10 +11,11 @@ class Staking(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(Staking, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(self, token, duration, interest_rate_monthly):
+    def set_user_defined_parameters(self, token, duration, interest_rate_monthly, start_analysis_block):
         self.token = token
         self.duration = duration
         self.interest_rate_monthly = interest_rate_monthly
+        self.start_analysis_block = start_analysis_block
 
     def sql(self, table_query, aux_table_query):
         token_holder_table = table_query
@@ -22,7 +24,7 @@ class Staking(Rule):
         return f"""
             with balance_changes as (select
                 safe,
-                balance_uint64 - lag(balance_uint64, 1 ,0) over (partition by safe order by _block_number asc) as change,
+                balance_downscale_e9_uint64 - lag(balance_downscale_e9_uint64, 1 ,0) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
                 from {token_holder_table}
@@ -33,7 +35,7 @@ class Staking(Rule):
                 _block_number::integer >= $1::integer
                 ),
             original_balances as (select safe,
-                last_value(balance_uint64) over (partition by safe order by _block_number asc) as change,
+                last_value(balance_downscale_e9_uint64) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 1 as compounding_rate,
                 from {token_holder_table}
@@ -67,11 +69,11 @@ class Staking(Rule):
         ]
 
         table_query = self._get_table_query(
-            "token_holder", "token_holder", 0, self.end_block
+            "token_holder", "token_holder", self.start_analysis_block, self.end_block
         )
 
         aux_table_query = self._get_table_query(
-            "safe_owner", "safe_owner", 0, self.end_block
+            "safe_owner", "safe_owner", self.start_analysis_block, self.end_block
         )
 
         if table_query == "parquet_scan([])" or aux_table_query == "parquet_scan([])":

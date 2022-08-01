@@ -1,0 +1,23 @@
+{
+  "core": {
+    "payment_cycle_length": 524000,
+    "start_block": 17265697,
+    "end_block": 23471735,
+    "subgraph_config_locations": {
+      "safe_owner": "s3://cardpay-production-partitioned-graph-data/data/safe_owner/0.0.1/",
+      "token_holder": "s3://cardpay-production-partitioned-graph-data/data/token_holder/1.0.0/" 
+    }
+  },
+  "run": {
+    "reward_program_id": "0x0000000000000000000000000000000000000000",
+    "payment_cycle": 23471735
+  },
+  "user_defined": {
+    "start_analysis_block": 17265697,
+    "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
+    "duration": 43200,
+    "interest_rate_monthly": 0.0048
+  }
+}
+
+
