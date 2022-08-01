@@ -99,59 +99,59 @@ def get_amount(result, payee, idx):
     return result.loc[idx, "amount"]
    
 
-def tst_correct_calc_rewards(monkeypatch):
+def test_correct_calc_rewards(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
         {
             "_block_number": 0,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1000
         },
         {
             "_block_number": 10,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1500
         },
         {
             "_block_number": 20,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1750
         },
         {
             "_block_number": 25,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1500
         },
         {
             "_block_number": 0,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe2",
             "balance_uint64": 1000
         },
         {
             "_block_number": 10,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe2",
             "balance_uint64": 1500
         },
         {
             "_block_number": 15,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe2",
             "balance_uint64": 1200
         },
         {
             "_block_number": 20,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe2",
             "balance_uint64": 1700
         },
         {
             "_block_number": 0,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe3",
             "balance_uint64": 1000
         }
@@ -161,15 +161,18 @@ def tst_correct_calc_rewards(monkeypatch):
     fake_data_safe_owner = pd.DataFrame([
         {
             "safe":"safe1",
-            "owner":"owner1"
+            "owner":"owner1",
+            "type":"depot"
         },
         {
             "safe":"safe2",
-            "owner":"owner2"
+            "owner":"owner2",
+            "type":"depot"
         },
         {
             "safe":"safe3",
-            "owner":"owner3"
+            "owner":"owner3",
+            "type":"depot"
         }
     ])
 
@@ -177,23 +180,23 @@ def tst_correct_calc_rewards(monkeypatch):
         monkeypatch, fake_data_token_holder, fake_data_safe_owner
     )
     result = rule.run(30, "0x0")
-    print(get_amount(result, "owner1", 0))
+
     assert math.ceil(get_amount(result, "owner1", 0)) == math.ceil(82.26866088)
     assert math.ceil(get_amount(result, "owner2", 1)) == math.ceil(80.74)
     assert math.ceil(get_amount(result, "owner3", 2)) == math.ceil(60)
 
 
-def tst_correctly_manages_first_deposit_in_cycle(monkeypatch):
+def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
         {
             "_block_number": 0,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1000
         },
         {
             "_block_number": 30,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 2000
         }
@@ -202,7 +205,8 @@ def tst_correctly_manages_first_deposit_in_cycle(monkeypatch):
     fake_data_safe_owner = pd.DataFrame([
         {
             "safe":"safe1",
-            "owner":"owner1"
+            "owner":"owner1",
+            "type":"depot"
         }
     ])
 
@@ -214,11 +218,11 @@ def tst_correctly_manages_first_deposit_in_cycle(monkeypatch):
     assert pytest.approx(get_amount(result, "owner1", 0)) == 120
 
 
-def tst_correct_calc_rewards_in_cycle(monkeypatch):
+def test_correct_calc_rewards_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
         {
             "_block_number": 0,
-            "token": "card",
+            "token": "card-0",
             "safe": "safe1",
             "balance_uint64": 1000
         }
@@ -227,7 +231,8 @@ def tst_correct_calc_rewards_in_cycle(monkeypatch):
     fake_data_safe_owner = pd.DataFrame([
         {
             "safe":"safe1",
-            "owner":"owner1"
+            "owner":"owner1",
+            "type":"depot"
         }
     ])
 
@@ -277,7 +282,6 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
                 if type(owner) == str:
                     payees_list.append(owner)
         result = rule.run(END_BLOCK, "0x0")
-        print(result)
         all_positive_rewards = True
         
         for payee in payees_list:

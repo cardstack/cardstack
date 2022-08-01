@@ -25,14 +25,14 @@ class Staking(Rule):
         
         return  f"""
             with filtered_balances as (
-                select tht.safe, tht.balance_uint64, tht._block_number, tht.token, 
+                select tht.safe, tht.balance_uint64::bigint as balance_int64, tht._block_number, tht.token, 
                 from {token_holder_table} as tht, {safe_owner_table} as sot
                 where tht.safe = sot.safe
                 and sot.type = 'depot'
             ),
             balance_changes as (select 
                 safe, 
-                balance_uint64 - lag(balance_uint64, 1 ,0) over (partition by safe order by _block_number asc) as change,
+                balance_int64 - lag(balance_int64, 1 ,0) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
                 from filtered_balances
@@ -44,7 +44,7 @@ class Staking(Rule):
                 _block_number::integer >= $1::integer
                 ),
             original_balances as (select safe,
-                last_value(balance_uint64) over (partition by safe order by _block_number asc) as change,
+                last_value(balance_int64) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 1 as compounding_rate,
                 from filtered_balances
