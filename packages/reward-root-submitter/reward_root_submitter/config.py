@@ -2,9 +2,11 @@ from pydantic import BaseSettings, root_validator, Field
 import boto3
 from functools import lru_cache
 
+
 @lru_cache
 def get_secrets_client():
     return boto3.client("secretsmanager")
+
 
 @lru_cache
 def get_secret(secret_id):

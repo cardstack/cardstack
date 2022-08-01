@@ -20,7 +20,6 @@ sentry_sdk.init(
 )
 
 
-
 def handler(event, _context):
     bucket = event["Records"][0]["s3"]["bucket"]["name"]
     key = urllib.parse.unquote_plus(

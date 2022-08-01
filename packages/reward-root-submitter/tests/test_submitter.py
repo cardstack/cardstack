@@ -5,15 +5,16 @@ from cloudpathlib import AnyPath
 from cloudpathlib.local.implementations.s3 import LocalS3Client
 from eth_utils import denoms
 from hexbytes import HexBytes
-from reward_root_submitter.submitter import RootSubmitter
-from reward_root_submitter.utils import get_all_reward_outputs, get_root_from_file
+from reward_root_submitter.contracts import RewardPool
+from reward_root_submitter.config import Config
+from reward_root_submitter.main import get_merkle_root_details, process_file
 from web3 import EthereumTesterProvider, Web3
 
 
 @pytest.fixture(autouse=True)
 def no_gas_oracle(monkeypatch):
     """Remove remote call to oracle for all tests."""
-    monkeypatch.setattr(RootSubmitter, "get_gas_price", lambda x: 1000000000)
+    monkeypatch.setattr(RewardPool, "get_gas_price", lambda x: 1000000000)
 
 
 @pytest.fixture
@@ -92,7 +93,7 @@ def deploy_address(eth_tester, deploy_key):
 
 
 @pytest.fixture
-def reward_pool(w3, deploy_address):
+def reward_pool_address(w3, deploy_address, deploy_key):
     token_manager = create_and_initialise("TokenManager", w3, deploy_address)
     version_manager = create_and_initialise("VersionManager", w3, deploy_address)
     reward_pool = create_and_initialise("RewardPool", w3, deploy_address)
@@ -133,184 +134,105 @@ def reward_pool(w3, deploy_address):
         version_manager.address,
     ).transact({"from": deploy_address})
     w3.eth.wait_for_transaction_receipt(tx_hash, 180)
-    return reward_pool
+    return reward_pool.address
 
 
-def test_submit_root(w3, reward_pool, deploy_address):
+@pytest.fixture
+def config(deploy_address, deploy_key):
+    return Config(
+        environment="test",
+        evm_full_node_url="test",
+        reward_root_submitter_address=deploy_address,
+        reward_root_submitter_private_key=deploy_key,
+        reward_root_submitter_sentry_dsn="test",
+    )
 
-    tx_hash = reward_pool.functions.submitPayeeMerkleRoot(
+
+def get_details_from_test_file(reward_program_id, payment_cycle):
+    return get_merkle_root_details(
+        AnyPath(
+            f"tests/resources/reward_output/rewardProgramID={reward_program_id}/paymentCycle={payment_cycle}/results.parquet"
+        )
+    )
+
+
+def test_submit_root(w3, reward_pool_address, config):
+    reward_pool_contract = RewardPool(w3)
+    reward_pool_contract.setup_from_address(reward_pool_address)
+    reward_pool_contract.submit_merkle_root(
         reward_programs()[0],
         12,
         HexBytes("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
-    ).transact(
-        {
-            "from": deploy_address,
-        }
+        config.reward_root_submitter_address,
+        config.reward_root_submitter_private_key,
     )
-    w3.eth.wait_for_transaction_receipt(tx_hash, 180)
-
-    hw = reward_pool.caller.payeeRoots(reward_programs()[0], 12)
+    hw = reward_pool_contract.contract.caller.payeeRoots(reward_programs()[0], 12)
     assert hw == HexBytes(
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     )
 
 
-def test_submit_single_root(w3, reward_pool, deploy_address, deploy_key):
-    submitter = RootSubmitter(
-        w3,
-        deploy_address,
-        deploy_key,
-        reward_pool.address,
-        "tests/resources/reward_output",
-    )
-    submitter.submit_root(
-        reward_programs()[0],
-        12,
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    )
-    hw = reward_pool.caller.payeeRoots(reward_programs()[0], 12)
-    assert hw == HexBytes(
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    )
-
-
-def test_submit_root_twice_is_safe(w3, reward_pool, deploy_address, deploy_key):
-    submitter = RootSubmitter(
-        w3,
-        deploy_address,
-        deploy_key,
-        reward_pool.address,
-        "tests/resources/reward_output",
-    )
-    submitter.submit_root(
-        reward_programs()[0],
-        12,
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    )
-    hw = reward_pool.caller.payeeRoots(reward_programs()[0], 12)
-    assert hw == HexBytes(
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    )
-    # Now try to submit again
-    submitter.submit_root(
-        reward_programs()[0],
-        12,
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    )
-    hw = reward_pool.caller.payeeRoots(reward_programs()[0], 12)
-    assert hw == HexBytes(
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    )
-
-
-def test_submits_all_roots(w3, reward_pool, deploy_address, deploy_key):
-    submitter = RootSubmitter(
-        w3,
-        deploy_address,
-        deploy_key,
-        reward_pool.address,
-        "tests/resources/reward_output",
-    )
-    submitter.submit_all_roots()
-    for reward_program_id in reward_programs():
-        for payment_cycle in [24000000, 24065536]:
-            assert reward_pool.caller.payeeRoots(
-                reward_program_id, payment_cycle
-            ) != HexBytes(
-                "0x0000000000000000000000000000000000000000000000000000000000000000"
-            )
-
-
-def test_submits_FF_for_empty_file(w3, reward_pool, deploy_address, deploy_key):
-    submitter = RootSubmitter(
-        w3,
-        deploy_address,
-        deploy_key,
-        reward_pool.address,
-        "tests/resources/reward_output",
-    )
+def test_gets_FFF_root_for_empty_file():
     empty_file_program_id = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
     empty_file_cycle = 24098304
-    submitter.submit_all_roots()
-    assert reward_pool.caller.payeeRoots(
-        empty_file_program_id, empty_file_cycle
-    ) == HexBytes("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-
-
-def test_can_find_all_payment_cycles():
-    all_cycles = list(get_all_reward_outputs(AnyPath("tests/resources/reward_output/")))
-    assert len(all_cycles) == 7
-    assert {
-        "file": AnyPath(
-            "tests/resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24000000/results.parquet"
-        ),
-        "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
-        "payment_cycle": 24000000,
-    } in all_cycles
-
-
-def test_can_find_all_payment_cycles_on_s3():
-    s3_client = LocalS3Client(local_storage_dir="tests")
-    all_cycles = list(
-        get_all_reward_outputs(s3_client.S3Path("s3://resources/reward_output/"))
+    details = get_details_from_test_file(empty_file_program_id, empty_file_cycle)
+    assert details.merkle_root_hash == HexBytes(
+        "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
     )
-    assert len(all_cycles) == 7
-    assert {
-        "file": s3_client.S3Path(
-            "s3://resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24000000/results.parquet"
-        ),
-        "reward_program_id": "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd",
-        "payment_cycle": 24000000,
-    } in all_cycles
+    assert details.payment_cycle == empty_file_cycle
+    assert details.reward_program_id == empty_file_program_id
 
 
 def test_can_get_root():
-    file = AnyPath(
-        "tests/resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24000000/results.parquet"
-    )
-    root = get_root_from_file(file)
-    assert root == HexBytes(
+    reward_program = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
+    payment_cycle = 24000000
+    details = get_details_from_test_file(reward_program, payment_cycle)
+    assert details.merkle_root_hash == HexBytes(
         "0xad76f200c39cc399e6bdbb260f7ad4add0847b6bdf4fd42abdd1472a0d53bdfb"
     )
+    assert details.payment_cycle == payment_cycle
 
 
-def test_returns_none_when_file_empty():
-    file = AnyPath(
-        "tests/resources/reward_output/rewardProgramID=0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd/paymentCycle=24098304/results.parquet"
-    )
-    root = get_root_from_file(file)
-    assert root is None
+def test_validates_address():
+    with pytest.raises(
+        Exception, match=r".* does not have a valid checksummed address .*"
+    ):
+        reward_program = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
+        payment_cycle = 24000000
+        get_details_from_test_file(reward_program.lower(), payment_cycle)
 
 
-def test_ignores_non_rewards_folders():
-    s3_client = LocalS3Client(local_storage_dir="tests")
-    all_cycles = list(
-        get_all_reward_outputs(
-            s3_client.S3Path("s3://resources/rewards_with_other_folders/")
+def test_validates_payment_cycle_missing():
+    with pytest.raises(Exception, match=r".* does not have a valid payment cycle.*"):
+        reward_program = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
+        payment_cycle = ""
+        get_details_from_test_file(reward_program, payment_cycle)
+
+
+def test_validates_payment_cycle_not_number():
+    with pytest.raises(Exception, match=r".* does not have a valid payment cycle.*"):
+        reward_program = "0xA2e8225dE0385ebC20B3C0160864f4e20a750cfd"
+        payment_cycle = "hello"
+        get_details_from_test_file(reward_program, payment_cycle)
+
+
+def test_validates_path_matches_reward_program():
+    with pytest.raises(
+        Exception, match=r".* payment cycle in path and in the file do not match.*"
+    ):
+        get_merkle_root_details(
+            AnyPath(
+                "tests/resources/reward_output_with_mismatched_contents/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=1234/results.parquet"
+            )
         )
-    )
-    assert len(all_cycles) == 1
-    assert {
-        "file": s3_client.S3Path(
-            "s3://resources/rewards_with_other_folders/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
-        ),
-        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
-        "payment_cycle": 24000000,
-    } in all_cycles
 
 
-def test_ignores_folders_without_parquet_results():
-    s3_client = LocalS3Client(local_storage_dir="tests")
-    all_cycles = list(
-        get_all_reward_outputs(
-            s3_client.S3Path("s3://resources/rewards_with_missing_parquet/")
+def test_validates_path_matches_reward_program():
+    with pytest.raises(
+        Exception, match=r".* reward program ID in path and in the file do not match.*"
+    ):
+        get_merkle_root_details(
+            AnyPath(
+                "tests/resources/reward_output_with_mismatched_contents/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
+            )
         )
-    )
-    assert len(all_cycles) == 1
-    assert {
-        "file": s3_client.S3Path(
-            "s3://resources/rewards_with_missing_parquet/rewardProgramID=0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1/paymentCycle=24000000/results.parquet"
-        ),
-        "reward_program_id": "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
-        "payment_cycle": 24000000,
-    } in all_cycles

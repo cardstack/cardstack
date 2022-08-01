@@ -3,8 +3,18 @@ import requests
 import logging
 from eth_utils import to_wei
 
+
 class Contract:
-    def get_gas_price(speed="average"):
+    def __init__(self, w3):
+        self.w3 = w3
+
+    def setup_from_environment(self, environment):
+        raise Exception("This function must be implemented in the base class")
+
+    def setup_from_address(self, contract_address):
+        raise Exception("This function must be implemented in the base class")
+
+    def get_gas_price(self, speed="average"):
         gas_price_oracle = "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle"
         current_values = requests.get(gas_price_oracle).json()
         gwei = current_values[speed]
@@ -12,17 +22,22 @@ class Contract:
 
 
 class RewardPool(Contract):
-    def __init__(self, w3, environment):
-        # TODO: extract these into common SDK python code
-        if environment == "staging":
-            self.address = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
-        elif environment == "production":
-            self.address = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
+    def __init__(self, w3):
         self.w3 = w3
+
+    def setup_from_environment(self, environment):
+        if environment == "staging":
+            self.setup_from_address("0xc9A238Ee71A65554984234DF9721dbdA873F84FA")
+        elif environment == "production":
+            self.setup_from_address("0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a")
+        else:
+            raise Exception(f"Environment '{environment}' not recognised")
+
+    def setup_from_address(self, contract_address):
         with open(f"abis/RewardPool.json") as contract_file:
             contract_json = json.load(contract_file)
-            self.contract = w3.eth.contract(
-                address=self.address, abi=contract_json["abi"]
+            self.contract = self.w3.eth.contract(
+                address=contract_address, abi=contract_json["abi"]
             )
 
     def submit_merkle_root(

@@ -15,11 +15,13 @@ EMPTY_MARKER_HEX = HexBytes(
     "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 )
 
+
 @dataclass
 class MerkleRoot:
     reward_program_id: str
     payment_cycle: int
     merkle_root_hash: HexBytes
+
 
 def setup_logging(config):
     logging.basicConfig(level=config.log_level.upper())
@@ -67,10 +69,15 @@ def get_merkle_root_details(reward_output_filename):
                 raise Exception(
                     f"{reward_output_filename} payment cycle in path and in the file do not match"
                 )
-            payment_cycle = int(payment_cycle)
         except StopIteration:
             root = EMPTY_MARKER_HEX
-    return MerkleRoot(reward_program_id=reward_program_id, payment_cycle=payment_cycle, merkle_root_hash=root)
+        payment_cycle = int(payment_cycle)
+    return MerkleRoot(
+        reward_program_id=reward_program_id,
+        payment_cycle=payment_cycle,
+        merkle_root_hash=root,
+    )
+
 
 def process_file(reward_output_filename, config):
     evm_node = config.evm_full_node_url
@@ -78,7 +85,8 @@ def process_file(reward_output_filename, config):
 
     merkle_root_details = get_merkle_root_details(reward_output_filename)
 
-    reward_pool_contract = RewardPool(w3, config.environment)
+    reward_pool_contract = RewardPool(w3)
+    reward_pool_contract.setup_from_environment(config.environment)
     reward_pool_contract.submit_merkle_root(
         merkle_root_details.reward_program_id,
         merkle_root_details.payment_cycle,
