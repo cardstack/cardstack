@@ -47,7 +47,7 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
 
     await click(SELECTION_CONTROL_GROUP_TOGGLE_SELECTOR);
 
-    assert.equal(toggled, true);
+    assert.true(toggled);
   });
 
   test('It can render a state where not all, but some items are selected', async function (assert) {
@@ -76,7 +76,7 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
 
     await click(SELECTION_CONTROL_GROUP_TOGGLE_SELECTOR);
 
-    assert.equal(toggled, true);
+    assert.true(toggled);
   });
 
   test('It can render a state where no items are selected', async function (assert) {
@@ -105,7 +105,7 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
 
     await click(SELECTION_CONTROL_GROUP_TOGGLE_SELECTOR);
 
-    assert.equal(toggled, true);
+    assert.true(toggled);
   });
 
   test('It can render without having a menu component passed in', async function (assert) {
@@ -130,6 +130,6 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
 
     await click(SELECTION_CONTROL_GROUP_TOGGLE_SELECTOR);
 
-    assert.equal(toggled, true);
+    assert.true(toggled);
   });
 });

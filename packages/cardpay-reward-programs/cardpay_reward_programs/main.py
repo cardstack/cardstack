@@ -5,7 +5,6 @@ import sentry_sdk
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
-from cardpay_reward_programs.rules import *
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 

@@ -1,6 +1,6 @@
 import pandas as pd
-from eth_utils import is_checksum_address
 from cardpay_reward_programs.rule import Rule
+from eth_utils import is_checksum_address
 
 
 class RetroAirdrop(Rule):
@@ -37,7 +37,7 @@ class RetroAirdrop(Rule):
 
     def sql(self, table_query):
         return f"""
-        select 
+        select
             prepaid_card_owner as payee,
             count(*) as transactions
         from {table_query}

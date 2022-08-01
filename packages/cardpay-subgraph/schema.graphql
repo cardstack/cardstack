@@ -586,6 +586,7 @@ type MerkleRootSubmission @entity {
   id: ID!
   rewardProgram: RewardProgram!
   paymentCycle: BigInt!
+  rootHash: Bytes!
   timestamp: BigInt!
   blockNumber: BigInt!
 }

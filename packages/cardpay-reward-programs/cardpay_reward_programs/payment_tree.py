@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-
 import itertools
 from collections import defaultdict
-from copy import deepcopy
 from typing import List, TypedDict
 
 import pyarrow as pa

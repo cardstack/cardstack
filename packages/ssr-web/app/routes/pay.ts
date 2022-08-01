@@ -4,10 +4,10 @@ import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
-import { getOwner } from '@ember/application';
 import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import RouterService from '@ember/routing/router-service';
 
 interface PayRouteModel {
   network: string;
@@ -17,13 +17,14 @@ interface PayRouteModel {
 }
 
 export default class PayRoute extends Route {
+  @service declare router: RouterService;
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
   @service('card-space') declare cardSpace: CardSpaceService;
 
   beforeModel() {
     if (this.cardSpace.isActive) {
-      this.transitionTo('index');
+      this.router.transitionTo('index');
     }
   }
 
@@ -106,12 +107,10 @@ export default class PayRoute extends Route {
   async fetchMerchantInfo(infoDID: string) {
     // use a resource in a blocking manner
     // see https://github.com/NullVoxPopuli/ember-resources/issues/316
-    let merchantInfo = new MerchantInfo(getOwner(this), {
-      named: {
-        infoDID,
-        waitForInfo: false,
-      },
-    });
+    let merchantInfo = MerchantInfo.from(this, () => ({
+      infoDID,
+      waitForInfo: false,
+    }));
     await merchantInfo.run();
 
     return merchantInfo;

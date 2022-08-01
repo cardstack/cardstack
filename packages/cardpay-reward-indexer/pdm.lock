@@ -234,6 +234,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "flake8"
+version = "4.0.1"
+requires_python = ">=3.6"
+summary = "the modular source code checker: pep8 pyflakes and co"
+dependencies = [
+    "mccabe<0.7.0,>=0.6.0",
+    "pycodestyle<2.9.0,>=2.8.0",
+    "pyflakes<2.5.0,>=2.4.0",
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.3.0"
 requires_python = ">=3.7"
@@ -298,6 +309,11 @@ dependencies = [
 name = "lru-dict"
 version = "1.1.7"
 summary = "An Dict like LRU container."
+
+[[package]]
+name = "mccabe"
+version = "0.6.1"
+summary = "McCabe checker, plugin for flake8"
 
 [[package]]
 name = "multiaddr"
@@ -396,6 +412,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "pycodestyle"
+version = "2.8.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+summary = "Python style guide checker"
+
+[[package]]
 name = "pycryptodome"
 version = "3.14.1"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -409,6 +431,12 @@ summary = "Data validation and settings management using python type hints"
 dependencies = [
     "typing-extensions>=3.7.4.3",
 ]
+
+[[package]]
+name = "pyflakes"
+version = "2.4.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "passive checker of Python programs"
 
 [[package]]
 name = "pyparsing"
@@ -580,7 +608,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:08477154e80fb8bbdade2277d940a4b5c958ae7a6a92d6a051411d75bc721ae9"
+content_hash = "sha256:6a84fe6dcbf9bfb271a9d98afda74b92ee1c16627006b3abd8a9dfeb4edac446"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -839,6 +867,10 @@ content_hash = "sha256:08477154e80fb8bbdade2277d940a4b5c958ae7a6a92d6a051411d75b
     {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
     {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
 ]
+"flake8 4.0.1" = [
+    {file = "flake8-4.0.1-py2.py3-none-any.whl", hash = "sha256:479b1304f72536a55948cb40a32dce8bb0ffe3501e26eaf292c7e60eb5e0428d"},
+    {file = "flake8-4.0.1.tar.gz", hash = "sha256:806e034dda44114815e23c16ef92f95c91e4c71100ff52813adf7132a6ad870d"},
+]
 "frozenlist 1.3.0" = [
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d2257aaba9660f78c7b1d8fea963b68f3feffb1a9d5d05a18401ca9eb3e8d0a3"},
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4a44ebbf601d7bac77976d429e9bdb5a4614f9f4027777f9e54fd765196e9d3b"},
@@ -987,6 +1019,10 @@ content_hash = "sha256:08477154e80fb8bbdade2277d940a4b5c958ae7a6a92d6a051411d75b
 ]
 "lru-dict 1.1.7" = [
     {file = "lru-dict-1.1.7.tar.gz", hash = "sha256:45b81f67d75341d4433abade799a47e9c42a9e22a118531dcb5e549864032d7c"},
+]
+"mccabe 0.6.1" = [
+    {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
+    {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 "multiaddr 0.0.9" = [
     {file = "multiaddr-0.0.9-py2.py3-none-any.whl", hash = "sha256:5c0f862cbcf19aada2a899f80ef896ddb2e85614e0c8f04dd287c06c69dac95b"},
@@ -1179,6 +1215,10 @@ content_hash = "sha256:08477154e80fb8bbdade2277d940a4b5c958ae7a6a92d6a051411d75b
     {file = "pyarrow-8.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:cb06cacc19f3b426681f2f6803cc06ff481e7fe5b3a533b406bc5b2138843d4f"},
     {file = "pyarrow-8.0.0.tar.gz", hash = "sha256:4a18a211ed888f1ac0b0ebcb99e2d9a3e913a481120ee9b1fe33d3fedb945d4e"},
 ]
+"pycodestyle 2.8.0" = [
+    {file = "pycodestyle-2.8.0-py2.py3-none-any.whl", hash = "sha256:720f8b39dde8b293825e7ff02c475f3077124006db4f440dcbc9a20b76548a20"},
+    {file = "pycodestyle-2.8.0.tar.gz", hash = "sha256:eddd5847ef438ea1c7870ca7eb78a9d47ce0cdb4851a5523949f2601d0cbbe7f"},
+]
 "pycryptodome 3.14.1" = [
     {file = "pycryptodome-3.14.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:75a3a364fee153e77ed889c957f6f94ec6d234b82e7195b117180dcc9fc16f96"},
     {file = "pycryptodome-3.14.1-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:aae395f79fa549fb1f6e3dc85cf277f0351e15a22e6547250056c7f0c990d6a5"},
@@ -1247,6 +1287,10 @@ content_hash = "sha256:08477154e80fb8bbdade2277d940a4b5c958ae7a6a92d6a051411d75b
     {file = "pydantic-1.9.1-cp39-cp39-win_amd64.whl", hash = "sha256:61b6760b08b7c395975d893e0b814a11cf011ebb24f7d869e7118f5a339a82e1"},
     {file = "pydantic-1.9.1-py3-none-any.whl", hash = "sha256:4988c0f13c42bfa9ddd2fe2f569c9d54646ce84adc5de84228cfe83396f3bd58"},
     {file = "pydantic-1.9.1.tar.gz", hash = "sha256:1ed987c3ff29fff7fd8c3ea3a3ea877ad310aae2ef9889a119e22d3f2db0691a"},
+]
+"pyflakes 2.4.0" = [
+    {file = "pyflakes-2.4.0-py2.py3-none-any.whl", hash = "sha256:3bb3a3f256f4b7968c9c788781e4ff07dce46bdf12339dcda61053375426ee2e"},
+    {file = "pyflakes-2.4.0.tar.gz", hash = "sha256:05a85c2872edf37a4ed30b0cce2f6093e1d0581f8c19d7393122da7e25b2b24c"},
 ]
 "pyparsing 3.0.9" = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},

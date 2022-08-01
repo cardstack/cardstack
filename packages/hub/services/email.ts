@@ -39,6 +39,25 @@ export default class Email {
       })
     );
   }
+
+  async sendTemplate(email: { to: string; from: string; templateName: string; templateData: Record<string, any> }) {
+    return this.client.send(
+      new SendEmailCommand({
+        Destination: {
+          CcAddresses: [],
+          ToAddresses: [email.to],
+        },
+        Content: {
+          Template: {
+            TemplateName: email.templateName,
+            TemplateData: JSON.stringify(email.templateData),
+          },
+        },
+        FromEmailAddress: email.from,
+        ReplyToAddresses: [email.from],
+      })
+    );
+  }
 }
 
 declare module '@cardstack/di' {

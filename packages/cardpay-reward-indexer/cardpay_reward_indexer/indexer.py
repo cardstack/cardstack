@@ -1,8 +1,4 @@
-#!/usr/bin/env python3
-
-
 import logging
-import re
 from datetime import datetime
 
 import eth_abi
@@ -11,7 +7,6 @@ import requests
 from cloudpathlib import AnyPath
 from eth_utils import to_checksum_address
 from hexbytes import HexBytes
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from . import models
@@ -76,7 +71,7 @@ class Indexer:
         )
         if not existing_root:
             new_root = models.Root(
-                rootHash=root["id"],
+                rootHash=root["rootHash"],
                 rewardProgramId=root["rewardProgram"]["id"],
                 paymentCycle=int(root["paymentCycle"]),
                 blockNumber=int(root["blockNumber"]),
@@ -109,7 +104,7 @@ class Indexer:
                     True
                 )  # find index of new proofs that already has leaf in db
                 del proofs[i]  # remove that proof from the array
-            except ValueError as e:
+            except ValueError:
                 pass
         db.add_all(proofs)
 

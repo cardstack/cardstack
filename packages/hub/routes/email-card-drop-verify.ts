@@ -1,12 +1,10 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { query } from '../queries';
 import { service } from '@cardstack/hub/services';
 import { inject } from '@cardstack/di';
 import Logger from '@cardstack/logger';
 import config from 'config';
 import * as Sentry from '@sentry/node';
-import { NOT_NULL } from '../utils/queries';
 
 let log = Logger('route:email-card-drop-verify');
 
@@ -14,10 +12,11 @@ const { url: webClientUrl } = config.get('webClient');
 const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
 
 export default class EmailCardDropVerifyRoute {
-  emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
+  clock = inject('clock');
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   relay = service('relay');
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -43,13 +42,17 @@ export default class EmailCardDropVerifyRoute {
     let verificationCode = (ctx.request.query['verification-code'] as string) || '';
     let emailHash = (ctx.request.query['email-hash'] as string) || '';
 
+    let prisma = await this.prismaManager.getClient();
+
     if (
-      (
-        await this.emailCardDropRequestQueries.query({
+      await prisma.emailCardDropRequest.count({
+        where: {
           ownerAddress,
-          claimedAt: NOT_NULL,
-        })
-      ).length
+          claimedAt: {
+            not: null,
+          },
+        },
+      })
     ) {
       ctx.redirect(`${webClientUrl}${alreadyClaimed}`);
       return;
@@ -57,19 +60,21 @@ export default class EmailCardDropVerifyRoute {
 
     // eoa has not claimed, but this email has already claimed
     if (
-      (
-        await this.emailCardDropRequestQueries.query({
+      await prisma.emailCardDropRequest.count({
+        where: {
           emailHash,
-          claimedAt: NOT_NULL,
-        })
-      ).length
+          claimedAt: {
+            not: null,
+          },
+        },
+      })
     ) {
       ctx.status = 400;
       ctx.body = 'Email has already been used to claim a prepaid card';
       return;
     }
 
-    let emailCardDropRequest = await this.emailCardDropRequestQueries.latestRequest(ownerAddress);
+    let emailCardDropRequest = await prisma.emailCardDropRequest.latestRequestForOwner(ownerAddress, this.clock);
 
     if (!emailCardDropRequest) {
       ctx.status = 400;
@@ -90,7 +95,10 @@ export default class EmailCardDropVerifyRoute {
     }
 
     // Optimistically mark the request as claimed to prevent stampede attack
-    await this.emailCardDropRequestQueries.claim(emailCardDropRequest.id);
+    await prisma.emailCardDropRequest.update({
+      data: { claimedAt: new Date(this.clock.now()) },
+      where: { id: emailCardDropRequest.id },
+    });
 
     try {
       log.info(`Provisioning prepaid card for ${emailCardDropRequest.ownerAddress}`);
@@ -100,7 +108,10 @@ export default class EmailCardDropVerifyRoute {
       );
 
       log.info(`Provisioned successfully, transaction hash: ${transactionHash}`);
-      await this.emailCardDropRequestQueries.updateTransactionHash(emailCardDropRequest.id, transactionHash);
+      await prisma.emailCardDropRequest.update({
+        data: { transactionHash },
+        where: { id: emailCardDropRequest.id },
+      });
 
       ctx.redirect(`${webClientUrl}${success}`);
       return;

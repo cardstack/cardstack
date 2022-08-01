@@ -16,5 +16,8 @@
   },
   "discord": {
     "allowedChannels": "958136277096620084"
+  },
+  "db": {
+    "prismaLog": ["query", "info", "warn", "error"]
   }
 }

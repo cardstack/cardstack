@@ -1,6 +1,6 @@
 import { Helpers, Job } from 'graphile-worker';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import { registry, setupHub } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 import RemoveOldSentNotificationsTask from '../../tasks/remove-old-sent-notifications';
 import { Client } from 'pg';
 
@@ -38,10 +38,6 @@ describe('RemoveOldSentNotificationsTask', function () {
   let subject: RemoveOldSentNotificationsTask;
   let db: Client;
 
-  this.beforeAll(async function () {
-    registry(this).register;
-  });
-
   this.beforeEach(async function () {
     db = await (await getContainer().lookup('database-manager')).getClient();
 
@@ -61,7 +57,7 @@ describe('RemoveOldSentNotificationsTask', function () {
       ]);
     }
 
-    subject = (await getContainer().lookup('remove-old-sent-notifications')) as RemoveOldSentNotificationsTask;
+    subject = await getContainer().instantiate(RemoveOldSentNotificationsTask);
   });
 
   it('deletes old items and keeps recent', async function () {

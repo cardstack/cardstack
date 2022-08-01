@@ -1,8 +1,8 @@
-import { Client } from 'pg';
 import shortUuid from 'short-uuid';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { registry, setupHub } from '../helpers/server';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -31,7 +31,7 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/prepaid-card-customizations', function () {
-  let db: Client;
+  let prismaClient: ExtendedPrismaClient;
   let validPayload: any;
 
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
@@ -43,40 +43,42 @@ describe('POST /api/prepaid-card-customizations', function () {
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    db = await dbManager.getClient();
+    prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
 
-    let rows = [
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'https://example.com/a.svg', 'Pattern A'],
-      ['D2E94EA2-8124-44D8-B495-D3CF33D4C2A4', 'https://example.com/b.svg', 'Pattern B'],
-    ];
-    for (const row of rows) {
-      try {
-        await db.query('INSERT INTO prepaid_card_patterns(id, pattern_url, description) VALUES($1, $2, $3)', row);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    rows = [
-      ['C169F7FE-D83C-426C-805E-DF1D695C30F1', '#efefef', 'black', 'black', 'Solid Gray'],
-      [
-        '5058B874-CE21-4FC4-958C-B6641E1DC175',
-        'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
-        'white',
-        'white',
-        'Awesome Gradient',
+    await prismaClient.prepaidCardPattern.createMany({
+      data: [
+        {
+          id: 'AB70B8D5-95F5-4C20-997C-4DB9013B347C',
+          patternUrl: 'https://example.com/a.svg',
+          description: 'Pattern A',
+        },
+        {
+          id: 'D2E94EA2-8124-44D8-B495-D3CF33D4C2A4',
+          patternUrl: 'https://example.com/b.svg',
+          description: 'Pattern B',
+        },
       ],
-    ];
-    for (const row of rows) {
-      try {
-        await db.query(
-          'INSERT INTO prepaid_card_color_schemes(id, background, pattern_color, text_color, description) VALUES($1, $2, $3, $4, $5)',
-          row
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    });
+
+    await prismaClient.prepaidCardColorScheme.createMany({
+      data: [
+        {
+          id: 'C169F7FE-D83C-426C-805E-DF1D695C30F1',
+          background: '#efefef',
+          patternColor: 'black',
+          textColor: 'black',
+          description: 'Solid Gray',
+        },
+        {
+          id: '5058B874-CE21-4FC4-958C-B6641E1DC175',
+          background: 'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
+          patternColor: 'white',
+          textColor: 'white',
+          description: 'Awesome Gradient',
+        },
+      ],
+    });
+
     validPayload = {
       data: {
         type: 'prepaid-card-customizations',
@@ -197,7 +199,7 @@ describe('POST /api/prepaid-card-customizations', function () {
       });
   });
 
-  it('responds with 200 and new resource', async function () {
+  it('responds with 201 and new resource', async function () {
     let resourceId: string;
     let actualDid: string;
     await request()
@@ -243,13 +245,13 @@ describe('POST /api/prepaid-card-customizations', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    let result = await db.query('SELECT * FROM prepaid_card_customizations WHERE id = $1', [resourceId!]);
-    expect(result.rows.length).to.eq(1, 'Expected new row in `prepaid_card_customizations` table');
-    expect(result.rows[0]['issuer_name']).to.eq('Satoshi Nakamoto');
-    expect(result.rows[0]['owner_address']).to.eq(stubUserAddress);
-    expect(result.rows[0]['pattern_id']).to.eq('ab70b8d5-95f5-4c20-997c-4db9013b347c');
-    expect(result.rows[0]['color_scheme_id']).to.eq('5058b874-ce21-4fc4-958c-b6641e1dc175');
-    expect(result.rows[0]['created_at']).to.be.a('date');
+    let result = await prismaClient.prepaidCardCustomization.findMany({ where: { id: resourceId! } });
+    expect(result.length).to.eq(1, 'Expected new row in `prepaid_card_customizations` table');
+    expect(result[0].issuerName).to.eq('Satoshi Nakamoto');
+    expect(result[0].ownerAddress).to.eq(stubUserAddress);
+    expect(result[0].patternId).to.eq('ab70b8d5-95f5-4c20-997c-4db9013b347c');
+    expect(result[0].colorSchemeId).to.eq('5058b874-ce21-4fc4-958c-b6641e1dc175');
+    expect(result[0].createdAt).to.be.a('date');
 
     expect(actualDid!).to.be.a('string');
     let parts = actualDid!.split(':');

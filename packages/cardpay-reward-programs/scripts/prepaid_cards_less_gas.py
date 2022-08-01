@@ -1,13 +1,9 @@
-#!/usr/bin/env python3
-
 import json
-import os
 
 import pandas as pd
 import requests
 import typer
 from cardpay_reward_programs.config import config
-from dotenv import load_dotenv
 from scripts.utils import Environment
 
 token_balance_in_wei = 50_000_000_000_000_000  # 0.05 dai

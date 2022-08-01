@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-
-
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        PickleType, String, Time, UniqueConstraint)
+from sqlalchemy import Column, DateTime, Integer, PickleType, String, UniqueConstraint
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.orm import relationship
 
 from .database import Base
 

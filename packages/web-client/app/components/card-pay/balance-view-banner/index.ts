@@ -3,7 +3,6 @@ import BN from 'bn.js';
 
 import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
 import { MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
-import { useResource } from 'ember-resources';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
@@ -55,7 +54,7 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
     }
   }
 
-  merchantInfo = useResource(this, MerchantInfo, () => ({
+  merchantInfo = MerchantInfo.from(this, () => ({
     infoDID: (this.args.safe as MerchantSafe).infoDID,
   }));
 }

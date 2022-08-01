@@ -18,10 +18,10 @@ dependencies = [
     "eth-typing>=2.3.0",
     "merklelib @ git+https://git@github.com/cardstack/merklelib@master",
     "pysha3>=1.0.2",
-    "duckdb>=0.3.2",
     "python-dotenv>=0.19.2",
     "future-fstrings>=1.2.0",
     "sentry-sdk>=1.5.12",
+    "duckdb>=0.4.0",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -35,7 +35,8 @@ Homepage = ""
 dev = [
     "pytest>=7.0.1",
     "black>=22.1.0",
-    "isort>=5.10.1"
+    "isort>=5.10.1",
+    "flake8>=4.0.1",
 ]
 explore = [
     "streamlit>=1.9.0",

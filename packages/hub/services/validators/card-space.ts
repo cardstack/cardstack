@@ -1,7 +1,7 @@
-import { CardSpace } from '../../routes/card-spaces';
 import { URL } from 'url';
 import { NestedAttributeError, RelationshipError } from '../../routes/utils/error';
-import { query } from '@cardstack/hub/queries';
+import { inject } from '@cardstack/di';
+import { CardSpace, MerchantInfo } from '@prisma/client';
 
 export type CardSpaceAttribute = 'profileDescription' | 'profileImageUrl' | 'links';
 
@@ -25,9 +25,9 @@ function isValidUrl(url: string): boolean {
 }
 
 export default class CardSpaceValidator {
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
-  async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
+  async validate(cardSpace: Partial<CardSpace & { merchantInfo: MerchantInfo }>): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
       merchantInfo: [],
       profileDescription: [],
@@ -45,7 +45,7 @@ export default class CardSpaceValidator {
 
     if (cardSpace.links) {
       cardSpace.links.forEach((linkItem, index) => {
-        let { title, url } = linkItem;
+        let { title, url } = linkItem as any;
 
         if (!title) {
           errors.links.push({

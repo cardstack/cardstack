@@ -1,22 +1,14 @@
-#!/usr/bin/env python3
-
 import json
-import os
 from typing import Optional
 
 import boto3
-import pyarrow.parquet as pq
 import typer
 from boto3.session import Session
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.payment_tree import PaymentTree
 from cardpay_reward_programs.rules import FlatPayment
-from cardpay_reward_programs.rules.flat_payment import FlatPayment
-from cardpay_reward_programs.utils import (write_parameters_file,
-                                           write_parquet_file)
+from cardpay_reward_programs.utils import write_parameters_file, write_parquet_file
 from cloudpathlib import AnyPath, S3Client
-from dotenv import load_dotenv
-from hexbytes import HexBytes
 from scripts.utils import EMPTY_MARKER_HEX, NULL_HEX, Environment
 from web3 import Web3
 
@@ -43,7 +35,7 @@ def flat_drop(
     )["SecretString"]
     # Make sure evm node corresponds to the environment
     w3 = Web3(Web3.HTTPProvider(evm_full_node_url))
-    with open(f"scripts/abis/RewardPool.json") as contract_file:
+    with open("scripts/abis/RewardPool.json") as contract_file:
         abi_file = json.load(contract_file)
     reward_contract = w3.eth.contract(
         address=config[env]["contracts"]["reward_pool"], abi=abi_file["abi"]

@@ -28,6 +28,7 @@ dev = [
     "black>=22.1.0",
     "isort>=5.10.1",
     "web3[tester]>=5.28.0",
+    "flake8>=4.0.1",
 ]
 [tool.pdm.scripts]
 fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"

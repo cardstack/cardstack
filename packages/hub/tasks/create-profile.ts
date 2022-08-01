@@ -1,5 +1,4 @@
 import { inject } from '@cardstack/di';
-import { query } from '@cardstack/hub/queries';
 import { service } from '@cardstack/hub/services';
 import { encodeDID } from '@cardstack/did-resolver';
 import * as Sentry from '@sentry/node';
@@ -27,10 +26,8 @@ const merchantCreationsQuery = `
 
 export default class CreateProfile {
   cardpay = inject('cardpay');
-  jobTickets = query('job-tickets', { as: 'jobTickets' });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
-  });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
+
   relay = service('relay');
   web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -42,11 +39,13 @@ export default class CreateProfile {
     'job-ticket-id': string;
     'merchant-info-id': string;
   }) {
+    let prisma = await this.prismaManager.getClient();
+
     try {
-      let merchantInfo = (await this.merchantInfoQueries.fetch({ id: merchantInfoId }))[0];
+      let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id: merchantInfoId } });
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfoId });
 
-      let profileRegistrationTxHash = await this.relay.registerProfile(merchantInfo.ownerAddress, did);
+      let profileRegistrationTxHash = await this.relay.registerProfile(merchantInfo!.ownerAddress, did);
 
       await this.cardpay.waitForTransactionConsistency(this.web3.getInstance(), profileRegistrationTxHash);
 
@@ -60,18 +59,30 @@ export default class CreateProfile {
         throw new Error(`subgraph query for transaction ${profileRegistrationTxHash} returned no results`);
       }
 
-      await this.jobTickets.update(
-        jobTicketId,
-        { 'merchant-safe-id': merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id },
-        'success'
-      );
+      await prisma.jobTicket.update({
+        where: { id: jobTicketId },
+        data: {
+          result: {
+            id: merchantCreationsSubgraphResult.data.transaction.merchantCreations[0].merchantSafe.id,
+          },
+          state: 'success',
+        },
+      });
 
-      this.workerClient.addJob('persist-off-chain-merchant-info', { 'merchant-safe-id': merchantInfoId });
+      this.workerClient.addJob('persist-off-chain-merchant-info', { id: merchantInfoId });
     } catch (error) {
       let errorString = (error as Error).toString();
       Sentry.captureException(error);
       log.error(errorString);
-      await this.jobTickets.update(jobTicketId, { error: errorString }, 'failed');
+      await prisma.jobTicket.update({
+        where: { id: jobTicketId },
+        data: {
+          result: {
+            error: errorString,
+          },
+          state: 'failed',
+        },
+      });
     }
   }
 }

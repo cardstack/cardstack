@@ -2,29 +2,21 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
-import { query } from '@cardstack/hub/queries';
-import { CardSpace } from './card-spaces';
-import { MerchantInfo } from './merchant-infos';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
-import { JobTicket } from './job-tickets';
+import * as Sentry from '@sentry/node';
+import { JobTicket } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
-
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
-
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
-  jobTicketsQueries = query('job-tickets', { as: 'jobTicketsQueries' });
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
 
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
-  });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
   });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -38,12 +30,29 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let alreadyCreatedJobTicket = await this.jobTicketsQueries.findAlreadyCreated(
-      'create-profile',
-      ctx.state.userAddress,
-      ctx.request.body.data.attributes
-    );
+    let { provider, receipt } = ctx.request.body.data.attributes || {};
+    let sourceArguments = {
+      provider,
+      receipt,
+    };
 
+    let prisma = await this.prismaManager.getClient();
+    let alreadyCreatedJobTicket;
+
+    try {
+      // prisma does not support postgres' @> object containment operator, so we're using a raw query here
+      let rows = await prisma.$queryRaw<JobTicket[]>`
+        SELECT * from job_tickets
+        WHERE
+          job_type = 'create-profile'
+          AND owner_address = ${ctx.state.userAddress}
+          AND source_arguments @> ${sourceArguments}
+        LIMIT 1
+      `;
+      alreadyCreatedJobTicket = rows[0];
+    } catch (e) {
+      console.log({ e });
+    }
     if (alreadyCreatedJobTicket) {
       ctx.status = 200;
       ctx.body = this.jobTicketSerializer.serialize(alreadyCreatedJobTicket);
@@ -94,7 +103,7 @@ export default class ProfilePurchasesRoute {
 
     if (
       !validateRequiredFields(ctx, {
-        requiredAttributes: ['name', 'slug', 'color'],
+        requiredAttributes: ['name', 'slug', 'color', 'text-color'],
         attributesObject: merchantAttributes,
       })
     ) {
@@ -142,7 +151,27 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    let { provider, receipt } = ctx.request.body.data.attributes;
+    let alreadyUsedReceipt = await prisma.jobTicket.findFirst({
+      where: {
+        jobType: 'create-profile',
+        sourceArguments: { equals: sourceArguments },
+      },
+    });
+
+    if (alreadyUsedReceipt) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
 
     let { valid: purchaseValidationResult, response: purchaseValidationResponse } = await this.inAppPurchases.validate(
       provider,
@@ -150,6 +179,11 @@ export default class ProfilePurchasesRoute {
     );
 
     if (!purchaseValidationResult) {
+      let error = new Error(`Unable to validate purchase, response: ${JSON.stringify(purchaseValidationResponse)}`);
+      Sentry.captureException(error, {
+        tags: { action: 'profile-purchases-route' },
+      });
+
       ctx.status = 422;
       ctx.body = {
         errors: [
@@ -165,7 +199,7 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    const merchantInfo: MerchantInfo = {
+    const merchantInfo = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
       slug,
@@ -175,28 +209,28 @@ export default class ProfilePurchasesRoute {
     };
 
     let db = await this.databaseManager.getClient();
-    let merchantInfoId!: string;
 
     await this.databaseManager.performTransaction(db, async () => {
-      merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
-      await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
+      await prisma.merchantInfo.create({ data: merchantInfo });
+      await prisma.cardSpace.create({ data: { id: shortUuid.uuid(), merchantId: merchantInfo.id } });
     });
 
     let jobTicketId = shortUuid.uuid();
-    let jobTicket = {
-      id: jobTicketId,
-      jobType: 'create-profile',
-      ownerAddress: ctx.state.userAddress,
-      payload: { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
-      spec: { maxAttempts: 1 },
-      sourceArguments: ctx.request.body.data.attributes,
-    };
 
-    let insertedJobTicket = await this.jobTicketsQueries.insert(jobTicket as unknown as JobTicket);
+    let insertedJobTicket = await prisma.jobTicket.create({
+      data: {
+        id: jobTicketId,
+        jobType: 'create-profile',
+        ownerAddress: ctx.state.userAddress,
+        payload: { 'merchant-info-id': merchantInfo.id, 'job-ticket-id': jobTicketId },
+        spec: { maxAttempts: 1 },
+        sourceArguments,
+      },
+    });
 
     this.workerClient.addJob(
       'create-profile',
-      { 'merchant-info-id': merchantInfoId, 'job-ticket-id': jobTicketId },
+      { 'merchant-info-id': merchantInfo.id, 'job-ticket-id': jobTicketId },
       { maxAttempts: 1 }
     );
 

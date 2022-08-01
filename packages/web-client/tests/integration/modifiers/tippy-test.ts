@@ -3,7 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, find, focus, triggerEvent, tap } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 
 module('Integration | Modifier | tippy', function (hooks) {
   setupRenderingTest(hooks);

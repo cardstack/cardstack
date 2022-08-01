@@ -6,7 +6,7 @@ interface ModalPageWrapperArguments {
   back: Function;
 }
 
-export default class ModalPageWrapper extends Component {
+export default class ModalPageWrapper extends Component<ModalPageWrapperArguments> {
   widthMediaQuery?: MediaQueryList;
   @tracked showPage = false;
 

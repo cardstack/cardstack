@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import SendEmailCardDropVerification from '../../tasks/send-email-card-drop-verification';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 import config from 'config';
 import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 
@@ -43,7 +42,7 @@ class StubEmail {
   static shouldThrow = false;
   static lastSent: any = null;
 
-  async send(email: any) {
+  async sendTemplate(email: any) {
     if (StubEmail.shouldThrow) throw new Error('Intentional error in stub email sending');
     StubEmail.lastSent = email;
   }
@@ -69,20 +68,19 @@ describe('SendEmailCardDropVerificationTask', function () {
     registry(this).register('email', StubEmail);
   });
 
-  let { getContainer } = setupHub(this);
+  let { getContainer, getPrisma } = setupHub(this);
   setupSentry(this);
   this.beforeEach(async function () {
     StubEmail.shouldThrow = false;
     StubEmail.lastSent = null;
-    let cardDropQueries = (await getContainer().lookup('email-card-drop-requests', {
-      type: 'query',
-    })) as EmailCardDropRequestsQueries;
-    await cardDropQueries.insert(cardDropRequest);
-    await cardDropQueries.insert(expiredCardDropRequest);
+
+    let prisma = await getPrisma();
+
+    await prisma.emailCardDropRequest.createMany({ data: [cardDropRequest, expiredCardDropRequest] });
   });
 
   it('sends an email that contains the verification link', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
     let params = new URLSearchParams();
     params.append('eoa', cardDropRequest.ownerAddress);
     params.append('verification-code', cardDropRequest.verificationCode);
@@ -93,17 +91,12 @@ describe('SendEmailCardDropVerificationTask', function () {
 
     expect(StubEmail.lastSent.to).to.equal('anyone@test.test');
     expect(StubEmail.lastSent.from).to.equal(config.get('aws.ses.supportEmail'));
-    expect(StubEmail.lastSent.text).to.contain(link);
-    expect(StubEmail.lastSent.html).to.contain(link);
-
-    let durationString = `${emailVerificationLinkExpiryMinutes} minutes`;
-
-    expect(StubEmail.lastSent.text).to.contain(durationString);
-    expect(StubEmail.lastSent.html).to.contain(durationString);
+    expect(StubEmail.lastSent.templateName).to.equal('card-drop-email');
+    expect(StubEmail.lastSent.templateData).to.deep.equal({ verificationUrl: link });
   });
 
   it('fails silently if the row does not exist', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
     let nonexistentId = '6a0d969f-84e1-41d3-8472-87fcf6353476';
 
     await task.perform({ email: 'anyone@test.test', id: nonexistentId }, helpers);
@@ -120,7 +113,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   });
 
   it('fails silently if the verification link is expired', async function () {
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
 
     await task.perform({ email: 'anyone@test.test', id: expiredCardDropRequest.id }, helpers);
 
@@ -140,7 +133,7 @@ describe('SendEmailCardDropVerificationTask', function () {
   it('reports emailing errors to Sentry with the correct tag, then rethrows', async function () {
     StubEmail.shouldThrow = true;
 
-    let task = (await getContainer().lookup('send-email-card-drop-verification')) as SendEmailCardDropVerification;
+    let task = await getContainer().instantiate(SendEmailCardDropVerification);
 
     await expect(task.perform({ email: 'anyone@test.test', id: cardDropRequest.id }, helpers)).to.be.rejectedWith(
       'Intentional error in stub email sending'

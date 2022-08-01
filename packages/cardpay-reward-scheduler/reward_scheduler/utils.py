@@ -1,10 +1,10 @@
-from pathlib import PosixPath
-import boto3
 import os
+from pathlib import PosixPath
 
+import boto3
 import yaml
+from cachetools import TTLCache, cached
 from cloudpathlib import AnyPath, CloudPath
-from cachetools import cached, TTLCache
 
 
 def get_local_file(file_location):
@@ -105,7 +105,7 @@ def get_job_definition_for_image(image_name):
 
 def run_job(image_name, parameters_location, output_location, tags={}):
     client = boto3.client("batch")
-    # The job definition is required to run a container 
+    # The job definition is required to run a container
     # it defines CPU/RAM requirements etc.
     job_definition = get_job_definition_for_image(image_name)
 
