@@ -1,10 +1,12 @@
 import json
-import duckdb
-from .utils import get_files, get_latest_details, run_job
-import requests
 import logging
 from copy import deepcopy
+
+import duckdb
+import requests
 from cloudpathlib import AnyPath
+
+from .utils import get_files, get_latest_details, run_job
 
 
 class RewardProgram:
@@ -58,7 +60,7 @@ class RewardProgram:
         )
         # graphql check
         query = f"""query {{
-            merkleRootSubmissions(orderBy:blockNumber, orderDirection:asc, 
+            merkleRootSubmissions(orderBy:blockNumber, orderDirection:asc,
                 where:{{rewardProgram:"{self.reward_program_id}", blockNumber_gt:{self.last_update_block}}}) {{
                 blockNumber
                 paymentCycle

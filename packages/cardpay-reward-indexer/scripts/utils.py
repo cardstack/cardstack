@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # BELOW ALL COPIED FROM ROOT SUBMITTER
 import re
 

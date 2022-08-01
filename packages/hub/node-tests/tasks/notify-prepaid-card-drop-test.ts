@@ -22,7 +22,7 @@ describe('NotifyPrepaidCardDropTask', function () {
   let { getContainer } = setupHub(this);
 
   it('adds send-notifications jobs', async function () {
-    let task = (await getContainer().lookup('notify-prepaid-card-drop')) as NotifyPrepaidCardDrop;
+    let task = await getContainer().instantiate(NotifyPrepaidCardDrop);
 
     await task.perform({ returnValues: { owner: 'eoa-address' }, transactionHash: 'a' } as unknown as EventData);
 

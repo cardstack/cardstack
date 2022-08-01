@@ -1,17 +1,9 @@
 import { inject } from '@cardstack/di';
-import DatabaseManager from '@cardstack/db';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
-
-interface PrepaidCardColorScheme {
-  id: string;
-  background: string;
-  patternColor: string;
-  textColor: string;
-  description: string;
-}
+import { PrepaidCardColorScheme } from '@prisma/client';
 
 export default class PrepaidCardColorSchemeSerializer {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async serialize(id: string): Promise<JSONAPIDocument>;
   async serialize(model: PrepaidCardColorScheme): Promise<JSONAPIDocument>;
@@ -36,21 +28,18 @@ export default class PrepaidCardColorSchemeSerializer {
   }
 
   async loadPrepaidCardColorScheme(id: string): Promise<PrepaidCardColorScheme> {
-    let db = await this.databaseManager.getClient();
-    let queryResult = await db.query(
-      'SELECT id, background, pattern_color, text_color, description FROM prepaid_card_color_schemes WHERE id = $1',
-      [id]
-    );
-    if (queryResult.rowCount === 0) {
+    let prisma = await this.prismaManager.getClient();
+
+    let model = await prisma.prepaidCardColorScheme.findUnique({ where: { id } });
+    if (!model) {
       return Promise.reject(new Error(`No prepaid_card_color_scheme record found with id ${id}`));
     }
-    let row = queryResult.rows[0];
     return {
-      id: row['id'],
-      background: row['background'],
-      patternColor: row['pattern_color'],
-      textColor: row['text_color'],
-      description: row['description'],
+      id: model.id,
+      background: model.background,
+      patternColor: model.patternColor,
+      textColor: model.textColor,
+      description: model.description,
     };
   }
 }

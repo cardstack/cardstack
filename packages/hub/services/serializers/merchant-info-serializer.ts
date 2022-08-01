@@ -1,14 +1,14 @@
 import { encodeDID } from '@cardstack/did-resolver';
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
-import { MerchantInfo } from '../../routes/merchant-infos';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
+import { MerchantInfo } from '@prisma/client';
 
 export default class MerchantInfoSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  serialize(model: MerchantInfo): JSONAPIDocument {
+  serialize(model: Omit<MerchantInfo, 'createdAt'>): JSONAPIDocument {
     let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
     const result = {
@@ -42,7 +42,7 @@ export default class MerchantInfoSerializer {
     return result as JSONAPIDocument;
   }
 
-  deserialize(json: JSONAPIDocument): MerchantInfo {
+  deserialize(json: JSONAPIDocument): MerchantInfo | Omit<MerchantInfo, 'createdAt'> {
     return {
       id: json.data.id,
       name: json.data.attributes['name'],

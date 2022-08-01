@@ -34,7 +34,7 @@ module('Integration | Component | Button', function (hooks) {
       hbs`<Boxel::Button {{ on "click" this.onClick }}>A button</Boxel::Button>`
     );
     await click(BUTTON_SELECTOR);
-    assert.equal(clicked, true);
+    assert.true(clicked);
   });
 
   test('It can be disabled via html attribute', async function (assert) {
@@ -154,7 +154,7 @@ module('Integration | Component | Button', function (hooks) {
       </Boxel::Button>
     `);
     await click(BUTTON_SELECTOR);
-    assert.equal(clicked, true);
+    assert.true(clicked);
   });
 
   test('When @loading is true, it displays the loading indicator on buttons and not anchors', async function (assert) {

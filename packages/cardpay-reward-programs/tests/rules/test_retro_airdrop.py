@@ -1,11 +1,8 @@
 import itertools
 
-import pandas as pd
 import pytest
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import RetroAirdrop
-
-from .fixture import indexed_data
 
 AIRDROP_AMOUNT = 6_000_000 * 1_000_000_000_000_000_000
 TEST_AMOUNT = 100 * 1_000_000_000_000_000_000
@@ -46,6 +43,7 @@ def rule(request):
     return RetroAirdrop(core_config, user_config)
 
 
+@pytest.mark.usefixtures("indexed_data")
 class TestRetroAirdropSingle:
     @pytest.mark.parametrize(
         "rule,summary",
@@ -60,7 +58,7 @@ class TestRetroAirdropSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, summary, indexed_data):
+    def test_run(self, rule, summary):
         payment_cycle = 24859648
         payment_list = rule.run(payment_cycle, "0x0")
         computed_summary = rule.get_summary(payment_list)
@@ -99,9 +97,7 @@ class TestRetroAirdropSingle:
         ],
         indirect=["rule"],
     )
-    def test_removes_payee_when_no_test_reward(
-        self, rule, expected_payees, indexed_data
-    ):
+    def test_removes_payee_when_no_test_reward(self, rule, expected_payees):
         payment_cycle = 24859648
         payment_list = rule.run(
             payment_cycle, "0x41149498EAc53F8C15Fe848bC5f010039A130963"
@@ -143,7 +139,7 @@ class TestRetroAirdropSingle:
         ],
         indirect=["rule"],
     )
-    def test_add_payee_reward(self, rule, expected_payees, test_accounts, indexed_data):
+    def test_add_payee_reward(self, rule, expected_payees, test_accounts):
         payment_cycle = 24859648
         payment_list = rule.run(
             payment_cycle, "0x41149498EAc53F8C15Fe848bC5f010039A130963"
@@ -177,9 +173,7 @@ class TestRetroAirdropSingle:
             ],
         ],
     )
-    def test_errors_when_non_checksummed_addresses_used(
-        self, test_accounts, indexed_data
-    ):
+    def test_errors_when_non_checksummed_addresses_used(self, test_accounts):
         core_config = {
             "start_block": 23592960,
             "end_block": 24859648,
@@ -202,4 +196,4 @@ class TestRetroAirdropSingle:
             ValueError,
             match=r".* is not a valid checksum address",
         ):
-            rule = RetroAirdrop(core_config, user_config)
+            RetroAirdrop(core_config, user_config)

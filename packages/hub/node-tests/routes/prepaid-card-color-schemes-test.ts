@@ -1,34 +1,31 @@
-import { Client } from 'pg';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { setupHub } from '../helpers/server';
 
 describe('GET /api/prepaid-card-color-schemes', function () {
-  let db: Client;
+  let prisma: ExtendedPrismaClient;
   let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    db = await dbManager.getClient();
+    prisma = await (await getContainer().lookup('prisma-manager')).getClient();
 
-    let rows = [
-      ['C169F7FE-D83C-426C-805E-DF1D695C30F1', '#efefef', 'black', 'black', 'Solid Gray'],
-      [
-        '5058B874-CE21-4FC4-958C-B6641E1DC175',
-        'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
-        'white',
-        'white',
-        'Awesome Gradient',
+    await prisma.prepaidCardColorScheme.createMany({
+      data: [
+        {
+          id: 'C169F7FE-D83C-426C-805E-DF1D695C30F1',
+          background: '#efefef',
+          patternColor: 'black',
+          textColor: 'black',
+          description: 'Solid Gray',
+        },
+        {
+          id: '5058B874-CE21-4FC4-958C-B6641E1DC175',
+          background: 'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
+          patternColor: 'white',
+          textColor: 'white',
+          description: 'Awesome Gradient',
+        },
       ],
-    ];
-    for (const row of rows) {
-      try {
-        await db.query(
-          'INSERT INTO prepaid_card_color_schemes(id, background, pattern_color, text_color, description) VALUES($1, $2, $3, $4, $5)',
-          row
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    });
   });
 
   it('responds with 200 and available color schemes', async function () {

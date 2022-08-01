@@ -1,11 +1,12 @@
 import { Job } from 'graphile-worker';
-import { registry, setupHub } from '../helpers/server';
+import { registry, setupHub, setupRegistry } from '../helpers/server';
 import SendNotifications, { PushNotificationData } from '../../tasks/send-notifications';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import SentPushNotificationsQueries from '../../queries/sent-push-notifications';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import shortUUID from 'short-uuid';
+import { PrismaClient } from '@prisma/client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 // https://github.com/graphile/worker/blob/e3176eab42ada8f4f3718192bada776c22946583/__tests__/helpers.ts#L135
 function makeMockJob(taskIdentifier: string): Job {
@@ -38,7 +39,7 @@ let helpers = makeJobHelpers({}, makeMockJob('send-notifications'), {
 
 const messageID = 'firebase-message-id';
 let createPushNotification: (prefix: string) => PushNotificationData = (prefix = '') => ({
-  notificationId: `${prefix}mock-notification-id`,
+  notificationId: shortUUID.uuid(),
   notificationTitle: `${prefix}notification-title`,
   notificationBody: `${prefix}notification-body`,
   notificationData: {},
@@ -85,27 +86,24 @@ class EntityNotFoundFirebasePushNotifications {
 
 describe('SendNotificationsTask', function () {
   let subject: SendNotifications;
-  let sentPushNotificationsQueries: SentPushNotificationsQueries;
-  let { getContainer } = setupHub(this);
+  setupRegistry(this, ['firebase-push-notifications', StubFirebasePushNotifications]);
+  let { instantiate, getPrisma } = setupHub(this);
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    let db = await dbManager.getClient();
-    await db.query(`DELETE FROM sent_push_notifications`);
-
-    sentPushNotificationsQueries = (await getContainer().lookup('sent-push-notifications', {
-      type: 'query',
-    })) as SentPushNotificationsQueries;
-    sentPushNotificationsQueries.insert({
-      ...existingNotification,
-      messageId: 'existing-message-id',
+    prisma = await getPrisma();
+    await prisma.sentPushNotification.deleteMany();
+    await prisma.sentPushNotification.create({
+      data: {
+        ...existingNotification,
+        messageId: 'existing-message-id',
+      },
     });
 
-    registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
     lastSentData = undefined;
     notificationSent = false;
 
-    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    subject = await instantiate(SendNotifications);
   });
 
   it('will not send a notification if it already exists in the db', async function () {
@@ -126,40 +124,54 @@ describe('SendNotificationsTask', function () {
     });
     expect(notificationSent).equal(true);
 
-    let newNotificationInDatabase = await sentPushNotificationsQueries.exists({
-      notificationId: newlyAddedNotification.notificationId,
+    let newNotificationInDatabase = await prisma.sentPushNotification.findFirst({
+      where: {
+        notificationId: newlyAddedNotification.notificationId,
+      },
     });
 
-    expect(newNotificationInDatabase).equal(true);
+    expect(!!newNotificationInDatabase).equal(true);
   });
 });
 
+class ErroringPrismaClientSentPushNotification {
+  async create() {
+    throw new Error('insert fails');
+  }
+
+  async findFirst() {
+    return null;
+  }
+}
+
+class ErroringPrismaClient {
+  sentPushNotification = new ErroringPrismaClientSentPushNotification();
+}
+
 describe('SendNotificationsTask deduplication errors', async function () {
-  let { getContainer } = setupHub(this);
+  setupRegistry(
+    this,
+    ['firebase-push-notifications', StubFirebasePushNotifications],
+    [
+      'prisma-manager',
+      class ErroringPrismaManager {
+        async getClient() {
+          return Promise.resolve(new ErroringPrismaClient());
+        }
+      },
+    ]
+  );
+  let { instantiate } = setupHub(this);
 
   setupSentry(this);
 
   this.beforeEach(async function () {
-    registry(this).register(
-      'sent-push-notifications',
-      class ErroredSentPushNotificationsQueries {
-        async insert() {
-          throw new Error('insert fails');
-        }
-
-        async exists() {
-          return false;
-        }
-      },
-      { type: 'query' }
-    );
     lastSentData = undefined;
     notificationSent = false;
-    registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
   });
 
   it('handles deduplication write failure by catching the error, and sends the notification', async function () {
-    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    let subject = await instantiate(SendNotifications);
 
     await subject.perform(newlyAddedNotification, helpers);
 
@@ -185,13 +197,12 @@ describe('SendNotificationsTask deduplication errors', async function () {
 });
 
 describe('SendNotificationsTask firebase errors', function () {
-  let { getContainer } = setupHub(this);
-
+  setupRegistry(this, ['firebase-push-notifications', ErroredFirebasePushNotifications]);
+  let { instantiate } = setupHub(this);
   setupSentry(this);
 
   it('should throw if sending a notification fails, and still log to sentry', async function () {
-    registry(this).register('firebase-push-notifications', ErroredFirebasePushNotifications);
-    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    let subject = await instantiate(SendNotifications);
 
     await expect(subject.perform(newlyAddedNotification, helpers)).to.be.rejectedWith(
       ErroredFirebasePushNotifications.message
@@ -208,27 +219,32 @@ describe('SendNotificationsTask firebase errors', function () {
 });
 
 describe('SendNotificationsTask requested entity not found', function () {
-  let { getContainer } = setupHub(this);
+  let { instantiate, getPrisma } = setupHub(this);
+  let prisma: PrismaClient;
+
+  this.beforeEach(async function () {
+    prisma = await getPrisma();
+  });
 
   it('should disable the push notification registration', async function () {
-    let pushNotificationRegistrationQueries = await getContainer().lookup('push-notification-registration', {
-      type: 'query',
-    });
-
-    await pushNotificationRegistrationQueries.upsert({
-      id: shortUUID.uuid(),
-      pushClientId: newlyAddedNotification.pushClientId,
-      ownerAddress: 'existing-owner-address',
-      disabledAt: null,
+    await prisma.pushNotificationRegistration.create({
+      data: {
+        id: shortUUID.uuid(),
+        pushClientId: newlyAddedNotification.pushClientId,
+        ownerAddress: 'existing-owner-address',
+        disabledAt: null,
+      },
     });
 
     registry(this).register('firebase-push-notifications', EntityNotFoundFirebasePushNotifications);
-    let subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    let subject = await instantiate(SendNotifications);
     await subject.perform(newlyAddedNotification, helpers);
 
-    let records = await pushNotificationRegistrationQueries.query({
-      ownerAddress: 'existing-owner-address',
-      pushClientId: newlyAddedNotification.pushClientId,
+    let records = await prisma.pushNotificationRegistration.findMany({
+      where: {
+        ownerAddress: 'existing-owner-address',
+        pushClientId: newlyAddedNotification.pushClientId,
+      },
     });
 
     expect(records.length).to.equal(1);
@@ -237,17 +253,16 @@ describe('SendNotificationsTask requested entity not found', function () {
 });
 
 describe('SendNotificationsTask expired notifications', function () {
-  let { getContainer } = setupHub(this);
   let subject: SendNotifications;
 
   setupSentry(this);
+  setupRegistry(this, ['firebase-push-notifications', StubFirebasePushNotifications]);
+  let { instantiate } = setupHub(this);
 
   this.beforeEach(async function () {
     lastSentData = undefined;
     notificationSent = false;
-    registry(this).register('firebase-push-notifications', StubFirebasePushNotifications);
-
-    subject = (await getContainer().lookup('send-notifications')) as SendNotifications;
+    subject = await instantiate(SendNotifications);
   });
 
   it('should not send an expired notification', async function () {

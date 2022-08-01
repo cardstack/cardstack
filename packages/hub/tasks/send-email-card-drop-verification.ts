@@ -1,12 +1,12 @@
 import { Helpers } from 'graphile-worker';
 import config from 'config';
-import { query } from '@cardstack/hub/queries';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 
 export default class SendEmailCardDropVerification {
+  clock = inject('clock');
   email = inject('email');
-  emailCardDropRequests = query('email-card-drop-requests', { as: 'emailCardDropRequests' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async perform(
     payload: {
@@ -15,10 +15,17 @@ export default class SendEmailCardDropVerification {
     },
     helpers: Helpers
   ) {
+    let prisma = await this.prismaManager.getClient();
+
     const request = (
-      await this.emailCardDropRequests.query({
-        id: payload.id,
-      })
+      await prisma.emailCardDropRequest.findManyWithExpiry(
+        {
+          where: {
+            id: payload.id,
+          },
+        },
+        this.clock
+      )
     )[0];
 
     if (!request) {
@@ -50,19 +57,15 @@ export default class SendEmailCardDropVerification {
     const verificationLink = config.get('cardDrop.verificationUrl') + '?' + params.toString();
 
     const senderEmailAddress = config.get('aws.ses.supportEmail') as string;
-    const expirationMinutes = config.get('cardDrop.email.expiryMinutes') as number;
-
-    const emailTitle = 'Claim your Card Drop';
-    const emailBodyHtml = `<h1></h1> This is your verification link: <a href="${verificationLink}">${verificationLink}</a> It will expire in ${expirationMinutes} minutes.`;
-    const emailBodyText = `This is your verification link: ${verificationLink} It will expire in ${expirationMinutes} minutes.`;
 
     try {
-      await this.email.send({
+      await this.email.sendTemplate({
         to: payload.email,
         from: senderEmailAddress,
-        text: emailBodyText,
-        html: emailBodyHtml,
-        title: emailTitle,
+        templateName: 'card-drop-email',
+        templateData: {
+          verificationUrl: verificationLink,
+        },
       });
     } catch (e) {
       helpers.logger.error('Failed to send verification email');

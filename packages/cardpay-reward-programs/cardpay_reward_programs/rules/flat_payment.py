@@ -11,18 +11,12 @@ class FlatPayment(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(FlatPayment, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(
-        self,
-        reward_per_user,
-        token,
-        duration,
-        accounts
-    ):
+    def set_user_defined_parameters(self, reward_per_user, token, duration, accounts):
         self.token = token
         self.duration = duration
         self.reward_per_user = reward_per_user
         self.accounts = accounts
-    
+
     def sql(self):
         return None
 
@@ -38,4 +32,6 @@ class FlatPayment(Rule):
                 "validTo": payment_cycle + self.duration,
                 "token": self.token,
                 "amount": self.reward_per_user,
-            } for account in self.accounts)
+            }
+            for account in self.accounts
+        )

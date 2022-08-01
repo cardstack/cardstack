@@ -58,6 +58,16 @@ module.exports = {
       ],
     }),
 
+    // copy Prisma client code and libraries
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join('..', '..', 'node_modules', '.prisma', 'client'),
+          to: path.join('.prisma', 'client'),
+        },
+      ],
+    }),
+
     // copy image assets that the hub hosts into dist
     new CopyPlugin({
       patterns: [
@@ -77,7 +87,7 @@ module.exports = {
       ],
     }),
 
-    // copy over pkgs necessary for node-pg-migrate to work. these will be added
+    // copy over pkgs necessary for node-pg-migrate and Prisma to work. these will be added
     // to the docker image's file system
     ...[
       'node-pg-migrate',
@@ -106,6 +116,7 @@ module.exports = {
       'graceful-fs',
       'jsonfile',
       'universalify',
+      '@prisma/client',
     ].map(
       (pkg) =>
         new CopyPlugin({
@@ -184,6 +195,9 @@ module.exports = {
     // the migration files which rely on a relative path calculation from
     // __dirname
     'node-pg-migrate': 'commonjs node-pg-migrate',
+
+    // @prisma/client fails to build without this
+    'util/types': 'util/types',
   },
 
   module: {

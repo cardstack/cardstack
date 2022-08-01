@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
 import { MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
-import { useResource } from 'ember-resources';
 
 interface CardPaySafeChooserDropdownSafeOptionComponentArgs {
   safe: Safe;
@@ -14,7 +13,7 @@ export default class CardPaySafeChooserDropdownSafeOptionComponent extends Compo
 
       return {
         type: 'Payment Profile',
-        info: useResource(this, MerchantInfo, () => ({
+        info: MerchantInfo.from(this, () => ({
           infoDID: merchant.infoDID,
         })),
       };

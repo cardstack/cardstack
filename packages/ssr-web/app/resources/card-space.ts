@@ -31,20 +31,19 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
   @tracked backgroundColor: string | undefined;
   @tracked textColor: string | undefined;
   @tracked ownerAddress: string | undefined;
+  @tracked slug: string | undefined;
 
   @tracked loading = true;
   @tracked errored: Error | undefined;
   @tracked is404 = false;
-
   @service declare offChainJson: OffChainJsonService;
 
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
+  modify(_positional: any, { slug }: { slug: any }) {
+    this.slug = slug;
   }
-
   async run() {
     try {
-      await this.fetchCardSpace(this.args.named.slug);
+      await this.fetchCardSpace(this.slug!);
     } catch (err) {
       this.errored = err;
 

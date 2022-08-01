@@ -1,8 +1,10 @@
 import Mocha from 'mocha';
 import { createRegistry, HubServer } from '../../main';
-import { Container, Registry } from '@cardstack/di';
+import { Container, TypedKnownServices, Registry } from '@cardstack/di';
 import supertest from 'supertest';
 import type HubBot from '../../services/discord-bots/hub-bot';
+import { Factory } from '@cardstack/di';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
 interface InternalContext {
   registry?: Registry;
@@ -20,10 +22,35 @@ export function contextFor(mocha: object): InternalContext {
 
 export function registry(context: object): Registry {
   let internal = contextFor(context);
+  if (internal.container) {
+    throw new Error(
+      'Registering services after creating a container is not reliable. Please check your order of operations.'
+    );
+  }
   if (!internal.registry) {
     internal.registry = createRegistry();
   }
   return internal.registry;
+}
+interface RegistrationOptions {
+  type: 'service' | 'query';
+}
+
+type RegistrationArgs = [string, any] | [string, any, RegistrationOptions];
+
+export function setupRegistry(mochaContext: Mocha.Suite, ...registrationArgsCollection: RegistrationArgs[]) {
+  mochaContext.beforeEach(async function () {
+    let contextRegistry = registry(this);
+    let context = contextFor(mochaContext);
+    if (context.container) {
+      throw new Error(
+        'Registering services after creating a container is not reliable. Please check your order of operations.'
+      );
+    }
+    for (const registrationArgs of registrationArgsCollection) {
+      contextRegistry.register.apply(contextRegistry, registrationArgs);
+    }
+  });
 }
 
 type TestSetupType = 'beforeEach' | 'beforeAll';
@@ -38,12 +65,26 @@ export function setupHub(mochaContext: Mocha.Suite) {
   });
 
   mochaContext.afterEach(async function () {
+    let context = contextFor(mochaContext);
     await container.teardown();
+    delete context.container;
   });
 
   return {
     getContainer() {
       return container;
+    },
+    async lookup<Name extends keyof TypedKnownServices[Type], Type extends keyof TypedKnownServices = 'default'>(
+      name: Name,
+      opts?: { type: Type }
+    ): Promise<TypedKnownServices[Type][Name]> {
+      return container.lookup(name, opts);
+    },
+    async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
+      return container.instantiate(factory, ...args);
+    },
+    async getPrisma(): Promise<ExtendedPrismaClient> {
+      return await (await container.lookup('prisma-manager')).getClient();
     },
     request() {
       return supertest(server.app.callback());

@@ -7,7 +7,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: PrepaidCard
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{PREPAID_CARD_MANAGER_ADDRESS}"
       abi: PrepaidCardManager
@@ -51,7 +51,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Market
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{PREPAID_CARD_MARKET_ADDRESS}"
       abi: PrepaidCardMarket
@@ -99,7 +99,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Merchant
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{MERCHANT_MANAGER_ADDRESS}"
       abi: MerchantManager
@@ -132,7 +132,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: DeprecatedMerchant
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}"
       abi: DeprecatedMerchantManager_v0_6_7
@@ -165,7 +165,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: MerchantRegistration
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{REGISTER_MERCHANT_HANDLER_ADDRESS}"
       abi: RegisterMerchantHandler
@@ -202,7 +202,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Payments
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{PAY_MERCHANT_HANDLER_ADDRESS}"
       abi: PayMerchantHandler
@@ -245,7 +245,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Splits
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{SPLIT_PREPAID_CARD_HANDLER_ADDRESS}"
       abi: SplitPrepaidCardHandler
@@ -281,7 +281,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: RevenuePool
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{REVENUE_POOL_ADDRESS}"
       abi: RevenuePool
@@ -315,7 +315,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Spend
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{SPEND_ADDRESS}"
       abi: Spend
@@ -347,7 +347,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Depot
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{SUPPLIER_MANAGER_ADDRESS}"
       abi: SupplierManager
@@ -382,7 +382,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: TokenBridge
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
       abi: HomeMultiAMBErc20ToErc677
@@ -419,7 +419,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Gnosis_v1_2
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{GNOSIS_SAFE_PROXY_FACTORY_v1_2}"
       abi: GnosisProxyFactory_v1_2
@@ -450,7 +450,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Gnosis_v1_3
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{GNOSIS_SAFE_PROXY_FACTORY_v1_3}"
       abi: GnosisProxyFactory_v1_3
@@ -481,7 +481,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: UniswapFactory
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{UNISWAP_V2_FACTORY_ADDRESS}"
       abi: UniswapV2Factory
@@ -517,7 +517,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: DaiToken
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{DAI_CPXD_ADDRESS}"
       abi: ERC20
@@ -559,7 +559,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: CardToken
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{CARD_CPXD_ADDRESS}"
       abi: ERC20
@@ -601,7 +601,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: RewardManager
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{REWARD_MANAGER_ADDRESS}"
       abi: RewardManager
@@ -630,7 +630,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: RegisterRewardProgram
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}"
       abi: RegisterRewardProgramHandler
@@ -663,7 +663,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: RewardPool
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       address: "{REWARD_POOL_ADDRESS}"
       abi: RewardPool
@@ -698,7 +698,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: GnosisSafe
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       abi: GnosisSafe
     mapping:
@@ -730,7 +730,7 @@ templates:
 
   - kind: ethereum/contract
     name: UniswapV2Pair
-    network: {NETWORK}
+    network: {LEGACY_NETWORK}
     source:
       abi: UniswapV2Pair
     mapping:

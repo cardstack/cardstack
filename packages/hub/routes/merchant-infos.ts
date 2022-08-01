@@ -1,5 +1,3 @@
-import type { MerchantInfoQueriesFilter } from '../queries/merchant-info';
-
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
@@ -7,28 +5,14 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
-import { CardSpace } from './card-spaces';
-import { query } from '@cardstack/hub/queries';
 import shortUUID from 'short-uuid';
-
-export interface MerchantInfo {
-  id: string;
-  name: string;
-  slug: string;
-  color: string;
-  textColor: string;
-  ownerAddress: string;
-}
+import { MerchantInfo } from '@prisma/client';
 
 export default class MerchantInfosRoute {
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
   merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
-  });
-  cardSpaceQueries = query('card-space', { as: 'cardSpaceQueries' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   reservedWords = inject('reserved-words', {
     as: 'reservedWords',
   });
@@ -43,12 +27,12 @@ export default class MerchantInfosRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
-
-    let params: MerchantInfoQueriesFilter = {
-      ownerAddress: ctx.state.userAddress,
-    };
-
-    let merchantInfos = await this.merchantInfoQueries.fetch(params);
+    let prisma = await this.prismaManager.getClient();
+    let merchantInfos = await prisma.merchantInfo.findMany({
+      where: {
+        ownerAddress: ctx.state.userAddress,
+      },
+    });
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
@@ -60,7 +44,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color'] })) {
+    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color', 'text-color'] })) {
       return;
     }
 
@@ -89,7 +73,8 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    const merchantInfo: MerchantInfo = {
+    let prisma = await this.prismaManager.getClient();
+    const merchantInfo: Omit<MerchantInfo, 'createdAt'> = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
@@ -98,16 +83,18 @@ export default class MerchantInfosRoute {
       ownerAddress: ctx.state.userAddress,
     };
 
-    let db = await this.databaseManager.getClient();
-    let merchantInfoId;
-
-    await this.databaseManager.performTransaction(db, async () => {
-      merchantInfoId = (await this.merchantInfoQueries.insert(merchantInfo, db)).id;
-      await this.cardSpaceQueries.insert({ id: shortUuid.uuid(), merchantId: merchantInfoId } as CardSpace, db);
+    await prisma.$transaction(async () => {
+      await prisma.merchantInfo.create({ data: merchantInfo });
+      await prisma.cardSpace.create({
+        data: {
+          id: shortUuid.uuid(),
+          merchantId: merchantInfo.id,
+        },
+      });
     });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
-      id: merchantInfoId,
+      id: merchantInfo.id,
     });
 
     let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);
@@ -147,7 +134,8 @@ export default class MerchantInfosRoute {
           detail: 'This ID is not allowed',
         };
       } else {
-        let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
+        let prisma = await this.prismaManager.getClient();
+        let merchantInfo = await prisma.merchantInfo.findFirst({ where: { slug } });
         return {
           slugAvailable: merchantInfo ? false : true,
           detail: merchantInfo ? 'This ID is already taken. Please choose another one' : 'ID is available',
@@ -157,17 +145,20 @@ export default class MerchantInfosRoute {
   }
 
   async getFromShortId(ctx: Koa.Context) {
-    let merchantInfos = await this.merchantInfoQueries.fetch({
-      id: shortUUID().toUUID(ctx.params.id),
+    let prisma = await this.prismaManager.getClient();
+    let merchantInfo = await prisma.merchantInfo.findUnique({
+      where: {
+        id: shortUUID().toUUID(ctx.params.id),
+      },
     });
 
-    if (!merchantInfos.length) {
+    if (!merchantInfo) {
       ctx.status = 404;
       return;
     }
 
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serialize(merchantInfos[0]);
+    ctx.body = this.merchantInfoSerializer.serialize(merchantInfo);
     ctx.type = 'application/vnd.api+json';
   }
 }

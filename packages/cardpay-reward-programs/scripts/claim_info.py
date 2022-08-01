@@ -1,13 +1,8 @@
-#!/usr/bin/env python3
-
 import json
-import os
 
-import pandas as pd
 import requests
 import typer
 from cardpay_reward_programs.config import config
-from dotenv import load_dotenv
 from eth_abi import decode_abi
 from hexbytes import HexBytes
 from scripts.utils import Environment

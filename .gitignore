@@ -90,6 +90,7 @@ package-lock.json
 
 
 # generated files for the subgraph
+/packages/cardpay-subgraph/localchain-addresses.json
 /packages/cardpay-subgraph/subgraph.yaml
 /packages/cardpay-subgraph/abis/generated/
 /packages/cardpay-subgraph/src/generated/
@@ -133,3 +134,6 @@ package-lock.json
 service-account.json
 **/ui-debug.log
 **/firebase-debug.log
+
+#python
+.pdm.toml

@@ -1,8 +1,4 @@
-#!/usr/bin/env python3
-
-import pytest
 from cardpay_reward_indexer.config import get_settings
-from cardpay_reward_indexer.database import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

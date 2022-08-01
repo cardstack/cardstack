@@ -1,5 +1,5 @@
 import { Job } from 'graphile-worker';
-import { registry, setupHub } from '../helpers/server';
+import { setupHub, setupRegistry } from '../helpers/server';
 import { expect } from 'chai';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
 import waitFor from '../utils/wait-for';
@@ -50,10 +50,7 @@ class StubMailchimp {
 
 describe('SubscribeEmailTask', function () {
   let subject: SubscribeEmail;
-
-  this.beforeAll(async function () {
-    registry(this).register('mailchimp', StubMailchimp);
-  });
+  setupRegistry(this, ['mailchimp', StubMailchimp]);
 
   let { getContainer } = setupHub(this);
 
@@ -67,7 +64,7 @@ describe('SubscribeEmailTask', function () {
       transport: sentryTransport,
     });
     testkit.reset();
-    subject = (await getContainer().lookup('subscribe-email')) as SubscribeEmail;
+    subject = await getContainer().instantiate(SubscribeEmail);
   });
 
   it('will try to subscribe the provided email to the Mailchimp newsletter', async function () {

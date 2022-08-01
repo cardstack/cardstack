@@ -42,8 +42,6 @@ import InventoryRoute from './routes/inventory';
 import SubgraphService from './services/subgraph';
 import OrderService from './services/order';
 import InventoryService from './services/inventory';
-import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
-import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
@@ -62,7 +60,6 @@ import ReservedWords from './services/reserved-words';
 import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
-import CreateProfile from './tasks/create-profile';
 import Web3HttpService from './services/web3-http';
 import Web3SocketService from './services/web3-socket';
 import ExchangeRatesService from './services/exchange-rates';
@@ -70,19 +67,13 @@ import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gat
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
 import Web3Storage from './services/web3-storage';
 import UploadRouter from './routes/upload';
-import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
-import NotifyCustomerPaymentTask from './tasks/notify-customer-payment';
-import NotifyPrepaidCardDropTask from './tasks/notify-prepaid-card-drop';
-import SendNotificationsTask from './tasks/send-notifications';
 import PushNotificationRegistrationSerializer from './services/serializers/push-notification-registration-serializer';
-import PushNotificationRegistrationsRoute from './routes/push_notification_registrations';
+import PushNotificationRegistrationsRoute from './routes/push-notification-registrations';
 import FirebasePushNotifications from './services/push-notifications/firebase';
 import Contracts from './services/contracts';
 import NotificationPreferenceSerializer from './services/serializers/notification-preference-serializer';
 import NotificationPreferencesRoute from './routes/notification-preferences';
 import NotificationPreferenceService from './services/push-notifications/preferences';
-import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notifications';
-import WyreTransferTask from './tasks/wyre-transfer';
 import { ContractSubscriptionEventHandler } from './services/contract-subscription-event-handler';
 import { HubWorker } from './worker';
 import HubBot from './services/discord-bots/hub-bot';
@@ -92,19 +83,16 @@ import ChecklyWebhookRoute from './routes/checkly-webhook';
 import PagerdutyIncidentsWebhookRoute from './routes/pagerduty-incidents-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
-import { registerQueries } from './queries';
 import EmailCardDropRouter from './services/email-card-drop-router';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
-import SendEmailCardDropVerificationTask from './tasks/send-email-card-drop-verification';
-import SubscribeEmailTask from './tasks/subscribe-email';
 import InAppPurchases from './services/in-app-purchases';
 import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
-import DiscordPostTask from './tasks/discord-post';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
+import PrismaManager from './services/prisma-manager';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -125,7 +113,6 @@ export function createRegistry(): Registry {
   registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
   registry.register('contracts', Contracts);
-  registry.register('create-profile', CreateProfile);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
@@ -143,19 +130,10 @@ export function createRegistry(): Registry {
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
   registry.register('nonce-tracker', NonceTracker);
-  registry.register('send-notifications', SendNotificationsTask);
-  registry.register('notify-customer-payment', NotifyCustomerPaymentTask);
-  registry.register('notify-merchant-claim', NotifyMerchantClaimTask);
-  registry.register('notify-prepaid-card-drop', NotifyPrepaidCardDropTask);
-  registry.register('send-email-card-drop-verification', SendEmailCardDropVerificationTask);
-  registry.register('subscribe-email', SubscribeEmailTask);
-  registry.register('discord-post', DiscordPostTask);
   registry.register('email', Email);
   registry.register('mailchimp', Mailchimp);
   registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
-  registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
-  registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
@@ -177,7 +155,6 @@ export function createRegistry(): Registry {
   registry.register('notification-preference-serializer', NotificationPreferenceSerializer);
   registry.register('notification-preference-service', NotificationPreferenceService);
   registry.register('contract-subscription-event-handler', ContractSubscriptionEventHandler);
-  registry.register('remove-old-sent-notifications', RemoveOldSentNotificationsTask);
   registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
@@ -189,13 +166,13 @@ export function createRegistry(): Registry {
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   registry.register('wyre-prices-route', WyrePricesRoute);
-  registry.register('wyre-transfer', WyreTransferTask);
   registry.register('web3-storage', Web3Storage);
   registry.register('pagerduty-api', PagerdutyApi);
   registry.register('statuspage-api', StatuspageApi);
   registry.register('checkly-webhook-route', ChecklyWebhookRoute);
   registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
+  registry.register('prisma-manager', PrismaManager);
 
   if (process.env.COMPILER) {
     registry.register(
@@ -209,7 +186,6 @@ export function createRegistry(): Registry {
 
   registerServices(registry);
   registerRoutes(registry);
-  registerQueries(registry);
 
   return registry;
 }

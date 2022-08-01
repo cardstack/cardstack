@@ -1,9 +1,9 @@
 import { registry, setupHub } from '../helpers/server';
-import CardSpaceQueries from '../../queries/card-space';
-import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
+import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
-import JobTicketsQueries from '../../queries/job-tickets';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
+import assert from 'assert';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -29,7 +29,10 @@ class StubInAppPurchases {
   }
 }
 
+let prisma: ExtendedPrismaClient;
+
 describe('POST /api/profile-purchases', function () {
+  setupSentry(this);
   let { getJobIdentifiers, getJobPayloads, getJobSpecs } = setupStubWorkerClient(this);
 
   this.beforeEach(function () {
@@ -43,14 +46,10 @@ describe('POST /api/profile-purchases', function () {
   });
 
   let { request, getContainer } = setupHub(this);
-  let merchantInfosQueries: MerchantInfoQueries,
-    cardSpacesQueries: CardSpaceQueries,
-    jobTicketsQueries: JobTicketsQueries;
 
   this.beforeEach(async function () {
-    jobTicketsQueries = await getContainer().lookup('job-tickets', { type: 'query' });
-    merchantInfosQueries = await getContainer().lookup('merchant-info', { type: 'query' });
-    cardSpacesQueries = await getContainer().lookup('card-space', { type: 'query' });
+    let container = getContainer();
+    prisma = await (await container.lookup('prisma-manager')).getClient();
   });
 
   it('validates the purchase, persists merchant information, returns a job ticket, and queues a single-attempt CreateProfile task', async function () {
@@ -131,17 +130,18 @@ describe('POST /api/profile-purchases', function () {
       'a-receipt': 'yes',
     });
 
-    let merchantRecord = (await merchantInfosQueries.fetch({ id: merchantId }))[0];
+    let merchantRecord = await prisma.merchantInfo.findUnique({ where: { id: merchantId } });
+    assert(!!merchantRecord);
     expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
     expect(merchantRecord.slug).to.equal('satoshi');
     expect(merchantRecord.color).to.equal('ff0000');
     expect(merchantRecord.textColor).to.equal('ffffff');
     expect(merchantRecord.ownerAddress).to.equal(stubUserAddress);
 
-    let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
+    let cardSpaceRecord = await prisma.cardSpace.findFirst({ where: { merchantId } });
     expect(cardSpaceRecord).to.exist;
 
-    let jobTicketRecord = await jobTicketsQueries.find(jobTicketId!);
+    let jobTicketRecord = await prisma.jobTicket.findUnique({ where: { id: jobTicketId! } });
     expect(jobTicketRecord?.state).to.equal('pending');
     expect(jobTicketRecord?.ownerAddress).to.equal(stubUserAddress);
     expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId });
@@ -154,17 +154,20 @@ describe('POST /api/profile-purchases', function () {
 
   it('returns the existing job ticket if the request is a duplicate', async function () {
     let existingJobTicketId = shortUUID.uuid();
-    await jobTicketsQueries.insert({
-      id: existingJobTicketId,
-      jobType: 'create-profile',
-      ownerAddress: stubUserAddress,
-      payload: {
-        'another-payload': 'okay',
-      },
-      sourceArguments: {
-        provider: 'a-provider',
-        receipt: {
-          'a-receipt': 'yes',
+    await prisma.jobTicket.create({
+      data: {
+        id: existingJobTicketId,
+        jobType: 'create-profile',
+        ownerAddress: stubUserAddress,
+        payload: {
+          'another-payload': 'okay',
+        },
+        sourceArguments: {
+          provider: 'a-provider',
+          receipt: {
+            'a-receipt': 'yes',
+          },
+          somethingelse: 'hmm',
         },
       },
     });
@@ -233,6 +236,73 @@ describe('POST /api/profile-purchases', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('rejects when the purchase receipt has already been used', async function () {
+    await prisma.jobTicket.create({
+      data: {
+        id: shortUUID.uuid(),
+        jobType: 'create-profile',
+        ownerAddress: '0xsomeoneelse',
+        payload: {
+          'another-payload': 'okay',
+        },
+        sourceArguments: {
+          provider: 'a-provider',
+          receipt: {
+            'a-receipt': 'yes',
+          },
+        },
+      },
+    });
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+            extraneous: 'hello',
+          },
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid purchase receipt',
+            detail: 'Purchase receipt is not valid',
+          },
+        ],
+      });
+  });
+
   it('rejects when the purchase receipt is invalid', async function () {
     shouldValidatePurchase = false;
     purchaseValidationResponse = {
@@ -286,6 +356,16 @@ describe('POST /api/profile-purchases', function () {
           },
         ],
       });
+
+    let sentryReport = await waitForSentryReport();
+
+    expect(sentryReport.tags).to.deep.equal({
+      action: 'profile-purchases-route',
+    });
+
+    expect(sentryReport.error?.message).to.equal(
+      `Unable to validate purchase, response: ${JSON.stringify(purchaseValidationResponse)}`
+    );
   });
 
   it('rejects when the merchant information is incomplete', async function () {
@@ -337,6 +417,11 @@ describe('POST /api/profile-purchases', function () {
             status: '422',
             title: 'Missing required attribute: color',
             detail: 'Required field color was not provided',
+          },
+          {
+            status: '422',
+            title: 'Missing required attribute: text-color',
+            detail: 'Required field text-color was not provided',
           },
         ],
       });
@@ -564,13 +649,15 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects a duplicate slug', async function () {
-    await merchantInfosQueries.insert({
-      id: shortUUID.uuid(),
-      name: 'yes',
-      slug: 'satoshi',
-      color: 'pink',
-      textColor: 'black',
-      ownerAddress: 'me',
+    await prisma.merchantInfo.create({
+      data: {
+        id: shortUUID.uuid(),
+        name: 'yes',
+        slug: 'satoshi',
+        color: 'pink',
+        textColor: 'black',
+        ownerAddress: 'me',
+      },
     });
 
     await request()

@@ -1,0 +1,52 @@
+{
+  "folders": [
+    {
+      "path": "./packages/cardpay-reward-api"
+    },
+    {
+      "path": "./packages/cardpay-reward-indexer"
+    },
+    {
+      "path": "./packages/cardpay-reward-programs"
+    },
+    {
+      "path": "./packages/reward-root-submitter"
+    },
+    {
+      "path": "./packages/cardpay-subgraph-extraction"
+    },
+    {
+      "path": "./packages/cardpay-reward-scheduler"
+    }
+  ],
+  "settings": {
+    "[python]": {
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+      }
+    },
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],
+    "python.testing.pytestArgs": ["tests", "--ignore=${workspaceFolder}/__pypackages__/"],
+    "python.analysis.extraPaths": [
+      "${workspaceFolder}/__pypackages__/3.10/lib",
+      "${workspaceFolder}/__pypackages__/3.9/lib"
+    ],
+    "python.autoComplete.extraPaths": [
+      "${workspaceFolder}/__pypackages__/3.10/lib",
+      "${workspaceFolder}/__pypackages__/3.9/lib"
+    ],
+    "python.linting.flake8Enabled": true
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "bungcip.better-toml",
+      "knowsuchagency.pdm-task-provider"
+    ]
+  }
+}

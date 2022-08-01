@@ -9,6 +9,7 @@ module('Acceptance | wc', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
+  // eslint-disable-next-line qunit/require-expect
   test('it can render a wc page', async function (assert) {
     class WalletAppContext extends AppContext {
       get currentApp(): 'wallet' {

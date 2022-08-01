@@ -82,6 +82,7 @@ module('Acceptance | visit card space', function (hooks) {
       });
     });
 
+    // eslint-disable-next-line qunit/require-expect
     test('renders a user’s card space', async function (assert) {
       await visit('/');
 
@@ -129,6 +130,7 @@ module('Acceptance | visit card space', function (hooks) {
       await percySnapshot(assert);
     });
 
+    // eslint-disable-next-line qunit/require-expect
     test('renders a user’s card space on iOS', async function (assert) {
       this.owner.register(
         'service:ua',
@@ -155,6 +157,7 @@ module('Acceptance | visit card space', function (hooks) {
       await percySnapshot(assert);
     });
 
+    // eslint-disable-next-line qunit/require-expect
     test('renders a user’s card space on Android', async function (assert) {
       this.owner.register(
         'service:ua',
@@ -210,55 +213,49 @@ module('Acceptance | visit card space', function (hooks) {
         );
     });
 
-    module(
-      'authed for this space',
-      async function (this: MirageTestContext, hooks) {
-        hooks.beforeEach(async function (this: MirageTestContext) {
-          // this is the condition for initializing with an authenticated state
-          // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
-          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-          layer2Service = this.owner.lookup('service:layer2-network').strategy;
-          await layer2Service.test__simulateAccountsChanged([
-            layer2AccountAddress,
-          ]);
-        });
+    module('authed for this space', function (this: MirageTestContext, hooks) {
+      hooks.beforeEach(async function (this: MirageTestContext) {
+        // this is the condition for initializing with an authenticated state
+        // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
+        window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+        layer2Service = this.owner.lookup('service:layer2-network').strategy;
+        await layer2Service.test__simulateAccountsChanged([
+          layer2AccountAddress,
+        ]);
+      });
 
-        hooks.afterEach(async function () {
-          delete window.TEST__AUTH_TOKEN;
-        });
+      hooks.afterEach(async function () {
+        delete window.TEST__AUTH_TOKEN;
+      });
 
-        test('it shows when auth is present', async function (assert) {
-          await visit('/');
+      test('it shows when auth is present', async function (assert) {
+        await visit('/');
 
-          assert.dom('[data-test-connect-button]').doesNotExist();
-          assert.dom('[data-test-auth-for-this-space]').exists();
-        });
-      }
-    );
+        assert.dom('[data-test-connect-button]').doesNotExist();
+        assert.dom('[data-test-auth-for-this-space]').exists();
+      });
+    });
 
-    module(
-      'authed but not owner',
-      async function (this: MirageTestContext, hooks) {
-        hooks.beforeEach(async function (this: MirageTestContext) {
-          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-          layer2Service = this.owner.lookup('service:layer2-network').strategy;
-          await layer2Service.test__simulateAccountsChanged([
-            otherLayer2AccountAddress,
-          ]);
-        });
+    module('authed but not owner', function (this: MirageTestContext, hooks) {
+      hooks.beforeEach(async function (this: MirageTestContext) {
+        window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+        layer2Service = this.owner.lookup('service:layer2-network').strategy;
+        await layer2Service.test__simulateAccountsChanged([
+          otherLayer2AccountAddress,
+        ]);
+      });
 
-        hooks.afterEach(async function () {
-          delete window.TEST__AUTH_TOKEN;
-        });
+      hooks.afterEach(async function () {
+        delete window.TEST__AUTH_TOKEN;
+      });
 
-        test('it shows when auth is present', async function (assert) {
-          await visit('/');
+      test('it shows when auth is present', async function (assert) {
+        await visit('/');
 
-          assert.dom('[data-test-connect-button]').doesNotExist();
-          assert.dom('[data-test-auth-not-for-this-space]').exists();
-        });
-      }
-    );
+        assert.dom('[data-test-connect-button]').doesNotExist();
+        assert.dom('[data-test-auth-not-for-this-space]').exists();
+      });
+    });
   });
 
   test('renders an error for a missing slug', async function (this: MirageTestContext, assert) {

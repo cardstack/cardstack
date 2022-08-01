@@ -28,6 +28,11 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
+    - name: Build Prisma client
+      run: yarn run prisma generate
+      shell: bash
+      working-directory: packages/hub
+
     - name: Webpack build
       run: yarn build
       shell: bash
@@ -55,15 +60,6 @@ runs:
       uses: ./.github/actions/waypoint-prune-dangling-resources
       with:
         app: "hub-worker"
-
-    - name: Deploy bot
-      run: waypoint up --app=hub-bot -prune-retain=0 -plain
-      shell: bash
-
-    - name: Prune dangling resources [hub-bot]
-      uses: ./.github/actions/waypoint-prune-dangling-resources
-      with:
-        app: "hub-bot"
 
     - name: Deploy event handler
       run: waypoint up --app=hub-event-listener -prune-retain=0 -plain
