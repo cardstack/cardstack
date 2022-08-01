@@ -1,4 +1,4 @@
-from re import M
+from re import M, fullmatch
 from tkinter import END
 import pytest
 import pandas as pd
@@ -20,13 +20,15 @@ safe_ownership_table = "_SAFE_OWNERSHIP"
 owner_st = st.from_regex("owner\-[0-2]", fullmatch = True)
 safe_st =  st.from_regex("safe\-[0-2]", fullmatch = True)
 card_st = st.from_regex("card\-[0-0]", fullmatch = True)
+depot_st = st.from_regex("depot", fullmatch = True)
 # card_st = st.text("card")
 block_number_st = st.integers(min_value = START_BLOCK - 5, max_value = END_BLOCK + 5)
 balance_st = st.integers(min_value = 22995968, max_value = 24032768)
 
 safe_owner_columns = {
     "owner": {"elements":owner_st, "unique":True},
-    "safe": {"elements":safe_st, "unique":True}
+    "safe": {"elements":safe_st, "unique":True},
+    "type": {"elements":depot_st}
 }
 
 token_holder_columns = {
