@@ -110,11 +110,11 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
     assert
       .dom(EXPLANATION)
       .containsText(
-        'Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment'
+        'Please install the Cardstack Wallet app on your mobile phone, then tap on the link below to complete your payment'
       );
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay with Card Wallet')
+      .containsText('Pay with Cardstack Wallet')
       .hasAttribute('href', deepLinkPaymentURL);
     assert.dom(PAYMENT_URL).containsText(deepLinkPaymentURL);
     assert.dom(LINK_VIEW_TOGGLE).containsText('Show as QR Code');
@@ -129,7 +129,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
     assert
       .dom(EXPLANATION)
       .containsText(
-        'Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment'
+        'Please install the Cardstack Wallet app on your mobile phone, then scan the QR code below to complete your payment'
       );
   });
 
