@@ -80,7 +80,7 @@ Then updating the function in lambda (this also waits for the new one to be live
 
      aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri') && time aws lambda wait function-updated --function-name reward_root_submitter
 
-These steps are combined in the github
+These steps are combined in the github action
 
 ## Issues running on M1
 
