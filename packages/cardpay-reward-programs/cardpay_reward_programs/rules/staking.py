@@ -20,8 +20,8 @@ class Staking(Rule):
         safe_owner_table = aux_table_query
 
         return f"""
-            with balance_changes as (select 
-                safe, 
+            with balance_changes as (select
+                safe,
                 balance_uint64 - lag(balance_uint64, 1 ,0) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
@@ -29,14 +29,14 @@ class Staking(Rule):
                 where _block_number::integer < $2::integer
                 and token = $3::text
                 and safe is not null
-                qualify 
+                qualify
                 _block_number::integer >= $1::integer
                 ),
             original_balances as (select safe,
                 last_value(balance_uint64) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 1 as compounding_rate,
-                from {token_holder_table} 
+                from {token_holder_table}
                 where _block_number::integer < $1::integer
                 and token = $3::text
                 and safe is not null
@@ -46,7 +46,7 @@ class Staking(Rule):
             ),
 
             all_data as (select * from original_balances union all select * from balance_changes)
-            
+
             select owner as payee, sum(change * ((interest_rate**compounding_rate) - 1)) as rewards
             from all_data
             left join {safe_owner_table} using (safe)

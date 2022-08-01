@@ -41,21 +41,21 @@ class DummyRule(Rule):
         ):
             return None
 
-        return f""" 
+        return f"""
             with merchant_safes as (
- 	            select merchant_safe, _block_number
-	            from {spend_accumulation_table}
-	            where _block_number > $1::integer
-	            and _block_number < $2::integer
-	            and historic_spend_balance_uint64 > $3::integer
+                select merchant_safe, _block_number
+                from {spend_accumulation_table}
+                where _block_number > $1::integer
+                and _block_number < $2::integer
+                and historic_spend_balance_uint64 > $3::integer
             ),
             final_safes as (
                 select merchant_safe,
                 max(_block_number)
                 from merchant_safes
-                group by 1      
+                group by 1
             )
-            select safe.owner as payee from {safe_owner_table} as safe, 
+            select safe.owner as payee from {safe_owner_table} as safe,
                 final_safes as f_s
                 where f_s.merchant_safe = safe.safe;
         """
@@ -77,7 +77,7 @@ class DummyRule(Rule):
 
     def run_query(self, tables_names, vars):
         query_string = self.sql_2(tables_names)
-        if query_string == None:
+        if query_string is None:
             df = pd.DataFrame(columns=[])
         else:
             con = duckdb.connect(database=":memory:", read_only=False)

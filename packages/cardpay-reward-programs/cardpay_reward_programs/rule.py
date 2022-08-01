@@ -48,7 +48,7 @@ class Rule(ABC):
 
     def run_query(self, table_query, vars, aux_table_query=None):
         con = duckdb.connect(database=":memory:", read_only=False)
-        if aux_table_query == None:
+        if aux_table_query is None:
             con.execute(self.sql(table_query), vars)
         else:
             con.execute(self.sql(table_query, aux_table_query), vars)
