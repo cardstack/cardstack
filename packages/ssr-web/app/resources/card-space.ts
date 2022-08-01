@@ -4,7 +4,7 @@ import OffChainJsonService from '../services/off-chain-json';
 import { inject as service } from '@ember/service';
 import { isStorage404 } from '@cardstack/ssr-web/utils/fetch-off-chain-json';
 import config from '@cardstack/ssr-web/config/environment';
-import SentryService from '../services/sentry';
+import { getSentry } from '../utils/sentry';
 
 interface Args {
   named: {
@@ -37,7 +37,7 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
   @tracked errored: Error | undefined;
   @tracked is404 = false;
   @service declare offChainJson: OffChainJsonService;
-  @service declare sentry: SentryService;
+  sentry = getSentry();
 
   modify(_positional: any, { slug }: { slug: any }) {
     this.slug = slug;

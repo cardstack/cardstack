@@ -7,7 +7,7 @@ import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import RouterService from '@ember/routing/router-service';
-import SentryService from '../services/sentry';
+import { getSentry } from '../utils/sentry';
 
 interface PayRouteModel {
   network: string;
@@ -21,7 +21,7 @@ export default class PayRoute extends Route {
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
   @service('card-space') declare cardSpace: CardSpaceService;
-  @service('sentry') declare sentry: SentryService;
+  sentry = getSentry();
 
   beforeModel() {
     if (this.cardSpace.isActive) {

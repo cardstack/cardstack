@@ -3,14 +3,13 @@ import config from '../config/environment';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator, timeout } from 'ember-concurrency';
 import { tracked } from '@glimmer/tracking';
-import SentryService from './sentry';
-import { inject as service } from '@ember/service';
+import { getSentry } from '../utils/sentry';
 export default class DegradedServiceDetector extends Service {
   @tracked notificationShown: boolean = false;
   @tracked title: string | null = null;
   @tracked body: string | null = null;
   @tracked impact: 'none' | 'minor' | 'major' | 'critical' | null = null;
-  @service declare sentry: SentryService;
+  sentry = getSentry();
 
   statusPageUrl = config.urls.statusPageUrl;
 

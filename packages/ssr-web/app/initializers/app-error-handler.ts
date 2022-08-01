@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { getSentry } from '../services/sentry';
+import { getSentry } from '../utils/sentry';
 
 /**
  * Initializer to attach an `onError` hook to your app running in fastboot. It catches any run loop

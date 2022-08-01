@@ -12,7 +12,7 @@ import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import { PaymentLinkMode } from '../../common/payment-link';
 import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
 import CardSpaceLogo from '../../../images/logos/card-space-logo-with-background.png';
-import SentryService from '@cardstack/ssr-web/services/sentry';
+import { getSentry } from '@cardstack/ssr-web/utils/sentry';
 
 interface CardSpaceUserPageArgs {
   model: {
@@ -34,7 +34,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
   @tracked address: string | null = null;
   @tracked addressFetchingError: string | null = null;
   @service declare subgraph: Subgraph;
-  @service declare sentry: SentryService;
+  sentry = getSentry();
   cardstackLogoForQR = CardstackLogoForQR;
   defaultAddressFetchingErrorMsg =
     'We ran into an issue while generating the payment request link. Please reload the page and try again. If the issue persists, please contact support.';

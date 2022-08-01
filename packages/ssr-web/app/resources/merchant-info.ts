@@ -3,7 +3,7 @@ import { Resource } from 'ember-resources';
 import OffChainJsonService from '../services/off-chain-json';
 import { inject as service } from '@ember/service';
 import { isStorage404 } from '@cardstack/ssr-web/utils/fetch-off-chain-json';
-import SentryService from '../services/sentry';
+import { getSentry } from '../utils/sentry';
 
 interface Args {
   named: {
@@ -36,7 +36,7 @@ export class MerchantInfo
   @tracked waitForInfo = false;
 
   @service declare offChainJson: OffChainJsonService;
-  @service declare sentry: SentryService;
+  sentry = getSentry();
 
   modify(_positional: any, { infoDID, waitForInfo }: Args['named']) {
     this.infoDID = infoDID;

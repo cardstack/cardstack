@@ -4,18 +4,14 @@ import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import { CardSpace } from '../resources/card-space';
 import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import { isTesting } from '@embroider/macros';
-import SentryService from '../services/sentry';
+import { getSentry } from '../utils/sentry';
 import { action } from '@ember/object';
 import Transition from '@ember/routing/-private/transition';
 
 export default class ApplicationRoute extends Route {
   @service('card-space') declare cardSpace: CardSpaceService;
   @service declare fastboot: Fastboot;
-  @service declare sentry: SentryService;
-
-  beforeModel() {
-    this.sentry.setup();
-  }
+  sentry = getSentry();
 
   async model(): Promise<CardSpace | undefined> {
     if (this.cardSpace.isActive) {

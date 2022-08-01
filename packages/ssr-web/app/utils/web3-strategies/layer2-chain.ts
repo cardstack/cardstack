@@ -25,7 +25,7 @@ import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
-import { getSentry } from '@cardstack/ssr-web/services/sentry';
+import { getSentry } from '@cardstack/ssr-web/utils/sentry';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
