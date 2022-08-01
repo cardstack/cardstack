@@ -1,9 +1,9 @@
-import urllib
-from .main import process_file, setup_logging
-from cloudpathlib import AnyPath
-from .config import Config
 import sys
 
+from cloudpathlib import AnyPath
+
+from .config import Config
+from .main import process_file, setup_logging
 
 config = Config()
 setup_logging(config)

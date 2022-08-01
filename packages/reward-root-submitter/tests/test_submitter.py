@@ -2,12 +2,11 @@ import json
 
 import pytest
 from cloudpathlib import AnyPath
-from cloudpathlib.local.implementations.s3 import LocalS3Client
 from eth_utils import denoms
 from hexbytes import HexBytes
-from reward_root_submitter.contracts import RewardPool
 from reward_root_submitter.config import Config
-from reward_root_submitter.main import get_merkle_root_details, process_file
+from reward_root_submitter.contracts import RewardPool
+from reward_root_submitter.main import get_merkle_root_details
 from web3 import EthereumTesterProvider, Web3
 
 
@@ -227,7 +226,7 @@ def test_validates_path_matches_reward_program():
         )
 
 
-def test_validates_path_matches_reward_program():
+def test_validates_cycle_matches_reward_program():
     with pytest.raises(
         Exception, match=r".* reward program ID in path and in the file do not match.*"
     ):

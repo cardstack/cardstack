@@ -1,11 +1,12 @@
-from dataclasses import dataclass
 import logging
 import re
+from dataclasses import dataclass
 
-from .contracts import RewardPool
 import pyarrow.parquet as pq
 from hexbytes import HexBytes
 from web3 import Web3
+
+from .contracts import RewardPool
 
 NULL_HEX = HexBytes(
     "0x0000000000000000000000000000000000000000000000000000000000000000"

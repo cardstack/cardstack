@@ -1,6 +1,7 @@
-from pydantic import BaseSettings, root_validator, Field
-import boto3
 from functools import lru_cache
+
+import boto3
+from pydantic import BaseSettings, Field, root_validator
 
 
 @lru_cache
