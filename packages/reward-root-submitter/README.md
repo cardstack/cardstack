@@ -28,7 +28,7 @@ To run test, run
 
 ## Running locally
 
-If you install ganache, you can create a fork of sokol or gnosis chain with
+If you install ganache, you can create a fork of sokol or gnosis with
 
     pdm run fork_sokol
 
@@ -36,20 +36,11 @@ And
 
     pdm run fork_gnosis
 
-Create a .env file with the following contents, adding in the private key and the S3 bucket name.
+A submission can be triggered by pointing to a file either local or on S3
 
-    ETHEREUM_NODE_URL=http://127.0.0.1:8545
-    REWARD_POOL_ADDRESS=0xc9A238Ee71A65554984234DF9721dbdA873F84FA
-    OWNER=0x159ADe032073d930E85f95AbBAB9995110c43C71
-    OWNER_PRIVATE_KEY=
-    REWARD_PROGRAM_OUTPUT=
-    LOGLEVEL=INFO
+    ENVIRONMENT=staging EVM_FULL_NODE_URL=http://127.0.0.1:8545 python -m reward_root_submitter.manual file_path_goes_here
 
-Now running
-
-    python -m reward_root_submitter.main
-
-will enter a 60 second loop that will submit the merkle root for all rewards that have been calculated.
+All required config can be overridden by setting an environment variable, otherwise they will be taken from the secrets manager
 
 ## Development
 
@@ -57,13 +48,16 @@ You can run black to format the code with
 
     pdm run black .
 
-You can build the docker image locally with
+## Manually executing
 
-    docker build -t reward_root_submitter .
+The lambda can be triggered manually in the AWS UI, and the code can be run from your local machine.
 
-And run the image with
+Make sure you are in the correct AWS profile for the required environment and run the manual submitter endpoint with a file on S3.
 
-    docker run --network host -v $HOME/.aws/:/root/.aws -v `pwd`/.env:/project/.env --rm -it reward_root_submitter
+For example
+
+    ENVIRONMENT=staging python -m reward_root_submitter.manual  s3://cardpay-staging-reward-programs/rewardProgramID=0x5E4E148baae93424B969a0Ea67FF54c315248BbA/paymentCycle=27071744/results.parquet
+
 
 ## Updating ABIs
 
@@ -78,11 +72,15 @@ You need to build and then copy from the subdirectory `artifacts` all of the non
 
 ## Releasing
 
-You can release a new version on staging by running the following command in the root of the monorepo:
+You can release a new version on staging by building the image from the base of the monorepo:
 
-     waypoint up -app=reward-submit -prune-retain=0
+     waypoint build -app=reward-submit-lambda
 
-This will remove the previous deployment, build the docker image and deploy a new service.
+Then updating the function in lambda (this also waits for the new one to be live)
+
+     aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri') && time aws lambda wait function-updated --function-name reward_root_submitter
+
+These steps are combined in the github
 
 ## Issues running on M1
 
