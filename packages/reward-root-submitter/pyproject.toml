@@ -36,6 +36,3 @@ fork_sokol = "ganache-cli  --fork https://sokol-archive.blockscout.com/"
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
-
-[project.scripts]
-reward_root_submit_loop = "reward_root_submitter.main:run_all"

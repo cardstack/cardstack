@@ -2,7 +2,6 @@ import urllib
 from .main import process_file, setup_logging
 from cloudpathlib import AnyPath
 from .config import Config
-import os
 import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 
