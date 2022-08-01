@@ -16,7 +16,8 @@ function healthCheckMiddleware(req, res, next) {
 
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
-  environment: process.env.SSR_WEB_ENVIRONMENT,
+  environment: process.env.SSR_WEB_ENVIRONMENT ?? 'development',
+  tracesSampleRate: 1.0,
 });
 
 let server = new FastBootAppServer({
