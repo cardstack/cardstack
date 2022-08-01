@@ -25,7 +25,7 @@ class Staking(Rule):
         
         return  f"""
             with filtered_balances as (
-                select tht.safe, tht.balance_uint64::bigint as balance_int64, tht._block_number, tht.token, 
+                select tht.safe, tht.balance_uint64::int64 as balance_int64, tht._block_number, tht.token, 
                 from {token_holder_table} as tht, {safe_owner_table} as sot
                 where tht.safe = sot.safe
                 and sot.type = 'depot'
