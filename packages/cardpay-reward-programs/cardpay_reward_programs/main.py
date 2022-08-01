@@ -9,8 +9,7 @@ from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
-from .utils import write_parquet_file
-from .utils import get_parameters_file_path
+from .utils import get_parameters_file_path, write_parquet_file
 
 load_dotenv()
 

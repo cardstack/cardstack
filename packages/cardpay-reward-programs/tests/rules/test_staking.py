@@ -1,11 +1,12 @@
-import pytest
-import pandas as pd
-import duckdb
 import math
+
+import duckdb
 import hypothesis.strategies as st
+import pandas as pd
+import pytest
 from cardpay_reward_programs.rules import staking
 from hypothesis import given
-from hypothesis.extra.pandas import data_frames, range_indexes, column
+from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
 START_BLOCK = 30

@@ -1,5 +1,5 @@
-from cardpay_reward_programs.rule import Rule
 import pandas as pd
+from cardpay_reward_programs.rule import Rule
 
 
 class Staking(Rule):

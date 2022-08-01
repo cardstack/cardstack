@@ -1,6 +1,7 @@
-import pandas as pd
-import duckdb
 from collections import defaultdict
+
+import duckdb
+import pandas as pd
 from cardpay_reward_programs.rules import staking
 
 
