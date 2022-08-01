@@ -34,7 +34,7 @@ class Rule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def sql(self, table_query, aux_table_query = None):
+    def sql(self, table_query, aux_table_query=None):
         raise NotImplementedError
 
     def _get_table_query(
@@ -46,7 +46,7 @@ class Rule(ABC):
         )
         return f"parquet_scan({local_files})"
 
-    def run_query(self, table_query, vars, aux_table_query = None):
+    def run_query(self, table_query, vars, aux_table_query=None):
         con = duckdb.connect(database=":memory:", read_only=False)
         if aux_table_query == None:
             con.execute(self.sql(table_query), vars)

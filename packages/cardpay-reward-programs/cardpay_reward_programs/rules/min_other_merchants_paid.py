@@ -30,7 +30,7 @@ class MinOtherMerchantsPaid(Rule):
 
         from {table_query}
         where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer and merchant != payee
-        """ 
+        """
 
     def df_to_payment_list(self, df, payment_cycle, reward_program_id):
         if df.empty:

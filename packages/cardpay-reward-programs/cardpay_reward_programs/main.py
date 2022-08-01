@@ -64,4 +64,3 @@ def run_reward_program(
 
 if __name__ == "__main__":
     typer.run(run_reward_program)
-
