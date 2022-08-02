@@ -7,6 +7,7 @@ import {
   ClaimBridgedTokensOptions,
   RelayTokensOptions,
   TxnBlockNumber,
+  DepositLimits,
 } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
@@ -19,7 +20,11 @@ import {
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { fromWei, toWei } from 'web3-utils';
-import { BridgeableSymbol, ConversionFunction } from '../token';
+import {
+  BridgeableSymbol,
+  bridgeableSymbols,
+  ConversionFunction,
+} from '../token';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 interface ClaimBridgedTokensRequest {
@@ -30,6 +35,17 @@ interface ClaimBridgedTokensRequest {
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainId = -1;
   bridgeConfirmationBlockCount = 5;
+  depositLimits = Object.fromEntries(
+    bridgeableSymbols.map((tokenSymbol) => {
+      return [
+        tokenSymbol,
+        {
+          max: new BN(toWei('7500000')),
+          min: new BN(toWei('5')).div(new BN('10')),
+        },
+      ];
+    })
+  ) as Record<BridgeableSymbol, DepositLimits>;
   @tracked isInitializing = false;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
