@@ -302,7 +302,7 @@ module(
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('Amount must be above 0.00 DAI');
+        .containsText('Amount must be at least 0.50 DAI');
     });
 
     test('it clears the unlock transaction hash if the transaction is reverted', async function (assert) {
