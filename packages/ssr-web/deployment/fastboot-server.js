@@ -60,9 +60,8 @@ let server = new FastBootAppServer({
     app.use(logger);
   },
 
-  // TODO: Seems good to confirm + note that afterMiddleware will not run
-  // if fastboot's middleware is successful in getting a response from the ember app
-  // This means that we only see afterMiddleware running if there is an uncaught error
+  // This middleware will only run if there is an error that is not handled within FastBoot
+  // This means that we should not have regular/non-error middleware, eg. loggers here because they won't work
   afterMiddleware: function (app) {
     app.use(Sentry.Handlers.errorHandler());
   },
