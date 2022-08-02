@@ -12,6 +12,7 @@ import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import BN from 'bn.js';
 import { ExtendedPrismaClient } from '../services/prisma-manager';
+import { SeverityLevel } from '@sentry/node';
 
 const log = logger('hub/email-card-drop-requests');
 
@@ -158,7 +159,7 @@ export default class EmailCardDropRequestsRoute {
     if (countOfRecentClaims >= count) {
       // The rate limit flag must be manually cleared by updating the database
       Sentry.captureException(new Error('Card drop rate limit has been triggered'), {
-        level: Sentry.Severity.Fatal,
+        level: 'fatal' as SeverityLevel,
         tags: {
           event: 'email-card-drop-rate-limit-reached',
         },

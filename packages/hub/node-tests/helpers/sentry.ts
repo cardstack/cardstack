@@ -2,6 +2,7 @@ import sentryTestkit from 'sentry-testkit';
 import * as Sentry from '@sentry/node';
 import waitFor from '../utils/wait-for';
 import { Suite } from 'mocha';
+import { NodeClientOptions } from '@sentry/node/types/types';
 
 const { testkit, sentryTransport } = sentryTestkit();
 const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
@@ -17,7 +18,7 @@ export function setupSentry(context: Suite) {
         release: 'test',
         tracesSampleRate: 1,
         transport: sentryTransport,
-      });
+      } as NodeClientOptions);
     });
 
     sentryNeedsInit = false;
