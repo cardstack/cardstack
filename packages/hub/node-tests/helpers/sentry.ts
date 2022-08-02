@@ -2,19 +2,27 @@ import sentryTestkit from 'sentry-testkit';
 import * as Sentry from '@sentry/node';
 import waitFor from '../utils/wait-for';
 import { Suite } from 'mocha';
+import { NodeClientOptions } from '@sentry/node/types/types';
 
 const { testkit, sentryTransport } = sentryTestkit();
 const DUMMY_DSN = 'https://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001';
 
+let sentryNeedsInit = true;
+
 export function setupSentry(context: Suite) {
-  context.beforeAll(function () {
-    Sentry.init({
-      dsn: DUMMY_DSN,
-      release: 'test',
-      tracesSampleRate: 1,
-      transport: sentryTransport,
+  // Only call Sentry.init once to prevent memory leaks
+  if (sentryNeedsInit) {
+    context.beforeAll(function () {
+      Sentry.init({
+        dsn: DUMMY_DSN,
+        release: 'test',
+        tracesSampleRate: 1,
+        transport: sentryTransport,
+      } as NodeClientOptions);
     });
-  });
+
+    sentryNeedsInit = false;
+  }
 
   context.beforeEach(function () {
     testkit.reset();

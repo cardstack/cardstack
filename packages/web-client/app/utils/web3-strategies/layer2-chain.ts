@@ -55,6 +55,7 @@ import { PrepaidCard } from '@cardstack/cardpay-sdk';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import * as Sentry from '@sentry/browser';
+import { SeverityLevel } from '@sentry/browser';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -176,7 +177,7 @@ export default abstract class Layer2ChainWeb3Strategy
         data: {
           url: rpcWssNode,
         },
-        level: Sentry.Severity.Info,
+        level: 'info' as SeverityLevel,
       });
     });
 
@@ -198,8 +199,8 @@ export default abstract class Layer2ChainWeb3Strategy
         // unlike other codes which will only get here after the websocket provider
         // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
         level: [1000, 1001].includes(event.code)
-          ? Sentry.Severity.Info
-          : Sentry.Severity.Error,
+          ? ('info' as SeverityLevel)
+          : ('error' as SeverityLevel),
       });
     });
 
@@ -238,7 +239,7 @@ export default abstract class Layer2ChainWeb3Strategy
           data: {
             account: accounts[0],
           },
-          level: Sentry.Severity.Info,
+          level: 'info' as SeverityLevel,
         });
       } catch (e) {
         console.error(
@@ -265,7 +266,7 @@ export default abstract class Layer2ChainWeb3Strategy
       Sentry.addBreadcrumb({
         type: 'debug',
         message: 'Layer 2 disconnected',
-        level: Sentry.Severity.Info,
+        level: 'info' as SeverityLevel,
       });
       if (error) {
         console.error('error disconnecting', error);

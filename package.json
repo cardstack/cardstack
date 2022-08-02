@@ -100,7 +100,8 @@
       "packages/firebase-functions/**"
     ],
     "nohoist": [
-      "**/@types/loader-utils"
+      "**/@types/loader-utils",
+      "**/wc-provider/**"
     ]
   },
   "private": true,

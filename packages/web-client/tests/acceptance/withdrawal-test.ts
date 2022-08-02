@@ -108,7 +108,7 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(postableSel(2, 0))
       .containsText(
-        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app`
       );
     await waitFor(postableSel(2, 1));
     assert

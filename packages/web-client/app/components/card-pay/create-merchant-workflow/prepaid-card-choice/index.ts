@@ -141,7 +141,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
     try {
       this.chinInProgressMessage =
-        'You will receive a confirmation request from the Card Wallet app in a few moments…';
+        'You will receive a confirmation request from the Cardstack Wallet app in a few moments…';
 
       if (!workflowSession.getValue('prepaidCardAddress')) {
         workflowSession.setValue(
