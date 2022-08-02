@@ -11,6 +11,7 @@ let log = Logger('checkly-webhook');
 // Check names and component names should map to the names and components in Checkly
 type CheckName =
   | 'hub-prod subgraph / RPC node block number diff within threshold'
+  | 'graph-production status'
   | 'xdai archive health check (eth_blockNumber)'
   | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)'
   | 'relay-production health check';
@@ -34,6 +35,11 @@ export default class ChecklyWebhookRoute {
 
   checks: Checks = {
     'hub-prod subgraph / RPC node block number diff within threshold': {
+      componentName: 'Subgraph',
+      incidentName: 'Transactions delayed',
+      incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
+    },
+    'graph-production status': {
       componentName: 'Subgraph',
       incidentName: 'Transactions delayed',
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
