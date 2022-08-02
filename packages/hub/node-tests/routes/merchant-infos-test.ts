@@ -31,7 +31,7 @@ describe('POST /api/merchant-infos', function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
 
-  let { request, getPrisma } = setupHub(this);
+  let { request } = setupHub(this);
 
   it('persists merchant info', async function () {
     const payload = {
@@ -47,8 +47,6 @@ describe('POST /api/merchant-infos', function () {
       },
     };
 
-    let resourceId = null;
-
     await request()
       .post('/api/merchant-infos')
       .send(payload)
@@ -57,7 +55,6 @@ describe('POST /api/merchant-infos', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
       .expect(function (res) {
-        resourceId = res.body.data.id;
         res.body.data.id = 'the-id';
         res.body.data.attributes.did = 'the-did';
       })
@@ -79,11 +76,6 @@ describe('POST /api/merchant-infos', function () {
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
-
-    let prisma = await getPrisma();
-    let cardSpace = await prisma.cardSpace.findFirst({ where: { merchantId: String(resourceId) } });
-
-    expect(cardSpace?.merchantId).to.exist;
   });
 
   it('returns 401 without bearer token', async function () {
@@ -435,7 +427,7 @@ describe('GET /api/merchant-infos/short-id/:id', function () {
 
   this.beforeEach(async function () {
     let prisma = await getPrisma();
-    await prisma.merchantInfo.create({
+    await prisma.profile.create({
       data: {
         id: fullUuid,
         name: 'Merchie!',
