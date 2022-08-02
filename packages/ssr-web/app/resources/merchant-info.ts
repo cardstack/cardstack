@@ -1,9 +1,9 @@
 import { tracked } from '@glimmer/tracking';
 import { Resource } from 'ember-resources';
-import * as Sentry from '@sentry/browser';
 import OffChainJsonService from '../services/off-chain-json';
 import { inject as service } from '@ember/service';
 import { isStorage404 } from '@cardstack/ssr-web/utils/fetch-off-chain-json';
+import { getSentry } from '../utils/sentry';
 
 interface Args {
   named: {
@@ -36,6 +36,7 @@ export class MerchantInfo
   @tracked waitForInfo = false;
 
   @service declare offChainJson: OffChainJsonService;
+  sentry = getSentry();
 
   modify(_positional: any, { infoDID, waitForInfo }: Args['named']) {
     this.infoDID = infoDID;
@@ -52,7 +53,7 @@ export class MerchantInfo
 
       if (!isStorage404(err)) {
         console.log('Exception fetching merchant info', err);
-        Sentry.captureException(err);
+        this.sentry.captureException(err);
       }
     }
   }

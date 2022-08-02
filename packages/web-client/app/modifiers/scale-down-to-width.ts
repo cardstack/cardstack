@@ -57,4 +57,4 @@ function scaleDownToWidth(element: HTMLElement, params: string[]) {
   (child as HTMLElement).style.transformOrigin = 'top left';
 }
 
-export default modifier(scaleDownToWidth);
+export default modifier(scaleDownToWidth, { eager: false });

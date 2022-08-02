@@ -16,7 +16,8 @@ function healthCheckMiddleware(req, res, next) {
 
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
-  environment: process.env.SSR_WEB_ENVIRONMENT,
+  environment: process.env.SSR_WEB_ENVIRONMENT ?? 'development',
+  tracesSampleRate: 1.0,
 });
 
 let server = new FastBootAppServer({
@@ -33,6 +34,7 @@ let server = new FastBootAppServer({
       },
       fetch,
       URLSearchParams,
+      NodeSentry: Sentry,
     });
   },
   // This should be false for Twitter/Linkedin according to https://github.com/ember-fastboot/ember-cli-fastboot/tree/master/packages/fastboot-app-server#twitter-and-linkedin
@@ -48,11 +50,9 @@ let server = new FastBootAppServer({
       if (!ignoreUrlPattern.test(req.url)) {
         let fullUrl = req.get('host') + req.originalUrl;
 
-        console.log(
-          `${new Date().toISOString()}: ${req.method} ${fullUrl} ${
-            res.statusCode
-          }`
-        );
+        // This logger runs before FastBoot has a chance to update the response
+        // So we can't log the status code here
+        console.log(`${new Date().toISOString()}: ${req.method} ${fullUrl}`);
       }
       next();
     };
@@ -60,6 +60,8 @@ let server = new FastBootAppServer({
     app.use(logger);
   },
 
+  // This middleware will only run if there is an error that is not handled within FastBoot
+  // This means that we should not have regular/non-error middleware, eg. loggers here because they won't work
   afterMiddleware: function (app) {
     app.use(Sentry.Handlers.errorHandler());
   },

@@ -129,7 +129,7 @@ export default class PayController extends Controller {
       'Payment Request';
     return {
       title,
-      description: `Use Card Wallet to pay ${paySubject}`,
+      description: `Use Cardstack Wallet to pay ${paySubject}`,
     };
   }
 

@@ -31,7 +31,8 @@ let unclaimedEoa: EmailCardDropRequest = {
   requestedAt: new Date(),
 };
 
-let fakeTime = 1650440847689;
+let fakeTime = 1650440847689; // 2022-04-20 07:47:27
+
 let fakeTimeString = new Date(fakeTime).toISOString();
 class FrozenClock extends Clock {
   now() {
@@ -69,16 +70,13 @@ describe('GET /api/email-card-drop-requests', function () {
     mockPrepaidCardQuantity = 50;
   });
 
-  let { getContainer, getPrisma, request } = setupHub(this);
+  let { getPrisma, request } = setupHub(this);
   let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
     prisma = await getPrisma();
 
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    await emailCardDropRequestsQueries.insert(unclaimedEmailForClaimedEoa);
-    await emailCardDropRequestsQueries.insert(claimedEoa);
-    await emailCardDropRequestsQueries.insert(unclaimedEoa);
+    await prisma.emailCardDropRequest.createMany({ data: [unclaimedEmailForClaimedEoa, claimedEoa, unclaimedEoa] });
   });
 
   it('returns claimed as true if a known EOA has a claim timestamp for its card drop request', async function () {
@@ -114,16 +112,17 @@ describe('GET /api/email-card-drop-requests', function () {
     // Since these values are returned as strings, quantity '50' < reservations '100' is false, checking for true number comparison
     let reservationCount = 100;
 
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     let insertionTimeBeforeExpiry = new Date(fakeTime - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000);
 
     for (let i = 0; i < reservationCount; i++) {
-      await emailCardDropRequestsQueries.insert({
-        ownerAddress: `0xother${i}`,
-        emailHash: `other-email-hash-${i}`,
-        verificationCode: 'x',
-        id: shortUUID.uuid(),
-        requestedAt: insertionTimeBeforeExpiry,
+      await prisma.emailCardDropRequest.create({
+        data: {
+          ownerAddress: `0xother${i}`,
+          emailHash: `other-email-hash-${i}`,
+          verificationCode: 'x',
+          id: shortUUID.uuid(),
+          requestedAt: insertionTimeBeforeExpiry,
+        },
       });
     }
 
@@ -222,26 +221,29 @@ describe('POST /api/email-card-drop-requests', function () {
     mockPrepaidCardQuantity = 50;
   });
 
-  let { getPrisma, getContainer, request } = setupHub(this);
+  let { getContainer, getPrisma, request } = setupHub(this);
+  let clock: Clock;
   let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
+    clock = await getContainer().lookup('clock');
     prisma = await getPrisma();
   });
 
   it('persists an email card drop request and triggers jobs', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
     let insertionTimeBeyondExpiry = fakeTime - emailVerificationLinkExpiryMinutes * 2 * 60 * 1000;
 
     // Create no-longer-active reservations
 
     for (let i = 0; i < mockPrepaidCardQuantity + 1; i++) {
-      await emailCardDropRequestsQueries.insert({
-        ownerAddress: `0xother${i}`,
-        emailHash: `other-email-hash-${i}`,
-        verificationCode: 'x',
-        id: shortUUID.uuid(),
-        requestedAt: new Date(insertionTimeBeyondExpiry),
+      await prisma.emailCardDropRequest.create({
+        data: {
+          ownerAddress: `0xother${i}`,
+          emailHash: `other-email-hash-${i}`,
+          verificationCode: 'x',
+          id: shortUUID.uuid(),
+          requestedAt: new Date(insertionTimeBeyondExpiry),
+        },
       });
     }
 
@@ -269,7 +271,9 @@ describe('POST /api/email-card-drop-requests', function () {
         resourceId = res.body.data.id;
       });
 
-    let emailCardDropRequest = (await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress }))[0];
+    let emailCardDropRequest = (
+      await prisma.emailCardDropRequest.findManyWithExpiry({ where: { ownerAddress: stubUserAddress } }, clock)
+    )[0];
 
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
@@ -316,8 +320,6 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('persists a new request for a given EOA and runs jobs if a request is present but has not been claimed', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-
     let email = 'valid@example.com';
     let email2 = 'second.valid.email@example.com';
 
@@ -327,15 +329,19 @@ describe('POST /api/email-card-drop-requests', function () {
     let emailHash2 = crypto.createHmac('sha256', config.get('emailHashSalt')).update(email2).digest('hex');
 
     let insertionTimeInMs = fakeTime - 60 * 1000;
-    await emailCardDropRequestsQueries.insert({
-      ownerAddress: stubUserAddress,
-      emailHash,
-      verificationCode: 'x',
-      id: '2850a954-525d-499a-a5c8-3c89192ad40e',
-      requestedAt: new Date(insertionTimeInMs),
+    await prisma.emailCardDropRequest.create({
+      data: {
+        ownerAddress: stubUserAddress,
+        emailHash,
+        verificationCode: 'x',
+        id: '2850a954-525d-499a-a5c8-3c89192ad40e',
+        requestedAt: new Date(insertionTimeInMs),
+      },
     });
 
-    expect((await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress })).length).to.equal(1);
+    expect(
+      (await prisma.emailCardDropRequest.findManyWithExpiry({ where: { ownerAddress: stubUserAddress } }, clock)).length
+    ).to.equal(1);
 
     const payload = {
       data: {
@@ -359,8 +365,13 @@ describe('POST /api/email-card-drop-requests', function () {
         resourceId = res.body.data.id;
       });
 
-    let allRequests = await emailCardDropRequestsQueries.query({ ownerAddress: stubUserAddress });
-    let latestRequest = await emailCardDropRequestsQueries.latestRequest(stubUserAddress);
+    let allRequests = await prisma.emailCardDropRequest.findManyWithExpiry(
+      {
+        where: { ownerAddress: stubUserAddress },
+      },
+      clock
+    );
+    let latestRequest = await prisma.emailCardDropRequest.latestRequestForOwner(stubUserAddress, clock);
 
     expect(allRequests.length).to.equal(2);
     expect(allRequests.find((v) => v.id === '2850a954-525d-499a-a5c8-3c89192ad40e')).to.not.be.undefined;
@@ -398,16 +409,17 @@ describe('POST /api/email-card-drop-requests', function () {
 
     let reservationCount = mockPrepaidCardQuantity + 1;
 
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    let insertionTimeBeforeExpiry = Date.now() - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
+    let insertionTimeBeforeExpiry = clock.now() - (emailVerificationLinkExpiryMinutes / 2) * 60 * 1000;
 
     for (let i = 0; i < reservationCount; i++) {
-      await emailCardDropRequestsQueries.insert({
-        ownerAddress: `0xother${i}`,
-        emailHash: `other-email-hash-${i}`,
-        verificationCode: 'x',
-        id: shortUUID.uuid(),
-        requestedAt: new Date(insertionTimeBeforeExpiry),
+      await prisma.emailCardDropRequest.create({
+        data: {
+          ownerAddress: `0xother${i}`,
+          emailHash: `other-email-hash-${i}`,
+          verificationCode: 'x',
+          id: shortUUID.uuid(),
+          requestedAt: new Date(insertionTimeBeforeExpiry),
+        },
       });
     }
 
@@ -506,15 +518,15 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('rejects and triggers the rate limit if enough drops have happened in the interval', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-
     let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+
+    let timeWithinRateLimitWindow = fakeTime - (periodMinutes / 2) * 60 * 1000; // 2022-04-20 07:37:27
 
     for (let i = 0; i <= count; i++) {
       let claim = Object.assign({}, claimedEoa);
-      claim.claimedAt = new Date(fakeTime - periodMinutes * 60 * 1000);
+      claim.claimedAt = new Date(timeWithinRateLimitWindow);
       claim.id = shortUUID.uuid();
-      await emailCardDropRequestsQueries.insert(claim);
+      await prisma.emailCardDropRequest.create({ data: claim });
     }
 
     const payload = {
@@ -558,15 +570,13 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-
     let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
 
     for (let i = 0; i <= count * 2; i++) {
       let claim = Object.assign({}, claimedEoa);
       claim.claimedAt = new Date(fakeTime - 2 * periodMinutes * 60 * 1000);
       claim.id = shortUUID.uuid();
-      await emailCardDropRequestsQueries.insert(claim);
+      await prisma.emailCardDropRequest.create({ data: claim });
     }
 
     const payload = {
@@ -617,15 +627,15 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('rejects when the owner address has already claimed', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-
-    await emailCardDropRequestsQueries.insert({
-      ownerAddress: stubUserAddress,
-      emailHash: 'abc123',
-      verificationCode: 'I4I.FX8OUx',
-      id: '2850a954-525d-499a-a5c8-3c89192ad40e',
-      requestedAt: new Date(),
-      claimedAt: new Date(),
+    await prisma.emailCardDropRequest.create({
+      data: {
+        ownerAddress: stubUserAddress,
+        emailHash: 'abc123',
+        verificationCode: 'I4I.FX8OUx',
+        id: '2850a954-525d-499a-a5c8-3c89192ad40e',
+        requestedAt: new Date(),
+        claimedAt: new Date(),
+      },
     });
 
     let email = 'valid@example.com';
@@ -657,21 +667,21 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('rejects when the email has already claimed', async function () {
-    let emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-
     let email = 'example@gmail.com';
 
     let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
-    await emailCardDropRequestsQueries.insert({
-      ownerAddress: '0xanother-address',
-      emailHash,
-      verificationCode: 'I4I.FX8OUx',
-      id: '2850a954-525d-499a-a5c8-3c89192ad40e',
-      requestedAt: new Date(),
-      claimedAt: new Date(),
+    await prisma.emailCardDropRequest.create({
+      data: {
+        ownerAddress: '0xanother-address',
+        emailHash,
+        verificationCode: 'I4I.FX8OUx',
+        id: '2850a954-525d-499a-a5c8-3c89192ad40e',
+        requestedAt: new Date(),
+        claimedAt: new Date(),
+      },
     });
 
     const payload = {
