@@ -306,23 +306,23 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   }
 
   async maxPerTx(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.maxPerTx(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.maxPerTx(tokenAddress).call());
   }
 
   async minPerTx(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.minPerTx(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.minPerTx(tokenAddress).call());
   }
 
   async dailyLimit(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.dailyLimit(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.dailyLimit(tokenAddress).call());
   }
 
-  async getCurrentDay(): Promise<BN> {
+  async getCurrentDay(): Promise<string> {
     return await (await this.getForeignBridge()).methods.getCurrentDay().call();
   }
   async totalSpentPerDay(tokenAddress: string): Promise<BN> {
     let currentDay = await this.getCurrentDay();
-    return await (await this.getForeignBridge()).methods.totalSpentPerDay(tokenAddress, currentDay).call();
+    return new BN(await (await this.getForeignBridge()).methods.totalSpentPerDay(tokenAddress, currentDay).call());
   }
 
   private async getNextNonce(from?: string): Promise<BN> {
