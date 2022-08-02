@@ -363,8 +363,8 @@ export default abstract class Layer1ChainWeb3Strategy
           return [
             tokenSymbol,
             {
-              min,
-              max,
+              min: new BN(min),
+              max: new BN(max),
             },
           ];
         })
