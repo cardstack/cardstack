@@ -25,7 +25,7 @@ import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
-import * as Sentry from '@sentry/browser';
+import { getSentry } from '@cardstack/ssr-web/utils/sentry';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -55,6 +55,7 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked walletConnectUri: string | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
+  sentry = getSentry();
 
   @reads('provider.connector') connector!: IConnector;
 
@@ -107,13 +108,13 @@ export default abstract class Layer2ChainWeb3Strategy
 
     this.provider.on('websocket-connected', () => {
       console.log('websocket connected');
-      Sentry.addBreadcrumb({
+      this.sentry.addBreadcrumb({
         type: 'debug',
         message: 'Websocket connected',
         data: {
           url: rpcNodeWssUrl,
         },
-        level: Sentry.Severity.Info,
+        level: this.sentry.Severity.Info,
       });
     });
 
@@ -121,7 +122,7 @@ export default abstract class Layer2ChainWeb3Strategy
       this.simpleEmitter.emit('websocket-disconnected');
       this.disconnect();
       console.log('websocket disconnected');
-      Sentry.addBreadcrumb({
+      this.sentry.addBreadcrumb({
         type: 'debug',
         message: 'Websocket connection closed',
         data: {
@@ -135,8 +136,8 @@ export default abstract class Layer2ChainWeb3Strategy
         // unlike other codes which will only get here after the websocket provider
         // fails to reconnect, 1000 and 1001 will get here immediately if the closing was clean
         level: [1000, 1001].includes(event.code)
-          ? Sentry.Severity.Info
-          : Sentry.Severity.Error,
+          ? this.sentry.Severity.Info
+          : this.sentry.Severity.Error,
       });
     });
 

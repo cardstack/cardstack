@@ -16,7 +16,8 @@ function healthCheckMiddleware(req, res, next) {
 
 Sentry.init({
   dsn: process.env.SSR_WEB_SERVER_SENTRY_DSN,
-  environment: process.env.SSR_WEB_ENVIRONMENT,
+  environment: process.env.SSR_WEB_ENVIRONMENT ?? 'development',
+  tracesSampleRate: 1.0,
 });
 
 let server = new FastBootAppServer({
@@ -33,6 +34,7 @@ let server = new FastBootAppServer({
       },
       fetch,
       URLSearchParams,
+      NodeSentry: Sentry,
     });
   },
   // This should be false for Twitter/Linkedin according to https://github.com/ember-fastboot/ember-cli-fastboot/tree/master/packages/fastboot-app-server#twitter-and-linkedin
@@ -57,9 +59,18 @@ let server = new FastBootAppServer({
       next();
     };
 
+    // TODO: reconsider how we're using this logger.
+    // Afaik we can't tell if the response status code is correct at the point of logging
+    // eg. visiting wallet.cardstack.com/does-not-exist produces
+    // 2022-08-01T06:47:23.085Z 0RQ2XN: 2022-08-01T06:47:23.085Z: GET wallet.cardstack.com/does-not-exist 200
+    // which is misleading. We should remove the status code
+    // Also worth noting that afterMiddleware might not run
     app.use(logger);
   },
 
+  // TODO: Seems good to confirm + note that afterMiddleware will not run
+  // if fastboot's middleware is successful in getting a response from the ember app
+  // This means that we only see afterMiddleware running if there is an uncaught error
   afterMiddleware: function (app) {
     app.use(Sentry.Handlers.errorHandler());
   },

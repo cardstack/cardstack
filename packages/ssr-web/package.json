@@ -161,6 +161,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
+    "@sentry/node": "^6.17.9",
     "@walletconnect/core": "^1.6.0",
     "@walletconnect/iso-crypto": "^1.6.0",
     "broadcastchannel-polyfill": "^1.0.1",
