@@ -50,21 +50,13 @@ let server = new FastBootAppServer({
       if (!ignoreUrlPattern.test(req.url)) {
         let fullUrl = req.get('host') + req.originalUrl;
 
-        console.log(
-          `${new Date().toISOString()}: ${req.method} ${fullUrl} ${
-            res.statusCode
-          }`
-        );
+        // This logger runs before FastBoot has a chance to update the response
+        // So we can't log the status code here
+        console.log(`${new Date().toISOString()}: ${req.method} ${fullUrl}`);
       }
       next();
     };
 
-    // TODO: reconsider how we're using this logger.
-    // Afaik we can't tell if the response status code is correct at the point of logging
-    // eg. visiting wallet.cardstack.com/does-not-exist produces
-    // 2022-08-01T06:47:23.085Z 0RQ2XN: 2022-08-01T06:47:23.085Z: GET wallet.cardstack.com/does-not-exist 200
-    // which is misleading. We should remove the status code
-    // Also worth noting that afterMiddleware might not run
     app.use(logger);
   },
 
