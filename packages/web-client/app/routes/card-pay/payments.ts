@@ -19,7 +19,7 @@ const MERCHANTS_PANEL = {
         'Create a payment profile',
         'Request and receive payments from customers, fans, and friends via QR code or short link',
         'Review your transaction history',
-        'Confirm transactions with Touch ID or Face ID in the Card Wallet mobile app',
+        'Confirm transactions with Touch ID or Face ID in the Cardstack Wallet mobile app',
       ],
       cta: 'Create Payment Profile',
       isCtaDisabled: false,

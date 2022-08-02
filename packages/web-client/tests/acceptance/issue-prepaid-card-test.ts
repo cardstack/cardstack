@@ -110,7 +110,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        `Before we get started, please connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app.`
+        `Before we get started, please connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app.`
       );
 
     assert
@@ -212,7 +212,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'To store card customization data in the Cardstack Hub, you need to authenticate using your Card Wallet'
+        'To store card customization data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet'
       );
     post = postableSel(1, 1);
     await click(
@@ -786,7 +786,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .containsText(
           `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,

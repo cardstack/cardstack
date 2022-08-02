@@ -138,7 +138,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         });
       } else {
         this.chinInProgressMessage =
-          'You will receive a confirmation request from the Card Wallet app in a few moments…';
+          'You will receive a confirmation request from the Cardstack Wallet app in a few moments…';
         let options: TransactionOptions = {
           onTxnHash: (txnHash: TransactionHash) => {
             this.txnHash = txnHash;

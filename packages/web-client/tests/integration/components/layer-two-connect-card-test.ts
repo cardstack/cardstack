@@ -136,7 +136,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
     assert
       .dom('[data-test-layer-2-connect-prompt]')
-      .containsText('Install the Card Wallet app on your mobile phone');
+      .containsText('Install the Cardstack Wallet app on your mobile phone');
   });
 
   test('It does not show the connect prompt when workflow is completed and wallet is disconnected', async function (assert) {
