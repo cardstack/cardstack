@@ -50,27 +50,18 @@ let server = new FastBootAppServer({
       if (!ignoreUrlPattern.test(req.url)) {
         let fullUrl = req.get('host') + req.originalUrl;
 
-        console.log(
-          `${new Date().toISOString()}: ${req.method} ${fullUrl} ${
-            res.statusCode
-          }`
-        );
+        // This logger runs before FastBoot has a chance to update the response
+        // So we can't log the status code here
+        console.log(`${new Date().toISOString()}: ${req.method} ${fullUrl}`);
       }
       next();
     };
 
-    // TODO: reconsider how we're using this logger.
-    // Afaik we can't tell if the response status code is correct at the point of logging
-    // eg. visiting wallet.cardstack.com/does-not-exist produces
-    // 2022-08-01T06:47:23.085Z 0RQ2XN: 2022-08-01T06:47:23.085Z: GET wallet.cardstack.com/does-not-exist 200
-    // which is misleading. We should remove the status code
-    // Also worth noting that afterMiddleware might not run
     app.use(logger);
   },
 
-  // TODO: Seems good to confirm + note that afterMiddleware will not run
-  // if fastboot's middleware is successful in getting a response from the ember app
-  // This means that we only see afterMiddleware running if there is an uncaught error
+  // This middleware will only run if there is an error that is not handled within FastBoot
+  // This means that we should not have regular/non-error middleware, eg. loggers here because they won't work
   afterMiddleware: function (app) {
     app.use(Sentry.Handlers.errorHandler());
   },
