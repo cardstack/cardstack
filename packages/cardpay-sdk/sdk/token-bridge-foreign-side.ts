@@ -92,7 +92,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       let dailyLimit = await this.dailyLimit(tokenAddress);
       let totalSpentPerDay = await this.totalSpentPerDay(tokenAddress);
       throw new Error(`
-        unlock action NOT within configured limits
+        unlock action NOT within configured limits. Attempted to unlock ${fromWei(amount)} amount of tokens
 
           Minimum Amount Per Tx: ${fromWei(minPerTx)}
           Maximum Amount Per Tx: ${fromWei(maxPerTx)}
@@ -169,7 +169,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       let dailyLimit = await this.dailyLimit(tokenAddress);
       let totalSpentPerDay = await this.totalSpentPerDay(tokenAddress);
       throw new Error(`
-        relay action NOT within configured limits
+        relay action NOT within configured limits. Attempted to relay ${fromWei(amount)} amount of tokens
 
           Minimum Amount Per Tx: ${fromWei(minPerTx)}
           Maximum Amount Per Tx: ${fromWei(maxPerTx)}
