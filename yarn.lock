@@ -4546,6 +4546,16 @@
     jquery "^3.4.1"
     resolve "^1.11.1"
 
+"@ember/legacy-built-in-components@^0.4.0":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@ember/legacy-built-in-components/-/legacy-built-in-components-0.4.1.tgz#5c0319be8f8d0b3b43c44912c3710da4fab7b274"
+  integrity sha512-tLxiU1YR+A+002rkGfwyB4FK8bO5qqU/3c7cZ1z2j3XG+1T28Yg2iZuMxPwFJ0LsE//mhRFkWlGzO3tJUtMHbA==
+  dependencies:
+    "@embroider/macros" "^1.0.0"
+    ember-cli-babel "^7.26.6"
+    ember-cli-htmlbars "^5.7.1"
+    ember-cli-typescript "^4.1.0"
+
 "@ember/optional-features@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@ember/optional-features/-/optional-features-2.0.0.tgz#c809abd5a27d5b0ef3c6de3941334ab6153313f0"
@@ -17303,11 +17313,12 @@ ember-head@^1.0.0:
   dependencies:
     "@embroider/addon-shim" "^1.0.0"
 
-ember-href-to@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-4.1.0.tgz#daa8b398bc5a51ba3ba5ff736e099f0a0d010b7b"
-  integrity sha512-h8xSzt9lQAUzk4JvXNnZjRj29hOWKo92VIHzH68io13UurDBaMmJ4WtXa0iy/awlSFs6h8BwpEWQeaCYIZDRuQ==
+ember-href-to@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-5.0.0.tgz#e70da7f056f341126481d5c2f4b7c6ddc6ecebed"
+  integrity sha512-IkcgPir4x4x6HvwPqHwIY3DQqreyMtCK/yXacAuQdeYCm/6lNzYMazSBZfkNRRahHXfAiPAXIw1DZK39UlovCw==
   dependencies:
+    "@ember/legacy-built-in-components" "^0.4.0"
     ember-cli-babel "^7.13.2"
 
 ember-in-element-polyfill@^1.0.1:
