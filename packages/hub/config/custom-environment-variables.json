@@ -27,6 +27,11 @@
     "allowedChannels": "CARDBOT_ALLOWED_CHANNELS",
     "onCallInternalWebhook": "DISCORD_ON_CALL_INTERNAL_WEBHOOK"
   },
+  "iap": {
+    "google": {
+      "serviceAccount": {"__name": "GOOGLE_IAP_SERVICE_ACCOUNT", "__format": "json"}
+    }
+  },
   "mailchimp": {
     "apiKey": "MAILCHIMP_API_KEY"
   },

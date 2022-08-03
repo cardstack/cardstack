@@ -21063,12 +21063,27 @@ google-gax@^2.24.1:
     protobufjs "6.11.2"
     retry-request "^4.0.0"
 
+google-oauth-jwt@^0.1.6:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/google-oauth-jwt/-/google-oauth-jwt-0.1.7.tgz#3ebb79848aba2602aecc0b482244253df8238033"
+  integrity sha512-vI+7yM3k+sF0lfYq6V7OlLN+puzusWtPkEYRPOSpPndU6BY8nq3uVItSLQg2njYBuozupMcxo892YsuXhRT6hg==
+  dependencies:
+    debug "^2.1.3"
+    request ">=2.55"
+
 google-p12-pem@^3.0.3:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/google-p12-pem/-/google-p12-pem-3.1.2.tgz#c3d61c2da8e10843ff830fdb0d2059046238c1d4"
   integrity sha512-tjf3IQIt7tWCDsa0ofDQ1qqSCNzahXDxdAGJDbruWqu3eCg5CKLYKN+hi0s6lfvzYZ1GDVr+oDF9OOWlDSdf0A==
   dependencies:
     node-forge "^0.10.0"
+
+google-play-billing-validator@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/google-play-billing-validator/-/google-play-billing-validator-2.1.3.tgz#a498161107a837fa38f09327b7e891ef646f1cbf"
+  integrity sha512-rBodLLOE7XGpkTy3p5C5l6rESfob8URlrIK3oTvIMSMo+vi+hDEWJYMV9zBFOQK3n9w3QS4F1sntpcKXFoYbpQ==
+  dependencies:
+    google-oauth-jwt "^0.1.6"
 
 got@9.6.0, got@^9.6.0:
   version "9.6.0"
@@ -29326,7 +29341,7 @@ repeating@^2.0.0:
   dependencies:
     is-finite "^1.0.0"
 
-request@^2.79.0, request@^2.85.0, request@^2.87.0, request@^2.88.0, request@^2.88.2:
+request@>=2.55, request@^2.79.0, request@^2.85.0, request@^2.87.0, request@^2.88.0, request@^2.88.2:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
