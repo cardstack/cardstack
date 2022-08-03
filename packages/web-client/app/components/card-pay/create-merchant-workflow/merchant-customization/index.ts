@@ -207,13 +207,14 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
 
       this.merchantIdValidationMessage =
         'There was an error validating payment profile ID uniqueness';
+      this.lastCheckedMerchantId = '';
+      this.lastCheckedMerchantIdValid = false;
 
       if (e.message.startsWith('No valid auth token')) {
         let { workflowSession } = this.args;
         workflowSession?.workflow?.cancel('UNAUTHENTICATED');
         throw new Error('UNAUTHENTICATED');
       }
-      this.lastCheckedMerchantIdValid = false;
       return;
     }
   }
