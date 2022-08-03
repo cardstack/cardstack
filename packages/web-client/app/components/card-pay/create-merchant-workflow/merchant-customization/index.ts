@@ -149,7 +149,21 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     this.merchantNameValidationMessage = message;
   }
 
-  @action async validateMerchantId() {
+  @action async validateMerchantId(earlyReturnForBlur = false) {
+    if (earlyReturnForBlur) {
+      if (!this.merchantId) {
+        // we know it's invalid if there's no merchant id, so we don't need the previous task to keep running
+        taskFor(this.validateMerchantIdTask).cancelAll();
+        this.merchantIdValidationMessage = 'This field is required';
+        this.lastCheckedMerchantId = '';
+        this.lastCheckedMerchantIdValid = false;
+      }
+      // if there is a merchant id, blur validation is a no-op
+      // let the last validation task from input continue if it needs to
+      // otherwise we keep the current state
+      return;
+    }
+
     try {
       await taskFor(this.validateMerchantIdTask).perform();
     } catch (e) {
