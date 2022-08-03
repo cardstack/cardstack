@@ -2,9 +2,9 @@ import json
 import logging
 
 import requests
+from eth_utils import to_wei
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
-from eth_utils import to_wei
 
 
 class Contract:
