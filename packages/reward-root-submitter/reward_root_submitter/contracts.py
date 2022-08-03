@@ -2,6 +2,8 @@ import json
 import logging
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 from eth_utils import to_wei
 
 
@@ -16,8 +18,11 @@ class Contract:
         raise Exception("This function must be implemented in the base class")
 
     def get_gas_price(self, speed="average"):
+        session = requests.Session()
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1))
+        session.mount("https://", adapter)
         gas_price_oracle = "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle"
-        current_values = requests.get(gas_price_oracle).json()
+        current_values = session.get(gas_price_oracle).json()
         gwei = current_values[speed]
         return to_wei(gwei, "gwei")
 
