@@ -49,9 +49,9 @@ def get_merkle_root_details(reward_output_filename):
             f"{reward_output_filename} does not have a valid checksummed address for the reward program ID"
         )
     payment_cycle = safe_regex_group_search(
-        r"paymentCycle=(\d*)", str(reward_output_filename), 1
+        r"paymentCycle=(\d+)/", str(reward_output_filename), 1
     )
-    if not (payment_cycle or "").isdigit():
+    if payment_cycle is None:
         raise Exception(
             f"{reward_output_filename} does not have a valid payment cycle, should be not blank and a number"
         )
