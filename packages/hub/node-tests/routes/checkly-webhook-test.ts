@@ -34,7 +34,7 @@ describe('POST /callbacks/checkly', async function () {
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .send({
-        check_name: 'hub-prod subgraph / RPC node block number diff within threshold',
+        check_name: 'graph-production status check',
         alert_type: 'ALERT_FAILURE',
       })
       .expect(200);
@@ -53,7 +53,7 @@ describe('POST /callbacks/checkly', async function () {
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .send({
-        check_name: 'hub-prod subgraph / RPC node block number diff within threshold',
+        check_name: 'graph-production status check',
         alert_type: 'ALERT_DEGRADED',
       })
       .expect(200);
@@ -72,7 +72,7 @@ describe('POST /callbacks/checkly', async function () {
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .send({
-        check_name: 'hub-prod subgraph / RPC node block number diff within threshold',
+        check_name: 'graph-production status check',
         alert_type: 'ALERT_RECOVERY',
       })
       .expect(200);
