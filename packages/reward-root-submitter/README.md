@@ -2,7 +2,7 @@
 
 This project is for taking calculated merkle roots for reward payments and submitting them on-chain.
 
-Results from the reward calculations are taken from the S3 bucket specified
+Results from the reward calculations are taken from the S3 bucket for that environment and submitted on chain. This is triggered from an S3 event ("s3:ObjectCreated:*") for all files that have a suffix "results.parquet". The code here will then do safety checks to make sure the file contents match the location (rewardProgramID and paymentCycle match).
 
 ## Installation
 
