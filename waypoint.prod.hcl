@@ -428,6 +428,37 @@ app "reward-submit" {
   }
 }
 
+
+app "reward-submit-lambda" {
+  path = "./packages/reward-root-submitter"
+
+
+  build {
+    use "docker" {
+      dockerfile = "Dockerfile"
+    }
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "reward-root-submitter-lambda"
+        tag        = "latest"
+      }
+    }
+  }
+
+  deploy {
+  use "aws-lambda" {
+    region = "us-east-1"
+  }
+}
+
+  url {
+    auto_hostname = false
+  }
+}
+
+
 app "reward-api" {
   path = "./packages/cardpay-reward-api"
 
