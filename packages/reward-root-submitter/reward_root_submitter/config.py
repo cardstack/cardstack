@@ -23,7 +23,7 @@ class Config(BaseSettings):
     reward_root_submitter_address: str
     reward_root_submitter_private_key: str
     reward_root_submitter_sentry_dsn: str
-    log_level: str = Field("WARNING")
+    log_level: str = Field("INFO")
 
     @root_validator(pre=True)
     def load_secrets(cls, values):
