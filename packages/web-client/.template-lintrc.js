@@ -47,6 +47,7 @@ function validatePossibleConfigNode(rule, node) {
 }
 
 module.exports = {
+<<<<<<< HEAD
   extends: 'octane',
   plugins: [
     {
@@ -65,4 +66,7 @@ module.exports = {
     },
     'no-unknown-config-key': 'error',
   },
+=======
+  extends: 'recommended',
+>>>>>>> eda0b0885 (v3.25.2...v4.6.0)
 };
