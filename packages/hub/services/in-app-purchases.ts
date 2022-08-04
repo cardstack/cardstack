@@ -2,6 +2,8 @@
 import config from 'config';
 import GoogleReceiptVerify from 'google-play-billing-validator';
 
+const googleIapConfig: any = config.get('iap.google');
+
 interface InAppPurchaseValidationResult {
   valid: boolean;
   response: any;
@@ -42,8 +44,8 @@ export default class InAppPurchases {
   private async validateFromGoogle(token: string): Promise<InAppPurchaseValidationResult> {
     try {
       let result = await this.googleVerifier.verifyINAPP({
-        packageName: 'com.cardstack.cardpay',
-        productId: '0001',
+        packageName: googleIapConfig.packageName,
+        productId: googleIapConfig.productId,
         purchaseToken: token,
       });
 
