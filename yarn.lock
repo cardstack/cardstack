@@ -4568,14 +4568,6 @@
     mkdirp "^1.0.4"
     silent-error "^1.1.1"
 
-"@ember/render-modifiers@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@ember/render-modifiers/-/render-modifiers-1.0.2.tgz#2e87c48db49d922ce4850d707215caaac60d8444"
-  integrity sha512-6tEnHl5+62NTSAG2mwhGMFPhUrJQjoVqV+slsn+rlTknm2Zik+iwxBQEbwaiQOU1FUYxkS8RWcieovRNMR8inQ==
-  dependencies:
-    ember-cli-babel "^7.10.0"
-    ember-modifier-manager-polyfill "^1.1.0"
-
 "@ember/render-modifiers@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@ember/render-modifiers/-/render-modifiers-2.0.4.tgz#0ac7af647cb736076dbfcd54ca71e090cd329d71"
@@ -11538,19 +11530,19 @@ babel-plugin-ember-data-packages-polyfill@^0.1.2:
   dependencies:
     "@ember-data/rfc395-data" "^0.0.4"
 
-babel-plugin-ember-modules-api-polyfill@*, babel-plugin-ember-modules-api-polyfill@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-ember-modules-api-polyfill/-/babel-plugin-ember-modules-api-polyfill-3.5.0.tgz#27b6087fac75661f779f32e60f94b14d0e9f6965"
-  integrity sha512-pJajN/DkQUnStw0Az8c6khVcMQHgzqWr61lLNtVeu0g61LRW0k9jyK7vaedrHDWGe/Qe8sxG5wpiyW9NsMqFzA==
-  dependencies:
-    ember-rfc176-data "^0.3.17"
-
 babel-plugin-ember-modules-api-polyfill@^2.6.0:
   version "2.13.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-ember-modules-api-polyfill/-/babel-plugin-ember-modules-api-polyfill-2.13.4.tgz#cf62bc9bfd808c48d810d5194f4329e9453bd603"
   integrity sha512-uxQPkEQAzCYdwhZk16O9m1R4xtCRNy4oEUTBrccOPfzlIahRZJic/JeP/ZEL0BC6Mfq6r55eOg6gMF/zdFoCvA==
   dependencies:
     ember-rfc176-data "^0.3.13"
+
+babel-plugin-ember-modules-api-polyfill@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-ember-modules-api-polyfill/-/babel-plugin-ember-modules-api-polyfill-3.5.0.tgz#27b6087fac75661f779f32e60f94b14d0e9f6965"
+  integrity sha512-pJajN/DkQUnStw0Az8c6khVcMQHgzqWr61lLNtVeu0g61LRW0k9jyK7vaedrHDWGe/Qe8sxG5wpiyW9NsMqFzA==
+  dependencies:
+    ember-rfc176-data "^0.3.17"
 
 babel-plugin-ember-template-compilation@^1.0.0:
   version "1.0.0"
@@ -17396,7 +17388,7 @@ ember-maybe-in-element@^2.0.3:
     ember-cli-version-checker "^5.1.1"
     ember-in-element-polyfill "^1.0.1"
 
-ember-modifier-manager-polyfill@^1.1.0, ember-modifier-manager-polyfill@^1.2.0:
+ember-modifier-manager-polyfill@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ember-modifier-manager-polyfill/-/ember-modifier-manager-polyfill-1.2.0.tgz#cf4444e11a42ac84f5c8badd85e635df57565dda"
   integrity sha512-bnaKF1LLKMkBNeDoetvIJ4vhwRPKIIumWr6dbVuW6W6p4QV8ZiO+GdF8J7mxDNlog9CeL9Z/7wam4YS86G8BYA==
