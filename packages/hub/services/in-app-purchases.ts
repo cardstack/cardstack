@@ -40,26 +40,29 @@ export default class InAppPurchases {
   }
 
   private async validateFromGoogle(token: string): Promise<InAppPurchaseValidationResult> {
-    let verify = new GoogleReceiptVerify({
-      email: this.jwt.client_email,
-      key: this.jwt.private_key,
-    });
+    try {
+      let result = await this.googleVerifier.verifyINAPP({
+        packageName: 'com.cardstack.cardpay',
+        productId: '0001',
+        purchaseToken: token,
+      });
 
-    let result = await verify.verifyINAPP({
-      packageName: 'com.cardstack.cardpay',
-      productId: '0001',
-      purchaseToken: token,
-    });
-
-    if (result.isSuccessful && result.payload.purchaseState === 0) {
-      return { valid: true, response: result.payload };
-    } else {
-      return { valid: false, response: result.payload };
+      if (result.isSuccessful && result.payload.purchaseState === 0) {
+        return { valid: true, response: result.payload };
+      } else {
+        return { valid: false, response: result.payload };
+      }
+    } catch (e) {
+      return { valid: false, response: e };
     }
   }
 
-  private get jwt(): any {
-    return config.get('iap.google.serviceAccount');
+  private get googleVerifier(): any {
+    let serviceAccount: any = config.get('iap.google.serviceAccount');
+    return new GoogleReceiptVerify({
+      email: serviceAccount.client_email,
+      key: serviceAccount.private_key,
+    });
   }
 }
 
