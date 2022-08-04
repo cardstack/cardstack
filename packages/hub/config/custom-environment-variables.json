@@ -29,7 +29,7 @@
   },
   "iap": {
     "google": {
-      "serviceAccount": {"__name": "GOOGLE_IAP_SERVICE_ACCOUNT", "__format": "json"}
+      "serviceAccount": {"__name": "HUB_GOOGLE_IAP_SERVICE_ACCOUNT", "__format": "json"}
     }
   },
   "mailchimp": {
