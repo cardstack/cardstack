@@ -91,7 +91,7 @@ import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
 import ProfilesRoute from './routes/profiles';
-import ProfileSerializer from './services/serializers/merchant-info-serializer';
+import ProfileSerializer from './services/serializers/profile-serializer';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
 import PrismaManager from './services/prisma-manager';
