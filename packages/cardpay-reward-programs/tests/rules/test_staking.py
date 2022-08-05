@@ -21,14 +21,16 @@ owner_st = st.from_regex("owner\-[0-2]", fullmatch = True)
 safe_st =  st.from_regex("safe\-[0-2]", fullmatch = True)
 card_st = st.from_regex("card\-[0-0]", fullmatch = True)
 depot_st = st.from_regex("depot", fullmatch = True)
+block_number_so_st = st.integers(min_value = 0, max_value = 1)
 # card_st = st.text("card")
-block_number_st = st.integers(min_value = START_BLOCK - 5, max_value = END_BLOCK + 5)
-balance_st = st.integers(min_value = 22995968, max_value = 24032768)
+block_number_st = st.integers(min_value = 1, max_value = END_BLOCK + 50)
+balance_st = st.integers(min_value = 0, max_value = 24032768)
 
 safe_owner_columns = {
     "owner": {"elements":owner_st, "unique":True},
     "safe": {"elements":safe_st, "unique":True},
-    "type": {"elements":depot_st}
+    "type": {"elements":depot_st},
+    "_block_number": {"elements": block_number_so_st}
 }
 
 token_holder_columns = {
@@ -98,7 +100,6 @@ def get_amount(result, payee, idx):
     idx = result.index[result["payee"] == payee].tolist()[0]
     return result.loc[idx, "amount"]
    
-
 def test_correct_calc_rewards(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
         {
@@ -162,17 +163,20 @@ def test_correct_calc_rewards(monkeypatch):
         {
             "safe":"safe1",
             "owner":"owner1",
-            "type":"depot"
+            "type":"depot",
+            "_block_number": 0
         },
         {
             "safe":"safe2",
             "owner":"owner2",
-            "type":"depot"
+            "type":"depot",
+            "_block_number": 0
         },
         {
             "safe":"safe3",
             "owner":"owner3",
-            "type":"depot"
+            "type":"depot",
+            "_block_number": 0
         }
     ])
 
@@ -184,7 +188,6 @@ def test_correct_calc_rewards(monkeypatch):
     assert math.ceil(get_amount(result, "owner1", 0)) == math.ceil(82.26866088)
     assert math.ceil(get_amount(result, "owner2", 1)) == math.ceil(80.74)
     assert math.ceil(get_amount(result, "owner3", 2)) == math.ceil(60)
-
 
 def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
@@ -206,7 +209,8 @@ def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
         {
             "safe":"safe1",
             "owner":"owner1",
-            "type":"depot"
+            "type":"depot",
+            "_block_number": 0
         }
     ])
 
@@ -216,7 +220,6 @@ def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     result = rule.run(60, "0x0")
     
     assert pytest.approx(get_amount(result, "owner1", 0)) == 120
-
 
 def test_correct_calc_rewards_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
@@ -232,7 +235,8 @@ def test_correct_calc_rewards_in_cycle(monkeypatch):
         {
             "safe":"safe1",
             "owner":"owner1",
-            "type":"depot"
+            "type":"depot",
+            "_block_number": 0
         }
     ])
 
@@ -242,6 +246,117 @@ def test_correct_calc_rewards_in_cycle(monkeypatch):
     result = rule.run(30, "0x0")
     
     assert pytest.approx(get_amount(result, "owner1", 0)) == 60
+
+def test_correct_filtering_of_safe_type(monkeypatch):
+    fake_data_token_holder = pd.DataFrame([
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": "safe1",
+            "balance_uint64": 1000
+        },
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": "safe2",
+            "balance_uint64": 1000
+        }
+    ])
+
+    fake_data_safe_owner = pd.DataFrame([
+        {
+            "safe":"safe1",
+            "owner":"owner1",
+            "type":"depot",
+            "_block_number": 0
+        },
+        {
+            "safe":"safe1",
+            "owner":"owner1",
+            "type":"prepaid",
+            "_block_number": 0
+        }
+    ])
+
+    rule = create_rule(
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
+    )
+    result = rule.run(30, "0x0")
+    assert len(result) == 1
+
+def test_correct_filtering_of_token(monkeypatch):
+    fake_data_token_holder = pd.DataFrame([
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": "safe1",
+            "balance_uint64": 1000
+        },
+        {
+            "_block_number": 0,
+            "token": "card-1",
+            "safe": "safe2",
+            "balance_uint64": 1000
+        }
+    ])
+
+    fake_data_safe_owner = pd.DataFrame([
+        {
+            "safe":"safe1",
+            "owner":"owner1",
+            "type":"depot",
+            "_block_number": 0
+        },
+        {
+            "safe":"safe2",
+            "owner":"owner2",
+            "type":"depot",
+            "_block_number": 0
+        }
+    ])
+
+    rule = create_rule(
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
+    )
+    result = rule.run(30, "0x0")
+    assert len(result) == 1
+
+def test_change_of_safes_during_payment_cycle(monkeypatch):
+    fake_data_token_holder = pd.DataFrame([
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": "safe1",
+            "balance_uint64": 1000
+        },
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": "safe2",
+            "balance_uint64": 1000
+        }
+    ])
+
+    fake_data_safe_owner = pd.DataFrame([
+        {
+            "safe":"safe1",
+            "owner":"owner1",
+            "type":"depot",
+            "_block_number": 0
+        },
+        {
+            "safe":"safe1",
+            "owner":"owner2",
+            "type":"depot",
+            "_block_number": 10
+        }
+    ])
+
+    rule = create_rule(
+        monkeypatch, fake_data_token_holder, fake_data_safe_owner
+    )
+    result = rule.run(30, "0x0")
+    assert len(result) == 1
 
 @given(token_holder_df, safe_owner_df)
 def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
@@ -259,6 +374,8 @@ def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
         
         result = rule.run(END_BLOCK, "0x0")
         assert len(result) == len(safes_set)
+
+
 
 @given(token_holder_df, safe_owner_df)  
 def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
@@ -281,6 +398,7 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
                 owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe )["owner"][0]
                 if type(owner) == str:
                     payees_list.append(owner)
+
         result = rule.run(END_BLOCK, "0x0")
         all_positive_rewards = True
         
@@ -288,6 +406,10 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
             if result.where(result["payee"] == payee)["amount"][0] <= 0:
                 all_positive_rewards = False
         assert all_positive_rewards
+
+
+
+
 
 
 

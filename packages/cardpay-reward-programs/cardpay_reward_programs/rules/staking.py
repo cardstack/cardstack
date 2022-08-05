@@ -24,9 +24,18 @@ class Staking(Rule):
         safe_owner_table = aux_table_query
         
         return  f"""
-            with filtered_balances as (
+            with filtered_safes as (
+                SELECT safe, _block_number, type, owner
+                FROM {safe_owner_table} a
+                WHERE _block_number = (
+                    SELECT MAX(_block_number)
+                    FROM {safe_owner_table} b
+                    WHERE a.safe = b.safe
+                )
+            ), 
+            filtered_balances as (
                 select tht.safe, tht.balance_uint64::int64 as balance_int64, tht._block_number, tht.token, 
-                from {token_holder_table} as tht, {safe_owner_table} as sot
+                from {token_holder_table} as tht, filtered_safes as sot
                 where tht.safe = sot.safe
                 and sot.type = 'depot'
             ),
@@ -36,8 +45,7 @@ class Staking(Rule):
                 $5::float+1 as interest_rate,
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
                 from filtered_balances
-                where 
-                _block_number::integer < $2::integer
+                where _block_number::integer < $2::integer
                 and token = $3::text
                 and safe is not null
                 qualify 
@@ -60,7 +68,7 @@ class Staking(Rule):
             
             select owner as payee, sum(change * ((interest_rate**compounding_rate) - 1)) as rewards
             from all_data
-            left join {safe_owner_table} using (safe)
+            left join filtered_safes using (safe)
             group by payee
         """        
 
