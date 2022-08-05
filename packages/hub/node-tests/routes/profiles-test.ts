@@ -196,6 +196,9 @@ describe.only('/api/profiles', function () {
               color: 'red',
               'text-color': 'purple',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              links: [],
+              'profile-description': null,
+              'profile-image-url': null,
             },
           },
         })
@@ -567,7 +570,12 @@ describe.only('/api/profiles', function () {
             type: 'profiles',
             id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
             attributes: {
-              did: 'did:cardstack:1cnaSutV4uMuyyJZcJ7ktsTw51955a8a4770c7e3',
+              did: 'did:cardstack:1mnaSutV4uMuyyJZcJ7ktsTw991de486680a9262',
+              name: 'Satoshi?',
+              slug: 'satoshi',
+              color: 'black',
+              'text-color': 'red',
+              'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'profile-description': "Satoshi's place",
               'profile-image-url': 'https://test.com/profile.jpg',
               links: [{ title: 'Link1', url: 'https://test.com/something' }],

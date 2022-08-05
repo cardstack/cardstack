@@ -36,6 +36,9 @@ export default class ProfileSerializer {
             color: model.color,
             'text-color': model.textColor,
             'owner-address': model.ownerAddress,
+            links: model.links,
+            'profile-description': model.profileDescription,
+            'profile-image-url': model.profileImageUrl,
           },
         },
       };
