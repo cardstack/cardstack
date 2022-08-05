@@ -322,6 +322,10 @@ def test_correct_filtering_of_token(monkeypatch):
     assert len(result) == 1
 
 def test_change_of_safes_during_payment_cycle(monkeypatch):
+    """
+        For this test I am assuming the safe_owner has a block_number as token holde but I am not entirely sure
+        This is test currently passed 
+    """
     fake_data_token_holder = pd.DataFrame([
         {
             "_block_number": 0,
@@ -362,6 +366,8 @@ def test_change_of_safes_during_payment_cycle(monkeypatch):
 def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
     """
     testing that number of safes within range matches the len of payees
+    NOTE: This test is currently not passing the in testing_safe_transfers branch because
+    I believe this rule is not considering that safe_owner table has the column block_number
     """
     with MonkeyPatch.context() as monkeypatch:
         rule = create_rule(
