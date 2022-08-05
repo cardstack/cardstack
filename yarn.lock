@@ -16911,7 +16911,7 @@ ember-cli-get-component-path-option@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-cli-get-component-path-option/-/ember-cli-get-component-path-option-1.0.0.tgz#0d7b595559e2f9050abed804f1d8eff1b08bc771"
 
-ember-cli-htmlbars@^4.2.2, ember-cli-htmlbars@^4.2.3, ember-cli-htmlbars@^4.3.1:
+ember-cli-htmlbars@^4.2.3, ember-cli-htmlbars@^4.3.1:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-4.5.0.tgz#d299e4f7eba6f30dc723ee086906cc550beb252e"
   integrity sha512-bYJpK1pqFu9AadDAGTw05g2LMNzY8xTCIqQm7dMJmKEoUpLRFbPf4SfHXrktzDh7Q5iggl6Skzf1M0bPlIxARw==
@@ -17800,14 +17800,6 @@ ember-set-helper@^2.0.0:
   dependencies:
     ember-cli-babel "^7.18.0"
     ember-cli-htmlbars "^4.2.3"
-
-ember-simple-set-helper@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/ember-simple-set-helper/-/ember-simple-set-helper-0.1.2.tgz#f0aad11f35df5f0396561ee4552c1790d8ef0930"
-  integrity sha512-Dx66Ki7tqd3R0MpAmE1j1pTI/K5OAcW4XYpz0T23x8KVUWbaZE9zGGUPlxsczf/44ML3kyIvS7rzQ+6DHS7dkw==
-  dependencies:
-    ember-cli-babel "^7.17.2"
-    ember-cli-htmlbars "^4.2.2"
 
 ember-sinon-qunit@^6.0.0:
   version "6.0.0"
