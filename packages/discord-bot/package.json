@@ -9,7 +9,7 @@
     "@cardstack/cardpay-sdk": "1.0.7",
     "@cardstack/db": "1.0.7",
     "@cardstack/logger": "^0.2.1",
-    "@sentry/node": "^6.10.0",
+    "@sentry/node": "^7.8.0",
     "@types/fs-extra": "^9.0.11",
     "@types/node": "^16.0.0",
     "@types/qrcode": "^1.4.1",

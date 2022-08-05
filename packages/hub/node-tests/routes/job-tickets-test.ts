@@ -27,6 +27,79 @@ describe('JobTicket endpoints', function () {
     prisma = await getPrisma();
   });
 
+  describe('GET /api/job-tickets', function () {
+    let [jobTicketId, anotherJobTicketid, otherOwnerJobTicketId] = [
+      shortUUID.uuid(),
+      shortUUID.uuid(),
+      shortUUID.uuid(),
+    ];
+
+    this.beforeEach(async function () {
+      await prisma.jobTicket.createMany({
+        data: [
+          {
+            id: jobTicketId,
+            jobType: 'boom',
+            ownerAddress: stubUserAddress,
+            result: { 'a-result': 'yes' },
+            state: 'success',
+          },
+          {
+            id: anotherJobTicketid,
+            jobType: 'ajob',
+            ownerAddress: stubUserAddress,
+            result: 'yay',
+            state: 'success',
+          },
+          {
+            id: otherOwnerJobTicketId,
+            jobType: 'boom',
+            ownerAddress: '0x111',
+          },
+        ],
+      });
+    });
+
+    it('returns the job ticket details', async function () {
+      await request()
+        .get(`/api/job-tickets`)
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(200)
+        .expect({
+          data: [
+            {
+              id: jobTicketId,
+              type: 'job-tickets',
+              attributes: { state: 'success', result: { 'a-result': 'yes' } },
+            },
+            {
+              id: anotherJobTicketid,
+              type: 'job-tickets',
+              attributes: { state: 'success', result: 'yay' },
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+
+    it('returns 401 without bearer token', async function () {
+      await request()
+        .get(`/api/job-tickets`)
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(401)
+        .expect({
+          errors: [
+            {
+              status: '401',
+              title: 'No valid auth token',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+  });
+
   describe('GET /api/job-tickets/:id', function () {
     let jobTicketId: string, otherOwnerJobTicketId: string;
 

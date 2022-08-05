@@ -1,8 +1,9 @@
 import type { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 import { registry, setupHub } from '../helpers/server';
-import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 import config from 'config';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
+import { Clock } from '../../services/clock';
 
 const { sku } = config.get('cardDrop');
 const { url: webClientUrl } = config.get('webClient');
@@ -47,25 +48,25 @@ let unclaimedEoaWithClaimedEmailHash: EmailCardDropRequest = {
   requestedAt: new Date(),
 };
 
-let emailCardDropRequestsQueries: EmailCardDropRequestsQueries;
-
 describe('GET /email-card-drop/verify', function () {
   let provisionedAddress = '0x123';
   let provisionedSku = 'sku';
   let mockTxnHash = '0x456';
   let provisionPrepaidCardCalls = 0;
   let provisioningShouldError = false;
+  let clock: Clock;
+  let prisma: ExtendedPrismaClient;
 
   class StubRelayService {
     async provisionPrepaidCardV2(userAddress: string, requestedSku: string) {
       provisionPrepaidCardCalls++;
+      provisionedAddress = userAddress;
+      provisionedSku = requestedSku;
 
       if (provisioningShouldError) {
         throw new Error('provisioning should error');
       }
 
-      provisionedAddress = userAddress;
-      provisionedSku = requestedSku;
       return Promise.resolve(mockTxnHash);
     }
   }
@@ -78,13 +79,13 @@ describe('GET /email-card-drop/verify', function () {
     provisioningShouldError = false;
   });
 
-  let { request, getContainer } = setupHub(this);
+  let { request, getContainer, getPrisma } = setupHub(this);
 
   this.beforeEach(async function () {
-    emailCardDropRequestsQueries = await getContainer().lookup('email-card-drop-requests', { type: 'query' });
-    await emailCardDropRequestsQueries.insert(claimedEoa);
-    await emailCardDropRequestsQueries.insert(unclaimedEoa);
-    await emailCardDropRequestsQueries.insert(unclaimedEoaOlderEntry);
+    clock = await getContainer().lookup('clock');
+    prisma = await getPrisma();
+
+    await prisma.emailCardDropRequest.createMany({ data: [claimedEoa, unclaimedEoa, unclaimedEoaOlderEntry] });
   });
 
   it('accepts a valid verification, marks it claimed, calls the relay service, and redirects to a success page', async function () {
@@ -93,9 +94,14 @@ describe('GET /email-card-drop/verify', function () {
     );
 
     let newlyClaimed = (
-      await emailCardDropRequestsQueries!.query({
-        id: unclaimedEoa.id,
-      })
+      await prisma.emailCardDropRequest.findManyWithExpiry(
+        {
+          where: {
+            id: unclaimedEoa.id,
+          },
+        },
+        clock
+      )
     )[0]!;
 
     expect(newlyClaimed.claimedAt).to.exist;
@@ -118,7 +124,7 @@ describe('GET /email-card-drop/verify', function () {
   });
 
   it('rejects an expired verification link', async function () {
-    await emailCardDropRequestsQueries.insert(unclaimedButExpiredEoa);
+    await prisma.emailCardDropRequest.create({ data: unclaimedButExpiredEoa });
 
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedButExpiredEoa.ownerAddress}&verification-code=${unclaimedButExpiredEoa.verificationCode}&email-hash=${unclaimedButExpiredEoa.emailHash}`
@@ -130,7 +136,7 @@ describe('GET /email-card-drop/verify', function () {
   });
 
   it('rejects a used email hash', async function () {
-    await emailCardDropRequestsQueries.insert(unclaimedEoaWithClaimedEmailHash);
+    await prisma.emailCardDropRequest.create({ data: unclaimedEoaWithClaimedEmailHash });
 
     let response = await request().get(
       `/email-card-drop/verify?eoa=${unclaimedEoaWithClaimedEmailHash.ownerAddress}&verification-code=${unclaimedEoaWithClaimedEmailHash.verificationCode}&email-hash=${unclaimedEoaWithClaimedEmailHash.emailHash}`
@@ -183,9 +189,14 @@ describe('GET /email-card-drop/verify', function () {
     );
 
     let newlyClaimed = (
-      await emailCardDropRequestsQueries!.query({
-        id: unclaimedEoa.id,
-      })
+      await prisma.emailCardDropRequest.findManyWithExpiry(
+        {
+          where: {
+            id: unclaimedEoa.id,
+          },
+        },
+        clock
+      )
     )[0]!;
 
     expect(newlyClaimed.claimedAt).to.exist;

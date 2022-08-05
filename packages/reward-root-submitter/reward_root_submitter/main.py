@@ -1,58 +1,97 @@
 import logging
-import os
-import time
+import re
+from dataclasses import dataclass
 
-import schedule
-import sentry_sdk
-from dotenv import load_dotenv
+import pyarrow.parquet as pq
+from hexbytes import HexBytes
 from web3 import Web3
 
-from .submitter import RootSubmitter
+from .contracts import RewardPool
 
-load_dotenv()  # take environment variables from .env
-for expected_env in [
-    "EVM_FULL_NODE_URL",
-    "OWNER",
-    "OWNER_PRIVATE_KEY",
-    "REWARD_POOL_ADDRESS",
-    "REWARD_PROGRAM_OUTPUT",
-    "ENVIRONMENT",
-]:
-    if expected_env not in os.environ:
-        raise ValueError(f"Missing environment variable {expected_env}")
+NULL_HEX = HexBytes(
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+)
 
-LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
-logging.basicConfig(level=LOGLEVEL)
-SENTRY_DSN = os.environ.get("SENTRY_DSN")
-if SENTRY_DSN is not None:
-    sentry_sdk.init(
-        SENTRY_DSN,
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
-        environment=os.environ.get("ENVIRONMENT"),
+EMPTY_MARKER_HEX = HexBytes(
+    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+)
+
+
+@dataclass
+class MerkleRoot:
+    reward_program_id: str
+    payment_cycle: int
+    merkle_root_hash: HexBytes
+
+
+def setup_logging(config):
+    logging.basicConfig(level=config.log_level.upper())
+
+
+def safe_regex_group_search(regex, string, group):
+    """
+    Returns None in the case of a missing group
+    """
+    match = re.search(regex, string)
+    if match:
+        return match.group(group)
+    else:
+        return None
+
+
+def get_merkle_root_details(reward_output_filename):
+
+    reward_program_id = safe_regex_group_search(
+        r"rewardProgramID=([^/]*)", str(reward_output_filename), 1
+    )
+    if not Web3().isChecksumAddress(reward_program_id):
+        raise Exception(
+            f"{reward_output_filename} does not have a valid checksummed address for the reward program ID"
+        )
+    payment_cycle = safe_regex_group_search(
+        r"paymentCycle=(\d+)/", str(reward_output_filename), 1
+    )
+    if payment_cycle is None:
+        raise Exception(
+            f"{reward_output_filename} does not have a valid payment cycle, should be not blank and a number"
+        )
+    with reward_output_filename.open("rb") as pf:
+        payment_file = pq.ParquetFile(pf)
+        # Read only a single row and a single column
+        try:
+            file_start = next(payment_file.iter_batches(batch_size=1))
+            first_row = file_start.to_pylist()[0]
+            root = HexBytes(first_row["root"])
+            if HexBytes(reward_program_id) != HexBytes(first_row["rewardProgramID"]):
+                raise Exception(
+                    f"{reward_output_filename} reward program ID in path and in the file do not match"
+                )
+            if payment_cycle != str(first_row["paymentCycle"]):
+                raise Exception(
+                    f"{reward_output_filename} payment cycle in path and in the file do not match"
+                )
+        except StopIteration:
+            root = EMPTY_MARKER_HEX
+        payment_cycle = int(payment_cycle)
+    return MerkleRoot(
+        reward_program_id=reward_program_id,
+        payment_cycle=payment_cycle,
+        merkle_root_hash=root,
     )
 
 
-def run_all():
+def process_file(reward_output_filename, config):
+    evm_node = config.evm_full_node_url
+    w3 = Web3(Web3.HTTPProvider(evm_node))
 
-    submitter = RootSubmitter(
-        Web3(Web3.HTTPProvider(os.getenv("EVM_FULL_NODE_URL"))),
-        os.getenv("OWNER"),
-        os.getenv("OWNER_PRIVATE_KEY"),
-        os.getenv("REWARD_POOL_ADDRESS"),
-        os.getenv("REWARD_PROGRAM_OUTPUT"),
+    merkle_root_details = get_merkle_root_details(reward_output_filename)
+
+    reward_pool_contract = RewardPool(w3)
+    reward_pool_contract.setup_from_environment(config.environment)
+    reward_pool_contract.submit_merkle_root(
+        merkle_root_details.reward_program_id,
+        merkle_root_details.payment_cycle,
+        merkle_root_details.merkle_root_hash,
+        config.reward_root_submitter_address,
+        config.reward_root_submitter_private_key,
     )
-    # Default to one minute
-    frequency = os.getenv("SUBMIT_FREQUENCY", 60)
-    schedule.every(frequency).seconds.do(submitter.submit_all_roots)
-    schedule.run_all()
-    # Go into an infinite loop
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-if __name__ == "__main__":
-    run_all()

@@ -1,4 +1,3 @@
-
 {
   // Use IntelliSense to learn about possible Node.js debug attributes.
   // Hover to view descriptions of existing attributes.
@@ -49,7 +48,7 @@
       "program": "${workspaceRoot}/packages/hub/bin/corde",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": ["--files", "./bot-tests/services/discord-bots/hub-bot/**/*.ts"],
+      "args": ["--files", "./bot-tests/services/discord-bots/hub-bot/**/*.ts"]
     },
     {
       "type": "node",
@@ -125,7 +124,7 @@
         "bridge",
         "to-l2",
         "200",
-        "${config:cardCli.network.l1.daiToken}", // Kovan DAI 
+        "${config:cardCli.network.l1.daiToken}", // Kovan DAI
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
         "--network",
         "${config:cardCli.network.l1.name}",
@@ -775,7 +774,7 @@
         "admin",
         "create-program",
         "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71",  //reward program
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //reward program
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -906,7 +905,7 @@
         "${config:cardCli.mnemonic}"
       ]
     },
-        {
+    {
       "type": "node",
       "request": "launch",
       "name": "Cardpay testnet: Check Rewards Claim Params",
@@ -1122,6 +1121,27 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Add Reward Rule",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "admin",
+        "add-rule",
+        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027",
+        "0x73F92405b438D85ee46539a8FaDbBCa04C155F81",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Resolve DID",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
@@ -1157,5 +1177,26 @@
         "${config:cardCli.mnemonic}"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode DID",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "did",
+        "encode",
+        "CardSpace",
+        "--uniqueId",
+        "4661e0e4-851d-511f-ab57-34687608ac08",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    }
   ]
 }

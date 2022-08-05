@@ -61,6 +61,9 @@ describe('InAppPurchases', function () {
 
     this.beforeEach(function () {
       mockServer = setupServer(
+        rest.post('https://accounts.google.com/o/oauth2/token', (_req, res, ctx) => {
+          return res(ctx.status(200), ctx.json({ access_token: 'OAUTH_TOKEN' }));
+        }),
         rest.get(`${config.get('iap.google.verificationUrlBase')}/:token`, (req, res, ctx) => {
           receiptSentToServer = req.params.token as keyof typeof mockResponses.google;
           let response = mockResponses.google[receiptSentToServer];
@@ -91,9 +94,15 @@ describe('InAppPurchases', function () {
 
       expect(receiptSentToServer).to.equal('INVALID_RECEIPT');
 
+      let jsonResponse = mockResponses.google['INVALID_RECEIPT'].json;
+
       expect(validationResponse).to.deep.equal({
         valid: false,
-        response: mockResponses.google['INVALID_RECEIPT'].json,
+        response: {
+          errorCode: jsonResponse.error.code,
+          errorMessage: jsonResponse.error.message,
+          isSuccessful: false,
+        },
       });
     });
 
@@ -155,16 +164,14 @@ const mockResponses = {
     VALID_RECEIPT: {
       status: 200,
       json: {
-        resource: {
-          purchaseTimeMillis: '1630529397125',
-          purchaseState: 0,
-          consumptionState: 0,
-          developerPayload: '',
-          orderId: 'GPA.3374-2691-3583-90384',
-          acknowledgementState: 1,
-          kind: 'androidpublisher#productPurchase',
-          regionCode: 'RU',
-        },
+        purchaseTimeMillis: '1630529397125',
+        purchaseState: 0,
+        consumptionState: 0,
+        developerPayload: '',
+        orderId: 'GPA.3374-2691-3583-90384',
+        acknowledgementState: 1,
+        kind: 'androidpublisher#productPurchase',
+        regionCode: 'RU',
       },
     },
     INVALID_RECEIPT: {
@@ -186,16 +193,14 @@ const mockResponses = {
     CANCELED_RECEIPT: {
       status: 200,
       json: {
-        resource: {
-          purchaseTimeMillis: '1630529397125',
-          purchaseState: 1,
-          consumptionState: 0,
-          developerPayload: '',
-          orderId: 'GPA.3374-2691-3583-90384',
-          acknowledgementState: 1,
-          kind: 'androidpublisher#productPurchase',
-          regionCode: 'RU',
-        },
+        purchaseTimeMillis: '1630529397125',
+        purchaseState: 1,
+        consumptionState: 0,
+        developerPayload: '',
+        orderId: 'GPA.3374-2691-3583-90384',
+        acknowledgementState: 1,
+        kind: 'androidpublisher#productPurchase',
+        regionCode: 'RU',
       },
     },
   },

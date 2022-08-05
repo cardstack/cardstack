@@ -29,6 +29,7 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { visitWithQueryFix } from '../test-helper';
 
 interface Context extends MirageTestContext {}
 
@@ -149,7 +150,7 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom(post)
       .containsText(
-        'To store data in the Cardstack Hub, you need to authenticate using your Card Wallet'
+        'To store data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet'
       );
     post = postableSel(1, 1);
 
@@ -285,7 +286,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
-      await visit('/card-pay/payments?flow=create-business');
+      await visitWithQueryFix('/card-pay/payments?flow=create-business');
 
       const flowId = new URL(
         'http://domain.test/' + currentURL()
@@ -332,7 +333,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
-      await visit('/card-pay/payments?flow=create-business');
+      await visitWithQueryFix('/card-pay/payments?flow=create-business');
       await waitFor('[data-test-merchant-customization-merchant-name-field]');
       await fillIn(
         `[data-test-merchant-customization-merchant-name-field] input`,
@@ -398,7 +399,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/payments?flow=create-business');
+      await visitWithQueryFix('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
@@ -454,7 +455,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('changing Layer 2 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/payments?flow=create-business');
+      await visitWithQueryFix('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
@@ -523,7 +524,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/payments?flow=create-business');
+    await visitWithQueryFix('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -561,7 +562,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/payments?flow=create-business');
+    await visitWithQueryFix('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -577,7 +578,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -601,7 +602,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/payments?flow=create-business');
+    await visitWithQueryFix('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -617,7 +618,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')

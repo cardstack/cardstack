@@ -56,6 +56,10 @@ export interface WithdrawalLimits {
   min: BN;
   max: BN;
 }
+export interface DepositLimits {
+  min: BN;
+  max: BN;
+}
 
 export interface Layer1Web3Strategy
   extends Web3Strategy,
@@ -67,6 +71,10 @@ export interface Layer1Web3Strategy
   daiBalance: BN | undefined;
   cardBalance: BN | undefined;
   nativeTokenSymbol: string | undefined;
+  /**
+   * If connected, this should be set. If not, it may be undefined.
+   */
+  depositLimits: Record<BridgeableSymbol, DepositLimits> | undefined;
   bridgeConfirmationBlockCount: number;
   refreshBalances(): Promise<void>;
   connect(walletProvider: WalletProvider): Promise<void>;

@@ -1,0 +1,37 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "tintinthong", email = "justinthong93@gmail.com"},
+]
+dependencies = [
+    "pycryptodome>=3.15.0",
+    "shortuuid>=1.0.9",
+    "typing-extensions>=4.3.0",
+    "did-resolver>=0.0.2",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+[project.optional-dependencies]
+
+[tool.black]
+skip-string-normalization = true
+
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "hypothesis>=6.50.1",
+    "hypothesis-auto>=1.1.4",
+    "pytest>=7.1.2",
+    "flake8>=4.0.1",
+    "black>=22.6.0",
+    "isort>=5.10.1",
+]
+[tool.mypy]
+[build-system]
+requires = ["pdm-pep517>=0.12.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.pdm.scripts]
+resolver = "python -m scripts.resolve"

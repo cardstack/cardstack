@@ -265,7 +265,7 @@ model WyrePrice {
 model Profile {
   id                 String   @id @db.Uuid
   name               String
-  slug               String
+  slug               String   @unique(map: "profiles_slug_unique_index")
   color              String
   textColor          String   @map("text_color")
   ownerAddress       String   @map("owner_address")

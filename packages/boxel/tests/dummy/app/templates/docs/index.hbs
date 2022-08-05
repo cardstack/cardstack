@@ -7,9 +7,9 @@
   @subtitle="Living Component Documentation"
 >
   <FreestyleSection @name="Components" class="freestyle-components-section" as |Section|>
-    {{#each this.usageComponents as |componentName|}}
-      <Section.subsection @name={{format-component-name componentName}}>
-        {{component (concat componentName "/usage")}}
+    {{#each this.usageComponents as |c|}}
+      <Section.subsection @name={{format-component-name c.title}}>
+        <c.component />
       </Section.subsection>
     {{/each}}
   </FreestyleSection>

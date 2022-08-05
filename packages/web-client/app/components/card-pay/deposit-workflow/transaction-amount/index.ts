@@ -30,6 +30,7 @@ import { next } from '@ember/runloop';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import config from '@cardstack/web-client/config/environment';
 import { guidFor } from '@ember/object/internals';
+import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
@@ -173,10 +174,20 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     return this.validationMessage !== '';
   }
 
+  get tokenInputHelperText() {
+    return this.isInvalid
+      ? ''
+      : `You can deposit up to ${formatWeiAmount(
+          this.layer1Network.depositLimits![this.currentTokenSymbol].max
+        )} ${this.currentTokenSymbol}`;
+  }
+
   validate() {
     this.validationMessage = validateTokenInput(this.amount, {
       tokenSymbol: this.currentTokenSymbol,
       balance: this.currentTokenBalance,
+      min: this.layer1Network.depositLimits![this.currentTokenSymbol].min,
+      max: this.layer1Network.depositLimits![this.currentTokenSymbol].max,
     });
   }
 

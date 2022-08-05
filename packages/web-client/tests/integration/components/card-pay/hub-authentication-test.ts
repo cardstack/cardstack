@@ -70,7 +70,7 @@ module(
           assert
             .dom('[data-test-boxel-action-chin]')
             .containsText(
-              'You will receive a confirmation request from the Card Wallet app in a few moments'
+              'You will receive a confirmation request from the Cardstack Wallet app in a few moments'
             );
 
           deferred.reject(new Error('User rejected request'));
@@ -99,7 +99,7 @@ module(
           assert
             .dom('[data-test-boxel-action-chin]')
             .containsText(
-              'You will receive a confirmation request from the Card Wallet app in a few moments'
+              'You will receive a confirmation request from the Cardstack Wallet app in a few moments'
             );
 
           layer2Service.test__simulateHubAuthentication('some-auth-token');
@@ -120,7 +120,7 @@ module(
           assert
             .dom('[data-test-boxel-action-chin]')
             .containsText(
-              'You will receive a confirmation request from the Card Wallet app in a few moments'
+              'You will receive a confirmation request from the Cardstack Wallet app in a few moments'
             );
           hubAuthentication.authToken = 'some-auth-token';
           hubAuthentication.isAuthenticated = true;
@@ -145,7 +145,7 @@ module(
         assert
           .dom('[data-test-failed]')
           .containsText(
-            "Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact Cardstack support"
+            "Authentication with Cardstack Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact Cardstack support"
           );
       });
     });

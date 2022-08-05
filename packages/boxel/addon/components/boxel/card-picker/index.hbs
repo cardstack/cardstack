@@ -8,7 +8,7 @@
     class={{cn "boxel-card-picker__dropdown" boxel-card-picker__dropdown--selected=@selectedItem}}
     @options={{@items}}
     @selected={{this.selectedOption}}
-    @selectedItemComponent="boxel/card-picker/selected-item"
+    @selectedItemComponent={{component "boxel/card-picker/selected-item"}}
     @placeholder="Select Card"
     @onChange={{@chooseItem}}
     @renderInPlace={{true}}

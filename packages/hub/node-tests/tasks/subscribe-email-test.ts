@@ -6,6 +6,7 @@ import waitFor from '../utils/wait-for';
 import * as Sentry from '@sentry/node';
 import sentryTestkit from 'sentry-testkit';
 import SubscribeEmail from '../../tasks/subscribe-email';
+import { NodeClientOptions } from '@sentry/node/types/types';
 
 const { testkit, sentryTransport } = sentryTestkit();
 
@@ -62,7 +63,7 @@ describe('SubscribeEmailTask', function () {
       release: 'test',
       tracesSampleRate: 1,
       transport: sentryTransport,
-    });
+    } as NodeClientOptions);
     testkit.reset();
     subject = await getContainer().instantiate(SubscribeEmail);
   });

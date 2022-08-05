@@ -8,6 +8,7 @@ import * as Sentry from '@sentry/browser';
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
   BridgeableSymbol,
+  bridgeableSymbols,
   ConversionFunction,
   Layer1TokenSymbol,
   TokenContractInfo,
@@ -23,6 +24,7 @@ import {
   Layer1NetworkSymbol,
   ClaimBridgedTokensOptions,
   RelayTokensOptions,
+  DepositLimits,
 } from './types';
 import {
   BridgeValidationResult,
@@ -65,6 +67,8 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
   @tracked bridgeConfirmationBlockCount: number;
+  @tracked depositLimits: Record<BridgeableSymbol, DepositLimits> | undefined =
+    undefined;
   nativeTokenSymbol: string;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
@@ -134,6 +138,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @action
   async onConnect(accounts: string[]) {
     await this.updateWalletInfo(accounts);
+    this.depositLimits = await this.getDepositLimits();
     this.currentProviderId = this.connectionManager?.providerId;
     this.#waitForAccountDeferred.resolve();
   }
@@ -336,6 +341,34 @@ export default abstract class Layer1ChainWeb3Strategy
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       amountInWei.toString(),
       { onTxnHash }
+    );
+  }
+
+  private async getDepositLimits(): Promise<
+    Record<BridgeableSymbol, DepositLimits>
+  > {
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+
+    return Object.fromEntries(
+      await Promise.all(
+        bridgeableSymbols.map(async (tokenSymbol) => {
+          let address = new TokenContractInfo(tokenSymbol, this.networkSymbol)
+            .address;
+
+          let [max, min] = await Promise.all([
+            tokenBridge.maxPerTx(address),
+            tokenBridge.minPerTx(address),
+          ]);
+
+          return [
+            tokenSymbol,
+            {
+              min,
+              max,
+            },
+          ];
+        })
+      )
     );
   }
 

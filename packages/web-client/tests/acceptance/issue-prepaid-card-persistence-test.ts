@@ -461,7 +461,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.'
         );
     });
 
@@ -492,7 +492,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         .containsText(
           `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(previousMinDaiAmount))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(previousSpendAmount)!,

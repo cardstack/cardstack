@@ -44,6 +44,8 @@ module.exports = {
       verificationUrl: 'https://sandbox.itunes.apple.com/verifyReceipt',
     },
     google: {
+      packageName: 'com.cardstack.cardpay',
+      productId: '0001',
       verificationUrlBase:
         'https://www.googleapis.com/androidpublisher/v3/applications/com.cardstack.cardpay/purchases/products/0001/tokens',
     },
