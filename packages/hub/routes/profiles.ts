@@ -5,10 +5,16 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
+import CardSpaceValidator from '../services/validators/card-space';
 import shortUUID from 'short-uuid';
 import { Profile } from '@prisma/client';
+import { serializeErrors } from './utils/error';
 
 export default class ProfilesRoute {
+  // FIXME remove/rename etc
+  cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
+    as: 'cardSpaceValidator',
+  });
   profileSerializer = inject('profile-serializer', {
     as: 'profileSerializer',
   });
@@ -102,6 +108,66 @@ export default class ProfilesRoute {
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
   }
+  async patch(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+    let prisma = await this.prismaManager.getClient();
+
+    let profileId = ctx.params.id;
+    let profile = await prisma.profile.findUnique({ where: { id: profileId } });
+
+    if (profile) {
+      if (ctx.state.userAddress !== profile.ownerAddress) {
+        ctx.status = 403;
+        return;
+      }
+    }
+
+    if (!profile) {
+      ctx.status = 404;
+      return;
+    }
+
+    let attributes = ctx.request.body.data.attributes;
+
+    if (attributes['profile-description']) {
+      profile.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
+    }
+
+    if (attributes['profile-image-url']) {
+      profile.profileImageUrl = this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']);
+    }
+
+    if (attributes['links']) {
+      profile.links = ctx.request.body.data.attributes['links'];
+    }
+
+    let errors = await this.cardSpaceValidator.validate(profile);
+    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
+
+    if (hasErrors) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: serializeErrors(errors),
+      };
+    } else {
+      await prisma.profile.update({
+        data: {
+          profileDescription: profile.profileDescription,
+          profileImageUrl: profile.profileImageUrl,
+          links: profile.links,
+        },
+        where: { id: profile.id },
+      });
+
+      let serialized = await this.profileSerializer.serialize(profile);
+
+      ctx.status = 200;
+      ctx.body = serialized;
+    }
+    ctx.type = 'application/vnd.api+json';
+  }
 
   async getValidation(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
@@ -159,6 +225,14 @@ export default class ProfilesRoute {
     ctx.status = 200;
     ctx.body = this.profileSerializer.serialize(profile);
     ctx.type = 'application/vnd.api+json';
+  }
+
+  sanitizeText(value: string | unknown): any {
+    if (typeof value === 'string') {
+      return value.trim().replace(/ +/g, ' ');
+    } else {
+      return value;
+    }
   }
 }
 
