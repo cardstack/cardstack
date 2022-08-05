@@ -90,6 +90,8 @@ import InAppPurchases from './services/in-app-purchases';
 import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
+import ProfilesRoute from './routes/profiles';
+import ProfileSerializer from './services/serializers/merchant-info-serializer';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
 import PrismaManager from './services/prisma-manager';
@@ -148,6 +150,8 @@ export function createRegistry(): Registry {
   registry.register('job-tickets-route', JobTicketsRoute);
   registry.register('job-ticket-serializer', JobTicketSerializer);
   registry.register('profile-purchases-route', ProfilePurchasesRoute);
+  registry.register('profiles-route', ProfilesRoute);
+  registry.register('profile-serializer', ProfileSerializer);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
