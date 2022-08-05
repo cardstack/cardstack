@@ -26,6 +26,9 @@ export default class APIRouter {
   merchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
   });
+  profilesRoute = inject('profiles-route', {
+    as: 'profilesRoute',
+  });
   cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
   });
@@ -55,6 +58,7 @@ export default class APIRouter {
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
       merchantInfosRoute,
+      profilesRoute,
       custodialWalletRoute,
       sessionRoute,
       status: statusRoute,
@@ -78,10 +82,17 @@ export default class APIRouter {
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
+
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
     apiSubrouter.get('/merchant-infos/short-id/:id', parseBody, merchantInfosRoute.getFromShortId);
+
+    apiSubrouter.post('/profiles', parseBody, profilesRoute.post);
+    apiSubrouter.get('/profiles/validate-slug/:slug', profilesRoute.getValidation);
+    apiSubrouter.get('/profiles', parseBody, profilesRoute.get);
+    apiSubrouter.get('/profiles/short-id/:id', parseBody, profilesRoute.getFromShortId);
+
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);
     apiSubrouter.post('/orders', parseBody, ordersRoute.post);
