@@ -119,7 +119,7 @@ describe('POST /api/profile-purchases', function () {
             {
               id: jobTicketId,
               type: 'job-tickets',
-              attributes: { state: 'pending' },
+              attributes: { 'job-type': 'create-profile', state: 'pending' },
             },
           ],
         });
