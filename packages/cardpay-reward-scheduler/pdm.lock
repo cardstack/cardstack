@@ -555,11 +555,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rusty-rlp"
-version = "0.2.1"
-summary = "Python RLP serialization/deserialization based on a rapid fast Rust implementation."
-
-[[package]]
 name = "s3transfer"
 version = "0.6.0"
 requires_python = ">= 3.7"
@@ -1560,23 +1555,6 @@ content_hash = "sha256:2dd78658fe6b3f9c7321ffed6d20b0e8f847556a89727d980669641b6
 "rlp 2.0.1" = [
     {file = "rlp-2.0.1-py2.py3-none-any.whl", hash = "sha256:52a57c9f53f03c88b189283734b397314288250cc4a3c4113e9e36e2ac6bdd16"},
     {file = "rlp-2.0.1.tar.gz", hash = "sha256:665e8312750b3fc5f7002e656d05b9dcb6e93b6063df40d95c49ad90c19d1f0e"},
-]
-"rusty-rlp 0.2.1" = [
-    {file = "rusty_rlp-0.2.1-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:0e2affd224960fcf813e3ecc765864c965f73f2ac78cb9dd6cb16946e6958e79"},
-    {file = "rusty_rlp-0.2.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:3aec6f2b47cb3c8f02e99ca4e1eb110d2d7030580568a31ad45ca78ab0353bd0"},
-    {file = "rusty_rlp-0.2.1-cp310-none-win_amd64.whl", hash = "sha256:fd0d31f8c95539df97abb8c887089f80af00d088efb2723aabfc446b0e7fb3c0"},
-    {file = "rusty_rlp-0.2.1-cp36-cp36m-macosx_10_7_x86_64.whl", hash = "sha256:f45f13ac4a066e568630e20412d09c5946d12e1159a9a7166a2aae4985a751b3"},
-    {file = "rusty_rlp-0.2.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:261122c3e48e3523d2aa6dc9ed4a9cb57c509c8e318f0bf9cb4ea3fb02d7ac91"},
-    {file = "rusty_rlp-0.2.1-cp36-none-win_amd64.whl", hash = "sha256:0a274ab122ece361ddf8844cc364a3248c4c9e3e2e0056254df1ccbd052e9526"},
-    {file = "rusty_rlp-0.2.1-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:dcdf542322249bfa09c11e13e73799cd2a4a59740b0b3aac109fe86891c6ebcb"},
-    {file = "rusty_rlp-0.2.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:11075717e52ec4f247bb26b85044c3bcb3b2d0fc2a7116e83b4f48e53c4c3b08"},
-    {file = "rusty_rlp-0.2.1-cp37-none-win_amd64.whl", hash = "sha256:ef5f49b77af3cb76ab3aafca788be2e03eb7c0d47d9eaf9946aece82195b6808"},
-    {file = "rusty_rlp-0.2.1-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:bedb057cbdc3cafba64f096be6421706208d6bc9ba0ff0cafa61bfca017e2ebe"},
-    {file = "rusty_rlp-0.2.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:5b55b3934557f47fc7790443d73b79414ef851a5509962085f18652019bbe98f"},
-    {file = "rusty_rlp-0.2.1-cp38-none-win_amd64.whl", hash = "sha256:a174c16257f643abe6600e51570ea591aaf8a3122a1a277c803d527b20c01d9b"},
-    {file = "rusty_rlp-0.2.1-cp39-cp39-macosx_10_7_x86_64.whl", hash = "sha256:d083944cd76f1f10f5a564ff136dc3bc9e4b52f1cad63a980bc2b3712865778a"},
-    {file = "rusty_rlp-0.2.1-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:d48c96bd3934ebf246e2bae986ab222d423ba431e05a29fa7bb6d9e82334a54a"},
-    {file = "rusty_rlp-0.2.1-cp39-none-win_amd64.whl", hash = "sha256:28b563120e5391365100ad25a0327235613f04a1f8b7bee47d2cf9546de137b5"},
 ]
 "s3transfer 0.6.0" = [
     {file = "s3transfer-0.6.0-py3-none-any.whl", hash = "sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd"},

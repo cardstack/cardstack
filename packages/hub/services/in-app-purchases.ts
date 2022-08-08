@@ -1,5 +1,8 @@
 /* global fetch */
 import config from 'config';
+import GoogleReceiptVerify from 'google-play-billing-validator';
+
+const googleIapConfig: any = config.get('iap.google');
 
 interface InAppPurchaseValidationResult {
   valid: boolean;
@@ -39,18 +42,29 @@ export default class InAppPurchases {
   }
 
   private async validateFromGoogle(token: string): Promise<InAppPurchaseValidationResult> {
-    // TODO this needs OAuth to truly work, see CS-4199
-    let response = await fetch(`${config.get('iap.google.verificationUrlBase')}/${token}`, {
-      method: 'GET',
-    });
+    try {
+      let result = await this.googleVerifier.verifyINAPP({
+        packageName: googleIapConfig.packageName,
+        productId: googleIapConfig.productId,
+        purchaseToken: token,
+      });
 
-    let json = await response.json();
-
-    if (response.ok && json.resource.purchaseState === 0) {
-      return { valid: true, response: json };
-    } else {
-      return { valid: false, response: json };
+      if (result.isSuccessful && result.payload.purchaseState === 0) {
+        return { valid: true, response: result.payload };
+      } else {
+        return { valid: false, response: result.payload };
+      }
+    } catch (e) {
+      return { valid: false, response: e };
     }
+  }
+
+  private get googleVerifier(): any {
+    let serviceAccount: any = config.get('iap.google.serviceAccount');
+    return new GoogleReceiptVerify({
+      email: serviceAccount.client_email,
+      key: serviceAccount.private_key,
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 import { URL } from 'url';
 import { NestedAttributeError, RelationshipError } from '../../routes/utils/error';
 import { inject } from '@cardstack/di';
-import { CardSpace, MerchantInfo } from '@prisma/client';
+import { Profile } from '@prisma/client';
 
 export type CardSpaceAttribute = 'profileDescription' | 'profileImageUrl' | 'links';
 
@@ -27,7 +27,7 @@ function isValidUrl(url: string): boolean {
 export default class CardSpaceValidator {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
-  async validate(cardSpace: Partial<CardSpace & { merchantInfo: MerchantInfo }>): Promise<CardSpaceErrors> {
+  async validate(cardSpace: Partial<Profile>): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
       merchantInfo: [],
       profileDescription: [],

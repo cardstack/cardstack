@@ -70,11 +70,13 @@ function parseWaypointConfig(waypointConfigFile): RelevantWaypointConfigByApp {
   let result = {} as RelevantWaypointConfigByApp;
   for (const appSlug of appSlugs) {
     let deployNode = waypointJson.app.find((a) => a[appSlug])[appSlug][0].deploy[0];
-    let secretsNode = deployNode.use[0]['aws-ecs'][0].secrets?.[0];
-    result[appSlug] = {
-      executionRoleName: deployNode.use[0]['aws-ecs'][0]['execution_role_name'],
-      secretArns: secretsNode ? Object.values(secretsNode) : [],
-    };
+    if (deployNode.use[0]['aws-ecs']) {
+      let secretsNode = deployNode.use[0]['aws-ecs'][0].secrets?.[0];
+      result[appSlug] = {
+        executionRoleName: deployNode.use[0]['aws-ecs'][0]['execution_role_name'],
+        secretArns: secretsNode ? Object.values(secretsNode) : [],
+      };
+    }
   }
   return result;
 }
