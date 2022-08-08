@@ -212,8 +212,5 @@ class RewardProgram:
 
 
 def resolve_rule(did: str):
-    try:
-        url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
-        return requests.get(url).json()
-    except Exception as e:
-        raise e
+    url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
+    return requests.get(url).json()
