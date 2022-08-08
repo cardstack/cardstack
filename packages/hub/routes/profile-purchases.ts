@@ -5,7 +5,7 @@ import { inject } from '@cardstack/di';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 import * as Sentry from '@sentry/node';
-import { JobTicket } from '@prisma/client';
+import { JobTicket, Profile } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -15,8 +15,8 @@ export default class ProfilePurchasesRoute {
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
 
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -199,13 +199,17 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    const merchantInfo = {
+    const merchantInfo: Profile = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
       slug,
       color: merchantAttributes['color'],
       textColor: merchantAttributes['text-color'],
       ownerAddress: ctx.state.userAddress,
+      links: [],
+      profileDescription: '',
+      profileImageUrl: '',
+      createdAt: new Date(),
     };
 
     let db = await this.databaseManager.getClient();
@@ -233,7 +237,7 @@ export default class ProfilePurchasesRoute {
       { maxAttempts: 1 }
     );
 
-    let serialized = this.merchantInfoSerializer.serialize(merchantInfo);
+    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
 
     serialized.included = [this.jobTicketSerializer.serialize(insertedJobTicket!).data];
 

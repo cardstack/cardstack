@@ -13,9 +13,6 @@ export default class CardSpacesRoute {
   cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
     as: 'cardSpaceValidator',
   });
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
-  });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {

@@ -6,11 +6,11 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import shortUUID from 'short-uuid';
-import { ProfileMerchantSubset } from '../services/merchant-info';
+import { Profile } from '@prisma/client';
 
 export default class MerchantInfosRoute {
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   reservedWords = inject('reserved-words', {
@@ -36,7 +36,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serializeCollection(profiles);
+    ctx.body = this.profileSerializer.serialize(profiles, 'merchant-infos');
   }
 
   async post(ctx: Koa.Context) {
@@ -74,13 +74,17 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const merchantInfo: ProfileMerchantSubset = {
+    const merchantInfo: Profile = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
       ownerAddress: ctx.state.userAddress,
+      links: [],
+      profileDescription: '',
+      profileImageUrl: '',
+      createdAt: new Date(),
     };
 
     await prisma.$transaction(async () => {
@@ -91,7 +95,7 @@ export default class MerchantInfosRoute {
       id: merchantInfo.id,
     });
 
-    let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);
+    let serialized = await this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
 
     ctx.status = 201;
     ctx.body = serialized;
@@ -152,7 +156,7 @@ export default class MerchantInfosRoute {
     }
 
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serialize(profile);
+    ctx.body = this.profileSerializer.serialize(profile, 'merchant-infos');
     ctx.type = 'application/vnd.api+json';
   }
 }

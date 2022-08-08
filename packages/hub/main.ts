@@ -47,7 +47,6 @@ import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
 import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
-import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoService from './services/merchant-info';
 import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
@@ -128,7 +127,6 @@ export function createRegistry(): Registry {
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
-  registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('email', Email);

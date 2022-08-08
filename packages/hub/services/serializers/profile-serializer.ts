@@ -4,6 +4,7 @@ import DatabaseManager from '@cardstack/db';
 import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
 import { Profile } from '@prisma/client';
+import { ProfileMerchantSubset } from '../merchant-info';
 
 type ResourceType = 'profiles' | 'card-spaces' | 'merchant-infos';
 
@@ -77,6 +78,17 @@ export default class ProfileSerializer {
 
       return result as JSONAPIDocument;
     }
+  }
+
+  deserialize(json: JSONAPIDocument): ProfileMerchantSubset {
+    return {
+      id: json.data.id,
+      name: json.data.attributes['name'],
+      slug: json.data.attributes['slug'],
+      color: json.data.attributes['color'],
+      textColor: json.data.attributes['text-color'],
+      ownerAddress: json.data.attributes['owner-address'],
+    };
   }
 }
 
