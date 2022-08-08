@@ -3,15 +3,11 @@ import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
 import ProfileSerializer from '../services/serializers/profile-serializer';
 import WorkerClient from '../services/worker-client';
-import CardSpaceValidator from '../services/validators/card-space';
 
 export default class CardSpacesRoute {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   profileSerializer: ProfileSerializer = inject('profile-serializer', {
     as: 'profileSerializer',
-  });
-  cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
-    as: 'cardSpaceValidator',
   });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
