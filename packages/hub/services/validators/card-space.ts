@@ -3,7 +3,7 @@ import { NestedAttributeError, RelationshipError } from '../../routes/utils/erro
 import { inject } from '@cardstack/di';
 import { Profile } from '@prisma/client';
 
-export type CardSpaceAttribute = 'profileDescription' | 'profileImageUrl' | 'links';
+export type CardSpaceAttribute = 'name' | 'profileDescription' | 'profileImageUrl' | 'links';
 
 export type CardSpaceRelationship = 'merchantInfo';
 
@@ -29,11 +29,16 @@ export default class CardSpaceValidator {
 
   async validate(cardSpace: Partial<Profile>): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
+      name: [],
       merchantInfo: [],
       profileDescription: [],
       links: [],
       profileImageUrl: [],
     };
+
+    if (cardSpace.name && cardSpace.name.length > MAX_SHORT_FIELD_LENGTH) {
+      errors.name.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    }
 
     if (cardSpace.profileDescription && cardSpace.profileDescription.length > MAX_LONG_FIELD_LENGTH) {
       errors.profileDescription.push(`Max length is ${MAX_LONG_FIELD_LENGTH}`);

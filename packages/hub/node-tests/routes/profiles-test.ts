@@ -529,7 +529,7 @@ describe('/api/profiles', function () {
         .expect('Content-Type', 'application/vnd.api+json');
     });
 
-    it('updates the specified fields of the resource', async function () {
+    it('updates specified fields of the resource that are permitted', async function () {
       let profileId = 'ab70b8d5-95f5-4c20-997c-4db9013b347c';
 
       let prisma = await getPrisma();
@@ -550,7 +550,11 @@ describe('/api/profiles', function () {
         data: {
           type: 'profiles',
           attributes: {
+            name: 'anewname',
+            color: 'blue',
+            'text-color': 'blue',
             links: [{ title: 'Link1', url: 'https://test.com/something' }],
+            slug: 'anewslugthatwillnotbesaved',
           },
         },
       };
@@ -571,10 +575,10 @@ describe('/api/profiles', function () {
             id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
             attributes: {
               did: 'did:cardstack:1mnaSutV4uMuyyJZcJ7ktsTw991de486680a9262',
-              name: 'Satoshi?',
+              name: 'anewname',
               slug: 'satoshi',
-              color: 'black',
-              'text-color': 'red',
+              color: 'blue',
+              'text-color': 'blue',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
               'profile-description': "Satoshi's place",
               'profile-image-url': 'https://test.com/profile.jpg',
@@ -605,6 +609,7 @@ describe('/api/profiles', function () {
         data: {
           type: 'profiles',
           attributes: {
+            name: 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11',
             'profile-description': "Satoshi's place",
             'profile-image-url': 'https://test.com/test1.png',
             links: [
@@ -627,6 +632,12 @@ describe('/api/profiles', function () {
         .expect(422)
         .expect({
           errors: [
+            {
+              status: '422',
+              title: 'Invalid attribute',
+              source: { pointer: '/data/attributes/name' },
+              detail: 'Max length is 50',
+            },
             {
               status: '422',
               title: 'Invalid attribute',

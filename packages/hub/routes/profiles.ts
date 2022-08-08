@@ -131,6 +131,18 @@ export default class ProfilesRoute {
 
     let attributes = ctx.request.body.data.attributes;
 
+    if (attributes['name']) {
+      profile.name = this.sanitizeText(ctx.request.body.data.attributes['name']);
+    }
+
+    if (attributes['color']) {
+      profile.color = this.sanitizeText(ctx.request.body.data.attributes['color']);
+    }
+
+    if (attributes['text-color']) {
+      profile.textColor = this.sanitizeText(ctx.request.body.data.attributes['text-color']);
+    }
+
     if (attributes['profile-description']) {
       profile.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
     }
