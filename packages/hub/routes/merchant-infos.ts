@@ -74,28 +74,22 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const merchantInfo: Profile = {
+    const properties = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
       ownerAddress: ctx.state.userAddress,
-      links: [],
-      profileDescription: '',
-      profileImageUrl: '',
-      createdAt: new Date(),
     };
 
-    await prisma.$transaction(async () => {
-      await prisma.profile.create({ data: { ...merchantInfo } });
-    });
+    let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
       id: merchantInfo.id,
     });
 
-    let serialized = await this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
+    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
 
     ctx.status = 201;
     ctx.body = serialized;
