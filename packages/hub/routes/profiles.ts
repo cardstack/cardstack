@@ -96,7 +96,6 @@ export default class ProfilesRoute {
       await prisma.profile.create({ data: { ...profile } });
     });
 
-    // FIXME make this persist profile as well?
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
       id: profile.id,
     });

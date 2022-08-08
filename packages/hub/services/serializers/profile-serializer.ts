@@ -36,7 +36,7 @@ export default class ProfileSerializer {
         }),
       };
     } else {
-      // FIXME what is to be done with this type?
+      // TODO migrate to Profile type CS-4386
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
       let attributes: any = { did };
