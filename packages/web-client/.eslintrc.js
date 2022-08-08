@@ -24,6 +24,7 @@ module.exports = {
     {
       files: ['*.ts'],
       rules: {
+        'ember/no-array-prototype-extensions': 'off',
         'no-undef': 'off',
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': [

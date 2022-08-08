@@ -116,7 +116,7 @@
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~4.6.0",
     "ember-svg-jar": "^2.3.3",
-    "ember-template-lint": "^4.10.1",
+    "ember-template-lint": "^3.16.0",
     "ember-window-mock": "^0.8.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",

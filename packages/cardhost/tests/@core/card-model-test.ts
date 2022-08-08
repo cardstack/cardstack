@@ -85,7 +85,7 @@ module('@core | card-model-for-browser', function (hooks) {
       'isolated'
     );
 
-    assert.equal(
+    assert.strictEqual(
       model.data.name,
       attributes.name,
       'name field value is correct'
@@ -94,7 +94,7 @@ module('@core | card-model-for-browser', function (hooks) {
       isSameDay(model.data.birthdate, p('1923-12-12')),
       'Dates are serialized to Dates'
     );
-    assert.equal(
+    assert.strictEqual(
       model.data.address.street,
       attributes.address.street,
       'street field value is correct'

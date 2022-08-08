@@ -90,7 +90,7 @@
         {{if this.error "Try Again" "Withdraw"}}
       </d.ActionButton>
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator
           class="withdrawal-transaction-amount__loading-indicator"
@@ -107,7 +107,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed

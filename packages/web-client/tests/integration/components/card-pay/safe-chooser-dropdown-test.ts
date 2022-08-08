@@ -107,7 +107,7 @@ module(
       await click('.ember-power-select-trigger');
       await click('.ember-power-select-options li:nth-child(2)');
 
-      assert.equal(chosenSafe, this.safes[1]);
+      assert.strictEqual(chosenSafe, this.safes[1]);
     });
 
     test('it renders with @selectedSafe chosen', async function (this: Context, assert) {

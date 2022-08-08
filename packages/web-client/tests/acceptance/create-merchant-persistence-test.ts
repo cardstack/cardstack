@@ -77,7 +77,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     await visit('/card-pay/payments');
     await click('[data-test-workflow-button="create-business"]');
 
-    assert.equal(
+    assert.strictEqual(
       // @ts-ignore (complains object is possibly null)
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         .length,
@@ -262,7 +262,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       ).searchParams.get('flow-id');
 
       assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
-      assert.equal(workflowPersistenceId!.length, 22);
+      assert.strictEqual(workflowPersistenceId!.length, 22);
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {

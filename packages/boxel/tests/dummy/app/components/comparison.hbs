@@ -131,7 +131,7 @@
 
         {{#each this.compFieldGroup as |compField|}}
           {{#if (not (includes compField.title this.fieldsNotRendered))}}
-            {{#with (find-by "title" compField.title this.baseFieldGroup) as |field|}}
+            {{#let (find-by "title" compField.title this.baseFieldGroup) as |field|}}
               <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
 
                 {{#if (eq field.type "collection")}}
@@ -255,7 +255,7 @@
                   />
                 {{/if}}
               </div>
-            {{/with}}
+            {{/let}}
           {{/if}}
         {{/each}}
 

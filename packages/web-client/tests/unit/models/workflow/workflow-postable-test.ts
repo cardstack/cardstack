@@ -16,12 +16,12 @@ module('Unit | WorkflowPostable model', function (hooks) {
 
   test('isComplete starts off as false', function (assert) {
     let subject = new WorkflowPostable(participant);
-    assert.equal(subject.isComplete, false);
+    assert.false(subject.isComplete);
   });
 
   test('passing includeIf sets up method', function (assert) {
     let subject = new WorkflowPostable(participant);
-    assert.ok(!subject.includeIf);
+    assert.notOk(subject.includeIf);
     subject = new WorkflowPostable(participant, () => {
       return true;
     });

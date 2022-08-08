@@ -42,8 +42,8 @@ module('Acceptance | card routing', function (hooks) {
 
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
-    assert.equal(currentURL(), '/welcome');
-    assert.equal(
+    assert.strictEqual(currentURL(), '/welcome');
+    assert.strictEqual(
       document.head.querySelector(
         `[data-asset-url="@cardstack/local-realm-compiled/https-cardstack.local-person/isolated.css"]`
       )?.innerHTML,

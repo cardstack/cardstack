@@ -700,6 +700,7 @@ module('Acceptance | pay', function (hooks) {
   });
 
   module('status page incidents', function () {
+    // eslint-disable-next-line qunit/require-expect
     test('it renders a degraded service banner on the pay page', async function (this: MirageTestContext, assert) {
       this.server.get(config.urls.statusPageUrl, function () {
         return new MirageResponse(

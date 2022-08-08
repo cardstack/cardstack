@@ -49,6 +49,6 @@ module('Acceptance | wc', function (hooks) {
 
     assert.dom('[data-test-wc-message]').doesNotExist();
 
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
   });
 });

@@ -97,7 +97,10 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
-    assert.equal(session.getValue<string>('layer2WalletAddress'), 'address');
+    assert.strictEqual(
+      session.getValue<string>('layer2WalletAddress'),
+      'address'
+    );
   });
 
   test('It should show a loading state if still fetching a depot', async function (assert) {
@@ -123,7 +126,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
 
-    assert.equal(
+    assert.strictEqual(
       session.getValue<string>('layer2WalletAddress'),
       'address-connected'
     );

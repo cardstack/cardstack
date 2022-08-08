@@ -41,27 +41,27 @@ module('Integration | Service | app-context', function (hooks) {
 
     test('it can match the card space suffix to determine the app', function (assert) {
       fastboot.request.host = `hello${config.cardSpaceHostnameSuffix}`;
-      assert.equal(appContext.currentApp, 'card-space');
+      assert.strictEqual(appContext.currentApp, 'card-space');
 
       fastboot.request.host = 'hello.localhost:4210';
-      assert.equal(appContext.currentApp, 'wallet');
+      assert.strictEqual(appContext.currentApp, 'wallet');
     });
 
     test('it can match the card space suffix and return a user id', function (assert) {
       fastboot.request.host = `oops${config.cardSpaceHostnameSuffix}`;
-      assert.equal(appContext.cardSpaceId, 'oops');
+      assert.strictEqual(appContext.cardSpaceId, 'oops');
 
       fastboot.request.host = `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end${config.cardSpaceHostnameSuffix}`;
-      assert.equal(
+      assert.strictEqual(
         appContext.cardSpaceId,
         `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end`
       );
 
       fastboot.request.host = `oops.two${config.cardSpaceHostnameSuffix}`;
-      assert.equal(appContext.cardSpaceId, 'oops.two');
+      assert.strictEqual(appContext.cardSpaceId, 'oops.two');
 
       fastboot.request.host = 'oops.wallet';
-      assert.equal(appContext.cardSpaceId, '');
+      assert.strictEqual(appContext.cardSpaceId, '');
     });
   });
 
@@ -79,24 +79,24 @@ module('Integration | Service | app-context', function (hooks) {
 
     test('it can match the card space suffix to determine the app', function (assert) {
       window.location.host = `hello${config.cardSpaceHostnameSuffix}`;
-      assert.equal(appContext.currentApp, 'card-space');
+      assert.strictEqual(appContext.currentApp, 'card-space');
 
       window.location.host = 'hello.localhost:4210';
-      assert.equal(appContext.currentApp, 'wallet');
+      assert.strictEqual(appContext.currentApp, 'wallet');
     });
 
     test('it can match the card space suffix and return a user id', function (assert) {
       window.location.host = `oops${config.cardSpaceHostnameSuffix}`;
-      assert.equal(appContext.cardSpaceId, 'oops');
+      assert.strictEqual(appContext.cardSpaceId, 'oops');
 
       window.location.host = `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end${config.cardSpaceHostnameSuffix}`;
-      assert.equal(
+      assert.strictEqual(
         appContext.cardSpaceId,
         `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end`
       );
 
       window.location.host = 'oops.wallet';
-      assert.equal(appContext.cardSpaceId, '');
+      assert.strictEqual(appContext.cardSpaceId, '');
     });
   });
 });

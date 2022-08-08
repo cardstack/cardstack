@@ -46,7 +46,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
   });
 
   test('It should not have a providerId at instantiation', async function (assert) {
-    assert.ok(!subject.providerId, 'There is no providerId at instantiation');
+    assert.notOk(subject.providerId, 'There is no providerId at instantiation');
   });
 
   test("It should have a providerId, and assign web3's provider after calling connect", async function (assert) {
@@ -87,7 +87,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
 
     subject.reset();
 
-    assert.ok(!subject.providerId, 'There is no providerId after reset');
+    assert.notOk(subject.providerId, 'There is no providerId after reset');
   });
 
   test('It calls the cross-tab-connection callback upon connected messages, if not already connected', async function (assert) {
@@ -176,7 +176,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     subject.onConnect(['some-account']);
 
-    assert.equal(
+    assert.strictEqual(
       ConnectionManager.getProviderIdForChain(subject.chainId),
       subject.providerId,
       'Storage contains the connected provider id after connection'
@@ -191,7 +191,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     subject.onConnect(['some-account']);
 
-    assert.equal(
+    assert.strictEqual(
       ConnectionManager.getProviderIdForChain(subject.chainId),
       subject.providerId,
       'Storage contains the connected provider id after connection'
@@ -199,9 +199,9 @@ module('Unit | layer 1 connection manager', function (hooks) {
 
     subject.onDisconnect(false);
 
-    assert.equal(
+    assert.strictEqual(
       ConnectionManager.getProviderIdForChain(subject.chainId),
-      null,
+      undefined,
       'Storage does not contain a provider id for the given chain, after disconnection'
     );
   });

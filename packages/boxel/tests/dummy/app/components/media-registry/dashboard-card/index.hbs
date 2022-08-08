@@ -1,5 +1,5 @@
 <Boxel::Dashboard @displayLeftEdge={{true}} class="media-registry media-registry--{{@currentOrg.id}}">
-  <:left-edge>
+  <:leftEdge>
     <aside class="media-registry__left-edge {{if this.isQueueFixed "with-queue"}}">
       <Boxel::LeftEdgeNav
         @home={{@home}}
@@ -31,7 +31,7 @@
         </div>
       {{/if}}
     </aside>
-  </:left-edge>
+  </:leftEdge>
 
   <:header>
     <div class="media-registry__header-container" style={{css-var media-registry-header-background-color=(or @currentOrg.brandColor "var(--boxel-dark)")}}>

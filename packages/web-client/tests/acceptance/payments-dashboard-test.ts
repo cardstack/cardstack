@@ -36,6 +36,7 @@ module('Acceptance | payments dashboard', function (hooks) {
     assert.dom('[data-test-merchants-section]').doesNotExist();
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('Merchants are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;

@@ -34,7 +34,7 @@ module('Unit | Workflow model', function (hooks) {
   test('attachWorkflow sets workflow on milestones', function (assert) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
-    assert.ok(!exampleMilestone.workflow);
+    assert.notOk(exampleMilestone.workflow);
     workflow.attachWorkflow();
     assert.strictEqual(workflow, exampleMilestone.workflow);
   });
@@ -43,7 +43,7 @@ module('Unit | Workflow model', function (hooks) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.epilogue.postables = [exampleMessage];
-    assert.ok(!exampleMessage.workflow);
+    assert.notOk(exampleMessage.workflow);
     workflow.attachWorkflow();
     assert.strictEqual(workflow, exampleMessage.workflow);
   });
@@ -52,7 +52,7 @@ module('Unit | Workflow model', function (hooks) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancelationMessages = new PostableCollection([exampleMessage]);
-    assert.ok(!exampleMessage.workflow);
+    assert.notOk(exampleMessage.workflow);
     workflow.attachWorkflow();
     assert.strictEqual(workflow, exampleMessage.workflow);
   });
@@ -69,11 +69,11 @@ module('Unit | Workflow model', function (hooks) {
     });
 
     workflow.milestones = [exampleMilestone, secondMilestone];
-    assert.equal(workflow.completedMilestoneCount, 0);
+    assert.strictEqual(workflow.completedMilestoneCount, 0);
     examplePostable.isComplete = true;
-    assert.equal(workflow.completedMilestoneCount, 1);
+    assert.strictEqual(workflow.completedMilestoneCount, 1);
     milestone2Postable.isComplete = true;
-    assert.equal(workflow.completedMilestoneCount, 2);
+    assert.strictEqual(workflow.completedMilestoneCount, 2);
   });
 
   test('visibleMilestones returns milestones up to and including first incomplete milestone', function (assert) {
@@ -116,30 +116,36 @@ module('Unit | Workflow model', function (hooks) {
 
     workflow.milestones = [exampleMilestone, secondMilestone];
     examplePostable.isComplete = true;
-    assert.equal(workflow.progressStatus, exampleMilestone.completedDetail);
+    assert.strictEqual(
+      workflow.progressStatus,
+      exampleMilestone.completedDetail
+    );
     milestone2Postable.isComplete = true;
-    assert.equal(workflow.progressStatus, secondMilestone.completedDetail);
+    assert.strictEqual(
+      workflow.progressStatus,
+      secondMilestone.completedDetail
+    );
   });
 
   test('progressStatus returns "Workflow started" when no milestones are complete', function (assert) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
-    assert.equal(workflow.progressStatus, 'Workflow started');
+    assert.strictEqual(workflow.progressStatus, 'Workflow started');
   });
 
   test('progressStatus returns "Workflow canceled" when workflow is canceled', function (assert) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancel('TEST');
-    assert.equal(workflow.progressStatus, 'Workflow canceled');
+    assert.strictEqual(workflow.progressStatus, 'Workflow canceled');
   });
 
   test('Incomplete workflow is canceled when workflow.cancel is called', function (assert) {
     let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancel('TEST');
-    assert.equal(workflow.isCanceled, true);
-    assert.equal(workflow.cancelationReason, 'TEST');
+    assert.true(workflow.isCanceled);
+    assert.strictEqual(workflow.cancelationReason, 'TEST');
   });
 
   test('Workflow cannot be canceled twice', function (assert) {
@@ -147,8 +153,8 @@ module('Unit | Workflow model', function (hooks) {
     workflow.milestones = [exampleMilestone];
     workflow.cancel('FIRST');
     workflow.cancel('SECOND');
-    assert.equal(workflow.isCanceled, true);
-    assert.equal(workflow.cancelationReason, 'FIRST');
+    assert.true(workflow.isCanceled);
+    assert.strictEqual(workflow.cancelationReason, 'FIRST');
   });
 
   test('Completed workflow is not canceled when workflow.cancel is called', function (assert) {
@@ -158,7 +164,7 @@ module('Unit | Workflow model', function (hooks) {
 
     assert.ok(workflow.isComplete, 'Completing workflow before canceling');
     workflow.cancel('TEST');
-    assert.ok(!workflow.isCanceled);
+    assert.notOk(workflow.isCanceled);
   });
 
   test('Workflow.resetTo resets each milestone and its epilogue correctly', function (assert) {
@@ -226,7 +232,7 @@ module('Unit | Workflow model', function (hooks) {
     ]);
     testWorkflow.attachWorkflow();
     testWorkflow.resetTo(targetPostable1);
-    assert.equal(indicesArray.length, 4);
+    assert.strictEqual(indicesArray.length, 4);
     assert.ok(indicesArray.includes('0-2'));
     assert.ok(indicesArray.includes('1-0'));
     assert.ok(indicesArray.includes('2-0'));
@@ -235,7 +241,7 @@ module('Unit | Workflow model', function (hooks) {
     indicesArray = [];
 
     testWorkflow.resetTo(targetPostable2);
-    assert.equal(indicesArray.length, 3);
+    assert.strictEqual(indicesArray.length, 3);
     assert.ok(indicesArray.includes('1-1'));
     assert.ok(indicesArray.includes('2-0'));
     assert.ok(indicesArray.includes('epilogue-0'));
@@ -243,7 +249,7 @@ module('Unit | Workflow model', function (hooks) {
     indicesArray = [];
 
     testWorkflow.resetTo(epiloguePostable);
-    assert.equal(indicesArray.length, 1);
+    assert.strictEqual(indicesArray.length, 1);
     assert.ok(indicesArray.includes('epilogue-1'));
   });
 
@@ -277,16 +283,14 @@ module('Unit | Workflow model', function (hooks) {
       workflow.visibleMilestones.map((milestone) => milestone.visiblePostables);
       workflow.isComplete;
       workflow.progressStatus;
-      assert.equal(
+      assert.false(
         calledIncludeIf,
-        false,
         'includeIf for the second milestone’s postables was NOT called'
       );
       examplePostable.isComplete = true;
       workflow.visibleMilestones.map((milestone) => milestone.visiblePostables);
-      assert.equal(
+      assert.true(
         calledIncludeIf,
-        true,
         'includeIf for the second milestone’s postables was called'
       );
     });

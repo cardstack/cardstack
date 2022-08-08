@@ -61,8 +61,8 @@ module('Integration | card-service', function (hooks) {
 
     test(`load a card's isolated view and model`, async function (assert) {
       let model = await cards.loadModel(cardID, 'isolated');
-      assert.equal(model.url, cardID, '@model id is correct');
-      assert.equal(
+      assert.strictEqual(model.url, cardID, '@model id is correct');
+      assert.strictEqual(
         model.data.title,
         'A blog post title',
         'post title is correct'
@@ -71,7 +71,7 @@ module('Integration | card-service', function (hooks) {
         model.data.createdAt instanceof Date,
         'CreatedAt is an instance of Date'
       );
-      assert.equal(
+      assert.strictEqual(
         model.data.createdAt.getTime(),
         1614714692121,
         'post created at is correct'

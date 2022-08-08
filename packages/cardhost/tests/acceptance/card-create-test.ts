@@ -44,7 +44,7 @@ module('Acceptance | Card Creation', function (hooks) {
 
   test('Creating a local card from a local card', async function (assert) {
     await visit(`/?url=${personURL}`);
-    assert.equal(currentURL(), `/?url=${personURL}`);
+    assert.strictEqual(currentURL(), `/?url=${personURL}`);
     await waitFor(PERSON);
     assert.dom(PERSON).hasText('Hi! I am Arthur');
 
@@ -67,7 +67,7 @@ module('Acceptance | Card Creation', function (hooks) {
   test('Creating a local card from a remote card', async function (assert) {
     let remoteCard = `${DEMO_REALM}post-0`;
     await visit(`/?url=${remoteCard}`);
-    assert.equal(currentURL(), `/?url=${remoteCard}`);
+    assert.strictEqual(currentURL(), `/?url=${remoteCard}`);
     await waitFor(POST);
 
     await click(NEW);
@@ -87,7 +87,7 @@ module('Acceptance | Card Creation', function (hooks) {
 
   test('Creating a card with an ID', async function (assert) {
     await visit(`/?url=${personURL}`);
-    assert.equal(currentURL(), `/?url=${personURL}`);
+    assert.strictEqual(currentURL(), `/?url=${personURL}`);
     await waitFor(PERSON);
 
     await click(NEW_WITH_ID);

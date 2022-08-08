@@ -79,7 +79,7 @@
         Unlock
       </a.ActionButton>
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionButton data-test-unlock-button>
         Unlocking
       </i.ActionButton>
@@ -90,7 +90,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-unlock-success-message>
         Unlocked
@@ -115,7 +115,7 @@
         Deposit
       </d.ActionButton>
     </:disabled>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionButton data-test-deposit-button>
         Depositing
       </i.ActionButton>
@@ -131,7 +131,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-deposit-success-message>
         Deposited

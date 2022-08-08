@@ -37,7 +37,7 @@
         Claim
       </d.ActionButton>
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea class="token-claim__in-progress" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator @color="var(--boxel-light)" />
         <div class="token-claim__in-progress-message">
@@ -55,7 +55,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed
