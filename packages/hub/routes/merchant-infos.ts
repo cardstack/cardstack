@@ -6,7 +6,6 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import shortUUID from 'short-uuid';
-import { Profile } from '@prisma/client';
 
 export default class MerchantInfosRoute {
   profileSerializer = inject('profile-serializer', {
