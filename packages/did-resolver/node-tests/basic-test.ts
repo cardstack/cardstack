@@ -141,7 +141,7 @@ describe('Cardstack DID Resolver', function () {
       let uniqueId = shortUuid.generate();
       let did = encodeDID({ type: 'Profile', version: 3, uniqueId });
       let result = await resolver.resolve(did);
-      expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/card-space/${uniqueId}.json`);
+      expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/profile/${uniqueId}.json`);
     });
     it('returns a DIDDocument for a RewardRule', async function () {
       let uniqueId = shortUuid.generate();
