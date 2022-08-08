@@ -5,10 +5,9 @@ import { inject } from '@cardstack/di';
 import { validateRequiredFields } from './utils/validation';
 import shortUuid from 'short-uuid';
 import * as Sentry from '@sentry/node';
-import { JobTicket, Profile } from '@prisma/client';
+import { JobTicket } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
@@ -199,7 +198,7 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    const merchantInfo: Profile = {
+    let properties = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
       slug,
@@ -212,11 +211,7 @@ export default class ProfilePurchasesRoute {
       createdAt: new Date(),
     };
 
-    let db = await this.databaseManager.getClient();
-
-    await this.databaseManager.performTransaction(db, async () => {
-      await prisma.profile.create({ data: { ...merchantInfo } });
-    });
+    let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
     let jobTicketId = shortUuid.uuid();
 
