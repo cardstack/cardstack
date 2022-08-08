@@ -71,12 +71,12 @@ describe('JobTicket endpoints', function () {
             {
               id: jobTicketId,
               type: 'job-tickets',
-              attributes: { state: 'success', result: { 'a-result': 'yes' } },
+              attributes: { 'job-type': 'boom', state: 'success', result: { 'a-result': 'yes' } },
             },
             {
               id: anotherJobTicketid,
               type: 'job-tickets',
-              attributes: { state: 'success', result: 'yay' },
+              attributes: { 'job-type': 'ajob', state: 'success', result: 'yay' },
             },
           ],
         })
@@ -135,7 +135,7 @@ describe('JobTicket endpoints', function () {
           data: {
             id: jobTicketId,
             type: 'job-tickets',
-            attributes: { state: 'success', result: { 'a-result': 'yes' } },
+            attributes: { 'job-type': 'boom', state: 'success', result: { 'a-result': 'yes' } },
           },
         })
         .expect('Content-Type', 'application/vnd.api+json');
@@ -241,6 +241,7 @@ describe('JobTicket endpoints', function () {
 
           expect(res.body.data.id).to.not.equal(jobTicketId);
           expect(res.body.data.attributes).to.deep.equal({
+            'job-type': 'boom',
             state: 'pending',
           });
         })
