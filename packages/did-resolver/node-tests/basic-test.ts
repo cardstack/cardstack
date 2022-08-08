@@ -97,7 +97,7 @@ describe('Cardstack DID Resolver', function () {
       expect(parseIdentifier(identifier).type).to.eq('SupplierInfo');
     });
 
-    it('generates a DID for card space', function () {
+    it('generates a DID for profile', function () {
       let identifier = encodeDID({ type: 'Profile' }).split(':')[2];
       expect(identifier).to.match(/^1o/);
       expect(parseIdentifier(identifier).type).to.eq('Profile');
