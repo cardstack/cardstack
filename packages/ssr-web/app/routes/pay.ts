@@ -1,12 +1,13 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
-import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
 import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import RouterService from '@ember/routing/router-service';
+import { getSentry } from '../utils/sentry';
 
 interface PayRouteModel {
   network: string;
@@ -16,13 +17,15 @@ interface PayRouteModel {
 }
 
 export default class PayRoute extends Route {
+  @service declare router: RouterService;
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
   @service('card-space') declare cardSpace: CardSpaceService;
+  sentry = getSentry();
 
   beforeModel() {
     if (this.cardSpace.isActive) {
-      this.transitionTo('index');
+      this.router.transitionTo('index');
     }
   }
 
@@ -51,7 +54,7 @@ export default class PayRoute extends Route {
           : undefined,
       };
     } catch (e) {
-      Sentry.captureException(e);
+      this.sentry.captureException(e);
       throw e;
     }
   }
@@ -80,7 +83,7 @@ export default class PayRoute extends Route {
       ).data.attributes.rates;
     } catch (e) {
       console.error('Failed to fetch exchange rates');
-      Sentry.captureException(e);
+      this.sentry.captureException(e);
       return {};
     }
   }

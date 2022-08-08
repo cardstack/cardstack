@@ -108,7 +108,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       let embed = new MessageEmbed()
         .setTitle('Your Prepaid Card is Ready!')
         .setDescription(
-          `Your prepaid card address is ${prepaidCard.address}. You can refresh your Card Wallet app to see your new prepaid card.`
+          `Your prepaid card address is ${prepaidCard.address}. You can refresh your Cardstack Wallet app to see your new prepaid card.`
         )
         .attachFiles([prepaidCardImage])
         .setImage(`attachment://${basename(prepaidCardImage)}`);

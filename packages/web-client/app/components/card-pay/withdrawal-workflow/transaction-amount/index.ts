@@ -96,11 +96,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get isAmountCtaDisabled() {
-    return (
-      this.isInvalid ||
-      this.amount === '' ||
-      this.amountCtaState === 'memorialized'
-    );
+    return this.isInvalid || this.amount === '' || this.args.isComplete;
   }
 
   get amountAsBigNumber(): BN {
@@ -172,7 +168,15 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
       assertBridgedTokenSymbol(currentTokenSymbol);
 
-      this.args.workflowSession.setValue('withdrawnAmount', withdrawnAmount);
+      let withdrawnAmountFromSession =
+        this.args.workflowSession.getValue('withdrawnAmount');
+      if (
+        !withdrawnAmountFromSession ||
+        !withdrawnAmount.eq(withdrawnAmountFromSession as BN)
+      ) {
+        // only set this if it is different than what is already in the session
+        this.args.workflowSession.setValue('withdrawnAmount', withdrawnAmount);
+      }
 
       let transactionReceipt: TransactionReceipt;
 

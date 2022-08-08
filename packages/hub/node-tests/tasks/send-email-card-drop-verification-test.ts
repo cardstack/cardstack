@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import SendEmailCardDropVerification from '../../tasks/send-email-card-drop-verification';
 import { makeJobHelpers } from 'graphile-worker/dist/helpers';
-import EmailCardDropRequestsQueries from '../../queries/email-card-drop-requests';
 import config from 'config';
 import { EmailCardDropRequest } from '../../routes/email-card-drop-requests';
 
@@ -69,16 +68,15 @@ describe('SendEmailCardDropVerificationTask', function () {
     registry(this).register('email', StubEmail);
   });
 
-  let { getContainer } = setupHub(this);
+  let { getContainer, getPrisma } = setupHub(this);
   setupSentry(this);
   this.beforeEach(async function () {
     StubEmail.shouldThrow = false;
     StubEmail.lastSent = null;
-    let cardDropQueries = (await getContainer().lookup('email-card-drop-requests', {
-      type: 'query',
-    })) as EmailCardDropRequestsQueries;
-    await cardDropQueries.insert(cardDropRequest);
-    await cardDropQueries.insert(expiredCardDropRequest);
+
+    let prisma = await getPrisma();
+
+    await prisma.emailCardDropRequest.createMany({ data: [cardDropRequest, expiredCardDropRequest] });
   });
 
   it('sends an email that contains the verification link', async function () {

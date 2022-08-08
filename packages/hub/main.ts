@@ -83,7 +83,6 @@ import ChecklyWebhookRoute from './routes/checkly-webhook';
 import PagerdutyIncidentsWebhookRoute from './routes/pagerduty-incidents-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
-import { registerQueries } from './queries';
 import EmailCardDropRouter from './services/email-card-drop-router';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
@@ -187,7 +186,6 @@ export function createRegistry(): Registry {
 
   registerServices(registry);
   registerRoutes(registry);
-  registerQueries(registry);
 
   return registry;
 }
