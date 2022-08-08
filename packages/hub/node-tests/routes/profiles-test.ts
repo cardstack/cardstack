@@ -27,7 +27,7 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe.only('/api/profiles', function () {
+describe('/api/profiles', function () {
   describe('GET /api/profiles/validate-slug/:slug', function () {
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);
