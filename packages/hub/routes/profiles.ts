@@ -79,7 +79,7 @@ export default class ProfilesRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const profile: Profile = {
+    let properties = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
@@ -89,23 +89,23 @@ export default class ProfilesRoute {
       profileImageUrl: ctx.request.body.data.attributes['profile-image-url'],
       links: ctx.request.body.data.attributes['links'],
       ownerAddress: ctx.state.userAddress,
-      createdAt: new Date(), // FIXME why when the field has a default?
     };
 
-    await prisma.$transaction(async () => {
-      await prisma.profile.create({ data: { ...profile } });
-    });
+    let profile: Profile;
+
+    profile = await prisma.profile.create({ data: { ...properties } });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
       id: profile.id,
     });
 
-    let serialized = await this.profileSerializer.serialize(profile);
+    let serialized = this.profileSerializer.serialize(profile);
 
     ctx.status = 201;
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
   }
+
   async patch(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
