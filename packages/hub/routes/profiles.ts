@@ -5,15 +5,14 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
-import CardSpaceValidator from '../services/validators/card-space';
+import ProfileValidator from '../services/validators/profile';
 import shortUUID from 'short-uuid';
 import { Profile } from '@prisma/client';
 import { serializeErrors } from './utils/error';
 
 export default class ProfilesRoute {
-  // FIXME remove/rename etc
-  cardSpaceValidator: CardSpaceValidator = inject('card-space-validator', {
-    as: 'cardSpaceValidator',
+  profileValidator: ProfileValidator = inject('profile-validator', {
+    as: 'profileValidator',
   });
   profileSerializer = inject('profile-serializer', {
     as: 'profileSerializer',
@@ -155,7 +154,7 @@ export default class ProfilesRoute {
       profile.links = ctx.request.body.data.attributes['links'];
     }
 
-    let errors = await this.cardSpaceValidator.validate(profile);
+    let errors = await this.profileValidator.validate(profile);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
 
     if (hasErrors) {

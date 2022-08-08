@@ -48,7 +48,7 @@ import WyreCallbackRoute from './routes/wyre-callback';
 import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoService from './services/merchant-info';
-import CardSpaceValidator from './services/validators/card-space';
+import ProfileValidator from './services/validators/profile';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
@@ -140,7 +140,6 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('email-card-drop-request-serializer', EmailCardDropRequestSerializer);
-  registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('job-tickets-route', JobTicketsRoute);
@@ -148,6 +147,7 @@ export function createRegistry(): Registry {
   registry.register('profile-purchases-route', ProfilePurchasesRoute);
   registry.register('profiles-route', ProfilesRoute);
   registry.register('profile-serializer', ProfileSerializer);
+  registry.register('profile-validator', ProfileValidator);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
