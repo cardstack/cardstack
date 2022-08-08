@@ -98,9 +98,9 @@ describe('Cardstack DID Resolver', function () {
     });
 
     it('generates a DID for card space', function () {
-      let identifier = encodeDID({ type: 'CardSpace' }).split(':')[2];
-      expect(identifier).to.match(/^1c/);
-      expect(parseIdentifier(identifier).type).to.eq('CardSpace');
+      let identifier = encodeDID({ type: 'Profile' }).split(':')[2];
+      expect(identifier).to.match(/^1o/);
+      expect(parseIdentifier(identifier).type).to.eq('Profile');
     });
 
     it('generates a DID for reward rule', function () {
@@ -137,9 +137,9 @@ describe('Cardstack DID Resolver', function () {
       let result = await resolver.resolve(did);
       expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/supplier-info/${uniqueId}.json`);
     });
-    it('returns a DIDDocument for a CardSpace', async function () {
+    it('returns a DIDDocument for a Profile', async function () {
       let uniqueId = shortUuid.generate();
-      let did = encodeDID({ type: 'CardSpace', version: 3, uniqueId });
+      let did = encodeDID({ type: 'Profile', version: 3, uniqueId });
       let result = await resolver.resolve(did);
       expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/card-space/${uniqueId}.json`);
     });
