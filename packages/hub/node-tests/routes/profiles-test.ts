@@ -222,6 +222,8 @@ describe('/api/profiles', function () {
             color: 'ff0000',
             'text-color': 'ffffff',
             'owner-address': '0x00000000000',
+            'profile-description': 'description',
+            'profile-image-url': 'http://example.com/image.jpg',
           },
         },
       };
@@ -251,6 +253,9 @@ describe('/api/profiles', function () {
               color: 'ff0000',
               'text-color': 'ffffff',
               'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              links: [],
+              'profile-description': 'description',
+              'profile-image-url': 'http://example.com/image.jpg',
             },
           },
         })
