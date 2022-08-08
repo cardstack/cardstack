@@ -5,13 +5,29 @@ import config from 'config';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
 import { Profile } from '@prisma/client';
 
+type ResourceType = 'profiles' | 'card-spaces' | 'merchant-infos';
+
+const cardSpacesMapping: Record<string, keyof Profile> = {
+  links: 'links',
+  'profile-description': 'profileDescription',
+  'profile-image-url': 'profileImageUrl',
+};
+
+const merchantInfosMapping: Record<string, keyof Profile> = {
+  name: 'name',
+  slug: 'slug',
+  color: 'color',
+  'text-color': 'textColor',
+  'owner-address': 'ownerAddress',
+};
+
 export default class ProfileSerializer {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  serialize(model: Profile): JSONAPIDocument;
-  serialize(model: Profile[]): JSONAPIDocument;
+  serialize(model: Profile, type?: ResourceType): JSONAPIDocument;
+  serialize(model: Profile[], type?: ResourceType): JSONAPIDocument;
 
-  serialize(model: Profile | Profile[]): JSONAPIDocument {
+  serialize(model: Profile | Profile[], type: ResourceType = 'profiles'): JSONAPIDocument {
     if (Array.isArray(model)) {
       return {
         data: model.map((m) => {
@@ -22,26 +38,42 @@ export default class ProfileSerializer {
       // FIXME what is to be done with this type?
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
-      const result = {
+      let attributes: any = { did };
+      let propertyMappings;
+
+      if (type === 'profiles') {
+        propertyMappings = { ...merchantInfosMapping, ...cardSpacesMapping };
+      } else if (type === 'merchant-infos') {
+        propertyMappings = merchantInfosMapping;
+      } else if (type === 'card-spaces') {
+        propertyMappings = cardSpacesMapping;
+      }
+
+      for (let key in propertyMappings) {
+        attributes[key] = model[propertyMappings[key]];
+      }
+
+      const result: JSONAPIDocument = {
         meta: {
           network: config.get('web3.layer2Network'),
         },
         data: {
           id: model.id,
-          type: 'profiles',
-          attributes: {
-            did,
-            name: model.name,
-            slug: model.slug,
-            color: model.color,
-            'text-color': model.textColor,
-            'owner-address': model.ownerAddress,
-            links: model.links,
-            'profile-description': model.profileDescription,
-            'profile-image-url': model.profileImageUrl,
-          },
+          type,
+          attributes,
         },
       };
+
+      if (type === 'card-spaces') {
+        result.data.relationships = { 'merchant-info': { data: { id: model.id, type: 'merchant-infos' } } };
+        let includedAttributes: any = { did };
+
+        for (let key in merchantInfosMapping) {
+          includedAttributes[key] = model[merchantInfosMapping[key]];
+        }
+
+        result.included = [{ attributes: includedAttributes, id: model.id, type: 'merchant-infos' }];
+      }
 
       return result as JSONAPIDocument;
     }
