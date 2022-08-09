@@ -90,7 +90,8 @@ export default class APIRouter {
 
     apiSubrouter.post('/profiles', parseBody, profilesRoute.post);
     apiSubrouter.get('/profiles/validate-slug/:slug', profilesRoute.getValidation);
-    apiSubrouter.get('/profiles', parseBody, profilesRoute.get);
+    apiSubrouter.get('/profiles', parseBody, profilesRoute.list);
+    apiSubrouter.get('/profiles/:slug', profilesRoute.get);
     apiSubrouter.patch('/profiles/:id', parseBody, profilesRoute.patch);
     apiSubrouter.get('/profiles/short-id/:id', parseBody, profilesRoute.getFromShortId);
 
