@@ -1,18 +1,18 @@
 {{#unless this.isInitializing}}
   <WorkflowThread
-    data-test-create-merchant-workflow
-    class="create-merchant-workflow"
+    data-test-create-profile-workflow
+    class='create-profile-workflow'
     @workflow={{this.workflow}}
     @onClose={{@onClose}}
   />
 {{/unless}}
 <Listener
   @emitter={{this.layer2Network}}
-  @event="disconnect"
+  @event='disconnect'
   @action={{this.onDisconnect}}
 />
 <Listener
   @emitter={{this.layer2Network}}
-  @event="account-changed"
+  @event='account-changed'
   @action={{this.onAccountChanged}}
 />

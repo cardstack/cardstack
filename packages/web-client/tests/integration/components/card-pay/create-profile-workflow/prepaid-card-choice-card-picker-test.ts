@@ -7,7 +7,7 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
 
 module(
-  'Integration | Component | card-pay/create-merchant/prepaid-card-choice-card-picker edge cases',
+  'Integration | Component | card-pay/create-profile/prepaid-card-choice-card-picker edge cases',
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let prepaidCardAddress: string;
@@ -44,11 +44,11 @@ module(
 
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        merchantName: 'Mandello',
-        merchantId: 'mandello1',
-        merchantBgColor: '#ff5050',
-        merchantTextColor: '#fff',
-        merchantRegistrationFee: 1000,
+        profileName: 'Mandello',
+        profileSlug: 'mandello1',
+        profileBgColor: '#ff5050',
+        profileTextColor: '#fff',
+        profileRegistrationFee: 1000,
       });
 
       this.setProperties({
@@ -60,7 +60,7 @@ module(
       });
 
       await render(hbs`
-        <CardPay::CreateMerchantWorkflow::PrepaidCardChoice
+        <CardPay::CreateProfileWorkflow::PrepaidCardChoice
           @onComplete={{this.onComplete}}
           @isComplete={{this.isComplete}}
           @onIncomplete={{this.onIncomplete}}

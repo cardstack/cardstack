@@ -10,7 +10,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { TinyColor } from '@ctrl/tinycolor';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createSafeToken,
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
@@ -30,7 +30,7 @@ module(
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      this.server.create('merchant-info', {
+      this.server.create('profile', {
         id: await getFilenameFromDid(EXAMPLE_DID),
         name: 'Mandello',
         slug: 'mandello1',
@@ -49,9 +49,9 @@ module(
               createSafeToken('DAI.CPXD', '250000000000000000000'),
             ],
           }),
-          createMerchantSafe({
+          createProfileSafe({
             address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
-            merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+            profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [
               createSafeToken('DAI.CPXD', '125000000000000000000'),
               createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -86,7 +86,7 @@ module(
         .containsText('0xmerchantbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom(
-          '.ember-power-select-options li:nth-child(2) [data-test-merchant-logo]'
+          '.ember-power-select-options li:nth-child(2) [data-test-profile-logo]'
         )
         .containsText('M')
         .hasStyle({

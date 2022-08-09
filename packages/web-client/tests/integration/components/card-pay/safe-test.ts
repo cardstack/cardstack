@@ -9,7 +9,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
   getFilenameFromDid,
@@ -28,11 +28,11 @@ module('Integration | Component | card-pay/safe', function (hooks) {
   let layer2Service: Layer2TestWeb3Strategy;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-  let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+  let profileAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
   let prepaidCardAddress = '0xprepaidDbAB0644ffCD32518eBF4924ba8666666';
 
   hooks.beforeEach(async function (this: Context) {
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(EXAMPLE_DID),
       name: 'Mandello',
       slug: 'mandello1',
@@ -90,9 +90,9 @@ module('Integration | Component | card-pay/safe', function (hooks) {
   test('it renders a merchant safe', async function (this: Context, assert) {
     this.set(
       'safe',
-      createMerchantSafe({
-        address: merchantAddress,
-        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      createProfileSafe({
+        address: profileAddress,
+        profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [createSafeToken('DAI.CPXD', '125000000000000000000')],
         accumulatedSpendValue: 100,
         infoDID: EXAMPLE_DID,
@@ -119,7 +119,7 @@ module('Integration | Component | card-pay/safe', function (hooks) {
     });
 
     assert
-      .dom('[data-test-merchant-logo]')
+      .dom('[data-test-profile-logo]')
       .containsText('M')
       .hasStyle({
         'background-color': new TinyColor('#00ffc1').toRgbString(),

@@ -2,7 +2,7 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
+import ProfileService from '@cardstack/web-client/services/profile';
 import { inject as service } from '@ember/service';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { didCancel, restartableTask, timeout } from 'ember-concurrency';
@@ -15,36 +15,36 @@ import { isPresent } from '@ember/utils';
 
 const randomColorOptions = config.environment === 'test' ? { seed: 1 } : {};
 
-export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
+export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
-  @service declare merchantInfo: MerchantInfoService;
+  @service declare profile: ProfileService;
 
-  @tracked merchantBgColor: string =
+  @tracked profileBgColor: string =
     randomColor(randomColorOptions).toHexString();
-  @tracked merchantName: string = '';
-  @tracked merchantId: string = '';
+  @tracked profileName: string = '';
+  @tracked profileSlug: string = '';
   @tracked lastCheckedMerchantId = '';
   @tracked lastCheckedMerchantIdValid = false;
-  @tracked merchantNameValidationMessage = '';
-  @tracked merchantIdValidationMessage = '';
-  @tracked merchantBgColorValidationMessage = '';
+  @tracked profileNameValidationMessage = '';
+  @tracked profileSlugValidationMessage = '';
+  @tracked profileBgColorValidationMessage = '';
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     let { workflowSession } = this.args;
-    let merchantName = workflowSession.getValue<string>('merchantName');
-    let merchantId = workflowSession.getValue<string>('merchantId');
-    let merchantBgColor = workflowSession.getValue<string>('merchantBgColor');
+    let profileName = workflowSession.getValue<string>('profileName');
+    let profileSlug = workflowSession.getValue<string>('profileSlug');
+    let profileBgColor = workflowSession.getValue<string>('profileBgColor');
 
     if (
-      isPresent(merchantName) &&
-      isPresent(merchantId) &&
-      isPresent(merchantBgColor)
+      isPresent(profileName) &&
+      isPresent(profileSlug) &&
+      isPresent(profileBgColor)
     ) {
-      this.merchantName = merchantName!;
-      this.merchantBgColor = merchantBgColor!;
-      this.merchantId = merchantId!;
-      this.validateMerchantId(); // this is necessary for enabling the CTA
+      this.profileName = profileName!;
+      this.profileBgColor = profileBgColor!;
+      this.profileSlug = profileSlug!;
+      this.validateProfileSlug(); // this is necessary for enabling the CTA
     }
   }
 
@@ -53,7 +53,7 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   }
 
   get allFieldsPopulated() {
-    if (this.merchantBgColor && this.merchantName && this.merchantId) {
+    if (this.profileBgColor && this.profileName && this.profileSlug) {
       return true;
     }
     return false;
@@ -61,21 +61,21 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
 
   get noValidationErrors() {
     return (
-      this.merchantIdInputState === 'valid' &&
-      !this.merchantNameValidationMessage &&
-      !this.merchantBgColorValidationMessage
+      this.profileSlugInputState === 'valid' &&
+      !this.profileNameValidationMessage &&
+      !this.profileBgColorValidationMessage
     );
   }
 
-  get merchantIdInputState() {
-    if (taskFor(this.validateMerchantIdTask).isRunning) {
+  get profileSlugInputState() {
+    if (taskFor(this.validateProfileSlugTask).isRunning) {
       return 'loading';
     } else if (
-      this.lastCheckedMerchantId === this.merchantId &&
+      this.lastCheckedMerchantId === this.profileSlug &&
       this.lastCheckedMerchantIdValid
     ) {
       return 'valid';
-    } else if (this.merchantIdValidationMessage) {
+    } else if (this.profileSlugValidationMessage) {
       return 'invalid';
     } else {
       return 'initial';
@@ -83,55 +83,53 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   }
 
   // We might want to do some whitespace collapsing before saving?
-  get trimmedMerchantName() {
-    return this.merchantName.trim();
+  get trimmedProfileName() {
+    return this.profileName.trim();
   }
 
-  get merchantTextColor() {
-    return mostReadable(this.merchantBgColor, [
+  get profileTextColor() {
+    return mostReadable(this.profileBgColor, [
       '#ffffff',
       '#000000',
     ])!.toHexString();
   }
 
-  @action onMerchantNameInput(value: string) {
-    this.merchantName = value;
+  @action onProfileNameInput(value: string) {
+    this.profileName = value;
     this.validateMerchantName();
   }
 
-  @action onMerchantIdInput(value: string) {
-    this.merchantId = value;
-    this.validateMerchantId();
+  @action onProfileSlugInput(value: string) {
+    this.profileSlug = value;
+    this.validateProfileSlug();
   }
 
-  @action onMerchantBgColorInput(event: InputEvent) {
+  @action onProfileBgColorInput(event: InputEvent) {
     let value = (event.target as HTMLInputElement).value;
-    this.merchantBgColor = value;
+    this.profileBgColor = value;
   }
 
   @action saveDetails() {
     let valuesToStore = {
-      merchantName: this.trimmedMerchantName,
-      merchantId: this.merchantId,
-      merchantBgColor: this.merchantBgColor,
-      merchantTextColor: this.merchantTextColor,
+      profileName: this.trimmedProfileName,
+      profileSlug: this.profileSlug,
+      profileBgColor: this.profileBgColor,
+      profileTextColor: this.profileTextColor,
     };
     let { workflowSession } = this.args;
-    let merchantInfoHasBeenPersisted =
-      !!workflowSession.getValue('merchantInfo');
+    let profileHasBeenPersisted = !!workflowSession.getValue('profile');
 
-    if (merchantInfoHasBeenPersisted) {
+    if (profileHasBeenPersisted) {
       let detailsHaveChangedSincePersistence =
-        workflowSession.getValue('merchantName') !==
-          valuesToStore.merchantName ||
-        workflowSession.getValue('merchantId') !== valuesToStore.merchantId ||
-        workflowSession.getValue('merchantBgColor') !==
-          valuesToStore.merchantBgColor ||
-        workflowSession.getValue('merchantTextColor') !==
-          valuesToStore.merchantTextColor;
+        workflowSession.getValue('profileName') !== valuesToStore.profileName ||
+        workflowSession.getValue('profileSlug') !== valuesToStore.profileSlug ||
+        workflowSession.getValue('profileBgColor') !==
+          valuesToStore.profileBgColor ||
+        workflowSession.getValue('profileTextColor') !==
+          valuesToStore.profileTextColor;
 
       if (detailsHaveChangedSincePersistence) {
-        workflowSession.delete('merchantInfo');
+        workflowSession.delete('profile');
       }
     }
 
@@ -141,31 +139,31 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
 
   @action validateMerchantName() {
     let message: string = '';
-    if (!this.trimmedMerchantName.length) {
+    if (!this.trimmedProfileName.length) {
       message = 'This field is required';
-    } else if (this.trimmedMerchantName.length > 50) {
+    } else if (this.trimmedProfileName.length > 50) {
       message = 'Cannot exceed 50 characters';
     }
-    this.merchantNameValidationMessage = message;
+    this.profileNameValidationMessage = message;
   }
 
-  @action async validateMerchantId(earlyReturnForBlur = false) {
+  @action async validateProfileSlug(earlyReturnForBlur = false) {
     if (earlyReturnForBlur) {
-      if (!this.merchantId) {
-        // we know it's invalid if there's no merchant id, so we don't need the previous task to keep running
-        taskFor(this.validateMerchantIdTask).cancelAll();
-        this.merchantIdValidationMessage = 'This field is required';
+      if (!this.profileSlug) {
+        // we know it's invalid if there's no profile id, so we don't need the previous task to keep running
+        taskFor(this.validateProfileSlugTask).cancelAll();
+        this.profileSlugValidationMessage = 'This field is required';
         this.lastCheckedMerchantId = '';
         this.lastCheckedMerchantIdValid = false;
       }
-      // if there is a merchant id, blur validation is a no-op
+      // if there is a profile id, blur validation is a no-op
       // let the last validation task from input continue if it needs to
       // otherwise we keep the current state
       return;
     }
 
     try {
-      await taskFor(this.validateMerchantIdTask).perform();
+      await taskFor(this.validateProfileSlugTask).perform();
     } catch (e) {
       if (didCancel(e)) {
         return;
@@ -174,38 +172,38 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     }
   }
 
-  @restartableTask *validateMerchantIdTask() {
+  @restartableTask *validateProfileSlugTask() {
     // debounce
     yield timeout(config.environment === 'test' ? 10 : 500);
-    let value = this.merchantId;
+    let value = this.profileSlug;
 
-    this.merchantIdValidationMessage = validateMerchantId(value);
+    this.profileSlugValidationMessage = validateMerchantId(value);
 
-    if (this.merchantIdValidationMessage) {
+    if (this.profileSlugValidationMessage) {
       this.lastCheckedMerchantIdValid = false;
       return;
     }
 
     try {
       let { slugAvailable, detail } = yield taskFor(
-        this.merchantInfo.checkMerchantSlugUniquenessTask
+        this.profile.checkMerchantSlugUniquenessTask
       ).perform({ slug: value });
 
       this.lastCheckedMerchantId = value;
       if (!slugAvailable) {
-        this.merchantIdValidationMessage = detail;
+        this.profileSlugValidationMessage = detail;
         this.lastCheckedMerchantIdValid = false;
         return;
       }
 
-      this.merchantIdValidationMessage = '';
+      this.profileSlugValidationMessage = '';
       this.lastCheckedMerchantIdValid = true;
       return;
     } catch (e) {
       console.error('Error validating uniqueness', e);
       Sentry.captureException(e);
 
-      this.merchantIdValidationMessage =
+      this.profileSlugValidationMessage =
         'There was an error validating payment profile ID uniqueness';
       this.lastCheckedMerchantId = '';
       this.lastCheckedMerchantIdValid = false;

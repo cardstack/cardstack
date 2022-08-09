@@ -12,7 +12,7 @@ interface Args {
   };
 }
 
-export interface MerchantInfoResource {
+export interface ProfileResource {
   id: string | undefined;
   name: string | undefined;
   backgroundColor: string | undefined;
@@ -21,10 +21,7 @@ export interface MerchantInfoResource {
   errored: Error | undefined;
 }
 
-export class MerchantInfo
-  extends Resource<Args>
-  implements MerchantInfoResource
-{
+export class Profile extends Resource<Args> implements ProfileResource {
   @tracked id: string | undefined;
   @tracked name: string | undefined;
   @tracked backgroundColor: string | undefined;
@@ -41,20 +38,20 @@ export class MerchantInfo
 
   private async run(infoDID: string, waitForInfo: boolean) {
     try {
-      await this.fetchMerchantInfo(infoDID, waitForInfo);
+      await this.fetchProfile(infoDID, waitForInfo);
       this.loading = false;
     } catch (err) {
       this.errored = err;
       this.loading = false;
 
       if (!isStorage404(err)) {
-        console.log('Exception fetching merchant info', err);
+        console.log('Exception fetching profile', err);
         Sentry.captureException(err);
       }
     }
   }
 
-  private async fetchMerchantInfo(
+  private async fetchProfile(
     infoDID: string,
     waitForInfo = false
   ): Promise<void> {

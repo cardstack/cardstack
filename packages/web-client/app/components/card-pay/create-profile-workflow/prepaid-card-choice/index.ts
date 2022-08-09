@@ -6,7 +6,7 @@ import { tracked } from '@glimmer/tracking';
 import config from '@cardstack/web-client/config/environment';
 import { IWorkflowSession } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
+import ProfileService from '@cardstack/web-client/services/profile';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
@@ -26,7 +26,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
-interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
+interface CardPayCreateProfileWorkflowPrepaidCardChoiceComponentArgs {
   workflowSession: IWorkflowSession;
   onComplete: () => void;
   isComplete: boolean;
@@ -40,12 +40,12 @@ interface DropdownOption {
 
 const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
-export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
-  @service declare merchantInfo: MerchantInfoService;
+export default class CardPayCreateProfileWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateProfileWorkflowPrepaidCardChoiceComponentArgs> {
+  @service declare profile: ProfileService;
   @service declare layer2Network: Layer2Network;
   @reads('createTask.last.error') declare error: Error | undefined;
-  get merchantRegistrationFee(): number {
-    return this.args.workflowSession.getValue('merchantRegistrationFee')!;
+  get profileRegistrationFee(): number {
+    return this.args.workflowSession.getValue('profileRegistrationFee')!;
   }
 
   @tracked chinInProgressMessage?: string;
@@ -57,7 +57,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
   constructor(
     owner: unknown,
-    args: CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs
+    args: CardPayCreateProfileWorkflowPrepaidCardChoiceComponentArgs
   ) {
     super(owner, args);
     let { workflowSession } = this.args;
@@ -74,7 +74,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       this.selectedPrepaidCardAddress = prepaidCardAddress;
     } else {
       let availableCards = this.prepaidCards.filter(
-        (c) => c.spendFaceValue >= this.merchantRegistrationFee
+        (c) => c.spendFaceValue >= this.profileRegistrationFee
       );
       if (availableCards.length === 1) {
         this.selectedPrepaidCardAddress = availableCards[0].address;
@@ -85,9 +85,9 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @action checkForPendingTransaction() {
     let { workflowSession } = this.args;
     let txnHash = workflowSession.getValue('txnHash');
-    let merchantSafe = workflowSession.getValue('merchantSafe');
+    let profileSafe = workflowSession.getValue('profileSafe');
 
-    if (txnHash && !merchantSafe) {
+    if (txnHash && !profileSafe) {
       this.createMerchant();
     }
   }
@@ -105,7 +105,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
     if (this.prepaidCards.length) {
       this.prepaidCards.forEach((c) => {
-        let isLowBal = c.spendFaceValue < this.merchantRegistrationFee;
+        let isLowBal = c.spendFaceValue < this.profileRegistrationFee;
         let option: DropdownOption = {
           id: c.address,
           card: c,
@@ -150,31 +150,31 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         );
       }
 
-      if (!workflowSession.getValue('merchantInfo')) {
-        let persistedMerchantInfo = yield taskFor(
-          this.merchantInfo.persistMerchantInfoTask
+      if (!workflowSession.getValue('profile')) {
+        let persistedProfile = yield taskFor(
+          this.profile.persistProfileInfoTask
         ).perform({
-          name: workflowSession.getValue('merchantName')!,
-          slug: workflowSession.getValue('merchantId')!,
-          color: workflowSession.getValue('merchantBgColor')!,
-          textColor: workflowSession.getValue('merchantTextColor')!,
+          name: workflowSession.getValue('profileName')!,
+          slug: workflowSession.getValue('profileSlug')!,
+          color: workflowSession.getValue('profileBgColor')!,
+          textColor: workflowSession.getValue('profileTextColor')!,
         });
 
-        workflowSession.setValue('merchantInfo', persistedMerchantInfo);
+        workflowSession.setValue('profile', persistedProfile);
       }
 
       if (
         workflowSession.getValue('txnHash') &&
-        !workflowSession.getValue('merchantSafe')
+        !workflowSession.getValue('profileSafe')
       ) {
         let txnHash = workflowSession.getValue<TransactionHash>('txnHash')!;
         this.chinInProgressMessage = 'Processing transaction…';
 
-        const merchantSafe: MerchantSafe = yield taskFor(
-          this.layer2Network.resumeRegisterMerchantTransactionTask
+        const profileSafe: MerchantSafe = yield taskFor(
+          this.layer2Network.resumeRegisterProfileTransactionTask
         ).perform(this.selectedPrepaidCardAddress, txnHash);
 
-        workflowSession.setValue('merchantSafe', merchantSafe);
+        workflowSession.setValue('profileSafe', profileSafe);
       } else {
         let options: TransactionOptions = {
           onTxnHash: (txnHash: TransactionHash) => {
@@ -192,20 +192,20 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
           };
         }
 
-        let registerMerchantTaskInstance = taskFor(
-          this.layer2Network.registerMerchantTask
+        let registerProfileTaskInstance = taskFor(
+          this.layer2Network.registerProfileTask
         ).perform(
           this.selectedPrepaidCardAddress,
-          workflowSession.getValue<Record<string, string>>('merchantInfo')!.did,
+          workflowSession.getValue<Record<string, string>>('profile')!.did,
           options
         );
 
-        let merchantSafe = yield race([
-          registerMerchantTaskInstance,
+        let profileSafe = yield race([
+          registerProfileTaskInstance,
           taskFor(this.timerTask).perform(),
         ]);
 
-        workflowSession.setValue('merchantSafe', merchantSafe);
+        workflowSession.setValue('profileSafe', profileSafe);
 
         this.createTaskRunningForAWhile = false;
       }
@@ -214,7 +214,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     } catch (e) {
       workflowSession.delete('txnHash');
       let insufficientFunds = e.message.startsWith(
-        'Prepaid card does not have enough balance to register a merchant.'
+        'Prepaid card does not have enough balance to register a profile.'
       );
       let tookTooLong = e.message.startsWith(
         'Transaction took too long to complete'

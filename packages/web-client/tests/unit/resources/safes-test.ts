@@ -10,7 +10,7 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import { DepotSafe, Safe, ViewSafesResult } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
   generateMockAddress,
@@ -95,13 +95,13 @@ module('Unit | Resource | Safes', function (hooks) {
   });
 
   test('it can return a TrackedSafe defined in individual update data but not in graphData', async function (assert) {
-    let merchantSafe = createMerchantSafe({});
-    strategy._latestSafe = merchantSafe;
+    let profileSafe = createProfileSafe({});
+    strategy._latestSafe = profileSafe;
 
-    await safes.updateOne(merchantSafe.address);
+    await safes.updateOne(profileSafe.address);
     assert.deepEqual(
-      safes.getByAddress(merchantSafe.address)!,
-      new TrackedMerchantSafe(merchantSafe)
+      safes.getByAddress(profileSafe.address)!,
+      new TrackedMerchantSafe(profileSafe)
     );
   });
 
@@ -281,7 +281,7 @@ module('Unit | Resource | Safes', function (hooks) {
       createSafeToken('CARD.CPXD', toWei('25')),
     ];
 
-    let sufficientMerchantSafe = createMerchantSafe({
+    let sufficientMerchantSafe = createProfileSafe({
       tokens: sufficientTokens,
     });
 
@@ -289,7 +289,7 @@ module('Unit | Resource | Safes', function (hooks) {
       safes: [
         defaultDepotSafe,
         sufficientMerchantSafe,
-        createMerchantSafe({ tokens: insufficientTokens }),
+        createProfileSafe({ tokens: insufficientTokens }),
         createPrepaidCardSafe({ tokens: sufficientTokens }),
       ],
       blockNumber: defaultBlockNumber,

@@ -10,7 +10,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
@@ -30,7 +30,7 @@ module(
     let layer2Service: Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let depotSafe: DepotSafe;
-    let merchantSafe: MerchantSafe;
+    let profileSafe: MerchantSafe;
     let workflowSession: WorkflowSession;
 
     setupRenderingTest(hooks);
@@ -49,9 +49,9 @@ module(
           ],
         });
 
-        merchantSafe = createMerchantSafe({
+        profileSafe = createProfileSafe({
           address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
-          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
             createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
             createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -61,10 +61,10 @@ module(
 
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           depotSafe,
-          merchantSafe,
-          createMerchantSafe({
+          profileSafe,
+          createProfileSafe({
             address: 'low-balance-safe',
-            merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+            profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [createSafeToken('DAI.CPXD', '1')],
             accumulatedSpendValue: 100,
           }),
@@ -132,7 +132,7 @@ module(
       test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
         workflowSession.setValue(
           'prepaidFundingSafeAddress',
-          merchantSafe.address
+          profileSafe.address
         );
 
         await render(hbs`
@@ -166,7 +166,7 @@ module(
 
       test('it renders an error message when no safe with sufficient balances exists', async function (assert) {
         depotSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
-        merchantSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
+        profileSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
         await render(hbs`
@@ -190,9 +190,9 @@ module(
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
-      merchantSafe = createMerchantSafe({
+      profileSafe = createProfileSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
-        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
           createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
           createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -201,7 +201,7 @@ module(
       });
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
-        merchantSafe,
+        profileSafe,
       ]);
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

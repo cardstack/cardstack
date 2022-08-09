@@ -23,7 +23,7 @@ const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your payment profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
 module(
-  'Integration | Component | card-pay/create-merchant/prepaid-card-choice',
+  'Integration | Component | card-pay/create-profile/prepaid-card-choice',
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let prepaidCardAddress: string;
@@ -62,12 +62,12 @@ module(
 
       workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        merchantName: 'Mandello',
-        merchantId: 'mandello1',
-        merchantBgColor: '#ff5050',
-        merchantTextColor: '#fff',
-        merchantRegistrationFee:
-          await layer2Service.fetchMerchantRegistrationFee(),
+        profileName: 'Mandello',
+        profileSlug: 'mandello1',
+        profileBgColor: '#ff5050',
+        profileTextColor: '#fff',
+        profileRegistrationFee:
+          await layer2Service.fetchProfileRegistrationFee(),
       });
 
       this.setProperties({
@@ -79,7 +79,7 @@ module(
       });
 
       await render(hbs`
-        <CardPay::CreateMerchantWorkflow::PrepaidCardChoice
+        <CardPay::CreateProfileWorkflow::PrepaidCardChoice
           @onComplete={{this.onComplete}}
           @isComplete={{this.isComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -104,17 +104,17 @@ module(
         .dom(`[data-test-boxel-card-container]`)
         .containsText('Choose a prepaid card to pay the profile creation fee');
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-fee]')
+        .dom('[data-test-prepaid-card-choice-profile-fee]')
         .containsText('$1.00 USD');
       assert
-        .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', 'Mandello');
+        .dom('[data-test-profile]')
+        .hasAttribute('data-test-profile', 'Mandello');
       assert
-        .dom('[data-test-merchant-logo]')
-        .hasAttribute('data-test-merchant-logo-background', '#ff5050')
-        .hasAttribute('data-test-merchant-logo-text-color', '#fff');
+        .dom('[data-test-profile-logo]')
+        .hasAttribute('data-test-profile-logo-background', '#ff5050')
+        .hasAttribute('data-test-profile-logo-text-color', '#fff');
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-id]')
+        .dom('[data-test-prepaid-card-choice-profile-slug]')
         .containsText('mandello1');
       assert
         .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
@@ -181,44 +181,44 @@ module(
 
     test('it displays the correct data in in-progress state', async function (assert) {
       await selectPrepaidCard(prepaidCardAddress);
-      await click('[data-test-create-merchant-button]');
-      await waitFor('[data-test-create-merchant-cancel-button]');
+      await click('[data-test-create-profile-button]');
+      await waitFor('[data-test-create-profile-cancel-button]');
 
       assert
         .dom(`[data-test-boxel-card-container]`)
         .containsText('Choose a prepaid card to pay the profile creation fee');
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-fee]')
+        .dom('[data-test-prepaid-card-choice-profile-fee]')
         .containsText('$1.00 USD');
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-id]')
+        .dom('[data-test-prepaid-card-choice-profile-slug]')
         .containsText('mandello1');
       assert.dom(`[data-test-boxel-card-picker-dropdown]`).doesNotExist();
     });
 
     test('it allows canceling and retrying after a while', async function (assert) {
       assert
-        .dom('[data-test-create-merchant-button]')
+        .dom('[data-test-create-profile-button]')
         .containsText('Create Profile');
 
       await selectPrepaidCard(prepaidCardAddress);
-      await click('[data-test-create-merchant-button]');
+      await click('[data-test-create-profile-button]');
 
-      assert.dom('[data-test-create-merchant-cancel-button]').doesNotExist();
+      assert.dom('[data-test-create-profile-cancel-button]').doesNotExist();
 
-      await waitFor('[data-test-create-merchant-cancel-button]');
+      await waitFor('[data-test-create-profile-cancel-button]');
       layer2Service.test__simulateOnNonceForRegisterMerchantRequest(
         prepaidCardAddress,
         new BN('12345')
       );
 
-      await click('[data-test-create-merchant-cancel-button]');
+      await click('[data-test-create-profile-cancel-button]');
       assert
         .dom(`[data-test-boxel-card-picker-dropdown]`)
         .containsText('Change Card');
-      assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
+      assert.dom('[data-test-create-profile-button]').hasText('Try Again');
 
-      await click('[data-test-create-merchant-button]');
+      await click('[data-test-create-profile-button]');
       await waitUntil(() =>
         layer2Service.test__getNonceForRegisterMerchantRequest(
           prepaidCardAddress
@@ -233,13 +233,13 @@ module(
       );
     });
 
-    module('Test the sdk register merchant calls', function () {
-      test('it can call register merchant with selected prepaid card address', async function (assert) {
-        let approveSpy = sinon.spy(layer2Service, 'registerMerchant');
+    module('Test the sdk register profile calls', function () {
+      test('it can call register profile with selected prepaid card address', async function (assert) {
+        let approveSpy = sinon.spy(layer2Service, 'registerProfile');
 
         await selectPrepaidCard(prepaidCardAddress2);
-        await click('[data-test-create-merchant-button]');
-        await waitFor('[data-test-create-merchant-cancel-button]');
+        await click('[data-test-create-profile-button]');
+        await waitFor('[data-test-create-profile-cancel-button]');
 
         assert.ok(
           approveSpy.calledWith(prepaidCardAddress2),
@@ -249,19 +249,19 @@ module(
 
       test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(new Error('An arbitrary error'));
 
         assert
-          .dom('[data-test-create-merchant-button]')
+          .dom('[data-test-create-profile-button]')
           .containsText('Create Profile');
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
-          .dom('[data-test-create-merchant-button]')
+          .dom('[data-test-create-profile-button]')
           .containsText('Try Again');
       });
 
@@ -271,11 +271,11 @@ module(
         this.set('workflowSession.workflow', workflow);
 
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(new Error('No valid auth token'));
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
@@ -283,7 +283,7 @@ module(
           .containsText(DEFAULT_ERROR_MESSAGE);
 
         this.set('frozen', true);
-        assert.dom('[data-test-create-merchant-button]').isDisabled();
+        assert.dom('[data-test-create-profile-button]').isDisabled();
 
         assert.true(workflow.isCanceled);
         assert.strictEqual(workflow.cancelationReason, 'UNAUTHENTICATED');
@@ -291,11 +291,11 @@ module(
 
       test('it shows the correct error message for a user rejection', async function (assert) {
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(new Error('User rejected request'));
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
@@ -305,7 +305,7 @@ module(
 
       test('it shows the correct error message for a timeout', async function (assert) {
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(
             new Error(
               'Transaction took too long to complete, waited 30 seconds'
@@ -313,7 +313,7 @@ module(
           );
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
@@ -323,7 +323,7 @@ module(
 
       test('it only makes one Hub call to persist when trying again after a timeout', async function (assert) {
         let stub = sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(
             new Error(
               'Transaction took too long to complete, waited 30 seconds'
@@ -331,37 +331,37 @@ module(
           );
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         stub.restore();
 
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
 
-        let merchantInfoStorageRequests = (
+        let profileStorageRequests = (
           this as any
         ).server.pretender.handledRequests.filter((req: { url: string }) =>
-          req.url.includes('merchant-infos')
+          req.url.includes('profiles')
         );
 
         assert.strictEqual(
-          merchantInfoStorageRequests.length,
+          profileStorageRequests.length,
           1,
-          'expected only one POST /api/merchant-infos'
+          'expected only one POST /api/profiles'
         );
       });
 
-      test('it shows the correct error message for the user not having enough of a token to create the merchant', async function (assert) {
+      test('it shows the correct error message for the user not having enough of a token to create the profile', async function (assert) {
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(
             new Error(
-              'Prepaid card does not have enough balance to register a merchant.'
+              'Prepaid card does not have enough balance to register a profile.'
             )
           );
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
@@ -371,11 +371,11 @@ module(
 
       test('it shows a correct fallback error message', async function (assert) {
         sinon
-          .stub(layer2Service, 'registerMerchant')
+          .stub(layer2Service, 'registerProfile')
           .throws(new Error('Not any matched error'));
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert
@@ -387,11 +387,11 @@ module(
         workflowSession.setValue('txnHash', 'any string');
 
         sinon
-          .stub(layer2Service, 'resumeRegisterMerchantTransaction')
+          .stub(layer2Service, 'resumeRegisterProfileTransaction')
           .throws(new Error("The actual error doesn't matter"));
 
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert.notOk(workflowSession.getValue('txnHash'));
@@ -400,14 +400,14 @@ module(
 
     module('when the Hub endpoint fails', function (hooks) {
       hooks.beforeEach(async function (this: Context) {
-        this.server.post('/merchant-infos', function () {
+        this.server.post('/profiles', function () {
           return new MirageResponse(500, {}, '');
         });
       });
 
       test('it shows the fallback error message', async function (assert) {
         await selectPrepaidCard(prepaidCardAddress);
-        await click('[data-test-create-merchant-button]');
+        await click('[data-test-create-profile-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
         assert

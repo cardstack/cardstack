@@ -45,7 +45,7 @@ export type CardPayWorkflowName =
   | 'PREPAID_CARD_ISSUANCE'
   | 'RESERVE_POOL_DEPOSIT'
   | 'WITHDRAWAL'
-  | 'MERCHANT_CREATION';
+  | 'PROFILE_CREATION';
 
 export type WorkflowName = CardPayWorkflowName;
 export abstract class Workflow {
@@ -269,7 +269,7 @@ export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
 export const CARD_PAY_WORKFLOW_NAMES = {
   PREPAID_CARD_ISSUANCE: 'Prepaid Card Issuance',
-  MERCHANT_CREATION: 'Payment Profile Creation',
+  PROFILE_CREATION: 'Payment Profile Creation',
   RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
   WITHDRAWAL: 'Withdrawal',
 };

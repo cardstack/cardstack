@@ -13,20 +13,19 @@ import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factorie
 interface Context extends MirageTestContext {}
 
 // selectors
-let PREVIEW = '[data-test-merchant-customization-merchant-preview]';
-let MERCHANT = '[data-test-merchant]';
-let MERCHANT_LOGO = '[data-test-merchant-logo]';
-let MERCHANT_NAME_FIELD =
-  '[data-test-merchant-customization-merchant-name-field]';
-let MERCHANT_ID_FIELD = '[data-test-merchant-customization-merchant-id-field]';
-let COLOR_FIELD = '[data-test-merchant-customization-color-field]';
-let MANAGER = '[data-test-merchant-customization-manager-address]';
-let SAVE_DETAILS_BUTTON = '[data-test-merchant-customization-save-details]';
-let EDIT_BUTTON = '[data-test-merchant-customization-edit]';
-let COMPLETED_SELECTOR = '[data-test-merchant-customization-is-complete]';
+let PREVIEW = '[data-test-profile-customization-profile-preview]';
+let PROFILE = '[data-test-profile]';
+let PROFILE_LOGO = '[data-test-profile-logo]';
+let PROFILE_NAME_FIELD = '[data-test-profile-customization-profile-name-field]';
+let PROFILE_ID_FIELD = '[data-test-profile-customization-profile-slug-field]';
+let COLOR_FIELD = '[data-test-profile-customization-color-field]';
+let MANAGER = '[data-test-profile-customization-manager-address]';
+let SAVE_DETAILS_BUTTON = '[data-test-profile-customization-save-details]';
+let EDIT_BUTTON = '[data-test-profile-customization-edit]';
+let COMPLETED_SELECTOR = '[data-test-profile-customization-is-complete]';
 
 // fixtures for validation
-const MERCHANT_NAME_INVALID_INPUTS = [
+const PROFILE_NAME_INVALID_INPUTS = [
   {
     value: '',
     errorMessage: 'This field is required',
@@ -41,7 +40,7 @@ const MERCHANT_NAME_INVALID_INPUTS = [
   },
 ];
 const VALID_ID = 'abc123';
-const MERCHANT_ID_INVALID_INPUTS = [
+const PROFILE_ID_INVALID_INPUTS = [
   {
     value: '',
     errorMessage: 'This field is required',
@@ -75,7 +74,7 @@ const MERCHANT_ID_INVALID_INPUTS = [
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
 module(
-  'Integration | Component | card-pay/create-merchant/merchant-customization',
+  'Integration | Component | card-pay/create-profile/profile-customization',
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let workflowSession: WorkflowSession;
@@ -116,7 +115,7 @@ module(
       });
 
       await render(hbs`
-        <CardPay::CreateMerchantWorkflow::MerchantCustomization
+        <CardPay::CreateProfileWorkflow::ProfileCustomization
           @onComplete={{this.onComplete}}
           @isComplete={{this.isComplete}}
           @onIncomplete={{this.onIncomplete}}
@@ -128,113 +127,113 @@ module(
 
     test('It displays the default state correctly', async function (assert) {
       assert.dom(PREVIEW).exists();
-      assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('Enter profile name');
+      assert.dom(`${PREVIEW} ${PROFILE}`).containsText('Enter profile name');
       assert
-        .dom(`${PREVIEW} ${MERCHANT}`)
-        .hasAttribute('data-test-merchant', 'Enter profile name');
-      assert.dom(MERCHANT_NAME_FIELD).exists();
-      assert.dom(MERCHANT_ID_FIELD).exists();
+        .dom(`${PREVIEW} ${PROFILE}`)
+        .hasAttribute('data-test-profile', 'Enter profile name');
+      assert.dom(PROFILE_NAME_FIELD).exists();
+      assert.dom(PROFILE_ID_FIELD).exists();
       assert.dom(COLOR_FIELD).exists();
       assert.dom(SAVE_DETAILS_BUTTON).exists().isDisabled();
       assert.dom(MANAGER).containsText(layer2AccountAddress);
     });
 
-    test('It validates the merchant name field and updates the preview', async function (assert) {
-      // enter valid merchant id so we can check that the merchant name being valid will make
+    test('It validates the profile name field and updates the preview', async function (assert) {
+      // enter valid profile id so we can check that the profile name being valid will make
       // the save details button enabled
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, VALID_ID);
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
+      await fillIn(profileSlugInput, VALID_ID);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
-      let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
+      let profileNameInput = `${PROFILE_NAME_FIELD} input`;
 
       // valid
-      await fillIn(merchantNameInput, 'HELLO!');
-      assert.dom(merchantNameInput).hasValue('HELLO!');
+      await fillIn(profileNameInput, 'HELLO!');
+      assert.dom(profileNameInput).hasValue('HELLO!');
       assert
-        .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', 'HELLO!')
+        .dom('[data-test-profile]')
+        .hasAttribute('data-test-profile', 'HELLO!')
         .containsText('HELLO!');
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
-      for (let invalidEntry of MERCHANT_NAME_INVALID_INPUTS) {
-        await fillIn(merchantNameInput, invalidEntry.value);
+      for (let invalidEntry of PROFILE_NAME_INVALID_INPUTS) {
+        await fillIn(profileNameInput, invalidEntry.value);
         assert
-          .dom(`${MERCHANT_NAME_FIELD} [data-test-boxel-input-error-message]`)
+          .dom(`${PROFILE_NAME_FIELD} [data-test-boxel-input-error-message]`)
           .containsText(invalidEntry.errorMessage);
         assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
       }
     });
 
-    test('It validates the merchant ID field', async function (assert) {
-      let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
-      await fillIn(merchantNameInput, 'HELLO!');
-      assert.dom(merchantNameInput).hasValue('HELLO!');
+    test('It validates the profile ID field', async function (assert) {
+      let profileNameInput = `${PROFILE_NAME_FIELD} input`;
+      await fillIn(profileNameInput, 'HELLO!');
+      assert.dom(profileNameInput).hasValue('HELLO!');
       assert
-        .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', 'HELLO!')
+        .dom('[data-test-profile]')
+        .hasAttribute('data-test-profile', 'HELLO!')
         .containsText('HELLO!');
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, VALID_ID);
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
+      await fillIn(profileSlugInput, VALID_ID);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
-      for (let invalidEntry of MERCHANT_ID_INVALID_INPUTS) {
-        await fillIn(merchantIdInput, invalidEntry.value);
+      for (let invalidEntry of PROFILE_ID_INVALID_INPUTS) {
+        await fillIn(profileSlugInput, invalidEntry.value);
         assert
-          .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+          .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
           .containsText(invalidEntry.errorMessage);
         assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
       }
     });
 
     test('It validates a given id and displays the error message returned from the hub', async function (this: Context, assert) {
-      this.server.create('merchant-info', { slug: 'existing' });
+      this.server.create('profile', { slug: 'existing' });
 
-      await fillIn(`${MERCHANT_NAME_FIELD} input`, 'HELLO!');
+      await fillIn(`${PROFILE_NAME_FIELD} input`, 'HELLO!');
 
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
 
-      await fillIn(merchantIdInput, 'existing');
+      await fillIn(profileSlugInput, 'existing');
       await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
-        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('This ID is already taken. Please choose another one');
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
-      await fillIn(merchantIdInput, 'unique');
+      await fillIn(profileSlugInput, 'unique');
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
       // www is hardcoded to be forbidden in mirage
-      await fillIn(merchantIdInput, 'www');
+      await fillIn(profileSlugInput, 'www');
       await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
-        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText('This ID is not allowed');
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
     });
 
     test('It shows when there is an error validating id uniqueness', async function (this: Context, assert) {
-      this.server.get('/merchant-infos/validate-slug/:slug', function () {
+      this.server.get('/profiles/validate-slug/:slug', function () {
         return new MirageResponse(500, {}, '');
       });
 
-      await fillIn(`${MERCHANT_NAME_FIELD} input`, 'HELLO!');
+      await fillIn(`${PROFILE_NAME_FIELD} input`, 'HELLO!');
 
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
 
-      await fillIn(merchantIdInput, 'existing');
+      await fillIn(profileSlugInput, 'existing');
       await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
-        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText(
           'There was an error validating payment profile ID uniqueness'
         );
@@ -243,66 +242,66 @@ module(
     });
 
     test('It updates the workflow session when saved', async function (assert) {
-      assert.notOk(workflowSession.getValue('merchantName'));
-      assert.notOk(workflowSession.getValue('merchantId'));
-      assert.notOk(workflowSession.getValue('merchantBgColor'));
-      assert.notOk(workflowSession.getValue('merchantTextColor'));
+      assert.notOk(workflowSession.getValue('profileName'));
+      assert.notOk(workflowSession.getValue('profileSlug'));
+      assert.notOk(workflowSession.getValue('profileBgColor'));
+      assert.notOk(workflowSession.getValue('profileTextColor'));
 
-      let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
-      await fillIn(merchantNameInput, 'HELLO!');
-      await blur(merchantNameInput);
+      let profileNameInput = `${PROFILE_NAME_FIELD} input`;
+      await fillIn(profileNameInput, 'HELLO!');
+      await blur(profileNameInput);
 
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, VALID_ID);
-      await blur(merchantIdInput);
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
+      await fillIn(profileSlugInput, VALID_ID);
+      await blur(profileSlugInput);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
 
       await click(SAVE_DETAILS_BUTTON);
 
       assert.strictEqual(
-        workflowSession.getValue<string>('merchantName'),
+        workflowSession.getValue<string>('profileName'),
         'HELLO!'
       );
       assert.strictEqual(
-        workflowSession.getValue<string>('merchantId'),
+        workflowSession.getValue<string>('profileId'),
         VALID_ID
       );
-      assert.ok(workflowSession.getValue<string>('merchantBgColor'));
-      assert.ok(workflowSession.getValue<string>('merchantTextColor'));
+      assert.ok(workflowSession.getValue<string>('profileBgColor'));
+      assert.ok(workflowSession.getValue<string>('profileTextColor'));
     });
 
     test('It displays the memorialized state correctly', async function (assert) {
-      let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
-      await fillIn(merchantNameInput, 'HELLO!');
+      let profileNameInput = `${PROFILE_NAME_FIELD} input`;
+      await fillIn(profileNameInput, 'HELLO!');
 
-      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, VALID_ID);
+      let profileSlugInput = `${PROFILE_ID_FIELD} input`;
+      await fillIn(profileSlugInput, VALID_ID);
       // await new Promise((resolve) => {
       //   setTimeout(resolve, 5000);
       // });
-      await blur(merchantIdInput);
+      await blur(profileSlugInput);
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
       await click(SAVE_DETAILS_BUTTON);
 
-      let bgColor = workflowSession.getValue<string>('merchantBgColor')!;
-      let textColor = workflowSession.getValue<string>('merchantTextColor')!;
+      let bgColor = workflowSession.getValue<string>('profileBgColor')!;
+      let textColor = workflowSession.getValue<string>('profileTextColor')!;
 
       await waitFor(COMPLETED_SELECTOR);
       assert.dom(COMPLETED_SELECTOR).exists();
       assert.dom(EDIT_BUTTON).exists();
-      assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('HELLO!');
+      assert.dom(`${PREVIEW} ${PROFILE}`).containsText('HELLO!');
       assert
-        .dom(`${PREVIEW} ${MERCHANT_LOGO}`)
-        .hasAttribute('data-test-merchant-logo-background', bgColor);
+        .dom(`${PREVIEW} ${PROFILE_LOGO}`)
+        .hasAttribute('data-test-profile-logo-background', bgColor);
       assert
-        .dom(`${PREVIEW} ${MERCHANT_LOGO}`)
-        .hasAttribute('data-test-merchant-logo-text-color', textColor);
+        .dom(`${PREVIEW} ${PROFILE_LOGO}`)
+        .hasAttribute('data-test-profile-logo-text-color', textColor);
       assert
-        .dom(`${PREVIEW} ${MERCHANT}`)
-        .hasAttribute('data-test-merchant', 'HELLO!');
-      assert.dom(MERCHANT_NAME_FIELD).doesNotExist();
-      assert.dom(MERCHANT_ID_FIELD).containsText(VALID_ID);
+        .dom(`${PREVIEW} ${PROFILE}`)
+        .hasAttribute('data-test-profile', 'HELLO!');
+      assert.dom(PROFILE_NAME_FIELD).doesNotExist();
+      assert.dom(PROFILE_ID_FIELD).containsText(VALID_ID);
       assert.dom(COLOR_FIELD).containsText(bgColor);
       assert.dom(MANAGER).containsText(layer2AccountAddress);
     });

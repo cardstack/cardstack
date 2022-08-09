@@ -9,34 +9,34 @@ import { buildState } from '@cardstack/web-client/models/workflow/workflow-sessi
 import { setupHubAuthenticationToken } from '../helpers/setup';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import {
   MILESTONE_TITLES,
   WORKFLOW_VERSION,
-} from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
+} from '@cardstack/web-client/components/card-pay/create-profile-workflow';
 
 interface Context extends MirageTestContext {}
 
-module('Acceptance | create merchant persistence', function (hooks) {
+module('Acceptance | create profile persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   const prepaidCardAddress = '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE';
-  const merchantName = 'Mandello';
-  const merchantId = 'mandello1';
-  const merchantBgColor = '#FF5050';
-  const merchantDID = 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b5fff';
-  const merchantAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
-  const merchantRegistrationFee = 150;
-  const merchantSafe = createMerchantSafe({
-    address: merchantAddress,
-    merchant: merchantName,
-    infoDID: merchantDID,
+  const profileName = 'Mandello';
+  const profileSlug = 'mandello1';
+  const profileBgColor = '#FF5050';
+  const profileDID = 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b5fff';
+  const profileAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
+  const profileRegistrationFee = 150;
+  const profileSafe = createProfileSafe({
+    address: profileAddress,
+    profile: profileName,
+    infoDID: profileDID,
     owners: [layer2AccountAddress],
   });
 
@@ -95,15 +95,15 @@ module('Acceptance | create merchant persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
         prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -113,15 +113,15 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
 
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-id]')
-        .containsText(merchantId);
+        .dom('[data-test-prepaid-card-choice-profile-slug]')
+        .containsText(profileSlug);
       assert
         .dom(
           `[data-test-boxel-card-picker-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
         )
         .exists();
       assert.dom('[data-test-boxel-card-picker-dropdown]').exists();
-      assert.dom('[data-test-create-merchant-button]').isNotDisabled();
+      assert.dom('[data-test-create-profile-button]').isNotDisabled();
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {
@@ -134,21 +134,21 @@ module('Acceptance | create merchant persistence', function (hooks) {
             'PREPAID_CARD_CHOICE',
           ],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantInfo: {
-          did: merchantDID,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profile: {
+          did: profileDID,
         },
-        merchantRegistrationFee,
+        profileRegistrationFee,
         prepaidCardAddress,
         txnHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
-        merchantSafe,
+        profileSafe,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -162,8 +162,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert.dom('[data-test-prepaid-card-choice-selected-card]').exists();
       assert.dom('[data-test-boxel-card-picker]').doesNotExist();
       assert
-        .dom('[data-test-prepaid-card-choice-merchant-address]')
-        .containsText(merchantAddress);
+        .dom('[data-test-prepaid-card-choice-profile-address]')
+        .containsText(profileAddress);
       assert
         .dom(
           '[data-test-prepaid-card-choice-is-complete] [data-test-boxel-button]'
@@ -173,7 +173,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .dom('[data-test-epilogue][data-test-postable="0"]')
         .includesText('Congratulations! You have created a payment profile.');
 
-      await click('[data-test-create-merchant-next-step="dashboard"]');
+      await click('[data-test-create-profile-next-step="dashboard"]');
       assert.dom('[data-test-workflow-thread]').doesNotExist();
     });
 
@@ -187,15 +187,15 @@ module('Acceptance | create merchant persistence', function (hooks) {
           isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
         prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -226,14 +226,14 @@ module('Acceptance | create merchant persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -271,16 +271,16 @@ module('Acceptance | create merchant persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
         prepaidCardAddress,
-        merchantSafe,
+        profileSafe,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -305,15 +305,15 @@ module('Acceptance | create merchant persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -335,14 +335,14 @@ module('Acceptance | create merchant persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 
@@ -351,8 +351,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
       assert.dom('[data-test-milestone="2"]').doesNotExist();
 
-      await waitFor(`[data-test-merchant="${merchantName}"]`);
-      await click('[data-test-merchant-customization-save-details]');
+      await waitFor(`[data-test-profile="${profileName}"]`);
+      await click('[data-test-profile-customization-save-details]');
 
       assert
         .dom('[data-test-milestone="2"] [data-test-boxel-card-container]')
@@ -367,15 +367,15 @@ module('Acceptance | create merchant persistence', function (hooks) {
           milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
-        merchantName,
-        merchantId,
-        merchantBgColor,
-        merchantRegistrationFee,
+        profileName,
+        profileSlug,
+        profileBgColor,
+        profileRegistrationFee,
         prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
-        name: 'MERCHANT_CREATION',
+        name: 'PROFILE_CREATION',
         state,
       });
 

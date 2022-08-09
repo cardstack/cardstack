@@ -33,7 +33,7 @@ import {
 } from '@cardstack/web-client/models/workflow/workflow-session';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
   defaultCreatedPrepaidCardDID,
@@ -134,9 +134,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let merchantSafe = createMerchantSafe({
+    let profileSafe = createProfileSafe({
       address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c94',
-      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
         createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -145,8 +145,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       infoDID: MERCHANT_DID,
     });
 
-    let otherMerchantSafe = createMerchantSafe({
-      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+    let otherMerchantSafe = createProfileSafe({
+      profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
         createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -155,7 +155,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       infoDID: OTHER_MERCHANT_DID,
     });
 
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(MERCHANT_DID),
       name: 'Mandello',
       slug: 'mandello1',
@@ -163,7 +163,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       'owner-address': layer2AccountAddress,
     });
 
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(OTHER_MERCHANT_DID),
       name: 'Ollednam',
       slug: 'ollednam1',
@@ -189,7 +189,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         issuer: layer2AccountAddress,
       }),
       otherMerchantSafe,
-      merchantSafe,
+      profileSafe,
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
@@ -332,7 +332,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
       )
-      .containsText(merchantSafe.address);
+      .containsText(profileSafe.address);
 
     await click(
       '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
@@ -361,7 +361,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText(layer2AccountAddress);
     assert
       .dom('[data-test-balance-view-safe-address]')
-      .containsText(merchantSafe.address);
+      .containsText(profileSafe.address);
     assert
       .dom('[data-test-balance-view-token-amount]')
       .containsText('499.00 DAI');
@@ -469,7 +469,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     layer2Service.test__simulateIssuePrepaidCardForAmountFromSource(
       10000,
-      merchantSafe.address,
+      profileSafe.address,
       layer2AccountAddress,
       prepaidCardAddress,
       {}
@@ -624,7 +624,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-      prepaidFundingSafeAddress: merchantSafe.address,
+      prepaidFundingSafeAddress: profileSafe.address,
       prepaidFundingToken: 'DAI.CPXD',
       reloadable: false,
       spendFaceValue: 10000,
@@ -766,8 +766,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
           owners: [layer2AccountAddress],
           tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
         }),
-        createMerchantSafe({
-          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        createProfileSafe({
+          profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
           accumulatedSpendValue: 100,
         }),

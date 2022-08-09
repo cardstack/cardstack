@@ -9,7 +9,7 @@ import BN from 'bn.js';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
@@ -24,7 +24,7 @@ module(
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+    let profileAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     let secondLayer2AccountAddress =
       '0x22222222222222222222222222222222222222222';
     let secondMerchantAddress = '0xmerchant22222222222222222222222222222222';
@@ -54,8 +54,8 @@ module(
             createSafeToken('CARD.CPXD', '500000000000000000000'),
           ],
         }),
-        createMerchantSafe({
-          address: merchantAddress,
+        createProfileSafe({
+          address: profileAddress,
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
             createSafeToken('DAI.CPXD', '125000000000000000000'),
@@ -126,7 +126,7 @@ module(
         .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
-        .containsText(merchantAddress);
+        .containsText(profileAddress);
       await click('.ember-power-select-options li:nth-child(2)');
 
       assert
@@ -162,13 +162,13 @@ module(
       );
       assert.strictEqual(
         session.getValue<string>('withdrawalSafe'),
-        merchantAddress,
+        profileAddress,
         'workflow session withdrawal safe updated'
       );
     });
 
     test('it uses the withdrawal safe from the workflow when it exists', async function (assert) {
-      session.setValue('withdrawalSafe', merchantAddress);
+      session.setValue('withdrawalSafe', profileAddress);
 
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
@@ -181,14 +181,14 @@ module(
 
       assert
         .dom('[data-test-choose-balance-from-safe]')
-        .containsText(merchantAddress);
+        .containsText(profileAddress);
     });
 
     test('it can fall back to a non-depot safe', async function (assert) {
       layer2Service.test__simulateRemoteAccountSafes(
         secondLayer2AccountAddress,
         [
-          createMerchantSafe({
+          createProfileSafe({
             address: secondMerchantAddress,
             merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [

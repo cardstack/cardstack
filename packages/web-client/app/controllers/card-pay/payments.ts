@@ -14,7 +14,7 @@ export default class CardPayPaymentsController extends Controller {
   @tracked flow: string | null = null;
   @tracked workflowPersistenceId: string | null = null;
 
-  get merchantSafes() {
+  get profileSafes() {
     return this.layer2Network.safes.value?.filterBy('type', 'merchant');
   }
 

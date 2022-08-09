@@ -98,7 +98,7 @@ export class TrackedMerchantSafe
 {
   type = 'merchant' as MerchantSafe['type'];
   @tracked accumulatedSpendValue!: MerchantSafe['accumulatedSpendValue'];
-  @tracked merchant!: MerchantSafe['merchant'];
+  @tracked profile!: MerchantSafe['profile'];
   @tracked infoDID: MerchantSafe['infoDID'];
 
   constructor(safe: MerchantSafe) {
@@ -109,7 +109,7 @@ export class TrackedMerchantSafe
   update(safe: MerchantSafe) {
     super.update(safe);
     this.accumulatedSpendValue = safe.accumulatedSpendValue;
-    this.merchant = safe.merchant;
+    this.profile = safe.profile;
     this.infoDID = safe.infoDID;
   }
 }

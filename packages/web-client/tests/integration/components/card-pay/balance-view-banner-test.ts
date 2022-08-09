@@ -7,7 +7,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
   getFilenameFromDid,
@@ -70,16 +70,16 @@ module(
     });
 
     test('it renders a merchant safe token balance', async function (this: Context, assert) {
-      let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+      let profileAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
 
       const MERCHANT_DID =
         'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
       this.set('walletAddress', walletAddress);
       this.set(
         'safe',
-        createMerchantSafe({
-          address: merchantAddress,
-          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        createProfileSafe({
+          address: profileAddress,
+          profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
             createSafeToken('DAI.CPXD', '125000000000000000000'),
             createSafeToken('CARD.CPXD', '450110000000000000000'),
@@ -89,7 +89,7 @@ module(
         })
       );
 
-      this.server.create('merchant-info', {
+      this.server.create('profile', {
         id: await getFilenameFromDid(MERCHANT_DID),
         name: 'Mandello',
         slug: 'mandello1',
@@ -104,7 +104,7 @@ module(
         />
       `);
 
-      // Wait for merchant resource to fetch
+      // Wait for profile resource to fetch
       await waitUntil(() =>
         find('[data-test-balance-view-summary]')?.textContent?.includes(
           'Mandello'
@@ -126,10 +126,10 @@ module(
       assert
         .dom('[data-test-balance-view-safe-address')
         .containsText('Payment Profile Mandello:')
-        .containsText(merchantAddress);
+        .containsText(profileAddress);
 
       assert
-        .dom('[data-test-balance-view-safe-address] [data-test-icon=merchant]')
+        .dom('[data-test-balance-view-safe-address] [data-test-icon=profile]')
         .exists();
 
       assert

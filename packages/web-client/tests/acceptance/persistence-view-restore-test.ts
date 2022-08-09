@@ -29,7 +29,7 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { WORKFLOW_VERSION as WITHDRAWAL_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
-import { WORKFLOW_VERSION as MERCHANT_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
+import { WORKFLOW_VERSION as PROFILE_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-profile-workflow';
 import { WORKFLOW_VERSION as PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import BN from 'bn.js';
@@ -66,15 +66,15 @@ module('Acceptance | persistence view and restore', function () {
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      let merchantRegistrationFee = await this.owner
+      let profileRegistrationFee = await this.owner
         .lookup('service:layer2-network')
-        .strategy.fetchMerchantRegistrationFee();
+        .strategy.fetchProfileRegistrationFee();
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
           address: '0x123400000000000000000000000000000000abcd',
           owners: [layer2AccountAddress],
-          spendFaceValue: merchantRegistrationFee,
+          spendFaceValue: profileRegistrationFee,
           prepaidCardOwner: layer2AccountAddress,
           issuer: layer2AccountAddress,
           transferrable: false,
@@ -110,11 +110,11 @@ module('Acceptance | persistence view and restore', function () {
 
     // eslint-disable-next-line qunit/require-expect
     test('it lists persisted Card Pay workflows', async function (this: Context, assert) {
-      workflowPersistenceService.persistData('persisted-merchant-creation', {
-        name: 'MERCHANT_CREATION',
+      workflowPersistenceService.persistData('persisted-profile-creation', {
+        name: 'PROFILE_CREATION',
         state: buildState({
           meta: {
-            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            version: PROFILE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -242,11 +242,11 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('clicking a persisted workflow restores it', async function (assert) {
-      workflowPersistenceService.persistData('persisted-merchant-creation', {
-        name: 'MERCHANT_CREATION',
+      workflowPersistenceService.persistData('persisted-profile-creation', {
+        name: 'PROFILE_CREATION',
         state: buildState({
           meta: {
-            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            version: PROFILE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -260,16 +260,16 @@ module('Acceptance | persistence view and restore', function () {
 
       assert.strictEqual(
         currentURL(),
-        '/card-pay/payments?flow=create-business&flow-id=persisted-merchant-creation'
+        '/card-pay/payments?flow=create-business&flow-id=persisted-profile-creation'
       );
     });
 
     test('clicking delete icon deletes the workflow', async function (assert) {
-      workflowPersistenceService.persistData('persisted-merchant-creation', {
-        name: 'MERCHANT_CREATION',
+      workflowPersistenceService.persistData('persisted-profile-creation', {
+        name: 'PROFILE_CREATION',
         state: buildState({
           meta: {
-            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            version: PROFILE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -292,11 +292,11 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('completed workflows can not be deleted', async function (assert) {
-      workflowPersistenceService.persistData('persisted-merchant-creation', {
-        name: 'MERCHANT_CREATION',
+      workflowPersistenceService.persistData('persisted-profile-creation', {
+        name: 'PROFILE_CREATION',
         state: buildState({
           meta: {
-            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            version: PROFILE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 3,
             milestonesCount: 3,
@@ -312,11 +312,11 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('completed workflows can be cleared', async function (this: Context, assert) {
-      workflowPersistenceService.persistData('persisted-merchant-creation', {
-        name: 'MERCHANT_CREATION',
+      workflowPersistenceService.persistData('persisted-profile-creation', {
+        name: 'PROFILE_CREATION',
         state: buildState({
           meta: {
-            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            version: PROFILE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -361,19 +361,17 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-button="create-business"]');
 
       await fillIn(
-        `[data-test-merchant-customization-merchant-name-field] input`,
+        `[data-test-profile-customization-profile-name-field] input`,
         'Mandello'
       );
-      await blur(
-        '[data-test-merchant-customization-merchant-name-field] input'
-      );
+      await blur('[data-test-profile-customization-profile-name-field] input');
       await fillIn(
-        `[data-test-merchant-customization-merchant-id-field] input`,
+        `[data-test-profile-customization-profile-slug-field] input`,
         'mandello1'
       );
-      await blur('[data-test-merchant-customization-merchant-id-field] input');
+      await blur('[data-test-profile-customization-profile-slug-field] input');
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
-      await click(`[data-test-merchant-customization-save-details]`);
+      await click(`[data-test-profile-customization-save-details]`);
 
       assert.dom('[data-test-workflow-tracker-count]').containsText('1');
 
@@ -515,15 +513,15 @@ module('Acceptance | persistence view and restore', function () {
           layer2AccountAddress,
         ]);
 
-        let merchantRegistrationFee = await this.owner
+        let profileRegistrationFee = await this.owner
           .lookup('service:layer2-network')
-          .strategy.fetchMerchantRegistrationFee();
+          .strategy.fetchProfileRegistrationFee();
 
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           createPrepaidCardSafe({
             address: '0x123400000000000000000000000000000000abcd',
             owners: [layer2AccountAddress],
-            spendFaceValue: merchantRegistrationFee,
+            spendFaceValue: profileRegistrationFee,
             prepaidCardOwner: layer2AccountAddress,
             issuer: layer2AccountAddress,
             transferrable: false,
@@ -603,9 +601,9 @@ module('Acceptance | persistence view and restore', function () {
           .strategy as Layer2TestWeb3Strategy;
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-        let merchantRegistrationFee = await this.owner
+        let profileRegistrationFee = await this.owner
           .lookup('service:layer2-network')
-          .strategy.fetchMerchantRegistrationFee();
+          .strategy.fetchProfileRegistrationFee();
 
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           createDepotSafe({
@@ -615,7 +613,7 @@ module('Acceptance | persistence view and restore', function () {
           createPrepaidCardSafe({
             address: '0x123400000000000000000000000000000000abcd',
             owners: [layer2AccountAddress],
-            spendFaceValue: merchantRegistrationFee,
+            spendFaceValue: profileRegistrationFee,
             prepaidCardOwner: layer2AccountAddress,
             issuer: layer2AccountAddress,
             transferrable: false,

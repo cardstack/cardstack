@@ -25,7 +25,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
@@ -57,7 +57,7 @@ let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
 let secondLayer2AccountAddress = '0x5416C61193C3393B46C2774ac4717C252031c0bE';
 let secondPrepaidCardAddress = '0x123400000000000000000000000000000000defa';
 
-let merchantAddress = '0x1234000000000000000000000000000000004321';
+let profileAddress = '0x1234000000000000000000000000000000004321';
 
 function createMockPrepaidCard(
   eoaAddress: string,
@@ -73,16 +73,16 @@ function createMockPrepaidCard(
   });
 }
 
-module('Acceptance | create merchant', function (hooks) {
+module('Acceptance | create profile', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
-  let merchantRegistrationFee: number;
+  let profileRegistrationFee: number;
 
   hooks.beforeEach(async function () {
-    merchantRegistrationFee = await this.owner
+    profileRegistrationFee = await this.owner
       .lookup('service:layer2-network')
-      .strategy.fetchMerchantRegistrationFee();
+      .strategy.fetchProfileRegistrationFee();
   });
 
   // eslint-disable-next-line qunit/require-expect
@@ -127,7 +127,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        merchantRegistrationFee
+        profileRegistrationFee
       ),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -176,20 +176,20 @@ module('Acceptance | create merchant', function (hooks) {
       .dom(post)
       .containsText('Choose a name and ID for your payment profile');
 
-    // // merchant-customization card
-    // TODO verify and interact with merchant customization card default state
+    // // profile-customization card
+    // TODO verify and interact with profile customization card default state
     await fillIn(
-      `[data-test-merchant-customization-merchant-name-field] input`,
+      `[data-test-profile-customization-profile-name-field] input`,
       'Mandello'
     );
-    await blur('[data-test-merchant-customization-merchant-name-field] input');
+    await blur('[data-test-profile-customization-profile-name-field] input');
     await fillIn(
-      `[data-test-merchant-customization-merchant-id-field] input`,
+      `[data-test-profile-customization-profile-slug-field] input`,
       'mandello1'
     );
-    await blur('[data-test-merchant-customization-merchant-id-field] input');
+    await blur('[data-test-profile-customization-profile-slug-field] input');
     await waitFor('[data-test-boxel-input-validation-state="valid"]');
-    await click(`[data-test-merchant-customization-save-details]`);
+    await click(`[data-test-profile-customization-save-details]`);
 
     await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText('Profile details saved');
@@ -209,7 +209,7 @@ module('Acceptance | create merchant', function (hooks) {
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    // need wait for Hub POST /api/merchant-infos
+    // need wait for Hub POST /api/profiles
     // eslint-disable-next-line ember/no-settled-after-test-helper
     await settled();
 
@@ -221,7 +221,7 @@ module('Acceptance | create merchant', function (hooks) {
 
     layer2Service.test__simulateRegisterMerchantForAddress(
       prepaidCardAddress,
-      merchantAddress,
+      profileAddress,
       {}
     );
 
@@ -235,8 +235,8 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert.dom(`[data-test-boxel-card-picker-dropdown]`).doesNotExist();
     assert
-      .dom('[data-test-prepaid-card-choice-merchant-address]')
-      .containsText(merchantAddress);
+      .dom('[data-test-prepaid-card-choice-profile-address]')
+      .containsText(profileAddress);
 
     await waitFor(milestoneCompletedSel(2));
     assert
@@ -254,7 +254,7 @@ module('Acceptance | create merchant', function (hooks) {
     await click(
       `${epiloguePostableSel(
         1
-      )} [data-test-create-merchant-next-step="dashboard"]`
+      )} [data-test-create-profile-next-step="dashboard"]`
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
 
@@ -280,7 +280,7 @@ module('Acceptance | create merchant', function (hooks) {
         createMockPrepaidCard(
           layer2AccountAddress,
           prepaidCardAddress,
-          merchantRegistrationFee
+          profileRegistrationFee
         ),
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -333,23 +333,21 @@ module('Acceptance | create merchant', function (hooks) {
       );
     });
 
-    test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
+    test('changed profile details after canceling the profile creation request are persisted', async function (this: Context, assert) {
       await visitWithQueryFix('/card-pay/payments?flow=create-business');
-      await waitFor('[data-test-merchant-customization-merchant-name-field]');
+      await waitFor('[data-test-profile-customization-profile-name-field]');
       await fillIn(
-        `[data-test-merchant-customization-merchant-name-field] input`,
+        `[data-test-profile-customization-profile-name-field] input`,
         'HELLO!'
       );
-      await blur(
-        '[data-test-merchant-customization-merchant-name-field] input'
-      );
+      await blur('[data-test-profile-customization-profile-name-field] input');
       await fillIn(
-        `[data-test-merchant-customization-merchant-id-field] input`,
+        `[data-test-profile-customization-profile-slug-field] input`,
         'abc123'
       );
-      await blur('[data-test-merchant-customization-merchant-id-field] input');
+      await blur('[data-test-profile-customization-profile-slug-field] input');
       await waitFor('[data-test-boxel-input-validation-state="valid"]');
-      await click(`[data-test-merchant-customization-save-details]`);
+      await click(`[data-test-profile-customization-save-details]`);
 
       let prepaidCardChoice = postableSel(2, 2);
       await waitFor(prepaidCardChoice);
@@ -358,7 +356,7 @@ module('Acceptance | create merchant', function (hooks) {
         `${prepaidCardChoice} [data-test-boxel-action-chin] [data-test-boxel-button]`
       );
 
-      // need wait for Hub POST /api/merchant-infos
+      // need wait for Hub POST /api/profiles
       // eslint-disable-next-line ember/no-settled-after-test-helper
       await settled();
 
@@ -366,12 +364,12 @@ module('Acceptance | create merchant', function (hooks) {
         prepaidCardAddress
       );
 
-      await click('[data-test-merchant-customization-edit]');
+      await click('[data-test-profile-customization-edit]');
       await fillIn(
-        '[data-test-merchant-customization-merchant-name-field] input',
+        '[data-test-profile-customization-profile-name-field] input',
         'changed'
       );
-      await click('[data-test-merchant-customization-save-details]');
+      await click('[data-test-profile-customization-save-details]');
 
       await waitFor(prepaidCardChoice);
       await selectPrepaidCard(prepaidCardAddress);
@@ -379,23 +377,23 @@ module('Acceptance | create merchant', function (hooks) {
         `${prepaidCardChoice} [data-test-boxel-action-chin] [data-test-boxel-button]`
       );
 
-      // wait for another Hub POST /api/merchant-infos
+      // wait for another Hub POST /api/profiles
       // eslint-disable-next-line ember/no-settled-after-test-helper
       await settled();
 
       layer2Service.test__simulateRegisterMerchantForAddress(
         prepaidCardAddress,
-        merchantAddress,
+        profileAddress,
         {}
       );
 
-      let secondMerchantInfo = this.server.schema.findBy('merchant-info', {
+      let secondProfileInfo = this.server.schema.findBy('profile', {
         name: 'changed',
       });
 
       assert.ok(
-        secondMerchantInfo,
-        'expected a second merchant-info to have been persisted'
+        secondProfileInfo,
+        'expected a second profile to have been persisted'
       );
     });
 
@@ -485,7 +483,7 @@ module('Acceptance | create merchant', function (hooks) {
           createMockPrepaidCard(
             secondLayer2AccountAddress,
             secondPrepaidCardAddress,
-            merchantRegistrationFee
+            profileRegistrationFee
           ),
         ]
       );
@@ -521,7 +519,7 @@ module('Acceptance | create merchant', function (hooks) {
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
-      createMerchantSafe({}),
+      createProfileSafe({}),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
@@ -549,7 +547,7 @@ module('Acceptance | create merchant', function (hooks) {
 
     await click('[data-test-has-profile-cancelation-cta]');
 
-    assert.dom('[data-test-create-merchant-workflow]').doesNotExist();
+    assert.dom('[data-test-create-profile-workflow]').doesNotExist();
   });
 
   test('it cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
@@ -577,7 +575,7 @@ module('Acceptance | create merchant', function (hooks) {
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
-          spendToUsd(merchantRegistrationFee)!,
+          spendToUsd(profileRegistrationFee)!,
           'USD'
         )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
@@ -598,7 +596,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        merchantRegistrationFee - 1
+        profileRegistrationFee - 1
       ),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -617,7 +615,7 @@ module('Acceptance | create merchant', function (hooks) {
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
-          spendToUsd(merchantRegistrationFee)!,
+          spendToUsd(profileRegistrationFee)!,
           'USD'
         )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );

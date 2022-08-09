@@ -42,10 +42,10 @@ export const MILESTONE_TITLES = [
   'Save profile details',
   'Create payment profile',
 ];
-export const WORKFLOW_VERSION = 3;
+export const WORKFLOW_VERSION = 1;
 
-class CreateMerchantWorkflow extends Workflow {
-  name = 'MERCHANT_CREATION' as WorkflowName;
+class CreateProfileWorkflow extends Workflow {
+  name = 'PROFILE_CREATION' as WorkflowName;
   version = WORKFLOW_VERSION;
 
   @service declare router: RouterService;
@@ -89,15 +89,15 @@ class CreateMerchantWorkflow extends Workflow {
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
-            let { layer2Network } = this.workflow as CreateMerchantWorkflow;
+            let { layer2Network } = this.workflow as CreateProfileWorkflow;
 
-            let merchantRegistrationFee = await taskFor(
-              layer2Network.fetchMerchantRegistrationFeeTask
+            let profileRegistrationFee = await taskFor(
+              layer2Network.fetchProfileRegistrationFeeTask
             ).perform();
 
             this.workflow?.session.setValue(
-              'merchantRegistrationFee',
-              merchantRegistrationFee
+              'profileRegistrationFee',
+              profileRegistrationFee
             );
 
             await layer2Network.refreshSafesAndBalances();
@@ -110,7 +110,7 @@ class CreateMerchantWorkflow extends Workflow {
               hasPrepaidCardWithSufficientBalance =
                 hasPrepaidCardWithSufficientBalance ||
                 (safe.type === 'prepaid-card' &&
-                  safe.spendFaceValue >= merchantRegistrationFee);
+                  safe.spendFaceValue >= profileRegistrationFee);
               hasProfile = hasProfile || safe.type === 'merchant';
               if (hasProfile) {
                 return {
@@ -166,7 +166,7 @@ class CreateMerchantWorkflow extends Workflow {
         new WorkflowCard({
           cardName: 'MERCHANT_CUSTOMIZATION',
           componentName:
-            'card-pay/create-merchant-workflow/merchant-customization',
+            'card-pay/create-profile-workflow/profile-customization',
         }),
       ],
       completedDetail: 'Profile details saved',
@@ -183,8 +183,7 @@ class CreateMerchantWorkflow extends Workflow {
         }),
         new WorkflowCard({
           cardName: 'PREPAID_CARD_CHOICE',
-          componentName:
-            'card-pay/create-merchant-workflow/prepaid-card-choice',
+          componentName: 'card-pay/create-profile-workflow/prepaid-card-choice',
         }),
       ],
       completedDetail: 'Payment profile created',
@@ -196,7 +195,7 @@ class CreateMerchantWorkflow extends Workflow {
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',
-      componentName: 'card-pay/create-merchant-workflow/next-steps',
+      componentName: 'card-pay/create-profile-workflow/next-steps',
     }),
   ]);
   cancelationMessages = new PostableCollection([
@@ -215,7 +214,7 @@ class CreateMerchantWorkflow extends Workflow {
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
-          spendToUsd(session.getValue('merchantRegistrationFee')!)!,
+          spendToUsd(session.getValue('profileRegistrationFee')!)!,
           'USD'
         )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`,
       includeIf() {
@@ -228,7 +227,7 @@ class CreateMerchantWorkflow extends Workflow {
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
-          spendToUsd(session.getValue('merchantRegistrationFee')!)!,
+          spendToUsd(session.getValue('profileRegistrationFee')!)!,
           'USD'
         )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`,
       includeIf() {
@@ -264,8 +263,7 @@ class CreateMerchantWorkflow extends Workflow {
     }),
 
     new WorkflowCard({
-      componentName:
-        'card-pay/create-merchant-workflow/has-profile-cancelation',
+      componentName: 'card-pay/create-profile-workflow/has-profile-cancelation',
       includeIf() {
         return this.workflow?.cancelationReason === FAILURE_REASONS.HAS_PROFILE;
       },
@@ -311,11 +309,11 @@ class CreateMerchantWorkflow extends Workflow {
   }
 }
 
-class CreateMerchantWorkflowComponent extends RestorableWorkflowComponent<CreateMerchantWorkflow> {
+class CreateProfileWorkflowComponent extends RestorableWorkflowComponent<CreateProfileWorkflow> {
   @service declare layer2Network: Layer2Network;
 
   get workflowClass() {
-    return CreateMerchantWorkflow;
+    return CreateProfileWorkflow;
   }
 
   @action onDisconnect() {
@@ -327,4 +325,4 @@ class CreateMerchantWorkflowComponent extends RestorableWorkflowComponent<Create
   }
 }
 
-export default CreateMerchantWorkflowComponent;
+export default CreateProfileWorkflowComponent;

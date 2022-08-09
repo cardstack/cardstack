@@ -1,7 +1,7 @@
 import BaseRoute from './base';
 import '../../css/card-pay/payments.css';
-import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
-import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
+import heroImageUrl from '@cardstack/web-client/images/dashboard/profiles-hero.svg';
+import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/profiles-summary-hero.svg';
 
 const MERCHANTS_PANEL = {
   title: 'Quick Payments',
@@ -12,7 +12,7 @@ const MERCHANTS_PANEL = {
   sections: [
     {
       workflow: 'create-business',
-      icon: 'merchants',
+      icon: 'profiles',
       title: 'Request Payments',
       description: `Set up your payment profile and start receiving payments in just a few minutes!`,
       bullets: [

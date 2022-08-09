@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import RouterService from '@ember/routing/router-service';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
-class CardPayCreateMerchantWorkflowNextStepsComponent extends Component<WorkflowCardComponentArgs> {
+class CardPayCreateProfileWorkflowNextStepsComponent extends Component<WorkflowCardComponentArgs> {
   @service declare router: RouterService;
 
   @action returnToDashboard() {
@@ -14,4 +14,4 @@ class CardPayCreateMerchantWorkflowNextStepsComponent extends Component<Workflow
   }
 }
 
-export default CardPayCreateMerchantWorkflowNextStepsComponent;
+export default CardPayCreateProfileWorkflowNextStepsComponent;
