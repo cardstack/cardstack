@@ -17,10 +17,10 @@ interface Context extends MirageTestContext {}
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
-  'There was a problem creating your payment profile. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the $1.00 USD payment profile creation fee. Please try another prepaid card, or buy one in Cardstack Wallet.`;
+  'There was a problem creating your profile. Please contact Cardstack support to find out the status of your transaction.';
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the $1.00 USD profile creation fee. Please try another prepaid card, or buy one in Cardstack Wallet.`;
 const DEFAULT_ERROR_MESSAGE =
-  'There was a problem creating your payment profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
+  'There was a problem creating your profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
 module(
   'Integration | Component | card-pay/create-profile/prepaid-card-choice',

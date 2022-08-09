@@ -96,7 +96,7 @@ module('Acceptance | create profile', function (hooks) {
     let post = postableSel(0, 0);
     assert.dom(`${postableSel(0, 0)} img`).exists();
     assert.dom(postableSel(0, 0)).containsText('Hello, nice to see you!');
-    assert.dom(postableSel(0, 1)).containsText('create your payment profile');
+    assert.dom(postableSel(0, 1)).containsText('create your profile');
 
     assert
       .dom(postableSel(0, 2))
@@ -166,7 +166,7 @@ module('Acceptance | create profile', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Let’s create a new payment profile.');
+      .containsText('Let’s create a new profile.');
 
     post = postableSel(1, 3);
 
@@ -174,7 +174,7 @@ module('Acceptance | create profile', function (hooks) {
 
     assert
       .dom(post)
-      .containsText('Choose a name and ID for your payment profile');
+      .containsText('Choose a name and ID for your profile');
 
     // // profile-customization card
     // TODO verify and interact with profile customization card default state
@@ -245,7 +245,7 @@ module('Acceptance | create profile', function (hooks) {
 
     assert
       .dom(epiloguePostableSel(0))
-      .containsText('You have created a payment profile.');
+      .containsText('You have created a profile.');
 
     await waitFor(epiloguePostableSel(1));
 
@@ -423,7 +423,7 @@ module('Acceptance | create profile', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a payment profile, please start again by connecting your wallet.`
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a profile, please start again by connecting your wallet.`
         );
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -492,7 +492,7 @@ module('Acceptance | create profile', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          'It looks like you changed accounts in the middle of this workflow. If you still want to create a payment profile, please restart the workflow.'
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a profile, please restart the workflow.'
         );
       assert
         .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -536,7 +536,7 @@ module('Acceptance | create profile', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `You already have a payment profile. You can not create another one with this account.`
+        `You already have a profile. You can not create another one with this account.`
       );
     assert
       .dom('[data-test-has-profile-cancelation]')
@@ -577,7 +577,7 @@ module('Acceptance | create profile', function (hooks) {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(profileRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
+        )} profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -617,7 +617,7 @@ module('Acceptance | create profile', function (hooks) {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(profileRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
+        )} profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')

@@ -42,7 +42,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   get selectedSafeTypeCopy() {
     if (this.selectedSafe) {
       return this.selectedSafe.type === 'merchant'
-        ? 'Payment Profile'
+        ? 'Profile'
         : this.selectedSafe.type;
     } else {
       return '';

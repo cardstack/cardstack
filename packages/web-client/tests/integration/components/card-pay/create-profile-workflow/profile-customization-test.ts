@@ -235,7 +235,7 @@ module(
       assert
         .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText(
-          'There was an error validating payment profile ID uniqueness'
+          'There was an error validating profile ID uniqueness'
         );
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();

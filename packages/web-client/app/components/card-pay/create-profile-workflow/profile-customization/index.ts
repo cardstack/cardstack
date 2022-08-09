@@ -204,7 +204,7 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
       Sentry.captureException(e);
 
       this.profileSlugValidationMessage =
-        'There was an error validating payment profile ID uniqueness';
+        'There was an error validating profile ID uniqueness';
       this.lastCheckedMerchantId = '';
       this.lastCheckedMerchantIdValid = false;
 

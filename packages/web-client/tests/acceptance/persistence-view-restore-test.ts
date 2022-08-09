@@ -212,7 +212,7 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Payment Profile Creation')
+        .containsText('Profile Creation')
         .containsText('Save profile details');
 
       assert.strictEqual(
@@ -378,7 +378,7 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-tracker-toggle]');
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Create payment profile');
+        .containsText('Create profile');
     });
 
     test('a storage event causes the count to update', async function (assert) {

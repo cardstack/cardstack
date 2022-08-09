@@ -67,7 +67,7 @@ module('Acceptance | payments dashboard', function (hooks) {
       .dom('[data-test-profiles-section] [data-test-safe]')
       .exists({ count: 1 });
 
-    // we don't want to allow additional payment profiles right now
+    // we don't want to allow additional profiles right now
     assert.dom('[data-test-workflow-button="create-business"]').doesNotExist();
 
     assert.dom('[data-test-safe-title]').containsText('Mandello');

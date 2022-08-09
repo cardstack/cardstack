@@ -81,11 +81,11 @@ module(
 
       assert
         .dom('[data-test-safe-address]')
-        .containsText('Payment Profile address')
+        .containsText('Profile address')
         .containsText(profileAddress);
       assert
         .dom('[data-test-balance-label]')
-        .containsText('Payment Profile balance');
+        .containsText('Profile balance');
       assert
         .dom('[data-test-balance="DAI.CPXD"]')
         .containsText('125.00 DAI.CPXD');

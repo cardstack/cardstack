@@ -1,6 +1,6 @@
 <ActionCardContainer
   class='prepaid-card-choice'
-  @header='Payment Profile'
+  @header='Profile'
   @isComplete={{@isComplete}}
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
   {{did-insert this.checkForPendingTransaction}}
@@ -56,7 +56,7 @@
       {{/if}}
     </Boxel::Field>
     {{#if @isComplete}}
-      <Boxel::Field @label='Payment Profile Safe Address'>
+      <Boxel::Field @label='Profile Safe Address'>
         <CardPay::Profile
           @name={{@workflowSession.state.profileName}}
           @address={{@workflowSession.state.profileSafe.address}}
@@ -72,9 +72,9 @@
         {{#if (eq this.error.message 'INSUFFICIENT_FUNDS')}}
           It looks like your prepaid card doesn't have enough funds to pay the {{format-usd
             (spend-to-usd this.profileRegistrationFee)
-          }} payment profile creation fee. Please try another prepaid card, or buy one in Cardstack Wallet.
+          }} profile creation fee. Please try another prepaid card, or buy one in Cardstack Wallet.
         {{else if (eq this.error.message 'TIMEOUT')}}
-          There was a problem creating your payment profile. Please contact
+          There was a problem creating your profile. Please contact
           <a
             href={{config 'urls.mailToSupportUrl'}}
             target='_blank'
@@ -86,7 +86,7 @@
         {{else if (eq this.error.message 'USER_REJECTION')}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}
-          There was a problem creating your payment profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact
+          There was a problem creating your profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact
           <a
             href={{config 'urls.mailToSupportUrl'}}
             target='_blank'

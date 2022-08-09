@@ -12,7 +12,7 @@ export default class CardPaySafeChooserDropdownSafeOptionComponent extends Compo
       let profile = this.args.safe as MerchantSafe;
 
       return {
-        type: 'Payment Profile',
+        type: 'Profile',
         info: Profile.from(this, () => ({
           infoDID: profile.infoDID,
         })),
