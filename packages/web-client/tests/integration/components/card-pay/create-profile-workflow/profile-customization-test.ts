@@ -234,9 +234,7 @@ module(
       await waitFor('[data-test-boxel-input-validation-state="invalid"]');
       assert
         .dom(`${PROFILE_ID_FIELD} [data-test-boxel-input-error-message]`)
-        .containsText(
-          'There was an error validating profile ID uniqueness'
-        );
+        .containsText('There was an error validating profile ID uniqueness');
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
     });
@@ -263,7 +261,7 @@ module(
         'HELLO!'
       );
       assert.strictEqual(
-        workflowSession.getValue<string>('profileId'),
+        workflowSession.getValue<string>('profileSlug'),
         VALID_ID
       );
       assert.ok(workflowSession.getValue<string>('profileBgColor'));
