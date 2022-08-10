@@ -74,7 +74,7 @@ export class MockLocalStorage {
     this.entries[key] = value;
   }
   getItem(key: string): string | null {
-    return this.entries[key];
+    return this.entries[key] ?? null;
   }
   removeItem(key: string): void {
     delete this.entries[key];

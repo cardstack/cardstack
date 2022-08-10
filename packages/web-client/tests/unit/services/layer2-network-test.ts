@@ -16,6 +16,6 @@ module('Unit | Service | Layer2Network', function (hooks) {
     assert.strictEqual(hubAuthentication.authToken, 'something');
     let layer2Network = this.owner.lookup('service:layer2-network');
     layer2Network.onDisconnect();
-    assert.strictEqual(hubAuthentication.authToken, undefined);
+    assert.strictEqual(hubAuthentication.authToken, null);
   });
 });

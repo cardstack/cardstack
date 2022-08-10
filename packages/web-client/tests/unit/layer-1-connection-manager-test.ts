@@ -201,7 +201,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
 
     assert.strictEqual(
       ConnectionManager.getProviderIdForChain(subject.chainId),
-      undefined,
+      null,
       'Storage does not contain a provider id for the given chain, after disconnection'
     );
   });
