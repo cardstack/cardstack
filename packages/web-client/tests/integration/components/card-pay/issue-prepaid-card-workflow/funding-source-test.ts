@@ -51,7 +51,7 @@ module(
 
         profileSafe = createProfileSafe({
           address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
-          profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
             createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
             createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -64,7 +64,7 @@ module(
           profileSafe,
           createProfileSafe({
             address: 'low-balance-safe',
-            profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+            merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [createSafeToken('DAI.CPXD', '1')],
             accumulatedSpendValue: 100,
           }),
@@ -188,7 +188,7 @@ module(
 
       profileSafe = createProfileSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
-        profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
           createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
           createSafeToken('CARD.CPXD', '450000000000000000000'),

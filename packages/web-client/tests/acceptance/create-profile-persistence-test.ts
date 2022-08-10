@@ -35,7 +35,7 @@ module('Acceptance | create profile persistence', function (hooks) {
   const profileRegistrationFee = 150;
   const profileSafe = createProfileSafe({
     address: profileAddress,
-    profile: profileName,
+    merchant: profileName,
     infoDID: profileDID,
     owners: [layer2AccountAddress],
   });

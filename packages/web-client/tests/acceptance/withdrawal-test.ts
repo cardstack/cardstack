@@ -141,7 +141,7 @@ module('Acceptance | withdrawal', function (hooks) {
       }),
       createProfileSafe({
         address: profileAddress,
-        profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         accumulatedSpendValue: 100,
         tokens: [
           createSafeToken('DAI.CPXD', '125000000000000000000'),

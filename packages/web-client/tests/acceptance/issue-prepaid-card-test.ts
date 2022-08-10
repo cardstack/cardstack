@@ -136,7 +136,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let profileSafe = createProfileSafe({
       address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c94',
-      profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
         createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -146,7 +146,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     });
 
     let otherMerchantSafe = createProfileSafe({
-      profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
         createSafeToken('CARD.CPXD', '450000000000000000000'),
@@ -767,7 +767,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
         }),
         createProfileSafe({
-          profile: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
           accumulatedSpendValue: 100,
         }),

@@ -92,7 +92,7 @@ const defaultMerchantSafe: MerchantSafe = {
   owners: ['DEFAULT_MERCHANT_OWNER_ADDRESS'], // should be overwritten in factory
   type: 'merchant',
   accumulatedSpendValue: 0,
-  profile: 'EOA_ADDRESS', // should be overwritten in factory
+  merchant: 'EOA_ADDRESS', // should be overwritten in factory
   infoDID: 'did:cardstack:example-did', // should be overwritten in factory
 };
 /**
@@ -115,7 +115,7 @@ export const createProfileSafe = (
   ...opts,
   address: opts.address || generateMockAddress(),
   owners: opts.owners || [generateMockAddress()],
-  profile: opts.profile || generateMockAddress(),
+  merchant: opts.merchant || generateMockAddress(),
 });
 
 const defaultPrepaidCardSafe: PrepaidCardSafe = {

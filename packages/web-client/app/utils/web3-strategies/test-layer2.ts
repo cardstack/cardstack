@@ -477,7 +477,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let profileSafe: MerchantSafe = createProfileSafe({
       createdAt: Math.floor(Date.now() / 1000),
       address: profileSafeAddress,
-      profile: prepaidCardAddress,
+      merchant: prepaidCardAddress,
       accumulatedSpendValue: 100,
       infoDID: request?.infoDID,
       ...options,
@@ -506,7 +506,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ) {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
     return request?.deferred.reject(
-      new Error('User rejected profile creation')
+      new Error('User rejected profileF creation')
     );
   }
 
