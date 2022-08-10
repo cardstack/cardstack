@@ -30,7 +30,6 @@ export default function () {
   this.get(
     '/merchant-infos/validate-slug/:slug',
     function ({ merchantInfos }, { params: { slug } }) {
-      // eslint-disable-next-line ember/no-array-prototype-extensions
       let merchantBySlug = merchantInfos.findBy({ slug });
 
       if (slug === 'www') {

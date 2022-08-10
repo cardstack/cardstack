@@ -75,7 +75,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       'service:workflow-persistence'
     );
 
-    // eslint-disable-next-line ember/no-array-prototype-extensions
     workflowPersistenceService.clear();
   });
 
