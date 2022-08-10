@@ -3,14 +3,9 @@ import { NestedAttributeError, RelationshipError } from '../../routes/utils/erro
 import { inject } from '@cardstack/di';
 import { Profile } from '@prisma/client';
 
-export type CardSpaceAttribute = 'profileDescription' | 'profileImageUrl' | 'links';
+export type ProfileAttribute = 'name' | 'profileDescription' | 'profileImageUrl' | 'links';
 
-export type CardSpaceRelationship = 'merchantInfo';
-
-export type CardSpaceErrors = Record<
-  CardSpaceAttribute | CardSpaceRelationship,
-  (string | NestedAttributeError | RelationshipError)[]
->;
+export type CardSpaceErrors = Record<ProfileAttribute, (string | NestedAttributeError | RelationshipError)[]>;
 
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
@@ -24,16 +19,20 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-export default class CardSpaceValidator {
+export default class ProfileValidator {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async validate(cardSpace: Partial<Profile>): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
-      merchantInfo: [],
+      name: [],
       profileDescription: [],
       links: [],
       profileImageUrl: [],
     };
+
+    if (cardSpace.name && cardSpace.name.length > MAX_SHORT_FIELD_LENGTH) {
+      errors.name.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    }
 
     if (cardSpace.profileDescription && cardSpace.profileDescription.length > MAX_LONG_FIELD_LENGTH) {
       errors.profileDescription.push(`Max length is ${MAX_LONG_FIELD_LENGTH}`);
@@ -83,6 +82,6 @@ export default class CardSpaceValidator {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'card-space-validator': CardSpaceValidator;
+    'profile-validator': ProfileValidator;
   }
 }

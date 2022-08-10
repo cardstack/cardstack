@@ -5,9 +5,15 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
+import ProfileValidator from '../services/validators/profile';
 import shortUUID from 'short-uuid';
+import { Profile } from '@prisma/client';
+import { serializeErrors } from './utils/error';
 
-export default class MerchantInfosRoute {
+export default class ProfilesRoute {
+  profileValidator: ProfileValidator = inject('profile-validator', {
+    as: 'profileValidator',
+  });
   profileSerializer = inject('profile-serializer', {
     as: 'profileSerializer',
   });
@@ -35,7 +41,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.profileSerializer.serialize(profiles, 'merchant-infos');
+    ctx.body = this.profileSerializer.serialize(profiles);
   }
 
   async post(ctx: Koa.Context) {
@@ -51,8 +57,8 @@ export default class MerchantInfosRoute {
       ctx.status = 422;
       ctx.body = {
         status: '422',
-        title: 'Invalid merchant name',
-        detail: 'Merchant name cannot exceed 50 characters',
+        title: 'Invalid profile name',
+        detail: 'Profile name cannot exceed 50 characters',
       };
       ctx.type = 'application/vnd.api+json';
       return;
@@ -65,7 +71,7 @@ export default class MerchantInfosRoute {
       ctx.status = 422;
       ctx.body = {
         status: '422',
-        title: 'Invalid merchant slug',
+        title: 'Invalid profile slug',
         detail: validationResult.detail,
       };
       ctx.type = 'application/vnd.api+json';
@@ -73,25 +79,107 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const properties = {
+    let properties = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
+      profileDescription: ctx.request.body.data.attributes['profile-description'],
+      profileImageUrl: ctx.request.body.data.attributes['profile-image-url'],
+      links: ctx.request.body.data.attributes['links'],
       ownerAddress: ctx.state.userAddress,
     };
 
-    let merchantInfo = await prisma.profile.create({ data: { ...properties } });
+    let profile: Profile;
+
+    profile = await prisma.profile.create({ data: { ...properties } });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
-      id: merchantInfo.id,
+      id: profile.id,
     });
 
-    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
+    let serialized = this.profileSerializer.serialize(profile);
 
     ctx.status = 201;
     ctx.body = serialized;
+    ctx.type = 'application/vnd.api+json';
+  }
+
+  async patch(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+    let prisma = await this.prismaManager.getClient();
+
+    let profileId = ctx.params.id;
+    let profile = await prisma.profile.findUnique({ where: { id: profileId } });
+
+    if (profile) {
+      if (ctx.state.userAddress !== profile.ownerAddress) {
+        ctx.status = 403;
+        return;
+      }
+    }
+
+    if (!profile) {
+      ctx.status = 404;
+      return;
+    }
+
+    let attributes = ctx.request.body.data.attributes;
+
+    if (attributes['name']) {
+      profile.name = this.normalizeText(ctx.request.body.data.attributes['name']);
+    }
+
+    if (attributes['color']) {
+      profile.color = this.normalizeText(ctx.request.body.data.attributes['color']);
+    }
+
+    if (attributes['text-color']) {
+      profile.textColor = this.normalizeText(ctx.request.body.data.attributes['text-color']);
+    }
+
+    if (attributes['profile-description']) {
+      profile.profileDescription = this.normalizeText(ctx.request.body.data.attributes['profile-description']);
+    }
+
+    if (attributes['profile-image-url']) {
+      profile.profileImageUrl = this.normalizeText(ctx.request.body.data.attributes['profile-image-url']);
+    }
+
+    if (attributes['links']) {
+      profile.links = ctx.request.body.data.attributes['links'];
+    }
+
+    let errors = await this.profileValidator.validate(profile);
+    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
+
+    if (hasErrors) {
+      ctx.status = 422;
+      ctx.body = {
+        errors: serializeErrors(errors),
+      };
+    } else {
+      await prisma.profile.update({
+        data: {
+          profileDescription: profile.profileDescription,
+          profileImageUrl: profile.profileImageUrl,
+          links: profile.links,
+        },
+        where: { id: profile.id },
+      });
+
+      await this.workerClient.addJob('persist-off-chain-merchant-info', {
+        id: profile.id,
+      });
+
+      let serialized = this.profileSerializer.serialize(profile);
+
+      ctx.status = 200;
+      ctx.body = serialized;
+    }
     ctx.type = 'application/vnd.api+json';
   }
 
@@ -127,10 +215,12 @@ export default class MerchantInfosRoute {
       } else {
         let prisma = await this.prismaManager.getClient();
         let profile = await prisma.profile.findFirst({ where: { slug } });
-        return {
-          slugAvailable: profile ? false : true,
-          detail: profile ? 'This ID is already taken. Please choose another one' : 'ID is available',
-        };
+
+        if (profile) {
+          return { slugAvailable: false, detail: 'This ID is already taken. Please choose another one' };
+        } else {
+          return { slugAvailable: true, detail: 'ID is available' };
+        }
       }
     }
   }
@@ -149,13 +239,21 @@ export default class MerchantInfosRoute {
     }
 
     ctx.status = 200;
-    ctx.body = this.profileSerializer.serialize(profile, 'merchant-infos');
+    ctx.body = this.profileSerializer.serialize(profile);
     ctx.type = 'application/vnd.api+json';
+  }
+
+  normalizeText(value: string | unknown): any {
+    if (typeof value === 'string') {
+      return value.trim().replace(/ +/g, ' ');
+    } else {
+      return value;
+    }
   }
 }
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'merchant-infos-route': MerchantInfosRoute;
+    'profiles-route': ProfilesRoute;
   }
 }
