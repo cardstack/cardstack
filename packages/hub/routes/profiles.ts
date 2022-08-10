@@ -130,23 +130,23 @@ export default class ProfilesRoute {
     let attributes = ctx.request.body.data.attributes;
 
     if (attributes['name']) {
-      profile.name = this.sanitizeText(ctx.request.body.data.attributes['name']);
+      profile.name = this.normalizeText(ctx.request.body.data.attributes['name']);
     }
 
     if (attributes['color']) {
-      profile.color = this.sanitizeText(ctx.request.body.data.attributes['color']);
+      profile.color = this.normalizeText(ctx.request.body.data.attributes['color']);
     }
 
     if (attributes['text-color']) {
-      profile.textColor = this.sanitizeText(ctx.request.body.data.attributes['text-color']);
+      profile.textColor = this.normalizeText(ctx.request.body.data.attributes['text-color']);
     }
 
     if (attributes['profile-description']) {
-      profile.profileDescription = this.sanitizeText(ctx.request.body.data.attributes['profile-description']);
+      profile.profileDescription = this.normalizeText(ctx.request.body.data.attributes['profile-description']);
     }
 
     if (attributes['profile-image-url']) {
-      profile.profileImageUrl = this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']);
+      profile.profileImageUrl = this.normalizeText(ctx.request.body.data.attributes['profile-image-url']);
     }
 
     if (attributes['links']) {
@@ -243,7 +243,7 @@ export default class ProfilesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
-  sanitizeText(value: string | unknown): any {
+  normalizeText(value: string | unknown): any {
     if (typeof value === 'string') {
       return value.trim().replace(/ +/g, ' ');
     } else {
