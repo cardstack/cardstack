@@ -29,8 +29,6 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/profiles', function () {
-  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
-
   describe('GET /api/profiles/validate-slug/:slug', function () {
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);
@@ -209,6 +207,8 @@ describe('/api/profiles', function () {
   });
 
   describe('POST /api/profiles', function () {
+    let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);
     });
@@ -481,6 +481,8 @@ describe('/api/profiles', function () {
   });
 
   describe('PATCH /api/profiles', function () {
+    let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+
     setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
     let { request, getPrisma } = setupHub(this);
 
