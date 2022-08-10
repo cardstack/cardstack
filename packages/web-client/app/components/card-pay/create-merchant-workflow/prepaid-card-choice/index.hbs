@@ -85,7 +85,7 @@
         {{if this.hasTriedCreatingMerchant "Try Again" "Create Profile"}}
       </d.ActionButton>
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator
           class="prepaid-card-choice__loading-indicator"
@@ -105,7 +105,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed

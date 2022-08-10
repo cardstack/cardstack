@@ -97,9 +97,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
     });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('Initiating workflow without wallet connections', async function (this: Context, assert) {
     await visit('/card-pay');
-    assert.equal(currentURL(), '/card-pay/wallet');
+    assert.strictEqual(currentURL(), '/card-pay/wallet');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
     let post = postableSel(0, 0);
@@ -496,7 +497,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       req.url.includes('prepaid-card-customizations')
     );
 
-    assert.equal(
+    assert.strictEqual(
       customizationStorageRequest.requestHeaders['authorization'],
       'Bearer abc123--def456--ghi789'
     );
@@ -505,12 +506,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
       customizationStorageRequest.requestBody
     );
 
-    assert.equal(customizationRequestJson.data.attributes['issuer-name'], 'JJ');
-    assert.equal(
+    assert.strictEqual(
+      customizationRequestJson.data.attributes['issuer-name'],
+      'JJ'
+    );
+    assert.strictEqual(
       customizationRequestJson.data.relationships.pattern.data.id,
       '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
     );
-    assert.equal(
+    assert.strictEqual(
       customizationRequestJson.data.relationships['color-scheme'].data.id,
       '4f219852-33ee-4e4c-81f7-76318630a423'
     );
@@ -590,7 +594,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       workflowPersistenceId
     );
 
-    assert.equal(persistedData.name, 'PREPAID_CARD_ISSUANCE');
+    assert.strictEqual(persistedData.name, 'PREPAID_CARD_ISSUANCE');
     let persistedState = persistedData.state;
 
     let deserializedState = deserializeState({
@@ -667,7 +671,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -710,7 +714,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -754,7 +758,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Workflow is canceled after showing wallet connection card if balances insufficient to create prepaid card', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
@@ -806,7 +810,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       let secondLayer2AccountAddress =
         '0x5416C61193C3393B46C2774ac4717C252031c0bE';
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert

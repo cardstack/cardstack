@@ -26,11 +26,11 @@ module('Integration | Modifiers | autoscroll', function (hooks) {
     `);
     let scrollEl = this.element.querySelector('.scroll-div');
 
-    assert.equal(scrollEl.scrollTop, 0);
+    assert.strictEqual(scrollEl.scrollTop, 0);
 
     this.set('blocks', [{}, {}, {}, {}]);
     await waitUntil(() => scrollEl.scrollTop === 100);
-    assert.equal(
+    assert.strictEqual(
       scrollEl.scrollTop,
       100,
       'autoscrolls when scrolled to bottom'
@@ -39,7 +39,7 @@ module('Integration | Modifiers | autoscroll', function (hooks) {
     scrollEl.scrollTo(0, 95);
     this.set('blocks', [{}, {}, {}, {}, {}]);
     await waitUntil(() => scrollEl.scrollTop === 200);
-    assert.equal(
+    assert.strictEqual(
       scrollEl.scrollTop,
       200,
       'autoscrolls when scrolled near bottom'
@@ -49,7 +49,7 @@ module('Integration | Modifiers | autoscroll', function (hooks) {
     await delay(100);
     this.set('blocks', [{}, {}, {}, {}, {}, {}]);
     await delay(100);
-    assert.equal(
+    assert.strictEqual(
       scrollEl.scrollTop,
       150,
       'does not autoscroll when not scrolled near bottom'
@@ -59,7 +59,7 @@ module('Integration | Modifiers | autoscroll', function (hooks) {
     await delay(100);
     this.set('blocks', [{}, {}, {}, {}, {}, {}, {}]);
     await waitUntil(() => scrollEl.scrollTop === 400);
-    assert.equal(
+    assert.strictEqual(
       scrollEl.scrollTop,
       400,
       'autoscrolls when scrolled to bottom again'

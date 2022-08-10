@@ -85,7 +85,7 @@ module('Integration | Component | ActionChin', function (hooks) {
       <Boxel::ActionChin
         @state={{this.state}}
       >
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionButton>
           {{this.mainActionButtonText}}
         </i.ActionButton>
@@ -97,7 +97,7 @@ module('Integration | Component | ActionChin', function (hooks) {
         <i.InfoArea>
           {{this.infoAreaText}}
         </i.InfoArea>
-      </:in-progress>
+      </:inProgress>
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
@@ -111,7 +111,7 @@ module('Integration | Component | ActionChin', function (hooks) {
       <Boxel::ActionChin
         @state={{this.state}}
       >
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionStatusArea>
           {{this.mainActionAreaText}}
         </i.ActionStatusArea>
@@ -119,7 +119,7 @@ module('Integration | Component | ActionChin', function (hooks) {
         <i.InfoArea>
           {{this.infoAreaText}}
         </i.InfoArea>
-      </:in-progress>
+      </:inProgress>
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_AREA_SELECTOR).containsText(mainActionAreaText);
@@ -190,9 +190,9 @@ module('Integration | Component | ActionChin', function (hooks) {
       <:default>
         {{get this.stateText "default"}}
       </:default>
-      <:in-progress>
+      <:inProgress>
         {{get this.stateText "in-progress"}}
-      </:in-progress>
+      </:inProgress>
       <:memorialized>
         {{get this.stateText "memorialized"}}
       </:memorialized>
@@ -271,11 +271,11 @@ module('Integration | Component | ActionChin', function (hooks) {
           Info area that visually replaces the private notice
         </a.InfoArea>
       </:default>
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.InfoArea>
           Info area that visually replaces the private notice
         </i.InfoArea>
-      </:in-progress>
+      </:inProgress>
       <:memorialized as |m|>
         <m.InfoArea>
           Info area that visually replaces the private notice
@@ -302,14 +302,14 @@ module('Integration | Component | ActionChin', function (hooks) {
           Default
         </a.ActionButton>
       </:default>
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionButton>
           In Progress
         </i.ActionButton>
         <i.CancelButton>
           Cancel
         </i.CancelButton>
-      </:in-progress>
+      </:inProgress>
       <:memorialized as |m|>
         <m.ActionButton>
           Memorialized

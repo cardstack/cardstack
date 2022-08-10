@@ -224,10 +224,10 @@ module(
           prepaidCardAddress
         )
       );
-      assert.equal(
-        layer2Service.test__getNonceForRegisterMerchantRequest(
-          prepaidCardAddress
-        ),
+      assert.strictEqual(
+        layer2Service
+          .test__getNonceForRegisterMerchantRequest(prepaidCardAddress)
+          ?.toString(),
         '12345',
         'The same nonce as was used for the first attempt is sent for the second'
       );
@@ -285,8 +285,8 @@ module(
         this.set('frozen', true);
         assert.dom('[data-test-create-merchant-button]').isDisabled();
 
-        assert.equal(workflow.isCanceled, true);
-        assert.equal(workflow.cancelationReason, 'UNAUTHENTICATED');
+        assert.true(workflow.isCanceled);
+        assert.strictEqual(workflow.cancelationReason, 'UNAUTHENTICATED');
       });
 
       test('it shows the correct error message for a user rejection', async function (assert) {
@@ -344,7 +344,7 @@ module(
           req.url.includes('merchant-infos')
         );
 
-        assert.equal(
+        assert.strictEqual(
           merchantInfoStorageRequests.length,
           1,
           'expected only one POST /api/merchant-infos'

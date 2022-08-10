@@ -368,7 +368,7 @@ module(
       await fillIn('input', '5');
       await click('[data-test-withdrawal-transaction-amount] button');
 
-      assert.equal(session.getValue('relayTokensTxnHash'), 'test hash');
+      assert.strictEqual(session.getValue('relayTokensTxnHash'), 'test hash');
 
       receipt.reject(new Error('Test reverted transaction'));
       await settled();

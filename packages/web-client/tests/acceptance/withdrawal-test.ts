@@ -45,9 +45,10 @@ function cancelationPostableSel(postableIndex: number) {
 module('Acceptance | withdrawal', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
+  // eslint-disable-next-line qunit/require-expect
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay/deposit-withdrawal');
-    assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
+    assert.strictEqual(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -367,7 +368,7 @@ module('Acceptance | withdrawal', function (hooks) {
 
   test('Initiating workflow without enough ETH to claim', async function (assert) {
     await visit('/card-pay/deposit-withdrawal');
-    assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
+    assert.strictEqual(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
     let post = postableSel(0, 2);
     await click(`${post} [data-test-wallet-option="metamask"]`);

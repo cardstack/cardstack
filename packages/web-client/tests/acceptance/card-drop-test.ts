@@ -12,6 +12,7 @@ module('Acceptance | card-drop', function (hooks) {
     await percySnapshot(assert, { widths: [375, 1280] });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('it shows an error message', async function (assert) {
     await visit('/card-drop/error?message=something');
     await percySnapshot(assert, { widths: [375, 1280] });

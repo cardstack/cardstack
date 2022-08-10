@@ -15,7 +15,7 @@
       <span class="boxel-sr-only">Step {{@stepNumber}}</span>
     </div>
   {{/if}}
-  {{#if (and (has-block "in-progress") this.isInProgress)}}
+  {{#if (and (has-block "inProgress") this.isInProgress)}}
     {{yield
       (hash
         ActionButton=(component
@@ -39,7 +39,7 @@
           class="boxel-action-chin__info-area"
         )
       )
-      to="in-progress"
+      to="inProgress"
     }}
   {{else if (and (has-block "memorialized") this.isMemorialized)}}
     {{!--
@@ -81,7 +81,6 @@
           class="boxel-action-chin__info-area"
         )
       )
-      to="default"
     }}
   {{/if}}
   {{!-- in any state except: disabled + has a step, we want the lock shown --}}

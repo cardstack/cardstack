@@ -176,9 +176,10 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     );
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('it throws an error if a token other than DAI, DAI.CPXD, CARD, CARD.CPXD, or ETH is requested', async function (assert) {
     setupOnerror(function (err: Error) {
-      assert.equal(
+      assert.strictEqual(
         err.message,
         'Invalid symbol LGTM passed to {{token-to-usd}}'
       );

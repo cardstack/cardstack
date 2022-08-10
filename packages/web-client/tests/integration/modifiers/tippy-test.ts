@@ -29,22 +29,29 @@ module('Integration | Modifier | tippy', function (hooks) {
     const tippy = find('#' + tippyId)!;
     assert.ok(tippy, 'attached tippy found');
 
-    assert.equal(trigger.parentElement!.children.namedItem(tippyId), tippy);
-    assert.equal(trigger.innerHTML, 'Trigger');
-    assert.equal(tippy.textContent, 'Tooltip');
+    assert.strictEqual(
+      trigger.parentElement!.children.namedItem(tippyId),
+      tippy
+    );
+    assert.strictEqual(trigger.innerHTML, 'Trigger');
+    assert.strictEqual(tippy.textContent, 'Tooltip');
 
     // @ts-ignore property patched onto HTML element
     const tippyInstance = trigger._tippy;
     assert.ok(tippyInstance, 'tippyInstance');
-    assert.equal(tippyInstance.popper, tippy, 'tippyInstance.popper');
-    assert.equal(tippyInstance.reference, trigger, 'tippyInstance.reference');
+    assert.strictEqual(tippyInstance.popper, tippy, 'tippyInstance.popper');
+    assert.strictEqual(
+      tippyInstance.reference,
+      trigger,
+      'tippyInstance.reference'
+    );
 
     assert.dom('[data-tippy-root]').hasAttribute('id', tippyId);
     let tippyBoxData = (find('[data-tippy-root] .tippy-box') as HTMLElement)
       .dataset;
-    assert.equal(tippyBoxData.state, 'visible');
-    assert.equal(tippyBoxData.placement, 'bottom-start');
-    assert.equal(
+    assert.strictEqual(tippyBoxData.state, 'visible');
+    assert.strictEqual(tippyBoxData.placement, 'bottom-start');
+    assert.strictEqual(
       (find('[data-tippy-root] .tippy-box .tippy-content') as HTMLElement)
         .dataset.state,
       'visible'
@@ -97,7 +104,7 @@ module('Integration | Modifier | tippy', function (hooks) {
     const tippy = find('#' + tippyId)!;
     assert.ok(tippy, 'attached tippy found');
 
-    assert.equal(tippy.textContent, 'Tooltip');
-    assert.equal(find('#b')!.textContent, 'tip');
+    assert.strictEqual(tippy.textContent, 'Tooltip');
+    assert.strictEqual(find('#b')!.textContent, 'tip');
   });
 });

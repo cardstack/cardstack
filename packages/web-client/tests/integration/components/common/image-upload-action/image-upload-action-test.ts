@@ -60,9 +60,15 @@ module(
 
         let imageEditorElement = find(IMAGE_EDITOR) as HTMLElement;
 
-        assert.equal(imageEditorElement.dataset.testImageEditorWidth, '430');
-        assert.equal(imageEditorElement.dataset.testImageEditorHeight, '230');
-        assert.equal(
+        assert.strictEqual(
+          imageEditorElement.dataset.testImageEditorWidth,
+          '430'
+        );
+        assert.strictEqual(
+          imageEditorElement.dataset.testImageEditorHeight,
+          '230'
+        );
+        assert.strictEqual(
           imageEditorElement.dataset.testImageEditorValue,
           imageDataUri
         );
@@ -90,7 +96,7 @@ module(
 
         await click(IMAGE_EDITOR_SAVE_BUTTON);
 
-        assert.equal(onUploadSpy.lastCall.args[0].filename, 'blob.png');
+        assert.strictEqual(onUploadSpy.lastCall.args[0].filename, 'blob.png');
         assert.ok(onUploadSpy.lastCall.args[0].file);
         assert.ok(onUploadSpy.lastCall.args[0].preview);
       });
@@ -217,7 +223,7 @@ module(
         await mockPngUpload(imageDataUri);
         await waitUntil(() => onUploadSpy.calledOnce);
 
-        assert.equal(onUploadSpy.lastCall.args[0].filename, 'blob.png');
+        assert.strictEqual(onUploadSpy.lastCall.args[0].filename, 'blob.png');
         assert.ok(onUploadSpy.lastCall.args[0].file);
         assert.ok(onUploadSpy.lastCall.args[0].preview);
       });
@@ -250,11 +256,11 @@ module(
         // and a boolean to indicate that it's a validation message
         // this is so we can use the validation message in the UI
         // and skip sending to sentry
-        assert.equal(
+        assert.strictEqual(
           onErrorSpy.lastCall.args[0].message,
           'Please upload an image with a file type of gif'
         );
-        assert.equal(onErrorSpy.lastCall.args[1], true);
+        assert.true(onErrorSpy.lastCall.args[1]);
         assert.ok(onUploadSpy.notCalled);
       });
     });

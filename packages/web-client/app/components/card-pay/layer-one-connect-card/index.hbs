@@ -82,7 +82,7 @@
           Connect Wallet
         </a.ActionButton>
       </:default>
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
           this.radioWalletProviderId "-logo" }} style={{css-var status-icon-size="2.5rem" }}>
           <Boxel::LoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
@@ -96,7 +96,7 @@
         <i.InfoArea>
           Only visible to you
         </i.InfoArea>
-      </:in-progress>
+      </:inProgress>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
           Disconnect Wallet

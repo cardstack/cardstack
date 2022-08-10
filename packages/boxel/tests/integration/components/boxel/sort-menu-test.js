@@ -95,14 +95,14 @@ module('Integration | Component | SortMenu', function (hooks) {
     });
 
     await render(
-      hbs`<Boxel::SortMenu @onSort={{fn this.onSort}} @sortableColumns={{this.sortableColumns}} @sortedColumn={{this.sortedColumn}} @sortedDirection={{this.sortedDirection}}/>`
+      hbs`<Boxel::SortMenu @onSort={{this.onSort}} @sortableColumns={{this.sortableColumns}} @sortedColumn={{this.sortedColumn}} @sortedDirection={{this.sortedDirection}} />`
     );
 
     await click(
       `[${TEST_DIRECTION_ATTRIBUTE}='asc'][${TEST_COLUMN_ATTRIBUTE}='Year']`
     );
-    assert.equal(currentSelection.direction, 'asc');
-    assert.equal(currentSelection.sortedColumn, yearColumn);
+    assert.strictEqual(currentSelection.direction, 'asc');
+    assert.strictEqual(currentSelection.sortedColumn, yearColumn);
     assert
       .dom(
         `[${TEST_DIRECTION_ATTRIBUTE}='asc'][${TEST_COLUMN_ATTRIBUTE}='Year']`
@@ -112,8 +112,8 @@ module('Integration | Component | SortMenu', function (hooks) {
     await click(
       `[${TEST_DIRECTION_ATTRIBUTE}='desc'][${TEST_COLUMN_ATTRIBUTE}='Title']`
     );
-    assert.equal(currentSelection.direction, 'desc');
-    assert.equal(currentSelection.sortedColumn, titleColumn);
+    assert.strictEqual(currentSelection.direction, 'desc');
+    assert.strictEqual(currentSelection.sortedColumn, titleColumn);
     assert
       .dom(
         `[${TEST_DIRECTION_ATTRIBUTE}='desc'][${TEST_COLUMN_ATTRIBUTE}='Title']`

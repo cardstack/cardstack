@@ -10,9 +10,9 @@
   </header>
 
   <div class="boxel-next-steps-box__content">
-    {{#if (has-block "default")}}
+    {{#if (has-block)}}
       <div class="boxel-next-steps-box__button-container">
-        {{yield to="default"}}
+        {{yield}}
       </div>
     {{/if}}
 

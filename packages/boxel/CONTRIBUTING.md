@@ -3,7 +3,7 @@
 ## Installation
 
 * `git clone <repository-url>`
-* `cd boxel`
+* `cd packages/boxel`
 * `yarn install`
 
 ## Linting
@@ -22,4 +22,4 @@
 * `ember serve`
 * Visit the application at [http://localhost:4200/boxel/](http://localhost:4200/boxel/).
 
-For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
+For more information on using ember-cli, visit [https://cli.emberjs.com/release/](https://cli.emberjs.com/release/).

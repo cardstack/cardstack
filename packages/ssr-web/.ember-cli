@@ -7,5 +7,11 @@
   */
   "testPort": 7367,
   "disableAnalytics": false,
-  "port": 4210
+  "port": 4210,
+
+  /**
+  Setting `isTypeScriptProject` to true will force the blueprint generators to generate TypeScript
+  rather than JavaScript by default, when a TypeScript version of a given blueprint is available.
+  */
+  "isTypeScriptProject": true
 }
