@@ -1,21 +1,21 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
-import { CardSpace } from '../resources/card-space';
-import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import { Profile } from '../resources/profile';
+import ProfileService from '@cardstack/ssr-web/services/profile';
 import { isTesting } from '@embroider/macros';
 import { getSentry } from '../utils/sentry';
 import { action } from '@ember/object';
 import Transition from '@ember/routing/-private/transition';
 
 export default class ApplicationRoute extends Route {
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
   @service declare fastboot: Fastboot;
   sentry = getSentry();
 
-  async model(): Promise<CardSpace | undefined> {
-    if (this.cardSpace.isActive) {
-      let model = this.cardSpace.model;
+  async model(): Promise<Profile | undefined> {
+    if (this.profile.isActive) {
+      let model = this.profile.model;
       await model.run();
 
       if (model.is404) {
@@ -23,7 +23,7 @@ export default class ApplicationRoute extends Route {
           this.fastboot.response.statusCode = 404;
         }
         let e = new Error(
-          `404: Card Space not found for ${this.cardSpace.slug}`
+          `404: Card Space not found for ${this.profile.slug}`
         );
 
         // @ts-ignore

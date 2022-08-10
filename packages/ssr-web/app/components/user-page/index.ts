@@ -5,16 +5,16 @@ import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
-import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import ProfileService from '@cardstack/ssr-web/services/profile';
 import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
-import { PaymentLinkMode } from '../../common/payment-link';
-import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
-import CardSpaceLogo from '../../../images/logos/card-space-logo-with-background.png';
+import { PaymentLinkMode } from '../common/payment-link';
+import CardstackLogoForQR from '../../images/icons/cardstack-logo-opaque-bg.svg';
+import CardSpaceLogo from '../../images/logos/profile-logo-with-background.png';
 import { getSentry } from '@cardstack/ssr-web/utils/sentry';
 
-interface CardSpaceUserPageArgs {
+interface ProfileUserPageArgs {
   model: {
     did: string;
     id: string;
@@ -25,9 +25,9 @@ interface CardSpaceUserPageArgs {
   };
 }
 
-export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> {
+export default class ProfileUserPage extends Component<ProfileUserPageArgs> {
   @service('app-context') declare appContext: AppContextService;
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
   @service('hub-authentication') declare hubAuthentication: HubAuthentication;
   @service('ua') declare UAService: UA;
   @tracked paymentLinkMode: PaymentLinkMode = 'link';
@@ -39,7 +39,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
   defaultAddressFetchingErrorMsg =
     'We ran into an issue while generating the payment request link. Please reload the page and try again. If the issue persists, please contact support.';
 
-  get cardSpaceLogoPng() {
+  get profileLogoPng() {
     return this.appContext.getAbsolutePath(CardSpaceLogo);
   }
 
@@ -51,7 +51,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
     return {
       description: `Visit ${this.args.model.name}’s profile on Card Space`,
       title: `${this.args.model.name}’s Profile`,
-      url: `https://${this.args.model.id}${config.cardSpaceHostnameSuffix}`,
+      url: `https://${this.args.model.id}${config.profileHostnameSuffix}`,
     };
   }
 

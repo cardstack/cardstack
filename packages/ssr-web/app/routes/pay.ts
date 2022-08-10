@@ -5,7 +5,7 @@ import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
 import { MerchantInfo } from '../resources/merchant-info';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
-import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import ProfileService from '@cardstack/ssr-web/services/profile';
 import RouterService from '@ember/routing/router-service';
 import { getSentry } from '../utils/sentry';
 
@@ -20,11 +20,11 @@ export default class PayRoute extends Route {
   @service declare router: RouterService;
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
   sentry = getSentry();
 
   beforeModel() {
-    if (this.cardSpace.isActive) {
+    if (this.profile.isActive) {
       this.router.transitionTo('index');
     }
   }

@@ -6,19 +6,18 @@ import { MerchantInfoResource } from '@cardstack/ssr-web/resources/merchant-info
 
 // selectors
 const EXPLANATION = '[data-test-payment-request-explanation]';
-const MERCHANT = '[data-test-merchant]';
-const MERCHANT_INFO_ADDRESS_ONLY =
-  '[data-test-payment-request-merchant-address]';
-const MERCHANT_INFO_MISSING_MESSAGE =
+const PROFILE = '[data-test-profile]';
+const PROFILE_ADDRESS_ONLY = '[data-test-payment-request-profile-address]';
+const PROFILE_MISSING_MESSAGE =
   '[data-test-payment-request-merchant-info-missing]';
-const MERCHANT_LOGO = '[data-test-merchant-logo]';
+const PROFILE_LOGO = '[data-test-profile-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-boxel-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-link-deep-link]';
 const LINK_VIEW_TOGGLE = '[data-test-payment-link-link-view-toggle]';
 const PAYMENT_URL = '[data-test-payment-link-url]';
-const LOADING_INDICATOR = '[data-test-merchant-loading-indicator]';
+const LOADING_INDICATOR = '[data-test-profile-loading-indicator]';
 
 // fixed data
 const amount = `§300`;
@@ -30,7 +29,7 @@ const deepLinkPaymentURL =
 let merchant: MerchantInfoResource;
 const merchantAddress = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 
-module('Integration | Component | merchant-payment-request', function (hooks) {
+module('Integration | Component | payment-request', function (hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -54,7 +53,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
 
   test('It renders the non-deep-link view correctly with merchant display info', async function (assert) {
     await render(hbs`
-        <MerchantPaymentRequest
+        <PaymentRequest
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -64,16 +63,16 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
         />
       `);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name!);
+    assert.dom(PROFILE).hasAttribute('data-test-profile', merchant.name!);
     assert
-      .dom(MERCHANT_LOGO)
+      .dom(PROFILE_LOGO)
       .hasAttribute(
-        'data-test-merchant-logo-background',
+        'data-test-profile-logo-background',
         merchant.backgroundColor!
       );
     assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute('data-test-merchant-logo-text-color', merchant.textColor!);
+      .dom(PROFILE_LOGO)
+      .hasAttribute('data-test-profile-logo-text-color', merchant.textColor!);
     assert.dom(AMOUNT).containsText(`§300`);
     assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
     assert
@@ -84,7 +83,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
 
   test('It renders the deep-link view correctly and allows toggling', async function (assert) {
     await render(hbs`
-        <MerchantPaymentRequest
+        <PaymentRequest
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -94,16 +93,16 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
         />
       `);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name!);
+    assert.dom(PROFILE).hasAttribute('data-test-profile', merchant.name!);
     assert
-      .dom(MERCHANT_LOGO)
+      .dom(PROFILE_LOGO)
       .hasAttribute(
-        'data-test-merchant-logo-background',
+        'data-test-profile-logo-background',
         merchant.backgroundColor!
       );
     assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute('data-test-merchant-logo-text-color', merchant.textColor!);
+      .dom(PROFILE_LOGO)
+      .hasAttribute('data-test-profile-logo-text-color', merchant.textColor!);
     assert.dom(AMOUNT).containsText(`§300`);
     assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
     assert.dom(QR_CODE).doesNotExist();
@@ -136,7 +135,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
   test('It renders correctly with merchant address and failure to fetch merchant info', async function (assert) {
     merchant.errored = new Error('An error');
     await render(hbs`
-        <MerchantPaymentRequest
+        <PaymentRequest
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -147,10 +146,10 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
         />
       `);
 
-    assert.dom(MERCHANT).doesNotExist();
-    assert.dom(MERCHANT_INFO_ADDRESS_ONLY).containsText(merchantAddress);
+    assert.dom(PROFILE).doesNotExist();
+    assert.dom(PROFILE_ADDRESS_ONLY).containsText(merchantAddress);
     assert
-      .dom(MERCHANT_INFO_MISSING_MESSAGE)
+      .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
         'Unable to find payment profile for this address. Use caution when paying.'
       );
@@ -165,7 +164,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
   test('It renders a loading state while a merchant is loading', async function (assert) {
     merchant.loading = true;
     await render(hbs`
-        <MerchantPaymentRequest
+        <PaymentRequest
           @amount={{this.amount}}
           @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
@@ -176,7 +175,7 @@ module('Integration | Component | merchant-payment-request', function (hooks) {
         />
       `);
 
-    assert.dom(MERCHANT).doesNotExist();
+    assert.dom(PROFILE).doesNotExist();
     assert.dom(LOADING_INDICATOR).exists();
     assert.dom(AMOUNT).containsText(`§300`);
     assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);

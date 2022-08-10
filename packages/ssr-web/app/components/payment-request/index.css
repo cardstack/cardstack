@@ -4,7 +4,7 @@
   --amount-font-size: 2.5rem;
   --gap: var(--boxel-sp-xl);
   --body-padding: var(--boxel-sp-xl);
-  --merchant-address-font-size: var(--boxel-font-size-lg);
+  --profile-address-font-size: var(--boxel-font-size-lg);
 
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
     --amount-font-size: var(--boxel-font-size-xl);
     --body-padding: var(--boxel-sp);
     --gap: var(--boxel-sp-lg);
-    --merchant-address-font-size: 1.125rem;
+    --profile-address-font-size: 1.125rem;
   }
 }
 
@@ -51,9 +51,9 @@
   gap: var(--boxel-sp-xs);
 }
 
-.payment-request__merchant-address {
+.payment-request__profile-address {
   font-family: var(--boxel-monospace-font-family);
-  font-size: var(--merchant-address-font-size);
+  font-size: var(--profile-address-font-size);
   line-height: calc(22 / 16);
   letter-spacing: var(--boxel-lsp-sm);
   max-width: 22ch;
@@ -61,7 +61,7 @@
   word-break: break-all;
 }
 
-.payment-request__merchant-address-segment--bold {
+.payment-request__profile-address-segment--bold {
   font-weight: 700;
 }
 

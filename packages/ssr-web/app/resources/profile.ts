@@ -12,7 +12,7 @@ interface Args {
   };
 }
 
-export interface CardSpaceResource {
+export interface ProfileResource {
   did: string | undefined;
   id: string | undefined;
   name: string | undefined;
@@ -24,7 +24,7 @@ export interface CardSpaceResource {
   is404: boolean;
 }
 
-export class CardSpace extends Resource<Args> implements CardSpaceResource {
+export class Profile extends Resource<Args> implements ProfileResource {
   @tracked did: string | undefined;
   @tracked id: string | undefined;
   @tracked name: string | undefined;
@@ -44,7 +44,7 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
   }
   async run() {
     try {
-      await this.fetchCardSpace(this.slug!);
+      await this.fetchProfile(this.slug!);
     } catch (err) {
       this.errored = err;
 
@@ -57,9 +57,9 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
     }
   }
 
-  private async fetchCardSpace(slug: string) {
+  private async fetchProfile(slug: string) {
     try {
-      const response = await fetch(`${config.hubURL}/api/card-spaces/${slug}`, {
+      const response = await fetch(`${config.hubURL}/api/profiles/${slug}`, {
         method: 'GET',
         headers: {
           Accept: 'application/vnd.api+json',
@@ -69,27 +69,21 @@ export class CardSpace extends Resource<Args> implements CardSpaceResource {
 
       if (response.status === 404) {
         this.is404 = true;
-        throw new Error(`404: Card Space not found for ${slug}`);
+        throw new Error(`404: Profile not found for ${slug}`);
       }
 
-      const cardSpaceResult: {
-        included: any[];
+      const {
+        data: { attributes },
+      }: {
+        data: { attributes: any };
       } = await response.json();
 
-      let merchant = cardSpaceResult.included?.find(
-        (v) => v.type === 'merchant-infos'
-      );
-      if (!merchant) {
-        this.is404 = true;
-        throw new Error(`404: Card Space not found for ${slug}`);
-      }
-
-      this.did = merchant.attributes['did'];
-      this.id = merchant.attributes['slug'];
-      this.name = merchant.attributes['name'];
-      this.backgroundColor = merchant.attributes['color'];
-      this.ownerAddress = merchant.attributes['owner-address'];
-      this.textColor = merchant.attributes['text-color'];
+      this.did = attributes['did'];
+      this.id = attributes['slug'];
+      this.name = attributes['name'];
+      this.backgroundColor = attributes['color'];
+      this.ownerAddress = attributes['owner-address'];
+      this.textColor = attributes['text-color'];
     } catch (e) {
       this.sentry.captureException(e);
       this.errored = e;

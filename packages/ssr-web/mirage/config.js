@@ -3,8 +3,8 @@ import config from '@cardstack/ssr-web/config/environment';
 export default function () {
   this.namespace = 'api';
 
-  this.get('/card-spaces/:slug', (schema, { params: { slug } }) => {
-    return schema.cardSpaces.where({ slug }).models[0];
+  this.get('/profiles/:slug', (schema, { params: { slug } }) => {
+    return schema.profiles.where({ slug }).models[0];
   });
 
   this.get('/exchange-rates', function (schema, { queryParams: { from, to } }) {

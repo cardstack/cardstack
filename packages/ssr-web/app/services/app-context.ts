@@ -1,12 +1,12 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import ProfileService from '@cardstack/ssr-web/services/profile';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import config from '../config/environment';
 import window from 'ember-window-mock';
 export interface AppContextService {
-  currentApp: 'card-space' | 'wallet';
-  cardSpaceId: string;
+  currentApp: 'profile' | 'wallet';
+  profileId: string;
 }
 
 const CARD_SPACE_SLUG_PARAMETER_NAME = 'slug';
@@ -24,12 +24,12 @@ function escapeDot(str: string) {
 }
 
 export default class AppContext extends Service implements AppContextService {
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
   @service declare fastboot: Fastboot;
   // do not use the global or sticky flags on this or it will become stateful and
   // mess up tests
   hostSuffixPattern = new RegExp(
-    escapeDot(config.cardSpaceHostnameSuffix) + '(:\\d+)?' + '$'
+    escapeDot(config.profileHostnameSuffix) + '(:\\d+)?' + '$'
   );
 
   get host() {
@@ -51,19 +51,19 @@ export default class AppContext extends Service implements AppContextService {
     return false;
   }
 
-  get currentApp(): 'card-space' | 'wallet' {
+  get currentApp(): 'profile' | 'wallet' {
     if (
       this.hostSuffixPattern.test(this.host) ||
       (this.hostIsPreview && this.queryIsCardSpace)
     ) {
-      return 'card-space';
+      return 'profile';
     } else {
       return 'wallet';
     }
   }
 
-  get cardSpaceId() {
-    if (this.cardSpace.isActive) {
+  get profileId() {
+    if (this.profile.isActive) {
       if (this.queryIsCardSpace) {
         return this.searchParams.get(CARD_SPACE_SLUG_PARAMETER_NAME)!;
       } else {

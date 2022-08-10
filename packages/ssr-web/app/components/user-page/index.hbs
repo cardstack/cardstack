@@ -1,6 +1,6 @@
 <InHead {{! template-lint-disable-tree no-forbidden-elements }}>
-  <meta property='og:image' content={{this.cardSpaceLogoPng}} />
-  <meta name='twitter:image' content={{this.cardSpaceLogoPng}} />
+  <meta property='og:image' content={{this.profileLogoPng}} />
+  <meta name='twitter:image' content={{this.profileLogoPng}} />
 
   <meta property='og:title' content={{this.meta.title}} />
   <meta property='og:type' content='website' />
@@ -16,15 +16,15 @@
 </InHead>
 
 <div
-  class='card-space-user-page'
+  class='profile-user-page'
   style={{
     css-var
-    card-space-background=@model.backgroundColor
-    card-space-text-color=@model.textColor
+    profile-background=@model.backgroundColor
+    profile-text-color=@model.textColor
   }}
   {{did-insert this.loadAddress}}
 >
-  <div class='card-space-user-page__header'>
+  <div class='profile-user-page__header'>
     <a
       href={{config 'urls.cardPayLink'}}
       target='_blank'
@@ -37,18 +37,18 @@
     </a>
 
     {{#if this.hubAuthentication.showAuth}}
-      <section class='card-space-user-page__auth'>
+      <section class='profile-user-page__auth'>
         {{#if this.hubAuthentication.isInitializing}}
           Loading…
         {{else}}
           {{#if this.hubAuthentication.isAuthenticated}}
-            {{#if this.cardSpace.canEdit}}
-              <span data-test-auth-for-this-space>
-                Authed for this space
+            {{#if this.profile.canEdit}}
+              <span data-test-auth-for-this-profile>
+                Authed for this profile
               </span>
             {{else}}
-              <span data-test-auth-not-for-this-space>
-                Authed but not for this space
+              <span data-test-auth-not-for-this-profile>
+                Authed but not for this profile
               </span>
             {{/if}}
           {{else}}
@@ -67,28 +67,28 @@
     {{/if}}
   </div>
 
-  <div class='card-space-user-page__wrapper'>
-    <div class='card-space-user-page__user-content'>
-      <div class='card-space-user-page__title' data-test-merchant-name>
+  <div class='profile-user-page__wrapper'>
+    <div class='profile-user-page__user-content'>
+      <div class='profile-user-page__title' data-test-profile-name>
         {{@model.name}}
       </div>
 
-      <div class='card-space-user-page__url' data-test-merchant-url>
-        {{@model.id}}{{config 'cardSpaceHostnameSuffix'}}
+      <div class='profile-user-page__url' data-test-profile-url>
+        {{@model.id}}{{config 'profileHostnameSuffix'}}
       </div>
 
-      <div class='card-space-user-payment-link'>
+      <div class='profile-user-payment-link'>
         {{#if this.addressFetchingError}}
           <div
-            class='card-space-user-page-payment-link__error'
+            class='profile-user-page-payment-link__error'
             data-test-address-fetching-error
           >
             {{this.addressFetchingError}}
           </div>
         {{else}}
-          <div class='card-space-user-payment-link__qr-container'>
+          <div class='profile-user-payment-link__qr-container'>
             <Boxel::StyledQrCode
-              class='card-space-user-payment-link__qr'
+              class='profile-user-payment-link__qr'
               @data={{this.paymentURL}}
               @image={{this.cardstackLogoForQR}}
               @size={{340}}
@@ -101,21 +101,19 @@
               @imageMargin={{5}}
             >
               <:before>
-                <div class='card-space-user-page__description'>
+                <div class='profile-user-page__description'>
                   Scan to Pay
                 </div>
               </:before>
 
               <:default>
                 {{#if this.canDeepLink}}
-                  <div
-                    class='card-space-user-payment-link__qr-container__actions'
-                  >
+                  <div class='profile-user-payment-link__qr-container__actions'>
                     <div
-                      class='card-space-user-payment-link__qr-container__separator'
+                      class='profile-user-payment-link__qr-container__separator'
                     ></div>
                     <div
-                      class='card-space-user-payment-link__qr-container__separator-or'
+                      class='profile-user-payment-link__qr-container__separator-or'
                     >
                       OR
                     </div>
@@ -139,13 +137,13 @@
       </div>
     </div>
 
-    <div class='card-space-user-page__apps-wrapper'>
-      <div class='card-space-user-page__apps-title'>
+    <div class='profile-user-page__apps-wrapper'>
+      <div class='profile-user-page__apps-title'>
         Cardpay is powered by
       </div>
-      <div class='card-space-user-page__apps'>
-        <Common::CardWalletApp class='card-space-user-page__apps-wallet' />
-        <Common::CardWalletBadges class='card-space-user-page__apps-stores' />
+      <div class='profile-user-page__apps'>
+        <Common::CardWalletApp class='profile-user-page__apps-wallet' />
+        <Common::CardWalletBadges class='profile-user-page__apps-stores' />
       </div>
     </div>
   </div>

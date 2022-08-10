@@ -1,27 +1,27 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
-import { CardSpace } from '../resources/card-space';
+import { Profile as Profile } from '../resources/profile';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
 import Layer2Network from './layer2-network';
 
-export default class CardSpaceService extends Service {
+export default class ProfileService extends Service {
   @service('app-context') declare appContext: AppContextService;
   @service declare fastboot: Fastboot;
   @service declare layer2Network: Layer2Network;
 
-  model = CardSpace.from(this, () => ({
+  model = Profile.from(this, () => ({
     named: {
       slug: this.slug,
     },
   }));
 
   get isActive() {
-    return this.appContext.currentApp === 'card-space';
+    return this.appContext.currentApp === 'profile';
   }
 
   get slug() {
-    return this.appContext.cardSpaceId;
+    return this.appContext.profileId;
   }
 
   get canEdit() {
@@ -34,6 +34,6 @@ export default class CardSpaceService extends Service {
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
   interface Registry {
-    'card-space': CardSpaceService;
+    profile: ProfileService;
   }
 }

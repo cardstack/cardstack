@@ -36,10 +36,10 @@ class MockSubgraph extends Service implements SubgraphServiceOptionals {
 
 class MockAppContext extends AppContext {
   get currentApp() {
-    return 'card-space' as 'card-space';
+    return 'profile' as 'profile';
   }
 
-  get cardSpaceId() {
+  get profileId() {
     return 'slug';
   }
 
@@ -51,7 +51,7 @@ class MockAppContext extends AppContext {
   }
 }
 
-module('Acceptance | visit card space', function (hooks) {
+module('Acceptance | visit profile', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
@@ -63,11 +63,7 @@ module('Acceptance | visit card space', function (hooks) {
   module('render', function (hooks) {
     let link: string;
     hooks.beforeEach(function (this: MirageTestContext) {
-      let cardSpace = this.server.create('card-space', {
-        slug: 'slug',
-      });
-
-      cardSpace.createMerchantInfo({
+      this.server.create('profile', {
         name: 'merchant name',
         slug: 'slug',
         color: 'blue',
@@ -83,11 +79,11 @@ module('Acceptance | visit card space', function (hooks) {
     });
 
     // eslint-disable-next-line qunit/require-expect
-    test('renders a user’s card space', async function (assert) {
+    test('renders a user’s profile', async function (assert) {
       await visit('/');
 
-      assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-url]').includesText('slug');
+      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-url]').includesText('slug');
       assert
         .dom('[data-test-boxel-styled-qr-code]')
         .hasAttribute('data-test-boxel-styled-qr-code', link);
@@ -111,14 +107,14 @@ module('Acceptance | visit card space', function (hooks) {
 
       assert
         .dom(
-          `meta[property='og:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          `meta[property='og:url'][content$='slug${config.profileHostnameSuffix}']`,
           document.documentElement
         )
         .exists();
 
       assert
         .dom(
-          `meta[name='twitter:url'][content$='slug${config.cardSpaceHostnameSuffix}']`,
+          `meta[name='twitter:url'][content$='slug${config.profileHostnameSuffix}']`,
           document.documentElement
         )
         .exists();
@@ -131,7 +127,7 @@ module('Acceptance | visit card space', function (hooks) {
     });
 
     // eslint-disable-next-line qunit/require-expect
-    test('renders a user’s card space on iOS', async function (assert) {
+    test('renders a user’s profile on iOS', async function (assert) {
       this.owner.register(
         'service:ua',
         class UA extends Service {
@@ -145,8 +141,8 @@ module('Acceptance | visit card space', function (hooks) {
       );
       await visit('/');
 
-      assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-url]').containsText('slug');
+      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-url]').containsText('slug');
 
       assert.dom('[data-test-boxel-styled-qr-code]').exists();
 
@@ -158,7 +154,7 @@ module('Acceptance | visit card space', function (hooks) {
     });
 
     // eslint-disable-next-line qunit/require-expect
-    test('renders a user’s card space on Android', async function (assert) {
+    test('renders a user’s profile on Android', async function (assert) {
       this.owner.register(
         'service:ua',
         class UA extends Service {
@@ -172,8 +168,8 @@ module('Acceptance | visit card space', function (hooks) {
       );
       await visit('/');
 
-      assert.dom('[data-test-merchant-name]').hasText('merchant name');
-      assert.dom('[data-test-merchant-url]').containsText('slug');
+      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-url]').containsText('slug');
 
       assert.dom('[data-test-boxel-styled-qr-code]').exists();
 
@@ -213,28 +209,31 @@ module('Acceptance | visit card space', function (hooks) {
         );
     });
 
-    module('authed for this space', function (this: MirageTestContext, hooks) {
-      hooks.beforeEach(async function (this: MirageTestContext) {
-        // this is the condition for initializing with an authenticated state
-        // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
-        window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-        layer2Service = this.owner.lookup('service:layer2-network').strategy;
-        await layer2Service.test__simulateAccountsChanged([
-          layer2AccountAddress,
-        ]);
-      });
+    module(
+      'authed for this profile',
+      function (this: MirageTestContext, hooks) {
+        hooks.beforeEach(async function (this: MirageTestContext) {
+          // this is the condition for initializing with an authenticated state
+          // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
+          window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
+          layer2Service = this.owner.lookup('service:layer2-network').strategy;
+          await layer2Service.test__simulateAccountsChanged([
+            layer2AccountAddress,
+          ]);
+        });
 
-      hooks.afterEach(async function () {
-        delete window.TEST__AUTH_TOKEN;
-      });
+        hooks.afterEach(async function () {
+          delete window.TEST__AUTH_TOKEN;
+        });
 
-      test('it shows when auth is present', async function (assert) {
-        await visit('/');
+        test('it shows when auth is present', async function (assert) {
+          await visit('/');
 
-        assert.dom('[data-test-connect-button]').doesNotExist();
-        assert.dom('[data-test-auth-for-this-space]').exists();
-      });
-    });
+          assert.dom('[data-test-connect-button]').doesNotExist();
+          assert.dom('[data-test-auth-for-this-profile]').exists();
+        });
+      }
+    );
 
     module('authed but not owner', function (this: MirageTestContext, hooks) {
       hooks.beforeEach(async function (this: MirageTestContext) {
@@ -253,7 +252,7 @@ module('Acceptance | visit card space', function (hooks) {
         await visit('/');
 
         assert.dom('[data-test-connect-button]').doesNotExist();
-        assert.dom('[data-test-auth-not-for-this-space]').exists();
+        assert.dom('[data-test-auth-not-for-this-profile]').exists();
       });
     });
   });
@@ -267,28 +266,28 @@ module('Acceptance | visit card space', function (hooks) {
   });
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {
-    let cardSpace = this.server.create('card-space', {
+    let profile = this.server.create('profile', {
       slug: 'slug',
     });
 
-    cardSpace.createMerchantInfo({ name: 'merchant name' });
+    profile.createMerchantInfo({ name: 'merchant name' });
 
     await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
 
     assert.strictEqual(currentURL(), '/');
-    assert.dom('[data-test-merchant-name]').hasText('merchant name');
+    assert.dom('[data-test-profile-name]').hasText('merchant name');
   });
 
   test('redirects from other links', async function (this: MirageTestContext, assert) {
-    let cardSpace = this.server.create('card-space', {
+    let profile = this.server.create('profile', {
       slug: 'slug',
     });
 
-    cardSpace.createMerchantInfo({ name: 'merchant name' });
+    profile.createMerchantInfo({ name: 'merchant name' });
 
     await visit('/nothing/nowhere');
 
     assert.strictEqual(currentURL(), '/');
-    assert.dom('[data-test-merchant-name]').hasText('merchant name');
+    assert.dom('[data-test-profile-name]').hasText('merchant name');
   });
 });

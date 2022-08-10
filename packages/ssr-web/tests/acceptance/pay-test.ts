@@ -23,13 +23,13 @@ import {
 import { Response as MirageResponse } from 'ember-cli-mirage';
 
 // selectors
-const MERCHANT = '[data-test-merchant]';
+const MERCHANT = '[data-test-profile]';
 const MERCHANT_INFO_ADDRESS_ONLY =
-  '[data-test-payment-request-merchant-address]';
+  '[data-test-payment-request-profile-address]';
 const MERCHANT_INFO_MISSING_MESSAGE =
   '[data-test-payment-request-merchant-info-missing]';
-const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
-const MERCHANT_LOGO = '[data-test-merchant-logo]';
+const MERCHANT_MISSING_MESSAGE = '[data-test-profile-missing]';
+const MERCHANT_LOGO = '[data-test-profile-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-boxel-styled-qr-code]';
@@ -84,7 +84,7 @@ module('Acceptance | pay', function (hooks) {
         else return { safe: undefined, blockNumber: 0 };
       });
 
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(exampleDid),
       name: merchantName,
       slug: 'mandello1',
@@ -101,18 +101,12 @@ module('Acceptance | pay', function (hooks) {
 
     await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(MERCHANT).hasAttribute('data-test-profile', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .containsText(merchantName.substr(0, 1).toUpperCase())
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .hasAttribute('data-test-profile-logo-background', merchantInfoBackground)
+      .hasAttribute('data-test-profile-logo-text-color', merchantInfoTextColor);
 
     await percySnapshot(assert);
   });
@@ -125,17 +119,11 @@ module('Acceptance | pay', function (hooks) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
     await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(MERCHANT).hasAttribute('data-test-profile', merchantName);
     assert
       .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .hasAttribute('data-test-profile-logo-background', merchantInfoBackground)
+      .hasAttribute('data-test-profile-logo-text-color', merchantInfoTextColor);
 
     await percySnapshot(assert);
   });
@@ -148,17 +136,11 @@ module('Acceptance | pay', function (hooks) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
     await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(MERCHANT).hasAttribute('data-test-profile', merchantName);
     assert
       .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .hasAttribute('data-test-profile-logo-background', merchantInfoBackground)
+      .hasAttribute('data-test-profile-logo-text-color', merchantInfoTextColor);
 
     await percySnapshot(assert);
   });

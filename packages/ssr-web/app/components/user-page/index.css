@@ -1,4 +1,4 @@
-.card-space-user-page {
+.profile-user-page {
   min-height: 100vh;
   width: 100%;
   margin: auto;
@@ -6,10 +6,10 @@
   overflow-y: auto;
 }
 
-.card-space-user-page__wrapper {
+.profile-user-page__wrapper {
   margin: auto;
-  background: var(--card-space-background);
-  color: var(--card-space-text-color);
+  background: var(--profile-background);
+  color: var(--profile-text-color);
   border-radius: var(--boxel-border-radius-lg) var(--boxel-border-radius-lg) 0 0;
   max-width: 34rem; /* use a media query to assign header horizontal padding based on this width */
   display: grid;
@@ -18,14 +18,14 @@
   grid-template-areas: "user-content" "apps";
 }
 
-.card-space-user-page__user-content {
+.profile-user-page__user-content {
   padding: min(var(--boxel-sp-xl), 5vw);
   align-self: center;
   grid-area: user-content;
   max-width: 100%;
 }
 
-.card-space-user-page__header {
+.profile-user-page__header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -37,20 +37,20 @@
 
 /* 34rem is based on user page wrapper width */
 @media only screen and (max-width: 34rem) {
-  .card-space-user-page__header {
+  .profile-user-page__header {
     padding-right: min(var(--boxel-sp-sm), 2vw);
     padding-left: min(var(--boxel-sp-sm), 2vw);
   }
 }
 
-.card-space-user-page__description {
+.profile-user-page__description {
   text-align: center;
   font-size: var(--boxel-font-size-xl);
   font-weight: 300;
   margin-top: var(--boxel-sp-sm);
 }
 
-.card-space-user-page__title {
+.profile-user-page__title {
   text-align: center;
   font-size: var(--boxel-font-size-lg);
   font-weight: 600;
@@ -62,7 +62,7 @@
   overflow-wrap: break-word;
 }
 
-.card-space-user-page__url {
+.profile-user-page__url {
   text-align: center;
   opacity: 0.9;
   font-size: var(--boxel-font-size-sm);
@@ -73,28 +73,28 @@
   margin-bottom: var(--boxel-sp-xl);
 }
 
-.card-space-user-payment-link {
+.profile-user-payment-link {
   margin: var(--boxel-sp) 0 var(--boxel-sp-xl) 0;
 }
 
-.card-space-user-page-payment-link__error {
+.profile-user-page-payment-link__error {
   margin: var(--boxel-sp-sm);
   text-align: center;
 }
 
-.card-space-user-footer {
+.profile-user-footer {
   text-align: center;
   font-size: var(--boxel-font-size-sm);
   margin-top: var(--boxel-sp-lg);
 }
 
-.card-space-user-payment-link__qr.boxel-styled-qr-code {
+.profile-user-payment-link__qr.boxel-styled-qr-code {
   max-width: 100%;
   color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius-lg);
 }
 
-.card-space-user-payment-link__qr-container__actions {
+.profile-user-payment-link__qr-container__actions {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -102,18 +102,18 @@
 
 /* the violation below is for 2 different parents */
 /* stylelint-disable-next-line no-descending-specificity */
-.card-space-user-payment-link__qr-container__actions > a {
+.profile-user-payment-link__qr-container__actions > a {
   margin: var(--boxel-sp-lg);
 }
 
-.card-space-user-payment-link__qr-container__separator {
+.profile-user-payment-link__qr-container__separator {
   width: 100%;
   height: 1px;
   background: var(--boxel-light-600);
   margin-top: var(--boxel-sp-xs);
 }
 
-.card-space-user-payment-link__qr-container__separator-or {
+.profile-user-payment-link__qr-container__separator-or {
   margin: auto;
   background: var(--boxel-light);
   margin-top: -10px;
@@ -123,11 +123,11 @@
   font-weight: 700;
 }
 
-.card-space-user-page__apps-wrapper {
+.profile-user-page__apps-wrapper {
   grid-area: apps;
 }
 
-.card-space-user-page__apps {
+.profile-user-page__apps {
   background: var(--boxel-light-200);
   color: var(--boxel-dark);
   padding: min(var(--boxel-sp-xl), 5vw);
@@ -138,7 +138,7 @@
   justify-content: space-between;
 }
 
-.card-space-user-page__apps-title {
+.profile-user-page__apps-title {
   text-align: center;
   font-size: var(--boxel-font-size-xs);
   font-weight: 600;
@@ -146,12 +146,12 @@
   padding-bottom: var(--boxel-sp-xs);
 }
 
-.card-space-user-page__apps-wallet {
+.profile-user-page__apps-wallet {
   margin-bottom: var(--boxel-sp-xxs);
   margin-top: var(--boxel-sp-xxs);
   margin-right: var(--boxel-sp-xxs);
 }
 
-.card-space-user-page__apps-stores {
+.profile-user-page__apps-stores {
   justify-content: space-between;
 }
