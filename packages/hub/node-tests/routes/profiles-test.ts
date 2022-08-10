@@ -113,7 +113,6 @@ describe('/api/profiles', function () {
             slug: 'mandello1',
             color: 'ff5050',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
@@ -221,7 +220,6 @@ describe('/api/profiles', function () {
             slug: 'satoshi',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
             'profile-description': 'description',
             'profile-image-url': 'http://example.com/image.jpg',
           },
@@ -289,7 +287,6 @@ describe('/api/profiles', function () {
             slug: 'sat-oshi',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
@@ -318,7 +315,6 @@ describe('/api/profiles', function () {
             slug: 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
@@ -347,7 +343,6 @@ describe('/api/profiles', function () {
             slug: 'satoshi',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
@@ -377,7 +372,6 @@ describe('/api/profiles', function () {
               slug: slug,
               color: 'ff0000',
               'text-color': 'ffffff',
-              'owner-address': '0x00000000000',
             },
           },
         };
@@ -436,7 +430,6 @@ describe('/api/profiles', function () {
             slug: 'satoshi',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
@@ -449,7 +442,6 @@ describe('/api/profiles', function () {
             slug: 'satoshi',
             color: 'ff0000',
             'text-color': 'ffffff',
-            'owner-address': '0x00000000000',
           },
         },
       };
