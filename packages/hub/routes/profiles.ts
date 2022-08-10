@@ -171,7 +171,11 @@ export default class ProfilesRoute {
         where: { id: profile.id },
       });
 
-      let serialized = await this.profileSerializer.serialize(profile);
+      await this.workerClient.addJob('persist-off-chain-merchant-info', {
+        id: profile.id,
+      });
+
+      let serialized = this.profileSerializer.serialize(profile);
 
       ctx.status = 200;
       ctx.body = serialized;

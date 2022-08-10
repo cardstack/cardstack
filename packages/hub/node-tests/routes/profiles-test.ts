@@ -1,5 +1,6 @@
 import { registry, setupHub, setupRegistry } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
+import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -28,6 +29,8 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/profiles', function () {
+  let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
+
   describe('GET /api/profiles/validate-slug/:slug', function () {
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);
@@ -204,6 +207,7 @@ describe('/api/profiles', function () {
         .expect('Content-Type', 'application/vnd.api+json');
     });
   });
+
   describe('POST /api/profiles', function () {
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);
@@ -226,6 +230,8 @@ describe('/api/profiles', function () {
         },
       };
 
+      let returnedId;
+
       await request()
         .post('/api/profiles')
         .send(payload)
@@ -234,6 +240,7 @@ describe('/api/profiles', function () {
         .set('Content-Type', 'application/vnd.api+json')
         .expect(201)
         .expect(function (res) {
+          returnedId = res.body.data.id;
           res.body.data.id = 'the-id';
           res.body.data.attributes.did = 'the-did';
         })
@@ -258,6 +265,9 @@ describe('/api/profiles', function () {
           },
         })
         .expect('Content-Type', 'application/vnd.api+json');
+
+      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+      expect(getJobPayloads()[0]).to.deep.equal({ id: returnedId });
     });
 
     it('returns 401 without bearer token', async function () {
@@ -584,6 +594,9 @@ describe('/api/profiles', function () {
           },
         })
         .expect('Content-Type', 'application/vnd.api+json');
+
+      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+      expect(getJobPayloads()[0]).to.deep.equal({ id: profileId });
     });
 
     it('returns errors when updating a resource with invalid attributes', async function () {
