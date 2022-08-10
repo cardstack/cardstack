@@ -215,10 +215,12 @@ export default class ProfilesRoute {
       } else {
         let prisma = await this.prismaManager.getClient();
         let profile = await prisma.profile.findFirst({ where: { slug } });
-        return {
-          slugAvailable: profile ? false : true,
-          detail: profile ? 'This ID is already taken. Please choose another one' : 'ID is available',
-        };
+
+        if (profile) {
+          return { slugAvailable: false, detail: 'This ID is already taken. Please choose another one' };
+        } else {
+          return { slugAvailable: true, detail: 'ID is available' };
+        }
       }
     }
   }
