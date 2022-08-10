@@ -25,7 +25,7 @@ export default function () {
     'https://storage.cardstack.com/merchant-info/:idWithExtension',
     function (schema, { params: { idWithExtension } }) {
       let [id] = idWithExtension.split('.');
-      return schema.merchantInfos.find(id);
+      return schema.profiles.find(id);
     }
   );
 
