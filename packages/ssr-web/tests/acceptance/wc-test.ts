@@ -30,10 +30,11 @@ module('Acceptance | wc', function (hooks) {
   });
 
   test('it can redirect to the root if the wc route is accessed on a Card Space', async function (this: MirageTestContext, assert) {
-    let profile = this.server.create('profile', {
+    this.server.create('profile', {
+      name: 'merchant name',
       slug: 'slug',
     });
-    profile.createMerchantInfo({ name: 'merchant name' });
+
     class CardSpaceContext extends AppContext {
       get currentApp(): 'profile' {
         return 'profile';

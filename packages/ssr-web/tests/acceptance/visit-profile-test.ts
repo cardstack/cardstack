@@ -266,11 +266,10 @@ module('Acceptance | visit profile', function (hooks) {
   });
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {
-    let profile = this.server.create('profile', {
+    this.server.create('profile', {
+      name: 'merchant name',
       slug: 'slug',
     });
-
-    profile.createMerchantInfo({ name: 'merchant name' });
 
     await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
 
@@ -279,11 +278,10 @@ module('Acceptance | visit profile', function (hooks) {
   });
 
   test('redirects from other links', async function (this: MirageTestContext, assert) {
-    let profile = this.server.create('profile', {
+    this.server.create('profile', {
+      name: 'merchant name',
       slug: 'slug',
     });
-
-    profile.createMerchantInfo({ name: 'merchant name' });
 
     await visit('/nothing/nowhere');
 
