@@ -486,58 +486,6 @@ describe('/api/profiles', function () {
     setupRegistry(this, ['authentication-utils', StubAuthenticationUtils]);
     let { request, getPrisma } = setupHub(this);
 
-    it('returns 404 when resource does not exist', async function () {
-      await request()
-        .patch('/api/profiles/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
-        .send({})
-        .set('Authorization', 'Bearer abc123--def456--ghi789')
-        .set('Accept', 'application/vnd.api+json')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(404);
-    });
-
-    it('returns 403 when resource does not belong to wallet', async function () {
-      let profileId = uuidv4();
-      let prisma = await getPrisma();
-      await prisma.profile.create({
-        data: {
-          id: profileId,
-          ownerAddress: '0x1234',
-          name: 'Satoshi?',
-          slug: 'satoshi',
-          color: 'black',
-          textColor: 'red',
-          profileDescription: 'Test',
-        },
-      });
-
-      await request()
-        .patch(`/api/profiles/${profileId}`)
-        .send({})
-        .set('Authorization', 'Bearer abc123--def456--ghi789')
-        .set('Accept', 'application/vnd.api+json')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(403);
-    });
-
-    it('returns 401 without bearer token', async function () {
-      await request()
-        .patch('/api/profiles/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
-        .send({})
-        .set('Accept', 'application/vnd.api+json')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(401)
-        .expect({
-          errors: [
-            {
-              status: '401',
-              title: 'No valid auth token',
-            },
-          ],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
-
     it('updates specified fields of the resource that are permitted', async function () {
       let profileId = 'ab70b8d5-95f5-4c20-997c-4db9013b347c';
 
@@ -599,6 +547,58 @@ describe('/api/profiles', function () {
 
       expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
       expect(getJobPayloads()[0]).to.deep.equal({ id: profileId });
+    });
+
+    it('returns 404 when resource does not exist', async function () {
+      await request()
+        .patch('/api/profiles/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+        .send({})
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(404);
+    });
+
+    it('returns 403 when resource does not belong to wallet', async function () {
+      let profileId = uuidv4();
+      let prisma = await getPrisma();
+      await prisma.profile.create({
+        data: {
+          id: profileId,
+          ownerAddress: '0x1234',
+          name: 'Satoshi?',
+          slug: 'satoshi',
+          color: 'black',
+          textColor: 'red',
+          profileDescription: 'Test',
+        },
+      });
+
+      await request()
+        .patch(`/api/profiles/${profileId}`)
+        .send({})
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(403);
+    });
+
+    it('returns 401 without bearer token', async function () {
+      await request()
+        .patch('/api/profiles/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
+        .send({})
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(401)
+        .expect({
+          errors: [
+            {
+              status: '401',
+              title: 'No valid auth token',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
     });
 
     it('returns errors when updating a resource with invalid attributes', async function () {
