@@ -10,6 +10,16 @@
       "request": "launch",
       "module": "scripts.resolve",
       "console": "integratedTerminal"
+    },
+    {
+      "name": "Run cardspace migration",
+      "type": "python",
+      "request": "launch",
+      "module": "scripts.migrate_cardspace",
+      "console": "integratedTerminal",
+      "env": {
+        "AWS_PROFILE": "cardstack-prod"
+      }
     }
   ]
 }

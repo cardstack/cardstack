@@ -10,6 +10,8 @@ dependencies = [
     "shortuuid>=1.0.9",
     "typing-extensions>=4.3.0",
     "did-resolver>=0.0.2",
+    "boto3>=1.24.48",
+    "cloudpathlib>=0.9.0",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
