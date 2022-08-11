@@ -83,9 +83,7 @@ module(
         .dom('[data-test-safe-address]')
         .containsText('Profile address')
         .containsText(profileAddress);
-      assert
-        .dom('[data-test-balance-label]')
-        .containsText('Profile balance');
+      assert.dom('[data-test-balance-label]').containsText('Profile balance');
       assert
         .dom('[data-test-balance="DAI.CPXD"]')
         .containsText('125.00 DAI.CPXD');

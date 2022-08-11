@@ -164,17 +164,13 @@ module('Acceptance | create profile', function (hooks) {
 
     await waitFor(postableSel(1, 2));
 
-    assert
-      .dom(postableSel(1, 2))
-      .containsText('Let’s create a new profile.');
+    assert.dom(postableSel(1, 2)).containsText('Let’s create a new profile.');
 
     post = postableSel(1, 3);
 
     await waitFor(post);
 
-    assert
-      .dom(post)
-      .containsText('Choose a name and ID for your profile');
+    assert.dom(post).containsText('Choose a name and ID for your profile');
 
     // // profile-customization card
     // TODO verify and interact with profile customization card default state
