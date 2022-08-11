@@ -1,10 +1,17 @@
 import config from '@cardstack/ssr-web/config/environment';
+import { Response as MirageResponse } from 'ember-cli-mirage';
 
 export default function () {
   this.namespace = 'api';
 
   this.get('/profiles/:slug', (schema, { params: { slug } }) => {
-    return schema.profiles.where({ slug }).models[0];
+    let model = schema.profiles.where({ slug }).models[0];
+
+    if (model) {
+      return model;
+    } else {
+      return new MirageResponse(404, {}, 'Not found');
+    }
   });
 
   this.get('/exchange-rates', function (schema, { queryParams: { from, to } }) {
