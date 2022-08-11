@@ -277,6 +277,47 @@ model Profile {
   @@map("profiles")
 }
 
+model ScheduledPaymentAttempt {
+  id                 String           @id @db.Uuid
+  startedAt          DateTime?        @map("started_at") @db.Timestamp(6)
+  endedAt            DateTime?        @map("ended_at") @db.Timestamp(6)
+  transactionHash    String?          @map("transaction_hash")
+  failureReason      String?          @map("failure_reason")
+  scheduledPaymentId String           @map("scheduled_payment_id") @db.Uuid
+  scheduledPayment   ScheduledPayment @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([scheduledPaymentId], map: "scheduled_payment_attempts_scheduled_payment_id_index")
+  @@map("scheduled_payment_attempts")
+}
+
+model ScheduledPayment {
+  id                         String                    @id @db.Uuid
+  senderSafeAddress          String                    @map("sender_safe_address")
+  moduleAddress              String                    @map("module_address")
+  tokenAddress               String                    @map("token_address")
+  amount                     BigInt
+  payeeAddress               String                    @map("payee_address")
+  executionGasEstimation     BigInt
+  maxGasPrice                BigInt
+  nonce                      BigInt
+  payAt                      DateTime?                 @map("pay_at") @db.Timestamp(6)
+  recurringDayOfMonth        Int?                      @map("recurring_day_of_month")
+  recurringUntil             DateTime?                 @map("recurring_until") @db.Timestamp(6)
+  validForDays               Int?                      @default(3) @map("valid_for_days")
+  spHash                     String                    @map("sp_hash")
+  chainId                    Int                       @map("chain_id")
+  creationTransactionHash    String?                   @map("creation_transaction_hash")
+  creationBlockNumber        BigInt?
+  cancelationTransactionHash String?                   @map("cancelation_transaction_hash")
+  cancelationBlockNumber     BigInt?
+  createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
+  scheduledPaymentAttempts   ScheduledPaymentAttempt[]
+
+  @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")
+  @@map("scheduled_payments")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
@@ -310,50 +351,4 @@ enum WalletOrdersStatusEnum {
   complete
 
   @@map("wallet_orders_status_enum")
-}
-
-model ScheduledPayment {
-  id                         String                    @id @db.Uuid
-  senderSafeAddress          String                    @map("sender_safe_address")
-  moduleAddress              String                    @map("module_address")
-  tokenAddress               String                    @map("token_address")
-  amount                     Decimal                   @map("amount") @db.Decimal
-  payeeAddress               String                    @map("payee_address")
-  executionGasEstimation     Decimal                   @map("execution_gas_estimation") @db.Decimal
-  maxGasPrice                Decimal                   @map("max_gas_price") @db.Decimal
-  feeFixedUsd                Decimal                   @map("fee_fixed_usd") @db.Decimal
-  feePercentage              Int                       @map("fee_percentage") @db.Integer
-  nonce                      Int                       @map("nonce") @db.Integer
-  payAt                      DateTime?                 @map("pay_at") @db.Timestamp(6)
-  recurringDayOfMonth        Int?                      @map("recurring_day_of_month") @db.SmallInt
-  recurringUntil             DateTime?                 @map("recurring_until") @db.Timestamp(6)
-  validForDays               Int?                      @map("valid_for_days") @db.SmallInt
-  spHash                     String                    @map("sp_hash")
-  chainId                    Int                       @map("chain_id") @db.Integer
-  creationTransactionHash    String?                   @map("creation_transaction_hash")
-  creationBlockNumber        Int?                      @map("creation_block_number") @db.Integer
-  cancelationTransactionHash String?                   @map("cancelation_transaction_hash")
-  cancelationBlockNumber     Int?                      @map("cancelation_block_number") @db.Integer
-  createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
-  ScheduledPaymentAttempt    ScheduledPaymentAttempt[]
-}
-
-enum ScheduledPaymentAttemptStatusEnum {
-  inProgress @map("in_progress")
-  finished
-  failed
-
-  @@map("scheduled_payment_attempts_status_enum")
-}
-
-model ScheduledPaymentAttempt {
-  id                 String                            @id @db.Uuid
-  startedAt          DateTime                          @map("started_at") @db.Timestamp(6)
-  endedAt            DateTime                          @map("ended_at") @db.Timestamp(6)
-  status             ScheduledPaymentAttemptStatusEnum @map("status")
-  transactionHash    String                            @map("transaction_hash")
-  failureReason      String                            @map("failure_reason")
-  scheduledPaymentId String                            @map("scheduled_payment_id") @db.Uuid
-  scheduledPayment   ScheduledPayment                  @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
