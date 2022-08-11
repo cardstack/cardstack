@@ -1,10 +1,10 @@
 <div
-  class={{cn 'merchant' merchant--vertical=@vertical}}
+  class={{cn 'profile' profile--vertical=@vertical}}
   data-test-profile={{@name}}
   ...attributes
 >
   <ProfileLogo
-    class='merchant__logo'
+    class='profile__logo'
     @name={{@name}}
     @size={{@size}}
     @logoBackground={{@logoBackground}}
@@ -12,19 +12,19 @@
   />
   <div>
     <div
-      class={{cn 'merchant__name' merchant__name--lg=(eq @size 'large')}}
+      class={{cn 'profile__name' profile__name--lg=(eq @size 'large')}}
       title={{@name}}
       data-test-profile-name
     >
       {{@name}}
     </div>
     {{#if @address}}
-      <div class='merchant__address'>
+      <div class='profile__address'>
         {{@address}}
       </div>
     {{/if}}
     {{#if @text}}
-      <div class='merchant__text' data-test-profile-text>
+      <div class='profile__text' data-test-profile-text>
         {{@text}}
       </div>
     {{/if}}

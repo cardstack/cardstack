@@ -11,9 +11,9 @@
   </div>
 
   <Boxel::CardContainer class='payment-request__body'>
-    {{#if @merchant.loading}}
+    {{#if @profile.loading}}
       <Boxel::LoadingIndicator data-test-profile-loading-indicator />
-    {{else if @merchant.errored}}
+    {{else if @profile.errored}}
       <div
         class='payment-request__address-only'
         data-test-payment-request-profile-address
@@ -24,7 +24,7 @@
         </span>
         <span
           class='payment-request__missing-info-message'
-          data-test-payment-request-merchant-info-missing
+          data-test-payment-request-profile-missing
         >
           {{svg-jar
             'failure-bordered'
@@ -35,9 +35,9 @@
       </div>
     {{else}}
       <Profile
-        @name={{@merchant.name}}
-        @logoBackground={{@merchant.backgroundColor}}
-        @logoTextColor={{@merchant.textColor}}
+        @name={{@profile.name}}
+        @logoBackground={{@profile.backgroundColor}}
+        @logoTextColor={{@profile.textColor}}
         @size='large'
         @vertical={{true}}
       />

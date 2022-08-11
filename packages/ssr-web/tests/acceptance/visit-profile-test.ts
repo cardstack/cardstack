@@ -64,7 +64,7 @@ module('Acceptance | visit profile', function (hooks) {
     let link: string;
     hooks.beforeEach(function (this: MirageTestContext) {
       this.server.create('profile', {
-        name: 'merchant name',
+        name: 'profile name',
         slug: 'slug',
         color: 'blue',
         textColor: 'hotpink',
@@ -82,7 +82,7 @@ module('Acceptance | visit profile', function (hooks) {
     test('renders a user’s profile', async function (assert) {
       await visit('/');
 
-      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-name]').hasText('profile name');
       assert.dom('[data-test-profile-url]').includesText('slug');
       assert
         .dom('[data-test-boxel-styled-qr-code]')
@@ -91,19 +91,19 @@ module('Acceptance | visit profile', function (hooks) {
 
       assert
         .dom(`meta[property='og:title']`, document.documentElement)
-        .hasAttribute('content', 'merchant name’s Profile');
+        .hasAttribute('content', 'profile name’s Profile');
 
       assert
         .dom(`meta[name='twitter:title']`, document.documentElement)
-        .hasAttribute('content', 'merchant name’s Profile');
+        .hasAttribute('content', 'profile name’s Profile');
 
       assert
         .dom(`meta[property='og:description']`, document.documentElement)
-        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+        .hasAttribute('content', 'Visit profile name’s profile on Card Space');
 
       assert
         .dom(`meta[name='twitter:description']`, document.documentElement)
-        .hasAttribute('content', 'Visit merchant name’s profile on Card Space');
+        .hasAttribute('content', 'Visit profile name’s profile on Card Space');
 
       assert
         .dom(
@@ -141,7 +141,7 @@ module('Acceptance | visit profile', function (hooks) {
       );
       await visit('/');
 
-      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-name]').hasText('profile name');
       assert.dom('[data-test-profile-url]').containsText('slug');
 
       assert.dom('[data-test-boxel-styled-qr-code]').exists();
@@ -168,7 +168,7 @@ module('Acceptance | visit profile', function (hooks) {
       );
       await visit('/');
 
-      assert.dom('[data-test-profile-name]').hasText('merchant name');
+      assert.dom('[data-test-profile-name]').hasText('profile name');
       assert.dom('[data-test-profile-url]').containsText('slug');
 
       assert.dom('[data-test-boxel-styled-qr-code]').exists();
@@ -267,25 +267,25 @@ module('Acceptance | visit profile', function (hooks) {
 
   test('redirects from wallet links', async function (this: MirageTestContext, assert) {
     this.server.create('profile', {
-      name: 'merchant name',
+      name: 'profile name',
       slug: 'slug',
     });
 
     await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
 
     assert.strictEqual(currentURL(), '/');
-    assert.dom('[data-test-profile-name]').hasText('merchant name');
+    assert.dom('[data-test-profile-name]').hasText('profile name');
   });
 
   test('redirects from other links', async function (this: MirageTestContext, assert) {
     this.server.create('profile', {
-      name: 'merchant name',
+      name: 'profile name',
       slug: 'slug',
     });
 
     await visit('/nothing/nowhere');
 
     assert.strictEqual(currentURL(), '/');
-    assert.dom('[data-test-profile-name]').hasText('merchant name');
+    assert.dom('[data-test-profile-name]').hasText('profile name');
   });
 });

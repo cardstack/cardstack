@@ -3,12 +3,12 @@ import { tracked } from '@glimmer/tracking';
 import { PaymentLinkMode } from '@cardstack/ssr-web/components/common/payment-link';
 import CardstackLogoForQR from '@cardstack/ssr-web/images/icons/cardstack-logo-opaque-bg.svg';
 interface PaymentRequestArgs {
-  merchantAddress: string;
+  profileAddress: string;
   paymentURL: string;
   deepLinkPaymentURL: string;
   image: string;
   canDeepLink: boolean;
-  merchant?: {
+  profile?: {
     name: string;
     backgroundColor: string;
     textColor: string;
@@ -28,15 +28,15 @@ export default class PaymentRequest extends Component<PaymentRequestArgs> {
     let breaks = [6, addressLength - 4];
     return [
       {
-        text: this.args.merchantAddress.slice(0, breaks[0]),
+        text: this.args.profileAddress.slice(0, breaks[0]),
         bold: true,
       },
       {
-        text: this.args.merchantAddress.slice(breaks[0], breaks[1]),
+        text: this.args.profileAddress.slice(breaks[0], breaks[1]),
         bold: false,
       },
       {
-        text: this.args.merchantAddress.slice(breaks[1]),
+        text: this.args.profileAddress.slice(breaks[1]),
         bold: true,
       },
     ];

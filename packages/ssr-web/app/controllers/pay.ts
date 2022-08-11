@@ -115,17 +115,17 @@ export default class PayController extends Controller {
     }
   }
 
-  get merchantInfo() {
-    return this.model.merchantInfo;
+  get profile() {
+    return this.model.profile;
   }
 
   get meta() {
-    let title = this.merchantInfo.name
-      ? this.merchantInfo.name + ' requests payment'
+    let title = this.profile.name
+      ? this.profile.name + ' requests payment'
       : 'Payment Requested';
     let paySubject =
       this.cleanedValues.displayed.amount ||
-      this.merchantInfo.name ||
+      this.profile.name ||
       'Payment Request';
     return {
       title,

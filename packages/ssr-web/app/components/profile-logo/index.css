@@ -1,4 +1,4 @@
-.merchant-logo {
+.profile-logo {
   --profile-logo-background: var(--boxel-blue);
   --profile-logo-text-color: var(--boxel-light);
   --profile-margin-right: var(--boxel-sp-xxs);
@@ -22,7 +22,7 @@
   border-radius: 50%;
 }
 
-.merchant-logo--lg {
+.profile-logo--lg {
   --logo-size: var(--boxel-icon-xxl);
 
   font-size: 2.8rem;

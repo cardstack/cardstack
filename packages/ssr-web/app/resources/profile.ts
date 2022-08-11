@@ -13,15 +13,15 @@ interface Args {
 }
 
 export interface ProfileResource {
-  did: string | undefined;
+  did?: string | undefined;
   id: string | undefined;
   name: string | undefined;
   backgroundColor: string | undefined;
-  ownerAddress: string | undefined;
+  ownerAddress?: string | undefined;
   textColor: string | undefined;
   loading: boolean;
   errored: Error | undefined;
-  is404: boolean;
+  is404?: boolean;
 }
 
 export class Profile extends Resource<Args> implements ProfileResource {
@@ -49,7 +49,7 @@ export class Profile extends Resource<Args> implements ProfileResource {
       this.errored = err;
 
       if (!isStorage404(err)) {
-        console.log('Exception fetching merchant info', err);
+        console.log('Exception fetching profile', err);
         this.sentry.captureException(err);
       }
     } finally {

@@ -1,20 +1,20 @@
-.merchant {
+.profile {
   display: flex;
   align-items: center;
 }
 
-.merchant--vertical {
+.profile--vertical {
   flex-flow: column;
   text-align: center;
 }
 
-.merchant--vertical .merchant__logo {
+.profile--vertical .profile__logo {
   margin-right: auto;
   margin-left: auto;
   margin-bottom: var(--boxel-sp-xxxs);
 }
 
-.merchant__name {
+.profile__name {
   font: 700 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
   max-width: 20rem;
@@ -23,12 +23,12 @@
   text-overflow: ellipsis;
 }
 
-.merchant__name--lg {
+.profile__name--lg {
   font: 700 var(--boxel-font-lg);
   letter-spacing: 0;
 }
 
-.merchant__address {
+.profile__address {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-size)/calc(22 / 16) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
@@ -37,7 +37,7 @@
   word-break: break-all;
 }
 
-.merchant__text {
+.profile__text {
   color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
 }
