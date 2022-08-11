@@ -1,7 +1,6 @@
 import json
 import logging
 from copy import deepcopy
-from json.decoder import JSONDecodeError
 
 import duckdb
 import requests
@@ -128,13 +127,13 @@ class RewardProgram:
         blob = self.reward_manager.caller.rule(self.reward_program_id)
         if blob and blob != b"":
             try:
+                did = blob.decode("utf-8")  # new blob format: hex encodes a did string
+                rules = resolve_rule(did)
+            except Exception:
                 # old blob format: our rule blobs were hex encoded json
                 # try..except maintains backward compatibality with our old blob format
                 # TODO: remove code once all reward programs have the old rule /blob removed
                 rules = json.loads(blob)
-            except JSONDecodeError:
-                did = blob.decode("utf-8")  # new blob format: hex encodes a did string
-                rules = resolve_rule(did)
             if type(rules) == list:
                 return rules
             else:
