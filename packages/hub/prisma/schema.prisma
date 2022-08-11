@@ -302,12 +302,58 @@ enum NotificationTypesStatusEnum {
 }
 
 enum WalletOrdersStatusEnum {
-  waiting_for_order        @map("waiting-for-order")
-  received_order           @map("received-order")
-  waiting_for_reservation  @map("waiting-for-reservation")
+  waiting_for_order       @map("waiting-for-order")
+  received_order          @map("received-order")
+  waiting_for_reservation @map("waiting-for-reservation")
   provisioning
-  error_provisioning       @map("error-provisioning")
+  error_provisioning      @map("error-provisioning")
   complete
 
   @@map("wallet_orders_status_enum")
+}
+
+model ScheduledPayment {
+  id                         String                    @id @db.Uuid
+  senderSafeAddress          String                    @map("sender_safe_address")
+  moduleAddress              String                    @map("module_address")
+  tokenAddress               String                    @map("token_address")
+  amount                     Decimal                   @map("amount") @db.Decimal
+  payeeAddress               String                    @map("payee_address")
+  executionGasEstimation     Decimal                   @map("execution_gas_estimation") @db.Decimal
+  maxGasPrice                Decimal                   @map("max_gas_price") @db.Decimal
+  feeFixedUsd                Decimal                   @map("fee_fixed_usd") @db.Decimal
+  feePercentage              Int                       @map("fee_percentage") @db.Integer
+  nonce                      Int                       @map("nonce") @db.Integer
+  payAt                      DateTime?                 @map("pay_at") @db.Timestamp(6)
+  recurringDayOfMonth        Int?                      @map("recurring_day_of_month") @db.SmallInt
+  recurringUntil             DateTime?                 @map("recurring_until") @db.Timestamp(6)
+  validForDays               Int?                      @map("valid_for_days") @db.SmallInt
+  spHash                     String                    @map("sp_hash")
+  chainId                    Int                       @map("chain_id") @db.Integer
+  creationTransactionHash    String?                   @map("creation_transaction_hash")
+  creationBlockNumber        Int?                      @map("creation_block_number") @db.Integer
+  cancelationTransactionHash String?                   @map("cancelation_transaction_hash")
+  cancelationBlockNumber     Int?                      @map("cancelation_block_number") @db.Integer
+  createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
+  ScheduledPaymentAttempt    ScheduledPaymentAttempt[]
+}
+
+enum ScheduledPaymentAttemptStatusEnum {
+  inProgress @map("in_progress")
+  finished
+  failed
+
+  @@map("scheduled_payment_attempts_status_enum")
+}
+
+model ScheduledPaymentAttempt {
+  id                 String                            @id @db.Uuid
+  startedAt          DateTime                          @map("started_at") @db.Timestamp(6)
+  endedAt            DateTime                          @map("ended_at") @db.Timestamp(6)
+  status             ScheduledPaymentAttemptStatusEnum @map("status")
+  transactionHash    String                            @map("transaction_hash")
+  failureReason      String                            @map("failure_reason")
+  scheduledPaymentId String                            @map("scheduled_payment_id") @db.Uuid
+  scheduledPayment   ScheduledPayment                  @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
