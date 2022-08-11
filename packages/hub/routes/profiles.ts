@@ -162,8 +162,11 @@ export default class ProfilesRoute {
         errors: serializeErrors(errors),
       };
     } else {
-      await prisma.profile.update({
+      profile = await prisma.profile.update({
         data: {
+          name: profile.name,
+          color: profile.color,
+          textColor: profile.textColor,
           profileDescription: profile.profileDescription,
           profileImageUrl: profile.profileImageUrl,
           links: profile.links,

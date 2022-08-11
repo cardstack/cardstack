@@ -545,6 +545,11 @@ describe('/api/profiles', function () {
         })
         .expect('Content-Type', 'application/vnd.api+json');
 
+      let updatedProfile = await prisma.profile.findUnique({ where: { id: profileId } });
+
+      expect(updatedProfile!.name).to.equal('anewname');
+      expect(updatedProfile!.slug).to.equal('satoshi');
+
       expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
       expect(getJobPayloads()[0]).to.deep.equal({ id: profileId });
     });
