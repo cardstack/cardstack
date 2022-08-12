@@ -94,29 +94,6 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
-  async rewardTokensAvailable(rewardProgramId?: string, address?: string): Promise<string[]> {
-    let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = new URL(`${tallyServiceURL}/reward-tokens/`);
-    if (rewardProgramId) {
-      url.searchParams.append('reward_program_id', rewardProgramId);
-    }
-    if (address) {
-      url.searchParams.append('payee', address);
-    }
-    let options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    let response = await fetch(url.toString(), options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    let json = await response.json();
-    return json['tokenAddresses'];
-  }
-
   async getProofs(
     address: string,
     rewardProgramId?: string,
