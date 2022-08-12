@@ -1,6 +1,7 @@
 import { registry, setupHub, setupRegistry } from '../helpers/server';
 import { v4 as uuidv4 } from 'uuid';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import { encodeDID } from '@cardstack/did-resolver';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -29,6 +30,62 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/profiles', function () {
+  describe('GET /api/profiles/:slug', function () {
+    let { request, getPrisma } = setupHub(this);
+
+    it('fetches a profile by slug', async function () {
+      let profileId = 'c8e7ceed-d5f2-4f66-be77-d81806e66ad7';
+      let prisma = await getPrisma();
+      await prisma.profile.create({
+        data: {
+          id: profileId,
+          ownerAddress: stubUserAddress,
+          name: 'Satoshi?',
+          slug: 'satoshi',
+          color: 'black',
+          textColor: 'red',
+          profileDescription: "Satoshi's place",
+          profileImageUrl: 'https://test.com/test1.png',
+        },
+      });
+
+      await request()
+        .get('/api/profiles/satoshi')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(200)
+        .expect({
+          meta: {
+            network: 'sokol',
+          },
+          data: {
+            type: 'profiles',
+            id: profileId,
+            attributes: {
+              'profile-description': "Satoshi's place",
+              'profile-image-url': 'https://test.com/test1.png',
+              links: [],
+              color: 'black',
+              did: encodeDID({ type: 'MerchantInfo', uniqueId: profileId }),
+              name: 'Satoshi?',
+              'owner-address': stubUserAddress,
+              slug: 'satoshi',
+              'text-color': 'red',
+            },
+          },
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+
+    it('returns 404 when profile does not exist', async function () {
+      await request()
+        .get('/api/profiles/satoshi')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(404);
+    });
+  });
+
   describe('GET /api/profiles/validate-slug/:slug', function () {
     this.beforeEach(function () {
       registry(this).register('authentication-utils', StubAuthenticationUtils);

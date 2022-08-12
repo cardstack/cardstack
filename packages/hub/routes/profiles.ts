@@ -29,6 +29,24 @@ export default class ProfilesRoute {
   }
 
   async get(ctx: Koa.Context) {
+    let prisma = await this.prismaManager.getClient();
+    let profile = await prisma.profile.findUnique({
+      where: {
+        slug: ctx.params.slug,
+      },
+    });
+
+    if (!profile) {
+      ctx.status = 404;
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = this.profileSerializer.serialize(profile);
+    ctx.type = 'application/vnd.api+json';
+  }
+
+  async list(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
