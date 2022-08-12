@@ -56,7 +56,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalances`](#rewardpoolrewardtokenbalances)
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
-  - [`RewardPool.balances`](#rewardpoolbalances)
+  - [`RewardPool.rewardProgramBalances`](#rewardpoolrewardprogrambalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
   - [`RewardPool.claimGasEstimate`](#rewardpoolclaimgasestimate)
   - [`RewardPool.getProofs`](#rewardpoolgetproofs)
@@ -766,13 +766,13 @@ let rewardPool = await getSDK('RewardPool', web3);
 await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount)
 ```
 
-### `RewardPool.balances`
+### `RewardPool.rewardProgramBalances`
 
-The `Balances` API is used to query the token balances inside the reward pool. When queried for a particular reward program, the user will receive an array of ERC677 token balances. This is useful if a rewardProgramAdmin wants to assess how much is left inside the pool for the reward program they manage.
+The `rewardProgramBalances` API is used to query the token balances inside the reward pool for a particular reward program. This is useful if a rewardProgramAdmin wants to assess how much is left inside the pool for the reward program they manage.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.balances(rewardProgramId)
+await rewardPool.rewardProgramBalances(rewardProgramId)
 ```
 
 ### `RewardPool.claim`

@@ -650,16 +650,16 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
-  async balances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
+  async rewardProgramBalances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const tokensAvailable = await this.get_reward_tokens();
     let promises = tokensAvailable.map((tokenAddress) => {
-      return this.balance(rewardProgramId, tokenAddress);
+      return this.rewardProgramBalance(rewardProgramId, tokenAddress);
     });
     let rewardTokenBalance = await Promise.all(promises);
     return this.addTokenSymbol(rewardTokenBalance);
   }
 
-  async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
+  async rewardProgramBalance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
     let balance: string = await (await this.getRewardPool()).methods
       .rewardBalance(rewardProgramId, tokenAddress)
       .call();
