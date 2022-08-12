@@ -393,7 +393,7 @@ export default class RewardPool {
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let weiAmount = new BN(amount);
-    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
+    let rewardPoolBalanceForRewardProgram = (await this.rewardProgramBalance(rewardProgramId, token)).balance;
     if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
       if (acceptPartialClaim) {
         // acceptPartialClaim means: if reward pool balance is less than amount,
@@ -497,7 +497,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     acceptPartialClaim?: boolean
   ): Promise<any> {
     let weiAmount = new BN(amount);
-    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, token)).balance;
+    let rewardPoolBalanceForRewardProgram = (await this.rewardProgramBalance(rewardProgramId, token)).balance;
     if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
       if (acceptPartialClaim) {
         // acceptPartialClaim means: if reward pool balance is less than amount,
@@ -571,7 +571,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
-    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, tokenAddress)).balance;
+    let rewardPoolBalanceForRewardProgram = (await this.rewardProgramBalance(rewardProgramId, tokenAddress)).balance;
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
 
