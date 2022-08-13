@@ -62,7 +62,10 @@ export interface RewardTokenBalance {
   balance: BN;
 }
 
-export type WithSymbol<T extends Proof | RewardTokenBalance> = T & {
+export interface HasTokenAddress {
+  tokenAddress: string;
+}
+export type WithSymbol<T extends HasTokenAddress> = T & {
   tokenSymbol: string;
 };
 
