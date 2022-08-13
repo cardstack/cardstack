@@ -37,6 +37,10 @@ export interface Proof {
   isValid: boolean;
 }
 
+export interface ProofWithGasFees extends Proof {
+  gasEstimates: GasEstimate;
+}
+
 export interface Leaf {
   rewardProgramId: string;
   paymentCycleNumber: number;
@@ -75,9 +79,9 @@ export default class RewardPool {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
-    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter(
-      (o) => o.isValid
-    );
+    const unclaimedValidProofs = (
+      await this.getProofs(address, undefined, rewardProgramId, tokenAddress, false)
+    ).filter((o) => o.isValid);
     return unclaimedValidProofs.reduce((total, { amount }) => {
       return total.add(amount);
     }, new BN('0'));
@@ -99,12 +103,31 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
+    safeAddress?: string,
     rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
     offset?: number,
     limit?: number
-  ): Promise<WithSymbol<Proof>[]> {
+  ): Promise<WithSymbol<Proof>[]>;
+  async getProofs(
+    address: string,
+    safeAddress: string,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    knownClaimed?: boolean,
+    offset?: number,
+    limit?: number
+  ): Promise<WithSymbol<ProofWithGasFees>[]>;
+  async getProofs(
+    address: string,
+    safeAddress?: string,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    knownClaimed?: boolean,
+    offset?: number,
+    limit?: number
+  ): Promise<WithSymbol<Proof | ProofWithGasFees>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
@@ -157,7 +180,22 @@ export default class RewardPool {
         }
       }
     });
-    return this.addTokenSymbol(res);
+    const proofs = await this.addTokenSymbol(res);
+    if (safeAddress) {
+      // if safeAddress is provided, we need to estimate gas of each proof claim
+      const proofsWithGasFees = await Promise.all(
+        proofs.map(async (proof) => {
+          const gasEstimate = await this.claimGasEstimate(safeAddress, proof.leaf, proof.proofArray, false);
+          return {
+            ...proof,
+            gasEstimate,
+          };
+        })
+      );
+      return proofsWithGasFees;
+    } else {
+      return proofs;
+    }
   }
 
   claimsQuery(payee: string, rewardProgramId?: string, skip = 0): string {
@@ -235,7 +273,7 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, undefined, false)).filter(
+    const unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
       (o) => o.isValid
     );
     let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
