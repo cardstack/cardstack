@@ -35,10 +35,7 @@ export interface Proof {
   amount: BN;
   leaf: string;
   isValid: boolean;
-}
-
-export interface ProofWithGasFees extends Proof {
-  gasEstimates: GasEstimate;
+  gasEstimate?: GasEstimate;
 }
 
 export interface Leaf {
@@ -100,7 +97,6 @@ export default class RewardPool {
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
-
   async getProofs(
     address: string,
     safeAddress?: string,
@@ -109,25 +105,7 @@ export default class RewardPool {
     knownClaimed?: boolean,
     offset?: number,
     limit?: number
-  ): Promise<WithSymbol<Proof>[]>;
-  async getProofs(
-    address: string,
-    safeAddress: string,
-    rewardProgramId?: string,
-    tokenAddress?: string,
-    knownClaimed?: boolean,
-    offset?: number,
-    limit?: number
-  ): Promise<WithSymbol<ProofWithGasFees>[]>;
-  async getProofs(
-    address: string,
-    safeAddress?: string,
-    rewardProgramId?: string,
-    tokenAddress?: string,
-    knownClaimed?: boolean,
-    offset?: number,
-    limit?: number
-  ): Promise<WithSymbol<Proof | ProofWithGasFees>[]> {
+  ): Promise<WithSymbol<Proof>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
