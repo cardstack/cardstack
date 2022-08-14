@@ -76,9 +76,9 @@ export default class RewardPool {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
   async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
-    const unclaimedValidProofs = (
-      await this.getProofs(address, undefined, rewardProgramId, tokenAddress, false)
-    ).filter((o) => o.isValid);
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter(
+      (o) => o.isValid
+    );
     return unclaimedValidProofs.reduce((total, { amount }) => {
       return total.add(amount);
     }, new BN('0'));
@@ -99,10 +99,10 @@ export default class RewardPool {
   }
   async getProofs(
     address: string,
-    safeAddress?: string,
     rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
+    safeAddress?: string,
     offset?: number,
     limit?: number
   ): Promise<WithSymbol<Proof>[]> {
@@ -251,7 +251,7 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
+    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, undefined, false)).filter(
       (o) => o.isValid
     );
     let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
@@ -565,7 +565,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     const safeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
     const unclaimedValidProofs = (
-      await this.getProofs(safeOwner, rewardSafeAddress, rewardProgramId, tokenAddress, false)
+      await this.getProofs(safeOwner, rewardProgramId, tokenAddress, false, rewardSafeAddress)
     ).filter((o) => o.isValid);
     const totalGasFees = unclaimedValidProofs.reduce((accum, o) => {
       if (o.gasEstimate) {
