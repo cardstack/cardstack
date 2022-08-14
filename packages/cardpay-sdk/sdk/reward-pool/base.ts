@@ -353,7 +353,7 @@ export default class RewardPool {
     safeAddress: string,
     leaf: string,
     proofArray: string[],
-    acceptPartialClaim?: boolean,
+    acceptPartialClaim: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
