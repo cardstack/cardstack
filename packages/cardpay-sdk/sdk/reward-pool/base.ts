@@ -509,6 +509,34 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
+  async claimAll(
+    rewardSafeAddress: string,
+    rewardProgramId: string,
+    tokenAddress: string,
+    accountAddress?: string
+  ): Promise<SuccessfulTransactionReceipt[]> {
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    const safeOwner = accountAddress ?? (await rewardManager.getRewardSafeOwner(rewardSafeAddress));
+    const unclaimedValidProofs = (
+      await this.getProofs(safeOwner, rewardProgramId, tokenAddress, false, rewardSafeAddress)
+    )
+      .filter((o) => o.isValid)
+      .filter((o) => {
+        //Intentionally step over claims which are not big enough to pay for gas fees
+        if (o.gasEstimate) {
+          return o.gasEstimate.amount.gt(o.amount);
+        } else {
+          return true;
+        }
+      });
+    const receipts: SuccessfulTransactionReceipt[] = [];
+    for (const { leaf, proofArray } of unclaimedValidProofs) {
+      const receipt = await this.claim(rewardSafeAddress, leaf, proofArray, false, undefined, { from: safeOwner });
+      receipts.push(receipt);
+    }
+    return receipts;
+  }
+
   async sufficientBalanceInPool(
     rewardProgramId: string,
     amount: BN,
@@ -560,10 +588,11 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   async claimAllGasEstimate(
     rewardSafeAddress: string,
     rewardProgramId: string,
-    tokenAddress: string
+    tokenAddress: string,
+    accountAddress?: string
   ): Promise<GasEstimate> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    const safeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
+    const safeOwner = accountAddress ?? (await rewardManager.getRewardSafeOwner(rewardSafeAddress));
     const unclaimedValidProofs = (
       await this.getProofs(safeOwner, rewardProgramId, tokenAddress, false, rewardSafeAddress)
     ).filter((o) => o.isValid);
