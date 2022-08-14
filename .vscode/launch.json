@@ -908,6 +908,27 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Claim ALL Rewards",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "claim-all",
+        "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Claim ALL Rewards Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
