@@ -78,7 +78,7 @@ function displayProof(o: WithSymbol<Proof>) {
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
       isValid: ${o.isValid} 
-      gasFees: ${gasAmount ? fromWei(gasAmount) : 'No Gas Estimates'}
+      gasFees: ${gasAmount ? fromWei(gasAmount) + ' ' + o.tokenSymbol : 'No Gas Estimates'}
         `);
 }
 
