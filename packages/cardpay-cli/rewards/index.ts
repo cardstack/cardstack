@@ -13,6 +13,7 @@ import registerRewardeeGasEstimate from './register-rewardee-gas-estimate';
 import claimRewardGasEstimate from './claim-reward-gas-estimate';
 import withdrawGasEstimate from './withdraw-gas-estimate';
 import checkClaimParams from './check-claim-params';
+import claimAllRewardsGasEstimate from './claim-all-rewards-gas-estimate';
 
 export const command = 'rewards <command>';
 export const desc = 'Commands to get interact with the reward programs and the reward manager contract';
@@ -32,6 +33,7 @@ export const builder = function (yargs: Argv) {
       view,
       registerRewardeeGasEstimate,
       claimRewardGasEstimate,
+      claimAllRewardsGasEstimate,
       withdrawGasEstimate,
       checkClaimParams,
     ] as any)

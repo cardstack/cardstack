@@ -35,7 +35,7 @@ export interface Proof {
   amount: BN;
   leaf: string;
   isValid: boolean;
-  gasEstimate?: GasEstimate;
+  gasEstimate?: GasEstimate; //the tokens in gas estimate always correspond to the reward token being claimed
 }
 
 export interface Leaf {
@@ -557,6 +557,28 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     };
   }
 
+  async claimAllGasEstimate(
+    rewardSafeAddress: string,
+    rewardProgramId: string,
+    tokenAddress: string
+  ): Promise<GasEstimate> {
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    const safeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
+    const unclaimedValidProofs = (
+      await this.getProofs(safeOwner, rewardSafeAddress, rewardProgramId, tokenAddress, false)
+    ).filter((o) => o.isValid);
+    const totalGasFees = unclaimedValidProofs.reduce((accum, o) => {
+      if (o.gasEstimate) {
+        return accum.add(o.gasEstimate.amount);
+      } else {
+        throw new Error("claimAllGasEstimate: Gas Fees can't be estimated");
+      }
+    }, new BN(0));
+    return {
+      gasToken: tokenAddress,
+      amount: totalGasFees,
+    };
+  }
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
     safeAddress: string,
