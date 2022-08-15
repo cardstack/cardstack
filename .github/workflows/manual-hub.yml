@@ -13,10 +13,48 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn --prefer-offline
+        shell: bash
+
+      - name: Build
+        run: yarn build
+        shell: bash
+        working-directory: packages/hub
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: hub-${{ github.sha }}
+          path: ./
+
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [hub, hub-worker, hub-event-listener]
+        include:
+          - retain: "0"
+          - retain: "1"
+            app: hub
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: hub-${{ github.sha }}
+          path: ./
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -35,14 +73,6 @@ jobs:
             exit 1;
           fi
 
-      - name: Set up yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -50,8 +80,10 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy hub
-        uses: ./.github/actions/deploy-hub
+        uses: ./.github/actions/waypoint-deploy
         with:
+          app: ${{ matrix.app }}
+          retain: ${{ matrix.retain }}
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:

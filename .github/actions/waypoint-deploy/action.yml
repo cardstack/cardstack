@@ -1,0 +1,58 @@
+name: Waypoint Deploy
+description: Deploy waypoint app
+
+inputs:
+  app:
+    description: Name of the app, specified in waypoint.hcl
+    required: true
+  retain:
+    description: Number of deployments to retain
+    required: false
+    default: "1"
+  waypoint_version:
+    description: Waypoint version to use
+    required: false
+    default: "0.8.1"
+  environment:
+    description: Deployment environment
+    required: true
+  discord_webhook:
+    description: Discord webhook URL
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: volta-cli/action@v1
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
+        yarn add hcl2-parser @actions/core -W --prefer-offline
+
+    - name: Deploy app
+      run: waypoint up -app=${{ inputs.app }} -plain
+      shell: bash
+
+    - uses: ./.github/actions/waypoint-ecs-failsafe
+      with:
+        app: ${{ inputs.app }}
+
+    - name: Prune dangling resources
+      uses: ./.github/actions/waypoint-prune-dangling-resources
+      with:
+        app: ${{ inputs.app }}
+        retain: ${{ inputs.retain }}
+
+    - name: Send notification to Discord
+      if: ${{ always() }}
+      uses: ./.github/actions/discord-notification-deploy
+      with:
+        app: ${{ inputs.app }}
+        status: ${{ github.action_status }}
+        environment: ${{ inputs.environment }}
+        webhook: ${{ inputs.discord_webhook }}
+        is_ecs: "true"
