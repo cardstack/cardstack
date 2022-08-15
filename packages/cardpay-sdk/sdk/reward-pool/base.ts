@@ -58,7 +58,7 @@ export interface FullLeaf extends Partial<TokenTransferDetail>, Leaf {}
 const DEFAULT_PAGE_SIZE = 1000000;
 
 export interface RewardTokenBalance {
-  rewardProgramId?: string;
+  rewardProgramId: string;
   tokenAddress: string;
   balance: BN;
 }
