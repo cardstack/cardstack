@@ -36,11 +36,14 @@ jobs:
         shell: bash
         working-directory: packages/hub
 
+      - name: Tar artifact
+        run: tar -cvf artifact.tar packages/hub/dist
+        shell: bash
+
       - uses: actions/upload-artifact@v3
         with:
           name: hub-${{ github.sha }}
-          path: |
-            packages/hub/dist
+          path: artifact.tar
 
   deploy:
     needs: build
@@ -54,12 +57,14 @@ jobs:
             app: hub
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
 
       - uses: actions/download-artifact@v3
         with:
           name: hub-${{ github.sha }}
-          path: packages/hub/dist
+
+      - name: Extract artifact
+        run: tar -xvf artifact.tar
+        shell: bash
 
       - name: Set up env
         env:
