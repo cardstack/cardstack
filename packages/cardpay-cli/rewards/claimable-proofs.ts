@@ -43,7 +43,12 @@ export default {
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false, safeAddress);
+    let proofs;
+    if (safeAddress) {
+      proofs = await rewardPool.getProofs(address, safeAddress, rewardProgramId, tokenAddress, false);
+    } else {
+      proofs = await rewardPool.getProofs(address, undefined, rewardProgramId, tokenAddress, false);
+    }
     if (isValidOnly) {
       displayProofs(proofs.filter((o) => o.isValid));
     } else {

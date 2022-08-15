@@ -38,6 +38,11 @@ export interface Proof {
   gasEstimate?: GasEstimate; //the tokens in gas estimate always correspond to the reward token being claimed
 }
 
+export interface ClaimableProof extends Proof {
+  safeAddress: string;
+  gasEstimate: GasEstimate;
+}
+
 export interface Leaf {
   rewardProgramId: string;
   paymentCycleNumber: number;
@@ -88,15 +93,34 @@ export default class RewardPool {
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
+
   async getProofs(
     address: string,
+    safeAddress: string,
     rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
-    safeAddress?: string,
     offset?: number,
     limit?: number
-  ): Promise<WithSymbol<Proof>[]> {
+  ): Promise<WithSymbol<ClaimableProof>[]>;
+  async getProofs(
+    address: string,
+    safeAddress: undefined,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    knownClaimed?: boolean,
+    offset?: number,
+    limit?: number
+  ): Promise<WithSymbol<Proof>[]>;
+  async getProofs(
+    address: string,
+    safeAddress?: string,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    knownClaimed?: boolean,
+    offset?: number,
+    limit?: number
+  ): Promise<WithSymbol<Proof | ClaimableProof>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (rewardProgramId) {
@@ -158,6 +182,7 @@ export default class RewardPool {
           return {
             ...proof,
             gasEstimate,
+            safeAddress,
           };
         })
       );
@@ -229,7 +254,7 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, undefined, false)).filter(
+    const unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
       (o) => o.isValid
     );
     let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
@@ -488,21 +513,19 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 
   async claimAll(
-    rewardSafeAddress: string,
-    unclaimedValidProofs: WithSymbol<Proof>[],
+    unclaimedValidProofs: WithSymbol<ClaimableProof>[],
     accountAddress?: string
   ): Promise<SuccessfulTransactionReceipt[]> {
+    if (unclaimedValidProofs.length == 0) {
+      throw new Error('Do not have any valid proofs to claim');
+    }
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    const safeOwner = accountAddress ?? (await rewardManager.getRewardSafeOwner(rewardSafeAddress));
+    const safeOwner = accountAddress ?? (await rewardManager.getRewardSafeOwner(unclaimedValidProofs[0].safeAddress));
     const proofs = unclaimedValidProofs
       .filter((o) => o.isValid)
       .filter((o) => {
         //Intentionally step over claims which are not big enough to pay for gas fees
-        if (o.gasEstimate) {
-          return o.gasEstimate.amount.lt(new BN(o.amount));
-        } else {
-          return true;
-        }
+        return o.gasEstimate.amount.lt(new BN(o.amount));
       });
     const receipts: SuccessfulTransactionReceipt[] = [];
     if (proofs.length < unclaimedValidProofs.length) {
@@ -510,8 +533,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         `Claiming only ${proofs.length} proofs out of ${unclaimedValidProofs.length} because of proof being smaller than gas fees`
       );
     }
-    for (const { leaf, proofArray } of proofs) {
-      const receipt = await this.claim(rewardSafeAddress, leaf, proofArray, false, undefined, { from: safeOwner });
+    for (const { leaf, proofArray, safeAddress } of proofs) {
+      const receipt = await this.claim(safeAddress, leaf, proofArray, false, undefined, { from: safeOwner });
       receipts.push(receipt);
     }
     return receipts;
@@ -566,6 +589,9 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 
   async claimAllGasEstimate(unclaimedValidProofsWithSingleToken: WithSymbol<Proof>[]): Promise<GasEstimate> {
+    if (unclaimedValidProofsWithSingleToken.length == 0) {
+      throw new Error('Do not have any valid proofs to claim');
+    }
     const proofs = unclaimedValidProofsWithSingleToken
       .filter((o) => o.isValid)
       .filter((o) => {
@@ -584,7 +610,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       }
     }, new BN(0));
     return {
-      gasToken: proofs[0].tokenAddress,
+      gasToken: unclaimedValidProofsWithSingleToken[0].tokenAddress,
       amount: totalGasFees,
     };
   }

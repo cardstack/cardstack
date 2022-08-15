@@ -39,7 +39,7 @@ export default {
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let assets = await getSDK('Assets', web3);
-    let unclaimedValidProofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false, rewardSafe);
+    let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
     let { gasToken, amount } = await rewardPool.claimAllGasEstimate(unclaimedValidProofs);
     let { symbol } = await assets.getTokenInfo(gasToken);
     console.log(

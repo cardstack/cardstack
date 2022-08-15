@@ -39,8 +39,8 @@ export default {
     let assets = await getSDK('Assets', web3);
     let blockExplorer = await getConstant('blockExplorer', web3);
     let { symbol } = await assets.getTokenInfo(tokenAddress);
-    let unclaimedValidProofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false, rewardSafe);
-    const receipts = await rewardPool.claimAll(rewardSafe, unclaimedValidProofs);
+    let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
+    const receipts = await rewardPool.claimAll(unclaimedValidProofs);
     receipts.forEach((receipt) => {
       console.log(`Transaction hash: ${blockExplorer}/tx/${receipt.transactionHash}/token-transfers`);
     });
