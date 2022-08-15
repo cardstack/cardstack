@@ -39,7 +39,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: hub-${{ github.sha }}
-          path: packages/hub/dist
+          path: |
+            packages/hub/dist
 
   deploy:
     needs: build
@@ -59,18 +60,6 @@ jobs:
         with:
           name: hub-${{ github.sha }}
           path: packages/hub/dist
-
-      - name: Set up yarn cache
-        uses: actions/cache@v2
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Install dependencies
-        run: yarn --prefer-offline
-        shell: bash
 
       - name: Set up env
         env:

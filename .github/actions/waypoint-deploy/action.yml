@@ -23,7 +23,9 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v1
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
 
     - name: Install dependencies
       shell: bash
