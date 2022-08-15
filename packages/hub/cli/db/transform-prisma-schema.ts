@@ -48,7 +48,7 @@ function fixFieldsArrayString(fields: string) {
 
 async function fixPrismaFile() {
   if (!fs.existsSync(PRISMA_FILE_PATH)) {
-    throw new Error('Attempting to apply Prisma file transformation but file does not exist');
+    console.error('Skipping Prisma schema transformation because file does not exist');
   }
 
   const text = await fs.promises.readFile(PRISMA_FILE_PATH, 'utf8');
