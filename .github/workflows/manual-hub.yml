@@ -39,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: hub-${{ github.sha }}
-          path: ./
+          path: packages/hub/dist
 
   deploy:
     needs: build
@@ -52,10 +52,25 @@ jobs:
           - retain: "1"
             app: hub
     steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+
       - uses: actions/download-artifact@v3
         with:
           name: hub-${{ github.sha }}
-          path: ./
+          path: packages/hub/dist
+
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        run: yarn --prefer-offline
+        shell: bash
 
       - name: Set up env
         env:
