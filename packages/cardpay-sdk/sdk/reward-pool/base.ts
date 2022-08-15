@@ -75,15 +75,6 @@ export default class RewardPool {
 
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
-  async getBalance(address: string, tokenAddress: string, rewardProgramId?: string): Promise<BN> {
-    const unclaimedValidProofs = (await this.getProofs(address, rewardProgramId, tokenAddress, false)).filter(
-      (o) => o.isValid
-    );
-    return unclaimedValidProofs.reduce((total, { amount }) => {
-      return total.add(amount);
-    }, new BN('0'));
-  }
-
   async isClaimed(leaf: string): Promise<boolean> {
     return (await this.getRewardPool()).methods.claimed(leaf).call();
   }
@@ -235,19 +226,6 @@ export default class RewardPool {
       }
     }
     return leafs;
-  }
-
-  async rewardTokenBalance(
-    address: string,
-    tokenAddress: string,
-    rewardProgramId?: string
-  ): Promise<RewardTokenBalance> {
-    let balance = await this.getBalance(address, tokenAddress, rewardProgramId);
-    return {
-      rewardProgramId,
-      tokenAddress,
-      balance,
-    };
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
