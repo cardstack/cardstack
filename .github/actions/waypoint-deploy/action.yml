@@ -30,6 +30,13 @@ runs:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
 
+    - name: Debug
+      shell: bash
+      run: |
+        pwd
+        ls
+        ls packages/hub/dist
+
     - name: Deploy app
       run: waypoint up -app=${{ inputs.app }} -plain
       shell: bash

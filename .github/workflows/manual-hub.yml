@@ -20,7 +20,7 @@ jobs:
       - uses: volta-cli/action@v1
 
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -60,7 +60,7 @@ jobs:
       - uses: volta-cli/action@v1
 
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -68,9 +68,8 @@ jobs:
             ${{ runner.os }}-node-modules-
 
       - name: Install dependencies
+        run: yarn --prefer-offline
         shell: bash
-        run: |
-          yarn add hcl2-parser @actions/core -W --prefer-offline
 
       - uses: actions/download-artifact@v3
         with:
@@ -79,6 +78,13 @@ jobs:
       - name: Extract artifact
         run: tar -xvf artifact.tar
         shell: bash
+
+      - name: Debug
+        shell: bash
+        run: |
+          pwd
+          ls
+          ls packages/hub/dist
 
       - name: Set up env
         env:
