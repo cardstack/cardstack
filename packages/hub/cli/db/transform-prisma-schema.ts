@@ -47,6 +47,10 @@ function fixFieldsArrayString(fields: string) {
 }
 
 async function fixPrismaFile() {
+  if (!fs.existsSync(PRISMA_FILE_PATH)) {
+    throw new Error('Attempting to apply Prisma file transformation but file does not exist');
+  }
+
   const text = await fs.promises.readFile(PRISMA_FILE_PATH, 'utf8');
 
   const textAsArray = text.split('\n');
@@ -165,5 +169,3 @@ async function fixPrismaFile() {
   const textToWrite = fixedText.join('\n').replace(/\n\n\n/g, '\n\n');
   await fs.promises.writeFile(PRISMA_FILE_PATH, textToWrite);
 }
-
-fixPrismaFile();
