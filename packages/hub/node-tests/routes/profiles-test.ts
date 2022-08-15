@@ -608,7 +608,7 @@ describe('/api/profiles', function () {
       expect(updatedProfile!.slug).to.equal('satoshi');
 
       expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
-      expect(getJobPayloads()[0]).to.deep.equal({ id: profileId });
+      expect(getJobPayloads()[0]).to.deep.equal({ id: profileId, invalidate: true });
     });
 
     it('returns 404 when resource does not exist', async function () {

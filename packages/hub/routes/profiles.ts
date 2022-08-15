@@ -194,6 +194,7 @@ export default class ProfilesRoute {
 
       await this.workerClient.addJob('persist-off-chain-merchant-info', {
         id: profile.id,
+        invalidate: true,
       });
 
       let serialized = this.profileSerializer.serialize(profile);
