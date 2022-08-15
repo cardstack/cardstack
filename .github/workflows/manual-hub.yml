@@ -90,7 +90,7 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Deploy hub
+      - name: Deploy ${{ matrix.app }}
         uses: ./.github/actions/waypoint-deploy
         with:
           app: ${{ matrix.app }}
