@@ -727,7 +727,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return [card_token_address];
   }
 
-  async addTokenSymbol<T extends Proof | RewardTokenBalance>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
+  async addTokenSymbol<T extends HasTokenAddress>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {
     const tokenAddresses = [...new Set(arrWithTokenAddress.map((item) => item.tokenAddress))];
     const tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
     return arrWithTokenAddress.map((o) => {
