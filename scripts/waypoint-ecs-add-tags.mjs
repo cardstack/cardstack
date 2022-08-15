@@ -57,6 +57,19 @@ function getServices(cluster, appName) {
   return services;
 }
 
+function isTagged(service, tags) {
+  let existingTags = {};
+  service.tags.forEach((tag) => {
+    existingTags[tag.key] = tag.value;
+  });
+
+  for (const key of tags) {
+    if (existingTags[key] !== tags[key]) return false;
+  }
+
+  return service.enableECSManagedTags && service.propagateTags === 'SERVICE';
+}
+
 function tagResources(cluster, service, tags) {
   const tagsArgs = Object.entries(tags)
     .map(([key, val]) => `key=${key},value=${val}`)
@@ -90,7 +103,10 @@ function main() {
   console.log('\n» Tagging resources...');
   const services = getServices(config.cluster, appName);
   const latestService = services[0];
-  tagResources(config.cluster, latestService, tags);
+
+  if (!isTagged(latestService, tags)) {
+    tagResources(config.cluster, latestService, tags);
+  }
 }
 
 try {
