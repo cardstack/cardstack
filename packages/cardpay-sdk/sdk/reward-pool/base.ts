@@ -588,7 +588,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     };
   }
 
-  async claimAllGasEstimate(unclaimedValidProofsWithSingleToken: WithSymbol<Proof>[]): Promise<GasEstimate> {
+  async claimAllGasEstimate(unclaimedValidProofsWithSingleToken: WithSymbol<ClaimableProof>[]): Promise<GasEstimate> {
     if (unclaimedValidProofsWithSingleToken.length == 0) {
       throw new Error('Do not have any valid proofs to claim');
     }
@@ -596,18 +596,10 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       .filter((o) => o.isValid)
       .filter((o) => {
         //Intentionally step over claims which are not big enough to pay for gas fees
-        if (o.gasEstimate) {
-          return o.gasEstimate.amount.lt(new BN(o.amount));
-        } else {
-          return true;
-        }
+        return o.gasEstimate.amount.lt(new BN(o.amount));
       });
     const totalGasFees = proofs.reduce((accum, o) => {
-      if (o.gasEstimate) {
-        return accum.add(o.gasEstimate.amount);
-      } else {
-        throw new Error("claimAllGasEstimate: Gas Fees can't be estimated");
-      }
+      return accum.add(o.gasEstimate.amount);
     }, new BN(0));
     return {
       gasToken: unclaimedValidProofsWithSingleToken[0].tokenAddress,
