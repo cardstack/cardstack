@@ -25,7 +25,7 @@ module('Unit | WorkflowCard model', function (hooks) {
 
     let wf = new WorkflowStub(this.owner);
     subject.setWorkflow(wf);
-    assert.equal(subject.session, wf.session);
+    assert.strictEqual(subject.session, wf.session);
   });
 
   test('isComplete starts off as false', function (assert) {
@@ -33,7 +33,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    assert.equal(subject.isComplete, false);
+    assert.false(subject.isComplete);
   });
 
   test('when onComplete is called, isComplete is set to true', async function (assert) {
@@ -43,7 +43,7 @@ module('Unit | WorkflowCard model', function (hooks) {
     });
     subject.onComplete();
     await settled();
-    assert.equal(subject.isComplete, true);
+    assert.true(subject.isComplete);
   });
 
   test("when onComplete is called, the card's check method is called and the card's workflow is canceled", async function (assert) {
@@ -72,9 +72,9 @@ module('Unit | WorkflowCard model', function (hooks) {
 
     subject.onComplete();
     await settled();
-    assert.equal(subject.isComplete, false);
-    assert.equal(wf.isCanceled, true);
-    assert.equal(wf.cancelationReason, 'TEST');
+    assert.false(subject.isComplete);
+    assert.true(wf.isCanceled);
+    assert.strictEqual(wf.cancelationReason, 'TEST');
   });
 
   test('when onIncomplete is called, workflow is called', function (assert) {
@@ -90,7 +90,7 @@ module('Unit | WorkflowCard model', function (hooks) {
     let wf = new CustomWorkflowStub(this.owner);
     subject.setWorkflow(wf);
     subject.onIncomplete();
-    assert.equal(subject.isComplete, false);
+    assert.false(subject.isComplete);
   });
 
   test('isEditable is true by default', function (assert) {
@@ -98,7 +98,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    assert.equal(subject.isEditable, true);
+    assert.true(subject.isEditable);
   });
 
   test('isEditable is false if editableIf returns false', function (assert) {
@@ -110,7 +110,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       },
     });
     subject.setWorkflow(new WorkflowStub(this.owner));
-    assert.equal(subject.isEditable, false);
+    assert.false(subject.isEditable);
   });
 
   test('isEditable is true if editableIf returns true', function (assert) {
@@ -122,6 +122,6 @@ module('Unit | WorkflowCard model', function (hooks) {
       },
     });
     subject.setWorkflow(new WorkflowStub(this.owner));
-    assert.equal(subject.isEditable, true);
+    assert.true(subject.isEditable);
   });
 });

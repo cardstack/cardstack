@@ -177,7 +177,10 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       <CardPay::LayerOneConnectCard @workflowSession={{this.session}} />
     `);
 
-    assert.equal(session.getValue<string>('layer1WalletAddress'), 'address');
+    assert.strictEqual(
+      session.getValue<string>('layer1WalletAddress'),
+      'address'
+    );
   });
 
   test('It should persist L1 address in workflow session after the wallet is connected', async function (assert) {
@@ -193,6 +196,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     await settled();
 
-    assert.equal(session.getValue<string>('layer1WalletAddress'), 'address');
+    assert.strictEqual(
+      session.getValue<string>('layer1WalletAddress'),
+      'address'
+    );
   });
 });

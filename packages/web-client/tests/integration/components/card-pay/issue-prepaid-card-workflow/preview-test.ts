@@ -143,8 +143,8 @@ module(
         this.set('frozen', true);
         assert.dom('[data-test-issue-prepaid-card-button]').isDisabled();
 
-        assert.equal(workflow.isCanceled, true);
-        assert.equal(workflow.cancelationReason, 'UNAUTHENTICATED');
+        assert.true(workflow.isCanceled);
+        assert.strictEqual(workflow.cancelationReason, 'UNAUTHENTICATED');
       });
 
       test('it shows the correct error message for a user rejection', async function (assert) {
@@ -228,7 +228,7 @@ module(
         await click('[data-test-issue-prepaid-card-button]');
         await waitUntil(() => !!workflowSession.getValue('txnHash'));
 
-        assert.equal(workflowSession.getValue('txnHash'), 'test hash');
+        assert.strictEqual(workflowSession.getValue('txnHash'), 'test hash');
 
         receipt.reject(new Error('Test reverted transaction'));
         await settled();
@@ -262,11 +262,13 @@ module(
             merchantSafe.address
           )
         );
-        assert.equal(
-          layer2Service.test__getNonceForIssuePrepaidCardRequest(
-            100000,
-            merchantSafe.address
-          ),
+        assert.strictEqual(
+          layer2Service
+            .test__getNonceForIssuePrepaidCardRequest(
+              100000,
+              merchantSafe.address
+            )
+            ?.toString(),
           '12345',
           'The same nonce as was used for the first attempt is sent for the second'
         );

@@ -1,11 +1,11 @@
 import { Profile } from '@prisma/client';
 import { setupHub } from '../helpers/server';
 
-describe('CardSpaceValidator', function () {
+describe('ProfileValidator', function () {
   let { getContainer } = setupHub(this);
 
   it('validates urls', async function () {
-    let subject = await getContainer().lookup('card-space-validator');
+    let subject = await getContainer().lookup('profile-validator');
 
     const cardSpace: Partial<Profile> = {
       id: '',
@@ -17,7 +17,7 @@ describe('CardSpaceValidator', function () {
   });
 
   it('validates text field attributes', async function () {
-    let subject = await getContainer().lookup('card-space-validator');
+    let subject = await getContainer().lookup('profile-validator');
 
     const cardSpace: Partial<Profile> = {
       id: '',
@@ -29,7 +29,7 @@ describe('CardSpaceValidator', function () {
   });
 
   it('validates links', async function () {
-    let subject = await getContainer().lookup('card-space-validator');
+    let subject = await getContainer().lookup('profile-validator');
     const cardSpace: Partial<Profile> = {
       id: '',
       links: [

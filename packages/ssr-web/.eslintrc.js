@@ -20,6 +20,9 @@ module.exports = {
   env: {
     browser: true,
   },
+  rules: {
+    'ember/no-array-prototype-extensions': 'off',
+  },
   overrides: [
     // typescript-specific
     {
@@ -69,7 +72,7 @@ module.exports = {
       },
     },
     {
-      // Test files:
+      // test files
       files: ['tests/**/*-test.{js,ts}'],
       extends: ['plugin:qunit/recommended'],
     },

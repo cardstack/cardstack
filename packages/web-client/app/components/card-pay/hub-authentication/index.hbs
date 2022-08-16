@@ -41,7 +41,7 @@
         </d.ActionButton>
       {{/if}}
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea
         @icon="card-wallet-app-icon"
         style={{css-var status-icon-size="2.5rem"}}
@@ -52,7 +52,7 @@
         />
         You will receive a confirmation request from the Cardstack Wallet app in a few moments…
       </i.ActionStatusArea>
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-authentication-memorialized>
         Authenticated with Hub

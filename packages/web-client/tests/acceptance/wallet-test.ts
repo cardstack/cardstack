@@ -32,6 +32,7 @@ module('Acceptance | wallet', function (hooks) {
     assert.dom('[data-test-card-balances]').doesNotExist();
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('Cards are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;

@@ -14,7 +14,7 @@ module('Integration | Helper | percent-complete', function (hooks) {
       hbs`{{percent-complete total=this.total completed=this.completed}}`
     );
 
-    assert.equal(this.element.textContent.trim(), '50');
+    assert.strictEqual(this.element.textContent.trim(), '50');
   });
 
   test('it handles missing total', async function (assert) {
@@ -25,7 +25,7 @@ module('Integration | Helper | percent-complete', function (hooks) {
       hbs`{{percent-complete total=this.total completed=this.completed}}`
     );
 
-    assert.equal(this.element.textContent.trim(), '0');
+    assert.strictEqual(this.element.textContent.trim(), '0');
   });
 
   test('it handles missing completed', async function (assert) {
@@ -36,6 +36,6 @@ module('Integration | Helper | percent-complete', function (hooks) {
       hbs`{{percent-complete total=this.total completed=this.completed}}`
     );
 
-    assert.equal(this.element.textContent.trim(), '0');
+    assert.strictEqual(this.element.textContent.trim(), '0');
   });
 });

@@ -52,24 +52,24 @@ module('Integration | Helper | postable-meta-hidden', function (hooks) {
     this.set('postB', post1); // later post
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
 
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
 
     this.set('postA', post1);
     this.set('postB', post2);
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
 
     this.set('postA', post3); // has card (later post)
     this.set('postB', post2);
     // when one has card and the other doesn't, the order matters
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
 
     this.set('postA', post4); // has card
     this.set('postB', post3); // has card
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
 
     this.set('postA', post5);
     this.set('postB', post4); // has card (earlier post)
-    assert.equal(
+    assert.strictEqual(
       this.element.textContent?.trim(),
       'false',
       'display meta for message post if it is following a card post'
@@ -85,27 +85,27 @@ module('Integration | Helper | postable-meta-hidden', function (hooks) {
     this.set('postA', post1);
     this.set('postB', post2);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', post1);
     this.set('postB', post3);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', post2);
     this.set('postB', post3);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', post3);
     this.set('postB', post2);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', post4);
     this.set('postB', post3);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 
   test('times different by more than a minute', async function (assert) {
@@ -132,23 +132,23 @@ module('Integration | Helper | postable-meta-hidden', function (hooks) {
     this.set('postA', earlierPost);
     this.set('postB', laterPost);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', laterPost);
     this.set('postB', earlierPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', latestPost);
     this.set('postB', laterPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', finalCardPost);
     this.set('postB', latestPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', finalPost);
     this.set('postB', finalCardPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 
   test('one is missing', async function (assert) {
@@ -157,18 +157,18 @@ module('Integration | Helper | postable-meta-hidden', function (hooks) {
     this.set('postA', post);
     this.set('postB', null);
     await render(hbs`{{postable-meta-hidden this.postA previous=this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', null);
     this.set('postB', post);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', cardPost);
     this.set('postB', null);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', null);
     this.set('postB', cardPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 });

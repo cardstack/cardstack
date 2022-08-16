@@ -332,7 +332,7 @@ module(
       await fillIn('input', '1');
       await click('[data-test-unlock-button]');
 
-      assert.equal(session.getValue('unlockTxnHash'), 'test hash');
+      assert.strictEqual(session.getValue('unlockTxnHash'), 'test hash');
 
       receipt.reject(new Error('Test reverted transaction'));
       await settled();
@@ -471,7 +471,10 @@ module(
         attempt1.resolve();
         await settled();
 
-        assert.equal(session.getValue('relayTokensTxnHash'), 'attempt 1 hash');
+        assert.strictEqual(
+          session.getValue('relayTokensTxnHash'),
+          'attempt 1 hash'
+        );
 
         receipt.reject(new Error('Test reverted transaction'));
         await settled();

@@ -82,7 +82,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     await visit('/card-pay');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
-    assert.equal(
+    assert.strictEqual(
       // @ts-ignore (complains object is possibly null)
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         .length,
@@ -347,7 +347,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ).searchParams.get('flow-id');
 
       assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
-      assert.equal(workflowPersistenceId!.length, 22);
+      assert.strictEqual(workflowPersistenceId!.length, 22);
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {

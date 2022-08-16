@@ -32,11 +32,14 @@
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-500);
   letter-spacing: var(--boxel-lsp-xs);
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   word-break: break-all;
 }
 
 .payment-link__link-view-toggle {
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   appearance: none;
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   -webkit-appearance: none;
   display: flex;
   align-items: center;

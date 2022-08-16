@@ -11,8 +11,8 @@ export type ProfileMerchantSubset = Omit<Profile, 'links' | 'profileImageUrl' | 
 export default class MerchantInfoService {
   #didResolver = new Resolver(getResolver());
 
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
 
   async getMerchantInfo(did?: string): Promise<Profile | ProfileMerchantSubset | null> {
@@ -22,7 +22,7 @@ export default class MerchantInfoService {
 
     try {
       let merchantInfo = await this.fetchMerchantInfo(did);
-      return this.merchantInfoSerializer.deserialize(merchantInfo);
+      return this.profileSerializer.deserialize(merchantInfo);
     } catch (e) {
       return null;
     }

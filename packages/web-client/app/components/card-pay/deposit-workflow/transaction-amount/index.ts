@@ -31,6 +31,7 @@ import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/typ
 import config from '@cardstack/web-client/config/environment';
 import { guidFor } from '@ember/object/internals';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
+import * as Sentry from '@sentry/ember';
 
 const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
@@ -222,6 +223,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     } catch (e) {
       session.delete('unlockTxnHash');
       console.error(e);
+      Sentry.captureException(e, {
+        tags: {
+          action: 'deposit/unlock-tokens',
+        },
+      });
       this.errorMessage =
         'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
     }
@@ -265,6 +271,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       if (didCancel(e)) {
         return;
       }
+      Sentry.captureException(e, {
+        tags: {
+          action: 'deposit/relay-tokens',
+        },
+      });
       console.error(e);
       this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
     }
@@ -299,6 +310,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       }
     } catch (e) {
       console.error(e);
+      Sentry.captureException(e, {
+        tags: {
+          action: 'deposit/relay-tokens',
+        },
+      });
       this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
     }
   }

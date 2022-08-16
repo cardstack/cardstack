@@ -16,7 +16,7 @@ module('Integration | Helper | dayjs-diff', function (hooks) {
     });
 
     await render(hbs`{{dayjs-diff this.dateA this.dateB}}`);
-    assert.equal(this.element.textContent.trim(), '432000000');
+    assert.strictEqual(this.element.textContent.trim(), '432000000');
   });
 
   test('two args with a dayjs instance and a string (dayJsInstance, dateString)', async function (assert) {
@@ -26,7 +26,7 @@ module('Integration | Helper | dayjs-diff', function (hooks) {
     });
 
     await render(hbs`{{dayjs-diff this.dayJsInstance this.dateString}}`);
-    assert.equal(this.element.textContent.trim(), '432000000');
+    assert.strictEqual(this.element.textContent.trim(), '432000000');
   });
 
   test('two args with (dateA, dateB) and expect a negative result', async function (assert) {
@@ -36,7 +36,7 @@ module('Integration | Helper | dayjs-diff', function (hooks) {
     });
 
     await render(hbs`{{dayjs-diff this.dateA this.dateB}}`);
-    assert.equal(this.element.textContent.trim(), '-432000000');
+    assert.strictEqual(this.element.textContent.trim(), '-432000000');
   });
 
   test('two args with precision (dateA, dateB, precision)', async function (assert) {
@@ -46,7 +46,7 @@ module('Integration | Helper | dayjs-diff', function (hooks) {
     });
 
     await render(hbs`{{dayjs-diff this.dateA this.dateB precision="day"}}`);
-    assert.equal(this.element.textContent.trim(), '5');
+    assert.strictEqual(this.element.textContent.trim(), '5');
   });
 
   // this test is not very consistent - the floating number has javascript floating point issues
@@ -59,6 +59,6 @@ module('Integration | Helper | dayjs-diff', function (hooks) {
     await render(
       hbs`{{dayjs-diff this.dateA this.dateB precision="year" float=true}}`
     );
-    assert.equal(this.element.textContent.trim(), '0.5');
+    assert.strictEqual(this.element.textContent.trim(), '0.5');
   });
 });

@@ -127,9 +127,10 @@ module('Integration | Component | card-pay/safe', function (hooks) {
       });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('it throws an error rendering a prepaid card safe', async function (this: Context, assert) {
     setupOnerror(function (err: Error) {
-      assert.equal(
+      assert.strictEqual(
         err.message,
         'CardPay::Safe does not support a safe type of prepaid-card'
       );

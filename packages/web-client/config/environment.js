@@ -36,7 +36,7 @@ module.exports = function (environment) {
     modulePrefix: '@cardstack/web-client',
     environment,
     rootURL: '/',
-    locationType: 'auto',
+    locationType: 'history',
     exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
@@ -67,10 +67,6 @@ module.exports = function (environment) {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
-      },
-      EXTEND_PROTOTYPES: {
-        // Prevent Ember Data from overriding Date.parse.
-        Date: false,
       },
     },
 

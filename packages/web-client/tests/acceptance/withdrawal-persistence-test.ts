@@ -70,7 +70,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
   test('Generates a flow uuid query parameter used as a persistence identifier and can be dismissed via the header button', async function (this: Context, assert) {
     await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
-    assert.equal(
+    assert.strictEqual(
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         ?.length,
       22

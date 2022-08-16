@@ -12,6 +12,7 @@ export default class JobTicketSerializer {
       };
     } else {
       let attributes: any = {
+        'job-type': model.jobType,
         state: model.state,
       };
 

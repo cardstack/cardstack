@@ -41,7 +41,7 @@ module('Acceptance | Card Editing', function (hooks) {
 
   test('Editing a card', async function (assert) {
     await visit(`/?url=${personURL}`);
-    assert.equal(currentURL(), `/?url=${personURL}`, 'URL is Correct');
+    assert.strictEqual(currentURL(), `/?url=${personURL}`, 'URL is Correct');
     await waitFor(PERSON);
     assert.dom(PERSON).hasText('Hi! I am Arthur');
 

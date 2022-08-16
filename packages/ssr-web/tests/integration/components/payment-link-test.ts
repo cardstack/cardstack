@@ -64,7 +64,7 @@ module('Integration | Component | common/payment-link', function (hooks) {
     this.set('mode', 'link');
     await click(TOGGLE);
     // eslint-disable-next-line ember/no-get
-    assert.equal(this.get('mode'), 'qr');
+    assert.strictEqual(this.get('mode'), 'qr');
     assert.dom(QR).hasAttribute('data-test-boxel-styled-qr-code', link);
     assert.dom(URL).containsText(link);
     assert.dom(TOGGLE).isEnabled().containsText('Show Payment Link');

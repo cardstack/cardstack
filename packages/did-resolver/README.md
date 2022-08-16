@@ -78,7 +78,7 @@ Let's break down the parts:
 
 1) First character: represents the version, uses "0"-"9" for 0-9, "A-Z" for 10-35, "a-z" for 36-61
 
-2) Second character: represents the type, 'p' for PrepaidCardCustomization, 'm' for MerchantInfo, 's' for SupplierInfo, 'c' for CardSpace, 'r' for RewardRule
+2) Second character: represents the type, 'p' for PrepaidCardCustomization, 'm' for MerchantInfo, 's' for SupplierInfo, 'o' for Profile, 'r' for RewardRule
 
 3) Next 22 characters: unique identifier, you can generate this using `shortUuid.generate()`
 
