@@ -363,6 +363,7 @@ def test_change_of_safes_during_payment_cycle(monkeypatch):
     assert len(result) == 1
 
 @given(token_holder_df, safe_owner_df)
+@settings(max_examples=500)
 def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
     """
     testing that number of safes within range matches the len of payees
@@ -396,14 +397,13 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
         safes_set = set()
         for _, row in token_holder_df.iterrows():
             cur_block_num = row["_block_number"]
-            if START_BLOCK <= cur_block_num <= END_BLOCK:
+            if START_BLOCK <= cur_block_num < END_BLOCK:
                 rewarded_safe = row["safe"]
-                if rewarded_safe in safes_set:
-                    return
-                safes_set.add(rewarded_safe)
-                owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe )["owner"][0]
-                if type(owner) == str:
-                    payees_list.append(owner)
+                if rewarded_safe not in safes_set:
+                    safes_set.add(rewarded_safe)
+                    owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe )["owner"][0]
+                    if type(owner) == str:
+                        payees_list.append(owner)
 
         result = rule.run(END_BLOCK, "0x0")
         all_positive_rewards = True

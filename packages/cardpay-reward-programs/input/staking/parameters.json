@@ -2,18 +2,18 @@
     "core": {
         "payment_cycle_length": 524000,
         "start_block": 17265697,
-        "end_block": 23471735,
+        "end_block": 23693329,
         "subgraph_config_locations": {
-            "token_holder": "/Users/paulinalcoserchong/Documents/Cardstack/cardstack-main/cardpay-production-partitioned-graph-data/data/token_holder/0.0.1",
-            "safe_owner": "/Users/paulinalcoserchong/Documents/Cardstack/cardstack-main/cardpay-production-partitioned-graph-data/data/safe_owner/0.0.1" 
+            "token_holder": "s3://cardpay-production-partitioned-graph-data/data/token_holder/1.0.0",
+            "safe_owner": "s3://cardpay-production-partitioned-graph-data/data/safe_owner/0.0.1" 
         }
     },
     "run": {
         "reward_program_id": "0x0000000000000000000000000000000000000000",
-        "payment_cycle": 23471735
+        "payment_cycle": 23693329
     },
     "user_defined": {
-        "token": "0x52031d287Bb58E260x52031d287Bb58E26A379A7Fec2c84acB54f54fe3A379A7Fec2c84acB54f54fe3",
+        "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
         "duration": 43200,
         "interest_rate_monthly": 0.0048
     }
