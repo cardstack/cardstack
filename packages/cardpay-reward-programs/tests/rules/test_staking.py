@@ -5,9 +5,10 @@ import pandas as pd
 import duckdb
 import math
 import hypothesis.strategies as st
+from hypothesis import given, settings
 import hypothesis.strategies as tuples
 from cardpay_reward_programs.rules import safe_ownership, staking
-from hypothesis import given, settings
+
 from hypothesis.extra.pandas import data_frames, columns, range_indexes, column
 from pytest import MonkeyPatch
 
@@ -37,7 +38,7 @@ token_holder_columns = {
     "_block_number":{"elements": block_number_st, "unique":True},
     "safe":{"elements":safe_st},
     "token":{"elements": card_st},
-    "balance_uint64":{"elements": balance_st, "unique":True}
+    "balance_downscale_e9_uint64":{"elements": balance_st, "unique":True}
 }
 
 safe_owner_df = data_frames(
@@ -106,55 +107,55 @@ def test_correct_calc_rewards(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 10,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1500
+            "balance_downscale_e9_uint64": 1500
         },
         {
             "_block_number": 20,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1750
+            "balance_downscale_e9_uint64": 1750
         },
         {
             "_block_number": 25,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1500
+            "balance_downscale_e9_uint64": 1500
         },
         {
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 10,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1500
+            "balance_downscale_e9_uint64": 1500
         },
         {
             "_block_number": 15,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1200
+            "balance_downscale_e9_uint64": 1200
         },
         {
             "_block_number": 20,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1700
+            "balance_downscale_e9_uint64": 1700
         },
         {
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe3",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         }
 
     ])
@@ -185,9 +186,9 @@ def test_correct_calc_rewards(monkeypatch):
     )
     result = rule.run(30, "0x0")
 
-    assert math.ceil(get_amount(result, "owner1", 0)) == math.ceil(82.26866088)
-    assert math.ceil(get_amount(result, "owner2", 1)) == math.ceil(80.74)
-    assert math.ceil(get_amount(result, "owner3", 2)) == math.ceil(60)
+    assert pytest.approx(get_amount(result, "owner1", 0)) == 82.26866088e9
+    assert pytest.approx(get_amount(result, "owner2", 1)) == 80.74258498e9
+    assert pytest.approx(get_amount(result, "owner3", 2)) == 60e9
 
 def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
@@ -195,13 +196,13 @@ def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 30,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 2000
+            "balance_downscale_e9_uint64": 2000
         }
     ])
 
@@ -219,7 +220,7 @@ def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     )
     result = rule.run(60, "0x0")
     
-    assert pytest.approx(get_amount(result, "owner1", 0)) == 120
+    assert pytest.approx(get_amount(result, "owner1", 0)) == 120e9
 
 def test_correct_calc_rewards_in_cycle(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
@@ -227,7 +228,7 @@ def test_correct_calc_rewards_in_cycle(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         }
     ])
 
@@ -245,7 +246,7 @@ def test_correct_calc_rewards_in_cycle(monkeypatch):
     )
     result = rule.run(30, "0x0")
     
-    assert pytest.approx(get_amount(result, "owner1", 0)) == 60
+    assert pytest.approx(get_amount(result, "owner1", 0)) == 60e9
 
 def test_correct_filtering_of_safe_type(monkeypatch):
     fake_data_token_holder = pd.DataFrame([
@@ -253,13 +254,13 @@ def test_correct_filtering_of_safe_type(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         }
     ])
 
@@ -290,13 +291,13 @@ def test_correct_filtering_of_token(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 0,
             "token": "card-1",
             "safe": "safe2",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         }
     ])
 
@@ -331,13 +332,13 @@ def test_change_of_safes_during_payment_cycle(monkeypatch):
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe1",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         },
         {
             "_block_number": 0,
             "token": "card-0",
             "safe": "safe2",
-            "balance_uint64": 1000
+            "balance_downscale_e9_uint64": 1000
         }
     ])
 
@@ -384,7 +385,8 @@ def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
 
 
 
-@given(token_holder_df, safe_owner_df)  
+@given(token_holder_df, safe_owner_df) 
+@settings(max_examples=1000) 
 def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
     """
     testing the any owner with some staking during the cycle receive rewards
@@ -393,22 +395,19 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
         rule = create_rule(
             monkeypatch, token_holder_df, safe_owner_df
         )
-        payees_list = []
-        safes_set = set()
+        payees = set()
         for _, row in token_holder_df.iterrows():
             cur_block_num = row["_block_number"]
             if START_BLOCK <= cur_block_num < END_BLOCK:
                 rewarded_safe = row["safe"]
-                if rewarded_safe not in safes_set:
-                    safes_set.add(rewarded_safe)
-                    owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe )["owner"][0]
-                    if type(owner) == str:
-                        payees_list.append(owner)
+                owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe )["owner"][0]
+                if type(owner) == str:
+                    payees.add(owner)
 
         result = rule.run(END_BLOCK, "0x0")
         all_positive_rewards = True
         
-        for payee in payees_list:
+        for payee in payees:
             if result.where(result["payee"] == payee)["amount"][0] <= 0:
                 all_positive_rewards = False
         assert all_positive_rewards
