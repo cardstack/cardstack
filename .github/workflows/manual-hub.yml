@@ -79,13 +79,6 @@ jobs:
         run: tar -xvf artifact.tar
         shell: bash
 
-      - name: Debug
-        shell: bash
-        run: |
-          pwd
-          ls
-          ls packages/hub/dist
-
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}

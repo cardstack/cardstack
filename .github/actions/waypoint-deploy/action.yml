@@ -23,19 +23,23 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: volta-cli/action@v1
+
+    - name: Set up yarn cache
+      uses: actions/cache@v3
+      with:
+        path: "**/node_modules"
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
+
     - name: Install dependencies
       shell: bash
       run: |
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
-
-    - name: Debug
-      shell: bash
-      run: |
-        pwd
-        ls
-        ls packages/hub/dist
+        yarn --prefer-offline
 
     - name: Deploy app
       run: waypoint up -app=${{ inputs.app }} -plain
