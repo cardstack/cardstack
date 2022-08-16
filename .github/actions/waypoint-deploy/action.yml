@@ -30,7 +30,7 @@ runs:
       with:
         path: |
           "node_modules"
-          "packages/*/node_modules"
+          "packages/**/node_modules"
         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-node-modules-
