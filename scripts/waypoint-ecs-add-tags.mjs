@@ -58,6 +58,8 @@ function getServices(cluster, appName) {
 }
 
 function isTagged(service, tags) {
+  console.log(JSON.stringify(service, null, 2));
+
   let existingTags = {};
   service.tags.forEach((tag) => {
     existingTags[tag.key] = tag.value;
