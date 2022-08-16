@@ -38,7 +38,7 @@ function getServices(cluster, appName) {
     const slicedServiceNames = serviceArns.slice(i, i + 10 > serviceArns.length ? serviceArns.length : i + 10);
 
     const responseJson = execute(
-      `aws ecs describe-services --cluster ${cluster} --services ${slicedServiceNames.join(' ')}`
+      `aws ecs describe-services --include TAGS --cluster ${cluster} --services ${slicedServiceNames.join(' ')}`
     );
     const response = JSON.parse(responseJson);
     services = services.concat(response.services);
