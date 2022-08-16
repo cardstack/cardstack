@@ -29,6 +29,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: |
+          ~/.cache/yarn
           node_modules
           packages/*/node_modules
           packages/firebase-functions/*/functions/node_modules
