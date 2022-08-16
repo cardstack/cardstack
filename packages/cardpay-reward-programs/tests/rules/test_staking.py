@@ -3,7 +3,7 @@ import hypothesis.strategies as st
 import pandas as pd
 import pytest
 from cardpay_reward_programs.rules import staking
-from hypothesis import given, settings
+from hypothesis import given, settings, example
 from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
@@ -20,7 +20,7 @@ depot_st = st.from_regex(r"depot", fullmatch=True)
 block_number_so_st = st.integers(min_value=0, max_value=1)
 # card_st = st.text("card")
 block_number_st = st.integers(min_value=1, max_value=END_BLOCK + 50)
-balance_st = st.integers(min_value=0, max_value=24032768)
+balance_st = st.integers(min_value=1, max_value=24032768)
 
 safe_owner_columns = {
     "owner": {"elements": owner_st, "unique": True},
@@ -33,7 +33,7 @@ token_holder_columns = {
     "_block_number": {"elements": block_number_st, "unique": True},
     "safe": {"elements": safe_st},
     "token": {"elements": card_st},
-    "balance_downscale_e9_uint64": {"elements": balance_st, "unique": True},
+    "balance_downscale_e9_uint64": {"elements": balance_st},
 }
 
 safe_owner_df = data_frames(
@@ -56,7 +56,7 @@ def create_rule(
 ):
     core_config = {
         "payment_cycle_length": CYCLE_LENGTH,
-        "start_block": START_BLOCK,
+        "start_block": 0,
         "end_block": END_BLOCK,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
@@ -354,7 +354,7 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
         payees = set()
         for _, row in token_holder_df.iterrows():
             cur_block_num = row["_block_number"]
-            if START_BLOCK <= cur_block_num < END_BLOCK:
+            if 0 <= cur_block_num < END_BLOCK and row["balance_downscale_e9_uint64"] > 0:
                 rewarded_safe = row["safe"]
                 owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe)[
                     "owner"
@@ -369,3 +369,123 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
             if result.where(result["payee"] == payee)["amount"][0] <= 0:
                 all_positive_rewards = False
         assert all_positive_rewards
+
+
+
+def apply_transfers(starting_balances, transfers):
+    history = [
+        {
+            "_block_number": 0,
+            "token": "card-0",
+            "safe": f"safe{n}",
+            "balance_downscale_e9_uint64": balance,
+        }
+        for n, balance in enumerate(starting_balances)
+    ]
+
+    accounts = [
+        {"balance": balance, "last_changed": 0, "safe": f"safe{n}"}
+        for n, balance in enumerate(starting_balances)
+    ]
+
+    for transfer in sorted(transfers, key=lambda x: x[3]):
+        from_acct, to_acct, amount, block = transfer
+        # Multiple transfers per block per account are trickier but not relevant here
+        if (
+            accounts[from_acct]["last_changed"] == block
+            or accounts[to_acct]["last_changed"] == block
+        ):
+            continue
+        # Can't send more than you have
+        amount = min(amount, accounts[from_acct]["balance"])
+        # Update balances
+        accounts[from_acct]["balance"] -= amount
+        accounts[to_acct]["balance"] += amount
+        accounts[from_acct]["last_changed"] = block
+        accounts[to_acct]["last_changed"] = block
+        history.append(
+            {
+                "_block_number": block,
+                "token": "card-0",
+                "safe": f"safe{from_acct}",
+                "balance_downscale_e9_uint64": accounts[from_acct]["balance"],
+            }
+        )
+        history.append(
+            {
+                "_block_number": block,
+                "token": "card-0",
+                "safe": f"safe{to_acct}",
+                "balance_downscale_e9_uint64": accounts[to_acct]["balance"],
+            }
+        )
+
+    return pd.DataFrame(history)
+
+
+@given(
+    st.lists(st.integers(min_value=0, max_value=1_000), min_size=10, max_size=10),
+    st.lists(
+        st.tuples(
+            st.integers(min_value=0, max_value=9),  # from
+            st.integers(min_value=0, max_value=9),  # to
+            st.integers(min_value=0, max_value=1000),  # amount
+            st.integers(min_value=0, max_value=1000),  # block
+        ),
+        min_size=0,
+        max_size=1000,
+    ),
+    st.integers(min_value=30, max_value=1000),  # payment cycle
+    st.lists(
+        st.tuples(
+            st.integers(min_value=0, max_value=9),  # safe
+            st.integers(min_value=0, max_value=9),  # new owner
+            st.integers(min_value=0, max_value=1000),  # block
+        ),
+    ),
+)
+@example(
+    safe_ownership_changes=[(4, 0, 0)],
+    payment_cycle=30,
+    transfers=[],
+    starting_balances=[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+)
+def test_reward_given_tokens(
+    starting_balances, transfers, payment_cycle, safe_ownership_changes
+):
+    interest_rate = 0.1
+    with MonkeyPatch.context() as monkeypatch:
+
+        token_holder_df = apply_transfers(starting_balances, transfers)
+        print(token_holder_df)
+        safe_owners = [
+            {
+                "safe": f"safe{n}",
+                "owner": f"owner{n}",
+                "type": "depot",
+                "_block_number": 0,
+            }
+            for n in range(len(starting_balances))
+        ]
+        for safe, owner, block in safe_ownership_changes:
+            safe_owners.append(
+                {
+                    "safe": f"safe{safe}",
+                    "owner": f"owner{owner}",
+                    "type": "depot",
+                    "_block_number": block,
+                }
+            )
+
+        safe_owner_df = pd.DataFrame(safe_owners)
+        rule = create_rule(
+            monkeypatch,
+            token_holder_df,
+            safe_owner_df,
+            user_config_overrides={"interest_rate_monthly": interest_rate},
+        )
+        result = rule.run(payment_cycle, "0x0")
+        assert (
+            pytest.approx(sum(result["amount"]))
+            == interest_rate * sum(starting_balances) * 1e9
+        )
