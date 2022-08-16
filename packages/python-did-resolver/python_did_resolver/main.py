@@ -157,3 +157,7 @@ def encode_did(opts: EncodeOptions) -> str:
     version = opts.get("version", CURRENT_VERSION)
     unique_id = opts.get("uniqueId", su.uuid())
     return CardstackIdentifier(version, opts["type"], unique_id).to_did()
+
+
+def get_resolver():
+    return {"cardstack": s3_resolution_method}
