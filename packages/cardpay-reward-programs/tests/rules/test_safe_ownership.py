@@ -39,7 +39,6 @@ def create_rule(
     monkeypatch.setattr(safe_ownership.SafeOwnership, "_get_table_query", table_query)
     monkeypatch.setattr(safe_ownership.SafeOwnership, "run_query", run_query)
 
-
     rule = safe_ownership.SafeOwnership(core_config, user_config)
     return rule
 

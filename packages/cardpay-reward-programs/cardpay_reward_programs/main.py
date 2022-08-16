@@ -7,9 +7,9 @@ from boto3.session import Session
 from cardpay_reward_programs.rule import Rule
 from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
-from .rules import *
 
 from .payment_tree import PaymentTree
+from .rules import *
 from .utils import write_parquet_file
 
 load_dotenv()
@@ -37,7 +37,8 @@ if SENTRY_DSN is not None:
 
 def run_reward_program(
     parameters_file: str = typer.Argument(
-        default="./input/safe_ownership/parameters.json", help="The parameters file to use"
+        default="./input/safe_ownership/parameters.json",
+        help="The parameters file to use",
     ),
     output_location: str = typer.Argument(
         default="./output", help="The directory to write the results to"
@@ -63,4 +64,3 @@ def run_reward_program(
 
 if __name__ == "__main__":
     typer.run(run_reward_program)
-

@@ -1,13 +1,18 @@
 from logging import raiseExceptions
-import pandas as pd
-import duckdb
 
+import duckdb
+import pandas as pd
 from cardpay_reward_programs.rules import dummy_rule
 
+
 def create_rule(
-    monkeypatch, fake_data_spend_acc, fake_data_safe_own, core_config_overrides={}, user_config_overrides={}
+    monkeypatch,
+    fake_data_spend_acc,
+    fake_data_safe_own,
+    core_config_overrides={},
+    user_config_overrides={},
 ):
-    
+
     core_config = {
         "payment_cycle_length": 32768,
         "start_block": 0,
@@ -15,15 +20,15 @@ def create_rule(
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/",
             # "spend_accumulation": "s3://tall-data-dev/paulin/spend_accumulation/0.0.1/",
-            "safe_owner": "s3://tall-data-dev/paulin/safe_owner/0.0.1/"  
-        }
+            "safe_owner": "s3://tall-data-dev/paulin/safe_owner/0.0.1/",
+        },
     }
     core_config.update(core_config_overrides)
     user_config = {
         "token": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
         "base_reward": 5000000000000000000,
         "duration": 43200,
-        "hist_balance_threshold": 100000
+        "hist_balance_threshold": 100000,
     }
 
     user_config.update(user_config_overrides)
@@ -31,7 +36,6 @@ def create_rule(
 
     con.execute("create table SPEND_TABLE as select * from fake_data_spend_acc")
     con.execute("create table SAFE_TABLE as select * from fake_data_safe_own")
-    
 
     def table_query(
         self, config_name, table_name, min_partition: int, max_partition: int
@@ -45,7 +49,7 @@ def create_rule(
             raise Exception("Table name is incorrect!")
 
     def run_query(self, tables_names, vars):
-        # con = duckdb.connect(database=":memory:", read_only=False) 
+        # con = duckdb.connect(database=":memory:", read_only=False)
         con.execute(self.sql_2(["SPEND_TABLE", "SAFE_TABLE"]), vars)
         df = con.fetchdf()
         return df
@@ -80,101 +84,86 @@ def create_rule(
     rule = dummy_rule.DummyRule(core_config, user_config)
     return rule
 
+
 def get_amount(result, payee):
     return result.where(result["payee"] == payee)["amount"][0]
+
 
 def test_identifies_correct_historic_balance(monkeypatch):
     fake_data_spend_acc = pd.DataFrame(
         [
             {
-                "merchant_safe":"0x1",
-                "_block_number":150, 
-                "historic_spend_balance_uint64":100001 #Should Pass
+                "merchant_safe": "0x1",
+                "_block_number": 150,
+                "historic_spend_balance_uint64": 100001,  # Should Pass
             },
             {
-                "merchant_safe":"0x2",
-                "_block_number":160, 
-                "historic_spend_balance_uint64":100000 #Filter out
-            }
+                "merchant_safe": "0x2",
+                "_block_number": 160,
+                "historic_spend_balance_uint64": 100000,  # Filter out
+            },
         ]
     )
 
     fake_data_safe_own = pd.DataFrame(
-        [
-            {"owner": "0xA", "safe": "0x1"},
-            {"owner": "0xB", "safe": "0x2"}
-        ]
+        [{"owner": "0xA", "safe": "0x1"}, {"owner": "0xB", "safe": "0x2"}]
     )
 
-    rule = create_rule(
-        monkeypatch, fake_data_spend_acc, fake_data_safe_own
-    )
-
+    rule = create_rule(monkeypatch, fake_data_spend_acc, fake_data_safe_own)
 
     result = rule.run(200, "0x0")
-    
+
     assert len(result) == 1
+
 
 def test_identifies_correct_block_number(monkeypatch):
     fake_data_spend_acc = pd.DataFrame(
         [
             {
-                "merchant_safe":"0x1",
-                "_block_number":150, 
-                "historic_spend_balance_uint64":100001 
+                "merchant_safe": "0x1",
+                "_block_number": 150,
+                "historic_spend_balance_uint64": 100001,
             },
             {
-                "merchant_safe":"0x2",
-                "_block_number":100001, #Larger than block range
-                "historic_spend_balance_uint64":100001 
-            }
+                "merchant_safe": "0x2",
+                "_block_number": 100001,  # Larger than block range
+                "historic_spend_balance_uint64": 100001,
+            },
         ]
     )
 
     fake_data_safe_own = pd.DataFrame(
-        [
-            {"owner": "0xA", "safe": "0x1"},
-            {"owner": "0xB", "safe": "0x2"}
-        ]
+        [{"owner": "0xA", "safe": "0x1"}, {"owner": "0xB", "safe": "0x2"}]
     )
 
-    
-    rule = create_rule(
-        monkeypatch, fake_data_spend_acc, fake_data_safe_own
-    )
-
+    rule = create_rule(monkeypatch, fake_data_spend_acc, fake_data_safe_own)
 
     result = rule.run(200, "0x0")
-    
+
     assert len(result) == 1
+
 
 def test_identifies_repetitive_safes(monkeypatch):
     fake_data_spend_acc = pd.DataFrame(
         [
             {
-                "merchant_safe":"0x2",
-                "_block_number":150, 
-                "historic_spend_balance_uint64":100001 #Should Pass
+                "merchant_safe": "0x2",
+                "_block_number": 150,
+                "historic_spend_balance_uint64": 100001,  # Should Pass
             },
             {
-                "merchant_safe":"0x2",
-                "_block_number":151, 
-                "historic_spend_balance_uint64":100001 #Filter out
-            }
+                "merchant_safe": "0x2",
+                "_block_number": 151,
+                "historic_spend_balance_uint64": 100001,  # Filter out
+            },
         ]
     )
 
     fake_data_safe_own = pd.DataFrame(
-        [
-            {"owner": "0xA", "safe": "0x1"},
-            {"owner": "0xB", "safe": "0x2"}
-        ]
+        [{"owner": "0xA", "safe": "0x1"}, {"owner": "0xB", "safe": "0x2"}]
     )
 
-   
-    rule = create_rule(
-        monkeypatch, fake_data_spend_acc, fake_data_safe_own
-    )
+    rule = create_rule(monkeypatch, fake_data_spend_acc, fake_data_safe_own)
 
     result = rule.run(200, "0x0")
     assert len(result) == 1
@@ -184,34 +173,24 @@ def test_identifies_no_matching_owners(monkeypatch):
     fake_data_spend_acc = pd.DataFrame(
         [
             {
-                "merchant_safe":"0x2",
-                "_block_number":150, 
-                "historic_spend_balance_uint64":100001 #Should Pass
+                "merchant_safe": "0x2",
+                "_block_number": 150,
+                "historic_spend_balance_uint64": 100001,  # Should Pass
             },
             {
-                "merchant_safe":"0x2",
-                "_block_number":151, 
-                "historic_spend_balance_uint64":100001 #Filter out
-            }
+                "merchant_safe": "0x2",
+                "_block_number": 151,
+                "historic_spend_balance_uint64": 100001,  # Filter out
+            },
         ]
     )
 
     fake_data_safe_own = pd.DataFrame(
-        [
-            {"owner": "0xA", "safe": "0x3"},
-            {"owner": "0xB", "safe": "0x4"}
-        ]
+        [{"owner": "0xA", "safe": "0x3"}, {"owner": "0xB", "safe": "0x4"}]
     )
 
-    rule = create_rule(
-        monkeypatch, fake_data_spend_acc, fake_data_safe_own
-    )
+    rule = create_rule(monkeypatch, fake_data_spend_acc, fake_data_safe_own)
 
     result = rule.run(200, "0x0")
-    
+
     assert len(result) == 0
-
-
-
-
-
