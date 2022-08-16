@@ -97,9 +97,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
     });
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('Initiating workflow without wallet connections', async function (this: Context, assert) {
     await visit('/card-pay');
-    assert.equal(currentURL(), '/card-pay/wallet');
+    assert.strictEqual(currentURL(), '/card-pay/wallet');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
     let post = postableSel(0, 0);
@@ -110,7 +111,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        `Before we get started, please connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app.`
+        `Before we get started, please connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app.`
       );
 
     assert
@@ -212,7 +213,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'To store card customization data in the Cardstack Hub, you need to authenticate using your Card Wallet'
+        'To store card customization data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet'
       );
     post = postableSel(1, 1);
     await click(
@@ -496,7 +497,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       req.url.includes('prepaid-card-customizations')
     );
 
-    assert.equal(
+    assert.strictEqual(
       customizationStorageRequest.requestHeaders['authorization'],
       'Bearer abc123--def456--ghi789'
     );
@@ -505,12 +506,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
       customizationStorageRequest.requestBody
     );
 
-    assert.equal(customizationRequestJson.data.attributes['issuer-name'], 'JJ');
-    assert.equal(
+    assert.strictEqual(
+      customizationRequestJson.data.attributes['issuer-name'],
+      'JJ'
+    );
+    assert.strictEqual(
       customizationRequestJson.data.relationships.pattern.data.id,
       '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
     );
-    assert.equal(
+    assert.strictEqual(
       customizationRequestJson.data.relationships['color-scheme'].data.id,
       '4f219852-33ee-4e4c-81f7-76318630a423'
     );
@@ -590,7 +594,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       workflowPersistenceId
     );
 
-    assert.equal(persistedData.name, 'PREPAID_CARD_ISSUANCE');
+    assert.strictEqual(persistedData.name, 'PREPAID_CARD_ISSUANCE');
     let persistedState = persistedData.state;
 
     let deserializedState = deserializeState({
@@ -667,7 +671,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -710,7 +714,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert
@@ -754,7 +758,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     test('Workflow is canceled after showing wallet connection card if balances insufficient to create prepaid card', async function (assert) {
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
@@ -786,7 +790,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .containsText(
           `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,
@@ -806,7 +810,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       let secondLayer2AccountAddress =
         '0x5416C61193C3393B46C2774ac4717C252031c0bE';
       await visit('/card-pay');
-      assert.equal(currentURL(), '/card-pay/wallet');
+      assert.strictEqual(currentURL(), '/card-pay/wallet');
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 
       assert

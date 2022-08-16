@@ -32,18 +32,18 @@ module('Integration | Helper | postable-meta-identical', function (hooks) {
     this.set('postB', laterPost);
     await render(hbs`{{postable-meta-identical this.postA this.postB}}`);
 
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
 
     this.set('postA', laterPost);
     this.set('postB', earlierPost);
-    assert.equal(this.element.textContent?.trim(), 'true');
+    assert.strictEqual(this.element.textContent?.trim(), 'true');
   });
 
   test('authors different', async function (assert) {
     this.set('postA', newPost('Frank', firstPostTime));
     this.set('postB', newPost('Not Frank', firstPostTime));
     await render(hbs`{{postable-meta-identical this.postA this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 
   test('times different by more than a minute', async function (assert) {
@@ -56,11 +56,11 @@ module('Integration | Helper | postable-meta-identical', function (hooks) {
     this.set('postA', earlierPost);
     this.set('postB', laterPost);
     await render(hbs`{{postable-meta-identical this.postA this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', laterPost);
     this.set('postB', earlierPost);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 
   test('one is missing', async function (assert) {
@@ -68,10 +68,10 @@ module('Integration | Helper | postable-meta-identical', function (hooks) {
     this.set('postA', post);
     this.set('postB', null);
     await render(hbs`{{postable-meta-identical this.postA this.postB}}`);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
 
     this.set('postA', null);
     this.set('postB', post);
-    assert.equal(this.element.textContent?.trim(), 'false');
+    assert.strictEqual(this.element.textContent?.trim(), 'false');
   });
 });

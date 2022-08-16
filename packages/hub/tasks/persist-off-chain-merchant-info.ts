@@ -4,8 +4,8 @@ import config from 'config';
 import shortUuid from 'short-uuid';
 
 export default class PersistOffChainMerchantInfo {
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
@@ -13,8 +13,8 @@ export default class PersistOffChainMerchantInfo {
     const { id } = payload;
     let prisma = await this.prismaManager.getClient();
 
-    let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id } });
-    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(merchantInfo!);
+    let profile = await prisma.profile.findUnique({ where: { id } });
+    let jsonAPIDoc = this.profileSerializer.serialize(profile!, 'merchant-infos');
 
     helpers.addJob('s3-put-json', {
       bucket: config.get('aws.offchainStorage.bucketName'),

@@ -8,15 +8,14 @@ import * as Sentry from '@sentry/node';
 import { JobTicket } from '@prisma/client';
 
 export default class ProfilePurchasesRoute {
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   inAppPurchases = inject('in-app-purchases', { as: 'inAppPurchases' });
 
   jobTicketSerializer = inject('job-ticket-serializer', { as: 'jobTicketSerializer' });
 
   merchantInfosRoute = inject('merchant-infos-route', { as: 'merchantInfosRoute' });
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -199,21 +198,20 @@ export default class ProfilePurchasesRoute {
       return;
     }
 
-    const merchantInfo = {
+    let properties = {
       id: shortUuid.uuid(),
       name: merchantAttributes['name'],
       slug,
       color: merchantAttributes['color'],
       textColor: merchantAttributes['text-color'],
       ownerAddress: ctx.state.userAddress,
+      links: [],
+      profileDescription: '',
+      profileImageUrl: '',
+      createdAt: new Date(),
     };
 
-    let db = await this.databaseManager.getClient();
-
-    await this.databaseManager.performTransaction(db, async () => {
-      await prisma.merchantInfo.create({ data: merchantInfo });
-      await prisma.cardSpace.create({ data: { id: shortUuid.uuid(), merchantId: merchantInfo.id } });
-    });
+    let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
     let jobTicketId = shortUuid.uuid();
 
@@ -234,7 +232,7 @@ export default class ProfilePurchasesRoute {
       { maxAttempts: 1 }
     );
 
-    let serialized = this.merchantInfoSerializer.serialize(merchantInfo);
+    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
 
     serialized.included = [this.jobTicketSerializer.serialize(insertedJobTicket!).data];
 

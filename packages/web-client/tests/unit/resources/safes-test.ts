@@ -105,8 +105,8 @@ module('Unit | Resource | Safes', function (hooks) {
     );
   });
 
-  test('it returns null when it fails to get a safe by address', async function (assert) {
-    assert.equal(safes.getByAddress('not-an-address'), null);
+  test('it returns undefined when it fails to get a safe by address', async function (assert) {
+    assert.strictEqual(safes.getByAddress('not-an-address'), undefined);
   });
 
   test('it returns the individual safe state if the block number is greater than the graph block number', async function (assert) {
@@ -116,8 +116,8 @@ module('Unit | Resource | Safes', function (hooks) {
 
     await settled();
 
-    assert.equal(safes.graphData.blockNumber, defaultBlockNumber);
-    assert.equal(
+    assert.strictEqual(safes.graphData.blockNumber, defaultBlockNumber);
+    assert.strictEqual(
       safes.individualSafeUpdateData[defaultDepotSafe.address]!.blockNumber,
       defaultBlockNumber + 1
     );
@@ -133,12 +133,12 @@ module('Unit | Resource | Safes', function (hooks) {
 
     await settled();
 
-    assert.equal(safes.graphData.blockNumber, defaultBlockNumber);
-    assert.equal(
+    assert.strictEqual(safes.graphData.blockNumber, defaultBlockNumber);
+    assert.strictEqual(
       safes.individualSafeUpdateData[defaultDepotSafe.address]!.blockNumber,
       defaultBlockNumber
     );
-    assert.equal(
+    assert.strictEqual(
       safes.getByAddress(defaultDepotSafe.address)!.tokens.length,
       0
     );
@@ -149,12 +149,12 @@ module('Unit | Resource | Safes', function (hooks) {
     };
     await safes.fetch();
 
-    assert.equal(safes.graphData.blockNumber, defaultBlockNumber + 10);
-    assert.equal(
+    assert.strictEqual(safes.graphData.blockNumber, defaultBlockNumber + 10);
+    assert.strictEqual(
       safes.individualSafeUpdateData[defaultDepotSafe.address]!.blockNumber,
       defaultBlockNumber
     );
-    assert.equal(
+    assert.strictEqual(
       safes.getByAddress(defaultDepotSafe.address)!.tokens.length,
       0
     );
@@ -255,17 +255,17 @@ module('Unit | Resource | Safes', function (hooks) {
   test('it can clear graphData, individual update data, safe references, and value', async function (assert) {
     await safes.updateOne(defaultDepotSafe.address);
 
-    assert.equal(safes.graphData.safes.length, 1);
-    assert.equal(Object.keys(safes.individualSafeUpdateData).length, 1);
-    assert.equal(Object.keys(safes.safeReferences).length, 1);
-    assert.equal(safes.value.length, 1);
+    assert.strictEqual(safes.graphData.safes.length, 1);
+    assert.strictEqual(Object.keys(safes.individualSafeUpdateData).length, 1);
+    assert.strictEqual(Object.keys(safes.safeReferences).length, 1);
+    assert.strictEqual(safes.value.length, 1);
 
     safes.clear();
 
-    assert.equal(safes.graphData.safes.length, 0);
-    assert.equal(Object.keys(safes.individualSafeUpdateData).length, 0);
-    assert.equal(Object.keys(safes.safeReferences).length, 0);
-    assert.equal(safes.value.length, 0);
+    assert.strictEqual(safes.graphData.safes.length, 0);
+    assert.strictEqual(Object.keys(safes.individualSafeUpdateData).length, 0);
+    assert.strictEqual(Object.keys(safes.safeReferences).length, 0);
+    assert.strictEqual(safes.value.length, 0);
   });
 
   test('it returns safes that are compatible with and have sufficient balance for issuing a prepaid card', async function (assert) {

@@ -55,6 +55,8 @@ module(
 
       this.setProperties({
         session,
+        onComplete: () => {},
+        onIncomplete: () => {},
       });
     });
 
@@ -63,11 +65,12 @@ module(
       this.set('onComplete', () => {
         completed = true;
       });
+      this.set('onIncomplete', () => {});
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
         @onComplete={{this.onComplete}}
-        @onIncomplete={{noop}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -122,8 +125,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -160,8 +163,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -182,8 +185,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -205,8 +208,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -236,8 +239,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -293,8 +296,8 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
@@ -302,7 +305,7 @@ module(
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('Amount must be above 0.00 DAI');
+        .containsText('Amount must be at least 0.50 DAI');
     });
 
     test('it clears the unlock transaction hash if the transaction is reverted', async function (assert) {
@@ -321,15 +324,15 @@ module(
       await render(hbs`
       <CardPay::DepositWorkflow::TransactionAmount
         @workflowSession={{this.session}}
-        @onComplete={{noop}}
-        @onIncomplete={{noop}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
 
       await fillIn('input', '1');
       await click('[data-test-unlock-button]');
 
-      assert.equal(session.getValue('unlockTxnHash'), 'test hash');
+      assert.strictEqual(session.getValue('unlockTxnHash'), 'test hash');
 
       receipt.reject(new Error('Test reverted transaction'));
       await settled();
@@ -388,7 +391,7 @@ module(
           <CardPay::DepositWorkflow::TransactionAmount
             @workflowSession={{this.session}}
             @onComplete={{this.onComplete}}
-            @onIncomplete={{noop}}
+            @onIncomplete={{this.onIncomplete}}
           />
         `);
 
@@ -468,7 +471,10 @@ module(
         attempt1.resolve();
         await settled();
 
-        assert.equal(session.getValue('relayTokensTxnHash'), 'attempt 1 hash');
+        assert.strictEqual(
+          session.getValue('relayTokensTxnHash'),
+          'attempt 1 hash'
+        );
 
         receipt.reject(new Error('Test reverted transaction'));
         await settled();

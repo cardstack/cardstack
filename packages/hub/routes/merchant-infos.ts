@@ -6,11 +6,10 @@ import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 import shortUUID from 'short-uuid';
-import { MerchantInfo } from '@prisma/client';
 
 export default class MerchantInfosRoute {
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   reservedWords = inject('reserved-words', {
@@ -28,7 +27,7 @@ export default class MerchantInfosRoute {
       return;
     }
     let prisma = await this.prismaManager.getClient();
-    let merchantInfos = await prisma.merchantInfo.findMany({
+    let profiles = await prisma.profile.findMany({
       where: {
         ownerAddress: ctx.state.userAddress,
       },
@@ -36,7 +35,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serializeCollection(merchantInfos);
+    ctx.body = this.profileSerializer.serialize(profiles, 'merchant-infos');
   }
 
   async post(ctx: Koa.Context) {
@@ -74,7 +73,7 @@ export default class MerchantInfosRoute {
     }
 
     let prisma = await this.prismaManager.getClient();
-    const merchantInfo: Omit<MerchantInfo, 'createdAt'> = {
+    const properties = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
       slug,
@@ -83,21 +82,13 @@ export default class MerchantInfosRoute {
       ownerAddress: ctx.state.userAddress,
     };
 
-    await prisma.$transaction(async () => {
-      await prisma.merchantInfo.create({ data: merchantInfo });
-      await prisma.cardSpace.create({
-        data: {
-          id: shortUuid.uuid(),
-          merchantId: merchantInfo.id,
-        },
-      });
-    });
+    let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
       id: merchantInfo.id,
     });
 
-    let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);
+    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
 
     ctx.status = 201;
     ctx.body = serialized;
@@ -135,10 +126,10 @@ export default class MerchantInfosRoute {
         };
       } else {
         let prisma = await this.prismaManager.getClient();
-        let merchantInfo = await prisma.merchantInfo.findFirst({ where: { slug } });
+        let profile = await prisma.profile.findFirst({ where: { slug } });
         return {
-          slugAvailable: merchantInfo ? false : true,
-          detail: merchantInfo ? 'This ID is already taken. Please choose another one' : 'ID is available',
+          slugAvailable: profile ? false : true,
+          detail: profile ? 'This ID is already taken. Please choose another one' : 'ID is available',
         };
       }
     }
@@ -146,19 +137,19 @@ export default class MerchantInfosRoute {
 
   async getFromShortId(ctx: Koa.Context) {
     let prisma = await this.prismaManager.getClient();
-    let merchantInfo = await prisma.merchantInfo.findUnique({
+    let profile = await prisma.profile.findUnique({
       where: {
         id: shortUUID().toUUID(ctx.params.id),
       },
     });
 
-    if (!merchantInfo) {
+    if (!profile) {
       ctx.status = 404;
       return;
     }
 
     ctx.status = 200;
-    ctx.body = this.merchantInfoSerializer.serialize(merchantInfo);
+    ctx.body = this.profileSerializer.serialize(profile, 'merchant-infos');
     ctx.type = 'application/vnd.api+json';
   }
 }

@@ -54,7 +54,7 @@ module('@core | compiler-basics', function (hooks) {
   test('can compile the base card', async function (assert) {
     let compiled = await builder.getCompiledCard(BASE_CARD_URL);
 
-    assert.equal(compiled.url, BASE_CARD_URL, 'Includes basecard URL');
+    assert.strictEqual(compiled.url, BASE_CARD_URL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
@@ -106,7 +106,7 @@ module('@core | compiler-basics', function (hooks) {
     createCard(card);
 
     let compiled = await builder.getCompiledCard(cardURL(card));
-    assert.equal(
+    assert.strictEqual(
       compiled.componentInfos.embedded.inlineHBS,
       `{{@model}}`,
       'templateModules includes inlineHBS for simple cards'
@@ -213,8 +213,8 @@ module('@core | compiler-basics', function (hooks) {
 
     let compiled = await builder.getCompiledCard(cardURL(card));
     let title = compiled.fields.title;
-    assert.equal(title.type, 'contains');
-    assert.equal(title.card.url, 'https://cardstack.com/base/string');
+    assert.strictEqual(title.type, 'contains');
+    assert.strictEqual(title.card.url, 'https://cardstack.com/base/string');
   });
 
   module('data', function () {
@@ -295,7 +295,10 @@ module('@core | compiler-basics', function (hooks) {
         compiled.componentInfos.embedded.componentModule.global
       );
 
-      assert.equal(code.default.moduleName, '@glimmer/component/template-only');
+      assert.strictEqual(
+        code.default.moduleName,
+        '@glimmer/component/template-only'
+      );
     });
   });
 

@@ -108,6 +108,7 @@ module('Acceptance | persistence view and restore', function () {
       assert.dom('[data-test-workflow-tracker-toggle]').doesNotExist();
     });
 
+    // eslint-disable-next-line qunit/require-expect
     test('it lists persisted Card Pay workflows', async function (this: Context, assert) {
       workflowPersistenceService.persistData('persisted-merchant-creation', {
         name: 'MERCHANT_CREATION',
@@ -214,7 +215,7 @@ module('Acceptance | persistence view and restore', function () {
         .containsText('Payment Profile Creation')
         .containsText('Save profile details');
 
-      assert.equal(
+      assert.strictEqual(
         getProgressIconCompletion(
           '[data-test-active-workflow]:nth-child(1) .boxel-progress-icon'
         ),
@@ -257,7 +258,7 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-tracker-toggle]');
       await click('[data-test-visit-workflow-button]');
 
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         '/card-pay/payments?flow=create-business&flow-id=persisted-merchant-creation'
       );

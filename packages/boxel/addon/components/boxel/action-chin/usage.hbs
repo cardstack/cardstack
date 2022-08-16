@@ -85,6 +85,7 @@
               <td>
                 InfoArea
               </td>
+              {{!-- template-lint-disable no-whitespace-for-layout --}}
               <td>
                 An area used for any relevant information to the action (eg for status updates)
                 If provided, it replaces the text:  "Actions only visible to you".
@@ -115,7 +116,7 @@
           Custom info area
         </a.InfoArea>
       </:default>
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionButton>
           In-progress
         </i.ActionButton>
@@ -125,7 +126,7 @@
         <i.InfoArea>
           Custom info area
         </i.InfoArea>
-      </:in-progress>
+      </:inProgress>
       <:memorialized as |m|>
         <m.ActionStatusArea>
           Memorialized
@@ -160,7 +161,7 @@
       @onInput={{fn (mut this.stepNumber)}}
     />
     <Args.Yield
-      @name="in-progress"
+      @name="inProgress"
       @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelButton, ActionStatusArea, InfoArea }"
     />
     <Args.Yield
@@ -226,14 +227,14 @@
           Unlock
         </a.ActionButton>
       </:default>
-      <:in-progress as |i|>
+      <:inProgress as |i|>
         <i.ActionButton>
           Unlocking
         </i.ActionButton>
         <i.CancelButton {{on "click" (fn this.changeState "default")}}>
           Cancel
         </i.CancelButton>
-      </:in-progress>
+      </:inProgress>
       <:memorialized as |m|>
         <m.ActionStatusArea>
           Unlocked

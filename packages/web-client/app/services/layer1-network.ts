@@ -2,6 +2,7 @@ import Service from '@ember/service';
 import config from '../config/environment';
 import {
   ClaimBridgedTokensOptions,
+  DepositLimits,
   Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
@@ -45,6 +46,10 @@ export default class Layer1Network
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.nativeTokenSymbol') nativeTokenSymbol: string | undefined;
+  // this is set as part of layer 1 getting connected (prior to the emit of the connect event and setting of the account)
+  @reads('strategy.depositLimits') declare depositLimits:
+    | Record<BridgeableSymbol, DepositLimits>
+    | undefined;
 
   getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN> {
     return this.strategy.getEstimatedGasForWithdrawalClaim(symbol);

@@ -53,24 +53,30 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.equal(animatedWorkflow.milestones[0].model, workflow.milestones[0]);
-    assert.equal(
+    assert.strictEqual(
+      animatedWorkflow.milestones[0].model,
+      workflow.milestones[0]
+    );
+    assert.strictEqual(
       animatedWorkflow.milestones[0].title,
       workflow.milestones[0].title,
       'The animated milestones should have the same title'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.milestones[0].completedDetail,
       workflow.milestones[0].completedDetail,
       'The animated milestones should have the same completedDetail'
     );
-    assert.equal(animatedWorkflow.milestones[1].model, workflow.milestones[1]);
-    assert.equal(
+    assert.strictEqual(
+      animatedWorkflow.milestones[1].model,
+      workflow.milestones[1]
+    );
+    assert.strictEqual(
       animatedWorkflow.milestones[1].title,
       workflow.milestones[1].title,
       'The animated milestones should have the same title'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.milestones[1].completedDetail,
       workflow.milestones[1].completedDetail,
       'The animated milestones should have the same completedDetail'
@@ -89,8 +95,8 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.ok(!workflow.isCanceled, "Workflow isn't canceled at the start");
-    assert.equal(
+    assert.notOk(workflow.isCanceled, "Workflow isn't canceled at the start");
+    assert.strictEqual(
       animatedWorkflow.isCanceled,
       workflow.isCanceled,
       'Value of isCanceled is the same on animated and wrapped workflow'
@@ -99,7 +105,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.cancel('TEST');
 
     assert.ok(workflow.isCanceled, 'workflow is now canceled');
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.isCanceled,
       workflow.isCanceled,
       'Value of isCanceled is the same on animated and wrapped workflow'
@@ -132,28 +138,28 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.equal(animatedWorkflow.completedMilestoneCount, 0);
+    assert.strictEqual(animatedWorkflow.completedMilestoneCount, 0);
 
     target1.onComplete();
     await settled();
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.visibleMilestones[0].visiblePostables.length,
       3
     );
 
     target2.onComplete();
     await settled();
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.visibleMilestones[0].visiblePostables.length,
       3,
       '3 postables should be visible for the first milestone'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.visibleMilestones[1].visiblePostables.length,
       2,
       '2 postables should be visible for the second milestone'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.completedMilestoneCount,
       1,
       '1 milestone is completed'
@@ -161,7 +167,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
 
     target3.onComplete();
     await settled();
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.completedMilestoneCount,
       3,
       '3 milestones are completed'
@@ -195,18 +201,18 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.equal(animatedWorkflow.progressStatus, 'Workflow started');
+    assert.strictEqual(animatedWorkflow.progressStatus, 'Workflow started');
 
     target1.onComplete();
     await settled();
-    assert.equal(animatedWorkflow.progressStatus, 'Milestone 1 finished');
+    assert.strictEqual(animatedWorkflow.progressStatus, 'Milestone 1 finished');
 
     target2.onComplete();
     await settled();
-    assert.equal(animatedWorkflow.progressStatus, 'Milestone 2 finished');
+    assert.strictEqual(animatedWorkflow.progressStatus, 'Milestone 2 finished');
 
     workflow.cancel('TEST');
-    assert.equal(animatedWorkflow.progressStatus, 'Workflow canceled');
+    assert.strictEqual(animatedWorkflow.progressStatus, 'Workflow canceled');
   });
 
   test('It makes cancelationMessages visible after the workflow is canceled', async function (assert) {
@@ -223,7 +229,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.cancelationMessages.visiblePostables.length,
       0
     );
@@ -231,7 +237,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.cancel('TEST');
     await settled();
 
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.cancelationMessages.visiblePostables.length,
       2,
       '2 cancelation messages are made visible after the workflow is canceled'
@@ -253,12 +259,12 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     workflow.attachWorkflow();
     animatedWorkflow = new AnimatedWorkflow(workflow);
 
-    assert.equal(animatedWorkflow.epilogue.visiblePostables.length, 0);
+    assert.strictEqual(animatedWorkflow.epilogue.visiblePostables.length, 0);
 
     target1.onComplete();
     await settled();
 
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.epilogue.visiblePostables.length,
       2,
       '2 epilogue messages are made visible after the workflow is completed'
@@ -291,12 +297,12 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
 
     await settled();
 
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.completedMilestoneCount,
       2,
       'The workflow starts off with 2 completed milestones'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.visibleMilestones[0].visiblePostables.length,
       3,
       'The first milestone has 3 visible postables'
@@ -304,12 +310,12 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
 
     target1.onIncomplete();
 
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.completedMilestoneCount,
       0,
       'After onIncomplete is called on the target, there are no completed milestones'
     );
-    assert.equal(
+    assert.strictEqual(
       animatedWorkflow.visibleMilestones[0].visiblePostables.length,
       2,
       'The first milestone has 2 visible postables'

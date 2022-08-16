@@ -78,8 +78,8 @@ module(
 
       await click(SAVE_BUTTON);
 
-      assert.equal(result!.preview, rotatedAndCroppedImageDataUri);
-      assert.equal(result!.file.type, 'image/png');
+      assert.strictEqual(result!.preview, rotatedAndCroppedImageDataUri);
+      assert.strictEqual(result!.file.type, 'image/png');
     });
 
     test('it throws an error when width and height are not provided', async function (assert) {

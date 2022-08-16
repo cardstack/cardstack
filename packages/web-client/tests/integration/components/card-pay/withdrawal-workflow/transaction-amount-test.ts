@@ -66,14 +66,16 @@ module(
 
       this.setProperties({
         session,
+        onComplete: () => {},
+        onIncomplete: () => {},
       });
 
       renderSubject = async () => {
         await render(hbs`
           <CardPay::WithdrawalWorkflow::TransactionAmount
             @workflowSession={{this.session}}
-            @onComplete={{(noop)}}
-            @onIncomplete={{(noop)}}
+            @onComplete={{this.onComplete}}
+            @onIncomplete={{this.onIncomplete}}
           />
         `);
       };
@@ -278,7 +280,7 @@ module(
         @workflowSession={{this.session}}
         @isComplete={{this.isComplete}}
         @onComplete={{this.onComplete}}
-        @onIncomplete={{noop}}
+        @onIncomplete={{this.onIncomplete}}
       />
     `);
       await fillIn('input', '5');
@@ -298,13 +300,25 @@ module(
         .dom('[data-test-withdrawal-transaction-amount-is-complete]')
         .isVisible();
 
-      assert.ok(session.getValue('withdrawnAmount'));
-      assert.ok(session.getValue('layer2BlockHeightBeforeBridging'));
-      assert.ok(session.getValue('relayTokensTxnHash'));
-      assert.ok(session.getValue('relayTokensTxnReceipt'));
+      assert.ok(
+        session.getValue('withdrawnAmount'),
+        'persisted withdrawnAmount to Session'
+      );
+      assert.ok(
+        session.getValue('layer2BlockHeightBeforeBridging'),
+        'persisted layer2BlockHeightBeforeBridging to Session'
+      );
+      assert.ok(
+        session.getValue('relayTokensTxnHash'),
+        'persisted relayTokensTxnHash to Session'
+      );
+      assert.ok(
+        session.getValue('relayTokensTxnReceipt'),
+        'persisted relayTokensTxnReceipt to Session'
+      );
     });
 
-    test('it resumes the transaction to relay tokens if provied with a transaction hash', async function (assert) {
+    test('it resumes the transaction to relay tokens if provided with a transaction hash', async function (assert) {
       let layer2Service: Layer2Network = this.owner.lookup(
         'service:layer2-network'
       );
@@ -348,13 +362,13 @@ module(
           @workflowSession={{this.session}}
           @isComplete={{this.isComplete}}
           @onComplete={{this.onComplete}}
-          @onIncomplete={{noop}}
+          @onIncomplete={{this.onIncomplete}}
         />
       `);
       await fillIn('input', '5');
       await click('[data-test-withdrawal-transaction-amount] button');
 
-      assert.equal(session.getValue('relayTokensTxnHash'), 'test hash');
+      assert.strictEqual(session.getValue('relayTokensTxnHash'), 'test hash');
 
       receipt.reject(new Error('Test reverted transaction'));
       await settled();

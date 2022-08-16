@@ -64,7 +64,7 @@
             @state={{this.merchantIdInputState}}
             @value={{this.merchantId}}
             @onInput={{this.onMerchantIdInput}}
-            @onBlur={{this.validateMerchantId}}
+            @onBlur={{fn this.validateMerchantId true}}
             @errorMessage={{this.merchantIdValidationMessage}}
             @helperText="This unique ID will also be used as a publicly available tag for payments."
           />

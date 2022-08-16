@@ -10,19 +10,19 @@ module('Integration | Helper | dec', function (hooks) {
     this.set('val', 5);
     this.set('amount', 2);
     await render(hbs`{{dec this.val this.amount}}`);
-    assert.equal(this.element.textContent?.trim(), '3');
+    assert.strictEqual(this.element.textContent?.trim(), '3');
   });
 
   test('five by default (one)', async function (assert) {
     this.set('val', 5);
     await render(hbs`{{dec this.val}}`);
-    assert.equal(this.element.textContent?.trim(), '4');
+    assert.strictEqual(this.element.textContent?.trim(), '4');
   });
 
   test('five by eight', async function (assert) {
     this.set('val', 5);
     this.set('amount', 8);
     await render(hbs`{{dec this.val this.amount}}`);
-    assert.equal(this.element.textContent?.trim(), '-3');
+    assert.strictEqual(this.element.textContent?.trim(), '-3');
   });
 });

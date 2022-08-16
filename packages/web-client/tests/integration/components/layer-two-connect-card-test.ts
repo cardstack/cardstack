@@ -97,7 +97,10 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
-    assert.equal(session.getValue<string>('layer2WalletAddress'), 'address');
+    assert.strictEqual(
+      session.getValue<string>('layer2WalletAddress'),
+      'address'
+    );
   });
 
   test('It should show a loading state if still fetching a depot', async function (assert) {
@@ -123,7 +126,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
 
-    assert.equal(
+    assert.strictEqual(
       session.getValue<string>('layer2WalletAddress'),
       'address-connected'
     );
@@ -136,7 +139,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
     assert
       .dom('[data-test-layer-2-connect-prompt]')
-      .containsText('Install the Card Wallet app on your mobile phone');
+      .containsText('Install the Cardstack Wallet app on your mobile phone');
   });
 
   test('It does not show the connect prompt when workflow is completed and wallet is disconnected', async function (assert) {

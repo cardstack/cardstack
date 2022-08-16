@@ -77,7 +77,7 @@ module(
 
       await click('[data-test-claim-button]');
 
-      assert.equal(session.getValue('claimTokensTxnHash'), 'test hash');
+      assert.strictEqual(session.getValue('claimTokensTxnHash'), 'test hash');
 
       receipt.reject(new Error('Test reverted transaction'));
       await settled();

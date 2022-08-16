@@ -14,9 +14,10 @@ module('Integration | Helper | config', function (hooks) {
     assert.dom('[data-test-container]').containsText(config.environment);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('it errors when an unknown config value is requested', async function (assert) {
     setupOnerror(function (err: Error) {
-      assert.equal(err.message, 'Unknown config property: urls.unknown');
+      assert.strictEqual(err.message, 'Unknown config property: urls.unknown');
     });
 
     render(

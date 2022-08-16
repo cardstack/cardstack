@@ -90,14 +90,14 @@
         {{if this.error "Try Again" "Withdraw"}}
       </d.ActionButton>
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator
           class="withdrawal-transaction-amount__loading-indicator"
           @color="var(--boxel-light)"
         />
         <div data-test-withdrawal-transaction-amount-in-progress class="withdrawal-transaction-amount__loading-message">
-          Waiting for you to confirm on your Card Wallet mobile app...
+          Waiting for you to confirm on your Cardstack Wallet mobile app...
         </div>
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
@@ -107,7 +107,7 @@
           </Boxel::Button>
         </i.InfoArea>
       {{/if}}
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed

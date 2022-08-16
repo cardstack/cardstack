@@ -15,7 +15,7 @@
         >
           {{#if (eq this.error.message "AUTH_TIMEOUT")}}
             <span>
-              Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+              Authentication with Cardstack Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{config 'urls.mailToSupportUrl'}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
             </span>
           {{else}}
             Authentication failed or was canceled.
@@ -37,11 +37,11 @@
           {{on "click" (perform this.authenticationTask)}}
           data-test-authentication-button
         >
-          Authenticate with Card Wallet
+          Authenticate with Cardstack Wallet
         </d.ActionButton>
       {{/if}}
     </:default>
-    <:in-progress as |i|>
+    <:inProgress as |i|>
       <i.ActionStatusArea
         @icon="card-wallet-app-icon"
         style={{css-var status-icon-size="2.5rem"}}
@@ -50,9 +50,9 @@
           class="authentication__loading-indicator"
           @color="var(--boxel-light)"
         />
-        You will receive a confirmation request from the Card Wallet app in a few moments…
+        You will receive a confirmation request from the Cardstack Wallet app in a few moments…
       </i.ActionStatusArea>
-    </:in-progress>
+    </:inProgress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-authentication-memorialized>
         Authenticated with Hub

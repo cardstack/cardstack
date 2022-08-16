@@ -26,6 +26,9 @@ export default class APIRouter {
   merchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
   });
+  profilesRoute = inject('profiles-route', {
+    as: 'profilesRoute',
+  });
   cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
   });
@@ -55,6 +58,7 @@ export default class APIRouter {
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
       merchantInfosRoute,
+      profilesRoute,
       custodialWalletRoute,
       sessionRoute,
       status: statusRoute,
@@ -78,10 +82,19 @@ export default class APIRouter {
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
+
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
     apiSubrouter.get('/merchant-infos/short-id/:id', parseBody, merchantInfosRoute.getFromShortId);
+
+    apiSubrouter.post('/profiles', parseBody, profilesRoute.post);
+    apiSubrouter.get('/profiles/validate-slug/:slug', profilesRoute.getValidation);
+    apiSubrouter.get('/profiles', parseBody, profilesRoute.list);
+    apiSubrouter.get('/profiles/:slug', profilesRoute.get);
+    apiSubrouter.patch('/profiles/:id', parseBody, profilesRoute.patch);
+    apiSubrouter.get('/profiles/short-id/:id', parseBody, profilesRoute.getFromShortId);
+
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);
     apiSubrouter.post('/orders', parseBody, ordersRoute.post);
@@ -92,14 +105,13 @@ export default class APIRouter {
     apiSubrouter.get('/email-card-drop-requests', emailCardDropRequestsRoute.get);
     apiSubrouter.post('/email-card-drop-requests', parseBody, emailCardDropRequestsRoute.post);
 
+    apiSubrouter.get('/job-tickets', jobTicketsRoute.list);
     apiSubrouter.get('/job-tickets/:id', jobTicketsRoute.get);
     apiSubrouter.post('/job-tickets/:id/retry', jobTicketsRoute.retry);
 
     apiSubrouter.post('/profile-purchases', parseBody, this.profilePurchasesRoute.post);
 
     apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
-    apiSubrouter.patch('/card-spaces/:id', parseBody, cardSpacesRoute.patch);
-    apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
 
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);
     apiSubrouter.delete(

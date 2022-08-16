@@ -18,7 +18,7 @@ const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your payment profile. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the $1.00 USD payment profile creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the $1.00 USD payment profile creation fee. Please try another prepaid card, or buy one in Cardstack Wallet.`;
 const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your payment profile. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
@@ -224,10 +224,10 @@ module(
           prepaidCardAddress
         )
       );
-      assert.equal(
-        layer2Service.test__getNonceForRegisterMerchantRequest(
-          prepaidCardAddress
-        ),
+      assert.strictEqual(
+        layer2Service
+          .test__getNonceForRegisterMerchantRequest(prepaidCardAddress)
+          ?.toString(),
         '12345',
         'The same nonce as was used for the first attempt is sent for the second'
       );
@@ -285,8 +285,8 @@ module(
         this.set('frozen', true);
         assert.dom('[data-test-create-merchant-button]').isDisabled();
 
-        assert.equal(workflow.isCanceled, true);
-        assert.equal(workflow.cancelationReason, 'UNAUTHENTICATED');
+        assert.true(workflow.isCanceled);
+        assert.strictEqual(workflow.cancelationReason, 'UNAUTHENTICATED');
       });
 
       test('it shows the correct error message for a user rejection', async function (assert) {
@@ -344,7 +344,7 @@ module(
           req.url.includes('merchant-infos')
         );
 
-        assert.equal(
+        assert.strictEqual(
           merchantInfoStorageRequests.length,
           1,
           'expected only one POST /api/merchant-infos'

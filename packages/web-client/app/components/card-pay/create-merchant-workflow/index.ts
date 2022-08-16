@@ -74,7 +74,7 @@ class CreateMerchantWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowMessage({
-          message: `To get started, connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
+          message: `To get started, connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -147,7 +147,7 @@ class CreateMerchantWorkflow extends Workflow {
       },
       postables: [
         new NetworkAwareWorkflowMessage({
-          message: `To store data in the Cardstack Hub, you need to authenticate using your Card Wallet.
+          message: `To store data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet.
           You only need to do this once per browser/device.`,
           includeIf() {
             return !this.isHubAuthenticated;
@@ -217,7 +217,7 @@ class CreateMerchantWorkflow extends Workflow {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
@@ -230,7 +230,7 @@ class CreateMerchantWorkflow extends Workflow {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -255,12 +255,12 @@ class CreateMerchantWorkflow extends Workflow {
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.',
     }),
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
-        'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but your Cardstack Wallet got disconnected. Please restart the workflow.',
     }),
 
     new WorkflowCard({

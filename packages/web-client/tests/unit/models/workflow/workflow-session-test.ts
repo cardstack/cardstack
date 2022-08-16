@@ -57,7 +57,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<string>('myKey'), 'myValue');
+    assert.strictEqual(subject.getValue<string>('myKey'), 'myValue');
   });
 
   test('get un-set string value', function (assert) {
@@ -73,7 +73,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<string>('myKey'), null);
+    assert.strictEqual(subject.getValue<string>('myKey'), null);
   });
 
   test('set string value', function (assert) {
@@ -98,13 +98,12 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', 'myValue');
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(subject.getValue<string>('myKey'), 'myValue');
+    assert.strictEqual(subject.getValue<string>('myKey'), 'myValue');
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
@@ -139,13 +138,15 @@ module('Unit | WorkflowSession model', function (hooks) {
     let s: string | undefined;
     subject.setValue('myKey', s);
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(subject.getValue<string | undefined>('myKey'), null);
+    assert.strictEqual(
+      subject.getValue<string | undefined>('myKey'),
+      undefined
+    );
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
@@ -172,7 +173,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<number>('myKey'), 42);
+    assert.strictEqual(subject.getValue<number>('myKey'), 42);
   });
 
   test('get un-set number value', function (assert) {
@@ -188,7 +189,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<number>('myKey'), null);
+    assert.strictEqual(subject.getValue<number>('myKey'), null);
   });
 
   test('set number value', function (assert) {
@@ -213,13 +214,12 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', 42);
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(subject.getValue<number>('myKey'), 42);
+    assert.strictEqual(subject.getValue<number>('myKey'), 42);
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
@@ -257,14 +257,13 @@ module('Unit | WorkflowSession model', function (hooks) {
       myStringKey: 'myValue',
     });
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(subject.getValue<number>('myNumberKey'), 42);
-    assert.equal(subject.getValue<string>('myStringKey'), 'myValue');
+    assert.strictEqual(subject.getValue<number>('myNumberKey'), 42);
+    assert.strictEqual(subject.getValue<string>('myStringKey'), 'myValue');
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
@@ -317,19 +316,19 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.state.myNumberKey, 42);
-    assert.equal(subject.state.myStringKey, 'myValue');
-    assert.ok(subject.state.noSuchKey === undefined);
+    assert.strictEqual(subject.state.myNumberKey, 42);
+    assert.strictEqual(subject.state.myStringKey, 'myValue');
+    assert.strictEqual(subject.state.noSuchKey, undefined);
     assert.ok(new BN('42').eq(subject.state.myBNKey as BN));
 
     subject.state.myNumberKey = 43;
 
-    assert.equal(subject.state.myNumberKey, 43);
-    assert.equal(subject.getValue<number>('myNumberKey'), 43);
+    assert.strictEqual(subject.state.myNumberKey, 43);
+    assert.strictEqual(subject.getValue<number>('myNumberKey'), 43);
 
     delete subject.state.myNumberKey;
 
-    assert.ok(subject.state.myNumberKey === undefined);
+    assert.strictEqual(subject.state.myNumberKey, undefined);
     assert.deepEqual(Object.keys(subject.state), [
       'myStringKey',
       'myBNKey',
@@ -352,7 +351,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<boolean>('myKey'), false);
+    assert.false(subject.getValue<boolean>('myKey'));
   });
 
   test('get un-set boolean value', function (assert) {
@@ -368,7 +367,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<boolean>('myKey'), null);
+    assert.strictEqual(subject.getValue<boolean>('myKey'), null);
   });
 
   test('set boolean value', function (assert) {
@@ -393,13 +392,12 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', false);
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(subject.getValue<boolean>('myKey'), false);
+    assert.false(subject.getValue<boolean>('myKey'));
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
@@ -445,7 +443,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<BN>('myKey'), null);
+    assert.strictEqual(subject.getValue<BN>('myKey'), null);
   });
 
   test('set BigNumber value', function (assert) {
@@ -470,9 +468,8 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', new BN(42));
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
@@ -506,7 +503,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(
+    assert.strictEqual(
       subject.getValue<Date>('myKey')?.getTime(),
       Date.UTC(2020, 8, 22, 20, 50, 18, 491),
       'returns correct Date'
@@ -526,7 +523,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     subject.restoreFromStorage();
-    assert.equal(subject.getValue<Date>('myKey'), null);
+    assert.strictEqual(subject.getValue<Date>('myKey'), null);
   });
 
   test('set Date value', function (assert) {
@@ -551,13 +548,12 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', new Date(Date.UTC(2020, 8, 22, 20, 50, 18, 491)));
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
-    assert.equal(
+    assert.strictEqual(
       subject.getValue<Date>('myKey')?.getTime(),
       Date.UTC(2020, 8, 22, 20, 50, 18, 491),
       'returns correct Date'
@@ -595,9 +591,8 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', ['a', 'b', 'c']);
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property is set'
     );
 
@@ -635,9 +630,8 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setValue('myKey', { a: 'A', b: 'B', c: 'C' });
 
-    assert.strictEqual(
+    assert.false(
       validateTag(tag, snapshot),
-      false,
       'tag is invalidated after property   is set'
     );
 
@@ -725,7 +719,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       ['mock-card-1'],
       'The initially set completedCardNames property was not overwritten'
     );
-    assert.equal(
+    assert.strictEqual(
       subject.getMeta().completedMilestonesCount,
       2,
       'The completedMilestonesCount property has the correct value'
@@ -768,14 +762,14 @@ module('Unit | WorkflowSession model', function (hooks) {
       workflowPersistenceId: ID,
     } as Workflow);
     let initialMeta = subject.getMeta();
-    assert.equal(
+    assert.strictEqual(
       initialMeta?.createdAt,
-      null,
+      undefined,
       'There is no created date when session is instantiated'
     );
-    assert.equal(
+    assert.strictEqual(
       initialMeta?.updatedAt,
-      null,
+      undefined,
       'There is no updated date when session is instantiated'
     );
 
@@ -783,12 +777,12 @@ module('Unit | WorkflowSession model', function (hooks) {
     subject.setValue('arbitrary-key', 'arbitrary-value');
 
     let updatedMeta = subject.getMeta();
-    assert.equal(
+    assert.strictEqual(
       updatedMeta.createdAt,
       startDateString,
       `Created date has the appropriate ISO date string: ${updatedMeta.createdAt}`
     );
-    assert.equal(
+    assert.strictEqual(
       updatedMeta.updatedAt,
       startDateString,
       `Updated date has the appropriate ISO date string: ${updatedMeta.updatedAt}`
@@ -818,12 +812,12 @@ module('Unit | WorkflowSession model', function (hooks) {
     subject.setValue('arbitrary-key-2', 'arbitrary-value-2');
 
     let meta = subject.getMeta();
-    assert.equal(
+    assert.strictEqual(
       meta.createdAt,
       startDateString,
       `Created date has the start ISO date string: ${startDateString}`
     );
-    assert.equal(
+    assert.strictEqual(
       meta.updatedAt,
       updatedDateString,
       `Updated date has an updated ISO date string: ${updatedDateString}`
@@ -844,6 +838,6 @@ module('Unit | WorkflowSession model', function (hooks) {
     } as Workflow);
     subject.setMeta({});
 
-    assert.equal(subject.getMeta().version, 2);
+    assert.strictEqual(subject.getMeta().version, 2);
   });
 });

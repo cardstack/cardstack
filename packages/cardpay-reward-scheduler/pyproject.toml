@@ -1,5 +1,5 @@
 [project]
-name = ""
+name = "cardpay-reward-scheduler"
 version = ""
 description = ""
 authors = [
@@ -16,9 +16,9 @@ dependencies = [
     "python-dotenv>=0.20.0",
     "schedule>=1.1.0",
     "duckdb>=0.3.4",
-    "rusty-rlp>=0.2.1",
     "typer>=0.6.1",
     "docker>=5.0.3",
+    "python-did-resolver>=0.0.3",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -44,3 +44,6 @@ dev = [
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
+
+[tool.pdm.scripts]
+resolver = "python -m reward_scheduler.main"

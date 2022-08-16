@@ -23,11 +23,15 @@ runs:
       run: |
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
+        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }} jq
         yarn add hcl2-parser @actions/core -W --prefer-offline
 
-    - name: Deploy reward submitter
-      run: waypoint up -app=reward-submit -prune-retain=0 -plain
+    - name: Build reward submitter
+      run: waypoint build -app=reward-submit-lambda
+      shell: bash
+      
+    - name: Update reward submitter
+      run: aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri') && time aws lambda wait function-updated --function-name reward_root_submitter
       shell: bash
 
     - name: Prune dangling resources

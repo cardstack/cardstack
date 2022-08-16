@@ -9,10 +9,10 @@ import CardSpaceService from '@cardstack/ssr-web/services/card-space';
 import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import UA from '@cardstack/ssr-web/services/ua';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
-import * as Sentry from '@sentry/browser';
 import { PaymentLinkMode } from '../../common/payment-link';
 import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
 import CardSpaceLogo from '../../../images/logos/card-space-logo-with-background.png';
+import { getSentry } from '@cardstack/ssr-web/utils/sentry';
 
 interface CardSpaceUserPageArgs {
   model: {
@@ -34,6 +34,7 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
   @tracked address: string | null = null;
   @tracked addressFetchingError: string | null = null;
   @service declare subgraph: Subgraph;
+  sentry = getSentry();
   cardstackLogoForQR = CardstackLogoForQR;
   defaultAddressFetchingErrorMsg =
     'We ran into an issue while generating the payment request link. Please reload the page and try again. If the issue persists, please contact support.';
@@ -76,14 +77,16 @@ export default class CardSpaceUserPage extends Component<CardSpaceUserPageArgs> 
       address = queryResult?.data?.merchantSafes[0]?.id;
     } catch (e) {
       this.addressFetchingError = this.defaultAddressFetchingErrorMsg;
-      Sentry.captureException(e);
+      this.sentry.captureException(e);
     }
 
     if (address) {
       this.address = address;
     } else {
       this.addressFetchingError = this.defaultAddressFetchingErrorMsg;
-      Sentry.captureException(`Unable to find merchant address for ${did}`);
+      this.sentry.captureException(
+        `Unable to find merchant address for ${did}`
+      );
     }
   }
 

@@ -60,7 +60,7 @@ module('@core | compiler-adoption', function (hooks) {
       let compiled = await builder.getCompiledCard(cardURL(card));
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
-      assert.equal(
+      assert.strictEqual(
         compiled.componentInfos.embedded.componentModule,
         parentCard.componentInfos.embedded.componentModule,
         'It reports the module name for the template that it adopts'
@@ -119,7 +119,7 @@ module('@core | compiler-adoption', function (hooks) {
       try {
         await builder.getCompiledCard(cardURL(card));
       } catch (err) {
-        assert.equal(
+        assert.strictEqual(
           err.message,
           `Field collision on birthdate with parent card ${LOCAL_REALM}person`
         );
@@ -167,7 +167,7 @@ module('@core | compiler-adoption', function (hooks) {
       try {
         await builder.getCompiledCard(cardURL(card));
       } catch (err) {
-        assert.equal(
+        assert.strictEqual(
           err.message,
           `Field collision on name with parent card ${LOCAL_REALM}user`
         );

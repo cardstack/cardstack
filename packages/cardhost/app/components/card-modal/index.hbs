@@ -20,7 +20,7 @@
           <state.component />
         </:default>
 
-        <:action-chin>
+        <:actionChin>
           {{#if (eq state.loadedCard.format 'edit') }}
             <Boxel::Button
               {{on "click" this.modal.close}}
@@ -39,7 +39,7 @@
               Save
             </Boxel::Button>
           {{/if}}
-        </:action-chin>
+        </:actionChin>
       </CardContainer>
     {{/if}}
   {{/let}}

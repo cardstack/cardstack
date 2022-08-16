@@ -85,10 +85,11 @@ module('Acceptance | create merchant', function (hooks) {
       .strategy.fetchMerchantRegistrationFee();
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
     await click('[data-test-card-pay-header-tab][href="/card-pay/payments"]');
-    assert.equal(currentURL(), '/card-pay/payments');
+    assert.strictEqual(currentURL(), '/card-pay/payments');
 
     await click('[data-test-workflow-button="create-business"]');
 
@@ -150,7 +151,7 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom(post)
       .containsText(
-        'To store data in the Cardstack Hub, you need to authenticate using your Card Wallet'
+        'To store data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet'
       );
     post = postableSel(1, 1);
 
@@ -291,7 +292,7 @@ module('Acceptance | create merchant', function (hooks) {
       const flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
@@ -404,7 +405,7 @@ module('Acceptance | create merchant', function (hooks) {
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
@@ -437,7 +438,7 @@ module('Acceptance | create merchant', function (hooks) {
       flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
         'flow-id'
       );
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
@@ -460,7 +461,7 @@ module('Acceptance | create merchant', function (hooks) {
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
@@ -505,7 +506,7 @@ module('Acceptance | create merchant', function (hooks) {
       flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
         'flow-id'
       );
-      assert.equal(
+      assert.strictEqual(
         currentURL(),
         `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
@@ -578,7 +579,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
@@ -618,7 +619,7 @@ module('Acceptance | create merchant', function (hooks) {
         `It looks like you don’t have a prepaid card with enough funds to pay the ${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )} payment profile creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )} payment profile creation fee. Please buy a prepaid card in your Cardstack Wallet mobile app before you continue with this workflow.`
       );
     assert
       .dom('[data-test-workflow-default-cancelation-cta="create-business"]')

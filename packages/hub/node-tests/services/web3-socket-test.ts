@@ -87,7 +87,7 @@ describe('Web3Socket', function () {
     let sentryReports = await waitForSentryReports(150000);
 
     let testCaseReport = sentryReports.find(
-      (v) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing'
+      (v: any) => (v?.originalReport?.extra?.__serialized__ as any).reason === 'Testing'
     )!;
     expect(testCaseReport?.extra?.__serialized__).to.deep.equal({
       code: 1000,

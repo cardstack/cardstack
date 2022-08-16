@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "packages/did-resolver/**"
+      - 'packages/python-did-resolver/**'
       - "packages/test-support/**"
       - "packages/eslint-config/**"
       - ".github/workflows/pr-did-resolver.yml"

@@ -10,12 +10,12 @@ module('Acceptance | accessibility', function (hooks) {
 
   test('accessibility check', async function (assert) {
     await visit('/');
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
     await a11yAudit();
     assert.ok(true, 'no a11y errors found on cardstack orgs landing page');
 
     await visit('/card-pay');
-    assert.equal(currentURL(), '/card-pay/wallet');
+    assert.strictEqual(currentURL(), '/card-pay/wallet');
     await a11yAudit();
     assert.ok(true, 'no a11y errors found on /card-pay/wallet ');
   });

@@ -42,10 +42,10 @@ export default class CreateProfile {
     let prisma = await this.prismaManager.getClient();
 
     try {
-      let merchantInfo = await prisma.merchantInfo.findUnique({ where: { id: merchantInfoId } });
+      let profile = await prisma.profile.findUnique({ where: { id: merchantInfoId } });
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfoId });
 
-      let profileRegistrationTxHash = await this.relay.registerProfile(merchantInfo!.ownerAddress, did);
+      let profileRegistrationTxHash = await this.relay.registerProfile(profile!.ownerAddress, did);
 
       await this.cardpay.waitForTransactionConsistency(this.web3.getInstance(), profileRegistrationTxHash);
 
