@@ -12,6 +12,7 @@ module.exports = {
       bucketName: 'storage.cardstack.com',
       region: 'ap-southeast-1',
       roleChain: ['prod:storage-bucket-writer-role', 'prod:cloudfront-distribution-invalidator-role'],
+      cloudfrontDistributionId: 'PLACEHOLDERFIXME',
     },
     ses: {
       supportEmail: 'no-reply@stack.cards',
