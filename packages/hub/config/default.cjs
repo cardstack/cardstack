@@ -11,7 +11,7 @@ module.exports = {
     offchainStorage: {
       bucketName: 'storage.cardstack.com',
       region: 'ap-southeast-1',
-      roleChain: ['prod:storage-bucket-writer-role'],
+      roleChain: ['prod:storage-bucket-writer-role', 'prod:cloudfront-distribution-invalidator-role'],
     },
     ses: {
       supportEmail: 'no-reply@stack.cards',

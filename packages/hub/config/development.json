@@ -1,7 +1,7 @@
 {
   "aws": {
     "offchainStorage": {
-      "roleChain": ["hub-local-dev", "prod:storage-bucket-writer-role"]
+      "roleChain": ["hub-local-dev", "prod:storage-bucket-writer-role", "prod:cloudfront-distribution-invalidator-role"]
     }
   },
   "cardDrop": {
