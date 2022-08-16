@@ -13,7 +13,7 @@ module('Integration | Helper | dayjs-from', function (hooks) {
     this.set('date', dayjs().add(3, 'day'));
 
     await render(hbs`{{dayjs-from this.date}}`);
-    assert.equal(this.element.textContent.trim(), 'in 3 days');
+    assert.strictEqual(this.element.textContent.trim(), 'in 3 days');
   });
 
   test('two args (dateA, dateB)', async function (assert) {
@@ -23,7 +23,7 @@ module('Integration | Helper | dayjs-from', function (hooks) {
     });
 
     await render(hbs`{{dayjs-from this.dateB this.dateA}}`);
-    assert.equal(this.element.textContent.trim(), 'in 3 days');
+    assert.strictEqual(this.element.textContent.trim(), 'in 3 days');
   });
 
   test('two args (dateA, dateB, withoutSuffix=boolean)', async function (assert) {
@@ -33,9 +33,9 @@ module('Integration | Helper | dayjs-from', function (hooks) {
     });
 
     await render(hbs`{{dayjs-from this.dateB this.dateA withoutSuffix=true}}`);
-    assert.equal(this.element.textContent.trim(), '3 days');
+    assert.strictEqual(this.element.textContent.trim(), '3 days');
     await render(hbs`{{dayjs-from this.dateB this.dateA withoutSuffix=false}}`);
-    assert.equal(this.element.textContent.trim(), 'in 3 days');
+    assert.strictEqual(this.element.textContent.trim(), 'in 3 days');
   });
 
   test('three args (dateA, dateB, boolean)', async function (assert) {
@@ -45,6 +45,6 @@ module('Integration | Helper | dayjs-from', function (hooks) {
     });
 
     await render(hbs`{{dayjs-from this.dateA this.dateB true}}`);
-    assert.equal(this.element.textContent.trim(), '3 days');
+    assert.strictEqual(this.element.textContent.trim(), '3 days');
   });
 });

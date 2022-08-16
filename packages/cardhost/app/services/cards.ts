@@ -277,6 +277,15 @@ export default class Cards extends Service implements CardService {
       // module was built by our Builder, so ask Builder for it
       let builder = await this.builder();
       return await builder.loadModule(moduleIdentifier);
+    } else if (
+      [
+        '@ember/template-factory',
+        '@ember/component',
+        '@ember/component/template-only',
+        '@glimmer/component',
+      ].includes(moduleIdentifier)
+    ) {
+      return window.require(moduleIdentifier);
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`

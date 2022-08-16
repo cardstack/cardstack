@@ -47,10 +47,8 @@ import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
 import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
-import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoService from './services/merchant-info';
-import CardSpaceSerializer from './services/serializers/card-space-serializer';
-import CardSpaceValidator from './services/validators/card-space';
+import ProfileValidator from './services/validators/profile';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
@@ -83,7 +81,6 @@ import ChecklyWebhookRoute from './routes/checkly-webhook';
 import PagerdutyIncidentsWebhookRoute from './routes/pagerduty-incidents-webhook';
 import { KnownRoutes, registerRoutes } from '@cardstack/hub/routes';
 import { registerServices } from '@cardstack/hub/services';
-import { registerQueries } from './queries';
 import EmailCardDropRouter from './services/email-card-drop-router';
 import EmailCardDropRequestsRoute from './routes/email-card-drop-requests';
 import EmailCardDropRequestSerializer from './services/serializers/email-card-drop-request-serializer';
@@ -91,6 +88,8 @@ import InAppPurchases from './services/in-app-purchases';
 import JobTicketsRoute from './routes/job-tickets';
 import JobTicketSerializer from './services/serializers/job-ticket-serializer';
 import ProfilePurchasesRoute from './routes/profile-purchases';
+import ProfilesRoute from './routes/profiles';
+import ProfileSerializer from './services/serializers/profile-serializer';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
 import PrismaManager from './services/prisma-manager';
@@ -128,7 +127,6 @@ export function createRegistry(): Registry {
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
-  registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info', MerchantInfoService);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('email', Email);
@@ -141,14 +139,15 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
-  registry.register('card-space-serializer', CardSpaceSerializer);
   registry.register('email-card-drop-request-serializer', EmailCardDropRequestSerializer);
-  registry.register('card-space-validator', CardSpaceValidator);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('job-tickets-route', JobTicketsRoute);
   registry.register('job-ticket-serializer', JobTicketSerializer);
   registry.register('profile-purchases-route', ProfilePurchasesRoute);
+  registry.register('profiles-route', ProfilesRoute);
+  registry.register('profile-serializer', ProfileSerializer);
+  registry.register('profile-validator', ProfileValidator);
   registry.register('push-notification-registrations-route', PushNotificationRegistrationsRoute);
   registry.register('push-notification-registration-serializer', PushNotificationRegistrationSerializer);
   registry.register('firebase-push-notifications', FirebasePushNotifications);
@@ -187,7 +186,6 @@ export function createRegistry(): Registry {
 
   registerServices(registry);
   registerRoutes(registry);
-  registerQueries(registry);
 
   return registry;
 }

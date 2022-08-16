@@ -47,6 +47,10 @@ function fixFieldsArrayString(fields: string) {
 }
 
 async function fixPrismaFile() {
+  if (!fs.existsSync(PRISMA_FILE_PATH)) {
+    console.error('Skipping Prisma schema transformation because file does not exist');
+  }
+
   const text = await fs.promises.readFile(PRISMA_FILE_PATH, 'utf8');
 
   const textAsArray = text.split('\n');
@@ -117,11 +121,17 @@ async function fixPrismaFile() {
         fixedFieldName = pluralize.plural(fixedFieldName);
       }
 
+      // In a belongs-to relation, the property should be singular
+      if (!isArrayType && pluralize.isPlural(fixedFieldName) && !isPrimitiveType(currentFieldType)) {
+        fixedFieldName = pluralize.singular(fixedFieldName);
+      }
+
       fixedLine = fixedLine.replace(currentFieldName, fixedFieldName);
 
       // Add map if we needed to convert the field name and the field is not a relational type
       // If it's relational, the field type will be a non-primitive, hence the isPrimitiveType check
-      if (currentFieldName.includes('_') && isPrimitiveType(currentFieldType)) {
+      // If it’s an enum, it’s not a true relation and needs mapping
+      if (currentFieldName.includes('_') && (isPrimitiveType(currentFieldType) || currentFieldType.endsWith('enum'))) {
         fixedLine = `${fixedLine} @map("${currentFieldName}")`;
       }
     }
@@ -159,5 +169,3 @@ async function fixPrismaFile() {
   const textToWrite = fixedText.join('\n').replace(/\n\n\n/g, '\n\n');
   await fs.promises.writeFile(PRISMA_FILE_PATH, textToWrite);
 }
-
-fixPrismaFile();

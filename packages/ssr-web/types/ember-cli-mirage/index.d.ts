@@ -29,10 +29,9 @@ export type Data<K extends keyof Registry> = Partial<ModelInitializer<Init<K>>>;
  * Result of `server.create('modelName', params);`
  * (with undefined/null props removed)
  */
-export type Instantiated<I, D> = I &
-  {
-    [K in keyof I & keyof D]: Exclude<I[K], undefined | null>;
-  };
+export type Instantiated<I, D> = I & {
+  [K in keyof I & keyof D]: Exclude<I[K], undefined | null>;
+};
 
 type ModelInitializer<Data> = {
   [K in keyof Data]: Data[K] extends Collection<infer M>

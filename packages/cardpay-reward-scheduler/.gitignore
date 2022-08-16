@@ -1,0 +1,10 @@
+.env
+.pytest_cache
+*.pyc
+.cache
+__pycache__
+__pypackages__
+.pdm.toml
+.hypothesis
+.mypy_cache
+.venv

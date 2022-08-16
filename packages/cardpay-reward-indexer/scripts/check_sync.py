@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-
 import os
 
-import boto3
 import pyarrow.parquet as pq
 import sqlalchemy.orm
 from boto3.session import Session
@@ -41,13 +38,13 @@ def check_sync(db_string: str, env: str):
         n_row = pq.read_metadata(output["file"]).num_rows
         proof_count = proof_count + n_row
 
-    print(f"=======IN S3=========")
+    print("=======IN S3=========")
     print(f"Number of Roots:  {root_count}")
     print(f"Number of Proofs: {proof_count}")
-    print(f"=======IN DB=========")
+    print("=======IN DB=========")
     print(f"Number of Roots:  {db_root_count}")
     print(f"Number of Proofs: {db_proof_count}")
-    print(f"=======DIFF=========")
+    print("=======DIFF=========")
     print(f"Number of Roots:  {root_count-db_root_count}")
     print(f"Number of Proofs: {proof_count-db_proof_count}")
 

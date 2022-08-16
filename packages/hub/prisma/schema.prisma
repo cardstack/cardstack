@@ -21,18 +21,6 @@ model CardDropRecipient {
   @@map("card_drop_recipients")
 }
 
-model CardSpace {
-  id                 String       @id @db.Uuid
-  profileImageUrl    String?      @map("profile_image_url")
-  profileDescription String?      @map("profile_description")
-  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
-  links              Json[]       @default([]) @db.Json
-  merchantId         String       @unique(map: "card_spaces_merchant_id_unique_index") @map("merchant_id") @db.Uuid
-  merchantInfos      MerchantInfo @relation(fields: [merchantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@map("card_spaces")
-}
-
 model Card {
   url            String   @id
   data           Json?
@@ -126,26 +114,13 @@ model LatestEventBlock {
   @@map("latest_event_block")
 }
 
-model MerchantInfo {
-  id           String     @id @db.Uuid
-  name         String
-  slug         String     @unique(map: "merchant_infos_slug_unique_index")
-  color        String
-  textColor    String     @map("text_color")
-  ownerAddress String     @map("owner_address")
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
-  cardSpaces   CardSpace?
-
-  @@map("merchant_infos")
-}
-
 model NotificationPreference {
   ownerAddress       String                            @map("owner_address")
   notificationTypeId String                            @map("notification_type_id") @db.Uuid
   pushClientId       String                            @map("push_client_id")
   status             NotificationPreferencesStatusEnum @default(enabled)
   createdAt          DateTime                          @default(now()) @map("created_at") @db.Timestamp(6)
-  notificationTypes  NotificationType                  @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  notificationType   NotificationType                  @relation(fields: [notificationTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([ownerAddress, notificationTypeId, pushClientId], map: "notification_preferences_owner_address_notification_type_id_pus")
   @@index([ownerAddress], map: "notification_preferences_owner_address_index")
@@ -155,7 +130,7 @@ model NotificationPreference {
 model NotificationType {
   id                      String                      @id @db.Uuid
   notificationType        String                      @map("notification_type")
-  defaultStatus           NotificationTypesStatusEnum @default(enabled)
+  defaultStatus           NotificationTypesStatusEnum @default(enabled) @map("default_status")
   createdAt               DateTime                    @default(now()) @map("created_at") @db.Timestamp(6)
   notificationPreferences NotificationPreference[]
 
@@ -174,14 +149,14 @@ model PrepaidCardColorScheme {
 }
 
 model PrepaidCardCustomization {
-  id                      String                 @id @db.Uuid
-  ownerAddress            String                 @map("owner_address")
-  issuerName              String                 @map("issuer_name")
-  colorSchemeId           String                 @map("color_scheme_id") @db.Uuid
-  patternId               String                 @map("pattern_id") @db.Uuid
-  createdAt               DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
-  prepaidCardColorSchemes PrepaidCardColorScheme @relation(fields: [colorSchemeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  prepaidCardPatterns     PrepaidCardPattern     @relation(fields: [patternId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                     String                 @id @db.Uuid
+  ownerAddress           String                 @map("owner_address")
+  issuerName             String                 @map("issuer_name")
+  colorSchemeId          String                 @map("color_scheme_id") @db.Uuid
+  patternId              String                 @map("pattern_id") @db.Uuid
+  createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
+  prepaidCardColorScheme PrepaidCardColorScheme @relation(fields: [colorSchemeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  prepaidCardPattern     PrepaidCardPattern     @relation(fields: [patternId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("prepaid_card_customizations")
 }
@@ -267,7 +242,7 @@ model WalletOrder {
   createdAt           DateTime               @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime               @default(now()) @map("updated_at") @db.Timestamp(6)
   reservationId       String?                @map("reservation_id") @db.Uuid
-  reservations        Reservation?           @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
+  reservation         Reservation?           @relation(fields: [reservationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservation_id")
 
   @@index([custodialTransferId, status], map: "wallet_orders_custodial_transfer_id_status_index")
   @@index([reservationId], map: "wallet_orders_reservation_id_index")
@@ -285,6 +260,21 @@ model WyrePrice {
 
   @@index([disabled], map: "wyre_prices_disabled_index")
   @@map("wyre_prices")
+}
+
+model Profile {
+  id                 String   @id @db.Uuid
+  name               String
+  slug               String   @unique(map: "profiles_slug_unique_index")
+  color              String
+  textColor          String   @map("text_color")
+  ownerAddress       String   @map("owner_address")
+  links              Json[]   @default([]) @db.Json
+  profileImageUrl    String?  @map("profile_image_url")
+  profileDescription String?  @map("profile_description")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("profiles")
 }
 
 enum DiscordBotsStatusEnum {

@@ -1,6 +1,5 @@
 from hypothesis import given
-from hypothesis.strategies import integers, lists, sampled_from
-
+from hypothesis.strategies import integers, lists
 from reward_scheduler.utils import get_partition_iterator
 
 

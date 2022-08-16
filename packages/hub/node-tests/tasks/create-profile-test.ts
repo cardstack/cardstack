@@ -14,7 +14,7 @@ import { ExtendedPrismaClient } from '../../services/prisma-manager';
 let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
 
 let exampleEthereumAddress = '0x323B2318F35c6b31113342830204335Dac715AA8';
-let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfoQueries, merchantInfosId: string;
+let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfosId: string;
 
 describe('CreateProfileTask', function () {
   let subject: CreateProfile;
@@ -99,15 +99,16 @@ describe('CreateProfileTask', function () {
       },
     });
 
-    merchantInfoQueries = await getContainer().lookup('merchant-info', { type: 'query' });
     merchantInfosId = shortUUID.uuid();
-    await merchantInfoQueries.insert({
-      id: merchantInfosId,
-      ownerAddress: exampleEthereumAddress,
-      name: '',
-      slug: '',
-      color: '',
-      textColor: '',
+    await prisma.profile.create({
+      data: {
+        id: merchantInfosId,
+        ownerAddress: exampleEthereumAddress,
+        name: '',
+        slug: '',
+        color: '',
+        textColor: '',
+      },
     });
 
     did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfosId });

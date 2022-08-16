@@ -17,6 +17,19 @@ export default class JobTicketsRoute {
     autoBind(this);
   }
 
+  async list(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let prisma = await this.prismaManager.getClient();
+    let jobTickets = await prisma.jobTicket.findMany({ where: { ownerAddress: ctx.state.userAddress } });
+
+    ctx.body = this.jobTicketSerializer.serialize(jobTickets);
+    ctx.type = 'application/vnd.api+json';
+    ctx.status = 200;
+  }
+
   async get(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;

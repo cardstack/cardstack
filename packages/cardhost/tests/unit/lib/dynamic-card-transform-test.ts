@@ -16,9 +16,9 @@ module('Unit | Lib | dynamic-card-transform', function () {
       'dynamic-component',
       COMPILED_TEMPLATE_COMPONENT
     );
-    assert.equal(
+    assert.strictEqual(
       result,
-      'define("dynamic-component", ["exports"], function (_exports) {\n  "use strict";\n\n  Object.defineProperty(_exports, "__esModule", {\n    value: true\n  });\n  _exports.default = void 0;\n\n  var _default = Ember._setComponentTemplate(Ember.HTMLBars.template(\n  /*\n    <h1>{{@model.title}}</h1>\n  */\n  {\n    "id": null,\n    "block": "[[[10,\\"h1\\"],[12],[1,[30,1,[\\"title\\"]]],[13]],[\\"@model\\"],false,[]]",\n    "moduleName": "(unknown template module)",\n    "isStrictMode": true\n  }), Ember._templateOnlyComponent());\n\n  _exports.default = _default;\n});'
+      'define("dynamic-component", ["exports", "@ember/template-factory", "@ember/component", "@ember/component/template-only"], function (_exports, _templateFactory, _component, _templateOnly) {\n  "use strict";\n\n  Object.defineProperty(_exports, "__esModule", {\n    value: true\n  });\n  _exports.default = void 0;\n\n  var _default = (0, _component.setComponentTemplate)((0, _templateFactory.createTemplateFactory)(\n  /*\n    <h1>{{@model.title}}</h1>\n  */\n  {\n    "id": null,\n    "block": "[[[10,\\"h1\\"],[12],[1,[30,1,[\\"title\\"]]],[13]],[\\"@model\\"],false,[]]",\n    "moduleName": "(unknown template module)",\n    "isStrictMode": true\n  }), (0, _templateOnly.default)());\n\n  _exports.default = _default;\n});'
     );
   });
 });

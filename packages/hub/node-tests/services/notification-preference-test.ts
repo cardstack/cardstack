@@ -1,26 +1,27 @@
-import { PrismaClient } from '@prisma/client';
+import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { setupHub } from '../helpers/server';
 
 describe('NotificationPreferenceService', function () {
   let { getPrisma, lookup } = setupHub(this);
-  let prisma: PrismaClient;
+  let prisma: ExtendedPrismaClient;
 
   this.beforeEach(async function () {
     prisma = await getPrisma();
 
-    let dbManager = await lookup('database-manager');
-    let db = await dbManager.getClient();
-    await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
-      '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
-      'merchant_claim',
-      'enabled',
-    ]);
-    await db.query('INSERT INTO notification_types(id, notification_type, default_status) VALUES($1, $2, $3)', [
-      '2cbe34e4-f41d-41d5-b7d2-ee875dc7c588',
-      'customer_payment',
-      'enabled',
-    ]);
-    let preferenceQueries = await lookup('notification-preference', { type: 'query' });
+    await prisma.notificationType.createMany({
+      data: [
+        {
+          id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+          notificationType: 'merchant_claim',
+          defaultStatus: 'enabled',
+        },
+        {
+          id: '2cbe34e4-f41d-41d5-b7d2-ee875dc7c588',
+          notificationType: 'customer_payment',
+          defaultStatus: 'enabled',
+        },
+      ],
+    });
 
     await prisma.pushNotificationRegistration.createMany({
       data: [
@@ -59,7 +60,7 @@ describe('NotificationPreferenceService', function () {
     });
 
     // Preference override for 1st device
-    await preferenceQueries.upsert({
+    await prisma.notificationPreference.updateStatus({
       ownerAddress: '0x01',
       pushClientId: '123',
       notificationType: 'customer_payment',

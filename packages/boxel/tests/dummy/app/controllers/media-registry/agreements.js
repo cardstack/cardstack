@@ -1,8 +1,11 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class MediaRegistryAgreementsController extends Controller {
+  @service router;
+
   @tracked status;
   @tracked org = this.model.org;
   @tracked catalog = this.model.collection;
@@ -38,7 +41,7 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   rejectAgreement() {
-    this.transitionToRoute(
+    this.router.transitionTo(
       'media-registry.collection',
       'bunny_records',
       this.catalog.id
@@ -57,7 +60,7 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   expandAction() {
-    this.transitionToRoute(
+    this.router.transitionTo(
       'media-registry.collection',
       'bunny_records',
       this.catalog.id

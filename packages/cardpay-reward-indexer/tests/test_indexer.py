@@ -1,21 +1,17 @@
-# #!/usr/bin/env python3
-
-from datetime import datetime
+#
 
 import pytest
-from cardpay_reward_indexer.config import get_settings
 from cardpay_reward_indexer.database import Base
 from cardpay_reward_indexer.indexer import Indexer
 from cardpay_reward_indexer.models import Proof, Root
-from sqlalchemy import exc
 
 from .config import engine, override_get_db, settings
-from .mocks import (extra_one_merkle_roots_for_program,
-                    extra_one_merkle_roots_old_file_written,
-                    extra_one_merkle_roots_without_s3, reward_programs,
-                    roots_for_program)
-from .utils import (check_duplicates_for_proofs, check_duplicates_for_roots,
-                    validate_proof_response_fields)
+from .mocks import (
+    extra_one_merkle_roots_for_program,
+    extra_one_merkle_roots_without_s3,
+    reward_programs,
+    roots_for_program,
+)
 
 
 @pytest.fixture()

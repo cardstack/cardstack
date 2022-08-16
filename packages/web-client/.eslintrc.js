@@ -19,6 +19,9 @@ module.exports = {
   env: {
     browser: true,
   },
+  rules: {
+    'ember/no-array-prototype-extensions': 'off',
+  },
   overrides: [
     // typescript-specific
     {
@@ -66,6 +69,11 @@ module.exports = {
         // https://github.com/mysticatea/eslint-plugin-node/issues/77
         'node/no-unpublished-require': 'off',
       },
+    },
+    {
+      // test files
+      files: ['tests/**/*-test.{js,ts}'],
+      extends: ['plugin:qunit/recommended'],
     },
   ],
 };

@@ -1,11 +1,12 @@
-from subgraph_extractor.cli import extract
-import click
-from cloudpathlib import AnyPath
-import os
 import logging
-import yaml
-import schedule
+import os
 import time
+
+import click
+import schedule
+import yaml
+from cloudpathlib import AnyPath
+from subgraph_extractor.cli import extract
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(

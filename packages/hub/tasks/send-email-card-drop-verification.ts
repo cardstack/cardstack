@@ -1,12 +1,12 @@
 import { Helpers } from 'graphile-worker';
 import config from 'config';
-import { query } from '@cardstack/hub/queries';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 
 export default class SendEmailCardDropVerification {
+  clock = inject('clock');
   email = inject('email');
-  emailCardDropRequests = query('email-card-drop-requests', { as: 'emailCardDropRequests' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async perform(
     payload: {
@@ -15,10 +15,17 @@ export default class SendEmailCardDropVerification {
     },
     helpers: Helpers
   ) {
+    let prisma = await this.prismaManager.getClient();
+
     const request = (
-      await this.emailCardDropRequests.query({
-        id: payload.id,
-      })
+      await prisma.emailCardDropRequest.findManyWithExpiry(
+        {
+          where: {
+            id: payload.id,
+          },
+        },
+        this.clock
+      )
     )[0];
 
     if (!request) {

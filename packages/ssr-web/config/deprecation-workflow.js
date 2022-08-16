@@ -1,8 +1,6 @@
 /*global self */
 self.deprecationWorkflow = self.deprecationWorkflow || {};
 self.deprecationWorkflow.config = {
-  workflow: [
-    { handler: 'silence', matchId: 'ember-source.deprecation-without-for' },
-    { handler: 'silence', matchId: 'ember-source.deprecation-without-since' },
-  ],
+  throwOnUnhandled: true,
+  workflow: [{ handler: 'log', matchId: 'ember-polyfills.deprecate-assign' }],
 };

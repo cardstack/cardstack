@@ -8,7 +8,7 @@ module('Acceptance | not-found', function (hooks) {
   test('it shows a 404 page for unknown routes', async function (assert) {
     await visit('/blah');
 
-    assert.equal(currentURL(), '/blah');
+    assert.strictEqual(currentURL(), '/blah');
 
     assert
       .dom('[data-test-not-found-page]')

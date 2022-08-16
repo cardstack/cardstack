@@ -28,23 +28,23 @@ module('Integration | Component | Menu', function (hooks) {
     });
     await render(hbs`
       <Boxel::Menu
-        @closeMenu={{fn this.closeMenu}}
+        @closeMenu={{this.closeMenu}}
         @items={{array
-          (menu-item 'One' (fn this.record 'One'))
-          (menu-item 'Two' (fn this.record 'Two') dangerous=true)
-          (menu-item 'Three' (fn this.record 'Three') icon='gear')
+          (menu-item "One" (fn this.record "One"))
+          (menu-item "Two" (fn this.record "Two") dangerous=true)
+          (menu-item "Three" (fn this.record "Three") icon="gear")
         }}
       />
     `);
     await click(`[${TEST_MENU_ITEM_TEXT_ATTRIBUTE}='One']`);
-    assert.equal(lastClicked, 'One');
-    assert.equal(closedMenuTimes, 1);
+    assert.strictEqual(lastClicked, 'One');
+    assert.strictEqual(closedMenuTimes, 1);
     await click(`[${TEST_MENU_ITEM_TEXT_ATTRIBUTE}='Two']`);
-    assert.equal(lastClicked, 'Two');
-    assert.equal(closedMenuTimes, 2);
+    assert.strictEqual(lastClicked, 'Two');
+    assert.strictEqual(closedMenuTimes, 2);
     await click(`[${TEST_MENU_ITEM_TEXT_ATTRIBUTE}='Three']`);
-    assert.equal(lastClicked, 'Three');
-    assert.equal(closedMenuTimes, 3);
+    assert.strictEqual(lastClicked, 'Three');
+    assert.strictEqual(closedMenuTimes, 3);
   });
 
   test('It can render dividers', async function (assert) {
@@ -52,9 +52,9 @@ module('Integration | Component | Menu', function (hooks) {
       <Boxel::Menu
         @closeMenu={{(noop)}}
         @items={{array
-          (menu-item 'Top' (noop))
-          (menu-item '---')
-          (menu-item 'Three' (noop))
+          (menu-item "Top" (noop))
+          (menu-item "---")
+          (menu-item "Three" (noop))
         }}
       />
     `);
@@ -66,9 +66,9 @@ module('Integration | Component | Menu', function (hooks) {
       <Boxel::Menu
         @closeMenu={{(noop)}}
         @items={{array
-          (menu-item 'Dangerous' (noop) dangerous=true)
-          (menu-item 'Icon' (noop) icon='gear')
-          (menu-item 'Icon' (noop) icon='gear' dangerous=true)
+          (menu-item "Dangerous" (noop) dangerous=true)
+          (menu-item "Icon" (noop) icon="gear")
+          (menu-item "Icon" (noop) icon="gear" dangerous=true)
         }}
       />
     `);

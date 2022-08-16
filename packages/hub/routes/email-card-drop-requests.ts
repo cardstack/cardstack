@@ -1,7 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import config from 'config';
-import { query } from '../queries';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
@@ -10,9 +9,10 @@ import normalizeEmail from 'validator/lib/normalizeEmail';
 import crypto from 'crypto';
 import cryptoRandomString from 'crypto-random-string';
 import * as Sentry from '@sentry/node';
-import { NOT_NULL } from '../utils/queries';
 import logger from '@cardstack/logger';
 import BN from 'bn.js';
+import { ExtendedPrismaClient } from '../services/prisma-manager';
+import { SeverityLevel } from '@sentry/node';
 
 const log = logger('hub/email-card-drop-requests');
 
@@ -32,12 +32,11 @@ export interface EmailCardDropRequest {
 export default class EmailCardDropRequestsRoute {
   cardpay = inject('cardpay');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
-  emailCardDropRequestQueries = query('email-card-drop-requests', { as: 'emailCardDropRequestQueries' });
   emailCardDropRequestSerializer = inject('email-card-drop-request-serializer', {
     as: 'emailCardDropRequestSerializer',
   });
-  emailCardDropStateQueries = query('email-card-drop-state', { as: 'emailCardDropStateQueries' });
   clock = inject('clock');
 
   web3 = inject('web3-http', { as: 'web3' });
@@ -66,13 +65,20 @@ export default class EmailCardDropRequestsRoute {
       return;
     }
 
-    let previousRequests = await this.emailCardDropRequestQueries.query({
-      ownerAddress,
-    });
+    let prisma = await this.prismaManager.getClient();
+
+    let previousRequests = await prisma.emailCardDropRequest.findManyWithExpiry(
+      {
+        where: {
+          ownerAddress,
+        },
+      },
+      this.clock
+    );
 
     let claimed = previousRequests.some((request) => Boolean(request?.claimedAt));
 
-    let rateLimited = await this.emailCardDropStateQueries.read();
+    let rateLimited = await prisma.emailCardDropState.read();
 
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
@@ -80,7 +86,7 @@ export default class EmailCardDropRequestsRoute {
 
     if (await prepaidCardMarketV2.isPaused()) {
       available = false;
-    } else if (await this.getPrepaidCardReservationsAreUnavailable()) {
+    } else if (await this.getPrepaidCardReservationsAreUnavailable(prisma)) {
       available = false;
     }
 
@@ -108,6 +114,7 @@ export default class EmailCardDropRequestsRoute {
 
     ctx.type = 'application/vnd.api+json';
 
+    let prisma = await this.prismaManager.getClient();
     let prepaidCardMarketV2 = await this.cardpay.getSDK('PrepaidCardMarketV2', this.web3.getInstance());
 
     if (await prepaidCardMarketV2.isPaused()) {
@@ -115,7 +122,7 @@ export default class EmailCardDropRequestsRoute {
     }
 
     let quantityAvailable = await this.getPrepaidCardQuantityAvailable();
-    let activeReservations = await this.getActiveReservations();
+    let activeReservations = await this.getActiveReservations(prisma);
     let unreserved = quantityAvailable.sub(activeReservations);
 
     let supplyIsBelowNotificationThreshold = unreserved.lt(new BN(notifyWhenQuantityBelow));
@@ -138,35 +145,40 @@ export default class EmailCardDropRequestsRoute {
       );
     }
 
-    if (await this.getPrepaidCardReservationsAreUnavailable()) {
+    if (await this.getPrepaidCardReservationsAreUnavailable(prisma)) {
       return respondWith503(ctx, 'There are no prepaid cards available');
     }
 
-    if (await this.emailCardDropStateQueries.read()) {
+    if (await prisma.emailCardDropState.read()) {
       return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
     let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
-    let countOfRecentClaims = await this.emailCardDropRequestQueries.claimedInLastMinutes(periodMinutes);
+    let countOfRecentClaims = await prisma.emailCardDropRequest.claimedInLastMinutes(periodMinutes, this.clock);
 
     if (countOfRecentClaims >= count) {
       // The rate limit flag must be manually cleared by updating the database
       Sentry.captureException(new Error('Card drop rate limit has been triggered'), {
-        level: Sentry.Severity.Fatal,
+        level: 'fatal' as SeverityLevel,
         tags: {
           event: 'email-card-drop-rate-limit-reached',
         },
       });
 
-      await this.emailCardDropStateQueries.update(true);
+      await prisma.emailCardDropState.updateState(true);
 
       return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
-    let claimedWithUserAddress = await this.emailCardDropRequestQueries.query({
-      ownerAddress: ctx.state.userAddress,
-      claimedAt: NOT_NULL,
-    });
+    let claimedWithUserAddress = await prisma.emailCardDropRequest.findManyWithExpiry(
+      {
+        where: {
+          ownerAddress: ctx.state.userAddress,
+          claimedAt: { not: null },
+        },
+      },
+      this.clock
+    );
 
     if (claimedWithUserAddress.length > 0) {
       ctx.status = 422;
@@ -205,10 +217,15 @@ export default class EmailCardDropRequestsRoute {
     hash.update(normalizedEmail);
     let normalizedEmailHash = hash.digest('hex');
 
-    let claimedWithUserEmail = await this.emailCardDropRequestQueries.query({
-      emailHash: normalizedEmailHash,
-      claimedAt: NOT_NULL,
-    });
+    let claimedWithUserEmail = await prisma.emailCardDropRequest.findManyWithExpiry(
+      {
+        where: {
+          emailHash: normalizedEmailHash,
+          claimedAt: { not: null },
+        },
+      },
+      this.clock
+    );
 
     if (claimedWithUserEmail.length > 0) {
       ctx.status = 422;
@@ -238,7 +255,7 @@ export default class EmailCardDropRequestsRoute {
     let db = await this.databaseManager.getClient();
 
     await this.databaseManager.performTransaction(db, async () => {
-      await this.emailCardDropRequestQueries.insert(emailCardDropRequest);
+      await prisma.emailCardDropRequest.create({ data: emailCardDropRequest });
     });
 
     await this.workerClient.addJob('send-email-card-drop-verification', {
@@ -276,12 +293,12 @@ export default class EmailCardDropRequestsRoute {
     return new BN(await (await this.getMarketContract()).getQuantity(cardDropSku));
   }
 
-  private async getActiveReservations() {
-    return new BN(await this.emailCardDropRequestQueries.activeReservations());
+  private async getActiveReservations(prisma: ExtendedPrismaClient) {
+    return new BN(await prisma.emailCardDropRequest.activeReservations(this.clock));
   }
 
-  private async getPrepaidCardReservationsAreUnavailable() {
-    return (await this.getPrepaidCardQuantityAvailable()).lte(await this.getActiveReservations());
+  private async getPrepaidCardReservationsAreUnavailable(prisma: ExtendedPrismaClient) {
+    return (await this.getPrepaidCardQuantityAvailable()).lte(await this.getActiveReservations(prisma));
   }
 }
 

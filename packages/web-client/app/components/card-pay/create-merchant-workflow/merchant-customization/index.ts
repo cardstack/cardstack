@@ -24,6 +24,7 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   @tracked merchantName: string = '';
   @tracked merchantId: string = '';
   @tracked lastCheckedMerchantId = '';
+  @tracked lastCheckedMerchantIdValid = false;
   @tracked merchantNameValidationMessage = '';
   @tracked merchantIdValidationMessage = '';
   @tracked merchantBgColorValidationMessage = '';
@@ -71,7 +72,7 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       return 'loading';
     } else if (
       this.lastCheckedMerchantId === this.merchantId &&
-      taskFor(this.validateMerchantIdTask).last?.value
+      this.lastCheckedMerchantIdValid
     ) {
       return 'valid';
     } else if (this.merchantIdValidationMessage) {
@@ -148,7 +149,21 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     this.merchantNameValidationMessage = message;
   }
 
-  @action async validateMerchantId() {
+  @action async validateMerchantId(earlyReturnForBlur = false) {
+    if (earlyReturnForBlur) {
+      if (!this.merchantId) {
+        // we know it's invalid if there's no merchant id, so we don't need the previous task to keep running
+        taskFor(this.validateMerchantIdTask).cancelAll();
+        this.merchantIdValidationMessage = 'This field is required';
+        this.lastCheckedMerchantId = '';
+        this.lastCheckedMerchantIdValid = false;
+      }
+      // if there is a merchant id, blur validation is a no-op
+      // let the last validation task from input continue if it needs to
+      // otherwise we keep the current state
+      return;
+    }
+
     try {
       await taskFor(this.validateMerchantIdTask).perform();
     } catch (e) {
@@ -167,7 +182,8 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     this.merchantIdValidationMessage = validateMerchantId(value);
 
     if (this.merchantIdValidationMessage) {
-      return false;
+      this.lastCheckedMerchantIdValid = false;
+      return;
     }
 
     try {
@@ -178,24 +194,28 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       this.lastCheckedMerchantId = value;
       if (!slugAvailable) {
         this.merchantIdValidationMessage = detail;
-        return false;
+        this.lastCheckedMerchantIdValid = false;
+        return;
       }
 
       this.merchantIdValidationMessage = '';
-      return true;
+      this.lastCheckedMerchantIdValid = true;
+      return;
     } catch (e) {
       console.error('Error validating uniqueness', e);
       Sentry.captureException(e);
 
       this.merchantIdValidationMessage =
         'There was an error validating payment profile ID uniqueness';
+      this.lastCheckedMerchantId = '';
+      this.lastCheckedMerchantIdValid = false;
 
       if (e.message.startsWith('No valid auth token')) {
         let { workflowSession } = this.args;
         workflowSession?.workflow?.cancel('UNAUTHENTICATED');
         throw new Error('UNAUTHENTICATED');
       }
-      return false;
+      return;
     }
   }
 }

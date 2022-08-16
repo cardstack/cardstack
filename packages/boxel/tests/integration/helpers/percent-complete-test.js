@@ -10,26 +10,32 @@ module('Integration | Helper | percent-complete', function (hooks) {
     this.set('total', 4);
     this.set('completed', 2);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
-    assert.equal(this.element.textContent.trim(), '50');
+    assert.strictEqual(this.element.textContent.trim(), '50');
   });
 
   test('it handles missing total', async function (assert) {
     this.set('total', undefined);
     this.set('completed', 2);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
-    assert.equal(this.element.textContent.trim(), '0');
+    assert.strictEqual(this.element.textContent.trim(), '0');
   });
 
   test('it handles missing completed', async function (assert) {
     this.set('total', 4);
     this.set('completed', null);
 
-    await render(hbs`{{percent-complete total=total completed=completed}}`);
+    await render(
+      hbs`{{percent-complete total=this.total completed=this.completed}}`
+    );
 
-    assert.equal(this.element.textContent.trim(), '0');
+    assert.strictEqual(this.element.textContent.trim(), '0');
   });
 });

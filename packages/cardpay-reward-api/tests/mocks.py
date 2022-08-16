@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 merkle_roots = [
     {
         "id": "0x2ffd93ec2ddc15dcb170e3fb29a1f06df274e65746a715562f6a6579bd8e9cd7",

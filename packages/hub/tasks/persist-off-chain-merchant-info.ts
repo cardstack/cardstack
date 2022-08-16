@@ -2,21 +2,19 @@ import { Helpers } from 'graphile-worker';
 import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
-import { query } from '../queries';
 
 export default class PersistOffChainMerchantInfo {
-  merchantInfoSerializer = inject('merchant-info-serializer', {
-    as: 'merchantInfoSerializer',
+  profileSerializer = inject('profile-serializer', {
+    as: 'profileSerializer',
   });
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
-  });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async perform(payload: { id: string }, helpers: Helpers) {
     const { id } = payload;
+    let prisma = await this.prismaManager.getClient();
 
-    let merchantInfo = (await this.merchantInfoQueries.fetch({ id }))[0];
-    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(merchantInfo);
+    let profile = await prisma.profile.findUnique({ where: { id } });
+    let jsonAPIDoc = this.profileSerializer.serialize(profile!, 'merchant-infos');
 
     helpers.addJob('s3-put-json', {
       bucket: config.get('aws.offchainStorage.bucketName'),

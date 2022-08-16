@@ -1,20 +1,22 @@
 import { DIDDocument, DIDResolutionOptions, DIDResolutionResult, ParsedDID, Resolver } from 'did-resolver';
 import { shake_128 } from 'js-sha3';
-import shortUuid from 'short-uuid';
 import invert from 'lodash/invert';
 import kebabCase from 'lodash/kebabCase';
+import shortUuid from 'short-uuid';
 import * as uuidv4 from 'uuid';
 
-const CURRENT_VERSION = 1;
+export const CURRENT_VERSION = 1;
+export const UUIDV5_NAMESPACE = '1b671a64-40d5-491e-99b0-da01ff1f3341';
 
-type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'CardSpace';
+type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'Profile' | 'RewardRule';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const DID_TYPE_TO_SHORT_TYPE: Record<CardstackIdentifierType, string> = {
   PrepaidCardCustomization: 'p',
   MerchantInfo: 'm',
   SupplierInfo: 's',
-  CardSpace: 'cs',
+  Profile: 'o',
+  RewardRule: 'r',
 };
 /* eslint-enable @typescript-eslint/naming-convention */
 
@@ -51,7 +53,7 @@ export function getResolver() {
   return { cardstack: resolve };
 }
 
-interface EncodeOptions {
+export interface EncodeOptions {
   type: CardstackIdentifierType;
   version?: number;
   uniqueId?: string;
@@ -93,6 +95,10 @@ function normalizeUniqueId(candidate: string) {
     return candidate;
   }
   if (uuidv4.validate(candidate)) {
+    // This validate() function validates ANY uuid
+    // Some candidates are generated with data via uuidv5
+    // As long as they're generated with a uuidv4 namespace, they should be collision safe
+    // https://stackoverflow.com/questions/68573977/is-mixing-uuidv4-and-uuidv5-collision-safe
     return shortUuid().fromUUID(candidate);
   }
   throw new Error(`uniqueId must be a flickrBase58 or RFC4122 v4-compliant UUID. Was: "${candidate}"`);

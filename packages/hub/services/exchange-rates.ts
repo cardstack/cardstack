@@ -1,5 +1,5 @@
 /* global fetch */
-import { query } from '../queries';
+import { inject } from '@cardstack/di';
 import config from 'config';
 import merge from 'lodash/merge';
 
@@ -24,7 +24,7 @@ export interface CryptoCompareConversionBlock {
 export const DEFAULT_CRYPTOCOMPARE_EXCHANGE = 'CCCAGG';
 
 export default class ExchangeRatesService {
-  exchangeRates = query('exchange-rates', { as: 'exchangeRates' });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   private get apiKey() {
     return config.get('exchangeRates.apiKey') as string;
@@ -105,14 +105,15 @@ export default class ExchangeRatesService {
 
   async fetchExchangeRates(
     from: string,
-    tos: string[],
+    to: string[],
     date: string,
     exchange = DEFAULT_CRYPTOCOMPARE_EXCHANGE
   ): Promise<CryptoCompareSuccessResponse | CryptoCompareFailureResponse | undefined> {
-    let cachedValues = await this.exchangeRates.select(from, tos, date, exchange);
+    let prisma = await this.prismaManager.getClient();
+    let cachedValues = await prisma.exchangeRate.select({ from, to, date, exchange });
 
     let cachedValuesTos = Object.keys(cachedValues || {});
-    let requestedButNotCached = tos.filter((to) => !cachedValuesTos.includes(to));
+    let requestedButNotCached = to.filter((to) => !cachedValuesTos.includes(to));
 
     if (requestedButNotCached.length === 0) {
       return {
@@ -129,8 +130,14 @@ export default class ExchangeRatesService {
         return result;
       }
 
-      requestedButNotCached.forEach(async (to) => {
-        await this.exchangeRates.insert(from, to, (result as CryptoCompareSuccessResponse)[from][to], date, exchange);
+      await prisma.exchangeRate.createMany({
+        data: requestedButNotCached.map((to) => ({
+          fromSymbol: from,
+          toSymbol: to,
+          rate: (result as CryptoCompareSuccessResponse)[from][to],
+          date: new Date(Date.parse(date)),
+          exchange,
+        })),
       });
 
       let resultConversions = (result as CryptoCompareSuccessResponse)[from];

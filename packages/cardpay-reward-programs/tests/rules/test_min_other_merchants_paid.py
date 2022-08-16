@@ -5,8 +5,6 @@ import pytest
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import MinOtherMerchantsPaid
 
-from .fixture import indexed_data
-
 summaries = [
     {"total_reward": 20, "unique_payee": 2},
     {"total_reward": 20, "unique_payee": 2},
@@ -38,6 +36,7 @@ def rule(request):
     return MinOtherMerchantsPaid(core_config, user_config)
 
 
+@pytest.mark.usefixtures("indexed_data")
 class TestMinOtherMerchantsPaidSingle:
     @pytest.mark.parametrize(
         "rule,summary",
@@ -47,7 +46,7 @@ class TestMinOtherMerchantsPaidSingle:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, summary, indexed_data):
+    def test_run(self, rule, summary):
         start_block = 24000000
         end_block = 26000000
         rule.payment_cycle_length = end_block - start_block
@@ -64,6 +63,7 @@ multiple_summaries = [
 ]
 
 
+@pytest.mark.usefixtures("indexed_data")
 class TestMinOtherMerchantsPaidMultiple:
     @pytest.mark.parametrize(
         "rule,summary",
@@ -73,7 +73,7 @@ class TestMinOtherMerchantsPaidMultiple:
         ),
         indirect=["rule"],
     )
-    def test_run(self, rule, summary, indexed_data):
+    def test_run(self, rule, summary):
         start_block = 24000000
         end_block = start_block + rule.payment_cycle_length * 10
         cached_df = []

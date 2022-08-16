@@ -40,7 +40,7 @@ describe('POST /upload', function () {
     registry(this).register('web3-storage', StubWeb3Storage);
   });
 
-  let { request, getContainer } = setupHub(this);
+  let { request, getPrisma } = setupHub(this);
 
   it('returns 401 without bearer token', async function () {
     await request()
@@ -51,9 +51,7 @@ describe('POST /upload', function () {
   });
 
   it('uploads an image', async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    let db = await dbManager.getClient();
-
+    let prisma = await getPrisma();
     let response = await request()
       .post('/upload')
       .set('Content-Type', 'multipart/form-data')
@@ -64,11 +62,10 @@ describe('POST /upload', function () {
     expect(response.headers['Location'], 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
     expect(response.body.data.attributes.url, 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg');
 
-    let queryResult = await db.query('SELECT id FROM uploads WHERE url = $1', [
-      'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg',
-    ]);
+    let queryResult =
+      await prisma.$queryRaw`SELECT id FROM uploads WHERE url = 'https://cloudflare-ipfs.com/ipfs/CID/cat.jpeg'`;
 
-    expect(queryResult.rows.length).to.equal(1);
+    expect((queryResult as any).length).to.equal(1);
   });
 
   it('rejects a non jpg/png format', async function () {
@@ -113,23 +110,21 @@ describe('POST /upload', function () {
   });
 
   it('detects abuse', async function () {
-    let dbManager = await getContainer().lookup('database-manager');
-    let db = await dbManager.getClient();
+    let prisma = await getPrisma();
 
     for (let index = 0; index < 10; index++) {
-      await db.query(
-        'INSERT INTO uploads(id, cid, service, url, filename, size, type, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-        [
-          shortUuid.uuid(),
-          'CID',
-          'web3.storage',
-          'url',
-          'test.jpg',
-          100,
-          'image/jpeg',
-          '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
-        ]
-      );
+      await prisma.upload.create({
+        data: {
+          id: shortUuid.uuid(),
+          cid: 'CID',
+          service: 'web3.storage',
+          url: 'url',
+          filename: 'test.jpg',
+          size: 100,
+          type: 'image/jpeg',
+          ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+        },
+      });
     }
 
     await request()

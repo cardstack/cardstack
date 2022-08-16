@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 type PushNotificationRegistrationGetter = Prisma.PushNotificationRegistrationDelegate<any>;
 
-export interface ExtendedPushNotificationRegistration extends PushNotificationRegistrationGetter {
+interface PushNotificationRegistrationExtensions {
   upsertByOwnerAndPushClient({
     id,
     ownerAddress,
@@ -15,6 +15,10 @@ export interface ExtendedPushNotificationRegistration extends PushNotificationRe
     disabledAt: Date | null;
   }): ReturnType<PushNotificationRegistrationGetter['upsert']>;
 }
+
+export interface ExtendedPushNotificationRegistration
+  extends PushNotificationRegistrationGetter,
+    PushNotificationRegistrationExtensions {}
 
 export function getPushNotificationRegistrationExtension(client: PrismaClient) {
   return {

@@ -58,13 +58,13 @@ module('Integration | Component | common/payment-link', function (hooks) {
     assert
       .dom(LINK)
       .hasAttribute('href', deepLink)
-      .containsText('Pay with Card Wallet');
+      .containsText('Pay with Cardstack Wallet');
   });
   test('it allows toggling to qr and back in the mobile state', async function (assert) {
     this.set('mode', 'link');
     await click(TOGGLE);
     // eslint-disable-next-line ember/no-get
-    assert.equal(this.get('mode'), 'qr');
+    assert.strictEqual(this.get('mode'), 'qr');
     assert.dom(QR).hasAttribute('data-test-boxel-styled-qr-code', link);
     assert.dom(URL).containsText(link);
     assert.dom(TOGGLE).isEnabled().containsText('Show Payment Link');

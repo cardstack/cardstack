@@ -82,7 +82,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     await visit('/card-pay');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
-    assert.equal(
+    assert.strictEqual(
       // @ts-ignore (complains object is possibly null)
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         .length,
@@ -347,7 +347,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ).searchParams.get('flow-id');
 
       assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
-      assert.equal(workflowPersistenceId!.length, 22);
+      assert.strictEqual(workflowPersistenceId!.length, 22);
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
@@ -461,7 +461,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.'
         );
     });
 
@@ -492,7 +492,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         .containsText(
           `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(previousMinDaiAmount))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(previousSpendAmount)!,

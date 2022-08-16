@@ -1,19 +1,19 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
-import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { ContractOptions, Contract } from 'web3-eth-contract';
+import { Contract, ContractOptions } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignAMBABI from '../contracts/abi/foreign-amb';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
 import {
-  TransactionOptions,
-  waitUntilTransactionMined,
   isTransactionHash,
+  TransactionOptions,
   waitUntilBlock,
+  waitUntilTransactionMined,
 } from './utils/general-utils';
+import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 const { fromWei } = Web3.utils;
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
@@ -85,6 +85,22 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
     let nextNonce = await this.getNextNonce(from);
 
+    let withinLimit = await this.withinLimit(tokenAddress, amount);
+    if (!withinLimit) {
+      let maxPerTx = await this.maxPerTx(tokenAddress);
+      let minPerTx = await this.minPerTx(tokenAddress);
+      let dailyLimit = await this.dailyLimit(tokenAddress);
+      let totalSpentPerDay = await this.totalSpentPerDay(tokenAddress);
+      throw new Error(`
+        unlock action NOT within configured limits. Attempted to unlock ${fromWei(amount)} amount of tokens
+
+          Minimum Amount Per Tx: ${fromWei(minPerTx)}
+          Maximum Amount Per Tx: ${fromWei(maxPerTx)}
+          Total Amount Today: ${fromWei(totalSpentPerDay)}
+          Daily Amount Limit: ${fromWei(dailyLimit)}
+
+      `);
+    }
     return await new Promise((resolve, reject) => {
       let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
@@ -153,7 +169,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       let dailyLimit = await this.dailyLimit(tokenAddress);
       let totalSpentPerDay = await this.totalSpentPerDay(tokenAddress);
       throw new Error(`
-        relay action NOT within configured limits
+        relay action NOT within configured limits. Attempted to relay ${fromWei(amount)} amount of tokens
 
           Minimum Amount Per Tx: ${fromWei(minPerTx)}
           Maximum Amount Per Tx: ${fromWei(maxPerTx)}
@@ -290,23 +306,23 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   }
 
   async maxPerTx(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.maxPerTx(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.maxPerTx(tokenAddress).call());
   }
 
   async minPerTx(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.minPerTx(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.minPerTx(tokenAddress).call());
   }
 
   async dailyLimit(tokenAddress: string): Promise<BN> {
-    return await (await this.getForeignBridge()).methods.dailyLimit(tokenAddress).call();
+    return new BN(await (await this.getForeignBridge()).methods.dailyLimit(tokenAddress).call());
   }
 
-  async getCurrentDay(): Promise<BN> {
+  async getCurrentDay(): Promise<string> {
     return await (await this.getForeignBridge()).methods.getCurrentDay().call();
   }
   async totalSpentPerDay(tokenAddress: string): Promise<BN> {
     let currentDay = await this.getCurrentDay();
-    return await (await this.getForeignBridge()).methods.totalSpentPerDay(tokenAddress, currentDay).call();
+    return new BN(await (await this.getForeignBridge()).methods.totalSpentPerDay(tokenAddress, currentDay).call());
   }
 
   private async getNextNonce(from?: string): Promise<BN> {

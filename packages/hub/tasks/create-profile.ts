@@ -1,5 +1,4 @@
 import { inject } from '@cardstack/di';
-import { query } from '@cardstack/hub/queries';
 import { service } from '@cardstack/hub/services';
 import { encodeDID } from '@cardstack/did-resolver';
 import * as Sentry from '@sentry/node';
@@ -29,9 +28,6 @@ export default class CreateProfile {
   cardpay = inject('cardpay');
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
-  merchantInfoQueries = query('merchant-info', {
-    as: 'merchantInfoQueries',
-  });
   relay = service('relay');
   web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -46,10 +42,10 @@ export default class CreateProfile {
     let prisma = await this.prismaManager.getClient();
 
     try {
-      let merchantInfo = (await this.merchantInfoQueries.fetch({ id: merchantInfoId }))[0];
+      let profile = await prisma.profile.findUnique({ where: { id: merchantInfoId } });
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: merchantInfoId });
 
-      let profileRegistrationTxHash = await this.relay.registerProfile(merchantInfo.ownerAddress, did);
+      let profileRegistrationTxHash = await this.relay.registerProfile(profile!.ownerAddress, did);
 
       await this.cardpay.waitForTransactionConsistency(this.web3.getInstance(), profileRegistrationTxHash);
 

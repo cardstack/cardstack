@@ -1,5 +1,5 @@
 [project]
-name = ""
+name = "reward_root_submitter"
 version = ""
 description = ""
 authors = [
@@ -12,6 +12,7 @@ dependencies = [
     "pyarrow>=7.0.0",
     "schedule>=1.1.0",
     "sentry-sdk>=1.5.12",
+    "pydantic[dotenv]>=1.9.1",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -27,6 +28,7 @@ dev = [
     "black>=22.1.0",
     "isort>=5.10.1",
     "web3[tester]>=5.28.0",
+    "flake8>=4.0.1",
 ]
 [tool.pdm.scripts]
 fork_gnosis = "ganache-cli  --fork https://xdai-archive.blockscout.com/"
@@ -35,6 +37,3 @@ fork_sokol = "ganache-cli  --fork https://sokol-archive.blockscout.com/"
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"
-
-[project.scripts]
-reward_root_submit_loop = "reward_root_submitter.main:run_all"

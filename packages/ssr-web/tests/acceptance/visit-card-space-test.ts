@@ -275,7 +275,7 @@ module('Acceptance | visit card space', function (hooks) {
 
     await visit('/pay/xdai/0xf9c0E2B59824f33656CC5A94423FcF62892dad60');
 
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
     assert.dom('[data-test-merchant-name]').hasText('merchant name');
   });
 
@@ -288,7 +288,7 @@ module('Acceptance | visit card space', function (hooks) {
 
     await visit('/nothing/nowhere');
 
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
     assert.dom('[data-test-merchant-name]').hasText('merchant name');
   });
 });

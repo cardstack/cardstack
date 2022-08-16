@@ -230,7 +230,7 @@ module('Acceptance | pay', function (hooks) {
       .exists();
 
     let amountInUSD = convertAmountToNativeDisplay(usdAmount, 'USD');
-    let description = `Use Card Wallet to pay ${amountInUSD}`;
+    let description = `Use Cardstack Wallet to pay ${amountInUSD}`;
 
     assert
       .dom(
@@ -251,7 +251,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
     await waitFor(MERCHANT);
 
-    let description = `Use Card Wallet to pay ${merchantName}`;
+    let description = `Use Cardstack Wallet to pay ${merchantName}`;
     assert
       .dom(
         `meta[property='og:description'][content="${description}"]`,
@@ -546,7 +546,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay with Card Wallet')
+      .containsText('Pay with Cardstack Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -583,7 +583,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay with Card Wallet')
+      .containsText('Pay with Cardstack Wallet')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -640,7 +640,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(`/pay/${network}/${merchantSafeWithoutInfo.address}`);
 
     let title = 'Payment Requested';
-    let description = `Use Card Wallet to pay Payment Request`;
+    let description = `Use Cardstack Wallet to pay Payment Request`;
     assert
       .dom(
         `meta[property='og:title'][content="${title}"]`,
@@ -700,6 +700,7 @@ module('Acceptance | pay', function (hooks) {
   });
 
   module('status page incidents', function () {
+    // eslint-disable-next-line qunit/require-expect
     test('it renders a degraded service banner on the pay page', async function (this: MirageTestContext, assert) {
       this.server.get(config.urls.statusPageUrl, function () {
         return new MirageResponse(

@@ -15,7 +15,7 @@ const SUPPLIERS_PANEL = {
       icon: 'deposit-route',
       buttonIcon: 'plus',
       title: 'Deposits',
-      description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your Card Wallet.`,
+      description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your Cardstack Wallet.`,
       bullets: [
         'Deposit funds into the CARD Protocol reserve pool and earn rewards',
         `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
@@ -27,9 +27,9 @@ const SUPPLIERS_PANEL = {
       icon: 'withdrawal-route',
       buttonIcon: 'minus',
       title: 'Withdrawals',
-      description: `Withdraw CPXD tokens from your Card Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
+      description: `Withdraw CPXD tokens from your Cardstack Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
       bullets: [
-        `Withdraw from a depot or payment profile in your Card Wallet`,
+        `Withdraw from a depot or payment profile in your Cardstack Wallet`,
         `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
       ],
       cta: 'Withdraw Tokens',

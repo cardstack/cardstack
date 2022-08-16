@@ -58,7 +58,7 @@ module('Acceptance | deposit persistence', function (hooks) {
   test('Generates a flow uuid query parameter used as a persistence identifier and can be dismissed via the header button', async function (this: Context, assert) {
     await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
-    assert.equal(
+    assert.strictEqual(
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         ?.length,
       22
@@ -435,7 +435,7 @@ module('Acceptance | deposit persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.'
         );
     });
 

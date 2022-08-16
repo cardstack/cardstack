@@ -172,7 +172,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     expect(dm.responses[3].type).to.equal('rich');
     expect(dm.responses[3].title).to.equal('Your Prepaid Card is Ready!');
     expect(dm.responses[3].description).to.equal(
-      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Card Wallet app to see your new prepaid card.`
+      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Cardstack Wallet app to see your new prepaid card.`
     );
     expect(dm.responses[3].image.url).to.equal(`attachment://${sku}.png`);
 
@@ -210,7 +210,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
       `Your prepaid card is on the way, here is the transaction that includes your prepaid card https://blockscout.com/poa/sokoltx/${mockTxnHash}/token-transfers`
     );
     expect(dm.responses[2].description).to.equal(
-      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Card Wallet app to see your new prepaid card.`
+      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Cardstack Wallet app to see your new prepaid card.`
     );
   });
 

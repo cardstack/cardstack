@@ -79,7 +79,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowMessage({
-          message: `Before we get started, please connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
+          message: `Before we get started, please connect your ${c.layer2.fullName} wallet via your Cardstack Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -146,7 +146,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       },
       postables: [
         new NetworkAwareWorkflowMessage({
-          message: `To store card customization data in the Cardstack Hub, you need to authenticate using your Card Wallet.
+          message: `To store card customization data in the Cardstack Hub, you need to authenticate using your Cardstack Wallet.
           You only need to do this once per browser/device.`,
           includeIf() {
             return !this.isHubAuthenticated;
@@ -248,7 +248,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       template: (session: IWorkflowSession) =>
         `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
           c.layer2.fullName
-        } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+        } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
@@ -265,7 +265,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       template: (session: IWorkflowSession) =>
         `You attempted to restore an unfinished workflow, but the chosen source does not have enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
           c.layer2.fullName
-        } wallet, or by claiming revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+        } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
@@ -308,12 +308,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Cardstack Wallet address. Please restart the workflow.',
     }),
     conditionalCancelationMessage({
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
-        'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but your Cardstack Wallet got disconnected. Please restart the workflow.',
     }),
     ...standardCancelationPostables(),
   ]);

@@ -5,18 +5,19 @@
 import Modifier from 'ember-modifier';
 import { isHTMLSafe } from '@ember/template';
 
-import tippy, { Instance as TippyInstance } from 'tippy.js';
+import tippy, { Instance as TippyInstance, Placement } from 'tippy.js';
 import type { Props as TippyOptions } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
 import '@cardstack/web-client/css/tippy.css';
+import { registerDestructor } from '@ember/destroyable';
 
 const baseTippyOptions = {
   theme: 'light-border',
-  placement: 'bottom-start',
+  placement: 'bottom-start' as Placement,
   arrow: false,
   maxWidth: 280,
-  offset: [0, 0],
+  offset: [0, 0] as [number, number],
 };
 
 type ModifierOptions = Partial<TippyOptions>;
@@ -25,20 +26,37 @@ export default class TippyModifier extends Modifier<{
   positional: [string] | [];
   named: any;
 }> {
+  didSetup = false;
   _instances: TippyInstance[] = [];
+  targetElement?: HTMLElement;
+  options?: ModifierOptions;
 
-  get defaultTarget() {
-    return this.element;
+  constructor(owner: unknown, args: any) {
+    super(owner, args);
+    registerDestructor(this, this.cleanup);
   }
 
-  get options() {
-    const optionsHash: ModifierOptions =
-      this.args.named.options || this.args.named;
-    return {
-      content: this.args.positional?.[0],
+  modify(element: HTMLElement, positional: [string], named: any) {
+    this.targetElement = element;
+    const optionsHash: ModifierOptions = named.options || named;
+    this.options = {
+      content: positional?.[0],
       ...baseTippyOptions,
       ...optionsHash,
     };
+    let tippyConfig = this.parseOptions(this.options);
+    const { tippyTargets, tippyOptions } = tippyConfig;
+    if (!this.didSetup) {
+      // NOTE: tippy() returns a single instance or an array of instances,
+      // depending on the type of targets argument.
+      // https://atomiks.github.io/tippyjs/v6/tippy-instance/#accessing-an-instance
+      const instances = tippy(tippyTargets, tippyOptions);
+      this._instances = ([] as TippyInstance[]).concat(instances);
+      this.didSetup = true;
+    } else {
+      let tippyConfig = this.parseOptions(this.options);
+      this._instances.forEach((x) => x.setProps(tippyConfig.tippyOptions));
+    }
   }
 
   parseOptions(options: any) {
@@ -56,30 +74,13 @@ export default class TippyModifier extends Modifier<{
     } = options;
 
     return {
-      tippyTargets: this.defaultTarget,
+      tippyTargets: this.targetElement!,
       tippyOptions,
     };
   }
 
-  didInstall() {
-    const options = this.parseOptions(this.options);
-    const { tippyTargets, tippyOptions } = options;
-
-    // NOTE: tippy() returns a single instance or an array of instances,
-    // depending on the type of targets argument.
-    // https://atomiks.github.io/tippyjs/v6/tippy-instance/#accessing-an-instance
-    const instances = tippy(tippyTargets, tippyOptions);
-    this._instances = ([] as TippyInstance[]).concat(instances);
-  }
-
-  didUpdateArguments() {
-    const options = this.parseOptions(this.options);
-
-    this._instances.forEach((x) => x.setProps(options.tippyOptions));
-  }
-
-  willDestroy() {
-    this._instances.forEach((x) => x.destroy());
-    this._instances = [];
+  cleanup(destroyable: TippyModifier) {
+    destroyable._instances.forEach((x) => x.destroy());
+    destroyable._instances = [];
   }
 }

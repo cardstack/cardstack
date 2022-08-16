@@ -1,6 +1,5 @@
 import { encodeDID } from '@cardstack/did-resolver';
 import { inject } from '@cardstack/di';
-import DatabaseManager from '@cardstack/db';
 import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
 import config from 'config';
@@ -15,13 +14,13 @@ interface PrepaidCardCustomizationSerializationOptions {
 type PrepaidCardCustomizationRelationship = 'colorScheme' | 'pattern';
 
 export default class PrepaidCardCustomizationSerializer {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   prepaidCardColorSchemeSerializer: PrepaidCardColorSchemeSerializer = inject('prepaid-card-color-scheme-serializer', {
     as: 'prepaidCardColorSchemeSerializer',
   });
   prepaidCardPatternSerializer: PrepaidCardPatternSerializer = inject('prepaid-card-pattern-serializer', {
     as: 'prepaidCardPatternSerializer',
   });
+  prismaManager = inject('prisma-manager', { as: 'prismaManager' });
 
   async serialize(id: string, options: Partial<PrepaidCardCustomizationSerializationOptions>): Promise<JSONAPIDocument>;
   async serialize(
@@ -77,21 +76,17 @@ export default class PrepaidCardCustomizationSerializer {
   }
 
   async loadPrepaidCardCustomization(id: string): Promise<PrepaidCardCustomizationWithoutCreatedAt> {
-    let db = await this.databaseManager.getClient();
-    let queryResult = await db.query(
-      'SELECT id, issuer_name, owner_address, pattern_id, color_scheme_id from prepaid_card_customizations WHERE id = $1',
-      [id]
-    );
-    if (queryResult.rowCount === 0) {
+    let prisma = await this.prismaManager.getClient();
+    let model = await prisma.prepaidCardCustomization.findUnique({ where: { id } });
+    if (!model) {
       return Promise.reject(new Error(`No prepaid_card_customization record found with id ${id}`));
     }
-    let row = queryResult.rows[0];
     return {
-      id: row['id'],
-      issuerName: row['issuer_name'],
-      ownerAddress: row['owner_address'],
-      patternId: row['pattern_id'],
-      colorSchemeId: row['color_scheme_id'],
+      id: model.id,
+      issuerName: model.issuerName,
+      ownerAddress: model.ownerAddress,
+      patternId: model.patternId,
+      colorSchemeId: model.colorSchemeId,
     };
   }
 }

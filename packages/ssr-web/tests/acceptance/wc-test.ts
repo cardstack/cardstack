@@ -23,7 +23,7 @@ module('Acceptance | wc', function (hooks) {
     assert
       .dom('[data-test-wc-message]')
       .containsText(
-        "Looks like you're trying to connect with WalletConnect, but we couldn't find Card Wallet on this device. Install the app using the links above, or switch to a device with Card Wallet, then retry connecting."
+        "Looks like you're trying to connect with WalletConnect, but we couldn't find Cardstack Wallet on this device. Install the app using the links above, or switch to a device with Cardstack Wallet, then retry connecting."
       );
 
     await percySnapshot(assert);
@@ -49,6 +49,6 @@ module('Acceptance | wc', function (hooks) {
 
     assert.dom('[data-test-wc-message]').doesNotExist();
 
-    assert.equal(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/');
   });
 });

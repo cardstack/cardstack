@@ -259,8 +259,14 @@ module(
 
       await click(SAVE_DETAILS_BUTTON);
 
-      assert.equal(workflowSession.getValue<string>('merchantName'), 'HELLO!');
-      assert.equal(workflowSession.getValue<string>('merchantId'), VALID_ID);
+      assert.strictEqual(
+        workflowSession.getValue<string>('merchantName'),
+        'HELLO!'
+      );
+      assert.strictEqual(
+        workflowSession.getValue<string>('merchantId'),
+        VALID_ID
+      );
       assert.ok(workflowSession.getValue<string>('merchantBgColor'));
       assert.ok(workflowSession.getValue<string>('merchantTextColor'));
     });

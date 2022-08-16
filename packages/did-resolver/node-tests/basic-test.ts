@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { Resolver } from 'did-resolver';
-import { encodeDID, parseIdentifier, getResolver } from '../index';
-import shortUuid from 'short-uuid';
-import { shake_128 } from 'js-sha3';
 import * as fc from 'fast-check';
+import { shake_128 } from 'js-sha3';
+import shortUuid from 'short-uuid';
+import { encodeDID, getResolver, parseIdentifier } from '../index';
 
 describe('Cardstack DID Resolver', function () {
   beforeEach(async function () {});
@@ -96,6 +96,18 @@ describe('Cardstack DID Resolver', function () {
       expect(identifier).to.match(/^1s/);
       expect(parseIdentifier(identifier).type).to.eq('SupplierInfo');
     });
+
+    it('generates a DID for profile', function () {
+      let identifier = encodeDID({ type: 'Profile' }).split(':')[2];
+      expect(identifier).to.match(/^1o/);
+      expect(parseIdentifier(identifier).type).to.eq('Profile');
+    });
+
+    it('generates a DID for reward rule', function () {
+      let identifier = encodeDID({ type: 'RewardRule' }).split(':')[2];
+      expect(identifier).to.match(/^1r/);
+      expect(parseIdentifier(identifier).type).to.eq('RewardRule');
+    });
   });
 
   describe('resolver', function () {
@@ -124,6 +136,18 @@ describe('Cardstack DID Resolver', function () {
       let did = encodeDID({ type: 'SupplierInfo', version: 5, uniqueId });
       let result = await resolver.resolve(did);
       expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/supplier-info/${uniqueId}.json`);
+    });
+    it('returns a DIDDocument for a Profile', async function () {
+      let uniqueId = shortUuid.generate();
+      let did = encodeDID({ type: 'Profile', version: 3, uniqueId });
+      let result = await resolver.resolve(did);
+      expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/profile/${uniqueId}.json`);
+    });
+    it('returns a DIDDocument for a RewardRule', async function () {
+      let uniqueId = shortUuid.generate();
+      let did = encodeDID({ type: 'RewardRule', version: 20, uniqueId });
+      let result = await resolver.resolve(did);
+      expect(result.didDocument?.alsoKnownAs![0]).to.eq(`https://storage.cardstack.com/reward-rule/${uniqueId}.json`);
     });
     it('fails to parse with invalid checksum', async function () {
       let did = encodeDID({ type: 'SupplierInfo' });

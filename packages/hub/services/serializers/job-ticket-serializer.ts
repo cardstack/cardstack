@@ -2,24 +2,34 @@ import { JSONAPIDocument } from '../../utils/jsonapi-document';
 import { JobTicket } from '@prisma/client';
 
 export default class JobTicketSerializer {
-  serialize(model: JobTicket): JSONAPIDocument {
-    let attributes: any = {
-      state: model.state,
-    };
+  serialize(model: JobTicket): JSONAPIDocument;
+  serialize(model: JobTicket[]): JSONAPIDocument;
 
-    if (model.result) {
-      attributes.result = model.result;
+  serialize(model: JobTicket | JobTicket[]): JSONAPIDocument {
+    if (Array.isArray(model)) {
+      return {
+        data: model.map((m) => this.serialize(m).data),
+      };
+    } else {
+      let attributes: any = {
+        'job-type': model.jobType,
+        state: model.state,
+      };
+
+      if (model.result) {
+        attributes.result = model.result;
+      }
+
+      const result = {
+        data: {
+          id: model.id,
+          type: 'job-tickets',
+          attributes,
+        },
+      };
+
+      return result as JSONAPIDocument;
     }
-
-    const result = {
-      data: {
-        id: model.id,
-        type: 'job-tickets',
-        attributes,
-      },
-    };
-
-    return result as JSONAPIDocument;
   }
 }
 

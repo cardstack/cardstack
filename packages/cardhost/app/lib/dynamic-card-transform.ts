@@ -9,8 +9,6 @@ import { precompile } from '@glimmer/compiler';
 // @ts-ignore
 import HTMLBarsInlinePrecompile from 'babel-plugin-htmlbars-inline-precompile';
 // @ts-ignore
-import EmberModulesApiPolyfill from 'babel-plugin-ember-modules-api-polyfill';
-// @ts-ignore
 import TransformModulesAmd from '@babel/plugin-transform-modules-amd';
 // @ts-ignore
 import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
@@ -37,13 +35,11 @@ export default function dynamicCardTransform(
 }
 
 function babelConfig(moduleURL: string): TransformOptions {
-  let ensureModuleApiPolyfill = true; // For now?Not sure we need this...
-
   let plugins = [
     [
       HTMLBarsInlinePrecompile,
       {
-        ensureModuleApiPolyfill,
+        ensureModuleApiPolyfill: false,
         precompile,
         modules: {
           'ember-cli-htmlbars': 'hbs',
@@ -58,9 +54,6 @@ function babelConfig(moduleURL: string): TransformOptions {
     ],
   ];
 
-  if (ensureModuleApiPolyfill) {
-    plugins.push([EmberModulesApiPolyfill]);
-  }
   plugins.push([ColocatedBabelPlugin]);
   plugins.push([ClassPropertiesPlugin]);
   plugins.push([

@@ -1,10 +1,9 @@
 import { registry, setupHub } from '../helpers/server';
-import CardSpaceQueries from '../../queries/card-space';
-import MerchantInfoQueries from '../../queries/merchant-info';
 import shortUUID from 'short-uuid';
 import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
+import assert from 'assert';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -51,15 +50,11 @@ describe('POST /api/profile-purchases', function () {
   this.beforeEach(async function () {
     let container = getContainer();
     prisma = await (await container.lookup('prisma-manager')).getClient();
-    merchantInfosQueries = await container.lookup('merchant-info', { type: 'query' });
-    cardSpacesQueries = await container.lookup('card-space', { type: 'query' });
   });
 
-  let merchantInfosQueries: MerchantInfoQueries, cardSpacesQueries: CardSpaceQueries;
-
   it('validates the purchase, persists merchant information, returns a job ticket, and queues a single-attempt CreateProfile task', async function () {
-    let merchantId,
-      merchantDid,
+    let profileId,
+      profileDid,
       jobTicketId: string | undefined = undefined;
 
     await request()
@@ -100,17 +95,17 @@ describe('POST /api/profile-purchases', function () {
       .expect(201)
       .expect('Content-Type', 'application/vnd.api+json')
       .expect(function (res) {
-        merchantId = res.body.data.id;
-        merchantDid = res.body.data.attributes.did;
+        profileId = res.body.data.id;
+        profileDid = res.body.data.attributes.did;
         jobTicketId = res.body.included.find((included: any) => included.type === 'job-tickets').id;
 
         expect(res.body).to.deep.equal({
           data: {
-            id: merchantId,
+            id: profileId,
             type: 'merchant-infos',
             attributes: {
               name: 'Satoshi Nakamoto',
-              did: merchantDid,
+              did: profileDid,
               slug: 'satoshi',
               color: 'ff0000',
               'text-color': 'ffffff',
@@ -124,7 +119,7 @@ describe('POST /api/profile-purchases', function () {
             {
               id: jobTicketId,
               type: 'job-tickets',
-              attributes: { state: 'pending' },
+              attributes: { 'job-type': 'create-profile', state: 'pending' },
             },
           ],
         });
@@ -135,24 +130,22 @@ describe('POST /api/profile-purchases', function () {
       'a-receipt': 'yes',
     });
 
-    let merchantRecord = (await merchantInfosQueries.fetch({ id: merchantId }))[0];
-    expect(merchantRecord.name).to.equal('Satoshi Nakamoto');
-    expect(merchantRecord.slug).to.equal('satoshi');
-    expect(merchantRecord.color).to.equal('ff0000');
-    expect(merchantRecord.textColor).to.equal('ffffff');
-    expect(merchantRecord.ownerAddress).to.equal(stubUserAddress);
-
-    let cardSpaceRecord = (await cardSpacesQueries.query({ merchantId }))[0];
-    expect(cardSpaceRecord).to.exist;
+    let profileRecord = await prisma.profile.findUnique({ where: { id: profileId } });
+    assert(!!profileRecord);
+    expect(profileRecord.name).to.equal('Satoshi Nakamoto');
+    expect(profileRecord.slug).to.equal('satoshi');
+    expect(profileRecord.color).to.equal('ff0000');
+    expect(profileRecord.textColor).to.equal('ffffff');
+    expect(profileRecord.ownerAddress).to.equal(stubUserAddress);
 
     let jobTicketRecord = await prisma.jobTicket.findUnique({ where: { id: jobTicketId! } });
     expect(jobTicketRecord?.state).to.equal('pending');
     expect(jobTicketRecord?.ownerAddress).to.equal(stubUserAddress);
-    expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId });
+    expect(jobTicketRecord?.payload).to.deep.equal({ 'job-ticket-id': jobTicketId, 'merchant-info-id': profileId });
     expect(jobTicketRecord?.spec).to.deep.equal({ maxAttempts: 1 });
 
     expect(getJobIdentifiers()).to.deep.equal(['create-profile']);
-    expect(getJobPayloads()).to.deep.equal([{ 'job-ticket-id': jobTicketId, 'merchant-info-id': merchantId }]);
+    expect(getJobPayloads()).to.deep.equal([{ 'job-ticket-id': jobTicketId, 'merchant-info-id': profileId }]);
     expect(getJobSpecs()).to.deep.equal([{ maxAttempts: 1 }]);
   });
 
@@ -653,13 +646,15 @@ describe('POST /api/profile-purchases', function () {
   });
 
   it('rejects a duplicate slug', async function () {
-    await merchantInfosQueries.insert({
-      id: shortUUID.uuid(),
-      name: 'yes',
-      slug: 'satoshi',
-      color: 'pink',
-      textColor: 'black',
-      ownerAddress: 'me',
+    await prisma.profile.create({
+      data: {
+        id: shortUUID.uuid(),
+        name: 'yes',
+        slug: 'satoshi',
+        color: 'pink',
+        textColor: 'black',
+        ownerAddress: 'me',
+      },
     });
 
     await request()

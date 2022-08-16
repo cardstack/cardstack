@@ -1,12 +1,14 @@
-from .reward_program import RewardProgram
-from web3 import Web3
-import os
-import sentry_sdk
 import json
-import schedule
 import logging
+import os
 import time
+
+import schedule
+import sentry_sdk
 from dotenv import load_dotenv
+from web3 import Web3
+
+from .reward_program import RewardProgram
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -61,7 +63,7 @@ def safe_run(reward_program):
 
 def main():
     w3 = Web3(Web3.HTTPProvider(EVM_FULL_NODE_URL))
-    with open(f"abis/RewardManager.json") as contract_file:
+    with open("abis/RewardManager.json") as contract_file:
         contract = json.load(contract_file)
     reward_manager = w3.eth.contract(
         address=REWARD_MANAGER_ADDRESS, abi=contract["abi"]

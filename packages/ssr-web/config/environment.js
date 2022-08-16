@@ -44,7 +44,7 @@ module.exports = function (environment) {
     modulePrefix: '@cardstack/ssr-web',
     environment,
     rootURL: '/',
-    locationType: 'auto',
+    locationType: 'history',
     exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
     previewSubdomainInfix: 'ssr-web-preview',
@@ -59,7 +59,7 @@ module.exports = function (environment) {
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
         enabled:
           environment === 'production' && process.env.SENTRY_DSN !== undefined,
-        environment: process.env.SENTRY_ENVIRONMENT || 'staging',
+        environment: process.env.SSR_WEB_ENVIRONMENT || 'development',
         release:
           `ssr-web${
             process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
@@ -77,10 +77,6 @@ module.exports = function (environment) {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
-      },
-      EXTEND_PROTOTYPES: {
-        // Prevent Ember Data from overriding Date.parse.
-        Date: false,
       },
     },
 

@@ -42,9 +42,9 @@ export default class WalletConnectService {
         let embed = (await buildMessageWithQRCode(uri))
           .setTitle('Scan This QR Code to Connect')
           .setDescription(
-            `From your Card Wallet app, tap on the "Scan QR" button, scan the QR code displayed here, ` +
-              `and then tap on the "Connect" button to connect your Card Wallet so that I can give you ` +
-              `a prepaid card. On a mobile device? Install Card Wallet and then tap this link: ` +
+            `From your Cardstack Wallet app, tap on the "Scan QR" button, scan the QR code displayed here, ` +
+              `and then tap on the "Connect" button to connect your Cardstack Wallet so that I can give you ` +
+              `a prepaid card. On a mobile device? Install Cardstack Wallet and then tap this link: ` +
               `https://${merchantUniLinkDomain}/wc?uri=${uri}`
           );
         // capture this to make sure we don't leak async

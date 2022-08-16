@@ -29,26 +29,27 @@ module('Unit | image-validation', function (hooks) {
 
   test('It has default validation', async function (assert) {
     let validator = new ImageValidation();
-    assert.equal(typeof validator.minFileSize, 'number');
-    assert.equal(typeof validator.maxFileSize, 'number');
-    assert.equal(typeof validator.minHeight, 'number');
-    assert.equal(typeof validator.maxHeight, 'number');
-    assert.equal(typeof validator.minWidth, 'number');
-    assert.equal(typeof validator.maxWidth, 'number');
+    assert.strictEqual(typeof validator.minFileSize, 'number');
+    assert.strictEqual(typeof validator.maxFileSize, 'number');
+    assert.strictEqual(typeof validator.minHeight, 'number');
+    assert.strictEqual(typeof validator.maxHeight, 'number');
+    assert.strictEqual(typeof validator.minWidth, 'number');
+    assert.strictEqual(typeof validator.maxWidth, 'number');
     assert.deepEqual(validator.fileType, ['image/png', 'image/jpeg']);
   });
 
   test('Its default validation can be overwritten', async function (assert) {
     let validator = new ImageValidation(config);
-    assert.equal(validator.minFileSize, config.minFileSize);
-    assert.equal(validator.maxFileSize, config.maxFileSize);
-    assert.equal(validator.minHeight, config.minHeight);
-    assert.equal(validator.maxHeight, config.maxHeight);
-    assert.equal(validator.minWidth, config.minWidth);
-    assert.equal(validator.maxWidth, config.maxWidth);
+    assert.strictEqual(validator.minFileSize, config.minFileSize);
+    assert.strictEqual(validator.maxFileSize, config.maxFileSize);
+    assert.strictEqual(validator.minHeight, config.minHeight);
+    assert.strictEqual(validator.maxHeight, config.maxHeight);
+    assert.strictEqual(validator.minWidth, config.minWidth);
+    assert.strictEqual(validator.maxWidth, config.maxWidth);
     assert.deepEqual(validator.fileType, config.fileType);
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It throws when set up with invalid config', async function (assert) {
     let invalidConfigs: Record<string, Partial<ImageRequirements>> = {
       width: {
@@ -96,10 +97,10 @@ module('Unit | image-validation', function (hooks) {
   test('It can detect a valid image', async function (assert) {
     let validator = new ImageValidation(config);
     let result = await validator.validate(image);
-    assert.ok(
-      result.valid && result.fileType && result.fileSize && result.imageSize,
-      'Validation succeeds'
-    );
+    assert.ok(result.valid, 'Validation succeeds');
+    assert.ok(result.fileType, 'Validation succeeds');
+    assert.ok(result.fileSize, 'Validation succeeds');
+    assert.ok(result.imageSize, 'Validation succeeds');
   });
 
   test('It can detect invalid image file type', async function (assert) {
@@ -110,7 +111,7 @@ module('Unit | image-validation', function (hooks) {
       'Validation should not succeed for invalid file type'
     );
     assert.notOk(result.fileType, 'Invalid file type is detected');
-    assert.equal(
+    assert.strictEqual(
       result.message,
       'Please upload an image with a file type of gif'
     );
@@ -124,6 +125,7 @@ module('Unit | image-validation', function (hooks) {
     );
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It can detect invalid image size', async function (assert) {
     let failingConfigs: Record<string, Partial<ImageRequirements>> = {
       minWidthFails: {
@@ -158,7 +160,7 @@ module('Unit | image-validation', function (hooks) {
         validationResult.imageSize,
         `Image size should not be valid, tested condition: ${condition}`
       );
-      assert.equal(
+      assert.strictEqual(
         validationResult.message,
         `Please upload an image larger than ${validator.minWidth}x${validator.minHeight}, and smaller than ${validator.maxWidth}x${validator.maxHeight}`
       );
@@ -167,6 +169,7 @@ module('Unit | image-validation', function (hooks) {
     }
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('It can detect invalid file size', async function (assert) {
     let failingConfigs: Record<string, Partial<ImageRequirements>> = {
       minFileSizeFails: {
@@ -207,7 +210,7 @@ module('Unit | image-validation', function (hooks) {
         validationResult.fileSize,
         `File size should not be valid, tested condition: ${condition}`
       );
-      assert.equal(
+      assert.strictEqual(
         validationResult.message,
         failingMessages[condition](validator)
       );
