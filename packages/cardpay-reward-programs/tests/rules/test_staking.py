@@ -1,15 +1,10 @@
-import math
-from re import M, fullmatch
-from tkinter import END
-
 import duckdb
 import hypothesis.strategies as st
-import hypothesis.strategies as tuples
 import pandas as pd
 import pytest
-from cardpay_reward_programs.rules import safe_ownership, staking
+from cardpay_reward_programs.rules import staking
 from hypothesis import given, settings
-from hypothesis.extra.pandas import column, columns, data_frames, range_indexes
+from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
 START_BLOCK = 30
@@ -18,10 +13,10 @@ CYCLE_LENGTH = 30
 token_holder_table = "_TOKEN_HOLDER"
 safe_ownership_table = "_SAFE_OWNERSHIP"
 
-owner_st = st.from_regex("owner\-[0-2]", fullmatch=True)
-safe_st = st.from_regex("safe\-[0-2]", fullmatch=True)
-card_st = st.from_regex("card\-[0-0]", fullmatch=True)
-depot_st = st.from_regex("depot", fullmatch=True)
+owner_st = st.from_regex(r"owner\-[0-2]", fullmatch=True)
+safe_st = st.from_regex(r"safe\-[0-2]", fullmatch=True)
+card_st = st.from_regex(r"card\-[0-0]", fullmatch=True)
+depot_st = st.from_regex(r"depot", fullmatch=True)
 block_number_so_st = st.integers(min_value=0, max_value=1)
 # card_st = st.text("card")
 block_number_st = st.integers(min_value=1, max_value=END_BLOCK + 50)

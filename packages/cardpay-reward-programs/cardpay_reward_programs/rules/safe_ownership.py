@@ -60,11 +60,11 @@ class SafeOwnership(Rule):
             self.safe_type,
             self.max_rewards,
         ]
-        
+
         table_query = self._get_table_query(
             "safe_owner", "safe_owner", self.start_analysis_block, payment_cycle
         )
-        
+
         if table_query == "parquet_scan([])":
             df = pd.DataFrame(columns=["payee", "payable_safes"])
         else:

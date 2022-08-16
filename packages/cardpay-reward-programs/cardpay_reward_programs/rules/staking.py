@@ -1,5 +1,3 @@
-from tracemalloc import start
-
 import pandas as pd
 from cardpay_reward_programs.rule import Rule
 
@@ -31,15 +29,15 @@ class Staking(Rule):
                     AND _block_number::integer < $2::integer
                 )
                 group by safe, _block_number, type
-            ), 
+            ),
             filtered_balances as (
-                select tht.safe, tht.balance_downscale_e9_uint64::int64 as balance_int64, tht._block_number, tht.token, 
+                select tht.safe, tht.balance_downscale_e9_uint64::int64 as balance_int64, tht._block_number, tht.token,
                 from {token_holder_table} as tht, filtered_safes as sot
                 where tht.safe = sot.safe
                 and sot.type = 'depot'
             ),
-            balance_changes as (select 
-                safe, 
+            balance_changes as (select
+                safe,
                 balance_int64 - lag(balance_int64, 1 ,0) over (partition by safe order by _block_number asc) as change,
                 $5::float+1 as interest_rate,
                 ($2::integer - _block_number::integer) / $4::float  as compounding_rate,
@@ -47,7 +45,7 @@ class Staking(Rule):
                 where _block_number::integer < $2::integer
                 and token = $3::text
                 and safe is not null
-                qualify 
+                qualify
                 _block_number::integer >= $1::integer
                 ),
             original_balances as (select safe,
@@ -62,12 +60,12 @@ class Staking(Rule):
                     SELECT MAX(_block_number)
                     FROM filtered_balances b
                     WHERE a.safe = b.safe
-                    AND _block_number::integer < $1::integer 
+                    AND _block_number::integer < $1::integer
                 )
                 group by safe
                 ),
             all_data as (select * from original_balances union all select * from balance_changes)
-            
+
             select owner as payee, sum(change * ((interest_rate**compounding_rate) - 1)) as rewards
             from all_data
             left join filtered_safes using (safe)

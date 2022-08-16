@@ -9,7 +9,7 @@ from cloudpathlib import AnyPath, S3Client
 from dotenv import load_dotenv
 
 from .payment_tree import PaymentTree
-from .rules import *
+from .rules import *  # noqa: F403 F401
 from .utils import write_parquet_file
 
 load_dotenv()

@@ -1,5 +1,3 @@
-from logging import raiseExceptions
-
 import duckdb
 import pandas as pd
 from cardpay_reward_programs.rules import dummy_rule
@@ -59,21 +57,21 @@ def create_rule(
         spend_accumulation_table = "SPEND_TABLE"
         safe_owner_table = "SAFE_TABLE"
 
-        return f""" 
+        return f"""
             with merchant_safes as (
- 	            select merchant_safe, _block_number
-	            from {spend_accumulation_table}
-	            where _block_number > $1::integer
-	            and _block_number < $2::integer
-	            and historic_spend_balance_uint64 > $3::integer
+                select merchant_safe, _block_number
+                from {spend_accumulation_table}
+                where _block_number > $1::integer
+                and _block_number < $2::integer
+                and historic_spend_balance_uint64 > $3::integer
             ),
             final_safes as (
                 select merchant_safe,
                 max(_block_number)
                 from merchant_safes
-                group by 1      
+                group by 1
             )
-            select safe.owner as payee from {safe_owner_table} as safe, 
+            select safe.owner as payee from {safe_owner_table} as safe,
                 final_safes as f_s
                 where f_s.merchant_safe = safe.safe;
         """

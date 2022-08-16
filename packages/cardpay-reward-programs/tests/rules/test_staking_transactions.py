@@ -1,8 +1,5 @@
-import math
-
 import duckdb
 import hypothesis.strategies as st
-import hypothesis.strategies as tuples
 import pandas as pd
 import pytest
 from cardpay_reward_programs.rules import staking
