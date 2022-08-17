@@ -93,7 +93,7 @@ class RetroAirdrop(Rule):
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "transactions"])
         else:
-            base_df = self.run_query(table_query, vars, None)
+            base_df = self.run_query(table_query, vars)
         airdrop_payments = self.calculate_airdrop_reward_amounts(
             base_df, payment_cycle, reward_program_id
         )
