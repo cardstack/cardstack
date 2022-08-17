@@ -164,7 +164,7 @@ class CreateProfileWorkflow extends Workflow {
           message: 'Let’s create a new profile.',
         }),
         new WorkflowCard({
-          cardName: 'MERCHANT_CUSTOMIZATION',
+          cardName: 'PROFILE_CUSTOMIZATION',
           componentName:
             'card-pay/create-profile-workflow/profile-customization',
         }),

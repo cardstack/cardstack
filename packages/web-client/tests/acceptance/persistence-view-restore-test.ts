@@ -115,7 +115,7 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({
           meta: {
             version: PROFILE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
             updatedAt: Date.UTC(2020, 8, 22, 20, 50, 18, 491).toString(),
@@ -247,7 +247,7 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({
           meta: {
             version: PROFILE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
           },
@@ -270,7 +270,7 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({
           meta: {
             version: PROFILE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
           },
@@ -297,7 +297,7 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({
           meta: {
             version: PROFILE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
             completedMilestonesCount: 3,
             milestonesCount: 3,
           },
@@ -317,7 +317,7 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({
           meta: {
             version: PROFILE_CREATION_WORKFLOW_VERSION,
-            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
           },

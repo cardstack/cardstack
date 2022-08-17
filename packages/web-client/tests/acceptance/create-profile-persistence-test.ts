@@ -93,7 +93,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       let state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
         },
         profileName,
         profileSlug,
@@ -110,7 +110,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
 
       assert
         .dom('[data-test-prepaid-card-choice-profile-slug]')
@@ -130,7 +130,7 @@ module('Acceptance | create profile persistence', function (hooks) {
           version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER2_CONNECT',
-            'MERCHANT_CUSTOMIZATION',
+            'PROFILE_CUSTOMIZATION',
             'PREPAID_CARD_CHOICE',
           ],
         },
@@ -155,7 +155,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert
         .dom('[data-test-milestone-completed][data-test-milestone="2"]')
         .exists(); // Prepaid card choice
@@ -181,7 +181,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
           milestonesCount: 3,
           completedMilestonesCount: 2,
           isCanceled: true,
@@ -202,7 +202,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert
         .dom('[data-test-cancelation]')
         .includesText(
@@ -224,7 +224,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
         },
         profileName,
         profileSlug,
@@ -242,7 +242,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
-      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Profile info
 
       assert
         .dom('[data-test-cancelation]')
@@ -254,7 +254,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       // Starts over
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
 
       const workflowPersistenceId = new URL(
@@ -269,7 +269,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
         },
         profileName,
         profileSlug,
@@ -286,7 +286,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert.dom('[data-test-milestone="2"]').exists(); // Prepaid card choice
 
       await waitFor('[data-test-milestone="1"] [data-test-boxel-button]');
@@ -295,7 +295,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
     });
 
@@ -303,7 +303,7 @@ module('Acceptance | create profile persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
         },
         profileName,
         profileSlug,
@@ -319,7 +319,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
-      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Profile info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
 
       assert
@@ -348,7 +348,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
-      assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').exists(); // Profile info
       assert.dom('[data-test-milestone="2"]').doesNotExist();
 
       await waitFor(`[data-test-profile="${profileName}"]`);
@@ -365,7 +365,7 @@ module('Acceptance | create profile persistence', function (hooks) {
           version: WORKFLOW_VERSION - 1,
           completedMilestonesCount: 2,
           milestonesCount: MILESTONE_TITLES.length,
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedCardNames: ['LAYER2_CONNECT', 'PROFILE_CUSTOMIZATION'],
         },
         profileName,
         profileSlug,
@@ -381,7 +381,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
       await visit('/card-pay/payments?flow=create-business&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
-      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Profile info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
 
       assert

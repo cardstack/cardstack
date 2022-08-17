@@ -88,7 +88,7 @@ export default class CardPayCreateProfileWorkflowPrepaidCardChoiceComponent exte
     let profileSafe = workflowSession.getValue('profileSafe');
 
     if (txnHash && !profileSafe) {
-      this.createMerchant();
+      this.createProfile();
     }
   }
 
@@ -126,7 +126,7 @@ export default class CardPayCreateProfileWorkflowPrepaidCardChoiceComponent exte
     this.selectedPrepaidCardAddress = option.card.address;
   }
 
-  @action createMerchant() {
+  @action createProfile() {
     taskFor(this.createTask)
       .perform()
       .catch((e) => console.error(e));
@@ -268,7 +268,7 @@ export default class CardPayCreateProfileWorkflowPrepaidCardChoiceComponent exte
     }
   }
 
-  get hasTriedCreatingMerchant() {
+  get hasTriedCreatingProfile() {
     return taskFor(this.createTask).performCount > 0;
   }
 

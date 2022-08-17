@@ -15,7 +15,7 @@ import { isPresent } from '@ember/utils';
 
 const randomColorOptions = config.environment === 'test' ? { seed: 1 } : {};
 
-export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
+export default class CardPayCreateProfileWorkflowProfileCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   @service declare profile: ProfileService;
 
@@ -23,8 +23,8 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
     randomColor(randomColorOptions).toHexString();
   @tracked profileName: string = '';
   @tracked profileSlug: string = '';
-  @tracked lastCheckedMerchantId = '';
-  @tracked lastCheckedMerchantIdValid = false;
+  @tracked lastCheckedProfileSlug = '';
+  @tracked lastCheckedProfileSlugValid = false;
   @tracked profileNameValidationMessage = '';
   @tracked profileSlugValidationMessage = '';
   @tracked profileBgColorValidationMessage = '';
@@ -71,8 +71,8 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
     if (taskFor(this.validateProfileSlugTask).isRunning) {
       return 'loading';
     } else if (
-      this.lastCheckedMerchantId === this.profileSlug &&
-      this.lastCheckedMerchantIdValid
+      this.lastCheckedProfileSlug === this.profileSlug &&
+      this.lastCheckedProfileSlugValid
     ) {
       return 'valid';
     } else if (this.profileSlugValidationMessage) {
@@ -96,7 +96,7 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
 
   @action onProfileNameInput(value: string) {
     this.profileName = value;
-    this.validateMerchantName();
+    this.validateProfileName();
   }
 
   @action onProfileSlugInput(value: string) {
@@ -137,7 +137,7 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
     this.args.onComplete?.();
   }
 
-  @action validateMerchantName() {
+  @action validateProfileName() {
     let message: string = '';
     if (!this.trimmedProfileName.length) {
       message = 'This field is required';
@@ -153,8 +153,8 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
         // we know it's invalid if there's no profile id, so we don't need the previous task to keep running
         taskFor(this.validateProfileSlugTask).cancelAll();
         this.profileSlugValidationMessage = 'This field is required';
-        this.lastCheckedMerchantId = '';
-        this.lastCheckedMerchantIdValid = false;
+        this.lastCheckedProfileSlug = '';
+        this.lastCheckedProfileSlugValid = false;
       }
       // if there is a profile id, blur validation is a no-op
       // let the last validation task from input continue if it needs to
@@ -180,24 +180,24 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
     this.profileSlugValidationMessage = validateMerchantId(value);
 
     if (this.profileSlugValidationMessage) {
-      this.lastCheckedMerchantIdValid = false;
+      this.lastCheckedProfileSlugValid = false;
       return;
     }
 
     try {
       let { slugAvailable, detail } = yield taskFor(
-        this.profile.checkMerchantSlugUniquenessTask
+        this.profile.checkProfileSlugUniquenessTask
       ).perform({ slug: value });
 
-      this.lastCheckedMerchantId = value;
+      this.lastCheckedProfileSlug = value;
       if (!slugAvailable) {
         this.profileSlugValidationMessage = detail;
-        this.lastCheckedMerchantIdValid = false;
+        this.lastCheckedProfileSlugValid = false;
         return;
       }
 
       this.profileSlugValidationMessage = '';
-      this.lastCheckedMerchantIdValid = true;
+      this.lastCheckedProfileSlugValid = true;
       return;
     } catch (e) {
       console.error('Error validating uniqueness', e);
@@ -205,8 +205,8 @@ export default class CardPayCreateProfileWorkflowMerchantCustomizationComponent 
 
       this.profileSlugValidationMessage =
         'There was an error validating profile ID uniqueness';
-      this.lastCheckedMerchantId = '';
-      this.lastCheckedMerchantIdValid = false;
+      this.lastCheckedProfileSlug = '';
+      this.lastCheckedProfileSlugValid = false;
 
       if (e.message.startsWith('No valid auth token')) {
         let { workflowSession } = this.args;

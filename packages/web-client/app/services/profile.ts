@@ -15,7 +15,7 @@ interface PersistProfileInfoTaskParams {
   textColor: string;
 }
 
-interface CheckMerchantSlugUniquenessTaskParams {
+interface checkProfileSlugUniquenessTaskParams {
   slug: string;
 }
 
@@ -67,8 +67,8 @@ export default class ProfileService extends Service {
     };
   }
 
-  @task *checkMerchantSlugUniquenessTask(
-    params: CheckMerchantSlugUniquenessTaskParams
+  @task *checkProfileSlugUniquenessTask(
+    params: checkProfileSlugUniquenessTaskParams
   ): TaskGenerator<{
     slugAvailable: boolean;
     detail: string;

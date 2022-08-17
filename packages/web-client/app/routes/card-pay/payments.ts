@@ -3,7 +3,7 @@ import '../../css/card-pay/payments.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/profiles-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/profiles-summary-hero.svg';
 
-const MERCHANTS_PANEL = {
+const PROFILES_PANEL = {
   title: 'Quick Payments',
   description:
     'Accept payments and tips backed by stablecoins with automatically managed currency conversions',
@@ -31,7 +31,7 @@ export default class CardPayBusinessServicesRoute extends BaseRoute {
   model(params: any, transition: any) {
     super.model(params, transition);
     return {
-      panel: MERCHANTS_PANEL,
+      panel: PROFILES_PANEL,
     };
   }
 }
