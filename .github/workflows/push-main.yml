@@ -20,14 +20,16 @@ jobs:
       # increasing the heap size to 8GB
       NODE_OPTIONS: --max-old-space-size=8192
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -38,14 +40,16 @@ jobs:
     name: Check Secret Access
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -95,14 +99,16 @@ jobs:
     steps:
       - name: Create database
         run: sudo -u postgres createdb hub_test
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -116,14 +122,16 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -170,9 +178,7 @@ jobs:
       cardie: ${{ steps.filter.outputs.cardie }}
       ssr_web: ${{ steps.filter.outputs.ssr_web }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -214,35 +220,83 @@ jobs:
               - 'yarn.lock'
               - 'waypoint.hcl'
 
+  build-hub-staging:
+    name: Build hub
+    needs: change_check
+    if: ${{ needs.change_check.outputs.hub == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: yarn --prefer-offline
+      - name: Build
+        run: yarn build
+        working-directory: packages/hub
+      - name: Tar artifact
+        run: tar -cvf artifact.tar packages/hub/dist
+      - uses: actions/upload-artifact@v3
+        with:
+          name: hub-${{ github.sha }}
+          path: artifact.tar
+
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
     needs: change_check
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [hub, hub-worker, hub-event-listener]
+        include:
+          - retain: "0"
+          - retain: "1"
+            app: hub
     steps:
       - uses: actions/checkout@v2
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
+      - uses: actions/download-artifact@v3
+        with:
+          name: hub-${{ github.sha }}
+      - name: Extract artifact
+        run: tar -xvf artifact.tar
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
-      - name: Deploy hub
-        uses: ./.github/actions/deploy-hub
+      - name: Deploy ${{ matrix.app }}
+        uses: ./.github/actions/waypoint-deploy
+        with:
+          app: ${{ matrix.app }}
+          retain: ${{ matrix.retain }}
+          environment: ${{ github.event.inputs.environment }}
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
+          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-        with:
-          environment: staging
-          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
@@ -250,11 +304,15 @@ jobs:
     if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -279,11 +337,16 @@ jobs:
     if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -299,8 +362,6 @@ jobs:
           SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
         with:
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -311,12 +372,16 @@ jobs:
     if: ${{ needs.change_check.outputs.boxel == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -348,11 +413,16 @@ jobs:
     if: ${{ needs.change_check.outputs.cardie == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -362,12 +432,12 @@ jobs:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
       - name: Deploy cardie
-        uses: ./.github/actions/deploy-cardie
-        env:
-          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
-          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+        uses: ./.github/actions/waypoint-deploy
         with:
+          app: cardie
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}

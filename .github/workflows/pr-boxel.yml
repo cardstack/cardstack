@@ -20,18 +20,21 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Test
         run: yarn test:boxel
 
@@ -41,9 +44,7 @@ jobs:
     outputs:
       boxel-files-changed: ${{ steps.boxel-files-that-changed.outputs.any_changed }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - name: Get boxel files that changed
         id: boxel-files-that-changed
         uses: tj-actions/changed-files@v1.1.2
@@ -64,12 +65,16 @@ jobs:
       S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
       S3_PREVIEW_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -99,12 +104,16 @@ jobs:
     env:
       S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -117,12 +126,9 @@ jobs:
           BOXEL_PREVIEW_GITHUB_TOKEN: ${{ secrets.BOXEL_PREVIEW_GITHUB_TOKEN }}
         with:
           branch: ${{ github.head_ref }}
-
       - name: Set env var for message
-        shell: bash
         run: |
           echo "COMMENT_TEXT=### :sparkles: Preview Boxel changes [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
-
       # finding a comment in given PR that contains the identifier string
       - name: Find comment that contains identifier
         uses: peter-evans/find-comment@v1
@@ -130,7 +136,6 @@ jobs:
         with:
           body-includes: ${{ env.COMMENT_TEXT }}
           issue-number: ${{ steps.fpr.outputs.pr-number }}
-
       - name: Create new comment if none exists
         uses: peter-evans/create-or-update-comment@v1
         if: steps.fc.outputs.comment-id == ''

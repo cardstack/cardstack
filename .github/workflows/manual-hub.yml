@@ -62,6 +62,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - uses: actions/download-artifact@v3
         with:
           name: hub-${{ github.sha }}
