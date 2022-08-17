@@ -68,7 +68,7 @@ class SafeOwnership(Rule):
         if table_query == "parquet_scan([])":
             df = pd.DataFrame(columns=["payee", "payable_safes"])
         else:
-            df = self.run_query(table_query, vars)
+            df = self.run_query(table_query, vars, None)
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
         df["validFrom"] = payment_cycle
