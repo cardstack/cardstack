@@ -8,7 +8,8 @@ import { getSentry } from '../utils/sentry';
 
 interface Args {
   named: {
-    slug: string;
+    slug?: string;
+    infoDID?: string;
   };
 }
 
@@ -31,7 +32,10 @@ export class Profile extends Resource<Args> implements ProfileResource {
   @tracked backgroundColor: string | undefined;
   @tracked textColor: string | undefined;
   @tracked ownerAddress: string | undefined;
+
   @tracked slug: string | undefined;
+  @tracked infoDID: string | undefined;
+  @tracked waitForInfo = false;
 
   @tracked loading = true;
   @tracked errored: Error | undefined;
@@ -39,12 +43,34 @@ export class Profile extends Resource<Args> implements ProfileResource {
   @service declare offChainJson: OffChainJsonService;
   sentry = getSentry();
 
-  modify(_positional: any, { slug }: { slug: any }) {
+  modify(
+    _positional: any,
+    { infoDID, slug }: { infoDID?: string; slug?: string }
+  ) {
+    this.infoDID = infoDID;
     this.slug = slug;
   }
+
   async run() {
+    if (this.infoDID) {
+      try {
+        await this.fetchProfileViaS3();
+        this.loading = false;
+      } catch (err) {
+        this.errored = err;
+        this.loading = false;
+
+        if (!isStorage404(err)) {
+          console.log('Exception fetching merchant info', err);
+          this.sentry.captureException(err);
+        }
+      }
+
+      return;
+    }
+
     try {
-      await this.fetchProfile(this.slug!);
+      await this.fetchProfileViaAPI(this.slug!);
     } catch (err) {
       this.errored = err;
 
@@ -57,7 +83,7 @@ export class Profile extends Resource<Args> implements ProfileResource {
     }
   }
 
-  private async fetchProfile(slug: string) {
+  private async fetchProfileViaAPI(slug: string) {
     try {
       const response = await fetch(`${config.hubURL}/api/profiles/${slug}`, {
         method: 'GET',
@@ -88,6 +114,20 @@ export class Profile extends Resource<Args> implements ProfileResource {
       this.sentry.captureException(e);
       this.errored = e;
       throw e;
+    }
+  }
+
+  private async fetchProfileViaS3(): Promise<void> {
+    let jsonApiDocument = await this.offChainJson.fetch(
+      this.infoDID,
+      this.waitForInfo
+    );
+
+    if (jsonApiDocument) {
+      this.id = jsonApiDocument.data.attributes['slug'];
+      this.name = jsonApiDocument.data.attributes['name'];
+      this.backgroundColor = jsonApiDocument.data.attributes['color'];
+      this.textColor = jsonApiDocument.data.attributes['text-color'];
     }
   }
 }
