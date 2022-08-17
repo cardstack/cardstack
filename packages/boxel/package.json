@@ -67,6 +67,7 @@
     "walk-sync": "^2.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.8",
     "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.4",
@@ -76,8 +77,9 @@
     "@embroider/core": "^1.8.3",
     "@embroider/test-setup": "^1.8.3",
     "@embroider/webpack": "^1.8.3",
-    "@glimmer/component": "^1.1.2",
-    "@glimmer/tracking": "^1.1.2",
+    "@glint/core": "^0.9.1",
+    "@glint/environment-ember-loose": "^0.9.1",
+    "@glint/environment-ember-template-imports": "^0.9.1",
     "@percy/cli": "^1.0.0-beta.70",
     "@percy/ember": "^3.0.0",
     "@types/ember": "^3.1.2",
@@ -134,6 +136,7 @@
     "ember-source": "^4.6.0",
     "ember-source-channel-url": "^3.0.0",
     "ember-table": "^4.0.0-beta.4",
+    "ember-template-imports": "^3.0.1",
     "ember-template-lint": "^3.16.0",
     "ember-try": "^2.0.0",
     "eslint": "^7.32.0",
