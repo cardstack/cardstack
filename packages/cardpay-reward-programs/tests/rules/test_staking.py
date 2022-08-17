@@ -3,7 +3,7 @@ import hypothesis.strategies as st
 import pandas as pd
 import pytest
 from cardpay_reward_programs.rules import staking
-from hypothesis import given, settings, example
+from hypothesis import example, given, settings
 from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
@@ -18,7 +18,6 @@ safe_st = st.from_regex(r"safe\-[0-2]", fullmatch=True)
 card_st = st.from_regex(r"card\-[0-0]", fullmatch=True)
 depot_st = st.from_regex(r"depot", fullmatch=True)
 block_number_so_st = st.integers(min_value=0, max_value=1)
-# card_st = st.text("card")
 block_number_st = st.integers(min_value=1, max_value=END_BLOCK + 50)
 balance_st = st.integers(min_value=1, max_value=24032768)
 
@@ -354,7 +353,10 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
         payees = set()
         for _, row in token_holder_df.iterrows():
             cur_block_num = row["_block_number"]
-            if 0 <= cur_block_num < END_BLOCK and row["balance_downscale_e9_uint64"] > 0:
+            if (
+                0 <= cur_block_num < END_BLOCK
+                and row["balance_downscale_e9_uint64"] > 0
+            ):
                 rewarded_safe = row["safe"]
                 owner = safe_owner_df.where(safe_owner_df["safe"] == rewarded_safe)[
                     "owner"
@@ -369,7 +371,6 @@ def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
             if result.where(result["payee"] == payee)["amount"][0] <= 0:
                 all_positive_rewards = False
         assert all_positive_rewards
-
 
 
 def apply_transfers(starting_balances, transfers):

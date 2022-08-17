@@ -1,5 +1,5 @@
-import pandas as pd
 import duckdb
+import pandas as pd
 from cardpay_reward_programs.rule import Rule
 
 

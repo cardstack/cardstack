@@ -1,9 +1,9 @@
+from .dummy_rule import DummyRule
 from .flat_payment import FlatPayment
 from .min_other_merchants_paid import MinOtherMerchantsPaid
 from .min_spend import MinSpend
 from .retro_airdrop import RetroAirdrop
 from .safe_ownership import SafeOwnership
-from .dummy_rule import DummyRule
 from .staking import Staking
 from .weighted_usage import WeightedUsage
 
