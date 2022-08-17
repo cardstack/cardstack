@@ -1,4 +1,3 @@
-from .dummy_rule import DummyRule
 from .flat_payment import FlatPayment
 from .min_other_merchants_paid import MinOtherMerchantsPaid
 from .min_spend import MinSpend
@@ -8,7 +7,6 @@ from .staking import Staking
 from .weighted_usage import WeightedUsage
 
 __all__ = [
-    "DummyRule",
     "Staking",
     "MinOtherMerchantsPaid",
     "MinSpend",

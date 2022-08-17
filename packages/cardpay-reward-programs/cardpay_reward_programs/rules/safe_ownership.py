@@ -26,7 +26,7 @@ class SafeOwnership(Rule):
         self.safe_type = safe_type
         self.max_rewards = max_rewards
 
-    def sql(self, table_query):
+    def sql(self, table_query, aux_table_query=None):
         return f"""
         with total_safes as (select
                 owner as payee,

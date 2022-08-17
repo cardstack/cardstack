@@ -22,7 +22,7 @@ class MinOtherMerchantsPaid(Rule):
         self.token = token
         self.duration = duration
 
-    def sql(self, table_query):
+    def sql(self, table_query, aux_table_query=None):
         return f"""
         select
         prepaid_card_owner as payee,

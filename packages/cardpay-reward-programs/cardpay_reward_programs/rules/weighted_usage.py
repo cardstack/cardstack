@@ -21,7 +21,7 @@ class WeightedUsage(Rule):
         self.token = token
         self.duration = duration
 
-    def sql(self, table_query, aux_table_query=None):
+    def sql(self, table_query):
         return f"""
         select
         prepaid_card_owner as payee,
