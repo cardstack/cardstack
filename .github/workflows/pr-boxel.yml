@@ -20,7 +20,7 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
         uses: actions/cache@v3
@@ -44,7 +44,7 @@ jobs:
     outputs:
       boxel-files-changed: ${{ steps.boxel-files-that-changed.outputs.any_changed }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Get boxel files that changed
         id: boxel-files-that-changed
         uses: tj-actions/changed-files@v1.1.2
@@ -65,7 +65,7 @@ jobs:
       S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
       S3_PREVIEW_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
         uses: actions/cache@v3
@@ -104,7 +104,7 @@ jobs:
     env:
       S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
         uses: actions/cache@v3
