@@ -4,6 +4,7 @@ FROM python:3.9 AS builder
 # install PDM
 RUN pip install -U pip setuptools wheel
 RUN pip install pdm
+RUN pdm config python.use_venv false
 
 # copy files
 COPY pyproject.toml pdm.lock /project/
