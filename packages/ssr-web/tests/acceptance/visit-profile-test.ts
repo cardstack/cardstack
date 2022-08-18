@@ -99,11 +99,11 @@ module('Acceptance | visit profile', function (hooks) {
 
       assert
         .dom(`meta[property='og:description']`, document.documentElement)
-        .hasAttribute('content', 'Visit profile name’s profile on Card Space');
+        .hasAttribute('content', 'Visit profile name’s profile on card.xyz');
 
       assert
         .dom(`meta[name='twitter:description']`, document.documentElement)
-        .hasAttribute('content', 'Visit profile name’s profile on Card Space');
+        .hasAttribute('content', 'Visit profile name’s profile on card.xyz');
 
       assert
         .dom(

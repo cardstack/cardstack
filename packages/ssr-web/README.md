@@ -33,13 +33,13 @@ Deployed versions will use a "HUB_URL" env var.
 ### Viewing the app locally
 This app is actually two apps in one: 
 1. Wallet (Universal Link): An app that hosts a page for folks to request payments from others (wallet.cardstack.com), and acts as a fallback for the universal link.
-2. Card Space: An app to view payment profiles on the web.
+2. card.xyz: An app to view payment profiles on the web.
 
-The fastboot server differentiates which app is being served via host. We follow this behaviour in local development, matching the `.card.xyz.localhost:4210` suffix to recognize a request's intention to visit profile. When developing locally, you can view a user's Card Space at `${paymentProfileId}.card.xyz.localhost:4210`.  Requests that do not match this pattern will be treated as intending to visit the wallet domain.
+The fastboot server differentiates which app is being served via host. We follow this behaviour in local development, matching the `.card.xyz.localhost:4210` suffix to recognize a request's intention to visit profile. When developing locally, you can view a user's card.xyz at `${paymentProfileId}.card.xyz.localhost:4210`.  Requests that do not match this pattern will be treated as intending to visit the wallet domain.
 
 **IMPORTANT: This does not work on Safari, only Firefox and Chrome. Instructions for Safari setup below.**
 
-If you want to develop Card Space on Safari with the behaviour described above, you should:
+If you want to develop card.xyz on Safari with the behaviour described above, you should:
 1. Add `card.xyz.localhost` to your `/etc/hosts` as an alias of `127.0.0.1`
 2. Install `dnsmasq` with Homebrew. Wildcard DNS support does not come by default, so the entry in step 1 will only match `card.xyz.localhost`, not `${spaceId}.card.xyz.localhost`. `dnsmasq` fixes this.
 3. Make a directory for `dnsmasq` config to live: `sudo mkdir -p $(brew --prefix)/etc/dnsmasq.d`

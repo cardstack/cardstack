@@ -49,7 +49,7 @@ export default class ProfileUserPage extends Component<ProfileUserPageArgs> {
 
   get meta() {
     return {
-      description: `Visit ${this.args.model.name}’s profile on Card Space`,
+      description: `Visit ${this.args.model.name}’s profile on card.xyz`,
       title: `${this.args.model.name}’s Profile`,
       url: `https://${this.args.model.id}${config.profileHostnameSuffix}`,
     };
