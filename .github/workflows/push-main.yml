@@ -253,7 +253,7 @@ jobs:
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
-    needs: change_check
+    needs: build-hub-staging
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
     strategy:
