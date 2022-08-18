@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -37,14 +38,6 @@ jobs:
             exit 1;
           fi
 
-      - name: Set up yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -54,7 +47,6 @@ jobs:
       - name: Deploy ssr-web
         uses: ./.github/actions/deploy-ssr-web
         env:
-          AWS_DEFAULT_REGION: us-east-1
           SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"

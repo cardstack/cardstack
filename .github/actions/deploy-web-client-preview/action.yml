@@ -11,22 +11,31 @@ runs:
   steps:
     - uses: actions/checkout@v2
     - uses: volta-cli/action@v1
+
     - name: Set up yarn cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
-        path: ~/.cache/yarn
+        path: |
+          ~/.cache/yarn
+          node_modules
+          packages/*/node_modules
+          packages/firebase-functions/*/functions/node_modules
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
+
     - name: Install dependencies
       shell: bash
       run: yarn --prefer-offline
+
     - name: Set PR branch name
       shell: bash
       run: echo "RAW_PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+
     - name: Convert branch name to subdomain-compatible form
       shell: bash
       run: echo "PR_BRANCH_NAME=`echo ${RAW_PR_BRANCH_NAME} | tr _ - | tr '[:upper:]' '[:lower:]' | sed -e 's/-$//' | sed -e 's/[^a-z0-9\-]//g'`" >> $GITHUB_ENV
+
     - name: Deploy preview
       shell: bash
       run: yarn deploy:web-client:preview-${{ inputs.environment }}
@@ -34,6 +43,7 @@ runs:
     - name: Store preview host
       shell: bash
       run: echo "PREVIEW_HOST=https://$PR_BRANCH_NAME.$S3_PREVIEW_BUCKET_NAME/" >> $GITHUB_ENV
+
     - name: add check with link to preview deployment
       shell: bash
       env:

@@ -17,6 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -42,11 +55,9 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy reward indexer
-        uses: ./.github/actions/deploy-reward-indexer
+        uses: ./.github/actions/waypoint-deploy
         with:
+          app: reward-indexer
+          retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
