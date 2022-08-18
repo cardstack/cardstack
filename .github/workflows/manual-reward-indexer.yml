@@ -58,5 +58,6 @@ jobs:
         uses: ./.github/actions/waypoint-deploy
         with:
           app: reward-indexer
+          retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
