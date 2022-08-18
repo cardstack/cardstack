@@ -14,6 +14,10 @@ export default {
         type: 'string',
         description: 'The address that tally rewarded -- The owner of prepaid card.',
       })
+      .option('safeAddress', {
+        type: 'string',
+        description: 'safe address. Specify if you want gas estimates for each claim',
+      })
       .option('rewardProgramId', {
         type: 'string',
         description: 'The reward program id.',
@@ -29,16 +33,22 @@ export default {
       .option('network', NETWORK_OPTION_LAYER_2);
   },
   async handler(args: Arguments) {
-    let { network, address, rewardProgramId, tokenAddress, isValidOnly } = args as unknown as {
+    let { network, address, rewardProgramId, tokenAddress, isValidOnly, safeAddress } = args as unknown as {
       network: string;
       address: string;
+      safeAddress?: string;
       rewardProgramId?: string;
       tokenAddress?: string;
       isValidOnly?: boolean;
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    const proofs = await rewardPool.getProofs(address, rewardProgramId, tokenAddress, false);
+    let proofs;
+    if (safeAddress) {
+      proofs = await rewardPool.getProofs(address, safeAddress, rewardProgramId, tokenAddress, false);
+    } else {
+      proofs = await rewardPool.getProofs(address, undefined, rewardProgramId, tokenAddress, false);
+    }
     if (isValidOnly) {
       displayProofs(proofs.filter((o) => o.isValid));
     } else {
@@ -60,15 +70,21 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
 ---------------------------------------------------------------------`);
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
-      console.log(`
+      displayProof(o);
+    });
+  });
+}
+
+function displayProof(o: WithSymbol<Proof>) {
+  let gasAmount = o.gasEstimate?.amount;
+  console.log(`
       proof: ${fromProofArray(o.proofArray)}
       leaf: ${o.leaf}
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
       isValid: ${o.isValid} 
+      gasFees: ${gasAmount ? fromWei(gasAmount) + ' ' + o.tokenSymbol : 'No Gas Estimates'}
         `);
-    });
-  });
 }
 
 const fromProofArray = (arr: string[]): string => {
