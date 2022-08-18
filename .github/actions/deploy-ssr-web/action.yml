@@ -37,5 +37,3 @@ runs:
         app: ssr-web
         environment: ${{ inputs.environment }}
         discord_webhook: ${{ inputs.discord_webhook }}
-      env:
-        AWS_DEFAULT_REGION: us-east-1

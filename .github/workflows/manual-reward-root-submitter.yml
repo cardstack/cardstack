@@ -56,3 +56,12 @@ jobs:
         run: |
           aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri')
           time aws lambda wait function-updated --function-name reward_root_submitter
+
+      - name: Send notification to Discord
+        if: ${{ always() }}
+        uses: ./.github/actions/discord-notification-deploy
+        with:
+          app: reward-submit
+          status: ${{ github.action_status }}
+          environment: ${{ github.event.inputs.environment }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}

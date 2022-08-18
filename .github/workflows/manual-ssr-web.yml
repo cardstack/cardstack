@@ -47,7 +47,6 @@ jobs:
       - name: Deploy ssr-web
         uses: ./.github/actions/deploy-ssr-web
         env:
-          AWS_DEFAULT_REGION: us-east-1
           SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"

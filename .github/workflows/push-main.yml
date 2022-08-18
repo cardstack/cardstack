@@ -294,7 +294,6 @@ jobs:
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
 
@@ -438,6 +437,5 @@ jobs:
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
