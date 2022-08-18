@@ -22,17 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       - run: yarn lint
 
@@ -42,17 +41,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       - name: Configure staging AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -101,17 +99,16 @@ jobs:
         run: sudo -u postgres createdb hub_test
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       - run: yarn db:test-init
         working-directory: packages/hub
@@ -124,17 +121,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       - name: Run boxel tests
         env:
@@ -228,17 +224,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - name: Install dependencies
         run: yarn --prefer-offline
       - name: Build
@@ -265,11 +260,10 @@ jobs:
             app: hub
     steps:
       - uses: actions/checkout@v2
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
@@ -304,17 +298,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -338,17 +331,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -373,17 +365,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -414,17 +405,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
