@@ -794,6 +794,15 @@ The leaf item contains most information about the claim, such as the reward prog
 
 `acceptPartialClaim` is a special scenario whereby a rewardee is willing to compromise his full reward compensation for a partial one. This scneario occurs, for example, when rewardee has 10 card in his proof but the reward pool only has 5 card, the rewardee may opt to just accepting that 5 card by setting `acceptPartialClaim=true`.
 
+### `RewardPool.claimAll`
+
+The `claimAll` is used by the rewardee to claim all rewards from a list of proofs. The looping occurs as separate transactions so the failure of one transaction will lead to the failure of all transactions after it (transactions before it will stil succeed). Proofs which have claims `rewardAmount < gasFees` will be excluded; this filter is to decrease the probability of `claimAll` failing.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
+await rewardManagerAPI.claimAll(unclaimedValidProofs)
+```
 
 ### `RewardPool.claimGasEstimate`
 
@@ -811,6 +820,24 @@ let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acceptPartialClaim)
 ```
 
+### `RewardPool.claimAllGasEstimate`
+
+The `claimAllGasEstimate` returns a cumulative gas estimate for a single token -- it accmulates `claimGasEstimate` calls from a list of proofs. This function complements `claimAll` in that it will also filter out proofs which have claims `rewardAmount < gasFees`. The SDK also assumes that all the proofs have a common token. 
+
+```ts
+interface GasEstimate {
+  gasToken: string 
+  amount: BN 
+}
+```
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
+await rewardManagerAPI.claimAllGasEstimate(unclaimedValidProofs)
+```
+
+
 ### `RewardPool.getProofs`
 
 The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner. Once a proof is used (i.e. `knownClaimed=true`) it cannot be re-used. `isValid` is a flag that checks if a proof is still valid. Assuming a proof has not been claimed, `isValid=false` means that a proof can no longer be claimed -- typically, to mean that the proof has expired.
@@ -827,13 +854,18 @@ interface Proof {
   leaf: string;
   isValid: boolean;
 }
+
+interface ClaimableProof extends Proof {
+  safeAddress: string;
+  gasEstimate: GasEstimate;
+}
 ```
 
 `
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.getProofs(address, rewardProgramId?, tokenAddress?, knownClaimed?)
+await rewardPool.getProofs(address, safeAddress?, rewardProgramId?, tokenAddress?, knownClaimed?)
 ```
 
 ### `RewardPool.recoverTokens`
