@@ -972,7 +972,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     const rule = await this.getRewardRule(rewardProgramId);
 
     let rewardPool = await getSDK('RewardPool', this.layer2Web3);
-    const tokenBalances = await rewardPool.balances(rewardProgramId);
+    const tokenBalances = await rewardPool.rewardProgramBalances(rewardProgramId);
     return {
       rewardProgramId,
       rewardProgramAdmin,
