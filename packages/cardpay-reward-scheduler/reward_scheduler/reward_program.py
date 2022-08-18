@@ -5,6 +5,8 @@ from copy import deepcopy
 import duckdb
 import requests
 from cloudpathlib import AnyPath
+from did_resolver import Resolver
+from python_did_resolver import get_resolver
 
 from .utils import get_files, get_latest_details, run_job
 
@@ -122,9 +124,16 @@ class RewardProgram:
         return set(range(start_block, end_block, payment_cycle_length))
 
     def get_rules(self):
-        rule_blob = self.reward_manager.caller.rule(self.reward_program_id)
-        if rule_blob:
-            rules = json.loads(rule_blob)
+        blob = self.reward_manager.caller.rule(self.reward_program_id)
+        if blob and blob != b"":
+            try:
+                did = blob.decode("utf-8")  # new blob format: hex encodes a did string
+                rules = resolve_rule(did)
+            except Exception:
+                # old blob format: our rule blobs were hex encoded json
+                # try..except maintains backward compatibality with our old blob format
+                # TODO: remove code once all reward programs have the old rule /blob removed
+                rules = json.loads(blob)
             if type(rules) == list:
                 return rules
             else:
@@ -206,3 +215,8 @@ class RewardProgram:
             )
             for payment_cycle in sorted(processable_payment_cycles):
                 self.run(payment_cycle, rule)
+
+
+def resolve_rule(did: str):
+    url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
+    return requests.get(url).json()

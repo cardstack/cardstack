@@ -3,11 +3,11 @@ name: CI [python-did-resolver]
 on:
   pull_request:
     paths:
-      - 'packages/python-did-resolver/**'
-      - 'packages/did-resolver/**'
+      - "packages/python-did-resolver/**"
+      - "packages/did-resolver/**"
       - "packages/test-support/**"
       - "packages/eslint-config/**"
-      - '.github/workflows/pr-python-did-resolver.yml'
+      - ".github/workflows/pr-python-did-resolver.yml"
       - "package.json"
       - "yarn.lock"
 
@@ -24,26 +24,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
-        uses: actions/cache@v2
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
+
       - run: yarn add -W ts-node --prefer-offline
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pdm
           pdm install -d
+
       - name: Test with pytest
         run: |
           pdm run -s pytest tests

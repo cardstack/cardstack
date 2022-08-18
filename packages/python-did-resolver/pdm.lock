@@ -6,8 +6,8 @@ summary = "Atomic file writes."
 
 [[package]]
 name = "attrs"
-version = "21.4.0"
-requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "22.1.0"
+requires_python = ">=3.5"
 summary = "Classes Without Boilerplate"
 
 [[package]]
@@ -21,6 +21,7 @@ dependencies = [
     "pathspec>=0.9.0",
     "platformdirs>=2",
     "tomli>=1.1.0; python_full_version < \"3.11.0a7\"",
+    "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -66,7 +67,7 @@ dependencies = [
 
 [[package]]
 name = "hypothesis"
-version = "6.52.4"
+version = "6.53.0"
 requires_python = ">=3.7"
 summary = "A library for property-based testing"
 dependencies = [
@@ -213,15 +214,15 @@ summary = "Backported and Experimental Type Hints for Python 3.7+"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:1307371f3fc371eba9da86951ffbd75cf9a56205b59a09bcfb5ebdbb2b478b16"
+content_hash = "sha256:9e7ded5ab06916b6763d50eeb888eafd26249c23a9c427fa6020a142ef838992"
 
 [metadata.files]
 "atomicwrites 1.4.1" = [
     {file = "atomicwrites-1.4.1.tar.gz", hash = "sha256:81b2c9071a49367a7f770170e5eec8cb66567cfbbc8c73d20ce5ca4a8d71cf11"},
 ]
-"attrs 21.4.0" = [
-    {file = "attrs-21.4.0-py2.py3-none-any.whl", hash = "sha256:2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4"},
-    {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
+"attrs 22.1.0" = [
+    {file = "attrs-22.1.0-py2.py3-none-any.whl", hash = "sha256:86efa402f67bf2df34f51a335487cf46b1ec130d02b8d39fd248abfd30da551c"},
+    {file = "attrs-22.1.0.tar.gz", hash = "sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"},
 ]
 "black 22.6.0" = [
     {file = "black-22.6.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:f586c26118bc6e714ec58c09df0157fe2d9ee195c764f630eb0d8e7ccce72e69"},
@@ -268,9 +269,9 @@ content_hash = "sha256:1307371f3fc371eba9da86951ffbd75cf9a56205b59a09bcfb5ebdbb2
     {file = "flake8-4.0.1-py2.py3-none-any.whl", hash = "sha256:479b1304f72536a55948cb40a32dce8bb0ffe3501e26eaf292c7e60eb5e0428d"},
     {file = "flake8-4.0.1.tar.gz", hash = "sha256:806e034dda44114815e23c16ef92f95c91e4c71100ff52813adf7132a6ad870d"},
 ]
-"hypothesis 6.52.4" = [
-    {file = "hypothesis-6.52.4-py3-none-any.whl", hash = "sha256:9e5da519958099586d4d44267a87fb83fe127ac6bafae4ecccfe2598c78d37fe"},
-    {file = "hypothesis-6.52.4.tar.gz", hash = "sha256:2af2f03cf49d44e2f8df916d46af6f9a0beeb2ca4c936512a6af0d61f4690772"},
+"hypothesis 6.53.0" = [
+    {file = "hypothesis-6.53.0-py3-none-any.whl", hash = "sha256:9c2b073731010cc00bcf060e71bd8f9507f6fe8f6d173f454634d1b91c537412"},
+    {file = "hypothesis-6.53.0.tar.gz", hash = "sha256:39f225530c28fe484a59c39839c8a2fb414f2ecfd4743f75d82f55e0f09268c0"},
 ]
 "hypothesis-auto 1.1.4" = [
     {file = "hypothesis_auto-1.1.4-py3-none-any.whl", hash = "sha256:fea8560c4522c0fd490ed8cc17e420b95dabebb11b9b334c59bf2d768839015f"},

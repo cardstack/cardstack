@@ -38,7 +38,7 @@ function getServices(cluster, appName) {
     const slicedServiceNames = serviceArns.slice(i, i + 10 > serviceArns.length ? serviceArns.length : i + 10);
 
     const responseJson = execute(
-      `aws ecs describe-services --cluster ${cluster} --services ${slicedServiceNames.join(' ')}`
+      `aws ecs describe-services --include TAGS --cluster ${cluster} --services ${slicedServiceNames.join(' ')}`
     );
     const response = JSON.parse(responseJson);
     services = services.concat(response.services);
@@ -55,6 +55,21 @@ function getServices(cluster, appName) {
   });
 
   return services;
+}
+
+function isTagged(service, tags) {
+  if (!service.tags) return false;
+
+  let existingTags = {};
+  service.tags.forEach((tag) => {
+    existingTags[tag.key] = tag.value;
+  });
+
+  for (const key in tags) {
+    if (existingTags[key] !== tags[key]) return false;
+  }
+
+  return service.enableECSManagedTags && service.propagateTags === 'SERVICE';
 }
 
 function tagResources(cluster, service, tags) {
@@ -90,7 +105,10 @@ function main() {
   console.log('\n» Tagging resources...');
   const services = getServices(config.cluster, appName);
   const latestService = services[0];
-  tagResources(config.cluster, latestService, tags);
+
+  if (!isTagged(latestService, tags)) {
+    tagResources(config.cluster, latestService, tags);
+  }
 }
 
 try {

@@ -28,16 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
-        uses: actions/cache@v2
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
       - run: yarn --prefer-offline
       # using yarn to install @percy/cli suddenly started causing V8 out of
       # memory errors. According to https://stackoverflow.com/a/56568741 likely
@@ -63,8 +64,6 @@ jobs:
       web-client-files-changed: ${{ steps.web-client-files-that-changed.outputs.any_changed }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Get web client files that changed
         id: web-client-files-that-changed
         uses: tj-actions/changed-files@v1.1.2

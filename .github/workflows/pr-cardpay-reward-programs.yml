@@ -3,8 +3,8 @@ name: CI [cardpay-reward-programs]
 on:
   pull_request:
     paths:
-      - 'packages/cardpay-reward-programs/**'
-      - '.github/workflows/pr-cardpay-reward-programs.yml'
+      - "packages/cardpay-reward-programs/**"
+      - ".github/workflows/pr-cardpay-reward-programs.yml"
 
 jobs:
   test:
