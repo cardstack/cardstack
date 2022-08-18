@@ -32,11 +32,10 @@ jobs:
             exit 1;
           fi
 
-      - name: Set up yarn cache
+      - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/yarn
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
