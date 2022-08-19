@@ -66,6 +66,7 @@ export interface RewardTokenBalance {
   rewardProgramId: string;
   tokenAddress: string;
   balance: BN;
+  balanceWithoutCryptoDust?: BN;
 }
 
 export interface HasTokenAddress {
@@ -253,10 +254,21 @@ export default class RewardPool {
     return leafs;
   }
 
-  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
-      (o) => o.isValid
-    );
+  async rewardTokenBalances(
+    address: string,
+    safeAddress?: string,
+    rewardProgramId?: string
+  ): Promise<WithSymbol<RewardTokenBalance>[]> {
+    let unclaimedValidProofs;
+    if (safeAddress) {
+      unclaimedValidProofs = (await this.getProofs(address, safeAddress, rewardProgramId, undefined, false)).filter(
+        (o) => o.isValid && o.gasEstimate.amount.lt(new BN(o.amount))
+      );
+    } else {
+      unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
+        (o) => o.isValid
+      );
+    }
     let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
       return {
         tokenAddress: o.tokenAddress,
