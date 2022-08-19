@@ -13,7 +13,8 @@ module.exports = {
       region: 'ap-southeast-1',
       roleChain: ['prod:storage-bucket-writer-role'],
       invalidationRoleChain: ['prod:cloudfront-distribution-invalidator-role'],
-      cloudfrontDistributionId: 'PLACEHOLDERFIXME',
+      cloudfrontDistributionId: 'E1YE1J4F4X2BOS',
+      fixCloudfrontDistributionId: 'FIXTHEABOVE it should be extracted from HUB_STORAGE_CLOUDFRONT_DISTRIBUTION',
     },
     ses: {
       supportEmail: 'no-reply@stack.cards',
