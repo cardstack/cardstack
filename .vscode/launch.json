@@ -752,8 +752,10 @@
         "rewards",
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
-        // "--rewardProgramId",
-        // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
+        "--safeAddress",
+        "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
+        "--rewardProgramId",
+        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
