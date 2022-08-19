@@ -1,0 +1,13 @@
+diff --git a/node_modules/ember-cli-mirage/addon/ember-data.js b/node_modules/ember-cli-mirage/addon/ember-data.js
+index 07d3149..75c2d89 100644
+--- a/node_modules/ember-cli-mirage/addon/ember-data.js
++++ b/node_modules/ember-cli-mirage/addon/ember-data.js
+@@ -11,7 +11,7 @@ import { camelize } from './utils/inflector';
+ const {
+   modulePrefix,
+   podModulePrefix
+-} = config;
++} = config || {};
+ 
+ // Caches
+ let DsModels, Models;
