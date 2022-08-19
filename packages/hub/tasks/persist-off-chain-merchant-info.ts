@@ -25,7 +25,11 @@ export default class PersistOffChainMerchantInfo {
     };
 
     if (invalidate) {
-      putJobPayload.invalidateOnDistribution = config.get('aws.offchainStorage.cloudfrontDistributionId');
+      try {
+        putJobPayload.invalidateOnDistribution = config.get('aws.offchainStorage.cloudfrontDistributionId');
+      } catch (e) {
+        console.log('Error adding invalidation', e);
+      }
     }
 
     helpers.addJob('s3-put-json', putJobPayload);
