@@ -23,7 +23,12 @@ export default async function s3PutJson(payload: any, helpers: Helpers) {
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);
 
   if (invalidateOnDistribution) {
-    let cloudfrontClient = new CloudFrontClient(s3Config); // Is this okay to reuse?
+    let cloudfrontConfig = await awsConfig({ roleChain: ['prod:cloudfront-distribution-invalidator-role'] });
+    if (region) {
+      cloudfrontConfig.region = region;
+    }
+
+    let cloudfrontClient = new CloudFrontClient(cloudfrontConfig);
     let invalidationCommand = new CreateInvalidationCommand({
       DistributionId: invalidateOnDistribution,
       InvalidationBatch: {
