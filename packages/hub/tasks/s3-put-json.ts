@@ -4,7 +4,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import awsConfig from '../utils/aws-config';
 
 export default async function s3PutJson(payload: any, helpers: Helpers) {
-  const { bucket, path, invalidateOnDistribution, json, region, roleChain } = payload;
+  const { bucket, path, invalidateOnDistribution, invalidationRoleChain, json, region, roleChain } = payload;
   let s3Config = await awsConfig({ roleChain });
   if (region) {
     s3Config.region = region;
@@ -23,9 +23,18 @@ export default async function s3PutJson(payload: any, helpers: Helpers) {
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);
 
   if (invalidateOnDistribution) {
-    let cloudfrontConfig = await awsConfig({ roleChain: ['prod:cloudfront-distribution-invalidator-role'] });
+    let cloudfrontConfig = await awsConfig({
+      roleChain: invalidationRoleChain,
+    });
+
     if (region) {
       cloudfrontConfig.region = region;
+    }
+
+    let invalidationPath = path;
+
+    if (!path.startsWith('/')) {
+      invalidationPath = `/${path}`;
     }
 
     let cloudfrontClient = new CloudFrontClient(cloudfrontConfig);
@@ -35,7 +44,7 @@ export default async function s3PutJson(payload: any, helpers: Helpers) {
         CallerReference: `${Date.now()}`,
         Paths: {
           Quantity: 1,
-          Items: [path],
+          Items: [invalidationPath],
         },
       },
     });
