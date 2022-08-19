@@ -26,6 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pdm
+          pdm config python.use_venv false
           pdm install -d
       - name: Test with pytest
         run: |

@@ -3,6 +3,7 @@ FROM python:3.9
 
 RUN pip install -U pip setuptools wheel
 RUN pip install pdm
+RUN pdm config python.use_venv false
 
 COPY pyproject.toml pdm.lock /project/
 
