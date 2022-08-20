@@ -81,7 +81,7 @@ module.exports = {
     // grab all js files from the addon directory, except utils
     let addonFiles = stew.find(
       this.treeGenerator(path.join(__dirname, 'addon')),
-      '**/*.+(js|ts|hbs)'
+      '**/*.+(js|ts|gts|hbs)'
     );
     addonFiles = stew.rm(addonFiles, 'utils/*.*');
     addonFiles = stew.rm(addonFiles, '**/*.d.ts');
@@ -92,13 +92,14 @@ module.exports = {
     // rewrite them into reexports
     let reexports = stew.map(addonFiles, (_content, relativePath) => {
       let pathWithoutExtension = relativePath
-        .replace(/\.(ts|js|hbs)$/, '')
+        .replace(/\.(ts|js|gts|hbs)$/, '')
         .replace(/\/index$/, '');
       // console.debug(`[boxel] Exporting ${pathWithoutExtension} to app`);
       return `export { default } from "${this.name}/${pathWithoutExtension}";`;
     });
     reexports = stew.rename(reexports, '.hbs', '.js');
     reexports = stew.rename(reexports, '.ts', '.js');
+    reexports = stew.rename(reexports, '.gts', '.js');
 
     return reexports;
   },
