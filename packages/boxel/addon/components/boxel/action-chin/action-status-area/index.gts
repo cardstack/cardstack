@@ -4,7 +4,7 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 interface ActionChinSignature {
   Element: HTMLDivElement;
   Args: {
-    icon: any;
+    icon: string;
   };
   Blocks: {
     default: [];
