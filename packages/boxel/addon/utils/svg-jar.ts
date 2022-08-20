@@ -10,13 +10,16 @@
   along with some type annotations that are lacking upstream.
 */
 
-// @ts-ignore
+// @ts-expect-error no upstream types
 import makeSVG from 'ember-svg-jar/utils/make-svg';
 import { importSync } from '@embroider/macros';
+import type { ContentValue } from '@glint/template';
 
 function getInlineAsset(assetId: string) {
   try {
-    return (importSync(`ember-svg-jar/inlined/${assetId}`) as any).default;
+    return (
+      importSync(`ember-svg-jar/inlined/${assetId}`) as { default: unknown }
+    ).default;
   } catch (err) {
     return null;
   }
@@ -32,6 +35,6 @@ export function svgJar(
     title?: string;
     desc?: string;
   }
-) {
+): ContentValue {
   return makeSVG(assetId, svgAttrs, getInlineAsset);
 }
