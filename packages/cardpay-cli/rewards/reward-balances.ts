@@ -32,8 +32,15 @@ export default {
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    const tokenBalances = await rewardPool.rewardTokenBalances(address, safeAddress, rewardProgramId);
-    console.log(`Reward balances for ${address}`);
-    displayRewardTokenBalance(tokenBalances);
+    let proofs;
+    if (safeAddress) {
+      proofs = await rewardPool.getProofs(address, safeAddress, rewardProgramId, undefined, false);
+      const tokenBalances = await rewardPool.rewardTokenBalances(proofs);
+      displayRewardTokenBalance(tokenBalances);
+    } else {
+      const tokenBalances = await rewardPool.rewardTokenBalances(undefined, address, rewardProgramId);
+      console.log(`Reward balances for ${address}`);
+      displayRewardTokenBalance(tokenBalances);
+    }
   },
 } as CommandModule;
