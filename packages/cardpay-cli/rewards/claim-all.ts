@@ -4,8 +4,8 @@ import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'claim-all <rewardSafe> <rewardProgramId> <tokenAddress>',
-  describe: 'claim all token rewards from a reward program',
+  command: 'claim-all <rewardSafe> [rewardProgramId] [tokenAddress]',
+  describe: 'claim all token of rewardee',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardSafe', {
@@ -39,6 +39,6 @@ export default {
     receipts.forEach((receipt) => {
       console.log(`Transaction hash: ${blockExplorer}/tx/${receipt.transactionHash}/token-transfers`);
     });
-    console.log(`Claimed ALL rewards of reward program ${rewardProgramId} to reward safe ${rewardSafe}`);
+    console.log(`Claimed ALL rewards of ${safeOwner} to reward safe ${rewardSafe}`);
   },
 } as CommandModule;
