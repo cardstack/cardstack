@@ -526,13 +526,12 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async claimAll(
     unclaimedValidProofs: WithSymbol<ClaimableProof>[],
-    accountAddress?: string
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt[]> {
     if (unclaimedValidProofs.length == 0) {
       throw new Error('Do not have any valid proofs to claim');
     }
-    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    const safeOwner = accountAddress ?? (await rewardManager.getRewardSafeOwner(unclaimedValidProofs[0].safeAddress));
     const proofs = unclaimedValidProofs
       .filter((o) => o.isValid)
       .filter((o) => {
@@ -546,7 +545,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       );
     }
     for (const { leaf, proofArray, safeAddress } of proofs) {
-      const receipt = await this.claim(safeAddress, leaf, proofArray, false, undefined, { from: safeOwner });
+      const receipt = await this.claim(safeAddress, leaf, proofArray, false, txnOptions, contractOptions);
       receipts.push(receipt);
     }
     return receipts;
