@@ -255,21 +255,33 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(
+    unclaimedValidProof: WithSymbol<ClaimableProof>[],
+    address?: string,
+    rewardProgramId?: string
+  ): Promise<WithSymbol<RewardTokenBalance>[]>;
+  async rewardTokenBalances(
+    unclaimedValidProof: undefined,
     address: string,
-    safeAddress?: string,
+    rewardProgramId?: string
+  ): Promise<WithSymbol<RewardTokenBalance>[]>;
+  async rewardTokenBalances(
+    unclaimedValidProof?: WithSymbol<ClaimableProof>[],
+    address?: string,
     rewardProgramId?: string
   ): Promise<WithSymbol<RewardTokenBalance>[]> {
-    let unclaimedValidProofs;
-    if (safeAddress) {
-      unclaimedValidProofs = (await this.getProofs(address, safeAddress, rewardProgramId, undefined, false)).filter(
-        (o) => o.isValid && o.gasEstimate.amount.lt(new BN(o.amount))
-      );
+    let proof;
+    if (unclaimedValidProof) {
+      proof = unclaimedValidProof.filter((o) => {
+        //Intentionally step over claims which are not big enough to pay for gas fees
+        return o.gasEstimate.amount.lt(new BN(o.amount));
+      });
     } else {
-      unclaimedValidProofs = (await this.getProofs(address, undefined, rewardProgramId, undefined, false)).filter(
-        (o) => o.isValid
-      );
+      if (!address) {
+        throw new Error('address has to be specified');
+      }
+      proof = await this.getProofs(address, undefined, rewardProgramId, undefined, false);
     }
-    let tokenBalances = unclaimedValidProofs.map((o: Proof) => {
+    let tokenBalances = proof.map((o: Proof) => {
       return {
         tokenAddress: o.tokenAddress,
         rewardProgramId: o.rewardProgramId,
