@@ -33,7 +33,7 @@ Deployed versions will use a "HUB_URL" env var.
 ### Viewing the app locally
 This app is actually two apps in one: 
 1. Wallet (Universal Link): An app that hosts a page for folks to request payments from others (wallet.cardstack.com), and acts as a fallback for the universal link.
-2. card.xyz: An app to view payment profiles on the web.
+2. card.xyz: An app to view profiles on the web.
 
 The fastboot server differentiates which app is being served via host. We follow this behaviour in local development, matching the `.card.xyz.localhost:4210` suffix to recognize a request's intention to visit card.xyz. When developing locally, you can view a user's card.xyz at `${paymentProfileId}.card.xyz.localhost:4210`.  Requests that do not match this pattern will be treated as intending to visit the wallet domain.
 

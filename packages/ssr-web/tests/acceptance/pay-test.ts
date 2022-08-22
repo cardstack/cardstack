@@ -597,7 +597,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(PROFILE_INFO_MISSING_MESSAGE)
       .containsText(
-        'Unable to find payment profile for this address. Use caution when paying.'
+        'Unable to find profile for this address. Use caution when paying.'
       );
     assert
       .dom(AMOUNT)
@@ -658,7 +658,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
-        'Oops, no payment profile found - please ask for confirmation of the payment link'
+        'Oops, no profile found - please ask for confirmation of the payment link'
       );
   });
 
@@ -670,7 +670,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
-        'Oops, no payment profile found - please ask for confirmation of the payment link'
+        'Oops, no profile found - please ask for confirmation of the payment link'
       );
   });
 

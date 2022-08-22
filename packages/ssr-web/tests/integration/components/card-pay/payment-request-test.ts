@@ -150,7 +150,7 @@ module('Integration | Component | payment-request', function (hooks) {
     assert
       .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
-        'Unable to find payment profile for this address. Use caution when paying.'
+        'Unable to find profile for this address. Use caution when paying.'
       );
     assert.dom(AMOUNT).containsText(`§300`);
     assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);

@@ -235,9 +235,7 @@ module('Acceptance | create profile', function (hooks) {
       .containsText(profileAddress);
 
     await waitFor(milestoneCompletedSel(2));
-    assert
-      .dom(milestoneCompletedSel(2))
-      .containsText('Payment profile created');
+    assert.dom(milestoneCompletedSel(2)).containsText('Profile created');
 
     assert
       .dom(epiloguePostableSel(0))
