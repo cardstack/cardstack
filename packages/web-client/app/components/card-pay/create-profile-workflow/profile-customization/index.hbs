@@ -1,0 +1,135 @@
+<ActionCardContainer
+  @header='Profile'
+  @isComplete={{@isComplete}}
+  data-test-profile-customization-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section
+    @title='Choose a name and ID for your profile'
+  >
+    <Boxel::Field
+      @label={{if @isComplete 'Profile Name' 'Preview'}}
+      @centeredDisplay={{true}}
+      data-test-profile-customization-profile-preview
+    >
+      <CardPay::Profile
+        class={{
+          unless this.trimmedProfileName 'profile-customization__enter-name'
+        }}
+        @name={{or this.trimmedProfileName 'Enter profile name'}}
+        @logoBackground={{this.profileBgColor}}
+        @logoTextColor={{this.profileTextColor}}
+        @size='large'
+        @vertical={{true}}
+      />
+    </Boxel::Field>
+    {{#if @isComplete}}
+      <Boxel::Field
+        @label='Unique ID'
+        data-test-profile-customization-profile-slug-field
+      >
+        {{this.profileSlug}}
+      </Boxel::Field>
+      <Boxel::Field
+        @label='Custom Color'
+        data-test-profile-customization-color-field
+      >
+        <div class='profile-customization__color'>
+          <div
+            class='profile-customization__color-preview'
+            style={{
+              css-var
+              profile-custom-color=(or this.profileBgColor 'var(--boxel-blue)')
+            }}
+          ></div>
+          {{or this.profileBgColor '#0069F9'}}
+        </div>
+      </Boxel::Field>
+      <Boxel::Field @label='Owned By'>
+        <CardPay::AccountDisplay
+          @wrapped={{true}}
+          @address={{this.layer2Network.walletInfo.firstAddress}}
+          data-test-profile-customization-manager-address
+        />
+      </Boxel::Field>
+    {{else}}
+      <CardPay::FieldStack>
+        <Boxel::Field
+          @tag='label'
+          @label='Profile name'
+          data-test-profile-customization-profile-name-field
+        >
+          <Boxel::Input
+            @value={{this.profileName}}
+            @onInput={{this.onProfileNameInput}}
+            @invalid={{this.profileNameValidationMessage}}
+            @errorMessage={{this.profileNameValidationMessage}}
+            @required={{true}}
+            autocomplete='off'
+            autocorrect='off'
+            autocapitalize='off'
+            spellcheck='false'
+            {{on 'blur' this.validateProfileName}}
+          />
+        </Boxel::Field>
+        <Boxel::Field
+          @tag='label'
+          @label='Unique ID'
+          data-test-profile-customization-profile-slug-field
+        >
+          <Boxel::Input::ValidationState
+            @state={{this.profileSlugInputState}}
+            @value={{this.profileSlug}}
+            @onInput={{this.onProfileSlugInput}}
+            @onBlur={{fn this.validateProfileSlug true}}
+            @errorMessage={{this.profileSlugValidationMessage}}
+            @helperText='This unique ID will also be used as a publicly available tag for payments.'
+          />
+        </Boxel::Field>
+        <Boxel::Field
+          @tag='label'
+          @label='Custom color'
+          data-test-profile-customization-color-field
+        >
+          {{! template-lint-disable require-input-label }}
+          <div class='profile-customization__color'>
+            <input
+              type='color'
+              value={{this.profileBgColor}}
+              class='profile-customization__color-input'
+              {{on 'input' this.onProfileBgColorInput}}
+            />
+            {{this.profileBgColor}}
+          </div>
+        </Boxel::Field>
+        <Boxel::Field @label='Owned By'>
+          <CardPay::AccountDisplay
+            @wrapped={{true}}
+            @address={{this.layer2Network.walletInfo.firstAddress}}
+            data-test-profile-customization-manager-address
+          />
+        </Boxel::Field>
+      </CardPay::FieldStack>
+    {{/if}}
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete 'memorialized' 'default'}}
+    @disabled={{or (not this.canSaveDetails) @frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        data-test-profile-customization-save-details
+        {{on 'click' this.saveDetails}}
+      >
+        Save Details
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton
+        data-test-profile-customization-edit
+        {{on 'click' @onIncomplete}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

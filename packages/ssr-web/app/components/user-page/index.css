@@ -1,0 +1,157 @@
+.profile-user-page {
+  min-height: 100vh;
+  width: 100%;
+  margin: auto;
+  background: var(--boxel-purple-600);
+  overflow-y: auto;
+}
+
+.profile-user-page__wrapper {
+  margin: auto;
+  background: var(--profile-background);
+  color: var(--profile-text-color);
+  border-radius: var(--boxel-border-radius-lg) var(--boxel-border-radius-lg) 0 0;
+  max-width: 34rem; /* use a media query to assign header horizontal padding based on this width */
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 1fr 2.5rem;
+  grid-template-areas: "user-content" "apps";
+}
+
+.profile-user-page__user-content {
+  padding: min(var(--boxel-sp-xl), 5vw);
+  align-self: center;
+  grid-area: user-content;
+  max-width: 100%;
+}
+
+.profile-user-page__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 34rem;
+  margin: auto;
+  padding: min(var(--boxel-sp-xl), 5vh) 0 var(--boxel-sp) 0;
+}
+
+/* 34rem is based on user page wrapper width */
+@media only screen and (max-width: 34rem) {
+  .profile-user-page__header {
+    padding-right: min(var(--boxel-sp-sm), 2vw);
+    padding-left: min(var(--boxel-sp-sm), 2vw);
+  }
+}
+
+.profile-user-page__description {
+  text-align: center;
+  font-size: var(--boxel-font-size-xl);
+  font-weight: 300;
+  margin-top: var(--boxel-sp-sm);
+}
+
+.profile-user-page__title {
+  text-align: center;
+  font-size: var(--boxel-font-size-lg);
+  font-weight: 600;
+  max-width: 30rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--boxel-sp-xxxs);
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+  overflow-wrap: break-word;
+}
+
+.profile-user-page__url {
+  text-align: center;
+  opacity: 0.9;
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 700;
+  letter-spacing: 1px;
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+  word-break: break-all;
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.profile-user-payment-link {
+  margin: var(--boxel-sp) 0 var(--boxel-sp-xl) 0;
+}
+
+.profile-user-page-payment-link__error {
+  margin: var(--boxel-sp-sm);
+  text-align: center;
+}
+
+.profile-user-footer {
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  margin-top: var(--boxel-sp-lg);
+}
+
+.profile-user-payment-link__qr.boxel-styled-qr-code {
+  max-width: 100%;
+  color: var(--boxel-dark);
+  border-radius: var(--boxel-border-radius-lg);
+}
+
+.profile-user-payment-link__qr-container__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* the violation below is for 2 different parents */
+/* stylelint-disable-next-line no-descending-specificity */
+.profile-user-payment-link__qr-container__actions > a {
+  margin: var(--boxel-sp-lg);
+}
+
+.profile-user-payment-link__qr-container__separator {
+  width: 100%;
+  height: 1px;
+  background: var(--boxel-light-600);
+  margin-top: var(--boxel-sp-xs);
+}
+
+.profile-user-payment-link__qr-container__separator-or {
+  margin: auto;
+  background: var(--boxel-light);
+  margin-top: -10px;
+  width: 4rem;
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 700;
+}
+
+.profile-user-page__apps-wrapper {
+  grid-area: apps;
+}
+
+.profile-user-page__apps {
+  background: var(--boxel-light-200);
+  color: var(--boxel-dark);
+  padding: min(var(--boxel-sp-xl), 5vw);
+  border-radius: 0 0 var(--boxel-border-radius-lg) var(--boxel-border-radius-lg);
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.profile-user-page__apps-title {
+  text-align: center;
+  font-size: var(--boxel-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding-bottom: var(--boxel-sp-xs);
+}
+
+.profile-user-page__apps-wallet {
+  margin-bottom: var(--boxel-sp-xxs);
+  margin-top: var(--boxel-sp-xxs);
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.profile-user-page__apps-stores {
+  justify-content: space-between;
+}

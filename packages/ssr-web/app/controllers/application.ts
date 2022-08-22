@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
-import CardSpaceService from '../services/card-space';
+import ProfileService from '../services/profile';
 
 export default class ApplicationController extends Controller {
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
 }

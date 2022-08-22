@@ -10,12 +10,12 @@ module('Integration | Service | app-context', function (hooks) {
   setupApplicationTest(hooks);
   setupWindowMock(hooks);
 
-  let originalValue = config.cardSpaceHostnameSuffix;
+  let originalValue = config.profileHostnameSuffix;
   hooks.before(function () {
-    config.cardSpaceHostnameSuffix = '.test.time.value';
+    config.profileHostnameSuffix = '.test.time.value';
   });
   hooks.after(function () {
-    config.cardSpaceHostnameSuffix = originalValue;
+    config.profileHostnameSuffix = originalValue;
   });
 
   let fastboot: {
@@ -39,29 +39,29 @@ module('Integration | Service | app-context', function (hooks) {
       appContext = this.owner.lookup('service:app-context');
     });
 
-    test('it can match the card space suffix to determine the app', function (assert) {
-      fastboot.request.host = `hello${config.cardSpaceHostnameSuffix}`;
-      assert.strictEqual(appContext.currentApp, 'card-space');
+    test('it can match the profile suffix to determine the app', function (assert) {
+      fastboot.request.host = `hello${config.profileHostnameSuffix}`;
+      assert.strictEqual(appContext.currentApp, 'profile');
 
       fastboot.request.host = 'hello.localhost:4210';
       assert.strictEqual(appContext.currentApp, 'wallet');
     });
 
-    test('it can match the card space suffix and return a user id', function (assert) {
-      fastboot.request.host = `oops${config.cardSpaceHostnameSuffix}`;
-      assert.strictEqual(appContext.cardSpaceId, 'oops');
+    test('it can match the profile suffix and return a user id', function (assert) {
+      fastboot.request.host = `oops${config.profileHostnameSuffix}`;
+      assert.strictEqual(appContext.profileId, 'oops');
 
-      fastboot.request.host = `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end${config.cardSpaceHostnameSuffix}`;
+      fastboot.request.host = `oops${config.profileHostnameSuffix}.should-appear-at-end${config.profileHostnameSuffix}`;
       assert.strictEqual(
-        appContext.cardSpaceId,
-        `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end`
+        appContext.profileId,
+        `oops${config.profileHostnameSuffix}.should-appear-at-end`
       );
 
-      fastboot.request.host = `oops.two${config.cardSpaceHostnameSuffix}`;
-      assert.strictEqual(appContext.cardSpaceId, 'oops.two');
+      fastboot.request.host = `oops.two${config.profileHostnameSuffix}`;
+      assert.strictEqual(appContext.profileId, 'oops.two');
 
       fastboot.request.host = 'oops.wallet';
-      assert.strictEqual(appContext.cardSpaceId, '');
+      assert.strictEqual(appContext.profileId, '');
     });
   });
 
@@ -77,26 +77,26 @@ module('Integration | Service | app-context', function (hooks) {
       appContext = this.owner.lookup('service:app-context');
     });
 
-    test('it can match the card space suffix to determine the app', function (assert) {
-      window.location.host = `hello${config.cardSpaceHostnameSuffix}`;
-      assert.strictEqual(appContext.currentApp, 'card-space');
+    test('it can match the profile suffix to determine the app', function (assert) {
+      window.location.host = `hello${config.profileHostnameSuffix}`;
+      assert.strictEqual(appContext.currentApp, 'profile');
 
       window.location.host = 'hello.localhost:4210';
       assert.strictEqual(appContext.currentApp, 'wallet');
     });
 
-    test('it can match the card space suffix and return a user id', function (assert) {
-      window.location.host = `oops${config.cardSpaceHostnameSuffix}`;
-      assert.strictEqual(appContext.cardSpaceId, 'oops');
+    test('it can match the profile suffix and return a user id', function (assert) {
+      window.location.host = `oops${config.profileHostnameSuffix}`;
+      assert.strictEqual(appContext.profileId, 'oops');
 
-      window.location.host = `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end${config.cardSpaceHostnameSuffix}`;
+      window.location.host = `oops${config.profileHostnameSuffix}.should-appear-at-end${config.profileHostnameSuffix}`;
       assert.strictEqual(
-        appContext.cardSpaceId,
-        `oops${config.cardSpaceHostnameSuffix}.should-appear-at-end`
+        appContext.profileId,
+        `oops${config.profileHostnameSuffix}.should-appear-at-end`
       );
 
       window.location.host = 'oops.wallet';
-      assert.strictEqual(appContext.cardSpaceId, '');
+      assert.strictEqual(appContext.profileId, '');
     });
   });
 });

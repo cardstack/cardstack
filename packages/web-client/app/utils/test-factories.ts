@@ -107,7 +107,7 @@ const defaultMerchantSafe: MerchantSafe = {
  *   merchant: 'EOA_ADDRESS', // should be overwritten in factory
  * }
  */
-export const createMerchantSafe = (
+export const createProfileSafe = (
   opts: Partial<MerchantSafe>
 ): MerchantSafe => ({
   ...defaultMerchantSafe,

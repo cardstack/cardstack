@@ -1,10 +1,17 @@
 import config from '@cardstack/ssr-web/config/environment';
+import { Response as MirageResponse } from 'ember-cli-mirage';
 
 export default function () {
   this.namespace = 'api';
 
-  this.get('/card-spaces/:slug', (schema, { params: { slug } }) => {
-    return schema.cardSpaces.where({ slug }).models[0];
+  this.get('/profiles/:slug', (schema, { params: { slug } }) => {
+    let model = schema.profiles.where({ slug }).models[0];
+
+    if (model) {
+      return model;
+    } else {
+      return new MirageResponse(404, {}, 'Not found');
+    }
   });
 
   this.get('/exchange-rates', function (schema, { queryParams: { from, to } }) {
@@ -25,7 +32,7 @@ export default function () {
     'https://storage.cardstack.com/merchant-info/:idWithExtension',
     function (schema, { params: { idWithExtension } }) {
       let [id] = idWithExtension.split('.');
-      return schema.merchantInfos.find(id);
+      return schema.profiles.find(id);
     }
   );
 

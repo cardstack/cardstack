@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import BN from 'bn.js';
 
-import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
+import { Profile } from '@cardstack/web-client/resources/profile';
 import { MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   BridgedTokenSymbol,
@@ -29,8 +29,9 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
   }
 
   get safeIcon() {
-    if (this.supportedSafeTypes.includes(this.args.safe.type)) {
-      return this.args.safe.type;
+    let safeType = this.args.safe.type;
+    if (this.supportedSafeTypes.includes(safeType)) {
+      return safeType === 'merchant' ? 'profile' : safeType;
     } else {
       return null;
     }
@@ -42,10 +43,10 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
 
   get summaryBalanceLabel() {
     if (this.args.safe.type === 'merchant') {
-      if (this.merchantInfo.loading) {
-        return `Payment Profile`;
+      if (this.profile.loading) {
+        return `Profile`;
       } else {
-        return `Payment Profile ${this.merchantInfo.name}`;
+        return `Profile ${this.profile.name}`;
       }
     } else if (this.args.safe.type === 'depot') {
       return 'DEPOT';
@@ -54,7 +55,7 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
     }
   }
 
-  merchantInfo = MerchantInfo.from(this, () => ({
+  profile = Profile.from(this, () => ({
     infoDID: (this.args.safe as MerchantSafe).infoDID,
   }));
 }

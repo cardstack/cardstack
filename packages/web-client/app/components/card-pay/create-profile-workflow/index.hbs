@@ -1,0 +1,18 @@
+{{#unless this.isInitializing}}
+  <WorkflowThread
+    data-test-create-profile-workflow
+    class='create-profile-workflow'
+    @workflow={{this.workflow}}
+    @onClose={{@onClose}}
+  />
+{{/unless}}
+<Listener
+  @emitter={{this.layer2Network}}
+  @event='disconnect'
+  @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event='account-changed'
+  @action={{this.onAccountChanged}}
+/>

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
+import { Profile } from '@cardstack/web-client/resources/profile';
 import { MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
 
 interface CardPaySafeChooserDropdownSafeOptionComponentArgs {
@@ -9,12 +9,12 @@ interface CardPaySafeChooserDropdownSafeOptionComponentArgs {
 export default class CardPaySafeChooserDropdownSafeOptionComponent extends Component<CardPaySafeChooserDropdownSafeOptionComponentArgs> {
   get data() {
     if (this.args.safe.type === 'merchant') {
-      let merchant = this.args.safe as MerchantSafe;
+      let profile = this.args.safe as MerchantSafe;
 
       return {
-        type: 'Payment Profile',
-        info: MerchantInfo.from(this, () => ({
-          infoDID: merchant.infoDID,
+        type: 'Profile',
+        info: Profile.from(this, () => ({
+          infoDID: profile.infoDID,
         })),
       };
     } else if (this.args.safe.type === 'depot') {

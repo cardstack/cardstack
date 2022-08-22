@@ -3,16 +3,16 @@ import { inject as service } from '@ember/service';
 import Subgraph from '@cardstack/ssr-web/services/subgraph';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import config from '../config/environment';
-import { MerchantInfo } from '../resources/merchant-info';
+import { Profile } from '../resources/profile';
 import AppContextService from '@cardstack/ssr-web/services/app-context';
-import CardSpaceService from '@cardstack/ssr-web/services/card-space';
+import ProfileService from '@cardstack/ssr-web/services/profile';
 import RouterService from '@ember/routing/router-service';
 import { getSentry } from '../utils/sentry';
 
 interface PayRouteModel {
   network: string;
   merchantSafe: MerchantSafe;
-  merchantInfo: MerchantInfo | undefined;
+  profile: Profile | undefined;
   exchangeRates: any;
 }
 
@@ -20,11 +20,11 @@ export default class PayRoute extends Route {
   @service declare router: RouterService;
   @service('subgraph') declare subgraph: Subgraph;
   @service('app-context') declare appContext: AppContextService;
-  @service('card-space') declare cardSpace: CardSpaceService;
+  @service('profile') declare profile: ProfileService;
   sentry = getSentry();
 
   beforeModel() {
-    if (this.cardSpace.isActive) {
+    if (this.profile.isActive) {
       this.router.transitionTo('index');
     }
   }
@@ -43,12 +43,12 @@ export default class PayRoute extends Route {
 
       // we're intentionally ignoring the infoDID being possibly undefined.
       // and letting the merchant info try to fetch and get into an errored state
-      let merchantInfo = await this.fetchMerchantInfo(merchantSafe.infoDID!);
+      let profile = await this.fetchProfile(merchantSafe.infoDID!);
 
       return {
         network,
         merchantSafe,
-        merchantInfo,
+        profile: profile,
         exchangeRates: this.shouldFetchExchangeRates
           ? await this.fetchExchangeRates('USD', params.currency)
           : undefined,
@@ -105,16 +105,16 @@ export default class PayRoute extends Route {
     return data;
   }
 
-  async fetchMerchantInfo(infoDID: string) {
+  async fetchProfile(infoDID: string) {
     // use a resource in a blocking manner
     // see https://github.com/NullVoxPopuli/ember-resources/issues/316
-    let merchantInfo = MerchantInfo.from(this, () => ({
+    let profile = Profile.from(this, () => ({
       infoDID,
       waitForInfo: false,
     }));
-    await merchantInfo.run();
+    await profile.run();
 
-    return merchantInfo;
+    return profile;
   }
 }
 

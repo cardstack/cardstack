@@ -156,13 +156,13 @@ export interface Layer2Web3Strategy
     options?: TransactionOptions
   ): Promise<PrepaidCardSafe>;
   resumeIssuePrepaidCardTransaction(txnHash: string): Promise<PrepaidCardSafe>;
-  fetchMerchantRegistrationFee(): Promise<number>;
-  registerMerchant(
+  fetchProfileRegistrationFee(): Promise<number>;
+  registerProfile(
     prepaidCardAddress: string,
     infoDid: string,
     options: TransactionOptions
   ): Promise<MerchantSafe>;
-  resumeRegisterMerchantTransaction(txnHash: string): Promise<MerchantSafe>;
+  resumeRegisterProfileTransaction(txnHash: string): Promise<MerchantSafe>;
   defaultTokenSymbol: BridgedTokenSymbol;
   refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;

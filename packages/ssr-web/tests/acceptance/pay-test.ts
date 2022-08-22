@@ -23,13 +23,12 @@ import {
 import { Response as MirageResponse } from 'ember-cli-mirage';
 
 // selectors
-const MERCHANT = '[data-test-merchant]';
-const MERCHANT_INFO_ADDRESS_ONLY =
-  '[data-test-payment-request-merchant-address]';
-const MERCHANT_INFO_MISSING_MESSAGE =
-  '[data-test-payment-request-merchant-info-missing]';
-const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
-const MERCHANT_LOGO = '[data-test-merchant-logo]';
+const PROFILE = '[data-test-profile]';
+const PROFILE_INFO_ADDRESS_ONLY = '[data-test-payment-request-profile-address]';
+const PROFILE_INFO_MISSING_MESSAGE =
+  '[data-test-payment-request-profile-missing]';
+const PROFILE_MISSING_MESSAGE = '[data-test-profile-missing]';
+const PROFILE_LOGO = '[data-test-profile-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-boxel-styled-qr-code]';
@@ -45,10 +44,10 @@ const usdSymbol = 'USD';
 const jpySymbol = 'JPY';
 const invalidCurrencySymbol = 'WUT';
 const network = 'sokol';
-const merchantName = 'mandello';
-const merchantInfoBackground = '#00ffcc';
-const merchantInfoTextColor = '#000000';
-const nonexistentMerchantId = 'nonexistentmerchant';
+const profileName = 'mandello';
+const profileBackground = '#00ffcc';
+const profileTextColor = '#000000';
+const nonexistentProfileSlug = 'nonexistentprofile';
 const merchantSafe = createMerchantSafe({
   address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c94',
   owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
@@ -84,81 +83,63 @@ module('Acceptance | pay', function (hooks) {
         else return { safe: undefined, blockNumber: 0 };
       });
 
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(exampleDid),
-      name: merchantName,
+      name: profileName,
       slug: 'mandello1',
       did: exampleDid,
-      color: merchantInfoBackground,
-      'text-color': merchantInfoTextColor,
+      color: profileBackground,
+      'text-color': profileTextColor,
       'owner-address': '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
     });
   });
 
   // eslint-disable-next-line qunit/require-expect
-  test('It displays merchant info correctly in a non-iOS/non-Android environment', async function (assert) {
+  test('It displays profile correctly in a non-iOS/non-Android environment', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
 
-    await waitFor(MERCHANT);
+    await waitFor(PROFILE);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(PROFILE).hasAttribute('data-test-profile', profileName);
     assert
-      .dom(MERCHANT_LOGO)
-      .containsText(merchantName.substr(0, 1).toUpperCase())
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .dom(PROFILE_LOGO)
+      .containsText(profileName.substr(0, 1).toUpperCase())
+      .hasAttribute('data-test-profile-logo-background', profileBackground)
+      .hasAttribute('data-test-profile-logo-text-color', profileTextColor);
 
     await percySnapshot(assert);
   });
 
   // eslint-disable-next-line qunit/require-expect
-  test('It displays merchant info correctly on iOS', async function (assert) {
+  test('It displays profile correctly on iOS', async function (assert) {
     let UAService = this.owner.lookup('service:ua');
     sinon.stub(UAService, 'isIOS').returns(true);
 
     await visit(`/pay/${network}/${merchantSafe.address}`);
-    await waitFor(MERCHANT);
+    await waitFor(PROFILE);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(PROFILE).hasAttribute('data-test-profile', profileName);
     assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .dom(PROFILE_LOGO)
+      .hasAttribute('data-test-profile-logo-background', profileBackground)
+      .hasAttribute('data-test-profile-logo-text-color', profileTextColor);
 
     await percySnapshot(assert);
   });
 
   // eslint-disable-next-line qunit/require-expect
-  test('It displays merchant info correctly on Android', async function (assert) {
+  test('It displays profile correctly on Android', async function (assert) {
     let UAService = this.owner.lookup('service:ua');
     sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(`/pay/${network}/${merchantSafe.address}`);
-    await waitFor(MERCHANT);
+    await waitFor(PROFILE);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert.dom(PROFILE).hasAttribute('data-test-profile', profileName);
     assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
+      .dom(PROFILE_LOGO)
+      .hasAttribute('data-test-profile-logo-background', profileBackground)
+      .hasAttribute('data-test-profile-logo-text-color', profileTextColor);
 
     await percySnapshot(assert);
   });
@@ -190,7 +171,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
-    await waitFor(MERCHANT);
+    await waitFor(PROFILE);
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
@@ -204,14 +185,14 @@ module('Acceptance | pay', function (hooks) {
 
     assert
       .dom(
-        `meta[property='og:title'][content='${merchantName} requests payment']`,
+        `meta[property='og:title'][content='${profileName} requests payment']`,
         document.documentElement
       )
       .exists();
 
     assert
       .dom(
-        `meta[name='twitter:title'][content='${merchantName} requests payment']`,
+        `meta[name='twitter:title'][content='${profileName} requests payment']`,
         document.documentElement
       )
       .exists();
@@ -249,9 +230,9 @@ module('Acceptance | pay', function (hooks) {
 
   test('it has a fallback meta description if there is no amount param specified', async function (assert) {
     await visit(`/pay/${network}/${merchantSafe.address}`);
-    await waitFor(MERCHANT);
+    await waitFor(PROFILE);
 
-    let description = `Use Cardstack Wallet to pay ${merchantName}`;
+    let description = `Use Cardstack Wallet to pay ${profileName}`;
     assert
       .dom(
         `meta[property='og:description'][content="${description}"]`,
@@ -603,20 +584,20 @@ module('Acceptance | pay', function (hooks) {
     );
   });
 
-  test('it renders appropriate UI when merchant info is not fetched', async function (assert) {
+  test('it renders appropriate UI when profile is not fetched', async function (assert) {
     await visit(
       `/pay/${network}/${merchantSafeWithoutInfo.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
-    await waitFor(MERCHANT_INFO_ADDRESS_ONLY);
+    await waitFor(PROFILE_INFO_ADDRESS_ONLY);
 
-    assert.dom(MERCHANT).doesNotExist();
+    assert.dom(PROFILE).doesNotExist();
     assert
-      .dom(MERCHANT_INFO_ADDRESS_ONLY)
+      .dom(PROFILE_INFO_ADDRESS_ONLY)
       .containsText(merchantSafeWithoutInfo.address);
     assert
-      .dom(MERCHANT_INFO_MISSING_MESSAGE)
+      .dom(PROFILE_INFO_MISSING_MESSAGE)
       .containsText(
-        'Unable to find payment profile for this address. Use caution when paying.'
+        'Unable to find profile for this address. Use caution when paying.'
       );
     assert
       .dom(AMOUNT)
@@ -636,7 +617,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
-  test('it renders appropriate meta tags when merchant info is not fetched', async function (assert) {
+  test('it renders appropriate meta tags when profile is not fetched', async function (assert) {
     await visit(`/pay/${network}/${merchantSafeWithoutInfo.address}`);
 
     let title = 'Payment Requested';
@@ -669,27 +650,27 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
     await visit(
-      `/pay/${network}/${nonexistentMerchantId}?amount=${usdAmount}&currency=${usdSymbol}`
+      `/pay/${network}/${nonexistentProfileSlug}?amount=${usdAmount}&currency=${usdSymbol}`
     );
 
-    await waitFor(MERCHANT_MISSING_MESSAGE);
+    await waitFor(PROFILE_MISSING_MESSAGE);
 
     assert
-      .dom(MERCHANT_MISSING_MESSAGE)
+      .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
-        'Oops, no payment profile found - please ask for confirmation of the payment link'
+        'Oops, no profile found - please ask for confirmation of the payment link'
       );
   });
 
   test('it renders appropriate UI when URL is not complete', async function (assert) {
     await visit(`/pay/sok`);
 
-    await waitFor(MERCHANT_MISSING_MESSAGE);
+    await waitFor(PROFILE_MISSING_MESSAGE);
 
     assert
-      .dom(MERCHANT_MISSING_MESSAGE)
+      .dom(PROFILE_MISSING_MESSAGE)
       .containsText(
-        'Oops, no payment profile found - please ask for confirmation of the payment link'
+        'Oops, no profile found - please ask for confirmation of the payment link'
       );
   });
 
@@ -743,7 +724,7 @@ module('Acceptance | pay', function (hooks) {
       });
 
       await visit(`/pay/sok`);
-      await waitFor(MERCHANT_MISSING_MESSAGE);
+      await waitFor(PROFILE_MISSING_MESSAGE);
 
       assert.dom('[data-test-degraded-service-banner]').isVisible({ count: 1 });
     });

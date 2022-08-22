@@ -34,7 +34,7 @@ import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 import {
   createPrepaidCardSafe,
-  createMerchantSafe,
+  createProfileSafe,
 } from '@cardstack/web-client/utils/test-factories';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk';
 
@@ -309,7 +309,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
-  fetchMerchantRegistrationFee() {
+  fetchProfileRegistrationFee() {
     return Promise.resolve(100);
   }
 
@@ -319,7 +319,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return defer<PrepaidCardSafe>().promise;
   }
 
-  async registerMerchant(
+  async registerProfile(
     prepaidCardAddress: string,
     infoDID: string,
     options: TransactionOptions
@@ -335,7 +335,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
-  resumeRegisterMerchantTransaction(_txnHash: string): Promise<MerchantSafe> {
+  resumeRegisterProfileTransaction(_txnHash: string): Promise<MerchantSafe> {
     return defer<MerchantSafe>().promise;
   }
 
@@ -470,13 +470,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   async test__simulateRegisterMerchantForAddress(
     prepaidCardAddress: string,
-    merchantSafeAddress: string,
+    profileSafeAddress: string,
     options: Object
   ) {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
-    let merchantSafe: MerchantSafe = createMerchantSafe({
+    let profileSafe: MerchantSafe = createProfileSafe({
       createdAt: Math.floor(Date.now() / 1000),
-      address: merchantSafeAddress,
+      address: profileSafeAddress,
       merchant: prepaidCardAddress,
       accumulatedSpendValue: 100,
       infoDID: request?.infoDID,
@@ -488,17 +488,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       .get(this.walletInfo.firstAddress!)!
       .find((safe) => safe.address === prepaidCardAddress);
 
-    let merchantCreationFee = await this.fetchMerchantRegistrationFee();
+    let profileCreationFee = await this.fetchProfileRegistrationFee();
 
     if (prepaidCard && prepaidCard.type === 'prepaid-card') {
       prepaidCard.spendFaceValue =
-        prepaidCard.spendFaceValue - merchantCreationFee;
+        prepaidCard.spendFaceValue - profileCreationFee;
     }
 
     this.test__simulateRemoteAccountSafes(this.walletInfo.firstAddress!, [
-      merchantSafe,
+      profileSafe,
     ]);
-    return request?.deferred.resolve(merchantSafe);
+    return request?.deferred.resolve(profileSafe);
   }
 
   async test__simulateRegisterMerchantRejectionForAddress(
@@ -506,7 +506,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ) {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
     return request?.deferred.reject(
-      new Error('User rejected merchant creation')
+      new Error('User rejected profile creation')
     );
   }
 

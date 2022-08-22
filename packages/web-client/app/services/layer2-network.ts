@@ -176,16 +176,16 @@ export default class Layer2Network
     return prepaidCardSafe;
   }
 
-  @task *fetchMerchantRegistrationFeeTask(): TaskGenerator<number> {
-    return yield this.strategy.fetchMerchantRegistrationFee();
+  @task *fetchProfileRegistrationFeeTask(): TaskGenerator<number> {
+    return yield this.strategy.fetchProfileRegistrationFee();
   }
 
-  @task *registerMerchantTask(
+  @task *registerProfileTask(
     prepaidCardAddress: string,
     infoDid: string,
     options: TransactionOptions
   ): any {
-    let merchant = yield this.strategy.registerMerchant(
+    let profile = yield this.strategy.registerProfile(
       prepaidCardAddress,
       infoDid,
       options
@@ -193,26 +193,24 @@ export default class Layer2Network
 
     yield all([
       this.safes.updateOne(prepaidCardAddress),
-      this.safes.updateOne(merchant.address),
+      this.safes.updateOne(profile.address),
     ]);
 
-    return merchant;
+    return profile;
   }
 
-  @task *resumeRegisterMerchantTransactionTask(
+  @task *resumeRegisterProfileTransactionTask(
     prepaidCardAddress: string,
     txnHash: string
   ): TaskGenerator<MerchantSafe> {
-    let merchant = yield this.strategy.resumeRegisterMerchantTransaction(
-      txnHash
-    );
+    let profile = yield this.strategy.resumeRegisterProfileTransaction(txnHash);
 
     yield all([
       this.safes.updateOne(prepaidCardAddress),
-      this.safes.updateOne(merchant.address),
+      this.safes.updateOne(profile.address),
     ]);
 
-    return merchant;
+    return profile;
   }
 
   disconnect() {

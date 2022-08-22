@@ -58,7 +58,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   get selectedSafeTypeCopy() {
     if (this.selectedSafe) {
       return this.selectedSafe.type === 'merchant'
-        ? 'Payment Profile'
+        ? 'Profile'
         : this.selectedSafe.type;
     } else {
       return '';
