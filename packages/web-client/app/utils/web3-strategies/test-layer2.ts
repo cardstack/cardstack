@@ -506,7 +506,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ) {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
     return request?.deferred.reject(
-      new Error('User rejected profileF creation')
+      new Error('User rejected profile creation')
     );
   }
 
