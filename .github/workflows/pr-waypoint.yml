@@ -19,33 +19,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: volta-cli/action@v1
-      - name: Set up yarn cache
-        uses: actions/cache@v2
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
+
       - run: yarn --prefer-offline
+
       - name: Configure staging AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
+
       - name: Check access to secrets specified in waypoint.hcl
         uses: ./.github/actions/check-secrets
         with:
           waypoint_config_file: waypoint.hcl
+
       - name: Configure prod AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::120317779495:role/waypoint
           aws-region: us-east-1
+
       - name: Check access to secrets specified in waypoint.prod.hcl
         uses: ./.github/actions/check-secrets
         with:
           waypoint_config_file: waypoint.prod.hcl
-

@@ -4,7 +4,7 @@ export type { PrepaidCard } from './sdk/prepaid-card';
 export type { PrepaidCardMarket } from './sdk/prepaid-card-market';
 export type { RevenuePool } from './sdk/revenue-pool';
 export type { RewardManager, RewardProgramInfo } from './sdk/reward-manager';
-export type { RewardPool, Proof, RewardTokenBalance, WithSymbol } from './sdk/reward-pool';
+export type { RewardPool, Proof, ClaimableProof, RewardTokenBalance, WithSymbol } from './sdk/reward-pool';
 export type {
   ISafes,
   Safe,

@@ -3,8 +3,8 @@ name: CI [cardpay-reward-indexer]
 on:
   pull_request:
     paths:
-      - 'packages/cardpay-reward-indexer/**'
-      - '.github/workflows/pr-cardpay-reward-indexer.yml'
+      - "packages/cardpay-reward-indexer/**"
+      - ".github/workflows/pr-cardpay-reward-indexer.yml"
 
 jobs:
   test:
@@ -26,8 +26,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pdm
+          pdm config python.use_venv false
           pdm install -d
-          pdm add setuptools 
+          pdm add setuptools
       - name: Test with pytest
         env:
           DB_STRING: "sqlite:///./test.db"

@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -41,12 +42,29 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Deploy reward root submitter
-        uses: ./.github/actions/deploy-reward-root-submitter
-        with:
-          environment: ${{ github.event.inputs.environment }}
-          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Install dependencies
+        shell: bash
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get install awscli waypoint=0.8.1 jq
+
+      - name: Build reward submitter
+        run: waypoint build -app=reward-submit-lambda
         env:
-          AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: "1"
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
+
+      - name: Update reward submitter
+        run: |
+          aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri')
+          time aws lambda wait function-updated --function-name reward_root_submitter
+
+      - name: Send notification to Discord
+        if: ${{ always() }}
+        uses: ./.github/actions/discord-notification-deploy
+        with:
+          app: reward-submit
+          status: ${{ github.action_status }}
+          environment: ${{ github.event.inputs.environment }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}

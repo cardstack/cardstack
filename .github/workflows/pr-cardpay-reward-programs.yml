@@ -3,8 +3,8 @@ name: CI [cardpay-reward-programs]
 on:
   pull_request:
     paths:
-      - 'packages/cardpay-reward-programs/**'
-      - '.github/workflows/pr-cardpay-reward-programs.yml'
+      - "packages/cardpay-reward-programs/**"
+      - ".github/workflows/pr-cardpay-reward-programs.yml"
 
 jobs:
   test:
@@ -26,6 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pdm
+          pdm config python.use_venv false
           pdm install -d
       - name: Test with pytest
         run: |

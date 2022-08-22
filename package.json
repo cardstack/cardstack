@@ -29,13 +29,15 @@
     "hcl2-parser": "^1.0.3",
     "js-hcl-parser": "^1.0.1",
     "lerna": "4.0.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.3.2",
     "start-server-and-test": "^1.12.0",
     "typescript": "4.2.3"
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
-    "postinstall": "yarn --cwd packages/cardpay-sdk codegen",
+    "postinstall": "yarn --cwd packages/cardpay-sdk codegen && patch-package",
     "cardpay": "yarn --cwd packages/cardpay-cli cardpay",
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",

@@ -52,6 +52,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay bridge withdrawal-limits <token>`](#cardpay-bridge-withdrawal-limits-token)
  - [`cardpay did resolve <did>`](#cardpay-did-resolve-did)
  - [`cardpay did resolve-aka <did>`](#cardpay-did-resolve-aka-did)
+ - [`cardpay did encode <type> [version] [uniqueId]`](#cardpay-did-encode-type-version-uniqueid)
  - [`cardpay hub auth <hubRootUrl>`](#cardpay-hub-auth-hubrooturl)
  - [`cardpay merchant claim-revenue <merchantSafe> <tokenAddress> [amount]`](#cardpay-merchant-claim-revenue-merchantsafe-tokenaddress-amount)
  - [`cardpay merchant claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>`](#cardpay-merchant-claim-revenue-gas-estimate-merchantsafe-tokenaddress-amount)
@@ -82,7 +83,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay price updated-at <token>`](#cardpay-price-updated-at-token)
  - [`cardpay price usd <token> [amount]`](#cardpay-price-usd-token-amount)
  - [`cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`](#cardpay-rewards-admin-add-tokens-safeaddress-rewardprogramid-tokenaddress-amount)
- - [`cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`](#cardpay-rewards-admin-add-rule-fundingcard-rewardprogramid-blob)
+ - [`cardpay rewards admin add-rule <fundingCard> <rewardProgramId> [didBlob] [pathToJsonRule]`](#cardpay-rewards-admin-add-rule-fundingcard-rewardprogramid-didblob-pathtojsonrule)
  - [`cardpay rewards admin create-program <prepaidCard> <admin>`](#cardpay-rewards-admin-create-program-prepaidcard-admin)
  - [`cardpay rewards admin lock <fundingCard> <rewardProgramId>`](#cardpay-rewards-admin-lock-fundingcard-rewardprogramid)
  - [`cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`](#cardpay-rewards-admin-recover-reward-tokens-safeaddress-rewardprogramid-tokenaddress-amount)
@@ -100,6 +101,8 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
  - [`cardpay rewards withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-gas-estimate-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-check-claim-params-rewardsafe-leaf-proof-acceptpartialclaim)
+ - [`cardpay rewards claim-all <address> <rewardSafe> <rewardProgramId> <tokenAddress>`](#cardpay-rewards-claim-all-address-rewardsafe-rewardprogramid-tokenaddress)
+ - [`cardpay rewards claim-all-rewards-gas-estimate <address> <rewardSafe> <rewardProgramId> <tokenAddress>`](#cardpay-rewards-claim-all-rewards-gas-estimate-address-rewardsafe-rewardprogramid-tokenaddress)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
  - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
@@ -257,6 +260,23 @@ Options:
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --network  [required]
+```
+
+## `cardpay did encode <type> [version] [uniqueId]`
+
+Encode DID
+
+```
+Positionals:
+  type  type  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --uniqueId        uniqueId  [string]
       --network  [required]
 ```
 
@@ -786,7 +806,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards admin add-rule <fundingCard> <rewardProgramId> <blob>`
+## `cardpay rewards admin add-rule <fundingCard> <rewardProgramId> [didBlob] [pathToJsonRule]`
 
 Add a rule to a reward program
 
@@ -794,13 +814,14 @@ Add a rule to a reward program
 Positionals:
   fundingCard      The prepaid card used to pay for gas for the txn  [string] [required]
   rewardProgramId  The reward program id.  [string] [required]
-  blob             Hex encoding of rule blob  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --didBlob         A hex encoded string of the didBlob. Will ignore pathToJsonRule if specified. To unset rule didBlob= "0x"  [string]
+      --pathToJsonRule  Relative path to json rule. The file should exist in cardpay-cli/rewards/admin. The default is rule.json  [string] [default: "rule.json"]
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
@@ -907,6 +928,7 @@ Options:
   -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic         Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
+      --safeAddress      safe address. Specify if you want gas estimates for each claim  [string]
       --rewardProgramId  The reward program id.  [string]
       --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
       --isValidOnly      Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo  [boolean]
@@ -1102,6 +1124,44 @@ Options:
   -e, --ethersMnemonic      Phrase for mnemonic wallet using ethers.js signer  [string]
       --acceptPartialClaim  Boolean if user is fine to accept partial claim of reward  [boolean] [default: false]
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay rewards claim-all <address> <rewardSafe> <rewardProgramId> <tokenAddress>`
+
+claim all token rewards from a reward program
+
+```
+Positionals:
+  address          The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  rewardSafe       The address of the rewardSafe which will receive the rewards  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
+  tokenAddress     The address of the tokens that are being claimed as rewards  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay rewards claim-all-rewards-gas-estimate <address> <rewardSafe> <rewardProgramId> <tokenAddress>`
+
+Obtain a gas estimate to claim all rewards corresponding to a rewardProgrmaId and tokenAddress
+
+```
+Positionals:
+  address     The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  rewardSafe  The address of the rewardSafe which will receive the rewards  [string] [required]
+
+Options:
+  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic         Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
+      --rewardProgramId  The reward program id.  [string]
+      --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
 ## `cardpay safe list [address] [safeType]`

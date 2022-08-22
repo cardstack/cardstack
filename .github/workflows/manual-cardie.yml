@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -26,13 +27,16 @@ jobs:
             exit 1;
           fi
 
-      - name: Set up yarn cache
-        uses: actions/cache@v2
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-modules-
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -41,12 +45,12 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy cardie
-        uses: ./.github/actions/deploy-cardie
+        uses: ./.github/actions/waypoint-deploy
         with:
+          app: cardie
+          retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"

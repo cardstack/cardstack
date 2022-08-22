@@ -17,6 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -41,12 +53,10 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Deploy subgraph extractor
-        uses: ./.github/actions/deploy-subgraph-extractor
+      - name: Deploy reward scheduler
+        uses: ./.github/actions/waypoint-deploy
         with:
+          app: cardpay-subg-ext
+          retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"

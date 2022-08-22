@@ -137,6 +137,7 @@ class Indexer:
             ){
                 id
                 blockNumber
+                rootHash
                 paymentCycle
                 rewardProgram {
                     id

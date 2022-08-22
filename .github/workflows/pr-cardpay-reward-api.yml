@@ -3,8 +3,8 @@ name: CI [cardpay-reward-api]
 on:
   pull_request:
     paths:
-      - 'packages/cardpay-reward-api/**'
-      - '.github/workflows/pr-cardpay-reward-api.yml'
+      - "packages/cardpay-reward-api/**"
+      - ".github/workflows/pr-cardpay-reward-api.yml"
 
 jobs:
   test:
@@ -15,7 +15,7 @@ jobs:
         working-directory: ./packages/cardpay-reward-api
     strategy:
       matrix:
-        python-version: ["3.9","3.10"]
+        python-version: ["3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v2
@@ -26,8 +26,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pdm
-          pdm install -d  
-          pdm add setuptools 
+          pdm config python.use_venv false
+          pdm install -d
+          pdm add setuptools
       - name: Test with pytest
         env:
           DB_STRING: "sqlite:///./test.db"

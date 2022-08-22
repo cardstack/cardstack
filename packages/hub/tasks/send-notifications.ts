@@ -1,6 +1,7 @@
 import { inject } from '@cardstack/di';
 import { Helpers } from 'graphile-worker';
 import * as Sentry from '@sentry/node';
+import { Prisma } from '@prisma/client';
 
 export interface PushNotificationData {
   /**
@@ -91,7 +92,17 @@ export default class SendNotificationsTask {
     try {
       // We don't want to have this in the same try catch block because
       // We don't want failure to write to the database to result in infinite notifications being sent
-      await prisma.sentPushNotification.create({ data: { ...payload, messageId } });
+      await prisma.sentPushNotification.create({
+        data: Prisma.validator<Prisma.SentPushNotificationCreateInput>()({
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
+          pushClientId: payload.pushClientId,
+          notificationTitle: payload.notificationTitle,
+          notificationBody: payload.notificationBody,
+          notificationData: payload.notificationData,
+          messageId,
+        }),
+      });
     } catch (e) {
       // This error is important to catch and have an alert for. This means that our deduplication mechanism is failing
       Sentry.captureException(e, {

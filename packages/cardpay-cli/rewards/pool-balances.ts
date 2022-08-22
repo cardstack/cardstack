@@ -22,7 +22,7 @@ export default {
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    let rewardTokenBalances = await rewardPool.balances(rewardProgramId);
+    let rewardTokenBalances = await rewardPool.rewardProgramBalances(rewardProgramId);
     displayRewardTokenBalance(rewardTokenBalances);
   },
 } as CommandModule;
