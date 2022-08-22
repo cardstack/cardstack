@@ -1,5 +1,4 @@
 import { format } from 'date-fns';
-import config from 'config';
 
 export class Clock {
   hrNow() {
@@ -10,11 +9,6 @@ export class Clock {
   }
   dateStringNow() {
     return format(this.now(), 'yyyy-MM-dd');
-  }
-
-  // FIXME remove
-  config() {
-    return config;
   }
 }
 
