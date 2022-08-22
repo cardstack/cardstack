@@ -444,6 +444,7 @@ jobs:
         uses: ./.github/actions/waypoint-deploy
         with:
           app: cardie
+          retain: "0"
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
