@@ -1,7 +1,7 @@
 {{page-title this.meta.title replace=true}}
 
 <InHead>
-  {{!-- template-lint-disable no-forbidden-elements --}}
+  {{! template-lint-disable no-forbidden-elements }}
   <meta property='og:title' content={{this.meta.title}} />
   <meta property='og:type' content='website' />
   <meta property='og:url' content={{this.paymentURL}} />
@@ -12,19 +12,19 @@
   <meta name='twitter:card' content='summary' />
   <meta name='twitter:description' content={{this.meta.description}} />
   <meta name='twitter:url' content={{this.paymentURL}} />
-  {{!-- template-lint-disable no-potential-path-strings --}}
+  {{! template-lint-disable no-potential-path-strings }}
   <meta name='twitter:site' content='@cardstack' />
   <meta name='twitter:image' content={{this.cardPayLogoPng}} />
 </InHead>
 
 <UniversalLinkPage::Layout>
-  <UniversalLinkPage::Header/>
+  <UniversalLinkPage::Header />
   <UniversalLinkPage::Card>
-    <MerchantPaymentRequest
+    <PaymentRequest
       @amount={{this.cleanedValues.displayed.amount}}
       @secondaryAmount={{this.cleanedValues.displayed.secondaryAmount}}
-      @merchant={{this.merchantInfo}}
-      @merchantAddress={{@model.merchantSafe.address}}
+      @profile={{this.profile}}
+      @profileAddress={{@model.merchantSafe.address}}
       @paymentURL={{this.paymentURL}}
       @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
       @canDeepLink={{this.canDeepLink}}

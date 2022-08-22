@@ -27,7 +27,7 @@ declare const config: {
   urls: UrlsOptions;
   walletConnectIcons: string[];
   APP: Record<string, unknown>;
-  cardSpaceHostnameSuffix: string;
+  profileHostnameSuffix: string;
   chains: {
     layer2: 'sokol' | 'gnosis' | 'test';
   };

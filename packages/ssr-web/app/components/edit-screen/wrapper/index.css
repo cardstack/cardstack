@@ -1,6 +1,6 @@
 .edit-screen-wrapper {
   position: fixed;
-  z-index: var(--card-space-overlay-z-index);
+  z-index: var(--profile-overlay-z-index);
 }
 
 .edit-screen-wrapper__full-page-container {

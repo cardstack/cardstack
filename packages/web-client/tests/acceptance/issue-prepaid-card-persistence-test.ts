@@ -490,7 +490,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation][data-test-postable="0"]')
         .containsText(
-          `Looks like you don’t have a payment profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+          `Looks like you don’t have a profile or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
           } wallet, or by claiming revenue in Cardstack Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(previousMinDaiAmount))

@@ -414,34 +414,36 @@ export default abstract class Layer2ChainWeb3Strategy
     return result.prepaidCards[0];
   }
 
-  async fetchMerchantRegistrationFee(): Promise<number> {
+  async fetchProfileRegistrationFee(): Promise<number> {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
     return await RevenuePool.merchantRegistrationFee(); // this is a SPEND amount
   }
 
-  async registerMerchant(
+  async registerProfile(
     prepaidCardAddress: string,
     infoDid: string,
     options: TransactionOptions
   ) {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
-    let { merchantSafe } = await RevenuePool.registerMerchant(
+    let { merchantSafe: profileSafe } = await RevenuePool.registerMerchant(
       prepaidCardAddress,
       infoDid,
       options
     );
 
-    return merchantSafe;
+    return profileSafe;
   }
 
-  async resumeRegisterMerchantTransaction(
+  async resumeRegisterProfileTransaction(
     txnHash: string
   ): Promise<MerchantSafe> {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
-    let { merchantSafe } = await RevenuePool.registerMerchant(txnHash);
+    let { merchantSafe: profileSafe } = await RevenuePool.registerMerchant(
+      txnHash
+    );
 
-    return merchantSafe;
+    return profileSafe;
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication

@@ -6,7 +6,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
   getFilenameFromDid,
@@ -26,14 +26,14 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     assert.dom('[data-test-available-balances-section]').doesNotExist();
   });
 
-  test('Depot and merchant balances are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
+  test('Depot and profile balances are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
     let layer2Service: Layer2TestWeb3Strategy = this.owner.lookup(
       'service:layer2-network'
     ).strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let merchantSafeAddress = '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33';
+    let profileSafeAddress = '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33';
 
-    this.server.create('merchant-info', {
+    this.server.create('profile', {
       id: await getFilenameFromDid(EXAMPLE_DID),
       name: 'Mandello',
       slug: 'mandello1',
@@ -44,8 +44,8 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     });
 
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
-      createMerchantSafe({
-        address: merchantSafeAddress,
+      createProfileSafe({
+        address: profileSafeAddress,
         owners: [layer2AccountAddress],
         infoDID: EXAMPLE_DID,
         tokens: [createSafeToken('CARD.CPXD', '467899100000000000000')],
@@ -93,11 +93,11 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       .dom(`${depotSafeSel} [data-test-safe-usd-total]`)
       .containsText(`$116.41 USD`);
 
-    let merchantSafeSel = `[data-test-safe]:nth-of-type(2)`;
+    let profileSafeSel = `[data-test-safe]:nth-of-type(2)`;
 
-    assert.dom(merchantSafeSel).containsText('0x2126...6F33');
+    assert.dom(profileSafeSel).containsText('0x2126...6F33');
 
-    assert.dom(`${merchantSafeSel} [data-test-safe-count]`).containsText('1');
+    assert.dom(`${profileSafeSel} [data-test-safe-count]`).containsText('1');
 
     let secondAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6EbAAAA';
     layer2Service.test__simulateRemoteAccountSafes(secondAddress, [

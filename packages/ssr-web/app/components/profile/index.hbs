@@ -1,0 +1,32 @@
+<div
+  class={{cn 'profile' profile--vertical=@vertical}}
+  data-test-profile={{@name}}
+  ...attributes
+>
+  <ProfileLogo
+    class='profile__logo'
+    @name={{@name}}
+    @size={{@size}}
+    @logoBackground={{@logoBackground}}
+    @logoTextColor={{@logoTextColor}}
+  />
+  <div>
+    <div
+      class={{cn 'profile__name' profile__name--lg=(eq @size 'large')}}
+      title={{@name}}
+      data-test-profile-name
+    >
+      {{@name}}
+    </div>
+    {{#if @address}}
+      <div class='profile__address'>
+        {{@address}}
+      </div>
+    {{/if}}
+    {{#if @text}}
+      <div class='profile__text' data-test-profile-text>
+        {{@text}}
+      </div>
+    {{/if}}
+  </div>
+</div>

@@ -18,7 +18,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { createMerchantSafe } from '@cardstack/web-client/utils/test-factories';
+import { createProfileSafe } from '@cardstack/web-client/utils/test-factories';
 import BN from 'bn.js';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 import {
@@ -43,7 +43,7 @@ module(
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let cardCustomizationService: CardCustomization;
-    let merchantSafe: MerchantSafe;
+    let profileSafe: MerchantSafe;
     let workflowSession: WorkflowSession;
 
     setupRenderingTest(hooks);
@@ -60,7 +60,7 @@ module(
         'service:card-customization'
       ) as CardCustomization;
 
-      merchantSafe = createMerchantSafe({
+      profileSafe = createProfileSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [],
@@ -70,7 +70,7 @@ module(
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
-        merchantSafe,
+        profileSafe,
       ]);
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -78,7 +78,7 @@ module(
       workflowSession = new WorkflowSession();
       workflowSession.setValue({
         spendFaceValue: 100000,
-        prepaidFundingSafeAddress: merchantSafe.address,
+        prepaidFundingSafeAddress: profileSafe.address,
         issuerName: 'Some name',
         colorScheme: {
           id: prepaidCardColorSchemes[0].id,
@@ -248,7 +248,7 @@ module(
         await waitFor('[data-test-issue-prepaid-card-cancel-button]');
         layer2Service.test__simulateOnNonceForIssuePrepaidCardRequest(
           100000,
-          merchantSafe.address,
+          profileSafe.address,
           new BN('12345')
         );
         await click('[data-test-issue-prepaid-card-cancel-button]');
@@ -259,14 +259,14 @@ module(
         await waitUntil(() =>
           layer2Service.test__getNonceForIssuePrepaidCardRequest(
             100000,
-            merchantSafe.address
+            profileSafe.address
           )
         );
         assert.strictEqual(
           layer2Service
             .test__getNonceForIssuePrepaidCardRequest(
               100000,
-              merchantSafe.address
+              profileSafe.address
             )
             ?.toString(),
           '12345',

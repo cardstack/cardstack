@@ -4,7 +4,7 @@ import { DepotSafe, MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import BN from 'bn.js';
-import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
+import { Profile } from '@cardstack/web-client/resources/profile';
 
 interface CardPaySafeComponentArgs {
   safe: Safe;
@@ -29,7 +29,7 @@ export default class CardPaySafeComponent extends Component<CardPaySafeComponent
     let safe = this.args.safe as SupportedSafe;
     return {
       depot: 'Depot',
-      merchant: 'Payment Profile',
+      merchant: 'Profile',
     }[safe.type];
   }
 
@@ -39,11 +39,11 @@ export default class CardPaySafeComponent extends Component<CardPaySafeComponent
 
   get data() {
     if (this.args.safe.type === 'merchant') {
-      let merchant = this.args.safe as MerchantSafe;
+      let profile = this.args.safe as MerchantSafe;
 
       return {
-        info: MerchantInfo.from(this, () => ({
-          infoDID: merchant.infoDID,
+        info: Profile.from(this, () => ({
+          infoDID: profile.infoDID,
         })),
       };
     } else if (this.args.safe.type === 'depot') {

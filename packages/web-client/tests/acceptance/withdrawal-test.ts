@@ -20,7 +20,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { toWei } from 'web3-utils';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -128,7 +128,7 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+    let profileAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -139,8 +139,8 @@ module('Acceptance | withdrawal', function (hooks) {
           createSafeToken('CARD.CPXD', '500000000000000000000'),
         ],
       }),
-      createMerchantSafe({
-        address: merchantAddress,
+      createProfileSafe({
+        address: profileAddress,
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         accumulatedSpendValue: 100,
         tokens: [
@@ -187,7 +187,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(
         '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
       )
-      .containsText(merchantAddress);
+      .containsText(profileAddress);
 
     await click(
       '[data-test-safe-chooser-dropdown] + .ember-basic-dropdown-content-wormhole-origin li:nth-child(2)'
@@ -276,7 +276,7 @@ module('Acceptance | withdrawal', function (hooks) {
     await waitFor(postableSel(4, 1));
 
     await layer2Service.test__simulateBridgedToLayer1(
-      merchantAddress,
+      profileAddress,
       layer1AccountAddress,
       'CARD.CPXD',
       toWei('200')
@@ -339,7 +339,7 @@ module('Acceptance | withdrawal', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-safe-address]`)
-      .containsText(merchantAddress);
+      .containsText(profileAddress);
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
       .containsText('125.00');

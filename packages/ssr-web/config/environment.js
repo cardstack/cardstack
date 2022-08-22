@@ -2,22 +2,21 @@
 
 // Note that the SDK (which holds these constants) is a TS lib, so we can't
 // require it in this CJS file.
-const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
-const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME =
-  'wallet-staging.stack.cards';
+const PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
+const PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME = 'wallet-staging.stack.cards';
 
 const universalLinkHostnamesByTarget = {
-  staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-  production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+  staging: PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+  production: PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
-const CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.xyz.localhost';
-const CARD_SPACE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
-const CARD_SPACE_HOSTNAME_SUFFIX = '.card.xyz';
+const PROFILE_LOCAL_DEV_HOSTNAME_SUFFIX = '.card.xyz.localhost';
+const PROFILE_STAGING_HOSTNAME_SUFFIX = '.pouty.pizza';
+const PROFILE_HOSTNAME_SUFFIX = '.card.xyz';
 
-const cardSpaceHostnameSuffixByTarget = {
-  staging: CARD_SPACE_STAGING_HOSTNAME_SUFFIX,
-  production: CARD_SPACE_HOSTNAME_SUFFIX,
+const profileHostnameSuffixByTarget = {
+  staging: PROFILE_STAGING_HOSTNAME_SUFFIX,
+  production: PROFILE_HOSTNAME_SUFFIX,
 };
 
 function convertHostnameSuffixToRegex(suffix) {
@@ -27,12 +26,12 @@ function convertHostnameSuffixToRegex(suffix) {
 
 const hostWhitelistByTarget = {
   staging: [
-    MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-    convertHostnameSuffixToRegex(CARD_SPACE_STAGING_HOSTNAME_SUFFIX),
+    PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+    convertHostnameSuffixToRegex(PROFILE_STAGING_HOSTNAME_SUFFIX),
   ],
   production: [
-    MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-    convertHostnameSuffixToRegex(CARD_SPACE_HOSTNAME_SUFFIX),
+    PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+    convertHostnameSuffixToRegex(PROFILE_HOSTNAME_SUFFIX),
   ],
 };
 
@@ -50,7 +49,7 @@ module.exports = function (environment) {
     previewSubdomainInfix: 'ssr-web-preview',
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
-      MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+      PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
@@ -104,9 +103,9 @@ module.exports = function (environment) {
         '/^localhost:\\d+$/',
       ],
     },
-    cardSpaceHostnameSuffix:
-      cardSpaceHostnameSuffixByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
-      CARD_SPACE_LOCAL_DEV_HOSTNAME_SUFFIX,
+    profileHostnameSuffix:
+      profileHostnameSuffixByTarget[process.env.SSR_WEB_ENVIRONMENT] ??
+      PROFILE_LOCAL_DEV_HOSTNAME_SUFFIX,
     chains: {
       layer2:
         process.env.SSR_WEB_ENVIRONMENT === 'production' ? 'gnosis' : 'sokol',

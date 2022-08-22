@@ -1,0 +1,30 @@
+.profile-logo {
+  --profile-logo-background: var(--boxel-blue);
+  --profile-logo-text-color: var(--boxel-light);
+  --profile-margin-right: var(--boxel-sp-xxs);
+  --logo-size: var(--boxel-icon-sm);
+
+  background: var(--profile-logo-background);
+  color: var(--profile-logo-text-color);
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  letter-spacing: -1px;
+  line-height: var(--logo-size);
+  width: var(--logo-size);
+  height: var(--logo-size);
+  margin-right: var(--profile-margin-right);
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.profile-logo--lg {
+  --logo-size: var(--boxel-icon-xxl);
+
+  font-size: 2.8rem;
+  font-weight: 700;
+}

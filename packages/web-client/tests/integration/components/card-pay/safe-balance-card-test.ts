@@ -7,7 +7,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
   createDepotSafe,
-  createMerchantSafe,
+  createProfileSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
@@ -21,7 +21,7 @@ module(
     let session: WorkflowSession;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+    let profileAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     let prepaidCardAddress = '0xprepaidDbAB0644ffCD32518eBF4924ba8666666';
 
     hooks.beforeEach(async function () {
@@ -38,8 +38,8 @@ module(
             createSafeToken('CARD.CPXD', '500000000000000000000'),
           ],
         }),
-        createMerchantSafe({
-          address: merchantAddress,
+        createProfileSafe({
+          address: profileAddress,
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
             createSafeToken('DAI.CPXD', '125000000000000000000'),
@@ -67,7 +67,7 @@ module(
 
     test('it renders the safe type and balances for the safe address specified in the workflow', async function (assert) {
       this.set('config', { safeAddressKey: 'prepaidFundingSafeAddress' });
-      session.setValue('prepaidFundingSafeAddress', merchantAddress);
+      session.setValue('prepaidFundingSafeAddress', profileAddress);
 
       await render(hbs`
         <CardPay::SafeBalanceCard
@@ -81,11 +81,9 @@ module(
 
       assert
         .dom('[data-test-safe-address]')
-        .containsText('Payment Profile address')
-        .containsText(merchantAddress);
-      assert
-        .dom('[data-test-balance-label]')
-        .containsText('Payment Profile balance');
+        .containsText('Profile address')
+        .containsText(profileAddress);
+      assert.dom('[data-test-balance-label]').containsText('Profile balance');
       assert
         .dom('[data-test-balance="DAI.CPXD"]')
         .containsText('125.00 DAI.CPXD');

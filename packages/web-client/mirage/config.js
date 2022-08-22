@@ -22,22 +22,22 @@ export default function () {
     };
   });
 
-  this.post('/merchant-infos');
-  this.get('/merchant-infos', function (schema) {
-    return schema.merchantInfos.all();
+  this.post('/profiles');
+  this.get('/profiles', function (schema) {
+    return schema.profiles.all();
   });
 
   this.get(
-    '/merchant-infos/validate-slug/:slug',
-    function ({ merchantInfos }, { params: { slug } }) {
-      let merchantBySlug = merchantInfos.findBy({ slug });
+    '/profiles/validate-slug/:slug',
+    function ({ profiles }, { params: { slug } }) {
+      let profileBySlug = profiles.findBy({ slug });
 
       if (slug === 'www') {
         return {
           slugAvailable: false,
           detail: 'This ID is not allowed',
         };
-      } else if (merchantBySlug) {
+      } else if (profileBySlug) {
         return {
           slugAvailable: false,
           detail: 'This ID is already taken. Please choose another one',
@@ -84,7 +84,7 @@ export default function () {
     'https://storage.cardstack.com/merchant-info/:idWithExtension',
     function (schema, { params: { idWithExtension } }) {
       let [id] = idWithExtension.split('.');
-      return schema.merchantInfos.find(id);
+      return schema.profiles.find(id);
     }
   );
 
