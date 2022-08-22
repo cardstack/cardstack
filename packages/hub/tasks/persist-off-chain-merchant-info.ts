@@ -26,7 +26,9 @@ export default class PersistOffChainMerchantInfo {
 
     if (invalidate) {
       try {
-        putJobPayload.invalidateOnDistribution = config.get('aws.offchainStorage.cloudfrontDistributionId');
+        // FIXME remove hardcoded fallback
+        putJobPayload.invalidateOnDistribution =
+          config.get('aws.offchainStorage.cloudfrontDistributionId') || 'E1YE1J4F4X2BOS';
         putJobPayload.invalidationRoleChain = config.get('aws.offchainStorage.invalidationRoleChain');
       } catch (e) {
         console.log('Error adding invalidation', e);
