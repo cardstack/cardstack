@@ -32,7 +32,7 @@ class Staking(Rule):
                 AND type = 'depot'
                 GROUP BY safe
             ),
-            -- Get the balance history of the safes we are interested in, filtered to the token, 
+            -- Get the balance history of the safes we are interested in, filtered to the token,
             -- joining to get the owner
             filtered_balances AS (
                 SELECT tht.safe, sot.owner, tht.balance_downscale_e9_uint64::int64 AS balance_int64, tht._block_number
@@ -56,8 +56,8 @@ class Staking(Rule):
                 QUALIFY _block_number::integer >= $1::integer
                 ),
             original_balances AS (
-                SELECT 
-                    safe, 
+                SELECT
+                    safe,
                     owner,
                     -- There is only one value here after the group but logically it is the "last" balance
                     -- it is called "change" to match the balance_changes CTE so we can union them together
@@ -75,7 +75,7 @@ class Staking(Rule):
                 GROUP BY safe, owner
                 ),
 
-            -- Combine the balances at the start of the period and 
+            -- Combine the balances at the start of the period and
             all_data AS (SELECT * FROM original_balances UNION ALL SELECT * FROM balance_changes)
 
             -- Aggregate the changes, each is treated as a compounding interest calculation
