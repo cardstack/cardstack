@@ -186,7 +186,7 @@ class CreateProfileWorkflow extends Workflow {
           componentName: 'card-pay/create-profile-workflow/prepaid-card-choice',
         }),
       ],
-      completedDetail: 'Payment profile created',
+      completedDetail: 'Profile created',
     }),
   ];
   epilogue = new PostableCollection([
