@@ -458,7 +458,6 @@ def test_reward_given_tokens(
     with MonkeyPatch.context() as monkeypatch:
 
         token_holder_df = apply_transfers(starting_balances, transfers)
-        print(token_holder_df)
         safe_owners = [
             {
                 "safe": f"safe{n}",
@@ -490,3 +489,64 @@ def test_reward_given_tokens(
             pytest.approx(sum(result["amount"]))
             == interest_rate * sum(starting_balances) * 1e9
         )
+
+
+@given(
+    st.lists(st.integers(min_value=0, max_value=60), min_size=1, max_size=100),
+)
+@example(
+    blocks=[0],
+)
+@example(
+    blocks=[0, 30],
+)
+@example(
+    blocks=[0, 10, 20, 30],
+)
+def test_rewards_identically_if_balance_never_changes(blocks):
+    blocks = [0]
+    interest_rate = 0.1
+    with MonkeyPatch.context() as monkeypatch:
+
+        starting_balances = [
+            {
+                "_block_number": 0,
+                "token": "card-0",
+                "safe": "safe0",
+                "balance_downscale_e9_uint64": 100,
+            }
+        ]
+        balance_history = [
+            {
+                "_block_number": block,
+                "token": "card-0",
+                "safe": "safe0",
+                "balance_downscale_e9_uint64": 100,
+            }
+            for block in blocks
+        ]
+        safe_owners = [
+            {
+                "safe": "safe0",
+                "owner": "owner0",
+                "type": "depot",
+                "_block_number": 0,
+            }
+        ]
+
+        rule_single_balance = create_rule(
+            monkeypatch,
+            pd.DataFrame(starting_balances),
+            pd.DataFrame(safe_owners),
+            user_config_overrides={"interest_rate_monthly": interest_rate},
+        )
+        result_single_balance = rule_single_balance.run(30, "0x0")
+        rule_multiple_balance = create_rule(
+            monkeypatch,
+            pd.DataFrame(balance_history),
+            pd.DataFrame(safe_owners),
+            user_config_overrides={"interest_rate_monthly": interest_rate},
+        )
+        result_multiple_balance = rule_multiple_balance.run(30, "0x0")
+        assert pytest.approx(sum(result_single_balance["amount"])) == 10e9
+        assert pytest.approx(sum(result_multiple_balance["amount"])) == 10e9
