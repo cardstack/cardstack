@@ -17,7 +17,7 @@ config = {
     "staging": {
         "tokens": {
             "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
-            "dai": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+            "dai": "0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b",
         },
         "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
