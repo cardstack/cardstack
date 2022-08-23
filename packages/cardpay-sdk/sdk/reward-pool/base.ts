@@ -554,9 +554,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt[]> {
-    if (unclaimedValidProofs.length == 0) {
-      throw new Error('Do not have any valid proofs to claim');
-    }
     const proofs = unclaimedValidProofs.filter((o) => o.isValid);
     const receipts: SuccessfulTransactionReceipt[] = [];
     if (proofs.length < unclaimedValidProofs.length) {
@@ -619,19 +616,18 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     };
   }
 
-  async claimAllProofsGasEstimate(
-    unclaimedValidProofsWithSingleToken: WithSymbol<ClaimableProof>[]
-  ): Promise<GasEstimate> {
-    if (unclaimedValidProofsWithSingleToken.length == 0) {
-      throw new Error('Do not have any valid proofs to claim');
-    }
-    const proofs = unclaimedValidProofsWithSingleToken
+  async claimAllGasEstimate(rewardSafeAddress: string, rewardProgramId?: string): Promise<GasEstimate> {
+    //TODO: Check for single token only
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardSafeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
+    const unclaimedValidProofsWithSingleToken = (
+      await this.getProofs(rewardSafeOwner, rewardSafeAddress, rewardProgramId, undefined, false)
+    )
       .filter((o) => o.isValid)
       .filter((o) => {
-        //Intentionally step over claims which are not big enough to pay for gas fees
         return o.gasEstimate.amount.lt(new BN(o.amount));
       });
-    const totalGasFees = proofs.reduce((accum, o) => {
+    const totalGasFees = unclaimedValidProofsWithSingleToken.reduce((accum, o) => {
       return accum.add(o.gasEstimate.amount);
     }, new BN(0));
     return {
