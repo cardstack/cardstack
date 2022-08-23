@@ -4,7 +4,7 @@ from pydantic import BaseSettings
 
 config = {
     "staging": {
-        "reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA",
+        "reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A",
         "tokens": {
             "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
         },
