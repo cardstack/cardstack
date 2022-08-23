@@ -22,12 +22,18 @@ export default async function s3PutJson(payload: any, helpers: Helpers) {
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);
 
   if (invalidateOnDistribution) {
-    helpers.addJob('create-cloudfront-invalidation', {
-      distributionId: invalidateOnDistribution,
-      region,
-      roleChain: invalidationRoleChain,
-      path,
-    });
+    helpers.addJob(
+      'create-cloudfront-invalidation',
+      {
+        distributionId: invalidateOnDistribution,
+        region,
+        roleChain: invalidationRoleChain,
+        path,
+      },
+      {
+        maxAttempts: 1,
+      }
+    );
   }
 }
 
