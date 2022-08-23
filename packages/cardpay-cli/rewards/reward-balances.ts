@@ -5,7 +5,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 import { displayRewardTokenBalance } from './utils';
 
 export default {
-  command: 'reward-balances <address>',
+  command: 'reward-balances <address> [safeAddress] [rewardProgramId]',
   describe: 'View token balances of unclaimed rewards in the reward pool',
   builder(yargs: Argv) {
     return yargs
@@ -27,19 +27,17 @@ export default {
     let { network, address, safeAddress, rewardProgramId } = args as unknown as {
       network: string;
       address: string;
-      safeAddress: string;
+      safeAddress?: string;
       rewardProgramId?: string;
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
-    let proofs;
+    console.log(`Reward balances for ${address}`);
     if (safeAddress) {
-      proofs = await rewardPool.getProofs(address, safeAddress, rewardProgramId, undefined, false);
-      const tokenBalances = await rewardPool.rewardTokenBalances(proofs);
+      const tokenBalances = await rewardPool.rewardTokenBalancesWithoutDust(address, safeAddress, rewardProgramId);
       displayRewardTokenBalance(tokenBalances);
     } else {
-      const tokenBalances = await rewardPool.rewardTokenBalances(undefined, address, rewardProgramId);
-      console.log(`Reward balances for ${address}`);
+      const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
       displayRewardTokenBalance(tokenBalances);
     }
   },
