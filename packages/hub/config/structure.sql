@@ -91,6 +91,19 @@ CREATE TYPE public.notification_types_status_enum AS ENUM (
 ALTER TYPE public.notification_types_status_enum OWNER TO postgres;
 
 --
+-- Name: scheduled_payment_attempts_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.scheduled_payment_attempts_status_enum AS ENUM (
+    'in_progress',
+    'succeeded',
+    'failed'
+);
+
+
+ALTER TYPE public.scheduled_payment_attempts_status_enum OWNER TO postgres;
+
+--
 -- Name: wallet_orders_status_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -1127,6 +1140,56 @@ CREATE TABLE public.reservations (
 ALTER TABLE public.reservations OWNER TO postgres;
 
 --
+-- Name: scheduled_payment_attempts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.scheduled_payment_attempts (
+    id uuid NOT NULL,
+    started_at timestamp without time zone,
+    ended_at timestamp without time zone,
+    status public.scheduled_payment_attempts_status_enum DEFAULT 'in_progress'::public.scheduled_payment_attempts_status_enum NOT NULL,
+    transaction_hash text,
+    failure_reason text,
+    scheduled_payment_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.scheduled_payment_attempts OWNER TO postgres;
+
+--
+-- Name: scheduled_payments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.scheduled_payments (
+    id uuid NOT NULL,
+    sender_safe_address text NOT NULL,
+    module_address text NOT NULL,
+    token_address text NOT NULL,
+    amount bigint NOT NULL,
+    payee_address text NOT NULL,
+    execution_gas_estimation bigint NOT NULL,
+    max_gas_price bigint NOT NULL,
+    fee_fixed_usd integer NOT NULL,
+    fee_percentage integer NOT NULL,
+    nonce text NOT NULL,
+    pay_at timestamp without time zone,
+    recurring_day_of_month integer,
+    recurring_until timestamp without time zone,
+    valid_for_days integer DEFAULT 3,
+    sp_hash text NOT NULL,
+    chain_id integer NOT NULL,
+    creation_transaction_hash text,
+    creation_block_number bigint,
+    cancelation_transaction_hash text,
+    cancelation_block_number bigint,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.scheduled_payments OWNER TO postgres;
+
+--
 -- Name: sent_push_notifications; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1397,6 +1460,30 @@ ALTER TABLE ONLY public.reservations
 
 
 --
+-- Name: scheduled_payment_attempts scheduled_payment_attempts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.scheduled_payment_attempts
+    ADD CONSTRAINT scheduled_payment_attempts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: scheduled_payments scheduled_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.scheduled_payments
+    ADD CONSTRAINT scheduled_payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: scheduled_payments scheduled_payments_sp_hash_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.scheduled_payments
+    ADD CONSTRAINT scheduled_payments_sp_hash_key UNIQUE (sp_hash);
+
+
+--
 -- Name: sent_push_notifications sent_push_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1506,6 +1593,20 @@ CREATE INDEX reservations_user_address_index ON public.reservations USING btree 
 
 
 --
+-- Name: scheduled_payment_attempts_scheduled_payment_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payment_attempts_scheduled_payment_id_index ON public.scheduled_payment_attempts USING btree (scheduled_payment_id);
+
+
+--
+-- Name: scheduled_payments_sender_safe_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payments_sender_safe_address_index ON public.scheduled_payments USING btree (sender_safe_address);
+
+
+--
 -- Name: sent_push_notifications_created_at_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1612,6 +1713,14 @@ ALTER TABLE ONLY public.prepaid_card_customizations
 
 ALTER TABLE ONLY public.prepaid_card_customizations
     ADD CONSTRAINT prepaid_card_customizations_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES public.prepaid_card_patterns(id);
+
+
+--
+-- Name: scheduled_payment_attempts scheduled_payment_attempts_scheduled_payment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.scheduled_payment_attempts
+    ADD CONSTRAINT scheduled_payment_attempts_scheduled_payment_id_fkey FOREIGN KEY (scheduled_payment_id) REFERENCES public.scheduled_payments(id);
 
 
 --
