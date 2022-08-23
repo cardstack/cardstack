@@ -29,7 +29,7 @@ jobs:
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
@@ -73,7 +73,7 @@ jobs:
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
@@ -111,7 +111,7 @@ jobs:
             node_modules
             packages/*/node_modules
             packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
