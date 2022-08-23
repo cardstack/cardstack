@@ -11,6 +11,7 @@ import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-cha
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import CreateCloudfrontInvalidation from './tasks/create-cloudfront-invalidation';
 import CreateProfile from './tasks/create-profile';
 import DiscordPostTask from './tasks/discord-post';
 import NotifyMerchantClaimTask from './tasks/notify-merchant-claim';
@@ -63,6 +64,7 @@ export class HubWorker {
       connectionString: dbConfig.url,
       taskList: {
         boom: boom,
+        'create-cloudfront-invalidation': this.instantiateTask(CreateCloudfrontInvalidation),
         'create-profile': this.instantiateTask(CreateProfile),
         'discord-post': this.instantiateTask(DiscordPostTask),
         'send-email-card-drop-verification': this.instantiateTask(SendEmailCardDropVerification),

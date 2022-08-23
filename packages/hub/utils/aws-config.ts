@@ -10,7 +10,7 @@ interface AwsConfigResult {
 
 // If credentials or region are configured, use them. If roleChain is present, assume the specified role,
 // in order, using the original or previous role's credentials to assume the role.
-export default async function awsConfig({ roleChain = [] }) {
+export default async function awsConfig({ roleChain = [] }: { roleChain: string[] }) {
   let result = {} as AwsConfigResult;
 
   let accessKeyId = config.get('aws.config.credentials.AccessKeyId');

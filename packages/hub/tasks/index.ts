@@ -5,6 +5,7 @@ export interface KnownTasks {}
 // vscode can help with this, via Cmd + . -> 'Add missing properties'
 const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   's3-put-json': true,
+  'create-cloudfront-invalidation': true,
   'create-profile': true,
   'discord-post': true,
   'send-notifications': true,

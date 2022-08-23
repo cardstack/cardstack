@@ -8,6 +8,9 @@
       },
       "region": "HUB_AWS_REGION"
     },
+    "offchainStorage": {
+      "cloudfrontDistributionId": "HUB_STORAGE_CLOUDFRONT_DISTRIBUTION"
+    },
     "ses": {
       "supportEmail": "HUB_AWS_SES_SUPPORT_EMAIL",
       "region": "HUB_AWS_SES_REGION"
