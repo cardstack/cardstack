@@ -16,6 +16,7 @@ client = TestClient(app)
 
 reward_token_address = config["staging"]["tokens"]["card"]
 
+
 @pytest.fixture(scope="module")
 def monkeymodule():
     """
