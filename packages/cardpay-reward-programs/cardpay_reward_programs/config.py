@@ -22,7 +22,7 @@ config = {
         "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
-        "contracts": {"reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"},
+        "contracts": {"reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A"},
     },
     "production": {
         "tokens": {
