@@ -22,7 +22,7 @@ class MinOtherMerchantsPaid(Rule):
         self.token = token
         self.duration = duration
 
-    def sql(self, table_query):
+    def sql(self, table_query, aux_table_query=None):
         return f"""
         select
         prepaid_card_owner as payee,
@@ -59,5 +59,5 @@ class MinOtherMerchantsPaid(Rule):
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "merchant"])
         else:
-            base_df = self.run_query(table_query, vars)
+            base_df = self.run_query(table_query, vars, None)
         return self.df_to_payment_list(base_df, payment_cycle, reward_program_id)

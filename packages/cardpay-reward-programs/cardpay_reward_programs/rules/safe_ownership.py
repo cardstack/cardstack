@@ -26,7 +26,7 @@ class SafeOwnership(Rule):
         self.safe_type = safe_type
         self.max_rewards = max_rewards
 
-    def sql(self, table_query):
+    def sql(self, table_query, aux_table_query=None):
         return f"""
         with total_safes as (select
                 owner as payee,
@@ -60,13 +60,15 @@ class SafeOwnership(Rule):
             self.safe_type,
             self.max_rewards,
         ]
+
         table_query = self._get_table_query(
             "safe_owner", "safe_owner", self.start_analysis_block, payment_cycle
         )
+
         if table_query == "parquet_scan([])":
             df = pd.DataFrame(columns=["payee", "payable_safes"])
         else:
-            df = self.run_query(table_query, vars)
+            df = self.run_query(table_query, vars, None)
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
         df["validFrom"] = payment_cycle

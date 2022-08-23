@@ -32,7 +32,7 @@ def create_rule(
     ):
         return "TEST_TABLE"
 
-    def run_query(self, table_query, vars):
+    def run_query(self, table_query, vars, aux_table_query):
         con.execute(self.sql("TEST_TABLE"), vars)
         return con.fetchdf()
 

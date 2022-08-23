@@ -35,7 +35,7 @@ class RetroAirdrop(Rule):
         self.test_accounts = test_accounts
         self.test_reward = test_reward
 
-    def sql(self, table_query):
+    def sql(self, table_query, aux_table_query=None):
         return f"""
         select
             prepaid_card_owner as payee,
@@ -93,7 +93,7 @@ class RetroAirdrop(Rule):
         if table_query == "parquet_scan([])":
             base_df = pd.DataFrame(columns=["payee", "transactions"])
         else:
-            base_df = self.run_query(table_query, vars)
+            base_df = self.run_query(table_query, vars, None)
         airdrop_payments = self.calculate_airdrop_reward_amounts(
             base_df, payment_cycle, reward_program_id
         )

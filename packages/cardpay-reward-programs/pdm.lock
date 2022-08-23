@@ -368,6 +368,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "exceptiongroup"
+version = "1.0.0rc8"
+requires_python = ">=3.7"
+summary = "Backport of PEP 654 (exception groups)"
+
+[[package]]
 name = "executing"
 version = "0.8.3"
 summary = "Get the currently executing AST node of a frame, and other information"
@@ -423,6 +429,17 @@ name = "hexbytes"
 version = "0.2.2"
 requires_python = ">=3.6, <4"
 summary = "hexbytes: Python `bytes` subclass that decodes hex, with a readable console output"
+
+[[package]]
+name = "hypothesis"
+version = "6.54.4"
+requires_python = ">=3.7"
+summary = "A library for property-based testing"
+dependencies = [
+    "attrs>=19.2.0",
+    "exceptiongroup>=1.0.0rc8; python_version < \"3.11\"",
+    "sortedcontainers<3.0.0,>=2.1.0",
+]
 
 [[package]]
 name = "idna"
@@ -996,7 +1013,7 @@ summary = "Python for Window Extensions"
 name = "pywinpty"
 version = "2.0.6"
 requires_python = ">=3.7"
-summary = ""
+summary = "Pseudo terminal support for Windows from Python."
 
 [[package]]
 name = "pyyaml"
@@ -1090,6 +1107,11 @@ name = "smmap"
 version = "5.0.0"
 requires_python = ">=3.6"
 summary = "A pure Python implementation of a sliding window memory map manager"
+
+[[package]]
+name = "sortedcontainers"
+version = "2.4.0"
+summary = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
 
 [[package]]
 name = "soupsieve"
@@ -1312,7 +1334,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:d03559940fa71d794964b76f7735088ce69ccc95be243c3fee82ed49d1859057"
+content_hash = "sha256:b7f8772eed9b6309b0440d354ab6ea8036403b058907e141e8bb18fb7f5a2a7c"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -1858,6 +1880,10 @@ content_hash = "sha256:d03559940fa71d794964b76f7735088ce69ccc95be243c3fee82ed49d
     {url = "https://files.pythonhosted.org/packages/99/71/78170b0fdeb7ee6aa24c2206ac2d0d4f097ff0d9ad4ab4f748e04ea73187/eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
     {url = "https://files.pythonhosted.org/packages/de/b1/fcae902be069ea771af755839b677d196ac0959bf93b6418f12e45212b5e/eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
 ]
+"exceptiongroup 1.0.0rc8" = [
+    {url = "https://files.pythonhosted.org/packages/94/e0/2f58a7e00e28cd57f8239bd8d16963c2810142af58028cf5b0681ed9fdfd/exceptiongroup-1.0.0rc8.tar.gz", hash = "sha256:6990c24f06b8d33c8065cfe43e5e8a4bfa384e0358be036af9cc60b6321bd11a"},
+    {url = "https://files.pythonhosted.org/packages/9a/8e/21e73923dabbf1b4bb36bc1c0f8f6da5c7d6becd0902213dbefa386ca8dc/exceptiongroup-1.0.0rc8-py3-none-any.whl", hash = "sha256:ab0a968e1ef769e55d9a596f4a89f7be9ffedbc9fdefdb77cc68cf5c33ce1035"},
+]
 "executing 0.8.3" = [
     {url = "https://files.pythonhosted.org/packages/16/14/5a9b7b7725e85aa66f00a89f1e912ded203217016562747f8b8effcf52bc/executing-0.8.3.tar.gz", hash = "sha256:c6554e21c6b060590a6d3be4b82fb78f8f0194d809de5ea7df1c093763311501"},
     {url = "https://files.pythonhosted.org/packages/61/d8/ad89910dc1da01a24135cb3dce702c72a8172f7b8f896ac0c4c34bcaf323/executing-0.8.3-py2.py3-none-any.whl", hash = "sha256:d1eef132db1b83649a3905ca6dd8897f71ac6f8cac79a7e58a1a09cf137546c9"},
@@ -1946,6 +1972,10 @@ content_hash = "sha256:d03559940fa71d794964b76f7735088ce69ccc95be243c3fee82ed49d
 "hexbytes 0.2.2" = [
     {url = "https://files.pythonhosted.org/packages/35/03/e16b7131197583225e47459e7e907dbef0dff84d9df49f9c6a6e62a7f69c/hexbytes-0.2.2.tar.gz", hash = "sha256:a5881304d186e87578fb263a85317c808cf130e1d4b3d37d30142ab0f7898d03"},
     {url = "https://files.pythonhosted.org/packages/4b/34/2c6b549bb318a1fcf8b86438cb414340906a30e29e597f7e0bb19464673b/hexbytes-0.2.2-py3-none-any.whl", hash = "sha256:ef53c37ea9f316fff86fcb1df057b4c6ba454da348083e972031bbf7bc9c3acc"},
+]
+"hypothesis 6.54.4" = [
+    {url = "https://files.pythonhosted.org/packages/3a/ad/066d74e85595e06569fb0706897e6bcb5a815304b5042459902ee0b2a6f4/hypothesis-6.54.4-py3-none-any.whl", hash = "sha256:469125235b4fdd6b6a4b6a6fa13e528d3e8de4dbd3bd9236b03323fefa3a9b32"},
+    {url = "https://files.pythonhosted.org/packages/9a/10/effc2b7673219726c221e597adcde67bcfc53b50284bbc703da89417fa35/hypothesis-6.54.4.tar.gz", hash = "sha256:ee42fe4d2ff96c49910085780d6b8f34cbcf4c44427616e22833869d451116bb"},
 ]
 "idna 3.3" = [
     {url = "https://files.pythonhosted.org/packages/04/a2/d918dcd22354d8958fe113e1a3630137e0fc8b44859ade3063982eacd2a4/idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -2748,6 +2778,10 @@ content_hash = "sha256:d03559940fa71d794964b76f7735088ce69ccc95be243c3fee82ed49d
 "smmap 5.0.0" = [
     {url = "https://files.pythonhosted.org/packages/21/2d/39c6c57032f786f1965022563eec60623bb3e1409ade6ad834ff703724f3/smmap-5.0.0.tar.gz", hash = "sha256:c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"},
     {url = "https://files.pythonhosted.org/packages/6d/01/7caa71608bc29952ae09b0be63a539e50d2484bc37747797a66a60679856/smmap-5.0.0-py3-none-any.whl", hash = "sha256:2aba19d6a040e78d8b09de5c57e96207b09ed71d8e55ce0959eeee6c8e190d94"},
+]
+"sortedcontainers 2.4.0" = [
+    {url = "https://files.pythonhosted.org/packages/32/46/9cb0e58b2deb7f82b84065f37f3bffeb12413f947f9388e4cac22c4621ce/sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
+    {url = "https://files.pythonhosted.org/packages/e8/c4/ba2f8066cceb6f23394729afe52f3bf7adec04bf9ed2c820b39e19299111/sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
 ]
 "soupsieve 2.3.2.post1" = [
     {url = "https://files.pythonhosted.org/packages/16/e3/4ad79882b92617e3a4a0df1960d6bce08edfb637737ac5c3f3ba29022e25/soupsieve-2.3.2.post1-py3-none-any.whl", hash = "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759"},

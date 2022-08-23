@@ -1,3 +1,12 @@
 {
-  "python.analysis.extraPaths": ["./streamlit"]
+    "python.testing.pytestArgs": [
+        "tests",
+        "-rs",
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.analysis.extraPaths": [
+        "./streamlit",
+        "./__pypackages__/3.9/lib"
+    ]
 }

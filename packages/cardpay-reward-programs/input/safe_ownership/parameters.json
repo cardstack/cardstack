@@ -1,0 +1,24 @@
+{
+  "core": {
+    "payment_cycle_length": 32768,
+    "start_block": 17265697,
+    "end_block": 21986688,
+    "subgraph_config_locations": {
+      "safe_owner": "s3://tall-data-dev/paulin/safe_owner/0.0.1/" 
+    }
+  },
+  "run": {
+    "reward_program_id": "0x0000000000000000000000000000000000000000",
+    "payment_cycle": 24032768
+  },
+  "user_defined": {
+    "reward_per_safe": 1,
+    "token": "0x0000000000000000000000000000000000000000",
+    "duration": 43200,
+    "start_analysis_block": 17265697,
+    "safe_type": "type_a",
+    "max_rewards": 10
+  }
+}
+
+
