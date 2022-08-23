@@ -1,6 +1,7 @@
 import { Helpers } from 'graphile-worker';
 import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 import awsConfig from '../utils/aws-config';
+import * as Sentry from '@sentry/node';
 
 export default class CreateCloudfrontInvalidation {
   async perform(
@@ -38,8 +39,14 @@ export default class CreateCloudfrontInvalidation {
       },
     });
 
-    let invalidationResponse = await cloudfrontClient.send(invalidationCommand);
-    helpers.logger.info(`Cloudfront invalidation completed:${path} [${invalidationResponse.$metadata.httpStatusCode}]`);
+    try {
+      let invalidationResponse = await cloudfrontClient.send(invalidationCommand);
+      helpers.logger.info(
+        `Cloudfront invalidation completed:${path} [${invalidationResponse.$metadata.httpStatusCode}]`
+      );
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   }
 }
 
