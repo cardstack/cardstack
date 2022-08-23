@@ -18,7 +18,7 @@ config = {
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "tokens": {
             "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
-            "dai": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+            "dai": "0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b",
         },
     },
     "production": {
