@@ -85,11 +85,11 @@ graft:
 }
 
 let cardpayGenesisBlock = {
-  sokol: 21403252,
+  sokol: 27128523,
   gnosis: 17265698,
 };
 let tokenStartBlock = {
-  sokol: 20644808, // the block that the token bridge was created (and hence our CPXD tokens)
+  sokol: 27129410, // the block that the token bridge was created (and hence our CPXD tokens)
   gnosis: cardpayGenesisBlock.gnosis,
 };
 let gnosisSafeGenesisBlock = {
@@ -102,37 +102,37 @@ let uniswapV2GenesisBlock = {
 };
 
 let v0_7_0_startBlock = {
-  sokol: 22189483,
+  sokol: 27128523,
   gnosis: 18457665,
 };
 
 let v0_8_0_startBlock = {
-  sokol: 22728770,
+  sokol: 27128523,
   gnosis: 18457665,
 };
 
 let v0_8_3_startBlock = {
-  sokol: 23046211,
+  sokol: 27128523,
   gnosis: 18457665,
 };
 
 let v0_8_4_startBlock = {
-  sokol: 23427748,
+  sokol: 27128523,
   gnosis: 18855934,
 };
 
 let v0_8_5_startBlock = {
-  sokol: 23567204,
+  sokol: 27128523,
   gnosis: 19003918,
 };
 
 let v0_8_6_startBlock = {
-  sokol: 23843871,
+  sokol: 27128523,
   gnosis: 19375796,
 };
 
 let v0_8_7_startBlock = {
-  sokol: 23912918,
+  sokol: 27128523,
   gnosis: 19375796,
 };
 

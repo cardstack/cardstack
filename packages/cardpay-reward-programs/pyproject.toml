@@ -37,6 +37,7 @@ dev = [
     "black>=22.1.0",
     "isort>=5.10.1",
     "flake8>=4.0.1",
+    "hypothesis>=6.54.3",
 ]
 explore = [
     "streamlit>=1.9.0",

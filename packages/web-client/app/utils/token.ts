@@ -59,8 +59,8 @@ const contractNames: Record<
     CARD: 'cardToken',
   },
   sokol: {
-    DAI: 'daiCpxd',
-    CARD: 'cardCpxd',
+    'DAI.CPXD': 'daiCpxd',
+    'CARD.CPXD': 'cardCpxd',
   },
   gnosis: {
     'DAI.CPXD': 'daiCpxd',
