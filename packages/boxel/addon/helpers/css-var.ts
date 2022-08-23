@@ -1,4 +1,6 @@
+// prettier-ignore
 import { helper } from '@ember/component/helper';
+// prettier-ignore
 import { htmlSafe } from '@ember/template';
 
 type StringOrFuncReturningString = string | (() => string);
@@ -22,6 +24,9 @@ export function cssVar(
   return vars.join('; ');
 }
 
-export default helper(function (_params, hash) {
+export default helper(function (
+  _params,
+  hash: Record<string, StringOrFuncReturningString>
+) {
   return htmlSafe(cssVar(hash));
 });

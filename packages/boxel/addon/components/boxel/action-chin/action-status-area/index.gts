@@ -4,7 +4,7 @@ import type { TemplateOnlyComponent } from '@ember/component/template-only';
 interface Signature {
   Element: HTMLDivElement;
   Args: {
-    icon: string;
+    icon?: string;
   };
   Blocks: {
     'default': [],
