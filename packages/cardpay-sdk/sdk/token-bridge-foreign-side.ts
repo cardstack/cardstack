@@ -70,7 +70,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<SuccessfulTransactionReceipt> {
+  ): Promise<SuccessfulTransactionReceipt | true> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
       return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
@@ -101,10 +101,23 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
 
       `);
     }
+    let currentAllowance = new BN(await token.methods.allowance().call());
+    let amountAsBn = new BN(amount);
+    let extraAllowanceNeeded: BN;
+    if (currentAllowance.lt(amountAsBn)) {
+      extraAllowanceNeeded = amountAsBn.sub(currentAllowance);
+    } else {
+      let { onTxnHash } = txnOptions ?? {};
+      if (typeof onTxnHash === 'function') {
+        onTxnHash(true);
+      }
+      return true;
+    }
+
     return await new Promise((resolve, reject) => {
       let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
-      let data = token.methods.approve(foreignBridge, amount).encodeABI();
+      let data = token.methods.increaseApproval(foreignBridge, extraAllowanceNeeded.toString()).encodeABI();
       let tx: TransactionConfig = {
         ...contractOptions,
         from,

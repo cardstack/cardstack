@@ -83,7 +83,7 @@ export interface Layer1Web3Strategy
     amountInWei: BN,
     token: string,
     options?: ApproveOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<TransactionReceipt | true>;
   resumeApprove(txnHash: string): Promise<TransactionReceipt>;
   relayTokens(
     token: ChainAddress,

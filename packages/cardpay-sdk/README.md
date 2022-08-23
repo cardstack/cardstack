@@ -164,20 +164,24 @@ let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
 ```
 
 ### `TokenBridgeForeignSide.unlockTokens`
-This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
+This call will perform an ERC-20 `increaseApproval` action on the tokens to grant the Token Bridge contract the ability bridge your tokens, unless the current allowance is sufficient in which case no action is taken. This method is invoked with:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The amount of tokens to unlock. This amount should be in units of `wei` and as string.
 - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a third argument.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
 
-This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
+If the method increases the allowance, it returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
 
 ```js
 let txnReceipt = await tokenBridge.unlockTokens(
   "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
   new BN("1000000000000000000") // this is 1 token in wei
 );
+
 ```
+
+If the method takes no action, it returns a promise that resolves to `false`
+
 ### `TokenBridgeForeignSide.relayTokens`
 This call will invoke the token bridge contract to relay tokens that have been unlocked in layer 1 and relay them to layer 2. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
 

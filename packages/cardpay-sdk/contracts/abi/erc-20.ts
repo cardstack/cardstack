@@ -135,6 +135,30 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      { internalType: 'address', name: 'spender', type: 'address' },
+      { internalType: 'uint256', name: 'addedValue', type: 'uint256' },
+    ],
+    name: 'increaseApproval',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      { internalType: 'address', name: 'spender', type: 'address' },
+      { internalType: 'uint256', name: 'subtractedValue', type: 'uint256' },
+    ],
+    name: 'decreaseApproval',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
     name: 'balanceOf',

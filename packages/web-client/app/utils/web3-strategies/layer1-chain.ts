@@ -334,7 +334,7 @@ export default abstract class Layer1ChainWeb3Strategy
     amountInWei: BN,
     tokenSymbol: BridgeableSymbol,
     { onTxnHash }: ApproveOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<TransactionReceipt | true> {
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     return tokenBridge.unlockTokens(
