@@ -13,7 +13,7 @@ config = {
             "0xd40c4b61D0B08548Dd1E2b79c1E8Ad98f15c65d8",
             "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07",
         ],
-        "reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA",
+        "reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "tokens": {
