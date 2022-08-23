@@ -1,5 +1,4 @@
 import { Helpers } from 'graphile-worker';
-import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import awsConfig from '../utils/aws-config';
 
@@ -23,34 +22,12 @@ export default async function s3PutJson(payload: any, helpers: Helpers) {
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);
 
   if (invalidateOnDistribution) {
-    let cloudfrontConfig = await awsConfig({
+    helpers.addJob('create-cloudfront-invalidation', {
+      distributionId: invalidateOnDistribution,
+      region,
       roleChain: invalidationRoleChain,
+      path,
     });
-
-    if (region) {
-      cloudfrontConfig.region = region;
-    }
-
-    let invalidationPath = path;
-
-    if (!path.startsWith('/')) {
-      invalidationPath = `/${path}`;
-    }
-
-    let cloudfrontClient = new CloudFrontClient(cloudfrontConfig);
-    let invalidationCommand = new CreateInvalidationCommand({
-      DistributionId: invalidateOnDistribution,
-      InvalidationBatch: {
-        CallerReference: `${Date.now()}`,
-        Paths: {
-          Quantity: 1,
-          Items: [invalidationPath],
-        },
-      },
-    });
-
-    let invalidationResponse = await cloudfrontClient.send(invalidationCommand);
-    helpers.logger.info(`Cloudfront invalidation completed:${path} [${invalidationResponse.$metadata.httpStatusCode}]`);
   }
 }
 
