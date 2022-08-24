@@ -26,10 +26,9 @@ CardstackIdentifierType = Literal[
     "PrepaidCardCustomization",
     "MerchantInfo",
     "SupplierInfo",
-    "Profile",
     "RewardRule",
 ]
-SHORT_TYPE = Literal["p", "m", "s", "o", "r"]
+SHORT_TYPE = Literal["p", "m", "s", "r"]
 
 
 def did_type_to_short_type(cardstack_identifier: CardstackIdentifierType) -> SHORT_TYPE:
@@ -39,8 +38,6 @@ def did_type_to_short_type(cardstack_identifier: CardstackIdentifierType) -> SHO
         return "m"
     elif cardstack_identifier == "SupplierInfo":
         return "s"
-    elif cardstack_identifier == "Profile":
-        return "o"
     elif cardstack_identifier == "RewardRule":
         return "r"
 
@@ -53,8 +50,6 @@ def short_type_to_did_type(short_type: str) -> CardstackIdentifierType:
         return "MerchantInfo"
     elif short_type == "s":
         return "SupplierInfo"
-    elif short_type == "o":
-        return "Profile"
     elif short_type == "r":
         return "RewardRule"
     else:
