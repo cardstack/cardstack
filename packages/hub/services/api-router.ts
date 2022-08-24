@@ -5,7 +5,7 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
-import { parseBody, reportDeprecatedRoute } from '../middleware';
+import { parseBody, reportDeprecatedRouteUsage } from '../middleware';
 import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
@@ -81,19 +81,24 @@ export default class APIRouter {
 
     apiSubrouter.post(
       '/merchant-infos',
-      reportDeprecatedRoute({ jortle: 'tortle' }),
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
       parseBody,
       merchantInfosRoute.post
     );
     apiSubrouter.get(
       '/merchant-infos/validate-slug/:slug',
-      reportDeprecatedRoute({ jortle: 'tortle' }),
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
       merchantInfosRoute.getValidation
     );
-    apiSubrouter.get('/merchant-infos', reportDeprecatedRoute({ jortle: 'tortle' }), parseBody, merchantInfosRoute.get);
+    apiSubrouter.get(
+      '/merchant-infos',
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
+      parseBody,
+      merchantInfosRoute.get
+    );
     apiSubrouter.get(
       '/merchant-infos/short-id/:id',
-      reportDeprecatedRoute({ jortle: 'tortle' }),
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
       parseBody,
       merchantInfosRoute.getFromShortId
     );

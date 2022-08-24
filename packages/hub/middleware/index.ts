@@ -24,7 +24,7 @@ export let parseBody = KoaBody({
   },
 });
 
-export function reportDeprecatedRoute(tags: any) {
+export function reportDeprecatedRouteUsage(tags: any) {
   return async function (ctx: Koa.Context, next: Koa.Next) {
     Sentry.captureException(new Error(`Deprecated route usage: ${ctx.request.method} ${ctx.request.path}`), {
       tags,
