@@ -5,7 +5,7 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
-import { parseBody } from '../middleware';
+import { parseBody, reportDeprecatedRoute } from '../middleware';
 import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
@@ -79,10 +79,15 @@ export default class APIRouter {
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
 
-    apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
-    apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
-    apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
-    apiSubrouter.get('/merchant-infos/short-id/:id', parseBody, merchantInfosRoute.getFromShortId);
+    apiSubrouter.post('/merchant-infos', reportDeprecatedRoute, parseBody, merchantInfosRoute.post);
+    apiSubrouter.get('/merchant-infos/validate-slug/:slug', reportDeprecatedRoute, merchantInfosRoute.getValidation);
+    apiSubrouter.get('/merchant-infos', reportDeprecatedRoute, parseBody, merchantInfosRoute.get);
+    apiSubrouter.get(
+      '/merchant-infos/short-id/:id',
+      reportDeprecatedRoute,
+      parseBody,
+      merchantInfosRoute.getFromShortId
+    );
 
     apiSubrouter.post('/profiles', parseBody, profilesRoute.post);
     apiSubrouter.get('/profiles/validate-slug/:slug', profilesRoute.getValidation);

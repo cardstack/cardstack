@@ -2,6 +2,7 @@ import type Koa from 'koa';
 import KoaBody from 'koa-body';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
+import * as Sentry from '@sentry/node';
 
 const serverLog = logger('hub/server');
 
@@ -22,6 +23,16 @@ export let parseBody = KoaBody({
     throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
   },
 });
+
+export function reportDeprecatedRoute(tags: any) {
+  return async function (ctx: Koa.Context, next: Koa.Next) {
+    Sentry.captureException(new Error(`Deprecated route usage: ${ctx.request.method} ${ctx.request.path}`), {
+      tags,
+    });
+
+    await next();
+  };
+}
 
 function getClientIp(req: Koa.Request) {
   let headerValue = req.headers['x-forwarded-for'] as string | undefined;
