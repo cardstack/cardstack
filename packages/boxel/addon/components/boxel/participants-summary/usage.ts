@@ -34,6 +34,6 @@ const SAMPLE_PARTICIPANTS = [
   },
 ] as Partial<Participant>[];
 
-export default class extends Component {
-  @tracked participants = A(SAMPLE_PARTICIPANTS);
+export default class ParticipantsSummaryUsage extends Component {
+  @tracked participants: Partial<Participant>[] = A(SAMPLE_PARTICIPANTS);
 }

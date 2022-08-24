@@ -14,6 +14,7 @@ export default class ThreadMessageUsageComponent extends Component {
   @tracked datetime = '2020-03-07T10:11';
   @tracked notRound = false;
   @tracked hideMeta = false;
+  @tracked hideName = false;
   @tracked messageArray = A([
     'Hello, it’s nice to see you!',
     'Let’s issue a Prepaid Card.',

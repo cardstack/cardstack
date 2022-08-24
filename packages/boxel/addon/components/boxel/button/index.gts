@@ -1,16 +1,18 @@
 import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
-import cn from 'ember-class-names-helper/helpers/class-names';
+import cn from '@cardstack/boxel/helpers/cn';
+
+//@ts-ignore glint does not think this is consumed-but it is consumed in the template
 import { array, concat, hash } from '@ember/helper';
-import eq from 'ember-truth-helpers/helpers/eq';
-import or from 'ember-truth-helpers/helpers/or';
-import not from 'ember-truth-helpers/helpers/not';
+import or from '@cardstack/boxel/helpers/truth-helpers/or';
+import eq from '@cardstack/boxel/helpers/truth-helpers/eq';
+import not from '@cardstack/boxel/helpers/truth-helpers/not';
 import LoadingIndicator from '../loading-indicator';
 import { LinkTo } from '@ember/routing';
 
 interface Signature {
-  Element: HTMLButtonElement | HTMLAnchorElement | (typeof LinkTo.Element);
+  Element: HTMLButtonElement | HTMLAnchorElement;
   Args: {
     as?: string;
     kind?: string;
@@ -66,7 +68,6 @@ export default class ButtonComponent extends Component<Signature> {
           @route={{@route}}
           @models={{if @models @models (array)}}
           @query={{or @query (hash)}}
-          @disabledClass="boxel-button--disabled-link"
           @disabled={{@disabled}}
           data-test-boxel-button 
           tabindex={{if @disabled -1 0}}
@@ -77,4 +78,10 @@ export default class ButtonComponent extends Component<Signature> {
       {{/if}}
     {{/let}}
   </template>
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'Boxel::Button': typeof ButtonComponent;
+  }
 }

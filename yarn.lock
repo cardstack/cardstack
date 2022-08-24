@@ -9753,6 +9753,13 @@
   resolved "https://registry.yarnpkg.com/@types/ember__error/-/ember__error-4.0.0.tgz#c73037e65c1c3d7060b97f98135ba73c712972b1"
   integrity sha512-1WVMR65/QTqPzMWafK2vKEwGafILxRxItbWJng6eEJyKDHRvvHFCl3XzJ4dQjdFcfOlozsn0mmEYCpjKoyzMqA==
 
+"@types/ember__helper@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/ember__helper/-/ember__helper-4.0.0.tgz#d159432c8f1e048c1549803a925ac8369251c739"
+  integrity sha512-G/du2s8Z4LFX9jquGesBoKfjWQryQYHOO0bQATaQElt/aq+NvN3ShMZUEC8JjLla/JVVdyltbnKQSFXwujGC+Q==
+  dependencies:
+    "@types/ember" "*"
+
 "@types/ember__object@*":
   version "3.12.6"
   resolved "https://registry.yarnpkg.com/@types/ember__object/-/ember__object-3.12.6.tgz#5f77662881e3c6f877d63e08b46861c52a36714a"
@@ -14794,7 +14801,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.6, classnames@^2.3.1:
+classnames@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.1.tgz#dfcfa3891e306ec1dad105d0e88f4417b8535e8e"
   integrity sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==
@@ -17121,16 +17128,6 @@ ember-cached-decorator-polyfill@^0.1.4:
     ember-cli-babel "^7.21.0"
     ember-cli-babel-plugin-helpers "^1.1.1"
 
-ember-class-names-helper@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/ember-class-names-helper/-/ember-class-names-helper-0.3.0.tgz#d1b77ace380227d141f851cfa2d901a6f7a59815"
-  integrity sha512-Nkw5qwxlJfjzHhXwXYMF6IpVsqgSbUXTlYeHwWX4HZ3EqZ2dAQVSSguQPiXmE+XRJO577ZAXuQFg94xLoQpZYg==
-  dependencies:
-    classnames "^2.2.6"
-    ember-auto-import "^1.11.3"
-    ember-cli-babel "^7.26.6"
-    ember-cli-htmlbars "^5.7.1"
-
 ember-classy-page-object@^0.8.0-beta:
   version "0.8.0-beta"
   resolved "https://registry.yarnpkg.com/ember-classy-page-object/-/ember-classy-page-object-0.8.0-beta.tgz#1e388e90e5205c617f48450fae764c6f90c38217"
@@ -18533,7 +18530,7 @@ ember-text-measurer@^0.6.0:
   dependencies:
     ember-cli-babel "^7.22.1"
 
-ember-truth-helpers@^3.1.0:
+ember-truth-helpers@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/ember-truth-helpers/-/ember-truth-helpers-3.1.1.tgz#434715926d72bcc63b8a115dec09745fda4474dc"
   integrity sha512-FHwJAx77aA5q27EhdaaiBFuy9No+8yaWNT5A7zs0sIFCmf14GbcLn69vJEp6mW7vkITezizGAWhw7gL0Wbk7DA==
