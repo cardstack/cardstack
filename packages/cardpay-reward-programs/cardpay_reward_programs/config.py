@@ -19,7 +19,7 @@ config = {
             "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
             "dai": "0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b",
         },
-        "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
+        "reward_program": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "contracts": {"reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A"},

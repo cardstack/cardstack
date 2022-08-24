@@ -4,14 +4,8 @@ from pydantic import BaseSettings
 
 config = {
     "staging": {
-        "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
+        "reward_program": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
         "archived_reward_programs": [
-            "0x0A4c62c8616342Fc3C5390c4e55aD26DeE694b0F",
-            "0x64D65d17B26312c0a2532E3cfB0a681A92eEf89d",
-            "0x73F92405b438D85ee46539a8FaDbBCa04C155F81",
-            "0x954A9C27bC398B4A8f6F543b13eea833d0e73308",
-            "0xd40c4b61D0B08548Dd1E2b79c1E8Ad98f15c65d8",
-            "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07",
         ],
         "reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
