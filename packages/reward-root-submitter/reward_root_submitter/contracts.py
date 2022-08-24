@@ -33,7 +33,7 @@ class RewardPool(Contract):
 
     def setup_from_environment(self, environment):
         if environment == "staging":
-            self.setup_from_address("0xc9A238Ee71A65554984234DF9721dbdA873F84FA")
+            self.setup_from_address("0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A")
         elif environment == "production":
             self.setup_from_address("0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a")
         else:
