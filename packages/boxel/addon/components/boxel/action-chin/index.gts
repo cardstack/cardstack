@@ -3,51 +3,52 @@ import { equal } from 'macro-decorators';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import BoxelButton from '../button';
-import ActionStatusArea from './action-status-area';
-import InfoArea from './info-area';
-import cn from 'ember-class-names-helper/helpers/class-names';
-import { concat, hash } from '@ember/helper';
-import and from 'ember-truth-helpers/helpers/and';
-import or from 'ember-truth-helpers/helpers/or';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import ActionStatusArea, { StatusAreaSignature } from './action-status-area';
+import InfoArea, { InfoAreaSignature } from './info-area';
+import cn from '@cardstack/boxel/helpers/cn';
 
-export enum ActionChinState {
+//@ts-ignore glint does not think this is consumed-but it is consumed in the template
+import { concat, hash } from '@ember/helper';
+import and from '@cardstack/boxel/helpers/truth-helpers/and';
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import { ComponentLike, WithBoundArgs } from '@glint/template';
+
+export type ActionChinState =
   // state before the cta has been activated/the action done
-  default = 'default',
+  'default' |
   // disabled state - currently visually corresponds to the default state.
   // design has no immediate plans to make a disabled state for the memorialized cta
-  disabled = 'disabled',
+  'disabled' |
   // in progress state - action has been taken, but not completed
-  inProgress = 'in-progress',
+  'in-progress' |
   // memorialized state - requirement for CTA has been met
-  memorialized = 'memorialized',
-}
+  'memorialized';
 
 interface DefaultBlockArgs {
-  ActionButton: typeof BoxelButton;
-  CancelButton: typeof BoxelButton;
-  ActionStatusArea: typeof ActionStatusArea;
-  InfoArea: typeof InfoArea;
+  ActionButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'>;
+  CancelButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'>;
+  ActionStatusArea: ComponentLike<StatusAreaSignature>;
+  InfoArea: ComponentLike<InfoAreaSignature>;
 }
 
 interface MemorializedBlockArgs {
-  ActionButton: typeof BoxelButton;
-  ActionStatusArea: typeof ActionStatusArea;
-  InfoArea: typeof InfoArea;
+  ActionButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'>;
+  ActionStatusArea: WithBoundArgs<typeof ActionStatusArea, 'icon'>;
+  InfoArea: ComponentLike<InfoAreaSignature>;
 }
 
 interface InProgressBlockArgs {
-  ActionButton: typeof BoxelButton;
-  CancelButton: typeof BoxelButton;
-  ActionStatusArea: typeof ActionStatusArea;
-  InfoArea: typeof InfoArea;
+  ActionButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'|'loading'>;
+  CancelButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'>;
+  ActionStatusArea: ComponentLike<StatusAreaSignature>;
+  InfoArea: ComponentLike<InfoAreaSignature>;
 }
 
 interface Signature {
   Element: HTMLDivElement;
   Args: {
     stepNumber?: number;
-    state: ActionChinState;
+    state: ActionChinState | 'default' | 'memorialized' | 'in-progress';
     disabled?: boolean;
   };
   Blocks: {
@@ -60,10 +61,10 @@ interface Signature {
 export default class ActionChin extends Component<Signature> {
   // convenience getters for state booleans. they are mutually exclusive since all are
   // derived from the args.state argument.
-  @equal('args.state', ActionChinState.default) declare isDefault: boolean;
-  @equal('args.state', ActionChinState.inProgress)
+  @equal('args.state', 'default') declare isDefault: boolean;
+  @equal('args.state', 'in-progress')
   declare isInProgress: boolean;
-  @equal('args.state', ActionChinState.memorialized)
+  @equal('args.state', 'memorialized')
   declare isMemorialized: boolean;
 
   <template>
@@ -166,4 +167,10 @@ export default class ActionChin extends Component<Signature> {
       {{/unless}}
     </div>
   </template>
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'Boxel::ActionChin': typeof ActionChin;
+  }
 }

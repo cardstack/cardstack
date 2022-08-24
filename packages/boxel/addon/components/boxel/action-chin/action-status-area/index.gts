@@ -1,7 +1,7 @@
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 
-interface Signature {
+export interface StatusAreaSignature {
   Element: HTMLDivElement;
   Args: {
     icon?: string;
@@ -11,7 +11,7 @@ interface Signature {
   }
 }
 
-const StatusArea: TemplateOnlyComponent<Signature> = <template>
+const StatusArea: TemplateOnlyComponent<StatusAreaSignature> = <template>
   <div class="boxel-action-chin__action-status-area" ...attributes data-test-boxel-action-chin-action-status-area>
     {{#if @icon}}
       {{svgJar @icon class="boxel-action-chin__action-status-area-icon" width="20" height="20" role="presentation"}}

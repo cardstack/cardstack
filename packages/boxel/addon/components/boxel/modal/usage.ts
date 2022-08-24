@@ -5,7 +5,7 @@ import './usage.css';
 
 export default class ModalUsage extends Component {
   @tracked isOpen = false;
-  @tracked size = 'n/a';
+  @tracked size: 'small' | 'medium' | 'large' | undefined = undefined;
   @tracked offsetRight = '0px';
   @tracked offsetLeft = '0px';
   @tracked offsetTop = '0px';

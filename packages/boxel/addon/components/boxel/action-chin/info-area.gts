@@ -1,6 +1,6 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 
-interface Signature {
+export interface InfoAreaSignature {
   Element: HTMLDivElement;
   Args: {
     class?: string;
@@ -10,7 +10,7 @@ interface Signature {
   }
 }
 
-const InfoArea: TemplateOnlyComponent<Signature> = <template>
+const InfoArea: TemplateOnlyComponent<InfoAreaSignature> = <template>
   <div class={{@class}} ...attributes data-test-boxel-action-chin-info-area>
     {{yield}}
   </div>

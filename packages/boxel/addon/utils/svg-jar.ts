@@ -14,6 +14,7 @@
 import makeSVG from 'ember-svg-jar/utils/make-svg';
 import { importSync } from '@embroider/macros';
 import type { ContentValue } from '@glint/template';
+import { SafeString } from '@ember/template/-private/handlebars';
 
 function getInlineAsset(assetId: string) {
   try {
@@ -34,7 +35,13 @@ export function svgJar(
     role?: string;
     title?: string;
     desc?: string;
+    style?: string | SafeString;
+    'aria-label'?: string;
   }
 ): ContentValue {
-  return makeSVG(assetId, svgAttrs, getInlineAsset);
+  let svgArgs = Object.assign({}, svgAttrs);
+  if (svgAttrs.style?.toString) {
+    svgArgs.style = svgAttrs.style?.toString();
+  }
+  return makeSVG(assetId, svgArgs, getInlineAsset);
 }
