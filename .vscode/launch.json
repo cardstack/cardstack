@@ -114,18 +114,20 @@
         // Kovan CARD Bridge args
         // "index.ts",
         // "bridge",
+        // "to-l2",
         // "10000",
         // "${config:cardCli.network.l1.cardToken}",
-        // "--network", "${config:cardCli.network.l1.name}",
-        // "--mnemonic", "${config:cardCli.mnemonic}"
+        // "--network", 
+        // "${config:cardCli.network.l1.name}",
+        // "--mnemonic", 
+        // "${config:cardCli.mnemonic}"
 
         // Kovan DAI Bridge args
         "index.ts",
         "bridge",
         "to-l2",
-        "200",
+        "5000",
         "${config:cardCli.network.l1.daiToken}", // Kovan DAI
-        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
         "--network",
         "${config:cardCli.network.l1.name}",
         "--mnemonic",
@@ -184,7 +186,7 @@
         "index.ts",
         "bridge",
         "withdrawal-limits",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -264,7 +266,7 @@
         "safe",
         "transfer-tokens",
         "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.cardToken}", // DAI.CPXD
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
         "--amount",
         "500", // amount (in ether units)
@@ -287,7 +289,7 @@
         "safe",
         "transfer-tokens-gas-estimate",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
         "5", // amount (in ether units)
         "--network",
@@ -309,7 +311,7 @@
         "prepaid-card",
         "create",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}",
         "",
         "100",
         "--network",
@@ -416,7 +418,7 @@
         "merchant",
         "register",
         "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
-        "",
+        "test-did",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -612,7 +614,7 @@
         "merchant",
         "claim-revenue",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "1",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -633,7 +635,7 @@
         "merchant",
         "claim-revenue-gas-estimate",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "1",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -653,7 +655,7 @@
         "index.ts",
         "prepaid-card",
         "price-for-face-value",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "10000",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -673,7 +675,7 @@
         "index.ts",
         "prepaid-card",
         "creation-gas-fee",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -751,9 +753,7 @@
         "index.ts",
         "rewards",
         "reward-balances",
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
-        // "--rewardProgramId",
-        // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -773,8 +773,8 @@
         "rewards",
         "admin",
         "create-program",
-        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //reward program
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -793,8 +793,8 @@
         "index.ts",
         "rewards",
         "register",
-        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832", 
+        "${config:cardCli.network.l2.rewardProgramId}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -813,8 +813,8 @@
         "index.ts",
         "rewards",
         "register-rewardee-gas-estimate",
-        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027", //prepaid card
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832", 
+        "${config:cardCli.network.l2.rewardProgramId}", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -834,10 +834,10 @@
         "rewards",
         "admin",
         "add-tokens",
-        "0x906B5c2877dEad3c5565b042094d182b7575ADdE", //single owner safe
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //address
-        "10",
+        "0xF69508b8fb878EAad06923314BD655Cc0Fe9E8E3", 
+        "${config:cardCli.network.l2.rewardProgramId}", 
+        "${config:cardCli.network.l2.cardToken}", 
+        "8000",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -856,7 +856,7 @@
         "index.ts",
         "rewards",
         "pool-balances",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program id
+        "${config:cardCli.network.l2.rewardProgramId}", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -919,8 +919,8 @@
         "claim-all",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "${config:cardCli.network.l2.rewardProgramId}",
+        "${config:cardCli.network.l2.cardToken}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -941,8 +941,8 @@
         "claim-all-rewards-gas-estimate",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
         "0x0cFE5B031781CF1999b7AbDD887863E7f52A913d",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "${config:cardCli.network.l2.rewardProgramId}",
+        "${config:cardCli.network.l2.cardToken}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -982,11 +982,7 @@
         "index.ts",
         "rewards",
         "claimable-proofs",
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //owner address
-        // "--rewardProgramId",
-        // "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
-        "--tokenAddress",
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1006,8 +1002,8 @@
         "rewards",
         "admin",
         "lock",
-        "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832", 
+        "${config:cardCli.network.l2.rewardProgramId}", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1027,9 +1023,9 @@
         "rewards",
         "admin",
         "set-admin",
-        "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", //reward program
-        "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832", 
+        "${config:cardCli.network.l2.rewardProgramId}", 
+        "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1048,9 +1044,9 @@
         "index.ts",
         "rewards",
         "withdraw-from-safe",
-        "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", 
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", 
+        "${config:cardCli.network.l2.cardToken}", 
         "--amount",
         "1", // amount (in ether units)
         "--network",
@@ -1071,9 +1067,9 @@
         "index.ts",
         "rewards",
         "withdraw-gas-estimate",
-        "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", //reward safe
-        "0x159ADe032073d930E85f95AbBAB9995110c43C71", //recipient (justin's depot)
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        "0xA29C835C67C13Cd6a06FfEB39a6812124A9841F0", 
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", 
+        "${config:cardCli.network.l2.cardToken}", 
         "1", // amount (in ether units)
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -1114,9 +1110,9 @@
         "rewards",
         "admin",
         "recover-reward-tokens",
-        "0x906B5c2877dEad3c5565b042094d182b7575ADdE", // safe address (justin's depot)
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", // reward program id
-        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", //token address
+        "0xF69508b8fb878EAad06923314BD655Cc0Fe9E8E3",
+        "${config:cardCli.network.l2.rewardProgramId}", 
+        "${config:cardCli.network.l2.cardToken}", 
         "--amount",
         "1",
         "--network",
@@ -1137,7 +1133,7 @@
         "index.ts",
         "rewards",
         "view",
-        "0x5E4E148baae93424B969a0Ea67FF54c315248BbA", // reward program id
+        "${config:cardCli.network.l2.rewardProgramId}", 
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1175,8 +1171,8 @@
         "rewards",
         "admin",
         "add-rule",
-        "0xE4EA6a40a91F424428c599AAbAb4D06579DbC027",
-        "0x73F92405b438D85ee46539a8FaDbBCa04C155F81",
+        "0x9ED58eA49bBedAFC600A816d5212cF77419eA832",
+        "${config:cardCli.network.l2.rewardProgramId}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
