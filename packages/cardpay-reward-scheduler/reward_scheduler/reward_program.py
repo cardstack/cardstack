@@ -49,9 +49,14 @@ class RewardProgram:
         )
         self.processed_cycles.update(r[0] for r in con.fetchall())
         con.execute(
-            f"select max(_block_number) from parquet_scan({subgraph_export_files})"
+            f"select max(_block_number), count(*) from parquet_scan({subgraph_export_files})"
         )
-        self.last_update_block = con.fetchall()[0][0]
+        last_update_block, total_payment_cycles = con.fetchall()[0]
+        if total_payment_cycles == 0:
+            # There are no payment cycles in the parquet files
+            self.last_update_block = 0
+        else:
+            self.last_update_block = last_update_block
 
     def update_processed(self):
         """
@@ -215,6 +220,7 @@ class RewardProgram:
             )
             for payment_cycle in sorted(processable_payment_cycles):
                 self.run(payment_cycle, rule)
+        logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
 
 def resolve_rule(did: str):
