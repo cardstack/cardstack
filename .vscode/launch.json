@@ -266,7 +266,7 @@
         "safe",
         "transfer-tokens",
         "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
-        "${config:cardCli.network.l2.cardToken}", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
         "--amount",
         "500", // amount (in ether units)
