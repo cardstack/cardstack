@@ -12,8 +12,8 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@types/node": "14.14.35",
-    "@typescript-eslint/eslint-plugin": "^5.9.1",
-    "@typescript-eslint/parser": "^5.9.1",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
     "babel-eslint": "^10.1.0",
     "cli-table3": "^0.6.1",
     "discord.js": "^12.5.3",
@@ -33,7 +33,7 @@
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.3.2",
     "start-server-and-test": "^1.12.0",
-    "typescript": "4.2.3"
+    "typescript": "^4.7.4"
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",

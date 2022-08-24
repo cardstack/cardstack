@@ -81,6 +81,16 @@ module.exports = {
 
     // Disabled here, but enabled again for TypeScript files.
     '@typescript-eslint/no-unused-vars': 'off',
+
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          BigInt: false, // un-ban a type that's banned by default
+        },
+        extendDefaults: true,
+      },
+    ],
   },
   overrides: [
     // === TypeScript rules ====================================================

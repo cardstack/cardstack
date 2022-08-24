@@ -18,7 +18,7 @@ describe('WorkerClient', function () {
     try {
       await subject.addJob(FAKE_KNOWN_TASK);
       expect.fail('Should not reach here');
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).to.equal('Cannot call addJob before workerUtils is ready');
     }
   });
