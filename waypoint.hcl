@@ -641,7 +641,7 @@ app "reward-scheduler" {
       ENVIRONMENT                        = "staging"
       REWARDS_BUCKET                     = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL                       = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07,0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
+      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72"
       REWARD_MANAGER_ADDRESS             = "0xC29EfEa853fb7c781488c70aF9135c853d809147"
       REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
       REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
