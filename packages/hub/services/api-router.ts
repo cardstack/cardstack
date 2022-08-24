@@ -79,12 +79,21 @@ export default class APIRouter {
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
 
-    apiSubrouter.post('/merchant-infos', reportDeprecatedRoute, parseBody, merchantInfosRoute.post);
-    apiSubrouter.get('/merchant-infos/validate-slug/:slug', reportDeprecatedRoute, merchantInfosRoute.getValidation);
-    apiSubrouter.get('/merchant-infos', reportDeprecatedRoute, parseBody, merchantInfosRoute.get);
+    apiSubrouter.post(
+      '/merchant-infos',
+      reportDeprecatedRoute({ jortle: 'tortle' }),
+      parseBody,
+      merchantInfosRoute.post
+    );
+    apiSubrouter.get(
+      '/merchant-infos/validate-slug/:slug',
+      reportDeprecatedRoute({ jortle: 'tortle' }),
+      merchantInfosRoute.getValidation
+    );
+    apiSubrouter.get('/merchant-infos', reportDeprecatedRoute({ jortle: 'tortle' }), parseBody, merchantInfosRoute.get);
     apiSubrouter.get(
       '/merchant-infos/short-id/:id',
-      reportDeprecatedRoute,
+      reportDeprecatedRoute({ jortle: 'tortle' }),
       parseBody,
       merchantInfosRoute.getFromShortId
     );
