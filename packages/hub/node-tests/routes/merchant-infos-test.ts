@@ -72,6 +72,9 @@ describe('POST /api/merchant-infos', function () {
             color: 'ff0000',
             'text-color': 'ffffff',
             'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+            links: [],
+            'profile-description': null,
+            'profile-image-url': null,
           },
         },
       })
@@ -462,6 +465,9 @@ describe('GET /api/merchant-infos/short-id/:id', function () {
             color: 'red',
             'text-color': 'purple',
             'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+            links: [],
+            'profile-description': null,
+            'profile-image-url': null,
           },
         },
       })

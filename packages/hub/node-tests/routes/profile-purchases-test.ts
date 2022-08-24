@@ -110,6 +110,9 @@ describe('POST /api/profile-purchases', function () {
               color: 'ff0000',
               'text-color': 'ffffff',
               'owner-address': stubUserAddress,
+              links: [],
+              'profile-description': '',
+              'profile-image-url': '',
             },
           },
           meta: {
@@ -207,6 +210,9 @@ describe('POST /api/profile-purchases', function () {
               color: 'ff0000',
               'text-color': 'ffffff',
               'owner-address': stubUserAddress,
+              links: [],
+              'profile-description': '',
+              'profile-image-url': '',
             },
           },
           meta: {
