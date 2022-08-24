@@ -14,7 +14,7 @@ export default class PersistOffChainProfile {
     let prisma = await this.prismaManager.getClient();
 
     let profile = await prisma.profile.findUnique({ where: { id } });
-    let jsonAPIDoc = this.profileSerializer.serialize(profile!, 'merchant-infos');
+    let jsonAPIDoc = this.profileSerializer.serialize(profile!);
 
     let putJobPayload: any = {
       bucket: config.get('aws.offchainStorage.bucketName'),

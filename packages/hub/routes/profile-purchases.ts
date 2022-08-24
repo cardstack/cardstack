@@ -232,7 +232,7 @@ export default class ProfilePurchasesRoute {
       { maxAttempts: 1 }
     );
 
-    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
+    let serialized = this.profileSerializer.serialize(merchantInfo);
 
     serialized.included = [this.jobTicketSerializer.serialize(insertedJobTicket!).data];
 

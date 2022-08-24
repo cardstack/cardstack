@@ -25,7 +25,7 @@ export default class CardSpacesRoute {
       return;
     }
 
-    let serialized = this.profileSerializer.serialize(profile, 'card-spaces');
+    let serialized = this.profileSerializer.serialize(profile);
 
     ctx.status = 200;
     ctx.body = serialized;

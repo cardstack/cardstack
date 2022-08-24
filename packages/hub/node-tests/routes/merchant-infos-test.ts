@@ -36,7 +36,7 @@ describe('POST /api/merchant-infos', function () {
   it('persists merchant info', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Satoshi Nakamoto',
           slug: 'satoshi',
@@ -63,7 +63,7 @@ describe('POST /api/merchant-infos', function () {
           network: 'sokol',
         },
         data: {
-          type: 'merchant-infos',
+          type: 'profiles',
           id: 'the-id',
           attributes: {
             name: 'Satoshi Nakamoto',
@@ -99,7 +99,7 @@ describe('POST /api/merchant-infos', function () {
   it('validates slug against invalid or lowercase characters', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Satoshi Nakamoto 2',
           slug: 'sat-oshi',
@@ -128,7 +128,7 @@ describe('POST /api/merchant-infos', function () {
   it('validates slug for length', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Satoshi Nakamoto 2',
           slug: 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11',
@@ -157,7 +157,7 @@ describe('POST /api/merchant-infos', function () {
   it('validates name for length', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'a'.repeat(51),
           slug: 'satoshi',
@@ -187,7 +187,7 @@ describe('POST /api/merchant-infos', function () {
     let requestWithSlug: any = (slug: string) => {
       let payload = {
         data: {
-          type: 'merchant-infos',
+          type: 'profiles',
           attributes: {
             name: 'Satoshi Nakamoto',
             slug: slug,
@@ -246,7 +246,7 @@ describe('POST /api/merchant-infos', function () {
   it('validates slug for uniqueness', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Satoshi Nakamoto',
           slug: 'satoshi',
@@ -259,7 +259,7 @@ describe('POST /api/merchant-infos', function () {
 
     const payload2 = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Satoshi Nakamoto 2',
           slug: 'satoshi',
@@ -373,7 +373,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
   it('validates slug for uniqueness', async function () {
     const payload = {
       data: {
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           name: 'Mandello',
           slug: 'mandello1',
@@ -454,7 +454,7 @@ describe('GET /api/merchant-infos/short-id/:id', function () {
         meta: { network: 'sokol' },
         data: {
           id: fullUuid,
-          type: 'merchant-infos',
+          type: 'profiles',
           attributes: {
             did: 'did:cardstack:1mmJKhNVKyAUgScu1dysmR8R728e839d5d105bff',
             name: 'Merchie!',

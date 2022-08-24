@@ -102,7 +102,7 @@ describe('POST /api/profile-purchases', function () {
         expect(res.body).to.deep.equal({
           data: {
             id: profileId,
-            type: 'merchant-infos',
+            type: 'profiles',
             attributes: {
               name: 'Satoshi Nakamoto',
               did: profileDid,
@@ -169,14 +169,14 @@ describe('POST /api/profile-purchases', function () {
         relationships: {
           'merchant-info': {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -199,7 +199,7 @@ describe('POST /api/profile-purchases', function () {
         expect(res.body).to.deep.equal({
           data: {
             id: profileId,
-            type: 'merchant-infos',
+            type: 'profiles',
             attributes: {
               name: 'Satoshi Nakamoto',
               did: profileDid,

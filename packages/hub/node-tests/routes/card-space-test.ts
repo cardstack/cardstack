@@ -43,7 +43,7 @@ describe('GET /api/card-spaces/:slug', function () {
           relationships: {
             'merchant-info': {
               data: {
-                type: 'merchant-infos',
+                type: 'profiles',
                 id: profileId,
               },
             },
@@ -51,7 +51,7 @@ describe('GET /api/card-spaces/:slug', function () {
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             id: profileId,
             attributes: {
               color: 'black',
