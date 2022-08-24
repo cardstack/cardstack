@@ -60,9 +60,10 @@ export default class ProfilePurchasesRoute {
     }
 
     let relationships = ctx.request.body.relationships || {};
-    let merchantInfoRelationship = relationships['merchant-info'];
+    // TODO remove merchant-info backward compatibility when Card Wallet is updated
+    let profileRelationship = relationships['profile'] || relationships['merchant-info'];
 
-    if (!merchantInfoRelationship) {
+    if (!profileRelationship) {
       ctx.status = 422;
       ctx.body = {
         errors: [
@@ -79,8 +80,7 @@ export default class ProfilePurchasesRoute {
 
     let included = ctx.request.body.included || [];
     let merchantObject = included.find(
-      (record: any) =>
-        record.type === merchantInfoRelationship.data.type && record.lid === merchantInfoRelationship.data.lid
+      (record: any) => record.type === profileRelationship.data.type && record.lid === profileRelationship.data.lid
     );
 
     if (!merchantObject) {
@@ -90,7 +90,7 @@ export default class ProfilePurchasesRoute {
           {
             status: '422',
             title: 'Missing merchant-infos',
-            detail: `No included merchant-infos with lid ${merchantInfoRelationship.data.lid} was found`,
+            detail: `No included merchant-infos with lid ${profileRelationship.data.lid} was found`,
           },
         ],
       };

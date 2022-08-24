@@ -70,16 +70,16 @@ describe('POST /api/profile-purchases', function () {
           },
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -149,6 +149,83 @@ describe('POST /api/profile-purchases', function () {
     expect(getJobSpecs()).to.deep.equal([{ maxAttempts: 1 }]);
   });
 
+  it('accepts merchant-info for the included type for backward compatibility', async function () {
+    let profileId,
+      profileDid,
+      jobTicketId: string | undefined = undefined;
+
+    await request()
+      .post(`/api/profile-purchases`)
+      .send({
+        data: {
+          type: 'profile-purchases',
+          attributes: {
+            provider: 'a-provider',
+            receipt: {
+              'a-receipt': 'yes',
+            },
+          },
+        },
+        relationships: {
+          'merchant-info': {
+            data: {
+              type: 'merchant-infos',
+              lid: '1',
+            },
+          },
+        },
+        included: [
+          {
+            type: 'merchant-infos',
+            lid: '1',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+            },
+          },
+        ],
+      })
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(201)
+      .expect('Content-Type', 'application/vnd.api+json')
+      .expect(function (res) {
+        profileId = res.body.data.id;
+        profileDid = res.body.data.attributes.did;
+        jobTicketId = res.body.included.find((included: any) => included.type === 'job-tickets').id;
+
+        expect(res.body).to.deep.equal({
+          data: {
+            id: profileId,
+            type: 'merchant-infos',
+            attributes: {
+              name: 'Satoshi Nakamoto',
+              did: profileDid,
+              slug: 'satoshi',
+              color: 'ff0000',
+              'text-color': 'ffffff',
+              'owner-address': stubUserAddress,
+            },
+          },
+          meta: {
+            network: 'sokol',
+          },
+          included: [
+            {
+              id: jobTicketId,
+              type: 'job-tickets',
+              attributes: { 'job-type': 'create-profile', state: 'pending' },
+            },
+          ],
+        });
+      });
+
+    let profileRecord = await prisma.profile.findUnique({ where: { id: profileId } });
+    assert(!!profileRecord);
+  });
+
   it('returns the existing job ticket if the request is a duplicate', async function () {
     let existingJobTicketId = shortUUID.uuid();
     await prisma.jobTicket.create({
@@ -182,16 +259,16 @@ describe('POST /api/profile-purchases', function () {
           },
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -265,16 +342,16 @@ describe('POST /api/profile-purchases', function () {
           },
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -319,16 +396,16 @@ describe('POST /api/profile-purchases', function () {
           },
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -379,16 +456,16 @@ describe('POST /api/profile-purchases', function () {
           },
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {},
           },
@@ -433,16 +510,16 @@ describe('POST /api/profile-purchases', function () {
           attributes: {},
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -481,16 +558,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -524,16 +601,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -567,16 +644,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'a'.repeat(51),
@@ -610,16 +687,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -664,16 +741,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -699,7 +776,7 @@ describe('POST /api/profile-purchases', function () {
       });
   });
 
-  it('rejects missing merchant-infos', async function () {
+  it('rejects missing profiles', async function () {
     await request()
       .post(`/api/profile-purchases`)
       .send({
@@ -707,16 +784,16 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '2',
             },
           },
         },
         included: [
           {
-            type: 'merchant-infos',
+            type: 'profiles',
             lid: '1',
             attributes: {
               name: 'Satoshi Nakamoto',
@@ -748,9 +825,9 @@ describe('POST /api/profile-purchases', function () {
           type: 'profile-purchases',
         },
         relationships: {
-          'merchant-info': {
+          profile: {
             data: {
-              type: 'merchant-infos',
+              type: 'profiles',
               lid: '1',
             },
           },
