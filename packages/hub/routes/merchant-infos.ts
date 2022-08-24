@@ -84,7 +84,7 @@ export default class MerchantInfosRoute {
 
     let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
-    await this.workerClient.addJob('persist-off-chain-merchant-info', {
+    await this.workerClient.addJob('persist-off-chain-profile', {
       id: merchantInfo.id,
     });
 

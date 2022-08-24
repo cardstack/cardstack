@@ -163,7 +163,7 @@ Hub > await client.query('SELECT * FROM merchant_infos');
 
 ```js
 Hub > const workerClient = await container.lookup('worker-client');
-Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
+Hub > await workerClient.addJob('persist-off-chain-profile', { id: 1 });
 ```
 
 To connect to a console in a remote environment (staging/production), use waypoint:
