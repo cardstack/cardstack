@@ -1,4 +1,4 @@
-import { Job, TaskSpec } from 'graphile-worker';
+import { Helpers, Job, TaskSpec } from 'graphile-worker';
 import { registry } from '../helpers/server';
 import { Suite } from 'mocha';
 
@@ -18,6 +18,12 @@ export function setupStubWorkerClient(context: Suite) {
   });
 
   return {
+    getHelpers: function () {
+      return {
+        addJob,
+      } as Helpers;
+    },
+
     getJobIdentifiers: function () {
       return jobIdentifiers;
     },
@@ -32,11 +38,15 @@ export function setupStubWorkerClient(context: Suite) {
   };
 }
 
+async function addJob(identifier: string, payload?: any, spec?: TaskSpec): Promise<Job> {
+  jobIdentifiers.push(identifier);
+  jobPayloads.push(payload);
+  jobSpecs.push(spec);
+  return Promise.resolve({} as Job);
+}
+
 export class StubWorkerClient {
   async addJob(identifier: string, payload?: any, spec?: TaskSpec): Promise<Job> {
-    jobIdentifiers.push(identifier);
-    jobPayloads.push(payload);
-    jobSpecs.push(spec);
-    return Promise.resolve({} as Job);
+    return addJob(identifier, payload, spec);
   }
 }

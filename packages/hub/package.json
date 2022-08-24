@@ -30,6 +30,7 @@
     "autotest": "NODE_ENV=test mocha --no-deprecation -w --reporter=min -r source-map-support/register dist/tests.js --timeout 60000"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudfront": "^3.150.0",
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sesv2": "^3.79.0",
     "@aws-sdk/client-sts": "^3.18.0",
