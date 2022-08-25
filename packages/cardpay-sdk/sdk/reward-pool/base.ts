@@ -24,7 +24,7 @@ import type { SuccessfulTransactionReceipt } from '../utils/successful-transacti
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
-import groupBy from 'lodash/groupby';
+import { groupBy } from 'lodash';
 
 export interface Proof {
   rootHash: string;
