@@ -35,7 +35,7 @@ export default class MerchantInfosRoute {
 
     ctx.type = 'application/vnd.api+json';
     ctx.status = 200;
-    ctx.body = this.profileSerializer.serialize(profiles, 'merchant-infos');
+    ctx.body = this.profileSerializer.serialize(profiles);
   }
 
   async post(ctx: Koa.Context) {
@@ -84,11 +84,11 @@ export default class MerchantInfosRoute {
 
     let merchantInfo = await prisma.profile.create({ data: { ...properties } });
 
-    await this.workerClient.addJob('persist-off-chain-merchant-info', {
+    await this.workerClient.addJob('persist-off-chain-profile', {
       id: merchantInfo.id,
     });
 
-    let serialized = this.profileSerializer.serialize(merchantInfo, 'merchant-infos');
+    let serialized = this.profileSerializer.serialize(merchantInfo);
 
     ctx.status = 201;
     ctx.body = serialized;
@@ -149,7 +149,7 @@ export default class MerchantInfosRoute {
     }
 
     ctx.status = 200;
-    ctx.body = this.profileSerializer.serialize(profile, 'merchant-infos');
+    ctx.body = this.profileSerializer.serialize(profile);
     ctx.type = 'application/vnd.api+json';
   }
 }

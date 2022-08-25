@@ -5,7 +5,7 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
 import { inject } from '@cardstack/di';
-import { parseBody } from '../middleware';
+import { parseBody, reportDeprecatedRouteUsage } from '../middleware';
 import { route } from '@cardstack/hub/routes';
 
 export default class APIRouter {
@@ -28,9 +28,6 @@ export default class APIRouter {
   });
   profilesRoute = inject('profiles-route', {
     as: 'profilesRoute',
-  });
-  cardSpacesRoute = inject('card-spaces-route', {
-    as: 'cardSpacesRoute',
   });
   emailCardDropRequestsRoute = inject('email-card-drop-requests-route', {
     as: 'emailCardDropRequestsRoute',
@@ -65,7 +62,6 @@ export default class APIRouter {
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
-      cardSpacesRoute,
       emailCardDropRequestsRoute,
       jobTicketsRoute,
       wyrePricesRoute,
@@ -83,10 +79,29 @@ export default class APIRouter {
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
     apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
 
-    apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
-    apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
-    apiSubrouter.get('/merchant-infos', parseBody, merchantInfosRoute.get);
-    apiSubrouter.get('/merchant-infos/short-id/:id', parseBody, merchantInfosRoute.getFromShortId);
+    apiSubrouter.post(
+      '/merchant-infos',
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
+      parseBody,
+      merchantInfosRoute.post
+    );
+    apiSubrouter.get(
+      '/merchant-infos/validate-slug/:slug',
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
+      merchantInfosRoute.getValidation
+    );
+    apiSubrouter.get(
+      '/merchant-infos',
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
+      parseBody,
+      merchantInfosRoute.get
+    );
+    apiSubrouter.get(
+      '/merchant-infos/short-id/:id',
+      reportDeprecatedRouteUsage({ alert: 'web-team' }),
+      parseBody,
+      merchantInfosRoute.getFromShortId
+    );
 
     apiSubrouter.post('/profiles', parseBody, profilesRoute.post);
     apiSubrouter.get('/profiles/validate-slug/:slug', profilesRoute.getValidation);
@@ -110,8 +125,6 @@ export default class APIRouter {
     apiSubrouter.post('/job-tickets/:id/retry', jobTicketsRoute.retry);
 
     apiSubrouter.post('/profile-purchases', parseBody, this.profilePurchasesRoute.post);
-
-    apiSubrouter.get('/card-spaces/:slug', cardSpacesRoute.get);
 
     apiSubrouter.post('/push-notification-registrations', parseBody, pushNotificationRegistrationsRoute.post);
     apiSubrouter.delete(

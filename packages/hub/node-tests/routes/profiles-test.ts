@@ -323,7 +323,7 @@ describe('/api/profiles', function () {
         })
         .expect('Content-Type', 'application/vnd.api+json');
 
-      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-profile');
       expect(getJobPayloads()[0]).to.deep.equal({ id: returnedId });
     });
 
@@ -607,7 +607,7 @@ describe('/api/profiles', function () {
       expect(updatedProfile!.name).to.equal('anewname');
       expect(updatedProfile!.slug).to.equal('satoshi');
 
-      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+      expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-profile');
       expect(getJobPayloads()[0]).to.deep.equal({ id: profileId, invalidate: true });
     });
 

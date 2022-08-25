@@ -46,7 +46,6 @@ import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
 import WyrePricesRoute from './routes/wyre-prices';
-import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoService from './services/merchant-info';
 import ProfileValidator from './services/validators/profile';
 import { AuthenticationUtils } from './utils/authentication';
@@ -140,7 +139,6 @@ export function createRegistry(): Registry {
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('email-card-drop-request-serializer', EmailCardDropRequestSerializer);
-  registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('email-card-drop-requests-route', EmailCardDropRequestsRoute);
   registry.register('job-tickets-route', JobTicketsRoute);
   registry.register('job-ticket-serializer', JobTicketSerializer);

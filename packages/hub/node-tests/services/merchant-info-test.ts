@@ -10,7 +10,7 @@ describe('MerchantInfoService', function () {
       meta: { network: 'sokol' },
       data: {
         id: '05074049-be24-45fe-81ba-8e3c1a623aa7',
-        type: 'merchant-infos',
+        type: 'profiles',
         attributes: {
           did: 'did:cardstack:1m1C1LK4xoVSyybjNRcLB4APbc07954765987f62',
           name: 'a long long long long multi-word name that will cause problems because it is so long it really maybe shouldn’t even be permitted amirite maybe there should be (more of?) a limit',

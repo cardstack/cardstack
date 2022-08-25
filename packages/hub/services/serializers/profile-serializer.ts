@@ -8,18 +8,15 @@ import { ProfileMerchantSubset } from '../merchant-info';
 
 type ResourceType = 'profiles' | 'card-spaces' | 'merchant-infos';
 
-const cardSpacesMapping: Record<string, keyof Profile> = {
-  links: 'links',
-  'profile-description': 'profileDescription',
-  'profile-image-url': 'profileImageUrl',
-};
-
-const merchantInfosMapping: Record<string, keyof Profile> = {
+const propertyMappings: Record<string, keyof Profile> = {
   name: 'name',
   slug: 'slug',
   color: 'color',
   'text-color': 'textColor',
   'owner-address': 'ownerAddress',
+  links: 'links',
+  'profile-description': 'profileDescription',
+  'profile-image-url': 'profileImageUrl',
 };
 
 export default class ProfileSerializer {
@@ -28,7 +25,7 @@ export default class ProfileSerializer {
   serialize(model: Profile, type?: ResourceType): JSONAPIDocument;
   serialize(model: Profile[], type?: ResourceType): JSONAPIDocument;
 
-  serialize(model: Profile | Profile[], type: ResourceType = 'profiles'): JSONAPIDocument {
+  serialize(model: Profile | Profile[]): JSONAPIDocument {
     if (Array.isArray(model)) {
       return {
         data: model.map((m) => {
@@ -36,19 +33,9 @@ export default class ProfileSerializer {
         }),
       };
     } else {
-      // TODO migrate to Profile type CS-4386
       let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
       let attributes: any = { did };
-      let propertyMappings;
-
-      if (type === 'profiles') {
-        propertyMappings = { ...merchantInfosMapping, ...cardSpacesMapping };
-      } else if (type === 'merchant-infos') {
-        propertyMappings = merchantInfosMapping;
-      } else if (type === 'card-spaces') {
-        propertyMappings = cardSpacesMapping;
-      }
 
       for (let key in propertyMappings) {
         attributes[key] = model[propertyMappings[key]];
@@ -60,21 +47,10 @@ export default class ProfileSerializer {
         },
         data: {
           id: model.id,
-          type,
+          type: 'profiles',
           attributes,
         },
       };
-
-      if (type === 'card-spaces') {
-        result.data.relationships = { 'merchant-info': { data: { id: model.id, type: 'merchant-infos' } } };
-        let includedAttributes: any = { did };
-
-        for (let key in merchantInfosMapping) {
-          includedAttributes[key] = model[merchantInfosMapping[key]];
-        }
-
-        result.included = [{ attributes: includedAttributes, id: model.id, type: 'merchant-infos' }];
-      }
 
       return result as JSONAPIDocument;
     }

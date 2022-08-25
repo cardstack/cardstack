@@ -3,7 +3,7 @@ import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
 
-export default class PersistOffChainMerchantInfo {
+export default class PersistOffChainProfile {
   profileSerializer = inject('profile-serializer', {
     as: 'profileSerializer',
   });
@@ -14,7 +14,7 @@ export default class PersistOffChainMerchantInfo {
     let prisma = await this.prismaManager.getClient();
 
     let profile = await prisma.profile.findUnique({ where: { id } });
-    let jsonAPIDoc = this.profileSerializer.serialize(profile!, 'merchant-infos');
+    let jsonAPIDoc = this.profileSerializer.serialize(profile!);
 
     let putJobPayload: any = {
       bucket: config.get('aws.offchainStorage.bucketName'),
@@ -39,6 +39,6 @@ export default class PersistOffChainMerchantInfo {
 
 declare module '@cardstack/hub/tasks' {
   interface KnownTasks {
-    'persist-off-chain-merchant-info': PersistOffChainMerchantInfo;
+    'persist-off-chain-profile': PersistOffChainProfile;
   }
 }

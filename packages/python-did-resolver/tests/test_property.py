@@ -34,7 +34,6 @@ encode_options = st.fixed_dictionaries(
                 "PrepaidCardCustomization",
                 "MerchantInfo",
                 "SupplierInfo",
-                "Profile",
                 "RewardRule",
             ]
         ),
@@ -52,7 +51,6 @@ encode_options_bad_unique_id = st.fixed_dictionaries(
                 "PrepaidCardCustomization",
                 "MerchantInfo",
                 "SupplierInfo",
-                "Profile",
                 "RewardRule",
             ]
         ),
@@ -67,7 +65,6 @@ encode_options_bad_version = st.fixed_dictionaries(
                 "PrepaidCardCustomization",
                 "MerchantInfo",
                 "SupplierInfo",
-                "Profile",
                 "RewardRule",
             ]
         ),

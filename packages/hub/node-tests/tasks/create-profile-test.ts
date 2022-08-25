@@ -116,14 +116,14 @@ describe('CreateProfileTask', function () {
     subject = (await getContainer().instantiate(CreateProfile)) as CreateProfile;
   });
 
-  it('calls the relay server endpoint to register a profile and queues persist-off-chain-merchant-info', async function () {
+  it('calls the relay server endpoint to register a profile and queues persist-off-chain-profile', async function () {
     await subject.perform({
       'job-ticket-id': jobTicketId,
       'merchant-info-id': merchantInfosId,
     });
     expect(registerProfileCalls).to.equal(1);
 
-    expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-merchant-info');
+    expect(getJobIdentifiers()[0]).to.equal('persist-off-chain-profile');
     expect(getJobPayloads()[0]).to.deep.equal({ id: merchantInfosId });
 
     let jobTicket = await prisma.jobTicket.findUnique({ where: { id: jobTicketId } });

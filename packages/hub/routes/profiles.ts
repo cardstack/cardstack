@@ -113,7 +113,7 @@ export default class ProfilesRoute {
 
     profile = await prisma.profile.create({ data: { ...properties } });
 
-    await this.workerClient.addJob('persist-off-chain-merchant-info', {
+    await this.workerClient.addJob('persist-off-chain-profile', {
       id: profile.id,
     });
 
@@ -192,7 +192,7 @@ export default class ProfilesRoute {
         where: { id: profile.id },
       });
 
-      await this.workerClient.addJob('persist-off-chain-merchant-info', {
+      await this.workerClient.addJob('persist-off-chain-profile', {
         id: profile.id,
         invalidate: true,
       });

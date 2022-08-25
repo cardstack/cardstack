@@ -3,7 +3,7 @@ import shortUUID from 'short-uuid';
 import { expect } from 'chai';
 import { setupSentry } from '../helpers/sentry';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
-import PersistOffChainMerchantInfo from '../../tasks/persist-off-chain-merchant-info';
+import PersistOffChainProfile from '../../tasks/persist-off-chain-profile';
 import { Profile } from '@prisma/client';
 import config from 'config';
 
@@ -15,7 +15,7 @@ class StubProfileSerializer {
   }
 }
 
-describe('PersistOffChainMerchantInfo', function () {
+describe('PersistOffChainProfile', function () {
   setupSentry(this);
   let { getHelpers, getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
@@ -41,7 +41,7 @@ describe('PersistOffChainMerchantInfo', function () {
   });
 
   it('adds an s3-put-json task', async function () {
-    let task = await getContainer().instantiate(PersistOffChainMerchantInfo);
+    let task = await getContainer().instantiate(PersistOffChainProfile);
 
     await task.perform({ id: profileId }, getHelpers());
 
@@ -58,7 +58,7 @@ describe('PersistOffChainMerchantInfo', function () {
   });
 
   it('includes invalidation configuration when requested', async function () {
-    let task = await getContainer().instantiate(PersistOffChainMerchantInfo);
+    let task = await getContainer().instantiate(PersistOffChainProfile);
 
     await task.perform({ id: profileId, invalidate: true }, getHelpers());
 

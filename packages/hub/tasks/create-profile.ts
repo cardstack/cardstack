@@ -69,7 +69,7 @@ export default class CreateProfile {
         },
       });
 
-      this.workerClient.addJob('persist-off-chain-merchant-info', { id: merchantInfoId });
+      this.workerClient.addJob('persist-off-chain-profile', { id: merchantInfoId });
     } catch (error) {
       let errorString = (error as Error).toString();
       Sentry.captureException(error);

@@ -18,7 +18,7 @@ const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   'wyre-transfer': true,
   'print-queued-jobs': true,
   'persist-off-chain-prepaid-card-customization': true,
-  'persist-off-chain-merchant-info': true,
+  'persist-off-chain-profile': true,
   boom: true,
 };
 
