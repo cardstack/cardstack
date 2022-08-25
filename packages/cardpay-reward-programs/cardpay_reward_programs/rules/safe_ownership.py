@@ -32,7 +32,7 @@ class SafeOwnership(Rule):
                 owner as payee,
                 count(distinct safe) as total_safe_count
                 from {table_query}
-                where _block_number > $1::integer and _block_number <= $2::integer
+                where _block_number::integer > $1::integer and _block_number::integer <= $2::integer
                 and type = $4::text
                 group by owner
                 ),
@@ -40,7 +40,7 @@ class SafeOwnership(Rule):
                 owner as payee,
                 count(distinct safe) as new_safe_count
                 from {table_query}
-                where _block_number > ($2 - $3) and _block_number <= $2::integer
+                where _block_number::integer > ($2::integer - $3::integer) and _block_number::integer <= $2::integer
                 and type = $4::text
                 group by owner
             )
@@ -55,7 +55,7 @@ class SafeOwnership(Rule):
     def run(self, payment_cycle: int, reward_program_id: str):
         vars = [
             self.start_analysis_block,
-            payment_cycle,
+            int(payment_cycle),
             self.payment_cycle_length,
             self.safe_type,
             self.max_rewards,
