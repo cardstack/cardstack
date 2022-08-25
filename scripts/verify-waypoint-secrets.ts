@@ -22,14 +22,14 @@ for (const appSlug of appSlugs) {
   }
 
   let valid = true;
-  let allowedSecretArns = [];
+  let allowedSecretArns: string[] = [];
 
   try {
     allowedSecretArns = [
       ...queryAttachedPoliciesForAllowedSecretAccess(appConfig),
       ...queryRolePoliciesForAllowedSecretAccess(appConfig),
     ];
-  } catch (err) {
+  } catch (err: any) {
     errors.push({ app: appSlug, error: err.message });
     valid = false;
   }
@@ -63,13 +63,13 @@ if (errors.length > 0) {
 
 console.log(`Task policy access to secrets configured in ${waypointConfigFile} has been confirmed.`);
 
-function parseWaypointConfig(waypointConfigFile): RelevantWaypointConfigByApp {
+function parseWaypointConfig(waypointConfigFile: string): RelevantWaypointConfigByApp {
   let hclInput = fs.readFileSync(waypointConfigFile, 'utf8');
   let waypointJson = JSON.parse(HCL.parse(hclInput));
-  let appSlugs = waypointJson.app.map((app) => Object.keys(app)[0]);
+  let appSlugs = waypointJson.app.map((app: any) => Object.keys(app)[0]);
   let result = {} as RelevantWaypointConfigByApp;
   for (const appSlug of appSlugs) {
-    let deployNode = waypointJson.app.find((a) => a[appSlug])[appSlug][0].deploy[0];
+    let deployNode = waypointJson.app.find((a: any) => a[appSlug])[appSlug][0].deploy[0];
     if (deployNode.use[0]['aws-ecs']) {
       let secretsNode = deployNode.use[0]['aws-ecs'][0].secrets?.[0];
       result[appSlug] = {
@@ -81,7 +81,7 @@ function parseWaypointConfig(waypointConfigFile): RelevantWaypointConfigByApp {
   return result;
 }
 
-function execute(command, options) {
+function execute(command: string, options: any) {
   return execSync(command, options ?? {})
     .toString()
     .trim();
@@ -103,7 +103,7 @@ function queryAttachedPoliciesForAllowedSecretAccess(appConfig: RelevantWaypoint
 }
 
 function queryRolePoliciesForAllowedSecretAccess(appConfig: RelevantWaypointConfig) {
-  let allowedSecretArns = [];
+  let allowedSecretArns: string[] = [];
 
   const policiesCmd = `aws iam list-role-policies --role-name ${appConfig.executionRoleName} --query 'PolicyNames'`;
   const policiesNames = JSON.parse(execute(policiesCmd, { env: { ...process.env, PAGER: '' } }));
@@ -117,7 +117,9 @@ function queryRolePoliciesForAllowedSecretAccess(appConfig: RelevantWaypointConf
         statement.Action.includes('secretsmanager:GetSecretValue')
       ) {
         const arnRegex = new RegExp('arn:aws:secretsmanager:[^:]+:[^:]+:secret:[^:]+');
-        allowedSecretArns = allowedSecretArns.concat(statement.Resource.filter((resource) => arnRegex.test(resource)));
+        allowedSecretArns = allowedSecretArns.concat(
+          statement.Resource.filter((resource: string) => arnRegex.test(resource))
+        );
       }
     }
   }

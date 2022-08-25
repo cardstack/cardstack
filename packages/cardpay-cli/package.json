@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/yargs": "^17.0.2",
     "npm-run-all": "^4.1.5",
-    "typescript": "4.2.3"
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.135.0",
@@ -44,7 +44,7 @@
     "parity-hdwallet-provider": "^1.3.0-fork.2",
     "short-uuid": "^4.2.0",
     "trezor-cli-wallet-provider": "^1.0.7",
-    "ts-node": "^10.3.0",
+    "ts-node": "^10.9.1",
     "uuid": "^8.3.2",
     "web3": "1.5.2",
     "web3-core": "1.5.2",

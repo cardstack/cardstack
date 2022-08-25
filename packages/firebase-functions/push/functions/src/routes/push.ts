@@ -29,7 +29,7 @@ export const push = async (req: Request): Promise<IResponse> => {
       code: 200,
       success: true,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.log('AN ERROR OCCURRED');
     logger.log({ error });
 

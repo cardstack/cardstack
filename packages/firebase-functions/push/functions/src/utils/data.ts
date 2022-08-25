@@ -20,7 +20,7 @@ export const setRegistration = async (registration: IRegistrationOptions) => {
       logger.log('topic exists, update it', registration);
       return await getCollection().doc(snapshot.docs[0].id).update(registration);
     }
-  } catch (e) {
+  } catch (e: any) {
     return Promise.reject(e.message);
   }
 };

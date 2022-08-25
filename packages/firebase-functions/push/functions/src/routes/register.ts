@@ -32,7 +32,7 @@ export const register = async (req: Request): Promise<IResponse> => {
       code: 200,
       success: true,
     };
-  } catch (err) {
+  } catch (err: any) {
     logger.log('AN ERROR OCCURRED');
     console.log({ err });
     return {
