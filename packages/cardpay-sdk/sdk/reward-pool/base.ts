@@ -534,18 +534,21 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async claimAll(
     safeAddress: string,
+    tokenAddress?: string,
     rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt[]> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
-    const unclaimedValidProofs = (await this.getProofs(rewardSafeOwner, safeAddress, rewardProgramId, undefined, false))
-      .filter((o) => o.isValid)
-      .filter((o) => {
-        return o.gasEstimate.amount.lt(new BN(o.amount));
-      });
-    return this.claimAllProofs(unclaimedValidProofs, safeAddress, txnOptions, contractOptions);
+    const unclaimedValidProofs = (
+      await this.getProofs(rewardSafeOwner, safeAddress, rewardProgramId, tokenAddress, false)
+    ).filter((o) => o.isValid);
+    const unclaimedValidProofsWithoutCryptoDust = unclaimedValidProofs.filter((o) => {
+      return o.gasEstimate.amount.lt(new BN(o.amount));
+    });
+    console.log(`Claiming ${unclaimedValidProofsWithoutCryptoDust} out of ${unclaimedValidProofs} proofs`);
+    return this.claimAllProofs(unclaimedValidProofsWithoutCryptoDust, safeAddress, txnOptions, contractOptions);
   }
 
   async claimAllProofs(
