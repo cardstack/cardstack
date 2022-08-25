@@ -4905,6 +4905,36 @@
     "@babel/helper-validator-identifier" "^7.18.6"
     to-fast-properties "^2.0.0"
 
+"@cardstack/cardpay-sdk@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@cardstack/cardpay-sdk/-/cardpay-sdk-1.0.11.tgz#edd867a6885342705484bbba2367db501281497a"
+  integrity sha512-9jpHZUGKza9hIJHGa1edc0igNpkkt9NxfMMBsWgM0TUJzszECAoZuIdYd2ZEVY+utIG3VcgZWfalp05Sqc15Jw==
+  dependencies:
+    "@truffle/hdwallet-provider" "^1.5.0"
+    "@trufflesuite/web3-provider-engine" "^15.0.13-1"
+    "@types/bn.js" "^5.1.0"
+    "@types/fs-extra" "^9.0.11"
+    "@types/lodash" "^4.14.168"
+    "@types/node-fetch" "^2.5.10"
+    "@types/url-parse" "^1.4.4"
+    bignumber.js "^9.0.1"
+    bn.js "^5.2.0"
+    eth-sig-util "^3.0.1"
+    ethereum-cryptography "^0.1.3"
+    ethereumjs-wallet "^1.0.1"
+    ethers "5.6.4"
+    fs-extra "^10.0.0"
+    glob "^7.1.7"
+    lodash "^4.17.21"
+    semver "^7.3.5"
+    url-parse "^1.5.3"
+    web3 "1.5.2"
+    web3-core "1.5.2"
+    web3-eth "1.5.2"
+    web3-eth-contract "1.5.2"
+    web3-provider-engine "^16.0.1"
+    web3-utils "1.5.2"
+
 "@cardstack/logger@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.2.1.tgz#6af0497c2b741c0a2bfcb8e5510fb75551cb5644"
