@@ -51,6 +51,8 @@ app "hub" {
         HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_email_card_drop_rate_limit_period_minutes-UKgldx"
         HUB_EMAIL_HASH_SALT                           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_email_hash_salt-nJvKQH"
         HUB_GOOGLE_IAP_SERVICE_ACCOUNT                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_google_iap_service_account-v0PB3u"
+        # The below is a distribution in the production AWS account
+        HUB_STORAGE_CLOUDFRONT_DISTRIBUTION           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         PAGERDUTY_TOKEN                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
         MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
@@ -108,14 +110,16 @@ app "hub-worker" {
       disable_alb         = true
 
       secrets = {
-        LAYER1_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
-        LAYER1_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
-        LAYER2_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
-        LAYER2_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
-        HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
-        PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
-        MAILCHIMP_API_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
+        LAYER1_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+        LAYER1_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+        LAYER2_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+        LAYER2_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
+        HUB_AUTH_SECRET                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+        # The below is a distribution in the production AWS account
+        HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
+        DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
+        PAGERDUTY_TOKEN                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
+        MAILCHIMP_API_KEY                   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
       }
     }
 
@@ -426,7 +430,7 @@ app "reward-submit" {
   config {
     env = {
       ENVIRONMENT           = "staging"
-      REWARD_POOL_ADDRESS   = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
+      REWARD_POOL_ADDRESS   = "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A"
       REWARD_PROGRAM_OUTPUT = "s3://cardpay-staging-reward-programs/"
     }
   }
@@ -641,8 +645,8 @@ app "reward-scheduler" {
       ENVIRONMENT                        = "staging"
       REWARDS_BUCKET                     = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL                       = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07,0x5E4E148baae93424B969a0Ea67FF54c315248BbA"
-      REWARD_MANAGER_ADDRESS             = "0xaC47B293f836F3a64eb4AEF02Cb7d1428dCe815f"
+      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72"
+      REWARD_MANAGER_ADDRESS             = "0xC29EfEa853fb7c781488c70aF9135c853d809147"
       REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
       REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
     }

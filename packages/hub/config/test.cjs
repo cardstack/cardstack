@@ -1,6 +1,12 @@
 const { join } = require('path');
 
 module.exports = {
+  aws: {
+    offchainStorage: {
+      cloudfrontDistributionId: 'A-FAKE-ID',
+      invalidationRoleChain: ['a-fake-role-chain'],
+    },
+  },
   db: {
     url: 'postgres://postgres:postgres@localhost:5432/hub_test',
     useTransactionalRollbacks: true,

@@ -748,7 +748,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   }
 
   async rewardProgramBalances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const tokensAvailable = await this.get_reward_tokens();
+    const tokensAvailable = await this.getRewardTokens();
     let promises = tokensAvailable.map((tokenAddress) => {
       return this.rewardProgramBalance(rewardProgramId, tokenAddress);
     });
@@ -769,11 +769,6 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
 
   async address(): Promise<string> {
     return await getAddress('rewardPool', this.layer2Web3);
-  }
-
-  async get_reward_tokens(): Promise<string[]> {
-    let card_token_address = await getAddress('cardCpxd', this.layer2Web3);
-    return [card_token_address];
   }
 
   async addTokenSymbol<T extends HasTokenAddress>(arrWithTokenAddress: T[]): Promise<WithSymbol<T>[]> {

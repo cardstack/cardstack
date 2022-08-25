@@ -12,13 +12,14 @@
     "network": {
       "l1": {
         "name": "kovan",
-        "cardToken": "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
+        "cardToken": "0x17d030616A9879C1Bc7e8764E9D80Ec289d4C7AE",
         "daiToken": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa"
       },
       "l2": {
         "name": "sokol",
-        "cardToken": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
-        "daiToken": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1"
+        "cardToken": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
+        "daiToken": "0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b",
+        "rewardProgramId": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72"
       }
     }
   },

@@ -1,4 +1,5 @@
 import pytest
+from cardpay_reward_api.config import config
 from cardpay_reward_api.database import Base
 from cardpay_reward_api.main import app, get_db
 from cardpay_reward_api.models import Proof
@@ -12,6 +13,8 @@ from .utils import check_duplicates_for_proofs, validate_proof_response_fields
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
+
+reward_token_address = config["staging"]["tokens"]["card"]
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +47,7 @@ mock_proofs = [
     {
         "rootHash": "0x9f880d8e63c4dca5f33fce867a36e988afbf41ed9f1ab0e08387b1bc76921173",
         "paymentCycle": 26777325,
-        "tokenAddress": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "tokenAddress": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
         "payee": "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "proofArray": [
             "0xde36d63c3f3e82f3c58d8fbe26245ff24723f946058c110a1efdbf5475a4858e",
@@ -62,7 +65,7 @@ mock_proofs = [
     {
         "rootHash": "0x3b4096bd5a350c9469089b781e7ee0c7e57a08749b267c770604a14e80f835b2",
         "paymentCycle": 26777601,
-        "tokenAddress": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "tokenAddress": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
         "payee": "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "proofArray": [
             "0x19ffcb37a60b415b6a1a17d3aa0078de68fa0307e85b1a55651b91a9baa988cb",
@@ -80,7 +83,7 @@ mock_proofs = [
     {
         "rootHash": "0xee9c501af460fa65d059d64f415969cfa954413158af14c9e6a6e2f4e97d7d45",
         "paymentCycle": 26778053,
-        "tokenAddress": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "tokenAddress": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
         "payee": "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "proofArray": [],
         "rewardProgramId": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",

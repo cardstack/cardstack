@@ -56,7 +56,7 @@ Make sure you are in the correct AWS profile for the required environment and ru
 
 For example
 
-    ENVIRONMENT=staging python -m reward_root_submitter.manual  s3://cardpay-staging-reward-programs/rewardProgramID=0x5E4E148baae93424B969a0Ea67FF54c315248BbA/paymentCycle=27071744/results.parquet
+    ENVIRONMENT=staging python -m reward_root_submitter.manual  s3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27071744/results.parquet
 
 
 ## Updating ABIs

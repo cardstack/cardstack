@@ -6,7 +6,7 @@ import { getSDK, getConstant } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]',
-  describe: 'Claim rewards using proof',
+  describe: 'Claim reward using proof',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardSafe', {

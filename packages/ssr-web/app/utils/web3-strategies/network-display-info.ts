@@ -27,7 +27,7 @@ let layer2NetworkDisplayInfo: Record<
     shortName: 'Sokol',
     conversationalName: 'Sokol',
     nativeTokenSymbol: 'SPOA',
-    daiToken: 'DAI',
+    daiToken: 'DAI.CPXD',
   },
   'test-layer2': {
     fullName: 'L2 test chain',

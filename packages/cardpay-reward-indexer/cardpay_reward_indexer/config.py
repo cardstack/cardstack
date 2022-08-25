@@ -4,21 +4,14 @@ from pydantic import BaseSettings
 
 config = {
     "staging": {
-        "reward_program": "0x5E4E148baae93424B969a0Ea67FF54c315248BbA",
-        "archived_reward_programs": [
-            "0x0A4c62c8616342Fc3C5390c4e55aD26DeE694b0F",
-            "0x64D65d17B26312c0a2532E3cfB0a681A92eEf89d",
-            "0x73F92405b438D85ee46539a8FaDbBCa04C155F81",
-            "0x954A9C27bC398B4A8f6F543b13eea833d0e73308",
-            "0xd40c4b61D0B08548Dd1E2b79c1E8Ad98f15c65d8",
-            "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07",
-        ],
-        "reward_pool": "0xc9A238Ee71A65554984234DF9721dbdA873F84FA",
+        "reward_program": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
+        "archived_reward_programs": [],
+        "reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "tokens": {
-            "card": "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
-            "dai": "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+            "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
+            "dai": "0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b",
         },
     },
     "production": {
