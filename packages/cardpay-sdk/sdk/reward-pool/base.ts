@@ -866,8 +866,7 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   }
   private async getRewardTokens(): Promise<string[]> {
     let cardTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
-    let daiTokenAddress = await getAddress('daiCpxd', this.layer2Web3);
-    return [cardTokenAddress, daiTokenAddress];
+    return [cardTokenAddress];
   }
 }
 
