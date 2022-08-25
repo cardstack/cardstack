@@ -101,11 +101,11 @@ class Staking(Rule):
         ]
 
         table_query = self._get_table_query(
-            "token_holder", "token_holder", self.start_block, payment_cycle
+            "token_holder", "token_holder", None, payment_cycle
         )
 
         aux_table_query = self._get_table_query(
-            "safe_owner", "safe_owner", self.start_block, payment_cycle
+            "safe_owner", "safe_owner", None, payment_cycle
         )
 
         if table_query == "parquet_scan([])" or aux_table_query == "parquet_scan([])":

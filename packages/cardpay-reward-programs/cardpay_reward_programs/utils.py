@@ -49,6 +49,8 @@ def get_partition_files(config_location, table, min_partition, max_partition):
         config = yaml.safe_load(stream)
     latest = get_latest_details(config_location)
     latest_block = latest.get("latest_block")
+    if min_partition is None:
+        min_partition = latest.get("earliest_block")
     # Get table
     table_config = config["tables"][table]
     partition_sizes = sorted(table_config["partition_sizes"], reverse=True)
