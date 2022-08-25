@@ -616,12 +616,16 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     };
   }
 
-  async claimAllGasEstimate(rewardSafeAddress: string, rewardProgramId?: string): Promise<GasEstimate> {
+  async claimAllGasEstimate(
+    rewardSafeAddress: string,
+    rewardProgramId?: string,
+    tokenAddress?: string
+  ): Promise<GasEstimate> {
     //TODO: Check for single token only
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
     const unclaimedValidProofsWithSingleToken = (
-      await this.getProofs(rewardSafeOwner, rewardSafeAddress, rewardProgramId, undefined, false)
+      await this.getProofs(rewardSafeOwner, rewardSafeAddress, rewardProgramId, tokenAddress, false)
     )
       .filter((o) => o.isValid)
       .filter((o) => {
