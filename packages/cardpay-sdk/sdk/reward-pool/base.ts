@@ -24,6 +24,7 @@ import type { SuccessfulTransactionReceipt } from '../utils/successful-transacti
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
+import groupBy from 'lodash/groupby';
 
 export interface Proof {
   rootHash: string;
@@ -618,24 +619,17 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     rewardSafeAddress: string,
     rewardProgramId?: string,
     tokenAddress?: string
-  ): Promise<GasEstimate> {
-    //TODO: Check for single token only
+  ): Promise<GasEstimate[]> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
-    const unclaimedValidProofsWithSingleToken = (
-      await this.getProofs(rewardSafeOwner, rewardSafeAddress, rewardProgramId, tokenAddress, false)
-    )
+    const proofs = await this.getProofs(rewardSafeOwner, rewardSafeAddress, rewardProgramId, tokenAddress, false);
+
+    const unclaimedValidProofsWithSingleToken = proofs
       .filter((o) => o.isValid)
       .filter((o) => {
         return o.gasEstimate.amount.lt(new BN(o.amount));
       });
-    const totalGasFees = unclaimedValidProofsWithSingleToken.reduce((accum, o) => {
-      return accum.add(o.gasEstimate.amount);
-    }, new BN(0));
-    return {
-      gasToken: unclaimedValidProofsWithSingleToken[0].tokenAddress,
-      amount: totalGasFees,
-    };
+    return aggregateGas(unclaimedValidProofsWithSingleToken);
   }
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
@@ -891,4 +885,14 @@ const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
     }
   });
   return output;
+};
+
+const aggregateGas = (arr: ClaimableProof[]): GasEstimate[] => {
+  let o = groupBy(arr, (o: ClaimableProof) => o.tokenAddress);
+  return Object.entries(o).map(([gasToken, proofs]) => {
+    let amount = proofs.reduce((accum, proof) => {
+      return accum.add(new BN(proof.gasEstimate.amount));
+    }, new BN(0));
+    return { gasToken, amount };
+  });
 };
