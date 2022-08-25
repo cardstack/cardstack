@@ -29,6 +29,7 @@
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
     "lodash": "^4.17.21",
+    "lodash.groupby": "^4.6.0",
     "semver": "^7.3.5",
     "url-parse": "^1.5.3",
     "web3": "1.5.2",
