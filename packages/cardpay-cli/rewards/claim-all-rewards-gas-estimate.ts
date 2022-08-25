@@ -35,10 +35,16 @@ export default {
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
     let assets = await getSDK('Assets', web3);
-    let { gasToken, amount } = await rewardPool.claimAllGasEstimate(rewardSafe, rewardProgramId, tokenAddress);
-    let { symbol } = await assets.getTokenInfo(gasToken);
-    console.log(
-      `The gas estimate for claiming ALL rewards to reward safe ${rewardSafe} is ${fromWei(amount)} ${symbol}`
+    const gasEstimates = await rewardPool.claimAllGasEstimate(rewardSafe, rewardProgramId, tokenAddress);
+    await Promise.all(
+      gasEstimates.map(async (gasEstimate) => {
+        let { symbol } = await assets.getTokenInfo(gasEstimate.gasToken);
+        console.log(
+          `The gas estimate for claiming ALL ${symbol} to reward safe ${rewardSafe} is ${fromWei(
+            gasEstimate.amount
+          )} ${symbol}`
+        );
+      })
     );
   },
 } as CommandModule;
