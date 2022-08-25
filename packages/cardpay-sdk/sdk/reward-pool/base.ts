@@ -817,6 +817,14 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     }
   }
 
+  isClaimableProof(proof: WithSymbol<Proof> | WithSymbol<ClaimableProof>): proof is WithSymbol<ClaimableProof> {
+    if ((proof as WithSymbol<ClaimableProof>).gasEstimate) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private hasTokenTransferDetail(o: any): o is TokenTransferDetail {
     return 'token' in o && 'amount' in o;
   }
