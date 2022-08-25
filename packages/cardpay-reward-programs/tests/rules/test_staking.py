@@ -7,7 +7,6 @@ from hypothesis import example, given
 from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
-
 END_BLOCK = 60
 CYCLE_LENGTH = 30
 token_holder_table = "_TOKEN_HOLDER"
