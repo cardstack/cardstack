@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
 import { getEthereumClients, NETWORK_OPTION_LAYER_2, getConnectionType } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
-import { Proof, getSDK, WithSymbol } from '@cardstack/cardpay-sdk';
+import { Proof, getSDK, WithSymbol, ClaimableProof, RewardPool } from '@cardstack/cardpay-sdk';
 import groupBy from 'lodash/groupBy';
 import { fromWei } from 'web3-utils';
 
@@ -50,14 +50,17 @@ export default {
       proofs = await rewardPool.getProofs(address, undefined, rewardProgramId, tokenAddress, false);
     }
     if (isValidOnly) {
-      displayProofs(proofs.filter((o) => o.isValid));
+      displayProofs(
+        proofs.filter((o) => o.isValid),
+        rewardPool
+      );
     } else {
-      displayProofs(proofs);
+      displayProofs(proofs, rewardPool);
     }
   },
 } as CommandModule;
 
-function displayProofs(proofs: WithSymbol<Proof>[]): void {
+function displayProofs(proofs: WithSymbol<Proof | ClaimableProof>[], rewardPool: RewardPool): void {
   if (proofs.length == 0) {
     console.log(`
     No proofs to display
@@ -70,20 +73,21 @@ function displayProofs(proofs: WithSymbol<Proof>[]): void {
 ---------------------------------------------------------------------`);
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
-      displayProof(o);
+      displayProof(o, rewardPool);
     });
   });
 }
 
-function displayProof(o: WithSymbol<Proof>) {
-  let gasAmount = o.gasEstimate?.amount;
+function displayProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
   console.log(`
       proof: ${fromProofArray(o.proofArray)}
       leaf: ${o.leaf}
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
       isValid: ${o.isValid} 
-      gasFees: ${gasAmount ? fromWei(gasAmount) + ' ' + o.tokenSymbol : 'No Gas Estimates'}
+      gasFees: ${
+        rewardPool.isClaimableProof(o) ? fromWei(o.gasEstimate.amount) + ' ' + o.tokenSymbol : 'No Gas Estimates'
+      }
         `);
 }
 
