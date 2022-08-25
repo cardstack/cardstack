@@ -3,11 +3,10 @@ import hypothesis.strategies as st
 import pandas as pd
 import pytest
 from cardpay_reward_programs.rules import staking
-from hypothesis import example, given, settings
+from hypothesis import example, given
 from hypothesis.extra.pandas import column, data_frames, range_indexes
 from pytest import MonkeyPatch
 
-START_BLOCK = 30
 END_BLOCK = 60
 CYCLE_LENGTH = 30
 token_holder_table = "_TOKEN_HOLDER"
@@ -98,7 +97,7 @@ def create_rule(
     return rule
 
 
-def get_amount(result, payee, idx):
+def get_amount(result, payee):
     idx = result.index[result["payee"] == payee].tolist()[0]
     return result.loc[idx, "amount"]
 
@@ -174,9 +173,9 @@ def test_correct_calc_rewards(monkeypatch):
     rule = create_rule(monkeypatch, fake_data_token_holder, fake_data_safe_owner)
     result = rule.run(30, "0x0")
 
-    assert pytest.approx(get_amount(result, "owner1", 0)) == 82.26866088e9
-    assert pytest.approx(get_amount(result, "owner2", 1)) == 80.74258498e9
-    assert pytest.approx(get_amount(result, "owner3", 2)) == 60e9
+    assert pytest.approx(get_amount(result, "owner1")) == 82.26866088e9
+    assert pytest.approx(get_amount(result, "owner2")) == 80.74258498e9
+    assert pytest.approx(get_amount(result, "owner3")) == 60e9
 
 
 def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
@@ -204,7 +203,7 @@ def test_correctly_manages_first_deposit_in_cycle(monkeypatch):
     rule = create_rule(monkeypatch, fake_data_token_holder, fake_data_safe_owner)
     result = rule.run(60, "0x0")
 
-    assert pytest.approx(get_amount(result, "owner1", 0)) == 120e9
+    assert pytest.approx(get_amount(result, "owner1")) == 120e9
 
 
 def test_correct_calc_rewards_in_cycle(monkeypatch):
@@ -226,7 +225,7 @@ def test_correct_calc_rewards_in_cycle(monkeypatch):
     rule = create_rule(monkeypatch, fake_data_token_holder, fake_data_safe_owner)
     result = rule.run(30, "0x0")
 
-    assert pytest.approx(get_amount(result, "owner1", 0)) == 60e9
+    assert pytest.approx(get_amount(result, "owner1")) == 60e9
 
 
 def test_correct_filtering_of_safe_type(monkeypatch):
@@ -324,13 +323,7 @@ def test_change_of_safes_during_payment_cycle(monkeypatch):
 
 
 @given(token_holder_df, safe_owner_df)
-@settings(max_examples=500)
 def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
-    """
-    testing that number of safes within range matches the len of payees
-    NOTE: This test is currently not passing the in testing_safe_transfers branch because
-    I believe this rule is not considering that safe_owner table has the column block_number
-    """
     with MonkeyPatch.context() as monkeypatch:
         rule = create_rule(monkeypatch, token_holder_df, safe_owner_df)
         safes_set = set()
@@ -343,7 +336,6 @@ def test_num_of_safes_matches_results(token_holder_df, safe_owner_df):
 
 
 @given(token_holder_df, safe_owner_df)
-@settings(max_examples=1000)
 def test_all_stakers_receiving_rewards(token_holder_df, safe_owner_df):
     """
     testing the any owner with some staking during the cycle receive rewards
@@ -550,3 +542,59 @@ def test_rewards_identically_if_balance_never_changes(blocks):
         result_multiple_balance = rule_multiple_balance.run(30, "0x0")
         assert pytest.approx(sum(result_single_balance["amount"])) == 10e9
         assert pytest.approx(sum(result_multiple_balance["amount"])) == 10e9
+
+
+def test_staking_does_not_use_start_and_end_blocks(monkeypatch):
+    """
+    The start & end blocks are variables for the *scheduler* not the rule.
+
+    It should not affect the data read to calculate ownership of safes or the balances.
+
+    When querying for the partitions, the min partition here should be None
+    which signifies that data from the earliest block is required
+    and the max partition should be the payment cycle as that's the latest
+    data that is required.
+    """
+    payment_cycle = 35
+    fake_data_token_holder = pd.DataFrame(
+        [
+            {
+                "_block_number": 0,
+                "token": "card-0",
+                "safe": "safe1",
+                "balance_downscale_e9_uint64": 1000,
+            },
+        ]
+    )
+
+    fake_data_safe_owner = pd.DataFrame(
+        [
+            {"safe": "safe1", "owner": "owner1", "type": "depot", "_block_number": 0},
+        ]
+    )
+
+    rule = create_rule(
+        monkeypatch,
+        fake_data_token_holder,
+        fake_data_safe_owner,
+        core_config_overrides={"start_block": 30},
+    )
+
+    def table_query(
+        self, config_name, table_name, min_partition: int, max_partition: int
+    ):
+        assert min_partition is None
+        assert max_partition == payment_cycle
+
+        if table_name == "token_holder":
+            return token_holder_table
+        elif table_name == "safe_owner":
+            return safe_ownership_table
+        else:
+            raise NameError
+
+    monkeypatch.setattr(staking.Staking, "_get_table_query", table_query)
+
+    result = rule.run(payment_cycle, "0x0")
+
+    assert pytest.approx(get_amount(result, "owner1")) == 60e9
