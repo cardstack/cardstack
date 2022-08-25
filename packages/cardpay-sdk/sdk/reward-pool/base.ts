@@ -556,11 +556,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   ): Promise<SuccessfulTransactionReceipt[]> {
     const proofs = unclaimedValidProofs.filter((o) => o.isValid);
     const receipts: SuccessfulTransactionReceipt[] = [];
-    if (proofs.length < unclaimedValidProofs.length) {
-      console.log(
-        `Claiming only ${proofs.length} proofs out of ${unclaimedValidProofs.length} because of proof being smaller than gas fees`
-      );
-    }
     for (const { leaf, proofArray } of proofs) {
       const receipt = await this.claim(safeAddress, leaf, proofArray, false, txnOptions, contractOptions);
       receipts.push(receipt);
