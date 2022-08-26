@@ -3,6 +3,8 @@ import { NodeOptions } from '@sentry/node/types/types';
 import config from 'config';
 import packageJson from '../package.json';
 import { ExtraErrorData as ExtraErrorDataIntegration } from '@sentry/integrations';
+import { Event, EventHint } from '@sentry/types';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 export default function initSentry() {
   if (config.get('sentry.enabled')) {
@@ -18,7 +20,31 @@ export default function initSentry() {
           // be replaced with standard Node.js REPL notation of [Object], [Array], [Function] or a primitive value
           depth: 5,
         }),
+        new SentryPrisma(),
       ],
     } as NodeOptions);
+  }
+}
+
+export class SentryPrisma {
+  public readonly name = 'SentryPrisma';
+  public static id = 'SentryPrisma';
+
+  setupOnce() {
+    Sentry.addGlobalEventProcessor((event: Event, hint?: EventHint) => {
+      if (hint?.originalException instanceof PrismaClientKnownRequestError) {
+        let prismaError = hint.originalException as PrismaClientKnownRequestError;
+
+        event.tags ??= {};
+        event.tags['prisma.error_code'] = prismaError.code;
+
+        let errorShouldTriggerAlert = prismaError.code.startsWith('P1');
+
+        if (errorShouldTriggerAlert) {
+          event.tags.alert = 'web-team';
+        }
+      }
+      return event;
+    });
   }
 }
