@@ -24,7 +24,6 @@ import type { SuccessfulTransactionReceipt } from '../utils/successful-transacti
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
-import { groupBy } from 'lodash';
 
 export interface Proof {
   rootHash: string;
@@ -633,9 +632,9 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async claimAllGasEstimate(
     rewardSafeAddress: string,
-    rewardProgramId?: string,
-    tokenAddress?: string
-  ): Promise<GasEstimate[]> {
+    tokenAddress: string,
+    rewardProgramId?: string
+  ): Promise<GasEstimate> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
 
@@ -645,7 +644,13 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       rewardProgramId,
       tokenAddress
     );
-    return aggregateGas(unclaimedValidProofsWithoutDust);
+    const amount = unclaimedValidProofsWithoutDust.reduce((accum, proof) => {
+      return accum.add(new BN(proof.gasEstimate.amount));
+    }, new BN(0));
+    return {
+      gasToken: tokenAddress,
+      amount,
+    };
   }
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
@@ -900,14 +905,4 @@ const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
     }
   });
   return output;
-};
-
-const aggregateGas = (arr: ClaimableProof[]): GasEstimate[] => {
-  let o = groupBy(arr, (o: ClaimableProof) => o.tokenAddress);
-  return Object.entries(o).map(([gasToken, proofs]) => {
-    let amount = proofs.reduce((accum, proof) => {
-      return accum.add(new BN(proof.gasEstimate.amount));
-    }, new BN(0));
-    return { gasToken, amount };
-  });
 };
