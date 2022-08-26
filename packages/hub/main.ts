@@ -93,6 +93,7 @@ import ProfileSerializer from './services/serializers/profile-serializer';
 import Email from './services/email';
 import Mailchimp from './services/mailchimp';
 import PrismaManager from './services/prisma-manager';
+import ScheduledPaymentsFetcherService from './services/scheduled-payments/fetcher';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -173,6 +174,7 @@ export function createRegistry(): Registry {
   registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
   registry.register('prisma-manager', PrismaManager);
+  registry.register('scheduled-payments-fetcher', ScheduledPaymentsFetcherService);
 
   if (process.env.COMPILER) {
     registry.register(
