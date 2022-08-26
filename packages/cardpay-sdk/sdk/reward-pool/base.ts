@@ -535,8 +535,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async claimAll(
     safeAddress: string,
-    tokenAddress?: string,
     rewardProgramId?: string,
+    tokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt[]> {
@@ -548,7 +548,9 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     const unclaimedValidProofsWithoutCryptoDust = unclaimedValidProofs.filter((o) => {
       return o.gasEstimate.amount.lt(new BN(o.amount));
     });
-    console.log(`Claiming ${unclaimedValidProofsWithoutCryptoDust} out of ${unclaimedValidProofs} proofs`);
+    console.log(
+      `Claiming ${unclaimedValidProofsWithoutCryptoDust.length} out of ${unclaimedValidProofs.length} proofs`
+    );
     return this.claimAllProofs(unclaimedValidProofsWithoutCryptoDust, safeAddress, txnOptions, contractOptions);
   }
 
