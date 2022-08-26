@@ -39,6 +39,7 @@ declare module '@glint/environment-ember-loose/registry' {
     'on-key': HelperLike<{
       Args: {
         Positional: [keyCombo: string, () => void];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Named: { event: any };
       };
       Return: void;

@@ -22,6 +22,8 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -75,8 +77,9 @@ module('Acceptance | deposit', function (hooks) {
     assert.ok(true, 'no a11y errors found - layer 1 connect card');
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
       'metamask'
@@ -116,8 +119,9 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${postableSel(1, 2)} [data-test-wallet-connect-loading-qr-code]`)
       .exists();
 
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
@@ -376,8 +380,9 @@ module('Acceptance | deposit', function (hooks) {
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
     assert.dom('[data-test-layer-connect-modal="layer1"]').exists();
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
@@ -439,8 +444,9 @@ module('Acceptance | deposit', function (hooks) {
       .dom(postableSel(1, 2))
       .containsText('Loading QR Code for Cardstack Wallet connection');
 
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
@@ -472,8 +478,9 @@ module('Acceptance | deposit', function (hooks) {
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
     assert.dom('[data-test-layer-connect-modal="layer2"]').exists();
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
@@ -502,8 +509,9 @@ module('Acceptance | deposit', function (hooks) {
     );
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
       'metamask'
@@ -533,8 +541,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Disconnecting Layer 1 from within the workflow', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
@@ -545,8 +554,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -617,8 +627,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
@@ -629,8 +640,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -697,8 +709,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Disconnecting Layer 2 from within the workflow', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
@@ -709,8 +722,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -783,8 +797,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
@@ -795,8 +810,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -866,8 +882,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Changing layer 1 account should cancel the workflow', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let secondLayer1AccountAddress =
       '0x5416C61193C3393B46C2774ac4717C252031c0bE';
@@ -880,8 +897,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -956,8 +974,9 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Changing layer 2 account should cancel the workflow', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
@@ -968,8 +987,9 @@ module('Acceptance | deposit', function (hooks) {
       dai: new BN('250500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let secondLayer2AccountAddress =
       '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';

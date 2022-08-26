@@ -11,6 +11,7 @@ import {
   createSafeToken,
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -27,9 +28,9 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
   });
 
   test('Depot and profile balances are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
-    let layer2Service: Layer2TestWeb3Strategy = this.owner.lookup(
-      'service:layer2-network'
-    ).strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let profileSafeAddress = '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33';
 
@@ -117,9 +118,9 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
   });
 
   test('Depot balance section when user has no depot', async function (this: Context, assert) {
-    let layer2Service: Layer2TestWeb3Strategy = this.owner.lookup(
-      'service:layer2-network'
-    ).strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

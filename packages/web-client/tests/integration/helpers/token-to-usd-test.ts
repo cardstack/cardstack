@@ -20,13 +20,17 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   let layer2Strategy!: Layer2TestWeb3Strategy;
   hooks.beforeEach(function () {
     // Simulate being connected on layer 2 -- prereq to converting bridged tokens to USD
-    layer2Service = this.owner.lookup('service:layer2-network');
+    layer2Service = this.owner.lookup(
+      'service:layer2-network'
+    ) as Layer2Network;
     layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
 
     // Simulate being connected on layer 1 -- prereq to converting layer 1 tokens to USD
-    layer1Service = this.owner.lookup('service:layer1-network');
+    layer1Service = this.owner.lookup(
+      'service:layer1-network'
+    ) as Layer1Network;
     layer1Strategy = layer1Service.strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xa1b219c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer1Strategy.test__simulateAccountsChanged(
@@ -191,34 +195,34 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     this.set('tokenSymbol', 'DAI.CPXD');
     this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('24.6');
+    assert.dom(this.element as Element).hasText('24.6');
 
     this.set('inputValue', new BN('223000000000000000000'));
-    assert.dom(this.element).hasText('44.6');
+    assert.dom(this.element as Element).hasText('44.6');
   });
 
   test('it updates conversion result when DAI exchange rate changes', async function (assert) {
     this.set('tokenSymbol', 'DAI.CPXD');
     this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('24.6'); // based on default exchange rate
+    assert.dom(this.element as Element).hasText('24.6'); // based on default exchange rate
 
     layer2Strategy.test__simulatedExchangeRate = 0.3;
     // allow time for TokenToUsd service interval to expire
     await waitUntil(() => this.element.textContent?.trim() !== '24.6');
-    assert.dom(this.element).hasText('36.9');
+    assert.dom(this.element as Element).hasText('36.9');
   });
 
   test('it updates conversion result when ETH exchange rate changes', async function (assert) {
     this.set('tokenSymbol', 'ETH');
     this.set('inputValue', new BN(toWei('2')));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('6000'); // based on default exchange rate
+    assert.dom(this.element as Element).hasText('6000'); // based on default exchange rate
 
     layer1Strategy.test__simulatedExchangeRate = 3052.22;
     // allow time for TokenToUsd service interval to expire
     await waitUntil(() => this.element.textContent?.trim() !== '6000');
-    assert.dom(this.element).hasText('6104.44');
+    assert.dom(this.element as Element).hasText('6104.44');
   });
 
   test('it renders an empty string while the conversion function is not yet set', async function (assert) {
@@ -227,10 +231,10 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     this.set('tokenSymbol', 'DAI.CPXD');
     this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('');
+    assert.dom(this.element as Element).hasText('');
 
     layer2Strategy.test__updateUsdConvertersDeferred.resolve();
     await settled();
-    assert.dom(this.element).hasText('24.6');
+    assert.dom(this.element as Element).hasText('24.6');
   });
 });

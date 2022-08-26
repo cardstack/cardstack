@@ -11,6 +11,7 @@ import { Response as MirageResponse } from 'ember-cli-mirage';
 import BN from 'bn.js';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -34,8 +35,9 @@ module(
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      layer2Service = this.owner.lookup('service:layer2-network')
-        .strategy as Layer2TestWeb3Strategy;
+      layer2Service = (
+        this.owner.lookup('service:layer2-network') as Layer2Network
+      ).strategy as Layer2TestWeb3Strategy;
 
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       prepaidCardAddress = '0x123400000000000000000000000000000000abcd';

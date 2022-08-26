@@ -183,7 +183,7 @@
     Click the button to toggle between <code>memorialized</code> and <code>default</code> states.
   </:description>
   <:example>
-    <Boxel::ActionChin @state={{if this.isComplete 'memorialized' 'default'}}>
+    <Boxel::ActionChin @state={{if this.isComplete "memorialized" "default"}}>
       <:default as |d|>
         <d.ActionButton {{on "click" this.toggleComplete}}>
           Save
@@ -226,7 +226,7 @@
       @state={{this.unlockState}}
     >
       <:default as |a|>
-        <a.ActionButton {{on "click" (fn this.changeState 'in-progress')}}>
+        <a.ActionButton {{on "click" (fn this.changeState "in-progress")}}>
           Unlock
         </a.ActionButton>
       </:default>

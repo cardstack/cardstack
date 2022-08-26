@@ -15,7 +15,7 @@ export default class NetworkAwareWorkflowCard<
 > extends WorkflowCard<T> {
   get layer1Network() {
     let postable = this as WorkflowPostable;
-    let layer1Network = getOwner(postable.workflow).lookup(
+    let layer1Network = getOwner(postable.workflow)?.lookup(
       'service:layer1-network'
     ) as Layer1Network;
     return layer1Network;
@@ -27,7 +27,7 @@ export default class NetworkAwareWorkflowCard<
 
   get hasLayer2Account() {
     let postable = this as WorkflowPostable;
-    let layer2Network = getOwner(postable.workflow).lookup(
+    let layer2Network = getOwner(postable.workflow)?.lookup(
       'service:layer2-network'
     ) as Layer2Network;
     return layer2Network.isConnected;
@@ -35,7 +35,7 @@ export default class NetworkAwareWorkflowCard<
 
   get isHubAuthenticated() {
     let postable = this as WorkflowPostable;
-    let hubAuthentication = getOwner(postable.workflow).lookup(
+    let hubAuthentication = getOwner(postable.workflow)?.lookup(
       'service:hub-authentication'
     ) as HubAuthentication;
     return hubAuthentication.isAuthenticated;

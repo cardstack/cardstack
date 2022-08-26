@@ -25,6 +25,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TransactionReceipt } from 'web3-core';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import { defer } from 'rsvp';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 const startDaiAmountString = '100.1111111111111111';
 let startDaiAmount = toWei(startDaiAmountString);
@@ -41,8 +42,10 @@ module(
     let depotAddress = generateMockAddress();
 
     hooks.beforeEach(async function () {
-      let layer2Service = this.owner.lookup('service:layer2-network');
-      layer2Strategy = layer2Service.strategy;
+      let layer2Service = this.owner.lookup(
+        'service:layer2-network'
+      ) as Layer2Network;
+      layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
       layer2Strategy.test__simulateRemoteAccountSafes(layer2AccountAddress, [
@@ -227,7 +230,9 @@ module(
       setupOnerror(function () {
         // Do nothing - Prevent test from crashing on error
       });
-      let layer2Service = this.owner.lookup('service:layer2-network');
+      let layer2Service = this.owner.lookup(
+        'service:layer2-network'
+      ) as Layer2Network;
       sinon
         .stub(layer2Service, 'bridgeToLayer1')
         .throws(new Error('User rejected request'));
@@ -244,7 +249,9 @@ module(
       setupOnerror(function () {
         // Do nothing - Prevent test from crashing on error
       });
-      let layer2Service = this.owner.lookup('service:layer2-network');
+      let layer2Service = this.owner.lookup(
+        'service:layer2-network'
+      ) as Layer2Network;
       sinon.stub(layer2Service, 'bridgeToLayer1').throws(new Error('Huh?'));
       await renderSubject();
       await fillIn('input', '5');
@@ -258,11 +265,12 @@ module(
     });
 
     test('it can complete and save necessary properties to the workflow session', async function (assert) {
-      let layer2Service: Layer2Network = this.owner.lookup(
+      let layer2Service = this.owner.lookup(
         'service:layer2-network'
-      );
-      let layer1Service = this.owner.lookup('service:layer1-network')
-        .strategy as Layer1TestWeb3Strategy;
+      ) as Layer2Network;
+      let layer1Service = (
+        this.owner.lookup('service:layer1-network') as Layer1Network
+      ).strategy as Layer1TestWeb3Strategy;
       let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
@@ -319,9 +327,9 @@ module(
     });
 
     test('it resumes the transaction to relay tokens if provided with a transaction hash', async function (assert) {
-      let layer2Service: Layer2Network = this.owner.lookup(
+      let layer2Service = this.owner.lookup(
         'service:layer2-network'
-      );
+      ) as Layer2Network;
       let resumeSpy = sinon.spy(layer2Service, 'resumeBridgeToLayer1');
       session.setValue({
         withdrawnAmount: new BN(toWei('12')),

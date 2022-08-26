@@ -1,4 +1,4 @@
-import type { TestContext } from 'ember-test-helpers';
+import type { TestContext } from '@ember/test-helpers';
 import type { Registry } from '@ember/service';
 
 export function lookup<K extends keyof Registry>(

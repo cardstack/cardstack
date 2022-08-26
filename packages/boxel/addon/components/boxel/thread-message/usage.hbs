@@ -161,10 +161,10 @@
           <Boxel::ActionChin
             @state={{if this.isComplete "memorialized" "default"}}>
             <:default as |d|>
-              <d.ActionButton {{on 'click' this.toggleIsComplete}}>Click to toggle card with</d.ActionButton>
+              <d.ActionButton {{on "click" this.toggleIsComplete}}>Click to toggle card with</d.ActionButton>
             </:default>
             <:memorialized as |m|>
-              <m.ActionButton {{on 'click' this.toggleIsComplete}}>Click to toggle card with</m.ActionButton>
+              <m.ActionButton {{on "click" this.toggleIsComplete}}>Click to toggle card with</m.ActionButton>
             </:memorialized>
           </Boxel::ActionChin>
         </Boxel::CardContainer>

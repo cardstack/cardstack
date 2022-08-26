@@ -22,6 +22,7 @@
     "lint:css:fix": "stylelint '**/*.css' --fix",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
+    "lint:glint": "glint",
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test --s --no-launch",

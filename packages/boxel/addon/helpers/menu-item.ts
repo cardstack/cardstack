@@ -40,7 +40,7 @@ export class MenuItem {
 }
 
 export default Helper.helper(function (
-  params: [string, Function?],
+  params: [string, (() => void)?],
   hash: MenuItemOptions
 ) {
   let text = params[0];

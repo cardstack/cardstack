@@ -12,6 +12,8 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 module('Acceptance | Connect Wallet', function (hooks) {
   setupApplicationTest(hooks);
@@ -26,8 +28,9 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     await click('[data-test-wallet-option="metamask"]');
     await click(
       '[data-test-mainnnet-connection-action-container] [data-test-boxel-button]'
@@ -61,8 +64,9 @@ module('Acceptance | Connect Wallet', function (hooks) {
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
 
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
