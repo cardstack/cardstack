@@ -551,10 +551,10 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     console.log(
       `Claiming ${unclaimedValidProofsWithoutCryptoDust.length} out of ${unclaimedValidProofs.length} proofs`
     );
-    return this.claimAllProofs(unclaimedValidProofsWithoutCryptoDust, safeAddress, txnOptions, contractOptions);
+    return this.claimProofs(unclaimedValidProofsWithoutCryptoDust, safeAddress, txnOptions, contractOptions);
   }
 
-  async claimAllProofs(
+  async claimProofs(
     unclaimedValidProofs: WithSymbol<Proof>[],
     safeAddress: string,
     txnOptions?: TransactionOptions,
