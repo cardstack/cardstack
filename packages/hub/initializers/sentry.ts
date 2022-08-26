@@ -3,8 +3,10 @@ import { NodeOptions } from '@sentry/node/types/types';
 import config from 'config';
 import packageJson from '../package.json';
 import { ExtraErrorData as ExtraErrorDataIntegration } from '@sentry/integrations';
-import { Event, EventHint } from '@sentry/types';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+
+// eslint-disable-next-line node/no-unpublished-import
+import { Event, EventHint } from '@sentry/types';
 
 export default function initSentry() {
   if (config.get('sentry.enabled')) {
