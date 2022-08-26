@@ -7,6 +7,7 @@ import BN from 'bn.js';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 const HEADER_SELECTOR = '[data-test-action-card-title="layer-one-connect"]';
 const CONNECT_BUTTON_SELECTOR = '[data-test-mainnet-connect-button]';
@@ -70,8 +71,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test("It should render the wallet provider's name if it is connected before rendering", async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
 
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
 
@@ -83,8 +85,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should show all nonzero token balances, and an appropriate message if there are none', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
 
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     layer1Service.test__simulateBalances({
@@ -133,8 +136,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should be able to move between default (unconnected), loading, and connected states', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
 
     await render(hbs`
         <CardPay::LayerOneConnectCard/>
@@ -168,7 +172,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should persist L1 address in workflow session if the wallet is already connected', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     let session = new WorkflowSession();
     this.setProperties({ session });
@@ -184,7 +190,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should persist L1 address in workflow session after the wallet is connected', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     let session = new WorkflowSession();
     this.setProperties({ session });
 

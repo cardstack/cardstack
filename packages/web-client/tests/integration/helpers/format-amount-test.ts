@@ -10,6 +10,6 @@ module('Integration | Helper | format-amount', function (hooks) {
     this.set('inputValue', 23.240000000000002);
 
     await render(hbs`{{format-amount this.inputValue}} `);
-    assert.dom(this.element).hasText('23.24');
+    assert.dom(this.element as Element).hasText('23.24');
   });
 });

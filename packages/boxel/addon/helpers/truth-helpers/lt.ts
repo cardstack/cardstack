@@ -1,6 +1,9 @@
 import { helper } from '@ember/component/helper';
 
-export function lt([left, right], hash) {
+export function lt(
+  [left, right]: [unknown, unknown],
+  hash: { forceNumber?: boolean }
+): boolean {
   if (hash.forceNumber) {
     if (typeof left !== 'number') {
       left = Number(left);
@@ -9,7 +12,8 @@ export function lt([left, right], hash) {
       right = Number(right);
     }
   }
-  return left < right;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (left as any) < (right as any);
 }
 
 export default helper(lt);

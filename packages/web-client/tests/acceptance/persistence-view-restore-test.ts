@@ -33,6 +33,8 @@ import { WORKFLOW_VERSION as PROFILE_CREATION_WORKFLOW_VERSION } from '@cardstac
 import { WORKFLOW_VERSION as PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import BN from 'bn.js';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -46,16 +48,18 @@ module('Acceptance | persistence view and restore', function () {
 
     hooks.beforeEach(async function (this: Context) {
       let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-      let layer1Service = this.owner.lookup('service:layer1-network')
-        .strategy as Layer1TestWeb3Strategy;
+      let layer1Service = (
+        this.owner.lookup('service:layer1-network') as Layer1Network
+      ).strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
         'metamask'
       );
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-      let layer2Service = this.owner.lookup('service:layer2-network')
-        .strategy as Layer2TestWeb3Strategy;
+      let layer2Service = (
+        this.owner.lookup('service:layer2-network') as Layer2Network
+      ).strategy as Layer2TestWeb3Strategy;
       let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         tokens: [createSafeToken('CARD.CPXD', '500000000000000000000')],
@@ -66,9 +70,9 @@ module('Acceptance | persistence view and restore', function () {
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      let profileRegistrationFee = await this.owner
-        .lookup('service:layer2-network')
-        .strategy.fetchProfileRegistrationFee();
+      let profileRegistrationFee = await (
+        this.owner.lookup('service:layer2-network') as Layer2Network
+      ).strategy.fetchProfileRegistrationFee();
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
@@ -83,7 +87,7 @@ module('Acceptance | persistence view and restore', function () {
 
       workflowPersistenceService = this.owner.lookup(
         'service:workflow-persistence'
-      );
+      ) as WorkflowPersistence;
 
       workflowPersistenceService.clear();
     });
@@ -459,16 +463,18 @@ module('Acceptance | persistence view and restore', function () {
       test('it lists existing persisted Card Pay workflows', async function (this: Context, assert) {
         let layer1AccountAddress =
           '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-        let layer1Service = this.owner.lookup('service:layer1-network')
-          .strategy as Layer1TestWeb3Strategy;
+        let layer1Service = (
+          this.owner.lookup('service:layer1-network') as Layer1Network
+        ).strategy as Layer1TestWeb3Strategy;
         layer1Service.test__simulateAccountsChanged(
           [layer1AccountAddress],
           'metamask'
         );
         let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-        let layer2Service = this.owner.lookup('service:layer2-network')
-          .strategy as Layer2TestWeb3Strategy;
+        let layer2Service = (
+          this.owner.lookup('service:layer2-network') as Layer2Network
+        ).strategy as Layer2TestWeb3Strategy;
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
         await visit('/card-pay/');
@@ -493,8 +499,9 @@ module('Acceptance | persistence view and restore', function () {
 
         let layer1AccountAddress =
           '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-        let layer1Service = this.owner.lookup('service:layer1-network')
-          .strategy as Layer1TestWeb3Strategy;
+        let layer1Service = (
+          this.owner.lookup('service:layer1-network') as Layer1Network
+        ).strategy as Layer1TestWeb3Strategy;
         layer1Service.test__simulateAccountsChanged(
           [layer1AccountAddress],
           'metamask'
@@ -507,15 +514,16 @@ module('Acceptance | persistence view and restore', function () {
 
         let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-        let layer2Service = this.owner.lookup('service:layer2-network')
-          .strategy as Layer2TestWeb3Strategy;
+        let layer2Service = (
+          this.owner.lookup('service:layer2-network') as Layer2Network
+        ).strategy as Layer2TestWeb3Strategy;
         await layer2Service.test__simulateAccountsChanged([
           layer2AccountAddress,
         ]);
 
-        let profileRegistrationFee = await this.owner
-          .lookup('service:layer2-network')
-          .strategy.fetchProfileRegistrationFee();
+        let profileRegistrationFee = await (
+          this.owner.lookup('service:layer2-network') as Layer2Network
+        ).strategy.fetchProfileRegistrationFee();
 
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           createPrepaidCardSafe({
@@ -583,8 +591,9 @@ module('Acceptance | persistence view and restore', function () {
 
         let layer1AccountAddress =
           '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-        let layer1Service = this.owner.lookup('service:layer1-network')
-          .strategy as Layer1TestWeb3Strategy;
+        let layer1Service = (
+          this.owner.lookup('service:layer1-network') as Layer1Network
+        ).strategy as Layer1TestWeb3Strategy;
         layer1Service.test__simulateAccountsChanged(
           [layer1AccountAddress],
           'metamask'
@@ -597,13 +606,14 @@ module('Acceptance | persistence view and restore', function () {
 
         let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-        let layer2Service = this.owner.lookup('service:layer2-network')
-          .strategy as Layer2TestWeb3Strategy;
+        let layer2Service = (
+          this.owner.lookup('service:layer2-network') as Layer2Network
+        ).strategy as Layer2TestWeb3Strategy;
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-        let profileRegistrationFee = await this.owner
-          .lookup('service:layer2-network')
-          .strategy.fetchProfileRegistrationFee();
+        let profileRegistrationFee = await (
+          this.owner.lookup('service:layer2-network') as Layer2Network
+        ).strategy.fetchProfileRegistrationFee();
 
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           createDepotSafe({

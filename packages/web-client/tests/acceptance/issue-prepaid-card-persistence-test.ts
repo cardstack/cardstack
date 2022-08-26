@@ -33,6 +33,7 @@ import {
   convertAmountToNativeDisplay,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
 const MIN_AMOUNT_TO_PASS = new BN(
@@ -54,8 +55,9 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
-    layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
@@ -73,7 +75,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     workflowPersistenceService.clear();
   });

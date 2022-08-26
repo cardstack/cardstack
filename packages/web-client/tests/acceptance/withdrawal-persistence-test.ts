@@ -21,6 +21,7 @@ import {
   WORKFLOW_VERSION,
 } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 interface Context extends MirageTestContext {}
 
@@ -34,11 +35,12 @@ module('Acceptance | withdrawal persistence', function (hooks) {
   hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = this.owner.lookup('service:layer1-network')
-      .strategy as Layer1TestWeb3Strategy;
+    let layer1Service = (
+      this.owner.lookup('service:layer1-network') as Layer1Network
+    ).strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
       'metamask'
@@ -50,8 +52,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     });
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let layer2Service = this.owner.lookup('service:layer2-network')
-      .strategy as Layer2TestWeb3Strategy;
+    let layer2Service = (
+      this.owner.lookup('service:layer2-network') as Layer2Network
+    ).strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: withdrawalSafeAddress,
@@ -359,7 +362,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       });
       let layer2Network: Layer2Network = this.owner.lookup(
         'service:layer2-network'
-      );
+      ) as Layer2Network;
       layer2Network.strategy.bridgeToLayer1(
         '0xsource',
         '0xdestination',
@@ -420,8 +423,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         state,
       });
 
-      let layer2Service = this.owner.lookup('service:layer2-network')
-        .strategy as Layer2TestWeb3Strategy;
+      let layer2Service = (
+        this.owner.lookup('service:layer2-network') as Layer2Network
+      ).strategy as Layer2TestWeb3Strategy;
 
       layer2Service.bridgeToLayer1(
         '0xsource',
