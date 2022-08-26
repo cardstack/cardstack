@@ -1183,7 +1183,8 @@ CREATE TABLE public.scheduled_payments (
     cancelation_transaction_hash text,
     cancelation_block_number bigint,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    canceled_at timestamp without time zone
 );
 
 
@@ -1597,6 +1598,13 @@ CREATE INDEX reservations_user_address_index ON public.reservations USING btree 
 --
 
 CREATE INDEX scheduled_payment_attempts_scheduled_payment_id_index ON public.scheduled_payment_attempts USING btree (scheduled_payment_id);
+
+
+--
+-- Name: scheduled_payments_canceled_at_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payments_canceled_at_index ON public.scheduled_payments USING btree (canceled_at);
 
 
 --

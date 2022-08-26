@@ -278,14 +278,14 @@ model Profile {
 }
 
 model ScheduledPaymentAttempt {
-  id                 String                             @id @db.Uuid
-  startedAt          DateTime?                          @map("started_at") @db.Timestamp(6)
-  endedAt            DateTime?                          @map("ended_at") @db.Timestamp(6)
-  status             ScheduledPaymentAttemptsStatusEnum @default(in_progress)
-  transactionHash    String?                            @map("transaction_hash")
-  failureReason      String?                            @map("failure_reason")
-  scheduledPaymentId String                             @map("scheduled_payment_id") @db.Uuid
-  scheduledPayment   ScheduledPayment                   @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                 String                            @id @db.Uuid
+  startedAt          DateTime?                         @map("started_at") @db.Timestamp(6)
+  endedAt            DateTime?                         @map("ended_at") @db.Timestamp(6)
+  status             ScheduledPaymentAttemptStatusEnum @default(inProgress)
+  transactionHash    String?                           @map("transaction_hash")
+  failureReason      String?                           @map("failure_reason")
+  scheduledPaymentId String                            @map("scheduled_payment_id") @db.Uuid
+  scheduledPayment   ScheduledPayment                  @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([scheduledPaymentId], map: "scheduled_payment_attempts_scheduled_payment_id_index")
   @@map("scheduled_payment_attempts")
@@ -298,8 +298,8 @@ model ScheduledPayment {
   tokenAddress               String                    @map("token_address")
   amount                     BigInt
   payeeAddress               String                    @map("payee_address")
-  executionGasEstimation     BigInt
-  maxGasPrice                BigInt
+  executionGasEstimation     BigInt                    @map("execution_gas_estimation")
+  maxGasPrice                BigInt                    @map("max_gas_price")
   feeFixedUsd                Int                       @map("fee_fixed_usd")
   feePercentage              Int                       @map("fee_percentage")
   nonce                      String
@@ -310,14 +310,16 @@ model ScheduledPayment {
   spHash                     String                    @unique @map("sp_hash")
   chainId                    Int                       @map("chain_id")
   creationTransactionHash    String?                   @map("creation_transaction_hash")
-  creationBlockNumber        BigInt?
+  creationBlockNumber        BigInt?                   @map("creation_block_number")
   cancelationTransactionHash String?                   @map("cancelation_transaction_hash")
-  cancelationBlockNumber     BigInt?
+  cancelationBlockNumber     BigInt?                   @map("cancelation_block_number")
   createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
+  canceledAt                 DateTime?                 @map("canceled_at") @db.Timestamp(6)
   scheduledPaymentAttempts   ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")
+  @@index([canceledAt], map: "scheduled_payments_canceled_at_index")
   @@map("scheduled_payments")
 }
 
@@ -356,8 +358,8 @@ enum WalletOrdersStatusEnum {
   @@map("wallet_orders_status_enum")
 }
 
-enum ScheduledPaymentAttemptsStatusEnum {
-  in_progress
+enum ScheduledPaymentAttemptStatusEnum {
+  inProgress @map("in_progress")
   succeeded
   failed
 
