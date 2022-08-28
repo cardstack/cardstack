@@ -13,6 +13,7 @@
     }
   },
   "dependencies": {
+    "@ethersproject/solidity": "^5.7.0",
     "@truffle/hdwallet-provider": "^1.5.0",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
     "@types/bn.js": "^5.1.0",

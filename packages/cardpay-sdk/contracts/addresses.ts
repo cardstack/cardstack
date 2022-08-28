@@ -32,11 +32,19 @@ consumeModule(RegisterRewardeeHandlerABI);
 consumeModule(SupplierManagerABI);
 
 const KOVAN = {
+  gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
+  gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   cardToken: '0x17d030616A9879C1Bc7e8764E9D80Ec289d4C7AE',
   daiToken: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
   foreignBridge: '0x97bb40db0fb70eeb4e2121b6d708bd91ec4d1a43',
   foreignAMB: '0xFe446bEF1DbF7AFE24E81e05BC8B271C1BA9a560',
   chainlinkEthToUsd: '0x9326BFA02ADD2366b30bacB125260Af641031331',
+  scheduledPaymentConfig: '0x9d4bd5b2e8145B18813c7239d6C86beE7920824B',
+  scheduledPaymentExchange: '0x63f0A6a12fE77b8fCe4E1bf10344d16F6318CF56',
+  scheduledPaymentModule: '0x1e107Ce56E66931dEcF503D5F7e7F3C239A26B0a',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
 };
 const SOKOL = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
@@ -76,6 +84,9 @@ const SOKOL = {
     DAI: '0x01264C442aC3A70953509eed0d475a9c1182307f',
     CARD: '0x0631326B1AEA3f7B864b5Fc9f1C5e025B8a2945F',
   },
+  scheduledPaymentConfig: '',
+  scheduledPaymentExchange: '',
+  scheduledPaymentModule: '',
 };
 
 const MAINNET = {
@@ -84,6 +95,9 @@ const MAINNET = {
   foreignBridge: '0x95d4FAe56F49c2FE6700A7135B6fb7a5aBA5a450',
   foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
+  scheduledPaymentConfig: '',
+  scheduledPaymentExchange: '',
+  scheduledPaymentModule: '',
 };
 const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
@@ -123,7 +137,11 @@ const GNOSIS = {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
+  scheduledPaymentConfig: '',
+  scheduledPaymentExchange: '',
+  scheduledPaymentModule: '',
 };
+
 const addresses: {
   [network: string]: {
     [contractName: string]: string | { [tokenName: string]: string };
