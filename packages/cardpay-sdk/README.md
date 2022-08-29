@@ -55,6 +55,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalances`](#rewardpoolrewardtokenbalances)
+  - [`RewardPool.rewardTokenBalancesWithoutDust`](#rewardpoolrewardtokenbalanceswithoutdust)
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
   - [`RewardPool.rewardProgramBalances`](#rewardpoolrewardprogrambalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
