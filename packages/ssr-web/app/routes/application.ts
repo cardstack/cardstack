@@ -7,6 +7,7 @@ import { isTesting } from '@embroider/macros';
 import { getSentry } from '../utils/sentry';
 import { action } from '@ember/object';
 import Transition from '@ember/routing/-private/transition';
+import { NotFoundError } from './not-found';
 
 export default class ApplicationRoute extends Route {
   @service('profile') declare profile: ProfileService;
@@ -49,7 +50,9 @@ export default class ApplicationRoute extends Route {
   @action error(error: any, _transition: Transition<unknown>): true {
     // Handle uncaught errors and then bubble them up so they can be handled
     // by the application error route
-    this.sentry.captureException(error);
+    if (error != NotFoundError) {
+      this.sentry.captureException(error);
+    }
     return true;
   }
 }
