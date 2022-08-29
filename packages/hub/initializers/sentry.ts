@@ -3,7 +3,12 @@ import { NodeOptions } from '@sentry/node/types/types';
 import config from 'config';
 import packageJson from '../package.json';
 import { ExtraErrorData as ExtraErrorDataIntegration } from '@sentry/integrations';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime';
 
 // eslint-disable-next-line node/no-unpublished-import
 import { Event, EventHint } from '@sentry/types';
@@ -28,19 +33,40 @@ export default function initSentry() {
   }
 }
 
+const errorClassesToReport = [
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientInitializationError,
+];
+
+const errorClassesToAlert = [
+  PrismaClientUnknownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientInitializationError,
+];
+
 export class SentryPrisma {
   public readonly name = 'SentryPrisma';
   public static id = 'SentryPrisma';
 
   setupOnce() {
     Sentry.addGlobalEventProcessor((event: Event, hint?: EventHint) => {
-      if (hint?.originalException instanceof PrismaClientKnownRequestError) {
-        let prismaError = hint.originalException as PrismaClientKnownRequestError;
+      let originalException = hint?.originalException as any;
 
+      if (originalException && errorClassesToReport.some((errorClass) => originalException instanceof errorClass)) {
         event.tags ??= {};
-        event.tags['prisma.error_code'] = prismaError.code;
+        event.tags['prisma.error_message'] = originalException.message;
 
-        let errorShouldTriggerAlert = prismaError.code.startsWith('P1');
+        let errorShouldTriggerAlert = false;
+
+        if (originalException.code) {
+          event.tags['prisma.error_code'] = originalException.code;
+
+          errorShouldTriggerAlert = originalException.code.startsWith('P1');
+        } else {
+          errorShouldTriggerAlert = errorClassesToAlert.some((errorClass) => originalException instanceof errorClass);
+        }
 
         if (errorShouldTriggerAlert) {
           event.tags.alert = 'web-team';
