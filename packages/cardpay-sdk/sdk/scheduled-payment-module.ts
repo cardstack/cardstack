@@ -5,7 +5,7 @@ import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-modu
 import { getAddress } from '../contracts/addresses';
 import { AbiItem, fromWei } from 'web3-utils';
 import { deployAndSetUpModule, encodeMultiSend } from './utils/module-utils';
-import { TransactionOptions, waitForTransactionConsistency } from './utils/general-utils';
+import { TransactionOptions } from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { Signer } from 'ethers';
@@ -72,7 +72,7 @@ export default class ScheduledPaymentModule {
         safeAddress,
         multiSendTransaction.to,
         multiSendTransaction.data,
-        Operation.CALL,
+        multiSendTransaction.operation,
         estimate,
         nonce,
         from,
@@ -87,7 +87,6 @@ export default class ScheduledPaymentModule {
     return {
       scheduledPaymentModuleAddress: enableModuleTxs.expectedModuleAddress,
       metaGuardAddress: setGuardTxs.expectedModuleAddress,
-      txnReceipt: await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce),
     };
   }
 
