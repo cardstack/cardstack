@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import './usage.css';
-import { ActionChinState } from './index';
+import { type ActionChinState } from './state';
 import { EmptyObject } from '@ember/component/helper';
 
 let inProgressTimeout: number;

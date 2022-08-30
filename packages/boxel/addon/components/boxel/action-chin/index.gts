@@ -12,17 +12,7 @@ import { concat, hash } from '@ember/helper';
 import and from 'ember-truth-helpers/helpers/and';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { ComponentLike, WithBoundArgs } from '@glint/template';
-
-export type ActionChinState =
-  // state before the cta has been activated/the action done
-  'default' |
-  // disabled state - currently visually corresponds to the default state.
-  // design has no immediate plans to make a disabled state for the memorialized cta
-  'disabled' |
-  // in progress state - action has been taken, but not completed
-  'in-progress' |
-  // memorialized state - requirement for CTA has been met
-  'memorialized';
+import { type ActionChinState} from './state';
 
 interface DefaultBlockArgs {
   ActionButton: WithBoundArgs<typeof BoxelButton, 'kind'|'disabled'>;
@@ -48,7 +38,7 @@ interface Signature {
   Element: HTMLDivElement;
   Args: {
     stepNumber?: number;
-    state: ActionChinState | 'default' | 'memorialized' | 'in-progress';
+    state: ActionChinState;
     disabled?: boolean;
   };
   Blocks: {

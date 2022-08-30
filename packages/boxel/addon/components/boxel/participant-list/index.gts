@@ -7,7 +7,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelParticipant from '../participant';
-import { Participant } from '../participants-summary';
+import { Participant } from '../participant/model';
 import eq from 'ember-truth-helpers/helpers/eq';
 import lt from 'ember-truth-helpers/helpers/lt';
 import or from 'ember-truth-helpers/helpers/or';
