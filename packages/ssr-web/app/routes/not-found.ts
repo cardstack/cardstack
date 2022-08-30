@@ -3,7 +3,9 @@ import { inject as service } from '@ember/service';
 import ProfileService from '@cardstack/ssr-web/services/profile';
 import RouterService from '@ember/routing/router-service';
 
-export const NotFoundError = new Error('404: Not Found');
+export class NotFoundError extends Error {
+  message = '404: Not Found';
+}
 
 export default class NotFoundRoute extends Route {
   @service declare router: RouterService;
@@ -13,7 +15,7 @@ export default class NotFoundRoute extends Route {
     if (this.profile.isActive) {
       this.router.transitionTo('index');
     } else {
-      throw NotFoundError;
+      throw new NotFoundError();
     }
   }
 }

@@ -50,7 +50,7 @@ export default class ApplicationRoute extends Route {
   @action error(error: any, _transition: Transition<unknown>): true {
     // Handle uncaught errors and then bubble them up so they can be handled
     // by the application error route
-    if (error != NotFoundError) {
+    if (!(error instanceof NotFoundError)) {
       this.sentry.captureException(error);
     }
     return true;
