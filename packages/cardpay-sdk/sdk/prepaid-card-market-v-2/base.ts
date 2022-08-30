@@ -121,6 +121,7 @@ export default class PrepaidCardMarketV2 {
         issuerSafeAddress,
         tokenAddress,
         payload,
+        Operation.CALL,
         estimate,
         nonce,
         from,

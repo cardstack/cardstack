@@ -174,6 +174,7 @@ export default class RevenuePool {
         merchantSafeAddress,
         revenuePoolAddress,
         payload,
+        Operation.CALL,
         estimate,
         nonce,
         from,

@@ -9,11 +9,9 @@ import { TransactionOptions, waitForTransactionConsistency } from './utils/gener
 import { ContractOptions } from 'web3-eth-contract';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { Signer } from 'ethers';
-import { signSafeTxAsRSV } from './utils/signing-utils';
+import { signSafeTx } from './utils/signing-utils';
 import { BN } from 'bn.js';
 import { ERC20ABI } from '..';
-import { ZERO_ADDRESS } from './constants';
-
 export default class ScheduledPaymentModule {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
@@ -61,22 +59,6 @@ export default class ScheduledPaymentModule {
         onNonce(nonce);
       }
     }
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      multiSendTransaction.to,
-      0,
-      multiSendTransaction.data,
-      multiSendTransaction.operation,
-      estimate.safeTxGas,
-      estimate.baseGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      safeAddress,
-      this.layer2Signer
-    );
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
@@ -85,7 +67,17 @@ export default class ScheduledPaymentModule {
       multiSendTransaction.operation,
       estimate,
       nonce,
-      signatures
+      await signSafeTx(
+        this.layer2Web3,
+        safeAddress,
+        multiSendTransaction.to,
+        multiSendTransaction.data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
     );
 
     if (typeof onTxnHash === 'function') {

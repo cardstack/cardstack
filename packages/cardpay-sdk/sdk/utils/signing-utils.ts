@@ -50,11 +50,13 @@ export async function signPrepaidCardSendTx(
   );
   return signatures;
 }
+
 export async function signSafeTx(
   web3: Web3,
   safeAddress: string,
   to: string,
   data: string,
+  operation: Operation,
   estimate: Estimate,
   nonce: BN,
   from: string,
@@ -65,7 +67,7 @@ export async function signSafeTx(
     to,
     0,
     data,
-    Operation.CALL,
+    operation ? operation : Operation.CALL,
     estimate.safeTxGas,
     estimate.dataGas,
     estimate.gasPrice,

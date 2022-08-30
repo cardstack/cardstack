@@ -16,14 +16,12 @@ export interface Transaction {
   operation: Operation;
 }
 
-export async function deployAndSetUpModule(
-  web3: Web3,
-  masterCopy: Contract,
-  setupArgs: {
-    types: string[];
-    values: any[];
-  }
-) {
+export interface SetupArgs {
+  types: string[];
+  values: any[];
+}
+
+export async function deployAndSetUpModule(web3: Web3, masterCopy: Contract, setupArgs: SetupArgs) {
   let factory = new web3.eth.Contract(ModuleProxyFactoryABI as AbiItem[], await getAddress('moduleProxyFactory', web3));
 
   let encodeInitParams = web3.eth.abi.encodeParameters(setupArgs.types, setupArgs.values);
@@ -80,10 +78,13 @@ export async function encodeMultiSend(web3: Web3, transactions: readonly Transac
   };
 }
 
-const encodePacked = (tx: any) =>
-  pack(
+function encodePacked(tx: Transaction) {
+  return pack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [tx.operation || Operation.CALL, tx.to, tx.value, hexDataLength(tx.data), tx.data]
   );
+}
 
-const remove0x = (hexString: string) => hexString.substr(2);
+function remove0x(hexString: string) {
+  return hexString.replace(/^0x/, '');
+}
