@@ -55,6 +55,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalances`](#rewardpoolrewardtokenbalances)
+  - [`RewardPool.rewardTokenBalancesWithoutDust`](#rewardpoolrewardtokenbalanceswithoutdust)
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
   - [`RewardPool.rewardProgramBalances`](#rewardpoolrewardprogrambalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
@@ -752,10 +753,23 @@ interface RewardTokenBalance {
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
 let balanceForAllTokens = await rewardPool.rewardTokenBalances(address, rewardProgramId)
-// You can also use `rewardTokenBalance` for a single token
-let balanceForSingleToken = await rewardPool.rewardTokenBalance(address,tokenAddress,rewardProgramId);
 ```
 
+### `RewardPool.rewardTokenBalancesWithoutDust`
+This call is exactly the same as `RewardPool.rewardTokenBalances` except it excludes `rewardAmount < gasFees` (crypto dust).
+
+```ts
+interface RewardTokenBalance {
+  rewardProgramId: string,
+  tokenAddress: string;
+  balance: BN;
+}
+```
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+let balanceForAllTokens = await rewardPool.rewardTokenBalancesWithoutDust(address, rewardSafe, rewardProgramId?)
+```
 
 ### `RewardPool.addRewardTokens`
 
@@ -796,12 +810,11 @@ The leaf item contains most information about the claim, such as the reward prog
 
 ### `RewardPool.claimAll`
 
-The `claimAll` is used by the rewardee to claim all rewards from a list of proofs. The looping occurs as separate transactions so the failure of one transaction will lead to the failure of all transactions after it (transactions before it will stil succeed). Proofs which have claims `rewardAmount < gasFees` will be excluded; this filter is to decrease the probability of `claimAll` failing.
+The `claimAll` is used by the rewardee to claim all rewards from a list of proofs. The looping occurs as separate transactions so the failure of one transaction will lead to the failure of all transactions after it (transactions before it will stil succeed). Proofs which have claims `rewardAmount < gasFees` (crypto dust) will be excluded; this filter is to decrease the probability of `claimAll` failing.
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
-await rewardManagerAPI.claimAll(unclaimedValidProofs)
+await rewardManagerAPI.claimAll(rewardSafe, rewardProgramId?, tokenAddress?)
 ```
 
 ### `RewardPool.claimGasEstimate`
@@ -822,7 +835,7 @@ await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acc
 
 ### `RewardPool.claimAllGasEstimate`
 
-The `claimAllGasEstimate` returns a cumulative gas estimate for a single token -- it accmulates `claimGasEstimate` calls from a list of proofs. This function complements `claimAll` in that it will also filter out proofs which have claims `rewardAmount < gasFees`. The SDK also assumes that all the proofs have a common token. 
+The `claimAllGasEstimate` returns a cumulative gas estimate for a single token -- it accmulates `claimGasEstimate` calls from a list of proofs. This function complements `claimAll` in that it will also filter out proofs which have claims `rewardAmount < gasFees`(crypto dust). 
 
 ```ts
 interface GasEstimate {
@@ -833,8 +846,7 @@ interface GasEstimate {
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-let unclaimedValidProofs = await rewardPool.getProofs(address, rewardSafe, rewardProgramId, tokenAddress, false);
-await rewardManagerAPI.claimAllGasEstimate(unclaimedValidProofs)
+await rewardManagerAPI.claimAllGasEstimate(rewardSafe, tokenAddress, rewardProgramId?)
 ```
 
 

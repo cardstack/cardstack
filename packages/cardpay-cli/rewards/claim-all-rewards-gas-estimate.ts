@@ -6,7 +6,7 @@ import Web3 from 'web3';
 const { fromWei } = Web3.utils;
 
 export default {
-  command: 'claim-all-rewards-gas-estimate <rewardSafe> [tokenAddress] [rewardProgramId]',
+  command: 'claim-all-rewards-gas-estimate <rewardSafe> <tokenAddress> [rewardProgramId]',
   describe: 'Obtain a gas estimate to claim all rewards corresponding to a rewardProgrmaId and tokenAddress',
   builder(yargs: Argv) {
     return yargs

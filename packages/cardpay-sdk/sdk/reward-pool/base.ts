@@ -175,15 +175,18 @@ export default class RewardPool {
     const proofs = await this.addTokenSymbol(res);
     if (safeAddress) {
       // if safeAddress is provided, we need to estimate gas of each proof claim
+      // when gas estimation is performed, we filter out proofs that are not valid
       const proofsWithGasFees = await Promise.all(
-        proofs.map(async (proof) => {
-          const gasEstimate = await this.claimGasEstimate(safeAddress, proof.leaf, proof.proofArray, false);
-          return {
-            ...proof,
-            gasEstimate,
-            safeAddress,
-          };
-        })
+        proofs
+          .filter((o) => o.isValid)
+          .map(async (proof) => {
+            const gasEstimate = await this.claimGasEstimate(safeAddress, proof.leaf, proof.proofArray, false);
+            return {
+              ...proof,
+              gasEstimate,
+              safeAddress,
+            };
+          })
       );
       return proofsWithGasFees;
     } else {

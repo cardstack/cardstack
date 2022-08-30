@@ -33,10 +33,16 @@ export default class AppContext extends Service implements AppContextService {
   );
 
   get host() {
-    let host = this.fastboot.isFastBoot
-      ? this.fastboot.request.host
-      : window.location.host;
-    return host;
+    if (this.fastboot.isFastBoot) {
+      try {
+        return this.fastboot.request.host;
+      } catch (e: any) {
+        // Ignore Fastboot error when the host is not on the safelist
+        return '';
+      }
+    } else {
+      return window.location.host;
+    }
   }
 
   get hostIsPreview() {
