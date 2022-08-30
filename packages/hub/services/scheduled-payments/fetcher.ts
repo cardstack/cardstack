@@ -25,7 +25,7 @@ export default class ScheduledPaymentsFetcherService {
           gt: 0,
         },
         payAt: {
-          gt: startOfDay(subDays(new Date(), this.validForDays)),
+          gt: startOfDay(subDays(nowUtc, this.validForDays)),
           lte: nowUtc,
         },
         OR: [
