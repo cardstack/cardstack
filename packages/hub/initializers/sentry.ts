@@ -46,6 +46,8 @@ const errorClassesToAlert = [
   PrismaClientInitializationError,
 ];
 
+const errorClassesToPage = [PrismaClientInitializationError, PrismaClientRustPanicError];
+
 export class SentryPrisma {
   public readonly name = 'SentryPrisma';
   public static id = 'SentryPrisma';
@@ -70,6 +72,12 @@ export class SentryPrisma {
 
         if (errorShouldTriggerAlert) {
           event.tags.alert = 'web-team';
+        }
+
+        let errorShouldTriggerPage = errorClassesToPage.some((errorClass) => originalException instanceof errorClass);
+
+        if (errorShouldTriggerPage) {
+          event.tags.page = 'on-call';
         }
       }
       return event;
